@@ -1,0 +1,71 @@
+### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
+
+use strict;
+use warnings;
+
+use Test::More;
+
+use Crypt::Mac::HMAC qw( hmac hmac_hex hmac_b64 );
+
+is( unpack('H*', Crypt::Mac::HMAC->new('SHA1','secretkey')->add("")->mac), '3353ae0208558692a0cce27396e07165ea76f969', 'HMAC/oo+raw/1');
+is( Crypt::Mac::HMAC->new('SHA1','secretkey')->add("")->hexmac, '3353ae0208558692a0cce27396e07165ea76f969', 'HMAC/oo+hex/1');
+is( unpack('H*', hmac('SHA1','secretkey',"")), '3353ae0208558692a0cce27396e07165ea76f969', 'HMAC/func+raw/1');
+is( hmac_hex('SHA1','secretkey',""), '3353ae0208558692a0cce27396e07165ea76f969', 'HMAC/func+hex/1');
+is( hmac_b64('SHA1','secretkey',""), 'M1OuAghVhpKgzOJzluBxZep2+Wk=', 'HMAC/func+b64/1');
+is( unpack('H*', Crypt::Mac::HMAC->new('SHA512','secretkey')->add("")->mac), '683f73ef2765ef315191ac32b1b4438bf5c2c6d0de8999574eeb522f902f02e1ef7f413cd615f07738a9d8be8250e0abfb78368dd487c03639f56ece28ca8c6c', 'HMAC/oo+raw/2');
+is( Crypt::Mac::HMAC->new('SHA512','secretkey')->add("")->hexmac, '683f73ef2765ef315191ac32b1b4438bf5c2c6d0de8999574eeb522f902f02e1ef7f413cd615f07738a9d8be8250e0abfb78368dd487c03639f56ece28ca8c6c', 'HMAC/oo+hex/2');
+is( unpack('H*', hmac('SHA512','secretkey',"")), '683f73ef2765ef315191ac32b1b4438bf5c2c6d0de8999574eeb522f902f02e1ef7f413cd615f07738a9d8be8250e0abfb78368dd487c03639f56ece28ca8c6c', 'HMAC/func+raw/2');
+is( hmac_hex('SHA512','secretkey',""), '683f73ef2765ef315191ac32b1b4438bf5c2c6d0de8999574eeb522f902f02e1ef7f413cd615f07738a9d8be8250e0abfb78368dd487c03639f56ece28ca8c6c', 'HMAC/func+hex/2');
+is( hmac_b64('SHA512','secretkey',""), 'aD9z7ydl7zFRkawysbRDi/XCxtDeiZlXTutSL5AvAuHvf0E81hXwdzip2L6CUOCr+3g2jdSHwDY59W7OKMqMbA==', 'HMAC/func+b64/2');
+is( unpack('H*', Crypt::Mac::HMAC->new('Tiger192','secretkey')->add("")->mac), 'f8a326890e07530aaf7eb1b60c4e10bfa4c875550ba8683e', 'HMAC/oo+raw/3');
+is( Crypt::Mac::HMAC->new('Tiger192','secretkey')->add("")->hexmac, 'f8a326890e07530aaf7eb1b60c4e10bfa4c875550ba8683e', 'HMAC/oo+hex/3');
+is( unpack('H*', hmac('Tiger192','secretkey',"")), 'f8a326890e07530aaf7eb1b60c4e10bfa4c875550ba8683e', 'HMAC/func+raw/3');
+is( hmac_hex('Tiger192','secretkey',""), 'f8a326890e07530aaf7eb1b60c4e10bfa4c875550ba8683e', 'HMAC/func+hex/3');
+is( hmac_b64('Tiger192','secretkey',""), '+KMmiQ4HUwqvfrG2DE4Qv6TIdVULqGg+', 'HMAC/func+b64/3');
+is( unpack('H*', Crypt::Mac::HMAC->new('Whirlpool','secretkey')->add("")->mac), '742456ee0548c7fe7e81fb86a05b291d0fa37bc95f1ce562a8a4f4e7bd37a5862a16647963ec3b934355cff410f0d0d8b98fa531f56547a85c1eb1ab25b22a5e', 'HMAC/oo+raw/4');
+is( Crypt::Mac::HMAC->new('Whirlpool','secretkey')->add("")->hexmac, '742456ee0548c7fe7e81fb86a05b291d0fa37bc95f1ce562a8a4f4e7bd37a5862a16647963ec3b934355cff410f0d0d8b98fa531f56547a85c1eb1ab25b22a5e', 'HMAC/oo+hex/4');
+is( unpack('H*', hmac('Whirlpool','secretkey',"")), '742456ee0548c7fe7e81fb86a05b291d0fa37bc95f1ce562a8a4f4e7bd37a5862a16647963ec3b934355cff410f0d0d8b98fa531f56547a85c1eb1ab25b22a5e', 'HMAC/func+raw/4');
+is( hmac_hex('Whirlpool','secretkey',""), '742456ee0548c7fe7e81fb86a05b291d0fa37bc95f1ce562a8a4f4e7bd37a5862a16647963ec3b934355cff410f0d0d8b98fa531f56547a85c1eb1ab25b22a5e', 'HMAC/func+hex/4');
+is( hmac_b64('Whirlpool','secretkey',""), 'dCRW7gVIx/5+gfuGoFspHQ+je8lfHOViqKT05703pYYqFmR5Y+w7k0NVz/QQ8NDYuY+lMfVlR6hcHrGrJbIqXg==', 'HMAC/func+b64/4');
+is( unpack('H*', Crypt::Mac::HMAC->new('SHA1','secretkey')->add(123)->mac), 'd1e8eaf9de1843fda2fa8e63bb6cc8a61a706fd6', 'HMAC/oo+raw/5');
+is( Crypt::Mac::HMAC->new('SHA1','secretkey')->add(123)->hexmac, 'd1e8eaf9de1843fda2fa8e63bb6cc8a61a706fd6', 'HMAC/oo+hex/5');
+is( unpack('H*', hmac('SHA1','secretkey',123)), 'd1e8eaf9de1843fda2fa8e63bb6cc8a61a706fd6', 'HMAC/func+raw/5');
+is( hmac_hex('SHA1','secretkey',123), 'd1e8eaf9de1843fda2fa8e63bb6cc8a61a706fd6', 'HMAC/func+hex/5');
+is( hmac_b64('SHA1','secretkey',123), '0ejq+d4YQ/2i+o5ju2zIphpwb9Y=', 'HMAC/func+b64/5');
+is( unpack('H*', Crypt::Mac::HMAC->new('SHA512','secretkey')->add(123)->mac), 'b0dc661fb66a42a2a3af93087da36317b088684b026030215986793f17b1ae748ec9d3234ac63d41976d6c7f7c2d8465a4ffd0fe7baa56460b4664882b8175e4', 'HMAC/oo+raw/6');
+is( Crypt::Mac::HMAC->new('SHA512','secretkey')->add(123)->hexmac, 'b0dc661fb66a42a2a3af93087da36317b088684b026030215986793f17b1ae748ec9d3234ac63d41976d6c7f7c2d8465a4ffd0fe7baa56460b4664882b8175e4', 'HMAC/oo+hex/6');
+is( unpack('H*', hmac('SHA512','secretkey',123)), 'b0dc661fb66a42a2a3af93087da36317b088684b026030215986793f17b1ae748ec9d3234ac63d41976d6c7f7c2d8465a4ffd0fe7baa56460b4664882b8175e4', 'HMAC/func+raw/6');
+is( hmac_hex('SHA512','secretkey',123), 'b0dc661fb66a42a2a3af93087da36317b088684b026030215986793f17b1ae748ec9d3234ac63d41976d6c7f7c2d8465a4ffd0fe7baa56460b4664882b8175e4', 'HMAC/func+hex/6');
+is( hmac_b64('SHA512','secretkey',123), 'sNxmH7ZqQqKjr5MIfaNjF7CIaEsCYDAhWYZ5PxexrnSOydMjSsY9QZdtbH98LYRlpP/Q/nuqVkYLRmSIK4F15A==', 'HMAC/func+b64/6');
+is( unpack('H*', Crypt::Mac::HMAC->new('Tiger192','secretkey')->add(123)->mac), '2625b3d7df40fbdcb87987e8cb50b4e815fcf91eac104c81', 'HMAC/oo+raw/7');
+is( Crypt::Mac::HMAC->new('Tiger192','secretkey')->add(123)->hexmac, '2625b3d7df40fbdcb87987e8cb50b4e815fcf91eac104c81', 'HMAC/oo+hex/7');
+is( unpack('H*', hmac('Tiger192','secretkey',123)), '2625b3d7df40fbdcb87987e8cb50b4e815fcf91eac104c81', 'HMAC/func+raw/7');
+is( hmac_hex('Tiger192','secretkey',123), '2625b3d7df40fbdcb87987e8cb50b4e815fcf91eac104c81', 'HMAC/func+hex/7');
+is( hmac_b64('Tiger192','secretkey',123), 'JiWz199A+9y4eYfoy1C06BX8+R6sEEyB', 'HMAC/func+b64/7');
+is( unpack('H*', Crypt::Mac::HMAC->new('Whirlpool','secretkey')->add(123)->mac), '26ffebc6d041002a375f5808095ee49aa0517070a750c40f4fd5e0c3adc8cdf8a8723cb8e1e37704ccc566bbb7613a46e23915428d97133fb31ef8cd264c4d60', 'HMAC/oo+raw/8');
+is( Crypt::Mac::HMAC->new('Whirlpool','secretkey')->add(123)->hexmac, '26ffebc6d041002a375f5808095ee49aa0517070a750c40f4fd5e0c3adc8cdf8a8723cb8e1e37704ccc566bbb7613a46e23915428d97133fb31ef8cd264c4d60', 'HMAC/oo+hex/8');
+is( unpack('H*', hmac('Whirlpool','secretkey',123)), '26ffebc6d041002a375f5808095ee49aa0517070a750c40f4fd5e0c3adc8cdf8a8723cb8e1e37704ccc566bbb7613a46e23915428d97133fb31ef8cd264c4d60', 'HMAC/func+raw/8');
+is( hmac_hex('Whirlpool','secretkey',123), '26ffebc6d041002a375f5808095ee49aa0517070a750c40f4fd5e0c3adc8cdf8a8723cb8e1e37704ccc566bbb7613a46e23915428d97133fb31ef8cd264c4d60', 'HMAC/func+hex/8');
+is( hmac_b64('Whirlpool','secretkey',123), 'Jv/rxtBBACo3X1gICV7kmqBRcHCnUMQPT9Xgw63Izfiocjy44eN3BMzFZru3YTpG4jkVQo2XEz+zHvjNJkxNYA==', 'HMAC/func+b64/8');
+is( unpack('H*', Crypt::Mac::HMAC->new('SHA1','secretkey')->add("test\0test\0test\n")->mac), '909a8e4f5688eac58c095db91cd1ad0d7e95bb08', 'HMAC/oo+raw/9');
+is( Crypt::Mac::HMAC->new('SHA1','secretkey')->add("test\0test\0test\n")->hexmac, '909a8e4f5688eac58c095db91cd1ad0d7e95bb08', 'HMAC/oo+hex/9');
+is( unpack('H*', hmac('SHA1','secretkey',"test\0test\0test\n")), '909a8e4f5688eac58c095db91cd1ad0d7e95bb08', 'HMAC/func+raw/9');
+is( hmac_hex('SHA1','secretkey',"test\0test\0test\n"), '909a8e4f5688eac58c095db91cd1ad0d7e95bb08', 'HMAC/func+hex/9');
+is( hmac_b64('SHA1','secretkey',"test\0test\0test\n"), 'kJqOT1aI6sWMCV25HNGtDX6Vuwg=', 'HMAC/func+b64/9');
+is( unpack('H*', Crypt::Mac::HMAC->new('SHA512','secretkey')->add("test\0test\0test\n")->mac), '97b775cb90e756d586e535ea6f90f9baea45514b9399eed71a1e9da262a753df0f54bce89d97e07b14b524d191c45aec469a66699636bf5f2a5edfc127aed342', 'HMAC/oo+raw/10');
+is( Crypt::Mac::HMAC->new('SHA512','secretkey')->add("test\0test\0test\n")->hexmac, '97b775cb90e756d586e535ea6f90f9baea45514b9399eed71a1e9da262a753df0f54bce89d97e07b14b524d191c45aec469a66699636bf5f2a5edfc127aed342', 'HMAC/oo+hex/10');
+is( unpack('H*', hmac('SHA512','secretkey',"test\0test\0test\n")), '97b775cb90e756d586e535ea6f90f9baea45514b9399eed71a1e9da262a753df0f54bce89d97e07b14b524d191c45aec469a66699636bf5f2a5edfc127aed342', 'HMAC/func+raw/10');
+is( hmac_hex('SHA512','secretkey',"test\0test\0test\n"), '97b775cb90e756d586e535ea6f90f9baea45514b9399eed71a1e9da262a753df0f54bce89d97e07b14b524d191c45aec469a66699636bf5f2a5edfc127aed342', 'HMAC/func+hex/10');
+is( hmac_b64('SHA512','secretkey',"test\0test\0test\n"), 'l7d1y5DnVtWG5TXqb5D5uupFUUuTme7XGh6domKnU98PVLzonZfgexS1JNGRxFrsRppmaZY2v18qXt/BJ67TQg==', 'HMAC/func+b64/10');
+is( unpack('H*', Crypt::Mac::HMAC->new('Tiger192','secretkey')->add("test\0test\0test\n")->mac), 'c22b1eba9138c1dba72d43426a3d3e4db14c90b6232d4781', 'HMAC/oo+raw/11');
+is( Crypt::Mac::HMAC->new('Tiger192','secretkey')->add("test\0test\0test\n")->hexmac, 'c22b1eba9138c1dba72d43426a3d3e4db14c90b6232d4781', 'HMAC/oo+hex/11');
+is( unpack('H*', hmac('Tiger192','secretkey',"test\0test\0test\n")), 'c22b1eba9138c1dba72d43426a3d3e4db14c90b6232d4781', 'HMAC/func+raw/11');
+is( hmac_hex('Tiger192','secretkey',"test\0test\0test\n"), 'c22b1eba9138c1dba72d43426a3d3e4db14c90b6232d4781', 'HMAC/func+hex/11');
+is( hmac_b64('Tiger192','secretkey',"test\0test\0test\n"), 'wiseupE4wdunLUNCaj0+TbFMkLYjLUeB', 'HMAC/func+b64/11');
+is( unpack('H*', Crypt::Mac::HMAC->new('Whirlpool','secretkey')->add("test\0test\0test\n")->mac), 'dab6a22e05b46ce641e022e6ea2b42646a25b994ed15fed09145e3906d159efba37b899c344f589b3ad5868cd631a8eb304d21dedf47e364c791ccfa665681f7', 'HMAC/oo+raw/12');
+is( Crypt::Mac::HMAC->new('Whirlpool','secretkey')->add("test\0test\0test\n")->hexmac, 'dab6a22e05b46ce641e022e6ea2b42646a25b994ed15fed09145e3906d159efba37b899c344f589b3ad5868cd631a8eb304d21dedf47e364c791ccfa665681f7', 'HMAC/oo+hex/12');
+is( unpack('H*', hmac('Whirlpool','secretkey',"test\0test\0test\n")), 'dab6a22e05b46ce641e022e6ea2b42646a25b994ed15fed09145e3906d159efba37b899c344f589b3ad5868cd631a8eb304d21dedf47e364c791ccfa665681f7', 'HMAC/func+raw/12');
+is( hmac_hex('Whirlpool','secretkey',"test\0test\0test\n"), 'dab6a22e05b46ce641e022e6ea2b42646a25b994ed15fed09145e3906d159efba37b899c344f589b3ad5868cd631a8eb304d21dedf47e364c791ccfa665681f7', 'HMAC/func+hex/12');
+is( hmac_b64('Whirlpool','secretkey',"test\0test\0test\n"), '2raiLgW0bOZB4CLm6itCZGoluZTtFf7QkUXjkG0Vnvuje4mcNE9YmzrVhozWMajrME0h3t9H42THkcz6ZlaB9w==', 'HMAC/func+b64/12');
+
+done_testing();

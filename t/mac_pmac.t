@@ -1,0 +1,71 @@
+### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
+
+use strict;
+use warnings;
+
+use Test::More;
+
+use Crypt::Mac::PMAC qw( pmac pmac_hex pmac_b64 );
+
+is( unpack('H*', Crypt::Mac::PMAC->new('AES','1234567890123456')->add("")->mac), '877a45a3b73543ec5cfde831c82998b2', 'PMAC/oo+raw/1');
+is( Crypt::Mac::PMAC->new('AES','1234567890123456')->add("")->hexmac, '877a45a3b73543ec5cfde831c82998b2', 'PMAC/oo+hex/1');
+is( unpack('H*', pmac('AES','1234567890123456',"")), '877a45a3b73543ec5cfde831c82998b2', 'PMAC/func+raw/1');
+is( pmac_hex('AES','1234567890123456',""), '877a45a3b73543ec5cfde831c82998b2', 'PMAC/func+hex/1');
+is( pmac_b64('AES','1234567890123456',""), 'h3pFo7c1Q+xc/egxyCmYsg==', 'PMAC/func+b64/1');
+is( unpack('H*', Crypt::Mac::PMAC->new('AES','12345678901234561234567890123456')->add("")->mac), '4fd07f0e3726d907fea45ab72c276b04', 'PMAC/oo+raw/2');
+is( Crypt::Mac::PMAC->new('AES','12345678901234561234567890123456')->add("")->hexmac, '4fd07f0e3726d907fea45ab72c276b04', 'PMAC/oo+hex/2');
+is( unpack('H*', pmac('AES','12345678901234561234567890123456',"")), '4fd07f0e3726d907fea45ab72c276b04', 'PMAC/func+raw/2');
+is( pmac_hex('AES','12345678901234561234567890123456',""), '4fd07f0e3726d907fea45ab72c276b04', 'PMAC/func+hex/2');
+is( pmac_b64('AES','12345678901234561234567890123456',""), 'T9B/Djcm2Qf+pFq3LCdrBA==', 'PMAC/func+b64/2');
+is( unpack('H*', Crypt::Mac::PMAC->new('Blowfish','1234567890123456')->add("")->mac), '9b9a50f5d0362a8b', 'PMAC/oo+raw/3');
+is( Crypt::Mac::PMAC->new('Blowfish','1234567890123456')->add("")->hexmac, '9b9a50f5d0362a8b', 'PMAC/oo+hex/3');
+is( unpack('H*', pmac('Blowfish','1234567890123456',"")), '9b9a50f5d0362a8b', 'PMAC/func+raw/3');
+is( pmac_hex('Blowfish','1234567890123456',""), '9b9a50f5d0362a8b', 'PMAC/func+hex/3');
+is( pmac_b64('Blowfish','1234567890123456',""), 'm5pQ9dA2Kos=', 'PMAC/func+b64/3');
+is( unpack('H*', Crypt::Mac::PMAC->new('Blowfish','12345678901234561234567890123456')->add("")->mac), '9b9a50f5d0362a8b', 'PMAC/oo+raw/4');
+is( Crypt::Mac::PMAC->new('Blowfish','12345678901234561234567890123456')->add("")->hexmac, '9b9a50f5d0362a8b', 'PMAC/oo+hex/4');
+is( unpack('H*', pmac('Blowfish','12345678901234561234567890123456',"")), '9b9a50f5d0362a8b', 'PMAC/func+raw/4');
+is( pmac_hex('Blowfish','12345678901234561234567890123456',""), '9b9a50f5d0362a8b', 'PMAC/func+hex/4');
+is( pmac_b64('Blowfish','12345678901234561234567890123456',""), 'm5pQ9dA2Kos=', 'PMAC/func+b64/4');
+is( unpack('H*', Crypt::Mac::PMAC->new('AES','1234567890123456')->add(123)->mac), '180cbe007c36eb4abce45430c079a4d4', 'PMAC/oo+raw/5');
+is( Crypt::Mac::PMAC->new('AES','1234567890123456')->add(123)->hexmac, '180cbe007c36eb4abce45430c079a4d4', 'PMAC/oo+hex/5');
+is( unpack('H*', pmac('AES','1234567890123456',123)), '180cbe007c36eb4abce45430c079a4d4', 'PMAC/func+raw/5');
+is( pmac_hex('AES','1234567890123456',123), '180cbe007c36eb4abce45430c079a4d4', 'PMAC/func+hex/5');
+is( pmac_b64('AES','1234567890123456',123), 'GAy+AHw260q85FQwwHmk1A==', 'PMAC/func+b64/5');
+is( unpack('H*', Crypt::Mac::PMAC->new('AES','12345678901234561234567890123456')->add(123)->mac), 'b5c5ca8f2227bf207c4c5cb6f465b664', 'PMAC/oo+raw/6');
+is( Crypt::Mac::PMAC->new('AES','12345678901234561234567890123456')->add(123)->hexmac, 'b5c5ca8f2227bf207c4c5cb6f465b664', 'PMAC/oo+hex/6');
+is( unpack('H*', pmac('AES','12345678901234561234567890123456',123)), 'b5c5ca8f2227bf207c4c5cb6f465b664', 'PMAC/func+raw/6');
+is( pmac_hex('AES','12345678901234561234567890123456',123), 'b5c5ca8f2227bf207c4c5cb6f465b664', 'PMAC/func+hex/6');
+is( pmac_b64('AES','12345678901234561234567890123456',123), 'tcXKjyInvyB8TFy29GW2ZA==', 'PMAC/func+b64/6');
+is( unpack('H*', Crypt::Mac::PMAC->new('Blowfish','1234567890123456')->add(123)->mac), '9df08c664a191e9f', 'PMAC/oo+raw/7');
+is( Crypt::Mac::PMAC->new('Blowfish','1234567890123456')->add(123)->hexmac, '9df08c664a191e9f', 'PMAC/oo+hex/7');
+is( unpack('H*', pmac('Blowfish','1234567890123456',123)), '9df08c664a191e9f', 'PMAC/func+raw/7');
+is( pmac_hex('Blowfish','1234567890123456',123), '9df08c664a191e9f', 'PMAC/func+hex/7');
+is( pmac_b64('Blowfish','1234567890123456',123), 'nfCMZkoZHp8=', 'PMAC/func+b64/7');
+is( unpack('H*', Crypt::Mac::PMAC->new('Blowfish','12345678901234561234567890123456')->add(123)->mac), '9df08c664a191e9f', 'PMAC/oo+raw/8');
+is( Crypt::Mac::PMAC->new('Blowfish','12345678901234561234567890123456')->add(123)->hexmac, '9df08c664a191e9f', 'PMAC/oo+hex/8');
+is( unpack('H*', pmac('Blowfish','12345678901234561234567890123456',123)), '9df08c664a191e9f', 'PMAC/func+raw/8');
+is( pmac_hex('Blowfish','12345678901234561234567890123456',123), '9df08c664a191e9f', 'PMAC/func+hex/8');
+is( pmac_b64('Blowfish','12345678901234561234567890123456',123), 'nfCMZkoZHp8=', 'PMAC/func+b64/8');
+is( unpack('H*', Crypt::Mac::PMAC->new('AES','1234567890123456')->add("test\0test\0test\n")->mac), '86bb8eeec8f0ece63582f64f14a9e60c', 'PMAC/oo+raw/9');
+is( Crypt::Mac::PMAC->new('AES','1234567890123456')->add("test\0test\0test\n")->hexmac, '86bb8eeec8f0ece63582f64f14a9e60c', 'PMAC/oo+hex/9');
+is( unpack('H*', pmac('AES','1234567890123456',"test\0test\0test\n")), '86bb8eeec8f0ece63582f64f14a9e60c', 'PMAC/func+raw/9');
+is( pmac_hex('AES','1234567890123456',"test\0test\0test\n"), '86bb8eeec8f0ece63582f64f14a9e60c', 'PMAC/func+hex/9');
+is( pmac_b64('AES','1234567890123456',"test\0test\0test\n"), 'hruO7sjw7OY1gvZPFKnmDA==', 'PMAC/func+b64/9');
+is( unpack('H*', Crypt::Mac::PMAC->new('AES','12345678901234561234567890123456')->add("test\0test\0test\n")->mac), '465b8c31fe8f9f6c9089497e2a312c50', 'PMAC/oo+raw/10');
+is( Crypt::Mac::PMAC->new('AES','12345678901234561234567890123456')->add("test\0test\0test\n")->hexmac, '465b8c31fe8f9f6c9089497e2a312c50', 'PMAC/oo+hex/10');
+is( unpack('H*', pmac('AES','12345678901234561234567890123456',"test\0test\0test\n")), '465b8c31fe8f9f6c9089497e2a312c50', 'PMAC/func+raw/10');
+is( pmac_hex('AES','12345678901234561234567890123456',"test\0test\0test\n"), '465b8c31fe8f9f6c9089497e2a312c50', 'PMAC/func+hex/10');
+is( pmac_b64('AES','12345678901234561234567890123456',"test\0test\0test\n"), 'RluMMf6Pn2yQiUl+KjEsUA==', 'PMAC/func+b64/10');
+is( unpack('H*', Crypt::Mac::PMAC->new('Blowfish','1234567890123456')->add("test\0test\0test\n")->mac), '3797cde072a8e286', 'PMAC/oo+raw/11');
+is( Crypt::Mac::PMAC->new('Blowfish','1234567890123456')->add("test\0test\0test\n")->hexmac, '3797cde072a8e286', 'PMAC/oo+hex/11');
+is( unpack('H*', pmac('Blowfish','1234567890123456',"test\0test\0test\n")), '3797cde072a8e286', 'PMAC/func+raw/11');
+is( pmac_hex('Blowfish','1234567890123456',"test\0test\0test\n"), '3797cde072a8e286', 'PMAC/func+hex/11');
+is( pmac_b64('Blowfish','1234567890123456',"test\0test\0test\n"), 'N5fN4HKo4oY=', 'PMAC/func+b64/11');
+is( unpack('H*', Crypt::Mac::PMAC->new('Blowfish','12345678901234561234567890123456')->add("test\0test\0test\n")->mac), '3797cde072a8e286', 'PMAC/oo+raw/12');
+is( Crypt::Mac::PMAC->new('Blowfish','12345678901234561234567890123456')->add("test\0test\0test\n")->hexmac, '3797cde072a8e286', 'PMAC/oo+hex/12');
+is( unpack('H*', pmac('Blowfish','12345678901234561234567890123456',"test\0test\0test\n")), '3797cde072a8e286', 'PMAC/func+raw/12');
+is( pmac_hex('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), '3797cde072a8e286', 'PMAC/func+hex/12');
+is( pmac_b64('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), 'N5fN4HKo4oY=', 'PMAC/func+b64/12');
+
+done_testing();

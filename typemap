@@ -1,0 +1,35 @@
+###########################
+TYPEMAP
+
+Crypt::Cipher          T_PTROBJ
+Crypt::Digest          T_PTROBJ
+
+Crypt::AuthEnc::CCM    T_PTROBJ
+Crypt::AuthEnc::EAX    T_PTROBJ
+Crypt::AuthEnc::GCM    T_PTROBJ
+Crypt::AuthEnc::OCB    T_PTROBJ
+
+Crypt::Mac::F9         T_PTROBJ
+Crypt::Mac::HMAC       T_PTROBJ
+Crypt::Mac::OMAC       T_PTROBJ
+Crypt::Mac::Pelican    T_PTROBJ
+Crypt::Mac::PMAC       T_PTROBJ
+Crypt::Mac::XCBC       T_PTROBJ
+
+Crypt::Mode::CBC       T_PTROBJ
+
+#pointer with automatic NULL<->undef conversion on input/output
+unsigned char *		T_PTR_OR_NULL
+
+###########################
+INPUT
+
+T_PTR_OR_NULL
+	$var = (SvIOK($arg)) ? INT2PTR($type,SvIVX($arg)) : NULL;
+
+###########################
+OUTPUT
+
+T_PTR_OR_NULL
+	if ($var==NULL) XSRETURN_UNDEF;
+	else sv_setiv($arg, PTR2IV($var));
