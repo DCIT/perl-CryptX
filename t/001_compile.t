@@ -55,6 +55,11 @@ use Crypt::Mac::OMAC;
 use Crypt::Mac::Pelican;
 use Crypt::Mac::PMAC;
 use Crypt::Mac::XCBC;
+use Crypt::Mode::CBC;
+use Crypt::Mode::ECB;
+use Crypt::Mode::OFB;
+use Crypt::Mode::CFB;
+use Crypt::Mode::CTR;
 
 ok 1, 'All modules loaded successfully';
 $ok = 1;

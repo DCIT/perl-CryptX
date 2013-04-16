@@ -62,7 +62,7 @@ mac(Crypt::Mac::Pelican self)
         mac_len = 16;
         rv = pelican_done(&self->state, (unsigned char*)mac);
         if (rv != CRYPT_OK) croak("FATAL: pelican_done failed: %s", error_to_string(rv));
-        RETVAL = newSVpv(mac, mac_len);
+        RETVAL = newSVpvn(mac, mac_len);
     }
     OUTPUT:
         RETVAL
@@ -83,7 +83,7 @@ b64mac(Crypt::Mac::Pelican self)
         outlen = sizeof(mac_base64);
         rv = base64_encode(mac, mac_len, (unsigned char*)mac_base64, &outlen);
         if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));         
-        RETVAL = newSVpv(mac_base64, outlen);
+        RETVAL = newSVpvn(mac_base64, outlen);
     }
     OUTPUT:
         RETVAL
@@ -103,7 +103,7 @@ hexmac(Crypt::Mac::Pelican self)
         mac_hex[0] = '\0';
         for(i=0; i<mac_len; i++)
             sprintf(&mac_hex[2*i], "%02x", mac[i]);
-        RETVAL = newSVpv(mac_hex, strlen(mac_hex));
+        RETVAL = newSVpvn(mac_hex, strlen(mac_hex));
     }
     OUTPUT:
         RETVAL

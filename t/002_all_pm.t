@@ -1,11 +1,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
-use File::Find qw(find);
+use Test::More;
+
+plan skip_all => "File::Find not installed" unless eval { require File::Find };
+plan tests => 1;
 
 my @files;
-find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');
+File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');
 
 for my $m (sort @files) {
   $m =~ s|[\\/]|::|g;

@@ -570,8 +570,3 @@ for (@$expected_results) {
   is( unpack('H*', Crypt::Cipher::MULTI2->new($key, $_->{rounds})->encrypt($plaintext)), $_->{ciphertext}, "MULTI2->encrypt - rounds=$_->{rounds}");
   is( Crypt::Cipher::MULTI2->new($key, $_->{rounds})->decrypt(pack('H*', $_->{ciphertext})), $plaintext, "MULTI2->decrypt - rounds=$_->{rounds}");
 }
-
-#use Data::Dump 'pp';
-#my @d;
-#push @d, { rounds=>$_, ciphertext=>unpack('H*', Crypt::Cipher::MULTI2->new($key, $_)->encrypt($plain)) } for(1..555);
-#print pp(\@d);

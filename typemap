@@ -17,6 +17,17 @@ Crypt::Mac::PMAC       T_PTROBJ
 Crypt::Mac::XCBC       T_PTROBJ
 
 Crypt::Mode::CBC       T_PTROBJ
+Crypt::Mode::CFB       T_PTROBJ
+Crypt::Mode::CTR       T_PTROBJ
+Crypt::Mode::ECB       T_PTROBJ
+Crypt::Mode::F8        T_PTROBJ
+Crypt::Mode::LRW       T_PTROBJ
+Crypt::Mode::OFB       T_PTROBJ
+Crypt::Mode::XTS       T_PTROBJ
+
+
+
+
 
 #pointer with automatic NULL<->undef conversion on input/output
 unsigned char *		T_PTR_OR_NULL

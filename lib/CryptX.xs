@@ -17,6 +17,25 @@ typedef struct digest_struct {          /* used by Crypt::Digest */
   struct ltc_hash_descriptor *desc;
 } *Crypt__Digest;
 
+typedef struct ccm_struct {             /* used by Crypt::AuthEnc::CCM */
+  int id;
+} *Crypt__AuthEnc__CCM;
+
+typedef struct eax_struct {             /* used by Crypt::AuthEnc::EAX */
+  eax_state state;
+  int id;
+} *Crypt__AuthEnc__EAX;
+
+typedef struct gcm_struct {             /* used by Crypt::AuthEnc::GCM */
+  gcm_state state;
+  int id;
+} *Crypt__AuthEnc__GCM;
+
+typedef struct ocb_struct {             /* used by Crypt::AuthEnc::OCB */
+  ocb3_state state;
+  int id;
+} *Crypt__AuthEnc__OCB;
+
 typedef struct f9_struct {              /* used by Crypt::Mac::F9 */
   f9_state state;
   int id;
@@ -46,6 +65,69 @@ typedef struct xcbc_struct {            /* used by Crypt::Mac::XCBC */
   xcbc_state state;
   int id;
 } *Crypt__Mac__XCBC;
+
+typedef struct cbc_struct {             /* used by Crypt::Mode::CBC */
+  int cipher_id, cipher_rounds;
+  symmetric_CBC state;
+  unsigned char pad[MAXBLOCKSIZE];
+  int padlen;
+  int padding_mode;
+  int direction;
+  int id;
+} *Crypt__Mode__CBC;
+
+typedef struct ecb_struct {             /* used by Crypt::Mode::ECB */
+  int cipher_id, cipher_rounds;
+  symmetric_ECB state;
+  unsigned char pad[MAXBLOCKSIZE];
+  int padlen;
+  int padding_mode;
+  int direction;
+  int id;
+} *Crypt__Mode__ECB;
+
+typedef struct cfb_struct {             /* used by Crypt::Mode::CFB */
+  int cipher_id, cipher_rounds;
+  symmetric_CFB state;
+  int direction;
+  int id;
+} *Crypt__Mode__CFB;
+
+typedef struct ctr_struct {             /* used by Crypt::Mode::CTR */
+  int cipher_id, cipher_rounds;
+  int ctr_mode_param;
+  symmetric_CTR state;
+  int direction;
+  int id;
+} *Crypt__Mode__CTR;
+
+typedef struct f8_struct {              /* used by Crypt::Mode::F8 */
+  int cipher_id, cipher_rounds;
+  symmetric_F8 state;
+  int direction;
+  int id;
+} *Crypt__Mode__F8;
+
+typedef struct lrw_struct {             /* used by Crypt::Mode::LRW */
+  int cipher_id, cipher_rounds;
+  symmetric_LRW state;
+  int direction;
+  int id;
+} *Crypt__Mode__LRW;
+
+typedef struct ofb_struct {             /* used by Crypt::Mode::OFB */
+  int cipher_id, cipher_rounds;
+  symmetric_OFB state;
+  int direction;
+  int id;
+} *Crypt__Mode__OFB;
+
+typedef struct xts_struct {             /* used by Crypt::Mode::XTS */
+  int cipher_id, cipher_rounds;
+  symmetric_xts state;
+  int direction;
+  int id;
+} *Crypt__Mode__XTS;
 
 MODULE = CryptX       PACKAGE = CryptX      PREFIX = CryptX_
 
@@ -105,10 +187,23 @@ CryptX_test(s)
 INCLUDE: CryptX_Digest.xs.inc
 INCLUDE: CryptX_Cipher.xs.inc
 
+INCLUDE: CryptX_AuthEnc_EAX.xs.inc
+INCLUDE: CryptX_AuthEnc_GCM.xs.inc
+INCLUDE: CryptX_AuthEnc_OCB.xs.inc
+INCLUDE: CryptX_AuthEnc_CCM.xs.inc
+
 INCLUDE: CryptX_Mac_F9.xs.inc
 INCLUDE: CryptX_Mac_HMAC.xs.inc
 INCLUDE: CryptX_Mac_OMAC.xs.inc
 INCLUDE: CryptX_Mac_Pelican.xs.inc
 INCLUDE: CryptX_Mac_PMAC.xs.inc
 INCLUDE: CryptX_Mac_XCBC.xs.inc
-
+ 
+INCLUDE: CryptX_Mode_CBC.xs.inc
+INCLUDE: CryptX_Mode_ECB.xs.inc
+INCLUDE: CryptX_Mode_CFB.xs.inc
+INCLUDE: CryptX_Mode_OFB.xs.inc
+INCLUDE: CryptX_Mode_CTR.xs.inc
+#INCLUDE: CryptX_Mode_F8.xs.inc
+#INCLUDE: CryptX_Mode_LRW.xs.inc
+#INCLUDE: CryptX_Mode_XTS.xs.inc

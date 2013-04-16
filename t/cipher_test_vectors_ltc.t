@@ -45,9 +45,6 @@ while (my $l = <DATA>) {
   $tv->{$name}->{$size}->{$k} = $v if $name && $k =~ /\d+/;
 }
 
-use Data::Dump 'pp';
-#die pp $tv;
-
 my $seq;
 $seq .= pack('C',$_) for(0..255);
 my $zeros = '\0' x 255;

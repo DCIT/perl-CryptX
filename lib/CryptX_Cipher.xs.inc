@@ -78,7 +78,7 @@ encrypt(self, data)
         void *plaintext = SvPVbyte(data, len);
 
         if (len==0)
-          RETVAL = newSVpv("", 0);
+          RETVAL = newSVpvn("", 0);
         else if (len % self->desc->block_length)
           croak ("FATAL: sizeof(data) should be multiple of blocksize (%d)", self->desc->block_length);
         else {
@@ -104,7 +104,7 @@ decrypt(self, data)
         void *ciphertext = SvPVbyte(data, len);
 
         if (len==0)
-          RETVAL = newSVpv("", 0);
+          RETVAL = newSVpvn("", 0);
         else if (len % self->desc->block_length)
           croak ("FATAL: sizeof(data) should be multiple of blocksize (%d)", self->desc->block_length);
         else {

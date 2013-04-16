@@ -76,26 +76,6 @@ sub addfile {
   return $self;
 }
 
-sub add_bits {
-  #$self->add_bits( $data, $bitlen )
-  #$self->add_bits( $bitstring )
-  my $self = shift;
-  my ($data, $bitlen);
-  if (scalar(@_)==1) {
-    my $bitstring = shift;
-    $bitlen = length($bitstring);
-    $data = pack("B*", $bitstring);
-  }
-  elsif (scalar(@_)==2) {
-    ($data, $bitlen) = @_;
-  }
-  else {
-    die "FATAL: invalid arguments";
-  }  
-  die "FATAL: bitlen must be multiple of 8" if ($bitlen % 8) != 0;
-  return $self->add(substr($data, 0, $bitlen/8));
-}
-
 sub hashsize {
   my $self = shift;
   return unless defined $self;

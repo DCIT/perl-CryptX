@@ -85,7 +85,7 @@ sub default_rounds {
 
 =head1 NAME
 
-Crypt::Cipher - Generic interface to hash/cipher functions
+Crypt::Cipher - Generic interface to cipher functions
 
 =head1 SYNOPSIS
 
@@ -95,8 +95,8 @@ Crypt::Cipher - Generic interface to hash/cipher functions
    $key = 'K' x 32; # 256 bits
    $c = Crypt::Cipher->new('AES', $key);
    $blocksize = $c->blocksize;
-   $ciphertext = $c->encrypt('plain text');
-   $plaintext = $c->decrypt($ciphertext);
+   $ciphertext = $c->encrypt('plain text block'); #encrypt 1 block
+   $plaintext = $c->decrypt($ciphertext);         #decrypt 1 block
    
    #### example 2 (compatibility with Crypt::CBC)
    use Crypt::CBC;
@@ -113,7 +113,7 @@ Provides an interface to various symetric cipher algorithms.
 
 B<BEWARE:> This module implements just elementary one-block (usually 8 or 16 byte) encryption/encryption 
 operation - if you want to encrypt/decrypt generic data of "any length" you have to use some of the cipher
-block modes - check for example L<Crypt::CBC|Crypt::CBC>.
+block modes - check for example L<Crypt::Mode::CBC|Crypt::Mode::CBC>.
 
 =head1 METHODS
 

@@ -24,12 +24,21 @@ Crypt::Cipher::SAFER_SK128 - Symetric cipher SAFER_SK128, key size: 128 bits (Cr
 
 =head1 SYNOPSIS
 
+  ### example 1
+  use Crypt::Cipher::CBC;
+  
+  my $key = '...'; # length has to be valid key size for this cipher
+  my $iv = '...';  # 16 bytes
+  my $cbc = Crypt::Mode::CBC->new('SAFER_SK128');
+  my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
+
+  ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::SAFER_SK128;
   
   my $key = '...'; # length has to be valid key size for this cipher
-  my $cipher = Crypt::Cipher::SAFER_SK128->new($key);
-  my $cbc = Crypt::CBC->new( -cipher=>$cipher );
+  my $iv = '...';  # 16 bytes
+  my $cbc = Crypt::CBC->new( -cipher=>'Cipher::SAFER_SK128', -key=>$key, -iv=>$iv );
   my $ciphertext = $cbc->encrypt("secret data");
 
 =head1 DESCRIPTION
@@ -38,11 +47,9 @@ This module implements the SAFER_SK128 cipher. Provided interface is compliant w
 
 B<BEWARE:> This module implements just elementary "one-block-(en|de)cryption" operation - if you want to
 encrypt/decrypt generic data you have to use some of the cipher block modes - check for example
-L<Crypt::CBC|Crypt::CBC>.
+L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CBC|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC>.
 
 =head1 METHODS
-
-The OO interface provides the same set of functions as L<Crypt::Cipher>.
 
 =head2 new
 

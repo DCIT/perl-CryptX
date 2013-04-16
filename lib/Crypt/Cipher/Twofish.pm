@@ -24,12 +24,21 @@ Crypt::Cipher::Twofish - Symetric cipher Twofish, key size: 128/192/256 bits (Cr
 
 =head1 SYNOPSIS
 
+  ### example 1
+  use Crypt::Cipher::CBC;
+  
+  my $key = '...'; # length has to be valid key size for this cipher
+  my $iv = '...';  # 16 bytes
+  my $cbc = Crypt::Mode::CBC->new('Twofish');
+  my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
+
+  ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::Twofish;
   
   my $key = '...'; # length has to be valid key size for this cipher
-  my $cipher = Crypt::Cipher::Twofish->new($key);
-  my $cbc = Crypt::CBC->new( -cipher=>$cipher );
+  my $iv = '...';  # 16 bytes
+  my $cbc = Crypt::CBC->new( -cipher=>'Cipher::Twofish', -key=>$key, -iv=>$iv );
   my $ciphertext = $cbc->encrypt("secret data");
 
 =head1 DESCRIPTION
@@ -38,11 +47,9 @@ This module implements the Twofish cipher. Provided interface is compliant with 
 
 B<BEWARE:> This module implements just elementary "one-block-(en|de)cryption" operation - if you want to
 encrypt/decrypt generic data you have to use some of the cipher block modes - check for example
-L<Crypt::CBC|Crypt::CBC>.
+L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CBC|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC>.
 
 =head1 METHODS
-
-The OO interface provides the same set of functions as L<Crypt::Cipher>.
 
 =head2 new
 

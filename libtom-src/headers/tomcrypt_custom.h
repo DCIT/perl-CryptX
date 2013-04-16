@@ -225,16 +225,16 @@
 
 /* ---> Encrypt + Authenticate Modes <--- */
 
-/*#define LTC_EAX_MODE*/
+#define LTC_EAX_MODE
 #if defined(LTC_EAX_MODE) && !(defined(LTC_CTR_MODE) && defined(LTC_OMAC))
    #error LTC_EAX_MODE requires CTR and LTC_OMAC mode
 #endif
-/*
+
 #define LTC_OCB_MODE
 #define LTC_OCB3_MODE
 #define LTC_CCM_MODE
 #define LTC_GCM_MODE
-*/
+
 /* Use 64KiB tables */
 #ifndef LTC_NO_TABLES
    #define LTC_GCM_TABLES

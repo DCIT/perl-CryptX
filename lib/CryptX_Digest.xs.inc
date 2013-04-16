@@ -72,7 +72,7 @@ digest(self)
         
         rv = self->desc->done(&self->state, hash);
         if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
-        RETVAL = newSVpv((char *) hash, self->desc->hashsize);
+        RETVAL = newSVpvn((char *) hash, self->desc->hashsize);
     }
     OUTPUT:
         RETVAL
@@ -92,7 +92,7 @@ hexdigest(self)
         hash_hex[0] = '\0';
         for(i=0; i<self->desc->hashsize; i++)
             sprintf(&hash_hex[2*i], "%02x", hash[i]);
-        RETVAL = newSVpv(hash_hex, strlen(hash_hex));
+        RETVAL = newSVpvn(hash_hex, strlen(hash_hex));
     }
     OUTPUT:
         RETVAL
@@ -113,7 +113,7 @@ b64digest(self)
         outlen = sizeof(hash_base64);
         rv = base64_encode(hash, self->desc->hashsize, (unsigned char *)hash_base64, &outlen);
         if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
-        RETVAL = newSVpv(hash_base64, outlen);
+        RETVAL = newSVpvn(hash_base64, outlen);
     }
     OUTPUT:
         RETVAL

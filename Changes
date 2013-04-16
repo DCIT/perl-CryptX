@@ -1,4 +1,8 @@
 Changes for CryptX
 
+0.003   2013/04/16
+        - added Crypt::Mode::CBC|CFB|CTR|ECB|OFB
+        - added Crypt::AuthEnc::CCM|EAX|GCM|OCB
+
 0.002   2013/04/11
         - first release on CPAN
