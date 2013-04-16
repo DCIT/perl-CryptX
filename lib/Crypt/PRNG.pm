@@ -1,4 +1,4 @@
-package Crypt::Random;
+package Crypt::PRNG;
 
 use strict;
 use warnings;

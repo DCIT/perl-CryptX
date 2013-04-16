@@ -1,5 +1,8 @@
 Changes for CryptX
 
+0.004   2013/04/16
+        - removing illegal Crypt::Random
+
 0.003   2013/04/16
         - added Crypt::Mode::CBC|CFB|CTR|ECB|OFB
         - added Crypt::AuthEnc::CCM|EAX|GCM|OCB
