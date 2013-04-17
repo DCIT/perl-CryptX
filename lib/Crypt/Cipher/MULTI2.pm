@@ -25,7 +25,7 @@ Crypt::Cipher::MULTI2 - Symetric cipher MULTI2, key size: 320 bits (Crypt::CBC c
 =head1 SYNOPSIS
 
   ### example 1
-  use Crypt::Cipher::CBC;
+  use Crypt::Mode::CBC;
   
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes

@@ -129,6 +129,40 @@ typedef struct xts_struct {             /* used by Crypt::Mode::XTS */
   int id;
 } *Crypt__Mode__XTS;
 
+typedef struct prng_struct {            /* used by Crypt::PRNG */
+  prng_state state;
+  struct ltc_prng_descriptor *desc;
+  int id;
+} *Crypt__PRNG;
+
+typedef struct rsa_struct {             /* used by Crypt::PK::RSA */
+  prng_state yarrow_prng_state;
+  int yarrow_prng_index;
+  rsa_key key;
+  int id;
+} *Crypt__PK__RSA;
+
+typedef struct dsa_struct {             /* used by Crypt::PK::DSA */
+  prng_state yarrow_prng_state;
+  int yarrow_prng_index;
+  dsa_key key;
+  int id;
+} *Crypt__PK__DSA;
+
+typedef struct dh_struct {              /* used by Crypt::PK::DH */
+  prng_state yarrow_prng_state;
+  int yarrow_prng_index;
+  dh_key key;
+  int id;
+} *Crypt__PK__DH;
+
+typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
+  prng_state yarrow_prng_state;
+  int yarrow_prng_index;
+  ecc_key key;
+  int id;
+} *Crypt__PK__ECC;
+
 MODULE = CryptX       PACKAGE = CryptX      PREFIX = CryptX_
 
 BOOT:
@@ -173,6 +207,17 @@ BOOT:
     if(register_hash(&whirlpool_desc)==-1)     { croak("FATAL: cannot register_hash whirlpool"); }    
     /* --- */
     if(chc_register(find_cipher("aes"))==-1)   { croak("FATAL: chc_register failed"); }
+    /* --- */
+    if(register_prng(&fortuna_desc)==-1)       { croak("FATAL: cannot register_prng fortuna"); }
+    if(register_prng(&rc4_desc)==-1)           { croak("FATAL: cannot register_prng rc4"); }
+    if(register_prng(&sober128_desc)==-1)      { croak("FATAL: cannot register_prng sober128"); }
+    if(register_prng(&yarrow_desc)==-1)        { croak("FATAL: cannot register_prng yarrow"); }
+    /* --- */
+#ifdef TFM_DESC
+    ltc_mp = tfm_desc;
+#else
+    ltc_mp = ltm_desc;
+#endif
 
 int
 CryptX_test(s)
@@ -207,3 +252,10 @@ INCLUDE: CryptX_Mode_CTR.xs.inc
 #INCLUDE: CryptX_Mode_F8.xs.inc
 #INCLUDE: CryptX_Mode_LRW.xs.inc
 #INCLUDE: CryptX_Mode_XTS.xs.inc
+
+INCLUDE: CryptX_PRNG.xs.inc
+
+INCLUDE: CryptX_PK_RSA.xs.inc
+INCLUDE: CryptX_PK_DSA.xs.inc
+INCLUDE: CryptX_PK_DH.xs.inc
+INCLUDE: CryptX_PK_ECC.xs.inc

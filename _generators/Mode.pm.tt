@@ -1,0 +1,157 @@
+package Crypt::Mode::[%orig_name%];
+
+[%comment%]
+
+use strict;
+use warnings;
+
+use Crypt::Cipher;
+use base 'Crypt::Mode';
+
+sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
+
+1;
+
+=pod
+
+=head1 NAME
+
+Crypt::Mode::[%orig_name%] - [%info%]
+
+=head1 SYNOPSIS
+
+   Crypt::Mode::[%orig_name%];
+   my $m = Crypt::Mode::[%orig_name%]->new('AES');
+
+   #(en|de)crypt at once
+[%-IF lc_name == 'ecb' %]
+   my $ciphertext = $m->encrypt($plaintext, $key);
+   my $plaintext = $m->decrypt($ciphertext, $key);
+[%-ELSE%]
+   my $ciphertext = $m->encrypt($plaintext, $key, $iv);
+   my $plaintext = $m->decrypt($ciphertext, $key, $iv);
+[%-END%]
+
+   #encrypt more chunks
+[%-IF lc_name == 'ecb' %]
+   $m->start_encrypt($key);
+[%-ELSE%]
+   $m->start_encrypt($key, $iv);
+[%-END%]
+   my $ciphertext = $m->add('some data');
+   $ciphertext .= $m->add('more data');
+ [%-IF lc_name == 'ecb' or lc_name == 'cbc' %]
+   $ciphertext .= $m->finish;
+[%-END%]
+
+   #decrypt more chunks
+[%-IF lc_name == 'ecb' %]
+   $m->start_decrypt($key);
+[%-ELSE%]
+   $m->start_decrypt($key, $iv);
+[%-END%]
+   my $plaintext = $m->add($some_ciphertext);
+   $plaintext .= $m->add($more_ciphertext);
+[%-IF lc_name == 'ecb' or lc_name == 'cbc' %]
+   $plaintext .= $m->finish;
+[%-END%]
+
+=head1 DESCRIPTION
+
+[%desc%]
+
+=head1 METHODS
+
+=head2 new
+
+[%-IF lc_name == 'ctr' %]
+ my $m = Crypt::Mode::[%orig_name%]->new($cipher_name);
+ #or
+ my $m = Crypt::Mode::[%orig_name%]->new($cipher_name, $ctr_mode, $ctr_width);
+ #or
+ my $m = Crypt::Mode::[%orig_name%]->new($cipher_name, $ctr_mode, $ctr_width, $cipher_rounds);
+ 
+ # $ctr_mode .... 0 little-endian counter (DEFAULT)
+ #                1 big-endian counter
+ #                2 little-endian + RFC3686 incrementing
+ #                3 big-endian + RFC3686 incrementing
+ # $ctr_width ... counter width in bytes (DEFAULT = full block width)
+ # $cipher_rounds ... optional num of rounds for given cipher
+[%-ELSIF lc_name == 'ecb' or lc_name == 'cbc' %]
+ my $m = Crypt::Mode::[%orig_name%]->new('AES');
+ #or
+ my $m = Crypt::Mode::[%orig_name%]->new('AES', $padding);
+ #or
+ my $m = Crypt::Mode::[%orig_name%]->new('AES', $padding, $cipher_rounds);
+
+ # $padding .... 0 no padding (plaintext size has to be myltiple of block length)
+ #               1 PKCS5 padding, Crypt::CBC's "standard" - DEFAULT
+ #               2 Crypt::CBC's "oneandzeroes"
+ # $cipher_rounds ... optional num of rounds for given cipher
+[%-ELSE%]
+ my $m = Crypt::Mode::[%orig_name%]->new('AES');
+ #or
+ my $m = Crypt::Mode::[%orig_name%]->new('AES', $cipher_rounds);
+
+ # $cipher_rounds ... optional num of rounds for given cipher
+[%-END%]
+ 
+=head2 encrypt
+
+[%-IF lc_name == 'ecb' %]
+   my $ciphertext = $m->encrypt($plaintext, $key);
+[%-ELSE%]
+   my $ciphertext = $m->encrypt($plaintext, $key, $iv);
+[%-END%]
+
+=head2 decrypt
+
+[%-IF lc_name == 'ecb' %]
+   my $plaintext = $m->decrypt($ciphertext, $key);
+[%-ELSE%]
+   my $plaintext = $m->encrypt($ciphertext, $key, $iv);
+[%-END%]
+
+=head2 start_encrypt
+
+=head2 start_decrypt
+
+=head2 add
+
+=head2 finish
+
+   #encrypt more chunks
+[%-IF lc_name == 'ecb' %]
+   $m->start_encrypt($key);
+[%-ELSE%]
+   $m->start_encrypt($key, $iv);
+[%-END%]
+   my $ciphertext = '';
+   $ciphertext .= $m->add('some data');
+   $ciphertext .= $m->add('more data');
+[%-IF lc_name == 'ecb' or lc_name == 'cbc' %]
+   $ciphertext .= $m->finish;
+[%-END%]
+
+   #decrypt more chunks
+[%-IF lc_name == 'ecb' %]
+   $m->start_decrypt($key);
+[%-ELSE%]
+   $m->start_decrypt($key, $iv);
+[%-END%]
+   my $plaintext = '';
+   $plaintext .= $m->add($some_ciphertext);
+   $plaintext .= $m->add($more_ciphertext);
+[%-IF lc_name == 'ecb' or lc_name == 'cbc' %]
+   $plaintext .= $m->finish;
+[%-END%]
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<CryptX|CryptX>
+[% FOREACH v IN urls %]
+=item L<[%v%]|[%v%]>
+[% END %]
+=back

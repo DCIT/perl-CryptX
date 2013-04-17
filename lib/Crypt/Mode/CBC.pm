@@ -41,7 +41,7 @@ Crypt::Mode::CBC - Block cipher mode CBC [Cipher-block chaining]
 
 =head1 DESCRIPTION
 
-This module implements CBC cipher mode. B<NOTE:> it works only with ciphers from L<Cryptx> (Crypt::Cipher::NNNN).
+This module implements CBC cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).
 
 =head1 METHODS
 

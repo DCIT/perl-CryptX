@@ -1,0 +1,197 @@
+package Crypt::Digest::[%orig_name%];
+
+[%comment%]
+
+use strict;
+use warnings;
+
+use Exporter 'import';
+our %EXPORT_TAGS = ( all => [qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_base64 [%lc_name%]_file [%lc_name%]_file_hex [%lc_name%]_file_base64 )] );
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+our @EXPORT = qw();
+
+use CryptX;
+use base 'Crypt::Digest';
+
+sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
+
+sub [%lc_name%]             { __PACKAGE__->new->add(@_)->digest }
+sub [%lc_name%]_hex         { __PACKAGE__->new->add(@_)->hexdigest }
+sub [%lc_name%]_base64      { __PACKAGE__->new->add(@_)->b64digest }
+
+sub [%lc_name%]_file        { __PACKAGE__->new->addfile(@_)->digest }
+sub [%lc_name%]_file_hex    { __PACKAGE__->new->addfile(@_)->hexdigest }
+sub [%lc_name%]_file_base64 { __PACKAGE__->new->addfile(@_)->b64digest }
+
+1;
+
+=pod
+
+=head1 NAME
+
+Crypt::Digest::[%orig_name%] - [%info%]
+
+=head1 SYNOPSIS
+
+   ### Functional interface:
+   use Crypt::Digest::[%orig_name%] qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_base64 [%lc_name%]_file [%lc_name%]_file_hex [%lc_name%]_file_base64 );
+
+   # calculate digest from string/buffer
+   $[%lc_name%]_raw = [%lc_name%]('data string');
+   $[%lc_name%]_hex = [%lc_name%]_hex('data string');
+   $[%lc_name%]_b64 = [%lc_name%]_base64('data string');
+   # calculate digest from file
+   $[%lc_name%]_raw = [%lc_name%]_file('filename.dat');
+   $[%lc_name%]_hex = [%lc_name%]_file_hex('filename.dat');
+   $[%lc_name%]_b64 = [%lc_name%]_file_base64('filename.dat');
+   # calculate digest from filehandle
+   $[%lc_name%]_raw = [%lc_name%]_file(*FILEHANDLE);
+   $[%lc_name%]_hex = [%lc_name%]_file_hex(*FILEHANDLE);
+   $[%lc_name%]_b64 = [%lc_name%]_file_base64(*FILEHANDLE);
+
+   ### OO interface:
+   use Crypt::Digest::[%orig_name%];
+
+   $d = Crypt::Digest::[%orig_name%]->new;
+   $d->add('any data');
+   $d->addfile('filename.dat');
+   $d->addfile(*FILEHANDLE);
+   $result_raw = $d->digest;    # raw bytes
+   $result_hex = $d->hexdigest; # hexadecimal form
+   $result_b64 = $d->b64digest; # Base64 form
+
+=head1 DESCRIPTION
+
+Provides an interface to the [%orig_name%] digest algorithm.
+
+=head1 EXPORT
+
+Nothing is exported by default.
+
+You can export selected functions:
+
+  use Crypt::Digest::[%orig_name%] qw([%lc_name%] [%lc_name%]_hex [%lc_name%]_base64 [%lc_name%]_file [%lc_name%]_file_hex [%lc_name%]_file_base64);
+
+Or all of them at once:
+
+  use Crypt::Digest::[%orig_name%] ':all';
+
+=head1 FUNCTIONS
+
+=head2 [%lc_name%]
+
+Logically joins all arguments into a single string, and returns its [%orig_name%] digest encoded as a binary string.
+
+ $[%lc_name%]_raw = [%lc_name%]('data string');
+ #or
+ $[%lc_name%]_raw = [%lc_name%]('any data', 'more data', 'even more data');
+
+=head2 [%lc_name%]_hex
+
+Logically joins all arguments into a single string, and returns its [%orig_name%] digest encoded as a hexadecimal string.
+
+ $[%lc_name%]_hex = [%lc_name%]_hex('data string');
+ #or
+ $[%lc_name%]_hex = [%lc_name%]('any data', 'more data', 'even more data');
+
+=head2 [%lc_name%]_base64
+
+Logically joins all arguments into a single string, and returns its [%orig_name%] digest encoded as a Base64 string, B<with> trailing '=' padding.
+
+ $[%lc_name%]_base64 = [%lc_name%]_base64('data string');
+ #or
+ $[%lc_name%]_base64 = [%lc_name%]('any data', 'more data', 'even more data');
+
+=head2 [%lc_name%]_file
+
+Reads file (defined by filename or filehandle) content, and returns its [%orig_name%] digest encoded as a binary string.
+
+ $[%lc_name%]_raw = [%lc_name%]_file('filename.dat');
+ #or
+ $[%lc_name%]_raw = [%lc_name%]_file(*FILEHANDLE);
+
+=head2 [%lc_name%]_file_hex
+
+Reads file (defined by filename or filehandle) content, and returns its [%orig_name%] digest encoded as a hexadecimal string.
+
+ $[%lc_name%]_hex = [%lc_name%]_file_hex('filename.dat');
+ #or
+ $[%lc_name%]_hex = [%lc_name%]_file_hex(*FILEHANDLE);
+
+B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
+
+=head2 [%lc_name%]_file_base64
+
+Reads file (defined by filename or filehandle) content, and returns its [%orig_name%] digest encoded as a Base64 string, B<with> trailing '=' padding.
+
+ $[%lc_name%]_base64 = [%lc_name%]_file_base64('filename.dat');
+ #or
+ $[%lc_name%]_base64 = [%lc_name%]_file_base64(*FILEHANDLE);
+
+=head1 METHODS
+
+The OO interface provides the same set of functions as L<Crypt::Digest>.
+
+=head2 new
+
+ $d = Crypt::Digest::[%orig_name%]->new();
+
+=head2 clone
+
+ $d->clone();
+
+=head2 reset
+
+ $d->reset();
+
+=head2 add
+
+ $d->add('any data');
+ #or
+ $d->add('any data', 'more data', 'even more data');
+
+=head2 addfile
+
+ $d->addfile('filename.dat');
+ #or
+ $d->addfile(*FILEHANDLE);
+
+=head2 add_bits
+
+ $d->addfile('filename.dat');
+ #or
+ $d->addfile(*FILEHANDLE);
+
+=head2 hashsize
+
+ $d->hashsize;
+ #or
+ Crypt::Digest::[%orig_name%]->hashsize();
+ #or
+ Crypt::Digest::[%orig_name%]::hashsize();
+
+=head2 digest
+
+ $result_raw = $d->digest();
+
+=head2 hexdigest
+
+ $result_hex = $d->hexdigest();
+
+=head2 b64digest
+
+ $result_base64 = $d->b64digest();
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+[% FOREACH v IN urls %]
+=item L<[%v%]|[%v%]>
+[% END %]
+=back
+
+=cut
+
+__END__

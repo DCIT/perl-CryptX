@@ -1,0 +1,41 @@
+[%comment%]
+
+use strict;
+use warnings;
+
+use Test::More tests => 7*[%t_strings_count%] + 8*[%t_files_count%] + 6;
+
+use Crypt::Digest qw( digest_data digest_data_hex digest_data_base64 digest_file digest_file_hex digest_file_base64 );
+use Crypt::Digest::[%orig_name%] qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_base64 [%lc_name%]_file [%lc_name%]_file_hex [%lc_name%]_file_base64 );
+
+is( Crypt::Digest::hashsize('[%orig_name%]'), [%hashsize%], 'hashsize/1');
+is( Crypt::Digest->hashsize('[%orig_name%]'), [%hashsize%], 'hashsize/2');
+is( Crypt::Digest::[%orig_name%]::hashsize, [%hashsize%], 'hashsize/3');
+is( Crypt::Digest::[%orig_name%]->hashsize, [%hashsize%], 'hashsize/4');
+is( Crypt::Digest->new('[%orig_name%]')->hashsize, [%hashsize%], 'hashsize/5');
+is( Crypt::Digest::[%orig_name%]->new->hashsize, [%hashsize%], 'hashsize/6');
+
+[% FOREACH v IN t_strings %]
+is( [%lc_name%]([%v.data%]), pack("H*","[%v.hex%]"), '[%lc_name%] (raw/[%loop.count%])');
+is( [%lc_name%]_hex([%v.data%]), "[%v.hex%]", '[%lc_name%] (hex/[%loop.count%])');
+is( [%lc_name%]_base64([%v.data%]), "[%v.base64%]", '[%lc_name%] (base64/[%loop.count%])');
+is( digest_data('[%orig_name%]', [%v.data%]), pack("H*","[%v.hex%]"), '[%lc_name%] (digest_data_raw/[%loop.count%])');
+is( digest_data_hex('[%orig_name%]', [%v.data%]), "[%v.hex%]", '[%lc_name%] (digest_data_hex/[%loop.count%])');
+is( digest_data_base64('[%orig_name%]', [%v.data%]), "[%v.base64%]", '[%lc_name%] (digest_data_base64/[%loop.count%])');
+is( Crypt::Digest::[%orig_name%]->new->add([%v.data%])->hexdigest, "[%v.hex%]", '[%lc_name%] (OO/[%loop.count%])');
+[% END %]
+[% FOREACH v IN t_files %]
+is( [%lc_name%]_file('[%v.file%]'), pack("H*","[%v.hex%]"), '[%lc_name%] (raw/file/[%loop.count%])');
+is( [%lc_name%]_file_hex('[%v.file%]'), "[%v.hex%]", '[%lc_name%] (hex/file/[%loop.count%])');
+is( [%lc_name%]_file_base64('[%v.file%]'), "[%v.base64%]", '[%lc_name%] (base64/file/[%loop.count%])');
+is( digest_file('[%orig_name%]', '[%v.file%]'), pack("H*","[%v.hex%]"), '[%lc_name%] (digest_file_raw/file/[%loop.count%])');
+is( digest_file_hex('[%orig_name%]', '[%v.file%]'), "[%v.hex%]", '[%lc_name%] (digest_file_hex/file/[%loop.count%])');
+is( digest_file_base64('[%orig_name%]', '[%v.file%]'), "[%v.base64%]", '[%lc_name%] (digest_file_base64/file/[%loop.count%])');
+is( Crypt::Digest::[%orig_name%]->new->addfile('[%v.file%]')->hexdigest, "[%v.hex%]", '[%lc_name%] (OO/file/[%loop.count%])');
+{
+  open(my $fh, '<', '[%v.file%]');
+  binmode($fh);
+  is( Crypt::Digest::[%orig_name%]->new->addfile($fh)->hexdigest, "[%v.hex%]", '[%lc_name%] (OO/filehandle/[%loop.count%])');
+  close($fh);
+}
+[% END %]

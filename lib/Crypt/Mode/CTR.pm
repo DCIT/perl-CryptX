@@ -39,7 +39,7 @@ Crypt::Mode::CTR - Block cipher mode CTR [Counter mode]
 
 =head1 DESCRIPTION
 
-This module implements CTR cipher mode. B<NOTE:> it works only with ciphers from L<Cryptx> (Crypt::Cipher::NNNN).
+This module implements CTR cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).
 
 =head1 METHODS
 

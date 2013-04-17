@@ -60,6 +60,10 @@ use Crypt::Mode::ECB;
 use Crypt::Mode::OFB;
 use Crypt::Mode::CFB;
 use Crypt::Mode::CTR;
+use Crypt::PK::RSA;
+use Crypt::PK::DSA;
+use Crypt::PK::ECC;
+use Crypt::PK::DH;
 
 ok 1, 'All modules loaded successfully';
 $ok = 1;

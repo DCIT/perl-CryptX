@@ -1,5 +1,9 @@
 Changes for CryptX
 
+0.005   2013/XX/XX
+        - added Crypt::PRNG::Fortuna|RC4|Sober128|Yarrow
+        - added Crypt::PK::RSA|DSA|ECC|DH
+
 0.004   2013/04/16
         - removing illegal Crypt::Random
 

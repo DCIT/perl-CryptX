@@ -1,0 +1,80 @@
+[%comment%]
+
+use strict;
+use warnings;
+
+[%- IF spec_rounds %]
+use Test::More tests => 42;
+[%- ELSE %]
+use Test::More tests => 38;
+[%- END %]
+
+use Crypt::Cipher;
+use Crypt::Cipher::[%orig_name%];
+
+is( Crypt::Cipher::[%orig_name%]::blocksize, [%blocksize%], '::blocksize');
+is( Crypt::Cipher::[%orig_name%]::keysize, [%keysize%], '::keysize');
+is( Crypt::Cipher::[%orig_name%]::max_keysize, [%max_keysize%], '::max_keysize');
+is( Crypt::Cipher::[%orig_name%]::min_keysize, [%min_keysize%], '::min_keysize');
+is( Crypt::Cipher::[%orig_name%]::default_rounds, [%default_rounds%], '::default_rounds');
+
+is( Crypt::Cipher::[%orig_name%]->blocksize, [%blocksize%], '->blocksize');
+is( Crypt::Cipher::[%orig_name%]->keysize, [%keysize%], '->keysize');
+is( Crypt::Cipher::[%orig_name%]->max_keysize, [%max_keysize%], '->max_keysize');
+is( Crypt::Cipher::[%orig_name%]->min_keysize, [%min_keysize%], '->min_keysize');
+is( Crypt::Cipher::[%orig_name%]->default_rounds, [%default_rounds%], '->default_rounds');
+
+my $min_key = '[%min_key%]';
+my $max_key = '[%max_key%]';
+
+is( Crypt::Cipher::blocksize('[%orig_name%]'), [%blocksize%], 'Cipher->blocksize');
+is( Crypt::Cipher::keysize('[%orig_name%]'), [%keysize%], 'Cipher->keysize');
+is( Crypt::Cipher::max_keysize('[%orig_name%]'), [%max_keysize%], 'Cipher->max_keysize');
+is( Crypt::Cipher::min_keysize('[%orig_name%]'), [%min_keysize%], 'Cipher->min_keysize');
+is( Crypt::Cipher::default_rounds('[%orig_name%]'), [%default_rounds%], 'Cipher->default_rounds');
+
+is( Crypt::Cipher->blocksize('[%orig_name%]'), [%blocksize%], 'Cipher->blocksize');
+is( Crypt::Cipher->keysize('[%orig_name%]'), [%keysize%], 'Cipher->keysize');
+is( Crypt::Cipher->max_keysize('[%orig_name%]'), [%max_keysize%], 'Cipher->max_keysize');
+is( Crypt::Cipher->min_keysize('[%orig_name%]'), [%min_keysize%], 'Cipher->min_keysize');
+is( Crypt::Cipher->default_rounds('[%orig_name%]'), [%default_rounds%], 'Cipher->default_rounds');
+
+is( Crypt::Cipher::[%orig_name%]->new($min_key)->blocksize, [%blocksize%], '[%orig_name%]->new()->blocksize');
+is( Crypt::Cipher::[%orig_name%]->new($min_key)->keysize, [%keysize%], '[%orig_name%]->new()->keysize');
+is( Crypt::Cipher::[%orig_name%]->new($min_key)->max_keysize, [%max_keysize%], '[%orig_name%]->new()->max_keysize');
+is( Crypt::Cipher::[%orig_name%]->new($min_key)->min_keysize, [%min_keysize%], '[%orig_name%]->new()->min_keysize');
+is( Crypt::Cipher::[%orig_name%]->new($min_key)->default_rounds, [%default_rounds%], '[%orig_name%]->new()->default_rounds');
+
+is( Crypt::Cipher->new('[%orig_name%]', $min_key)->blocksize, [%blocksize%], 'Cipher->new()->blocksize');
+is( Crypt::Cipher->new('[%orig_name%]', $min_key)->keysize, [%keysize%], 'Cipher->new()->keysize');
+is( Crypt::Cipher->new('[%orig_name%]', $min_key)->max_keysize, [%max_keysize%], 'Cipher->new()->max_keysize');
+is( Crypt::Cipher->new('[%orig_name%]', $min_key)->min_keysize, [%min_keysize%], 'Cipher->new()->min_keysize');
+is( Crypt::Cipher->new('[%orig_name%]', $min_key)->default_rounds, [%default_rounds%], 'Cipher->new()->default_rounds');
+
+my $block_plain = '[%block_plain%]';
+my $block_encrypted_min_key_hex = '[%block_encrypted_min_key_hex%]';
+my $block_encrypted_max_key_hex = '[%block_encrypted_max_key_hex%]';
+
+is( unpack('H*', Crypt::Cipher::[%orig_name%]->new($min_key)->encrypt($block_plain)), $block_encrypted_min_key_hex, '[%orig_name%]->encrypt');
+is( Crypt::Cipher::[%orig_name%]->new($min_key)->decrypt(pack('H*', $block_encrypted_min_key_hex)), $block_plain, '[%orig_name%]->decrypt');
+
+is( unpack('H*', Crypt::Cipher->new('[%orig_name%]', $min_key)->encrypt($block_plain)), $block_encrypted_min_key_hex, 'Cipher->encrypt');
+is( Crypt::Cipher->new('[%orig_name%]', $min_key)->decrypt(pack('H*', $block_encrypted_min_key_hex)), $block_plain, 'Cipher->decrypt');
+
+is( unpack('H*', Crypt::Cipher::[%orig_name%]->new($max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, '[%orig_name%]->encrypt');
+is( Crypt::Cipher::[%orig_name%]->new($max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, '[%orig_name%]->decrypt');
+
+is( unpack('H*', Crypt::Cipher->new('[%orig_name%]', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
+is( Crypt::Cipher->new('[%orig_name%]', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
+[% IF spec_rounds %]
+my $spec_key = '[%spec_key%]';
+my $spec_rounds = '[%spec_rounds%]';
+my $spec_block_encrypted_hex = '[%spec_block_encrypted_hex%]';
+
+is( unpack('H*', Crypt::Cipher::[%orig_name%]->new($spec_key, $spec_rounds)->encrypt($block_plain)), $spec_block_encrypted_hex, '[%orig_name%]->encrypt');
+is( Crypt::Cipher::[%orig_name%]->new($spec_key, $spec_rounds)->decrypt(pack('H*', $spec_block_encrypted_hex)), $block_plain, '[%orig_name%]->decrypt');
+
+is( unpack('H*', Crypt::Cipher->new('[%orig_name%]', $spec_key, $spec_rounds)->encrypt($block_plain)), $spec_block_encrypted_hex, 'Cipher->encrypt');
+is( Crypt::Cipher->new('[%orig_name%]', $spec_key, $spec_rounds)->decrypt(pack('H*', $spec_block_encrypted_hex)), $block_plain, 'Cipher->decrypt');
+[% END %]

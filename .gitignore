@@ -7,6 +7,7 @@
 *.zip
 *.gz
 _tmp
+tmp.*
 generators/_tmp
 _build
 blib

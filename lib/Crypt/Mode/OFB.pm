@@ -39,7 +39,7 @@ Crypt::Mode::OFB - Block cipher mode OFB [Output feedback]
 
 =head1 DESCRIPTION
 
-This module implements OFB cipher mode. B<NOTE:> it works only with ciphers from L<Cryptx> (Crypt::Cipher::NNNN).
+This module implements OFB cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).
 
 =head1 METHODS
 

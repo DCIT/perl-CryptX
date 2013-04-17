@@ -1,0 +1,22 @@
+[%comment%]
+
+use strict;
+use warnings;
+
+[%- IF t_strings_count %]
+use Test::More;
+[%- ELSE %]
+use Test::More tests => 0;
+[%- END %]
+
+use Crypt::Mac::[%orig_name%] qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_b64 );
+
+[%- FOREACH v IN t_strings %]
+is( unpack('H*', Crypt::Mac::[%orig_name%]->new([%v.args%])->add([%v.data%])->mac), '[%v.mac%]', '[%orig_name%]/oo+raw/[%loop.count%]');
+is( Crypt::Mac::[%orig_name%]->new([%v.args%])->add([%v.data%])->hexmac, '[%v.mac%]', '[%orig_name%]/oo+hex/[%loop.count%]');
+is( unpack('H*', [%lc_name%]([%v.args%],[%v.data%])), '[%v.mac%]', '[%orig_name%]/func+raw/[%loop.count%]');
+is( [%lc_name%]_hex([%v.args%],[%v.data%]), '[%v.mac%]', '[%orig_name%]/func+hex/[%loop.count%]');
+is( [%lc_name%]_b64([%v.args%],[%v.data%]), '[%v.b64mac%]', '[%orig_name%]/func+b64/[%loop.count%]');
+[%- END %]
+
+done_testing();

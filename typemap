@@ -25,9 +25,12 @@ Crypt::Mode::LRW       T_PTROBJ
 Crypt::Mode::OFB       T_PTROBJ
 Crypt::Mode::XTS       T_PTROBJ
 
+Crypt::PRNG            T_PTROBJ
 
-
-
+Crypt::PK::RSA         T_PTROBJ
+Crypt::PK::DSA         T_PTROBJ
+Crypt::PK::ECC         T_PTROBJ
+Crypt::PK::DH          T_PTROBJ
 
 #pointer with automatic NULL<->undef conversion on input/output
 unsigned char *		T_PTR_OR_NULL

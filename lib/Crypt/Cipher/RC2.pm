@@ -25,7 +25,7 @@ Crypt::Cipher::RC2 - Symetric cipher RC2, key size: 64-1024 bits (Crypt::CBC com
 =head1 SYNOPSIS
 
   ### example 1
-  use Crypt::Cipher::CBC;
+  use Crypt::Mode::CBC;
   
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes

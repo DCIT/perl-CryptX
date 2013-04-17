@@ -25,7 +25,7 @@ Crypt::Cipher::SAFER_SK64 - Symetric cipher SAFER_SK64, key size: 64 bits (Crypt
 =head1 SYNOPSIS
 
   ### example 1
-  use Crypt::Cipher::CBC;
+  use Crypt::Mode::CBC;
   
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes

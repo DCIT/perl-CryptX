@@ -25,7 +25,7 @@ Crypt::Cipher::Khazad - Symetric cipher Khazad, key size: 128 bits (Crypt::CBC c
 =head1 SYNOPSIS
 
   ### example 1
-  use Crypt::Cipher::CBC;
+  use Crypt::Mode::CBC;
   
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
