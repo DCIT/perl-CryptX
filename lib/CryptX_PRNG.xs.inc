@@ -56,52 +56,43 @@ bytes(Crypt::PRNG self, UV output_len)
     CODE:
     {
         int rv_len;
-        unsigned char *out_data;
+        unsigned char *rdata;
         RETVAL = NEWSV(0, output_len);
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, output_len);
-        out_data = (unsigned char *)SvPV_nolen(RETVAL);
-        rv_len = (self->desc->read)(out_data, output_len, &self->state);
+        rdata = (unsigned char *)SvPV_nolen(RETVAL);
+        rv_len = (self->desc->read)(rdata, output_len, &self->state);
         if (rv_len != output_len) croak("FATAL: PRNG_read failed");
     }
     OUTPUT:
         RETVAL
 
 UV
-irand(Crypt::PRNG self)
+int32(Crypt::PRNG self)
     CODE:
     {
         int i;
-        UV u;
-        unsigned char out_data[4];
-        i = (self->desc->read)(out_data, 4, &self->state);
-        if (i != sizeof(UV)) croak("FATAL: PRNG_read failed");
-        for(i=0, u=0; i<sizeof(UV); i++) u += (UV)(out_data[i]) << i*8;
-        RETVAL = ((UV)(out_data[0])<<24) + ((UV)(out_data[1])<<16) + ((UV)(out_data[2])<<8) + ((UV)(out_data[3]));
+        unsigned char rdata[4];
+        i = (self->desc->read)(rdata, 4, &self->state);
+        if (i != 4) croak("FATAL: PRNG_read failed");
+        RETVAL = ((UV)(rdata[0])<<24) + ((UV)(rdata[1])<<16) + ((UV)(rdata[2])<<8) + ((UV)(rdata[3]));
     }
     OUTPUT:
         RETVAL
 
 NV
-rand(Crypt::PRNG self, NV limit=1)
+double(Crypt::PRNG self, NV limit=1)
     CODE:
     {
         int i;
-        UV u;
-        unsigned char out_data[sizeof(UV)];
-        i = (self->desc->read)(out_data, sizeof(UV), &self->state);
-        if (i != sizeof(UV)) croak("FATAL: PRNG_read failed");
-        for(i=0, u=0; i<sizeof(UV); i++) u += (UV)(out_data[i]) << i*8;
-        RETVAL = 0;
-        if (sizeof(u) == 8) { /* 64bit int */
-          u = u >> 12;
-          RETVAL = (NV)u * (NV)2.220446049250313080847263336181640625e-16;  /* RETVAL = u>>12 / 2^52 */
-          if (items>1) RETVAL = RETVAL * limit;
-        }
-        else if (sizeof(u) == 4) { /* 32bit int */
-          RETVAL = (NV)u * (NV)2.3283064365386962890625e-10;       /* RETVAL = u / 2^32 */
-          if (items>1) RETVAL = RETVAL * limit;
-        }
+        UV a, b;
+        unsigned char rdata[7]; /* for double we need 53 bits */
+        i = (self->desc->read)(rdata, 7, &self->state);
+        if (i != 7) croak("FATAL: PRNG_read failed");
+        a = (((UV)(rdata[0])<<16) + ((UV)(rdata[1])<<8) + ((UV)(rdata[2]))) & 0x1FFFFF;           /* 21 bits */
+        b = ((UV)(rdata[3])<<24) + ((UV)(rdata[4])<<16) + ((UV)(rdata[5])<<8) + ((UV)(rdata[6])); /* 32 bits */
+        RETVAL = ( (NV)a * 4294967296.0 + (NV)b ) / 9007199254740992.0;                           /* (a * 2^32 + b) / 2^53 */
+        if (items>1) RETVAL = RETVAL * limit;
     }
     OUTPUT:
         RETVAL

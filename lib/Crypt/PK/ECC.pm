@@ -20,27 +20,14 @@ sub new {
   return  $self;
 }
 
-sub export_key_pem {
-  my ($self, $type) = @_;
-  my $key = $self->export_key_der($type||'');
-  return undef unless $key;
-  
-  return "-----BEGIN EC PRIVATE KEY-----\n" .
-         encode_base64($key) .
-         "-----END EC PRIVATE KEY-----\n " if $type eq 'private';
-  
-  return "-----BEGIN PUBLIC KEY-----\n" .
-         encode_base64($key) .
-         "-----END PUBLIC KEY-----\n " if $type eq 'public';
-}
-
 sub import_key {
   my ($self, $data) = @_;
   croak "FATAL: undefined key" unless $data;
   $data = _slurp_file($data) if -f $data;
-  if ($data =~ /-----BEGIN (EC PRIVATE|EC PUBLIC|PRIVATE|PUBLIC) KEY-----(.*?)-----END/sg) {
-    $data = decode_base64($2);
-  }
+  ### no PEM support
+  #if ($data =~ /-----BEGIN (EC PRIVATE|EC PUBLIC|PRIVATE|PUBLIC) KEY-----(.*?)-----END/sg) {
+  #  $data = decode_base64($2);
+  #}
   croak "FATAL: invalid key format" unless $data;
   $self->_import($data);
   return $self;
@@ -122,7 +109,54 @@ sub _slurp_file {
 
 =head1 NAME
 
-__PACKAGE__ - XXX-TODO
+Crypt::PK::ECC - Public key cryptography based on EC
+
+=head1 SYNOPSIS
+
+ ### OO interface
+ 
+ #Encryption: Alice
+ my $pub = Crypt::PK::ECC->new('Bob_pub_ecc1.der'); 
+ my $ct = $pub->encrypt("secret message");
+ #
+ #Encryption: Bob (received ciphertext $ct)
+ my $priv = Crypt::PK::ECC->new('Bob_priv_ecc1.der');
+ my $pt = $priv->decrypt($ct);
+  
+ #Signature: Alice
+ my $priv = Crypt::PK::ECC->new('Alice_priv_ecc1.der');
+ my $sig = $priv->sign($message);
+ #
+ #Signature: Bob (received $message + $sig)
+ my $pub = Crypt::PK::ECC->new('Alice_pub_ecc1.der');
+ $pub->verify($sig, $message) or die "ERROR";
+ 
+ #Shared secret
+ my $priv = Crypt::PK::ECC->new('Alice_priv_ecc1.der');
+ my $pub = Crypt::PK::ECC->new('Bob_pub_ecc1.der'); 
+ my $shared_secret = $priv->shared_secret($pub);
+
+ #Key generation
+ my $pk = Crypt::PK::ECC->new();
+ $pk->generate_key(24);
+ my $private_der = $pk->export_key_der('private');
+ my $public_der = $pk->export_key_der('public');
+ my $public_ansi_x963 = $pk->export_key_x963();
+
+ ### Functional interface
+ 
+ #Encryption: Alice
+ my $ct = ecc_encrypt('Bob_pub_ecc1.der', "secret message");
+ #Encryption: Bob (received ciphertext $ct)
+ my $pt = ecc_decrypt('Bob_priv_ecc1.der', $ct);
+  
+ #Signature: Alice
+ my $sig = ecc_sign('Alice_priv_ecc1.der', $message);
+ #Signature: Bob (received $message + $sig)
+ ecc_verify('Alice_pub_ecc1.der', $sig, $message) or die "ERROR";
+ 
+ #Shared secret
+ my $shared_secret = ecc_shared_secret('Alice_priv_ecc1.der', 'Bob_pub_ecc1.der');
 
 =head1 FUNCTIONS
 
@@ -142,11 +176,12 @@ __PACKAGE__ - XXX-TODO
 
 =head2 generate_key
 
+ $pk->generate_key($keysize);
+ # $keysize .. key size in bytes: 12, 16, 20, 24, 28, 32, 48 or 65
+
 =head2 import_key
 
 =head2 import_key_x963
-
-=head2 export_key_pem
 
 =head2 export_key_der
 

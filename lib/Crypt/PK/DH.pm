@@ -105,7 +105,53 @@ sub _slurp_file {
 
 =head1 NAME
 
-__PACKAGE__ - XXX-TODO
+Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
+
+=head1 SYNOPSIS
+
+ ### OO interface
+ 
+ #Encryption: Alice
+ my $pub = Crypt::PK::DH->new('Bob_pub_dh1.der'); 
+ my $ct = $pub->encrypt("secret message");
+ #
+ #Encryption: Bob (received ciphertext $ct)
+ my $priv = Crypt::PK::DH->new('Bob_priv_dh1.der');
+ my $pt = $priv->decrypt($ct);
+  
+ #Signature: Alice
+ my $priv = Crypt::PK::DH->new('Alice_priv_dh1.der');
+ my $sig = $priv->sign($message);
+ #
+ #Signature: Bob (received $message + $sig)
+ my $pub = Crypt::PK::DH->new('Alice_pub_dh1.der');
+ $pub->verify($sig, $message) or die "ERROR";
+ 
+ #Shared secret
+ my $priv = Crypt::PK::DH->new('Alice_priv_dh1.der');
+ my $pub = Crypt::PK::DH->new('Bob_pub_dh1.der'); 
+ my $shared_secret = $priv->shared_secret($pub);
+
+ #Key generation
+ my $pk = Crypt::PK::DH->new();
+ $pk->generate_key(128);
+ my $private = $pk->export_key('private');
+ my $public = $pk->export_key('public');
+ 
+ ### Functional interface
+ 
+ #Encryption: Alice
+ my $ct = dh_encrypt('Bob_pub_dh1.der', "secret message");
+ #Encryption: Bob (received ciphertext $ct)
+ my $pt = dh_decrypt('Bob_priv_dh1.der', $ct);
+  
+ #Signature: Alice
+ my $sig = dh_sign('Alice_priv_dh1.der', $message);
+ #Signature: Bob (received $message + $sig)
+ dh_verify('Alice_pub_dh1.der', $sig, $message) or die "ERROR";
+ 
+ #Shared secret
+ my $shared_secret = dh_shared_secret('Alice_priv_dh1.der', 'Bob_pub_dh1.der');
 
 =head1 FUNCTIONS
 
@@ -124,6 +170,18 @@ __PACKAGE__ - XXX-TODO
 =head2 new
 
 =head2 generate_key
+
+ $pk->generate_key($keysize);
+ # $keysize:
+ # 96   =>  DH-768
+ # 128  =>  DH-1024
+ # 160  =>  DH-1280
+ # 192  =>  DH-1536
+ # 224  =>  DH-1792
+ # 256  =>  DH-2048
+ # 320  =>  DH-2560
+ # 384  =>  DH-3072
+ # 512  =>  DH-4096
 
 =head2 import_key
 

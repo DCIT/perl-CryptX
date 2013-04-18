@@ -8,20 +8,44 @@ my $flags = '-Ilibtom-src/headers -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES
 
 $flags   .= ' -DLTC_NO_ASM';
 
-####-DLTC_SMALL_CODE #optimize for SIZE 
 #unless ($ENV{CRYPTX_USE_ASM} || $Config{archname} =~ /MSWin32-x86/) {
-#  # avoid on MSWin32/x64 + gcc
 #  $flags .= ' -DLTC_NO_ASM';
 #}
 
-### DSA benchmark keygen(30,256)
-# Win7/32bit fastmath + NO_ASM     7.4s
-# Win7/32bit fastmath              2.8s
-# Win7/32bit tommath + NO_ASM      5.6s
-# Win7/32bit tommath               5.3s
-# Win7/64bit tommath + NO_ASM      xx.4s
+my $class = Module::Build->subclass(
+    class => 'My::Builder',
+    code  => <<'CODE',
+sub ACTION_gencode {
+    my $self = shift;
+    $self->depends_on(qw[touch]);
+    system($^X, qw[_generators/tt_cipher.pl install_code]);
+    system($^X, qw[_generators/tt_digest.pl install_code]);
+    system($^X, qw[_generators/tt_mac.pl install_code]);
+    system($^X, qw[_generators/tt_mode.pl install_code]);
+    return;
+}
+sub ACTION_gentests {
+    my $self = shift;
+    $self->depends_on(qw[build]);
+    system($^X, qw[-Mblib _generators/tt_cipher.pl install_tests]);
+    system($^X, qw[-Mblib _generators/tt_digest.pl install_tests]);
+    system($^X, qw[-Mblib _generators/tt_mac.pl install_tests]);
+    system($^X, qw[-Mblib _generators/tt_mode.pl install_tests]);
+    return;
+}
+sub ACTION_touch {
+    my $self = shift;
+    system($^X, qw[-MFile::Touch -e touch('lib/CryptX.xs')]);
+    return;
+}
+sub ACTION_xs {
+    my $self = shift;
+    $self->depends_on(qw[touch build]);
+}
+CODE
+);
 
-Module::Build->new(
+my $builder = $class->new(
   module_name          => 'CryptX',
   dist_abstract        => 'Crypto toolkit',
   dist_author          => 'Karel Miko',
@@ -41,4 +65,6 @@ Module::Build->new(
   configure_requires   => {
     'Module::Build' => 0,
   },
-)->create_build_script;
+);
+
+$builder->create_build_script;

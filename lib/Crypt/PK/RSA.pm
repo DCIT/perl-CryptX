@@ -133,7 +133,55 @@ sub _slurp_file {
 
 =head1 NAME
 
-__PACKAGE__ - XXX-TODO
+Crypt::PK::RSA - Public key cryptography based on RSA
+
+=head1 SYNOPSIS
+
+ ### OO interface
+ 
+ #Encryption: Alice
+ my $pub = Crypt::PK::RSA->new('Bob_pub_rsa1.der'); 
+ my $ct = $pub->encrypt("secret message");
+ #
+ #Encryption: Bob (received ciphertext $ct)
+ my $priv = Crypt::PK::RSA->new('Bob_priv_rsa1.der');
+ my $pt = $priv->decrypt($ct);
+  
+ #Signature: Alice
+ my $priv = Crypt::PK::RSA->new('Alice_priv_rsa1.der');
+ my $sig = $priv->sign($message);
+ #
+ #Signature: Bob (received $message + $sig)
+ my $pub = Crypt::PK::RSA->new('Alice_pub_rsa1.der');
+ $pub->verify($sig, $message) or die "ERROR";
+ 
+ #Shared secret
+ my $priv = Crypt::PK::RSA->new('Alice_priv_rsa1.der');
+ my $pub = Crypt::PK::RSA->new('Bob_pub_rsa1.der'); 
+ my $shared_secret = $priv->shared_secret($pub);
+
+ #Key generation
+ my $pk = Crypt::PK::RSA->new();
+ $pk->generate_key(256, 65537);
+ my $private_der = $pk->export_key_der('private');
+ my $public_der = $pk->export_key_der('public');
+ my $private_pem = $pk->export_key_pem('private');
+ my $public_pem = $pk->export_key_pem('public');
+
+ ### Functional interface
+ 
+ #Encryption: Alice
+ my $ct = rsa_encrypt('Bob_pub_rsa1.der', "secret message");
+ #Encryption: Bob (received ciphertext $ct)
+ my $pt = rsa_decrypt('Bob_priv_rsa1.der', $ct);
+  
+ #Signature: Alice
+ my $sig = rsa_sign('Alice_priv_rsa1.der', $message);
+ #Signature: Bob (received $message + $sig)
+ rsa_verify('Alice_pub_rsa1.der', $sig, $message) or die "ERROR";
+ 
+ #Shared secret
+ my $shared_secret = rsa_shared_secret('Alice_priv_rsa1.der', 'Bob_pub_rsa1.der');
 
 =head1 FUNCTIONS
 
@@ -145,25 +193,67 @@ __PACKAGE__ - XXX-TODO
 
 =head2 rsa_verify
 
+=head2 rsa_shared_secret
+
 =head1 METHODS
 
 =head2 new
 
 =head2 generate_key
 
-=head2 import_key
+ $pk->generate_key($size, $e);
+ # $size .. (in bytes) 128 - 512
+ # $e   ... 3, 17, 257 or 65537
 
-=head2 export_key_pem
+=head2 import_key
 
 =head2 export_key_der
 
+=head2 export_key_pem
+
 =head2 encrypt
+
+ my $ct = $pk->encrypt($message);
+ #or
+ my $ct = $pk->encrypt($message, $padding);
+ #or
+ my $ct = $pk->encrypt($message, 'oaep', $hash_name, $lparam);
+ 
+ # $padding .. 'oaep', 'v1.5' or 'none'
+ # $hash_name (only for oaep) .. 'SHA1' (DEFAULT), 'SHA256' ...
+ # $lparam (only for oaep)
 
 =head2 decrypt
 
+ my $pt = $pk->decrypt($ciphertext);
+ #or
+ my $pt = $pk->decrypt($ciphertext, $padding);
+ #or
+ my $pt = $pk->decrypt($ciphertext, 'oaep', $hash_name, $lparam);
+
 =head2 sign
 
+ my $signature = $priv->sign($message);
+ #or
+ my $signature = $priv->sign($message, $padding);
+ #or
+ my $signature = $priv->sign($message, $padding, $hash_name);
+ #or
+ my $signature = $priv->sign($message, $padding, $hash_name, $saltlen);
+ 
+ # $padding .. 'pss' or 'v1.5'
+ # $hash_name (only for pss) .. 'SHA1' (DEFAULT), 'SHA256' ...
+ # $saltlen (only for pss) ..... DEFAULT: 12
+
 =head2 verify
+
+ my $valid = $pub->verify($signature, $message)
+ #or
+ my $valid = $pub->verify($signature, $padding, $hash_name);
+ #or
+ my $valid = $pub->verify($signature, $padding, $hash_name, $saltlen);
+
+=head2 shared_secret
 
 =head2 is_private
 

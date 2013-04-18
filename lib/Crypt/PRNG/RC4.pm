@@ -4,12 +4,29 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( random_bytes )] );
+our %EXPORT_TAGS = ( all => [qw(random_bytes random_bytes_hex random_bytes_b64 random_string random_string_from rand irand)] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
 use base 'Crypt::PRNG';
+
+{
+  ### stolen from Bytes::Random::Secure  
+  my $RNG_object = undef;
+  my $fetch_RNG = sub { # Lazily, instantiate the RNG object, but only once.
+    $RNG_object = Crypt::PRNG::RC4->new unless defined $RNG_object;
+    return $RNG_object;
+  }; 
+  sub rand               { return $fetch_RNG->()->double(@_) }
+  sub irand              { return $fetch_RNG->()->int32(@_) }
+  sub random_bytes       { return $fetch_RNG->()->bytes(@_) }
+  sub random_bytes_hex   { return $fetch_RNG->()->bytes_hex(@_) }
+  sub random_bytes_b64   { return $fetch_RNG->()->bytes_b64(@_) }
+  sub random_string_from { return $fetch_RNG->()->string_from(@_) }
+  sub random_string      { return $fetch_RNG->()->string(@_) }
+}
+
 
 1;
 
@@ -17,4 +34,78 @@ use base 'Crypt::PRNG';
 
 =head1 NAME
 
-Crypt::PRNG - XXX-TODO
+Crypt::PRNG::RC4 - Cryptographically secure PRNG based on RC4 algorithm
+
+=head1 SYNOPSIS
+
+   ### Functional interface:
+   use Crypt::PRNG::RC4 qw(random_bytes random_bytes_hex random_bytes_b64 random_string random_string_from rand irand);
+
+   $octets = random_bytes(45);
+   $hex_string = random_bytes_hex(45);
+   $base64_string = random_bytes_b64(45);
+   $alphanumeric_string = random_string(30);
+   $string = random_string_from('ACGT', 64);
+   $floating_point_number_0_to_1 = rand;
+   $floating_point_number_0_to_88 = rand(88);
+   $unsigned_32bit_int = irand;
+
+   ### OO interface:
+   use Crypt::PRNG::RC4;
+
+   $prng = Crypt::PRNG::RC4->new;
+   #or
+   $prng = Crypt::PRNG::RC4->new("some data used for seeding PRNG");
+   
+   $octets = $prng->bytes(45);
+   $hex_string = $prng->bytes_hex(45);
+   $base64_string = $prng->bytes_b64(45);
+   $alphanumeric_string = $prng->string(30);
+   $string = $prng->string_from('ACGT', 64);
+   $floating_point_number_0_to_1 = rand;
+   $floating_point_number_0_to_88 = rand(88);
+   $unsigned_32bit_int = irand;
+
+=head1 DESCRIPTION
+
+Provides an interface to the RC4 based pseudo random number generator
+
+All methods and functions are the same as for L<Crypt::PRNG>.
+
+=head1 FUNCTIONS
+
+=head2 random_bytes
+
+=head2 random_bytes_hex
+
+=head2 random_bytes_b64
+
+=head2 random_string
+
+=head2 random_string_from
+
+=head2 rand
+
+=head2 irand
+
+=head1 METHODS
+
+=head1 new
+
+=head2 bytes
+
+=head2 bytes_hex
+
+=head2 bytes_b64
+
+=head2 string
+
+=head2 string_from
+
+=head2 double
+
+=head2 int32
+
+=head1 SEE ALSO
+
+L<Crypt::PRNG>

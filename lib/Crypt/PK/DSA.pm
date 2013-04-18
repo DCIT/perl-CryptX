@@ -113,7 +113,55 @@ sub _slurp_file {
 
 =head1 NAME
 
-__PACKAGE__ - XXX-TODO
+Crypt::PK::DSA - Public key cryptography based on DSA
+
+=head1 SYNOPSIS
+
+ ### OO interface
+ 
+ #Encryption: Alice
+ my $pub = Crypt::PK::DSA->new('Bob_pub_dsa1.der'); 
+ my $ct = $pub->encrypt("secret message");
+ #
+ #Encryption: Bob (received ciphertext $ct)
+ my $priv = Crypt::PK::DSA->new('Bob_priv_dsa1.der');
+ my $pt = $priv->decrypt($ct);
+  
+ #Signature: Alice
+ my $priv = Crypt::PK::DSA->new('Alice_priv_dsa1.der');
+ my $sig = $priv->sign($message);
+ #
+ #Signature: Bob (received $message + $sig)
+ my $pub = Crypt::PK::DSA->new('Alice_pub_dsa1.der');
+ $pub->verify($sig, $message) or die "ERROR";
+ 
+ #Shared secret
+ my $priv = Crypt::PK::DSA->new('Alice_priv_dsa1.der');
+ my $pub = Crypt::PK::DSA->new('Bob_pub_dsa1.der'); 
+ my $shared_secret = $priv->shared_secret($pub);
+
+ #Key generation
+ my $pk = Crypt::PK::DSA->new();
+ $pk->generate_key(30, 256);
+ my $private_der = $pk->export_key_der('private');
+ my $public_der = $pk->export_key_der('public');
+ my $private_pem = $pk->export_key_pem('private');
+ my $public_pem = $pk->export_key_pem('public');
+
+ ### Functional interface
+ 
+ #Encryption: Alice
+ my $ct = dsa_encrypt('Bob_pub_dsa1.der', "secret message");
+ #Encryption: Bob (received ciphertext $ct)
+ my $pt = dsa_decrypt('Bob_priv_dsa1.der', $ct);
+  
+ #Signature: Alice
+ my $sig = dsa_sign('Alice_priv_dsa1.der', $message);
+ #Signature: Bob (received $message + $sig)
+ dsa_verify('Alice_pub_dsa1.der', $sig, $message) or die "ERROR";
+ 
+ #Shared secret
+ my $shared_secret = dsa_shared_secret('Alice_priv_dsa1.der', 'Bob_pub_dsa1.der');
 
 =head1 FUNCTIONS
 
@@ -125,17 +173,29 @@ __PACKAGE__ - XXX-TODO
 
 =head2 dsa_verify
 
+=head2 dsa_shared_secret
+
 =head1 METHODS
 
 =head2 new
 
 =head2 generate_key
 
+ $pk->generate_key($group_size, $modulus_size);
+ # $group_size  ... 15 < $group_size < 1024
+ # $modulus_size .. ($modulus_size - $group_size) < 512
+ 
+ # Bits of Security  $group_size  $modulus_size
+ # 80                20           128
+ # 120               30           256
+ # 140               35           384
+ # 160               40           512
+
 =head2 import_key
 
-=head2 export_key_pem
-
 =head2 export_key_der
+
+=head2 export_key_pem
 
 =head2 encrypt
 
@@ -144,6 +204,8 @@ __PACKAGE__ - XXX-TODO
 =head2 sign
 
 =head2 verify
+
+=head2 shared_secret
 
 =head2 is_private
 

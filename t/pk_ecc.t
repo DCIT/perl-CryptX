@@ -23,21 +23,21 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign ecc_verify ecc_shared_sec
   ok($k, 'load cryptx_pub_ecc2.der');
   ok(!$k->is_private, 'is_private cryptx_pub_ecc2.der');
    
-  $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc1.pem');
-  ok($k, 'load cryptx_priv_ecc1.pem');
-  ok($k->is_private, 'is_private cryptx_priv_ecc1.pem');
+  # $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc1.pem');
+  # ok($k, 'load cryptx_priv_ecc1.pem');
+  # ok($k->is_private, 'is_private cryptx_priv_ecc1.pem');
   
-  $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc2.pem');
-  ok($k, 'load cryptx_priv_ecc2.pem');
-  ok($k->is_private, 'is_private cryptx_priv_ecc2.pem');
+  # $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc2.pem');
+  # ok($k, 'load cryptx_priv_ecc2.pem');
+  # ok($k->is_private, 'is_private cryptx_priv_ecc2.pem');
   
-  $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc1.pem');
-  ok($k, 'load cryptx_pub_ecc1.pem');
-  ok(!$k->is_private, 'is_private cryptx_pub_ecc1.pem');
+  # $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc1.pem');
+  # ok($k, 'load cryptx_pub_ecc1.pem');
+  # ok(!$k->is_private, 'is_private cryptx_pub_ecc1.pem');
   
-  $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.pem');
-  ok($k, 'load cryptx_pub_ecc2.pem');
-  ok(!$k->is_private, 'is_private cryptx_pub_ecc2.pem');
+  # $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.pem');
+  # ok($k, 'load cryptx_pub_ecc2.pem');
+  # ok(!$k->is_private, 'is_private cryptx_pub_ecc2.pem');
 }
 
 {
@@ -70,8 +70,8 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign ecc_verify ecc_shared_sec
   $k->generate_key(32);
   ok($k, 'generate_key');
   ok($k->is_private, 'is_private');
-  ok($k->export_key_pem('private'), 'export_key_pem pri');
-  ok($k->export_key_pem('public'), 'export_key_pem pub');
+  #ok($k->export_key_pem('private'), 'export_key_pem pri');
+  #ok($k->export_key_pem('public'), 'export_key_pem pub');
   ok($k->export_key_der('private'), 'export_key_der pri');
   ok($k->export_key_der('public'), 'export_key_der pub');
   is($k->size, 32, 'size');
