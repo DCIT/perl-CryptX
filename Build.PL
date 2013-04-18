@@ -4,9 +4,9 @@ use Module::Build;
 use Config;
 
 my $src = 'libtom-src';
-my $flags = '-Ilibtom-src/headers -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -libtom-src -DLTM_DESC';
+my $flags = '-Ilibtom-src/headers -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -Ilibtom-src -DLTM_DESC';
 
-$flags   .= ' -DLTC_NO_ASM';
+$flags   .= ' -DLTC_NO_ASM'; # -Wall
 
 #unless ($ENV{CRYPTX_USE_ASM} || $Config{archname} =~ /MSWin32-x86/) {
 #  $flags .= ' -DLTC_NO_ASM';
@@ -31,6 +31,12 @@ sub ACTION_gentests {
     system($^X, qw[-Mblib _generators/tt_digest.pl install_tests]);
     system($^X, qw[-Mblib _generators/tt_mac.pl install_tests]);
     system($^X, qw[-Mblib _generators/tt_mode.pl install_tests]);
+    return;
+}
+sub ACTION_libjumbo {
+    my $self = shift;
+    $self->depends_on(qw[build]);
+    system($^X, '_generators/libjumbo.pl');
     return;
 }
 sub ACTION_touch {

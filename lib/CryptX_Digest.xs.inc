@@ -82,7 +82,8 @@ hexdigest(self)
         Crypt::Digest self
     CODE:
     {
-        int rv, i;
+        int rv;
+        unsigned long i;
         unsigned char hash[MAXBLOCKSIZE];
         char hash_hex[MAXBLOCKSIZE*2 + 1];
         

@@ -93,8 +93,8 @@ hexmac(Crypt::Mac::Pelican self)
     CODE:
     {
         unsigned char mac[MAXBLOCKSIZE];
-        unsigned long mac_len;
-        int rv, i;
+        unsigned long mac_len, i;
+        int rv;
         char mac_hex[MAXBLOCKSIZE*2 + 1];
 
         mac_len = 16;

@@ -127,8 +127,8 @@ hexmac(Crypt::Mac::[%orig_name%] self)
     CODE:
     {
         unsigned char mac[MAXBLOCKSIZE];
-        unsigned long mac_len;
-        int rv, i;
+        unsigned long mac_len, i;
+        int rv;
         char mac_hex[MAXBLOCKSIZE*2 + 1];
 
 [%-IF lc_name == 'pelican' %]

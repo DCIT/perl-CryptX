@@ -56,7 +56,7 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
  */
 
 /* detect x86-32 machines somewhat */
-#if !defined(__STRICT_ANSI__) && (defined(INTEL_CC) || (defined(_MSC_VER) && defined(WIN32)) || (defined(__GNUC__) && (defined(__DJGPP__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__i386__))))
+#if !defined(__STRICT_ANSI__) && !defined(_WIN64) && (defined(INTEL_CC) || (defined(_MSC_VER) && defined(WIN32)) || (defined(__GNUC__) && (defined(__DJGPP__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__i386__))))
    #define ENDIAN_LITTLE
    #define ENDIAN_32BITWORD
    #define LTC_FAST
@@ -70,11 +70,19 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 #endif
 
 /* detect amd64 */
-#if !defined(__STRICT_ANSI__) && defined(__x86_64__)
+#ifdef _WIN64
+   #define ENDIAN_LITTLE
+   #define ENDIAN_64BITWORD
+   #define LTC_FAST
+   /* on 64bit ms windows 'unsigned long' is only 32bit we need 'long long'*/
+   #define LTC_FAST_TYPE    unsigned long long
+#else
+ #if !defined(__STRICT_ANSI__) && defined(__x86_64__)
    #define ENDIAN_LITTLE
    #define ENDIAN_64BITWORD
    #define LTC_FAST
    #define LTC_FAST_TYPE    unsigned long
+ #endif
 #endif
 
 /* detect PPC32 */
@@ -111,7 +119,7 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
    #undef LTC_FAST
    #undef LTC_FAST_TYPE
    #define LTC_NO_ROLC
-	#define LTC_NO_BSWAP
+   #define LTC_NO_BSWAP
 #endif
 
 /* #define ENDIAN_LITTLE */

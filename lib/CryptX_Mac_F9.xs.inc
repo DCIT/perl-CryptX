@@ -97,8 +97,8 @@ hexmac(Crypt::Mac::F9 self)
     CODE:
     {
         unsigned char mac[MAXBLOCKSIZE];
-        unsigned long mac_len;
-        int rv, i;
+        unsigned long mac_len, i;
+        int rv;
         char mac_hex[MAXBLOCKSIZE*2 + 1];
 
         mac_len = sizeof(mac);

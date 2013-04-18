@@ -73,15 +73,18 @@ extern "C" {
    typedef signed long long   long64;
 #endif
 
-#ifdef __WIN64
-   typedef unsigned long      mp_digit __attribute__ ((mode(DI)));
-   typedef unsigned long      mp_word __attribute__ ((mode(TI)));
-#else
+ #ifdef __WIN64
+   typedef unsigned long        mp_digit;
+   typedef unsigned long long   mp_word;
+   #define DIGIT_BIT            28
+   #define MP_28BIT
+ #else
    typedef unsigned long      mp_digit;
    typedef unsigned long      mp_word __attribute__ ((mode(TI)));
-#endif
-
    #define DIGIT_BIT          60
+ #endif
+
+   
 #else
    /* this is the default case, 28-bit digits */
    

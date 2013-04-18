@@ -102,7 +102,7 @@ int der_encode_setof(ltc_asn1_list *list, unsigned long inlen,
       }
       
       /* get the size of the static header */
-      hdrlen = ((unsigned long)ptr) - ((unsigned long)buf);
+      hdrlen = (unsigned long)(ptr - buf);
       
       
    /* scan for edges */

@@ -49,6 +49,14 @@ L<Crypt::Digest::SHA512>, L<Crypt::Digest::Tiger192>, L<Crypt::Digest::Whirlpool
 
 L<Crypt::Mac::F9>, L<Crypt::Mac::HMAC>, L<Crypt::Mac::OMAC>, L<Crypt::Mac::Pelican>, L<Crypt::Mac::PMAC>, L<Crypt::Mac::XCBC>
 
+=item * Public key cryptography
+
+L<Crypt::PK::RSA>, L<Crypt::PK::DSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DH>
+
+=item * Cryptographically secure random number generators
+
+L<Crypt::PRNG>, L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::Yarrow>, L<Crypt::PRNG::RC4>, L<Crypt::PRNG::Sober128>
+
 =back
 
 =head1 COPYRIGHT

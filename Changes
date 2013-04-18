@@ -1,5 +1,9 @@
 Changes for CryptX
 
+0.006   2013/04/XXX
+        - added Crypt::KeyDerivation
+        - Win64 compatibility
+
 0.005   2013/04/18
         - added Crypt::PRNG::Fortuna|RC4|Sober128|Yarrow
         - added Crypt::PK::RSA|DSA|ECC|DH

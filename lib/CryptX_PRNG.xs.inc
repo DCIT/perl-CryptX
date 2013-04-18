@@ -62,7 +62,7 @@ bytes(Crypt::PRNG self, UV output_len)
         SvCUR_set(RETVAL, output_len);
         rdata = (unsigned char *)SvPV_nolen(RETVAL);
         rv_len = (self->desc->read)(rdata, output_len, &self->state);
-        if (rv_len != output_len) croak("FATAL: PRNG_read failed");
+        if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
     }
     OUTPUT:
         RETVAL
