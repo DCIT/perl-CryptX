@@ -6,7 +6,8 @@ use Config;
 my $src = 'libtom-src';
 my $flags = '-Ilibtom-src/headers -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -Ilibtom-src -DLTM_DESC';
 
-$flags   .= ' -DLTC_NO_ASM'; # -Wall
+$flags .= ' -DLTC_NO_ASM';
+#$flags .= ' -Wall';
 
 #unless ($ENV{CRYPTX_USE_ASM} || $Config{archname} =~ /MSWin32-x86/) {
 #  $flags .= ' -DLTC_NO_ASM';
