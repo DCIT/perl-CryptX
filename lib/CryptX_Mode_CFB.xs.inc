@@ -43,7 +43,7 @@ _start(Crypt::Mode::CFB self, int dir, SV * key, SV * iv)
 
         if (!SvPOK(iv))    croak("FATAL: iv must be string/buffer scalar");
         i = (unsigned char *) SvPVbyte(iv, i_len);
-        if (i_len != cipher_descriptor[self->cipher_id].block_length) {
+        if (i_len != (STRLEN)cipher_descriptor[self->cipher_id].block_length) {
           croak ("FATAL: sizeof(iv) should be equal to blocksize (%d)", cipher_descriptor[self->cipher_id].block_length);
         }
 

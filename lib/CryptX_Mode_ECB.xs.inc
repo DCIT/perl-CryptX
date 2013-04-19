@@ -54,7 +54,9 @@ SV *
 _encrypt(Crypt::Mode::ECB self, SV * data)
     CODE:
     {
-        int rv, i, blen, has_tmp_block;
+        int rv, has_tmp_block, blen;
+        unsigned int i;
+
         STRLEN in_data_len, in_data_start;
         unsigned char *in_data, *out_data, tmp_block[MAXBLOCKSIZE];
 
@@ -155,7 +157,8 @@ SV *
 _decrypt(Crypt::Mode::ECB self, SV * data)
     CODE:
     {
-        int rv, i, blen, has_tmp_block;
+        int rv, has_tmp_block, blen;
+        unsigned long i;
         STRLEN in_data_len, in_data_start;
         unsigned char *in_data, *out_data, tmp_block[MAXBLOCKSIZE];
 
