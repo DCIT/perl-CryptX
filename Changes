@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.006   2013/04/XXX
+0.006   2013/04/19
         - added Crypt::KeyDerivation
         - Win64 compatibility
 

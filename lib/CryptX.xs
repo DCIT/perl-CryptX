@@ -259,3 +259,5 @@ INCLUDE: CryptX_PK_RSA.xs.inc
 INCLUDE: CryptX_PK_DSA.xs.inc
 INCLUDE: CryptX_PK_DH.xs.inc
 INCLUDE: CryptX_PK_ECC.xs.inc
+
+INCLUDE: CryptX_KeyDerivation.xs.inc
