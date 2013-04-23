@@ -15,7 +15,7 @@ use base 'Crypt::PRNG';
   ### stolen from Bytes::Random::Secure  
   my $RNG_object = undef;
   my $fetch_RNG = sub { # Lazily, instantiate the RNG object, but only once.
-    $RNG_object = Crypt::PRNG::Sober128->new unless defined $RNG_object;
+    $RNG_object = Crypt::PRNG::Sober128->new unless defined $RNG_object && ref($RNG_object) ne 'SCALAR';
     return $RNG_object;
   }; 
   sub rand               { return $fetch_RNG->()->double(@_) }

@@ -3,7 +3,7 @@ package CryptX;
 use strict;
 use warnings ;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 $VERSION = eval $VERSION;
 
 require XSLoader;
@@ -45,7 +45,7 @@ L<Crypt::Digest::CHAES>, L<Crypt::Digest::MD2>, L<Crypt::Digest::MD4>, L<Crypt::
 L<Crypt::Digest::RIPEMD256>, L<Crypt::Digest::RIPEMD320>, L<Crypt::Digest::SHA1>, L<Crypt::Digest::SHA224>, L<Crypt::Digest::SHA256>, L<Crypt::Digest::SHA384>, 
 L<Crypt::Digest::SHA512>, L<Crypt::Digest::Tiger192>, L<Crypt::Digest::Whirlpool>
 
-=item * Message Authentication Codes - see L<Crypt::Mac> and related modules
+=item * Message Authentication Codes
 
 L<Crypt::Mac::F9>, L<Crypt::Mac::HMAC>, L<Crypt::Mac::OMAC>, L<Crypt::Mac::Pelican>, L<Crypt::Mac::PMAC>, L<Crypt::Mac::XCBC>
 
@@ -56,6 +56,10 @@ L<Crypt::PK::RSA>, L<Crypt::PK::DSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DH>
 =item * Cryptographically secure random number generators
 
 L<Crypt::PRNG>, L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::Yarrow>, L<Crypt::PRNG::RC4>, L<Crypt::PRNG::Sober128>
+
+=item * Key derivation functions - PBKDF1, PBKFD2 and HKDF
+
+L<Crypt::KeyDerivation>
 
 =back
 

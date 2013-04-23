@@ -39,5 +39,6 @@ sub addfile {
   return $self;
 }
 
+sub CLONE_SKIP { 1 } # XXX-FIXME for now just prevent cloning
 
 1;

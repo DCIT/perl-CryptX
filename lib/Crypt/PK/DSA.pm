@@ -167,13 +167,26 @@ Crypt::PK::DSA - Public key cryptography based on DSA
 
 =head2 dsa_encrypt
 
+DSA based encryption.
+
+Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared key is computed, and 
+the hash of the shared key XOR'ed against the plaintext forms the ciphertext.
+
 =head2 dsa_decrypt
+
+DSA based decryption.
 
 =head2 dsa_sign
 
+Generate DSA signature.
+
 =head2 dsa_verify
 
+Verify DSA signature.
+
 =head2 dsa_shared_secret
+
+Establish shared secret with a private and public DSA key.
 
 =head1 METHODS
 
@@ -210,4 +223,3 @@ Crypt::PK::DSA - Public key cryptography based on DSA
 =head2 is_private
 
 =head2 size
-

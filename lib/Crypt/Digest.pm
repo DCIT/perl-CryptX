@@ -84,6 +84,8 @@ sub hashsize {
   return _hashsize_by_name(_trans_digest_name($self));
 }
 
+sub CLONE_SKIP { 1 } # XXX-FIXME for now just prevent cloning
+
 ### FUNCTIONS
 
 sub digest_data        { Crypt::Digest->new(lc(shift))->add(@_)->digest }

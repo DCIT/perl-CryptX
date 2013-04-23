@@ -8,7 +8,9 @@ our %EXPORT_TAGS = ( all => [qw( ccm_encrypt_authenticate ccm_decrypt_verify )] 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use CryptX;
 use Crypt::Cipher;
+use base 'Crypt::AuthEnc';
 
 ### the following functions are implemented in XS:
 # - _memory_encrypt

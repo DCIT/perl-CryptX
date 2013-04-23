@@ -10,6 +10,7 @@ use Crypt::PK::DSA qw(dsa_encrypt dsa_decrypt dsa_sign dsa_verify);
   $k = Crypt::PK::DSA->new('t/data/cryptx_priv_dsa1.der');
   ok($k, 'load cryptx_priv_dsa1.der');
   ok($k->is_private, 'is_private cryptx_priv_dsa1.der');
+  is($k->size, 256, 'size');
 
   $k = Crypt::PK::DSA->new('t/data/cryptx_priv_dsa2.der');
   ok($k, 'load cryptx_priv_dsa2.der');
@@ -57,28 +58,28 @@ use Crypt::PK::DSA qw(dsa_encrypt dsa_decrypt dsa_sign dsa_verify);
 }
 
 {
- my $pr1 = Crypt::PK::DSA->new;
- $pr1->import_key('t/data/cryptx_priv_dsa1.der');
- my $pu1 = Crypt::PK::DSA->new;
- $pu1->import_key('t/data/cryptx_pub_dsa1.der');
+  my $pr1 = Crypt::PK::DSA->new;
+  $pr1->import_key('t/data/cryptx_priv_dsa1.der');
+  my $pu1 = Crypt::PK::DSA->new;
+  $pu1->import_key('t/data/cryptx_pub_dsa1.der');
  
- my $ct = $pu1->encrypt("secret message");
- my $pt = $pr1->decrypt($ct);
- ok(length $ct > 200, 'encrypt ' . length($ct));
- is($pt, "secret message", 'decrypt');
+  my $ct = $pu1->encrypt("secret message");
+  my $pt = $pr1->decrypt($ct);
+  ok(length $ct > 200, 'encrypt ' . length($ct));
+  is($pt, "secret message", 'decrypt');
  
- my $sig = $pr1->sign("message");
- ok(length $sig > 60, 'sign ' . length($sig));
- ok($pu1->verify($sig, "message"), 'verify');
+  my $sig = $pr1->sign("message");
+  ok(length $sig > 60, 'sign ' . length($sig));
+  ok($pu1->verify($sig, "message"), 'verify');
  
   my $pr2 = Crypt::PK::DSA->new;
- $pr2->import_key('t/data/cryptx_priv_dsa2.der');
- my $pu2 = Crypt::PK::DSA->new;
- $pu2->import_key('t/data/cryptx_pub_dsa2.der');
+  $pr2->import_key('t/data/cryptx_priv_dsa2.der');
+  my $pu2 = Crypt::PK::DSA->new;
+  $pu2->import_key('t/data/cryptx_pub_dsa2.der');
  
- #my $ss1 = $pr1->shared_secret($pu2);
- #my $ss2 = $pr2->shared_secret($pu1);
- #is(unpack("H*",$ss1), unpack("H*",$ss2), 'shared_secret');
+  #my $ss1 = $pr1->shared_secret($pu2);
+  #my $ss2 = $pr2->shared_secret($pu1);
+  #is(unpack("H*",$ss1), unpack("H*",$ss2), 'shared_secret');
 }
 
 {
@@ -90,7 +91,6 @@ use Crypt::PK::DSA qw(dsa_encrypt dsa_decrypt dsa_sign dsa_verify);
   ok($k->export_key_pem('public'), 'export_key_pem pub');
   ok($k->export_key_der('private'), 'export_key_der pri');
   ok($k->export_key_der('public'), 'export_key_der pub');
-  is($k->size, 128, 'size');
 }
 
 {

@@ -22,16 +22,18 @@ sub _trans_prng_name {
 sub new {
   my $pkg = shift;
   my $prng_name = $pkg eq __PACKAGE__ ? _trans_prng_name(shift||'Fortuna') : _trans_prng_name($pkg);
-  return _new($prng_name, @_);
+  return _new($$, $prng_name, @_);
 }
 
-sub bytes_hex {
-  return unpack("H*", shift->bytes(shift));
-}
+sub bytes  { return shift->_bytes($$, shift) }
 
-sub bytes_b64 {
-  return encode_base64(shift->bytes(shift), "");
-}
+sub int32  { return shift->_int32($$) }
+
+sub double { return shift->_double($$, shift) }
+
+sub bytes_hex { return unpack("H*", shift->bytes(shift)) }
+
+sub bytes_b64 { return encode_base64(shift->bytes(shift), "") }
 
 sub string {
   my ($self, $len) = @_;
@@ -40,6 +42,9 @@ sub string {
 
 sub string_from {
   my ($self, $chars, $len) = @_;
+  
+  $len = 20 unless defined $len;
+  
   my @ch = split(//, $chars);
   my $max_index = scalar(@ch)-1;
   
@@ -58,13 +63,7 @@ sub string_from {
   return $rv;
 }
 
-#XXX-TODO maybe add
-#random_bytes_base64
-#random_bytes_hex
-#random_bytes_qp
-#bytes_hex
-#bytes_base64
-#bytes_qp
+sub CLONE_SKIP { 1 } # XXX-FIXME for now just prevent cloning
 
 ### FUNCTIONS
 
@@ -75,18 +74,17 @@ sub string_from {
   # limiting the scope of the RNG object so it can't be tampered with.
   my $RNG_object = undef;
   my $fetch_RNG = sub { # Lazily, instantiate the RNG object, but only once.
-    $RNG_object = Crypt::PRNG->new unless defined $RNG_object;
+    $RNG_object = Crypt::PRNG->new unless defined $RNG_object && ref($RNG_object) ne 'SCALAR';
     return $RNG_object;
   }; 
   sub rand               { return $fetch_RNG->()->double(@_) }
-  sub irand              { return $fetch_RNG->()->int32(@_) }
+  sub irand              { return $fetch_RNG->()->int32() }
   sub random_bytes       { return $fetch_RNG->()->bytes(@_) }
   sub random_bytes_hex   { return $fetch_RNG->()->bytes_hex(@_) }
   sub random_bytes_b64   { return $fetch_RNG->()->bytes_b64(@_) }
   sub random_string_from { return $fetch_RNG->()->string_from(@_) }
   sub random_string      { return $fetch_RNG->()->string(@_) }
 }
-
 
 1;
 
@@ -130,7 +128,7 @@ Crypt::PRNG - Cryptographically secure random number generator
 
 =head1 DESCRIPTION
 
-Provides an interface to the Fortuna based pseudo random number generator
+Provides an interface to the Fortuna based pseudo random number generator (thread-safe and fork-safe).
 
 =head1 FUNCTIONS
 
@@ -163,6 +161,8 @@ Returns a random string made of C<$length> chars randomly chosen from C<$range> 
 =head2 random_string
 
    $alphanumeric_string = random_string($length);
+   #or
+   $alphanumeric_string = random_string;  # default length = 20
 
 Similar to random_string_from, only C<$range> is fixed to C<'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'>.
 
@@ -193,8 +193,18 @@ Returns a random unsigned 32bit integer - range 0 .. 0xFFFFFFFF.
    # $alg  ... algorithm name 'Frotuna' (DEFAULT), 'RC4', 'Sober128' or 'Yarrow'
    # $seed ... will be used as an initial entropy for seeding PRNG
 
-If C<$seed> is not specified the PRNG is automatically seeded with random data taken from /dev/random (UNIX) or CryptGenRandom (Win32)
+If C<$seed> is not specified the PRNG is automatically seeded with 32bytes random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32)
 
+=head2 add_entropy
+
+  $prng->add_entropy($random_data);
+  #or
+  $prng->add_entropy();
+
+If called without parameter it uses 32bytes random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
+
+B<BEWARE:> you probably do not need this function at all as the module does automatic seeding on initialization as well as reseeding after fork and thread creation.
+    
 =head2 bytes
 
    $octets = $prng->bytes($length);
@@ -216,6 +226,8 @@ See L<random_bytes_b64|/random_bytes_b64>
 =head2 string
 
    $alphanumeric_string = $prng->string($length);
+   #or
+   $alphanumeric_string = $prng->string;
 
 See L<random_string|/random_string>
 

@@ -132,6 +132,7 @@ typedef struct xts_struct {             /* used by Crypt::Mode::XTS */
 typedef struct prng_struct {            /* used by Crypt::PRNG */
   prng_state state;
   struct ltc_prng_descriptor *desc;
+  IV last_pid;
   int id;
 } *Crypt__PRNG;
 

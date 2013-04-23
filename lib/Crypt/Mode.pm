@@ -3,10 +3,6 @@ package Crypt::Mode;
 use strict;
 use warnings;
 
-use Exporter 'import';
-our @EXPORT_OK = qw(
-);
-
 ### METHODS
 
 sub new { die }    # overriden in subclass
@@ -59,5 +55,7 @@ sub _finish {
   return $self->_finish_dec(@_) if $self->_get_dir == -1;
   return undef;
 }
+
+sub CLONE_SKIP { 1 } # XXX-FIXME for now just prevent cloning
 
 1;

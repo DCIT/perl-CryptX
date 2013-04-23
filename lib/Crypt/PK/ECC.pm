@@ -158,17 +158,34 @@ Crypt::PK::ECC - Public key cryptography based on EC
  #Shared secret
  my $shared_secret = ecc_shared_secret('Alice_priv_ecc1.der', 'Bob_pub_ecc1.der');
 
+=head1 DESCRIPTION
+
+The module provides a set of core ECC functions as well that are designed to be the Elliptic Curve analogy of 
+all of the Diffie-Hellman routines (ECDH).
+
 =head1 FUNCTIONS
 
 =head2 ecc_encrypt
 
+Elliptic Curve Diffie-Hellman (ECDH) encryption.
+
+ECCDH Encryption is performed by producing a random key, hashing it, and XOR'ing the digest against the plaintext.
+
 =head2 ecc_decrypt
+
+Elliptic Curve Diffie-Hellman (ECDH) decryption
 
 =head2 ecc_sign
 
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation
+
 =head2 ecc_verify
 
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification
+
 =head2 ecc_shared_secret
+
+Elliptic curve Diffie-Hellman (ECDH) - construct a Diffie-Hellman shared secret with a private and public ECC key.
 
 =head1 METHODS
 
@@ -177,15 +194,29 @@ Crypt::PK::ECC - Public key cryptography based on EC
 =head2 generate_key
 
  $pk->generate_key($keysize);
- # $keysize .. key size in bytes: 12, 16, 20, 24, 28, 32, 48 or 65
+ # $keysize .. key size in bytes: 14, 16, 20, 24, 28, 32, 48 or 65
+ #   14 => use curve SECP112R1
+ #   16 => use curve SECP128R1
+ #   20 => use curve SECP160R1
+ #   24 => use curve P-192 recommended by FIPS 186-3
+ #   28 => use curve P-224 recommended by FIPS 186-3
+ #   32 => use curve P-256 recommended by FIPS 186-3
+ #   48 => use curve P-384 recommended by FIPS 186-3
+ #   65 => use curve P-521 recommended by FIPS 186-3
+ 
+See L<http://csrc.nist.gov/publications/fips/fips186-3/fips_186-3.pdf> and L<http://www.secg.org/collateral/sec2_final.pdf>
 
 =head2 import_key
 
 =head2 import_key_x963
 
+ANSI X9.63 Import (public key only)
+
 =head2 export_key_der
 
 =head2 export_key_x963
+
+ANSI X9.63 Export (public key only)
 
 =head2 encrypt
 
