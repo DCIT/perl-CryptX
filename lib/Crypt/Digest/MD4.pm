@@ -10,18 +10,20 @@ our %EXPORT_TAGS = ( all => [qw( md4 md4_hex md4_base64 md4_file md4_file_hex md
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use base 'Crypt::Digest';
 
 sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
-sub md4             { __PACKAGE__->new->add(@_)->digest }
-sub md4_hex         { __PACKAGE__->new->add(@_)->hexdigest }
-sub md4_base64      { __PACKAGE__->new->add(@_)->b64digest }
+sub md4             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
+sub md4_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
+sub md4_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
 
-sub md4_file        { __PACKAGE__->new->addfile(@_)->digest }
-sub md4_file_hex    { __PACKAGE__->new->addfile(@_)->hexdigest }
-sub md4_file_base64 { __PACKAGE__->new->addfile(@_)->b64digest }
+sub md4_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
+sub md4_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
+sub md4_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
 
 1;
 

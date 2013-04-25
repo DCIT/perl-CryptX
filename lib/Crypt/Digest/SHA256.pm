@@ -10,18 +10,20 @@ our %EXPORT_TAGS = ( all => [qw( sha256 sha256_hex sha256_base64 sha256_file sha
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use base 'Crypt::Digest';
 
 sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
-sub sha256             { __PACKAGE__->new->add(@_)->digest }
-sub sha256_hex         { __PACKAGE__->new->add(@_)->hexdigest }
-sub sha256_base64      { __PACKAGE__->new->add(@_)->b64digest }
+sub sha256             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
+sub sha256_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
+sub sha256_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
 
-sub sha256_file        { __PACKAGE__->new->addfile(@_)->digest }
-sub sha256_file_hex    { __PACKAGE__->new->addfile(@_)->hexdigest }
-sub sha256_file_base64 { __PACKAGE__->new->addfile(@_)->b64digest }
+sub sha256_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
+sub sha256_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
+sub sha256_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
 
 1;
 

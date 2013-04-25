@@ -10,18 +10,20 @@ our %EXPORT_TAGS = ( all => [qw( ripemd160 ripemd160_hex ripemd160_base64 ripemd
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use base 'Crypt::Digest';
 
 sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
-sub ripemd160             { __PACKAGE__->new->add(@_)->digest }
-sub ripemd160_hex         { __PACKAGE__->new->add(@_)->hexdigest }
-sub ripemd160_base64      { __PACKAGE__->new->add(@_)->b64digest }
+sub ripemd160             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
+sub ripemd160_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
+sub ripemd160_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
 
-sub ripemd160_file        { __PACKAGE__->new->addfile(@_)->digest }
-sub ripemd160_file_hex    { __PACKAGE__->new->addfile(@_)->hexdigest }
-sub ripemd160_file_base64 { __PACKAGE__->new->addfile(@_)->b64digest }
+sub ripemd160_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
+sub ripemd160_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
+sub ripemd160_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
 
 1;
 

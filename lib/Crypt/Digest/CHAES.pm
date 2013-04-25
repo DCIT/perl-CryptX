@@ -10,18 +10,20 @@ our %EXPORT_TAGS = ( all => [qw( chaes chaes_hex chaes_base64 chaes_file chaes_f
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use base 'Crypt::Digest';
 
 sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
-sub chaes             { __PACKAGE__->new->add(@_)->digest }
-sub chaes_hex         { __PACKAGE__->new->add(@_)->hexdigest }
-sub chaes_base64      { __PACKAGE__->new->add(@_)->b64digest }
+sub chaes             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
+sub chaes_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
+sub chaes_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
 
-sub chaes_file        { __PACKAGE__->new->addfile(@_)->digest }
-sub chaes_file_hex    { __PACKAGE__->new->addfile(@_)->hexdigest }
-sub chaes_file_base64 { __PACKAGE__->new->addfile(@_)->b64digest }
+sub chaes_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
+sub chaes_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
+sub chaes_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
 
 1;
 

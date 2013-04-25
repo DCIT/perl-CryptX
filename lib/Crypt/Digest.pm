@@ -8,18 +8,20 @@ our %EXPORT_TAGS = ( all => [qw( digest_data digest_data_hex digest_data_base64 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{'Crypt::Digest'}++;
 use CryptX;
 
 ### the following methods/functions are implemented in XS:
 # - _new
+# - _hashsize
+# - _hashsize_by_name (function, not method)
 # - clone
 # - reset
 # - digest
 # - hexdigest
 # - b64digest
-# - _add_single
-# - _hashsize
-# - _hashsize_by_name (function, not method)
+# - add
 # - DESTROY
 
 sub _trans_digest_name {
@@ -32,7 +34,7 @@ sub _trans_digest_name {
     RIPEMD320 => 'rmd320',
     TIGER192  => 'tiger',
   );
-  $name =~ s/^Crypt::Digest:://;
+  $name =~ s/^Crypt::Digest:://i;
   return $trans{uc($name)} if defined $trans{uc($name)};
   return lc($name);
 }
@@ -41,14 +43,18 @@ sub _trans_digest_name {
 
 sub new {
   my $pkg = shift;
-  my $digest_name = $pkg eq __PACKAGE__ ? _trans_digest_name(shift) : _trans_digest_name($pkg);
-  return _new($digest_name, @_);
+  unshift @_, ($pkg eq 'Crypt::Digest' ? _trans_digest_name(shift) : _trans_digest_name($pkg));
+  goto \&_new; # keep the real caller for croak()
 }
 
-sub add {
-  my $self = shift;
-  $self->_add_single($_) for (@_);
-  return $self;
+sub hashsize {
+  return unless defined $_[0];
+
+  goto \&_hashsize if ref $_[0];        # keep the real caller for croak()
+  
+  my $pkg = shift;
+  unshift @_, ($pkg eq 'Crypt::Digest' ? _trans_digest_name(shift) : _trans_digest_name($pkg));
+  goto \&_hashsize_by_name;             # keep the real caller for croak()
 }
 
 sub addfile {
@@ -57,44 +63,43 @@ sub addfile {
   my $handle;
   if (ref(\$file) eq 'SCALAR') {
     #filename
-    open($handle, "<", $file) || die "FATAL: cannot open '$file': $!";
+    open($handle, "<", $file) || croak "FATAL: cannot open '$file': $!";
     binmode($handle);
   }
   else {
     #handle
     $handle = $file
   }  
-  die "FATAL: invalid handle" unless defined $handle;
+  croak "FATAL: invalid handle" unless defined $handle;
   
   my $n;
   my $buf = "";
   while (($n = read($handle, $buf, 32*1024))) {
-    $self->_add_single($buf)
+    $self->add($buf)
   }
-  die "FATAL: read failed: $!" unless defined $n;
+  croak "FATAL: read failed: $!" unless defined $n;
   
   return $self;
-}
-
-sub hashsize {
-  my $self = shift;
-  return unless defined $self;
-  return $self->_hashsize if ref($self);
-  $self = _trans_digest_name(shift) if $self eq __PACKAGE__;
-  return _hashsize_by_name(_trans_digest_name($self));
 }
 
 sub CLONE_SKIP { 1 } # XXX-FIXME for now just prevent cloning
 
 ### FUNCTIONS
 
-sub digest_data        { Crypt::Digest->new(lc(shift))->add(@_)->digest }
-sub digest_data_hex    { Crypt::Digest->new(lc(shift))->add(@_)->hexdigest }
-sub digest_data_base64 { Crypt::Digest->new(lc(shift))->add(@_)->b64digest }
+sub digest_data        { my $rv = eval {Crypt::Digest->new(shift)->add(@_)->digest}; _croak($@); $rv }
+sub digest_data_hex    { my $rv = eval {Crypt::Digest->new(shift)->add(@_)->hexdigest}; _croak($@); $rv }
+sub digest_data_base64 { my $rv = eval {Crypt::Digest->new(shift)->add(@_)->b64digest}; _croak($@); $rv }
 
-sub digest_file        { Crypt::Digest->new(lc(shift))->addfile(@_)->digest }
-sub digest_file_hex    { Crypt::Digest->new(lc(shift))->addfile(@_)->hexdigest }
-sub digest_file_base64 { Crypt::Digest->new(lc(shift))->addfile(@_)->b64digest }
+sub digest_file        { my $rv = eval {Crypt::Digest->new(shift)->addfile(@_)->digest}; _croak($@); $rv }
+sub digest_file_hex    { my $rv = eval {Crypt::Digest->new(shift)->addfile(@_)->hexdigest}; _croak($@); $rv }
+sub digest_file_base64 { my $rv = eval {Crypt::Digest->new(shift)->addfile(@_)->b64digest}; _croak($@); $rv }
+
+sub _croak { #XXX-FIXME ugly hack for reporting real caller from XS croaks
+   if ($_[0]) {
+     $_[0] =~ s/ at .*?\.pm line \d+.[\n\r]*$//g;
+     croak $_[0];
+   }
+}
 
 1;
 
