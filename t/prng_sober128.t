@@ -18,7 +18,7 @@ ok($r, 'new');
  my $sum = 0;
  $sum += $r->double(-180) for (1..1000);
  my $avg = $sum/1000;
- ok($avg>-95 && $avg<-85, "rand $avg"); 
+ ok($avg>-99 && $avg<-81, "rand $avg"); 
 }
 
 {
