@@ -15,7 +15,6 @@ is( Crypt::Digest::SHA1->hashsize, 20, 'hashsize/4');
 is( Crypt::Digest->new('SHA1')->hashsize, 20, 'hashsize/5');
 is( Crypt::Digest::SHA1->new->hashsize, 20, 'hashsize/6');
 
-
 is( sha1(""), pack("H*","da39a3ee5e6b4b0d3255bfef95601890afd80709"), 'sha1 (raw/1)');
 is( sha1_hex(""), "da39a3ee5e6b4b0d3255bfef95601890afd80709", 'sha1 (hex/1)');
 is( sha1_base64(""), "2jmj7l5rSw0yVb/vlWAYkK/YBwk=", 'sha1 (base64/1)');

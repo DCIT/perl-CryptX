@@ -2,12 +2,13 @@ Changes for CryptX
 
 TODO:
         - http://www.cpantesters.org/cpan/report/f9dc6958-accc-11e2-99fc-de953c106faf
-        - maybe add xxx_b64url alternatives
-        - croak with the "real caller" (now at many places)
+        - maybe add xxx_b64url alternatives (e.g. sha1_b64url ...)
+        - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
+        - croak when mode does not call start_(en|de)crypt
 
-0.008   2013/04/XX
+0.008   2013/05/02
         - fixed prng test failures
-        - Crypt::Digest::* croak with the "real caller"
+        - Crypt::Digest::* croaks with the "real caller" (not a nice solution)
 
 0.007   2013/04/23
         - Crypt::PRNG supports add_entropy() - without params

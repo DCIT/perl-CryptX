@@ -9,7 +9,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use Carp;
-$Carp::Internal{'Crypt::Digest'}++;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
 ### the following methods/functions are implemented in XS:
@@ -44,30 +44,34 @@ sub _trans_digest_name {
 sub new {
   my $pkg = shift;
   unshift @_, ($pkg eq 'Crypt::Digest' ? _trans_digest_name(shift) : _trans_digest_name($pkg));
+  ###return _new(@_);
   goto \&_new; # keep the real caller for croak()
 }
 
 sub hashsize {
   return unless defined $_[0];
 
-  goto \&_hashsize if ref $_[0];        # keep the real caller for croak()
-  
-  my $pkg = shift;
-  unshift @_, ($pkg eq 'Crypt::Digest' ? _trans_digest_name(shift) : _trans_digest_name($pkg));
-  goto \&_hashsize_by_name;             # keep the real caller for croak()
+  if (ref $_[0]) {
+    ###return _hashsize(@_);
+    goto \&_hashsize if ref $_[0];        # keep the real caller for croak()
+  }
+  else {
+    my $pkg = shift;
+    unshift @_, ($pkg eq 'Crypt::Digest' ? _trans_digest_name(shift) : _trans_digest_name($pkg));  
+    ###return _hashsize_by_name(@_);
+    goto \&_hashsize_by_name;             # keep the real caller for croak()
+  }
 }
 
 sub addfile {
   my ($self, $file) = @_;
   
   my $handle;
-  if (ref(\$file) eq 'SCALAR') {
-    #filename
+  if (ref(\$file) eq 'SCALAR') {        #filename
     open($handle, "<", $file) || croak "FATAL: cannot open '$file': $!";
     binmode($handle);
   }
-  else {
-    #handle
+  else {                                #handle    
     $handle = $file
   }  
   croak "FATAL: invalid handle" unless defined $handle;
