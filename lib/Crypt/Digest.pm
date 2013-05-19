@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( digest_data digest_data_hex digest_data_base64 digest_file digest_file_hex digest_file_base64 )] );
+our %EXPORT_TAGS = ( all => [qw( digest_data digest_data_hex digest_data_b64 digest_file digest_file_hex digest_file_b64 )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -92,11 +92,11 @@ sub CLONE_SKIP { 1 } # XXX-FIXME for now just prevent cloning
 
 sub digest_data        { my $rv = eval {Crypt::Digest->new(shift)->add(@_)->digest}; _croak($@); $rv }
 sub digest_data_hex    { my $rv = eval {Crypt::Digest->new(shift)->add(@_)->hexdigest}; _croak($@); $rv }
-sub digest_data_base64 { my $rv = eval {Crypt::Digest->new(shift)->add(@_)->b64digest}; _croak($@); $rv }
+sub digest_data_b64    { my $rv = eval {Crypt::Digest->new(shift)->add(@_)->b64digest}; _croak($@); $rv }
 
 sub digest_file        { my $rv = eval {Crypt::Digest->new(shift)->addfile(@_)->digest}; _croak($@); $rv }
 sub digest_file_hex    { my $rv = eval {Crypt::Digest->new(shift)->addfile(@_)->hexdigest}; _croak($@); $rv }
-sub digest_file_base64 { my $rv = eval {Crypt::Digest->new(shift)->addfile(@_)->b64digest}; _croak($@); $rv }
+sub digest_file_b64    { my $rv = eval {Crypt::Digest->new(shift)->addfile(@_)->b64digest}; _croak($@); $rv }
 
 sub _croak { #XXX-FIXME ugly hack for reporting real caller from XS croaks
    if ($_[0]) {
@@ -116,20 +116,20 @@ Crypt::Digest - Generic interface to hash/digest functions
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest qw( digest_data digest_data_hex digest_data_base64 digest_file digest_file_hex digest_file_base64 );
+   use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_file digest_file_hex digest_file_b64 );
    
    # calculate digest from string/buffer
    $digest_raw = digest_data('SHA1', 'data string');
    $digest_hex = digest_data_hex('SHA1', 'data string');
-   $digest_b64 = digest_data_base64('SHA1', 'data string');  
+   $digest_b64 = digest_data_b64('SHA1', 'data string');  
    # calculate digest from file
    $digest_raw = digest_file('SHA1', 'filename.dat');
    $digest_hex = digest_file_hex('SHA1', 'filename.dat');
-   $digest_b64 = digest_file_base64('SHA1', 'filename.dat');
+   $digest_b64 = digest_file_b64('SHA1', 'filename.dat');
    # calculate digest from filehandle
    $digest_raw = digest_file('SHA1', *FILEHANDLE);
    $digest_hex = digest_file_hex('SHA1', *FILEHANDLE);
-   $digest_b64 = digest_file_base64('SHA1', *FILEHANDLE);   
+   $digest_b64 = digest_file_b64('SHA1', *FILEHANDLE);   
 
    ### OO interface:
    use Crypt::Digest;
@@ -152,7 +152,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest qw(digest_data digest_data_hex digest_data_base64 digest_file digest_file_hex digest_file_base64);
+  use Crypt::Digest qw(digest_data digest_data_hex digest_data_b64 digest_file digest_file_hex digest_file_b64);
   
 Or all of them at once:
 
@@ -184,13 +184,13 @@ Logically joins all arguments into a single string, and returns its SHA1 digest 
  #or 
  $digest_hex = digest_data('SHA1', 'any data', 'more data', 'even more data');
 
-=head2 digest_data_base64
+=head2 digest_data_b64
 
 Logically joins all arguments into a single string, and returns its SHA1 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $digest_base64 = digest_data_base64('SHA1', 'data string');
+ $digest_b64 = digest_data_b64('SHA1', 'data string');
  #or 
- $digest_base64 = digest_data('SHA1', 'any data', 'more data', 'even more data');
+ $digest_b64 = digest_data('SHA1', 'any data', 'more data', 'even more data');
 
 =head2 digest_file
 
@@ -210,13 +210,13 @@ Reads file (defined by filename or filehandle) content, and returns its digest e
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
-=head2 digest_file_base64
+=head2 digest_file_b64
 
 Reads file (defined by filename or filehandle) content, and returns its digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $digest_base64 = digest_file_base64('SHA1', 'filename.dat');
+ $digest_b64 = digest_file_b64('SHA1', 'filename.dat');
  #or
- $digest_base64 = digest_file_base64('SHA1', *FILEHANDLE);   
+ $digest_b64 = digest_file_b64('SHA1', *FILEHANDLE);   
 
 =head1 METHODS
 
@@ -317,7 +317,7 @@ Returns the digest encoded as a hexadecimal string.
 Return the digest encoded as a Base64 string, B<with> trailing '=' padding (B<BEWARE:> this padding
 style might differ from other Digest::SOMETHING modules on CPAN).
 
- $result_base64 = $d->b64digest();
+ $result_b64 = $d->b64digest();
 
 =head1 SEE ALSO
 

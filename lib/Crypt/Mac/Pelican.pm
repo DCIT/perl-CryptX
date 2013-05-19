@@ -127,7 +127,7 @@ The OO interface provides the same set of functions as L<Crypt::Mac>.
 
 =head2 b64mac
 
- $result_base64 = $d->b64mac();
+ $result_b64 = $d->b64mac();
 
 =head1 SEE ALSO
 

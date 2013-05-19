@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( md5 md5_hex md5_base64 md5_file md5_file_hex md5_file_base64 )] );
+our %EXPORT_TAGS = ( all => [qw( md5 md5_hex md5_b64 md5_file md5_file_hex md5_file_b64 )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -19,11 +19,11 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
 sub md5             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub md5_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub md5_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
+sub md5_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
 
 sub md5_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub md5_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub md5_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
+sub md5_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +36,20 @@ Crypt::Digest::MD5 - Hash function MD5 [size: 128 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::MD5 qw( md5 md5_hex md5_base64 md5_file md5_file_hex md5_file_base64 );
+   use Crypt::Digest::MD5 qw( md5 md5_hex md5_b64 md5_file md5_file_hex md5_file_b64 );
 
    # calculate digest from string/buffer
    $md5_raw = md5('data string');
    $md5_hex = md5_hex('data string');
-   $md5_b64 = md5_base64('data string');
+   $md5_b64 = md5_b64('data string');
    # calculate digest from file
    $md5_raw = md5_file('filename.dat');
    $md5_hex = md5_file_hex('filename.dat');
-   $md5_b64 = md5_file_base64('filename.dat');
+   $md5_b64 = md5_file_b64('filename.dat');
    # calculate digest from filehandle
    $md5_raw = md5_file(*FILEHANDLE);
    $md5_hex = md5_file_hex(*FILEHANDLE);
-   $md5_b64 = md5_file_base64(*FILEHANDLE);
+   $md5_b64 = md5_file_b64(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::MD5;
@@ -72,7 +72,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::MD5 qw(md5 md5_hex md5_base64 md5_file md5_file_hex md5_file_base64);
+  use Crypt::Digest::MD5 qw(md5 md5_hex md5_b64 md5_file md5_file_hex md5_file_b64);
 
 Or all of them at once:
 
@@ -96,13 +96,13 @@ Logically joins all arguments into a single string, and returns its MD5 digest e
  #or
  $md5_hex = md5_hex('any data', 'more data', 'even more data');
 
-=head2 md5_base64
+=head2 md5_b64
 
 Logically joins all arguments into a single string, and returns its MD5 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $md5_base64 = md5_base64('data string');
+ $md5_b64 = md5_b64('data string');
  #or
- $md5_base64 = md5_base64('any data', 'more data', 'even more data');
+ $md5_b64 = md5_b64('any data', 'more data', 'even more data');
 
 =head2 md5_file
 
@@ -122,13 +122,13 @@ Reads file (defined by filename or filehandle) content, and returns its MD5 dige
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
-=head2 md5_file_base64
+=head2 md5_file_b64
 
 Reads file (defined by filename or filehandle) content, and returns its MD5 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $md5_base64 = md5_file_base64('filename.dat');
+ $md5_b64 = md5_file_b64('filename.dat');
  #or
- $md5_base64 = md5_file_base64(*FILEHANDLE);
+ $md5_b64 = md5_file_b64(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -182,7 +182,7 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 b64digest
 
- $result_base64 = $d->b64digest();
+ $result_b64 = $d->b64digest();
 
 =head1 SEE ALSO
 

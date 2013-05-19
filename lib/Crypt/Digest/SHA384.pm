@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( sha384 sha384_hex sha384_base64 sha384_file sha384_file_hex sha384_file_base64 )] );
+our %EXPORT_TAGS = ( all => [qw( sha384 sha384_hex sha384_b64 sha384_file sha384_file_hex sha384_file_b64 )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -19,11 +19,11 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
 sub sha384             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub sha384_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub sha384_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
+sub sha384_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
 
 sub sha384_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub sha384_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub sha384_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
+sub sha384_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +36,20 @@ Crypt::Digest::SHA384 - Hash function SHA-384 [size: 384 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::SHA384 qw( sha384 sha384_hex sha384_base64 sha384_file sha384_file_hex sha384_file_base64 );
+   use Crypt::Digest::SHA384 qw( sha384 sha384_hex sha384_b64 sha384_file sha384_file_hex sha384_file_b64 );
 
    # calculate digest from string/buffer
    $sha384_raw = sha384('data string');
    $sha384_hex = sha384_hex('data string');
-   $sha384_b64 = sha384_base64('data string');
+   $sha384_b64 = sha384_b64('data string');
    # calculate digest from file
    $sha384_raw = sha384_file('filename.dat');
    $sha384_hex = sha384_file_hex('filename.dat');
-   $sha384_b64 = sha384_file_base64('filename.dat');
+   $sha384_b64 = sha384_file_b64('filename.dat');
    # calculate digest from filehandle
    $sha384_raw = sha384_file(*FILEHANDLE);
    $sha384_hex = sha384_file_hex(*FILEHANDLE);
-   $sha384_b64 = sha384_file_base64(*FILEHANDLE);
+   $sha384_b64 = sha384_file_b64(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::SHA384;
@@ -72,7 +72,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::SHA384 qw(sha384 sha384_hex sha384_base64 sha384_file sha384_file_hex sha384_file_base64);
+  use Crypt::Digest::SHA384 qw(sha384 sha384_hex sha384_b64 sha384_file sha384_file_hex sha384_file_b64);
 
 Or all of them at once:
 
@@ -96,13 +96,13 @@ Logically joins all arguments into a single string, and returns its SHA384 diges
  #or
  $sha384_hex = sha384_hex('any data', 'more data', 'even more data');
 
-=head2 sha384_base64
+=head2 sha384_b64
 
 Logically joins all arguments into a single string, and returns its SHA384 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $sha384_base64 = sha384_base64('data string');
+ $sha384_b64 = sha384_b64('data string');
  #or
- $sha384_base64 = sha384_base64('any data', 'more data', 'even more data');
+ $sha384_b64 = sha384_b64('any data', 'more data', 'even more data');
 
 =head2 sha384_file
 
@@ -122,13 +122,13 @@ Reads file (defined by filename or filehandle) content, and returns its SHA384 d
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
-=head2 sha384_file_base64
+=head2 sha384_file_b64
 
 Reads file (defined by filename or filehandle) content, and returns its SHA384 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $sha384_base64 = sha384_file_base64('filename.dat');
+ $sha384_b64 = sha384_file_b64('filename.dat');
  #or
- $sha384_base64 = sha384_file_base64(*FILEHANDLE);
+ $sha384_b64 = sha384_file_b64(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -182,7 +182,7 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 b64digest
 
- $result_base64 = $d->b64digest();
+ $result_b64 = $d->b64digest();
 
 =head1 SEE ALSO
 

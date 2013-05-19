@@ -61,11 +61,11 @@ for my $n (keys %list) {
     require Crypt::Digest;
     Crypt::Digest::import(':all');
     for (@test_strings) {
-      push @{$data->{t_strings}}, { data=>pp($_), hex=>Crypt::Digest::digest_data_hex($n, $_), base64=>Crypt::Digest::digest_data_base64($n, $_) };
+      push @{$data->{t_strings}}, { data=>pp($_), hex=>Crypt::Digest::digest_data_hex($n, $_), base64=>Crypt::Digest::digest_data_b64($n, $_) };
     }
     for (@test_files) {
       $_ =~ s|\\|/|g;
-      push @{$data->{t_files}}, { file=>$_, hex=>Crypt::Digest::digest_file_hex($n, "$FindBin::Bin/../$_"), base64=>Crypt::Digest::digest_file_base64($n, "$FindBin::Bin/../$_") };
+      push @{$data->{t_files}}, { file=>$_, hex=>Crypt::Digest::digest_file_hex($n, "$FindBin::Bin/../$_"), base64=>Crypt::Digest::digest_file_b64($n, "$FindBin::Bin/../$_") };
     }  
     $data->{t_files_count} = scalar(@{$data->{t_files}});
     $data->{t_strings_count} = scalar(@{$data->{t_strings}});

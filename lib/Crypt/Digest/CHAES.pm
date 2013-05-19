@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( chaes chaes_hex chaes_base64 chaes_file chaes_file_hex chaes_file_base64 )] );
+our %EXPORT_TAGS = ( all => [qw( chaes chaes_hex chaes_b64 chaes_file chaes_file_hex chaes_file_b64 )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -19,11 +19,11 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
 sub chaes             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub chaes_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub chaes_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
+sub chaes_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
 
 sub chaes_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub chaes_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub chaes_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
+sub chaes_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +36,20 @@ Crypt::Digest::CHAES - Hash function - CipherHash based on AES [size: 128 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::CHAES qw( chaes chaes_hex chaes_base64 chaes_file chaes_file_hex chaes_file_base64 );
+   use Crypt::Digest::CHAES qw( chaes chaes_hex chaes_b64 chaes_file chaes_file_hex chaes_file_b64 );
 
    # calculate digest from string/buffer
    $chaes_raw = chaes('data string');
    $chaes_hex = chaes_hex('data string');
-   $chaes_b64 = chaes_base64('data string');
+   $chaes_b64 = chaes_b64('data string');
    # calculate digest from file
    $chaes_raw = chaes_file('filename.dat');
    $chaes_hex = chaes_file_hex('filename.dat');
-   $chaes_b64 = chaes_file_base64('filename.dat');
+   $chaes_b64 = chaes_file_b64('filename.dat');
    # calculate digest from filehandle
    $chaes_raw = chaes_file(*FILEHANDLE);
    $chaes_hex = chaes_file_hex(*FILEHANDLE);
-   $chaes_b64 = chaes_file_base64(*FILEHANDLE);
+   $chaes_b64 = chaes_file_b64(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::CHAES;
@@ -72,7 +72,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::CHAES qw(chaes chaes_hex chaes_base64 chaes_file chaes_file_hex chaes_file_base64);
+  use Crypt::Digest::CHAES qw(chaes chaes_hex chaes_b64 chaes_file chaes_file_hex chaes_file_b64);
 
 Or all of them at once:
 
@@ -96,13 +96,13 @@ Logically joins all arguments into a single string, and returns its CHAES digest
  #or
  $chaes_hex = chaes_hex('any data', 'more data', 'even more data');
 
-=head2 chaes_base64
+=head2 chaes_b64
 
 Logically joins all arguments into a single string, and returns its CHAES digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $chaes_base64 = chaes_base64('data string');
+ $chaes_b64 = chaes_b64('data string');
  #or
- $chaes_base64 = chaes_base64('any data', 'more data', 'even more data');
+ $chaes_b64 = chaes_b64('any data', 'more data', 'even more data');
 
 =head2 chaes_file
 
@@ -122,13 +122,13 @@ Reads file (defined by filename or filehandle) content, and returns its CHAES di
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
-=head2 chaes_file_base64
+=head2 chaes_file_b64
 
 Reads file (defined by filename or filehandle) content, and returns its CHAES digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $chaes_base64 = chaes_file_base64('filename.dat');
+ $chaes_b64 = chaes_file_b64('filename.dat');
  #or
- $chaes_base64 = chaes_file_base64(*FILEHANDLE);
+ $chaes_b64 = chaes_file_b64(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -182,7 +182,7 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 b64digest
 
- $result_base64 = $d->b64digest();
+ $result_b64 = $d->b64digest();
 
 =head1 SEE ALSO
 

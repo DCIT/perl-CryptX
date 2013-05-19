@@ -5,8 +5,8 @@ use warnings;
 
 use Test::More tests => 7*3 + 8*4 + 6;
 
-use Crypt::Digest qw( digest_data digest_data_hex digest_data_base64 digest_file digest_file_hex digest_file_base64 );
-use Crypt::Digest::SHA384 qw( sha384 sha384_hex sha384_base64 sha384_file sha384_file_hex sha384_file_base64 );
+use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_file digest_file_hex digest_file_b64 );
+use Crypt::Digest::SHA384 qw( sha384 sha384_hex sha384_b64 sha384_file sha384_file_hex sha384_file_b64 );
 
 is( Crypt::Digest::hashsize('SHA384'), 48, 'hashsize/1');
 is( Crypt::Digest->hashsize('SHA384'), 48, 'hashsize/2');
@@ -18,35 +18,35 @@ is( Crypt::Digest::SHA384->new->hashsize, 48, 'hashsize/6');
 
 is( sha384(""), pack("H*","38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b"), 'sha384 (raw/1)');
 is( sha384_hex(""), "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b", 'sha384 (hex/1)');
-is( sha384_base64(""), "OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb", 'sha384 (base64/1)');
+is( sha384_b64(""), "OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb", 'sha384 (base64/1)');
 is( digest_data('SHA384', ""), pack("H*","38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b"), 'sha384 (digest_data_raw/1)');
 is( digest_data_hex('SHA384', ""), "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b", 'sha384 (digest_data_hex/1)');
-is( digest_data_base64('SHA384', ""), "OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb", 'sha384 (digest_data_base64/1)');
+is( digest_data_b64('SHA384', ""), "OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb", 'sha384 (digest_data_b64/1)');
 is( Crypt::Digest::SHA384->new->add("")->hexdigest, "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b", 'sha384 (OO/1)');
 
 is( sha384(123), pack("H*","9a0a82f0c0cf31470d7affede3406cc9aa8410671520b727044eda15b4c25532a9b5cd8aaf9cec4919d76255b6bfb00f"), 'sha384 (raw/2)');
 is( sha384_hex(123), "9a0a82f0c0cf31470d7affede3406cc9aa8410671520b727044eda15b4c25532a9b5cd8aaf9cec4919d76255b6bfb00f", 'sha384 (hex/2)');
-is( sha384_base64(123), "mgqC8MDPMUcNev/t40BsyaqEEGcVILcnBE7aFbTCVTKptc2Kr5zsSRnXYlW2v7AP", 'sha384 (base64/2)');
+is( sha384_b64(123), "mgqC8MDPMUcNev/t40BsyaqEEGcVILcnBE7aFbTCVTKptc2Kr5zsSRnXYlW2v7AP", 'sha384 (base64/2)');
 is( digest_data('SHA384', 123), pack("H*","9a0a82f0c0cf31470d7affede3406cc9aa8410671520b727044eda15b4c25532a9b5cd8aaf9cec4919d76255b6bfb00f"), 'sha384 (digest_data_raw/2)');
 is( digest_data_hex('SHA384', 123), "9a0a82f0c0cf31470d7affede3406cc9aa8410671520b727044eda15b4c25532a9b5cd8aaf9cec4919d76255b6bfb00f", 'sha384 (digest_data_hex/2)');
-is( digest_data_base64('SHA384', 123), "mgqC8MDPMUcNev/t40BsyaqEEGcVILcnBE7aFbTCVTKptc2Kr5zsSRnXYlW2v7AP", 'sha384 (digest_data_base64/2)');
+is( digest_data_b64('SHA384', 123), "mgqC8MDPMUcNev/t40BsyaqEEGcVILcnBE7aFbTCVTKptc2Kr5zsSRnXYlW2v7AP", 'sha384 (digest_data_b64/2)');
 is( Crypt::Digest::SHA384->new->add(123)->hexdigest, "9a0a82f0c0cf31470d7affede3406cc9aa8410671520b727044eda15b4c25532a9b5cd8aaf9cec4919d76255b6bfb00f", 'sha384 (OO/2)');
 
 is( sha384("test\0test\0test\n"), pack("H*","3339da627d4b92fd5af59ce0bdabdbdfea3895d2e698322ee49a37b5bd47245fa015d716921ff689dd9e8c02ba02cea8"), 'sha384 (raw/3)');
 is( sha384_hex("test\0test\0test\n"), "3339da627d4b92fd5af59ce0bdabdbdfea3895d2e698322ee49a37b5bd47245fa015d716921ff689dd9e8c02ba02cea8", 'sha384 (hex/3)');
-is( sha384_base64("test\0test\0test\n"), "MznaYn1Lkv1a9Zzgvavb3+o4ldLmmDIu5Jo3tb1HJF+gFdcWkh/2id2ejAK6As6o", 'sha384 (base64/3)');
+is( sha384_b64("test\0test\0test\n"), "MznaYn1Lkv1a9Zzgvavb3+o4ldLmmDIu5Jo3tb1HJF+gFdcWkh/2id2ejAK6As6o", 'sha384 (base64/3)');
 is( digest_data('SHA384', "test\0test\0test\n"), pack("H*","3339da627d4b92fd5af59ce0bdabdbdfea3895d2e698322ee49a37b5bd47245fa015d716921ff689dd9e8c02ba02cea8"), 'sha384 (digest_data_raw/3)');
 is( digest_data_hex('SHA384', "test\0test\0test\n"), "3339da627d4b92fd5af59ce0bdabdbdfea3895d2e698322ee49a37b5bd47245fa015d716921ff689dd9e8c02ba02cea8", 'sha384 (digest_data_hex/3)');
-is( digest_data_base64('SHA384', "test\0test\0test\n"), "MznaYn1Lkv1a9Zzgvavb3+o4ldLmmDIu5Jo3tb1HJF+gFdcWkh/2id2ejAK6As6o", 'sha384 (digest_data_base64/3)');
+is( digest_data_b64('SHA384', "test\0test\0test\n"), "MznaYn1Lkv1a9Zzgvavb3+o4ldLmmDIu5Jo3tb1HJF+gFdcWkh/2id2ejAK6As6o", 'sha384 (digest_data_b64/3)');
 is( Crypt::Digest::SHA384->new->add("test\0test\0test\n")->hexdigest, "3339da627d4b92fd5af59ce0bdabdbdfea3895d2e698322ee49a37b5bd47245fa015d716921ff689dd9e8c02ba02cea8", 'sha384 (OO/3)');
 
 
 is( sha384_file('t/data/binary-test.file'), pack("H*","aec56ad72d87f626f2c3fdeca938a83ff4f5184c4eabddcc64ceeec3130d0626c5880ec1a6a7fd1a8c88c7995a45fc49"), 'sha384 (raw/file/1)');
 is( sha384_file_hex('t/data/binary-test.file'), "aec56ad72d87f626f2c3fdeca938a83ff4f5184c4eabddcc64ceeec3130d0626c5880ec1a6a7fd1a8c88c7995a45fc49", 'sha384 (hex/file/1)');
-is( sha384_file_base64('t/data/binary-test.file'), "rsVq1y2H9ibyw/3sqTioP/T1GExOq93MZM7uwxMNBibFiA7Bpqf9GoyIx5laRfxJ", 'sha384 (base64/file/1)');
+is( sha384_file_b64('t/data/binary-test.file'), "rsVq1y2H9ibyw/3sqTioP/T1GExOq93MZM7uwxMNBibFiA7Bpqf9GoyIx5laRfxJ", 'sha384 (base64/file/1)');
 is( digest_file('SHA384', 't/data/binary-test.file'), pack("H*","aec56ad72d87f626f2c3fdeca938a83ff4f5184c4eabddcc64ceeec3130d0626c5880ec1a6a7fd1a8c88c7995a45fc49"), 'sha384 (digest_file_raw/file/1)');
 is( digest_file_hex('SHA384', 't/data/binary-test.file'), "aec56ad72d87f626f2c3fdeca938a83ff4f5184c4eabddcc64ceeec3130d0626c5880ec1a6a7fd1a8c88c7995a45fc49", 'sha384 (digest_file_hex/file/1)');
-is( digest_file_base64('SHA384', 't/data/binary-test.file'), "rsVq1y2H9ibyw/3sqTioP/T1GExOq93MZM7uwxMNBibFiA7Bpqf9GoyIx5laRfxJ", 'sha384 (digest_file_base64/file/1)');
+is( digest_file_b64('SHA384', 't/data/binary-test.file'), "rsVq1y2H9ibyw/3sqTioP/T1GExOq93MZM7uwxMNBibFiA7Bpqf9GoyIx5laRfxJ", 'sha384 (digest_file_b64/file/1)');
 is( Crypt::Digest::SHA384->new->addfile('t/data/binary-test.file')->hexdigest, "aec56ad72d87f626f2c3fdeca938a83ff4f5184c4eabddcc64ceeec3130d0626c5880ec1a6a7fd1a8c88c7995a45fc49", 'sha384 (OO/file/1)');
 {
   open(my $fh, '<', 't/data/binary-test.file');
@@ -57,10 +57,10 @@ is( Crypt::Digest::SHA384->new->addfile('t/data/binary-test.file')->hexdigest, "
 
 is( sha384_file('t/data/text-CR.file'), pack("H*","fd1408765c0b42d3d836e945e21ee92fe17bc7f68b23ccfbdaaf3ffd6f6e81732bd8340d1418b18abd2745ef1a0544e6"), 'sha384 (raw/file/2)');
 is( sha384_file_hex('t/data/text-CR.file'), "fd1408765c0b42d3d836e945e21ee92fe17bc7f68b23ccfbdaaf3ffd6f6e81732bd8340d1418b18abd2745ef1a0544e6", 'sha384 (hex/file/2)');
-is( sha384_file_base64('t/data/text-CR.file'), "/RQIdlwLQtPYNulF4h7pL+F7x/aLI8z72q8//W9ugXMr2DQNFBixir0nRe8aBUTm", 'sha384 (base64/file/2)');
+is( sha384_file_b64('t/data/text-CR.file'), "/RQIdlwLQtPYNulF4h7pL+F7x/aLI8z72q8//W9ugXMr2DQNFBixir0nRe8aBUTm", 'sha384 (base64/file/2)');
 is( digest_file('SHA384', 't/data/text-CR.file'), pack("H*","fd1408765c0b42d3d836e945e21ee92fe17bc7f68b23ccfbdaaf3ffd6f6e81732bd8340d1418b18abd2745ef1a0544e6"), 'sha384 (digest_file_raw/file/2)');
 is( digest_file_hex('SHA384', 't/data/text-CR.file'), "fd1408765c0b42d3d836e945e21ee92fe17bc7f68b23ccfbdaaf3ffd6f6e81732bd8340d1418b18abd2745ef1a0544e6", 'sha384 (digest_file_hex/file/2)');
-is( digest_file_base64('SHA384', 't/data/text-CR.file'), "/RQIdlwLQtPYNulF4h7pL+F7x/aLI8z72q8//W9ugXMr2DQNFBixir0nRe8aBUTm", 'sha384 (digest_file_base64/file/2)');
+is( digest_file_b64('SHA384', 't/data/text-CR.file'), "/RQIdlwLQtPYNulF4h7pL+F7x/aLI8z72q8//W9ugXMr2DQNFBixir0nRe8aBUTm", 'sha384 (digest_file_b64/file/2)');
 is( Crypt::Digest::SHA384->new->addfile('t/data/text-CR.file')->hexdigest, "fd1408765c0b42d3d836e945e21ee92fe17bc7f68b23ccfbdaaf3ffd6f6e81732bd8340d1418b18abd2745ef1a0544e6", 'sha384 (OO/file/2)');
 {
   open(my $fh, '<', 't/data/text-CR.file');
@@ -71,10 +71,10 @@ is( Crypt::Digest::SHA384->new->addfile('t/data/text-CR.file')->hexdigest, "fd14
 
 is( sha384_file('t/data/text-CRLF.file'), pack("H*","f0d643a22c2f25fda36f3f834b05b5c9201c5139b374c4a581328ce52dd9bababcc7017f96b74eff8f66c097c9156373"), 'sha384 (raw/file/3)');
 is( sha384_file_hex('t/data/text-CRLF.file'), "f0d643a22c2f25fda36f3f834b05b5c9201c5139b374c4a581328ce52dd9bababcc7017f96b74eff8f66c097c9156373", 'sha384 (hex/file/3)');
-is( sha384_file_base64('t/data/text-CRLF.file'), "8NZDoiwvJf2jbz+DSwW1ySAcUTmzdMSlgTKM5S3Zurq8xwF/lrdO/49mwJfJFWNz", 'sha384 (base64/file/3)');
+is( sha384_file_b64('t/data/text-CRLF.file'), "8NZDoiwvJf2jbz+DSwW1ySAcUTmzdMSlgTKM5S3Zurq8xwF/lrdO/49mwJfJFWNz", 'sha384 (base64/file/3)');
 is( digest_file('SHA384', 't/data/text-CRLF.file'), pack("H*","f0d643a22c2f25fda36f3f834b05b5c9201c5139b374c4a581328ce52dd9bababcc7017f96b74eff8f66c097c9156373"), 'sha384 (digest_file_raw/file/3)');
 is( digest_file_hex('SHA384', 't/data/text-CRLF.file'), "f0d643a22c2f25fda36f3f834b05b5c9201c5139b374c4a581328ce52dd9bababcc7017f96b74eff8f66c097c9156373", 'sha384 (digest_file_hex/file/3)');
-is( digest_file_base64('SHA384', 't/data/text-CRLF.file'), "8NZDoiwvJf2jbz+DSwW1ySAcUTmzdMSlgTKM5S3Zurq8xwF/lrdO/49mwJfJFWNz", 'sha384 (digest_file_base64/file/3)');
+is( digest_file_b64('SHA384', 't/data/text-CRLF.file'), "8NZDoiwvJf2jbz+DSwW1ySAcUTmzdMSlgTKM5S3Zurq8xwF/lrdO/49mwJfJFWNz", 'sha384 (digest_file_b64/file/3)');
 is( Crypt::Digest::SHA384->new->addfile('t/data/text-CRLF.file')->hexdigest, "f0d643a22c2f25fda36f3f834b05b5c9201c5139b374c4a581328ce52dd9bababcc7017f96b74eff8f66c097c9156373", 'sha384 (OO/file/3)');
 {
   open(my $fh, '<', 't/data/text-CRLF.file');
@@ -85,10 +85,10 @@ is( Crypt::Digest::SHA384->new->addfile('t/data/text-CRLF.file')->hexdigest, "f0
 
 is( sha384_file('t/data/text-LF.file'), pack("H*","042e8f361c9fbdb1bf5f9bc254951dca66566196ecaf2df7850c5438338e2c06ea718d8cf3415b77ad56280ba5a3ca1e"), 'sha384 (raw/file/4)');
 is( sha384_file_hex('t/data/text-LF.file'), "042e8f361c9fbdb1bf5f9bc254951dca66566196ecaf2df7850c5438338e2c06ea718d8cf3415b77ad56280ba5a3ca1e", 'sha384 (hex/file/4)');
-is( sha384_file_base64('t/data/text-LF.file'), "BC6PNhyfvbG/X5vCVJUdymZWYZbsry33hQxUODOOLAbqcY2M80Fbd61WKAulo8oe", 'sha384 (base64/file/4)');
+is( sha384_file_b64('t/data/text-LF.file'), "BC6PNhyfvbG/X5vCVJUdymZWYZbsry33hQxUODOOLAbqcY2M80Fbd61WKAulo8oe", 'sha384 (base64/file/4)');
 is( digest_file('SHA384', 't/data/text-LF.file'), pack("H*","042e8f361c9fbdb1bf5f9bc254951dca66566196ecaf2df7850c5438338e2c06ea718d8cf3415b77ad56280ba5a3ca1e"), 'sha384 (digest_file_raw/file/4)');
 is( digest_file_hex('SHA384', 't/data/text-LF.file'), "042e8f361c9fbdb1bf5f9bc254951dca66566196ecaf2df7850c5438338e2c06ea718d8cf3415b77ad56280ba5a3ca1e", 'sha384 (digest_file_hex/file/4)');
-is( digest_file_base64('SHA384', 't/data/text-LF.file'), "BC6PNhyfvbG/X5vCVJUdymZWYZbsry33hQxUODOOLAbqcY2M80Fbd61WKAulo8oe", 'sha384 (digest_file_base64/file/4)');
+is( digest_file_b64('SHA384', 't/data/text-LF.file'), "BC6PNhyfvbG/X5vCVJUdymZWYZbsry33hQxUODOOLAbqcY2M80Fbd61WKAulo8oe", 'sha384 (digest_file_b64/file/4)');
 is( Crypt::Digest::SHA384->new->addfile('t/data/text-LF.file')->hexdigest, "042e8f361c9fbdb1bf5f9bc254951dca66566196ecaf2df7850c5438338e2c06ea718d8cf3415b77ad56280ba5a3ca1e", 'sha384 (OO/file/4)');
 {
   open(my $fh, '<', 't/data/text-LF.file');

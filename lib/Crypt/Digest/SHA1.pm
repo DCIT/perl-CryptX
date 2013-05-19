@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( sha1 sha1_hex sha1_base64 sha1_file sha1_file_hex sha1_file_base64 )] );
+our %EXPORT_TAGS = ( all => [qw( sha1 sha1_hex sha1_b64 sha1_file sha1_file_hex sha1_file_b64 )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -19,11 +19,11 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
 sub sha1             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub sha1_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub sha1_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
+sub sha1_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
 
 sub sha1_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub sha1_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub sha1_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
+sub sha1_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +36,20 @@ Crypt::Digest::SHA1 - Hash function SHA-1 [size: 160 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::SHA1 qw( sha1 sha1_hex sha1_base64 sha1_file sha1_file_hex sha1_file_base64 );
+   use Crypt::Digest::SHA1 qw( sha1 sha1_hex sha1_b64 sha1_file sha1_file_hex sha1_file_b64 );
 
    # calculate digest from string/buffer
    $sha1_raw = sha1('data string');
    $sha1_hex = sha1_hex('data string');
-   $sha1_b64 = sha1_base64('data string');
+   $sha1_b64 = sha1_b64('data string');
    # calculate digest from file
    $sha1_raw = sha1_file('filename.dat');
    $sha1_hex = sha1_file_hex('filename.dat');
-   $sha1_b64 = sha1_file_base64('filename.dat');
+   $sha1_b64 = sha1_file_b64('filename.dat');
    # calculate digest from filehandle
    $sha1_raw = sha1_file(*FILEHANDLE);
    $sha1_hex = sha1_file_hex(*FILEHANDLE);
-   $sha1_b64 = sha1_file_base64(*FILEHANDLE);
+   $sha1_b64 = sha1_file_b64(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::SHA1;
@@ -72,7 +72,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::SHA1 qw(sha1 sha1_hex sha1_base64 sha1_file sha1_file_hex sha1_file_base64);
+  use Crypt::Digest::SHA1 qw(sha1 sha1_hex sha1_b64 sha1_file sha1_file_hex sha1_file_b64);
 
 Or all of them at once:
 
@@ -96,13 +96,13 @@ Logically joins all arguments into a single string, and returns its SHA1 digest 
  #or
  $sha1_hex = sha1_hex('any data', 'more data', 'even more data');
 
-=head2 sha1_base64
+=head2 sha1_b64
 
 Logically joins all arguments into a single string, and returns its SHA1 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $sha1_base64 = sha1_base64('data string');
+ $sha1_b64 = sha1_b64('data string');
  #or
- $sha1_base64 = sha1_base64('any data', 'more data', 'even more data');
+ $sha1_b64 = sha1_b64('any data', 'more data', 'even more data');
 
 =head2 sha1_file
 
@@ -122,13 +122,13 @@ Reads file (defined by filename or filehandle) content, and returns its SHA1 dig
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
-=head2 sha1_file_base64
+=head2 sha1_file_b64
 
 Reads file (defined by filename or filehandle) content, and returns its SHA1 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $sha1_base64 = sha1_file_base64('filename.dat');
+ $sha1_b64 = sha1_file_b64('filename.dat');
  #or
- $sha1_base64 = sha1_file_base64(*FILEHANDLE);
+ $sha1_b64 = sha1_file_b64(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -182,7 +182,7 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 b64digest
 
- $result_base64 = $d->b64digest();
+ $result_b64 = $d->b64digest();
 
 =head1 SEE ALSO
 

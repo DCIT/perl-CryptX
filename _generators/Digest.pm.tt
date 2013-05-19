@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_base64 [%lc_name%]_file [%lc_name%]_file_hex [%lc_name%]_file_base64 )] );
+our %EXPORT_TAGS = ( all => [qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_b64 [%lc_name%]_file [%lc_name%]_file_hex [%lc_name%]_file_b64 )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -19,11 +19,11 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
 sub [%lc_name%]             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub [%lc_name%]_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub [%lc_name%]_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
+sub [%lc_name%]_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
 
 sub [%lc_name%]_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub [%lc_name%]_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub [%lc_name%]_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
+sub [%lc_name%]_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +36,20 @@ Crypt::Digest::[%orig_name%] - [%info%]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::[%orig_name%] qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_base64 [%lc_name%]_file [%lc_name%]_file_hex [%lc_name%]_file_base64 );
+   use Crypt::Digest::[%orig_name%] qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_b64 [%lc_name%]_file [%lc_name%]_file_hex [%lc_name%]_file_b64 );
 
    # calculate digest from string/buffer
    $[%lc_name%]_raw = [%lc_name%]('data string');
    $[%lc_name%]_hex = [%lc_name%]_hex('data string');
-   $[%lc_name%]_b64 = [%lc_name%]_base64('data string');
+   $[%lc_name%]_b64 = [%lc_name%]_b64('data string');
    # calculate digest from file
    $[%lc_name%]_raw = [%lc_name%]_file('filename.dat');
    $[%lc_name%]_hex = [%lc_name%]_file_hex('filename.dat');
-   $[%lc_name%]_b64 = [%lc_name%]_file_base64('filename.dat');
+   $[%lc_name%]_b64 = [%lc_name%]_file_b64('filename.dat');
    # calculate digest from filehandle
    $[%lc_name%]_raw = [%lc_name%]_file(*FILEHANDLE);
    $[%lc_name%]_hex = [%lc_name%]_file_hex(*FILEHANDLE);
-   $[%lc_name%]_b64 = [%lc_name%]_file_base64(*FILEHANDLE);
+   $[%lc_name%]_b64 = [%lc_name%]_file_b64(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::[%orig_name%];
@@ -72,7 +72,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::[%orig_name%] qw([%lc_name%] [%lc_name%]_hex [%lc_name%]_base64 [%lc_name%]_file [%lc_name%]_file_hex [%lc_name%]_file_base64);
+  use Crypt::Digest::[%orig_name%] qw([%lc_name%] [%lc_name%]_hex [%lc_name%]_b64 [%lc_name%]_file [%lc_name%]_file_hex [%lc_name%]_file_b64);
 
 Or all of them at once:
 
@@ -96,13 +96,13 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
  #or
  $[%lc_name%]_hex = [%lc_name%]_hex('any data', 'more data', 'even more data');
 
-=head2 [%lc_name%]_base64
+=head2 [%lc_name%]_b64
 
 Logically joins all arguments into a single string, and returns its [%orig_name%] digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $[%lc_name%]_base64 = [%lc_name%]_base64('data string');
+ $[%lc_name%]_b64 = [%lc_name%]_b64('data string');
  #or
- $[%lc_name%]_base64 = [%lc_name%]_base64('any data', 'more data', 'even more data');
+ $[%lc_name%]_b64 = [%lc_name%]_b64('any data', 'more data', 'even more data');
 
 =head2 [%lc_name%]_file
 
@@ -122,13 +122,13 @@ Reads file (defined by filename or filehandle) content, and returns its [%orig_n
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
-=head2 [%lc_name%]_file_base64
+=head2 [%lc_name%]_file_b64
 
 Reads file (defined by filename or filehandle) content, and returns its [%orig_name%] digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $[%lc_name%]_base64 = [%lc_name%]_file_base64('filename.dat');
+ $[%lc_name%]_b64 = [%lc_name%]_file_b64('filename.dat');
  #or
- $[%lc_name%]_base64 = [%lc_name%]_file_base64(*FILEHANDLE);
+ $[%lc_name%]_b64 = [%lc_name%]_file_b64(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -182,7 +182,7 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 b64digest
 
- $result_base64 = $d->b64digest();
+ $result_b64 = $d->b64digest();
 
 =head1 SEE ALSO
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( ripemd160 ripemd160_hex ripemd160_base64 ripemd160_file ripemd160_file_hex ripemd160_file_base64 )] );
+our %EXPORT_TAGS = ( all => [qw( ripemd160 ripemd160_hex ripemd160_b64 ripemd160_file ripemd160_file_hex ripemd160_file_b64 )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -19,11 +19,11 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
 sub ripemd160             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub ripemd160_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub ripemd160_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
+sub ripemd160_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
 
 sub ripemd160_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub ripemd160_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub ripemd160_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
+sub ripemd160_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +36,20 @@ Crypt::Digest::RIPEMD160 - Hash function RIPEMD-160 [size: 160 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::RIPEMD160 qw( ripemd160 ripemd160_hex ripemd160_base64 ripemd160_file ripemd160_file_hex ripemd160_file_base64 );
+   use Crypt::Digest::RIPEMD160 qw( ripemd160 ripemd160_hex ripemd160_b64 ripemd160_file ripemd160_file_hex ripemd160_file_b64 );
 
    # calculate digest from string/buffer
    $ripemd160_raw = ripemd160('data string');
    $ripemd160_hex = ripemd160_hex('data string');
-   $ripemd160_b64 = ripemd160_base64('data string');
+   $ripemd160_b64 = ripemd160_b64('data string');
    # calculate digest from file
    $ripemd160_raw = ripemd160_file('filename.dat');
    $ripemd160_hex = ripemd160_file_hex('filename.dat');
-   $ripemd160_b64 = ripemd160_file_base64('filename.dat');
+   $ripemd160_b64 = ripemd160_file_b64('filename.dat');
    # calculate digest from filehandle
    $ripemd160_raw = ripemd160_file(*FILEHANDLE);
    $ripemd160_hex = ripemd160_file_hex(*FILEHANDLE);
-   $ripemd160_b64 = ripemd160_file_base64(*FILEHANDLE);
+   $ripemd160_b64 = ripemd160_file_b64(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::RIPEMD160;
@@ -72,7 +72,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::RIPEMD160 qw(ripemd160 ripemd160_hex ripemd160_base64 ripemd160_file ripemd160_file_hex ripemd160_file_base64);
+  use Crypt::Digest::RIPEMD160 qw(ripemd160 ripemd160_hex ripemd160_b64 ripemd160_file ripemd160_file_hex ripemd160_file_b64);
 
 Or all of them at once:
 
@@ -96,13 +96,13 @@ Logically joins all arguments into a single string, and returns its RIPEMD160 di
  #or
  $ripemd160_hex = ripemd160_hex('any data', 'more data', 'even more data');
 
-=head2 ripemd160_base64
+=head2 ripemd160_b64
 
 Logically joins all arguments into a single string, and returns its RIPEMD160 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $ripemd160_base64 = ripemd160_base64('data string');
+ $ripemd160_b64 = ripemd160_b64('data string');
  #or
- $ripemd160_base64 = ripemd160_base64('any data', 'more data', 'even more data');
+ $ripemd160_b64 = ripemd160_b64('any data', 'more data', 'even more data');
 
 =head2 ripemd160_file
 
@@ -122,13 +122,13 @@ Reads file (defined by filename or filehandle) content, and returns its RIPEMD16
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
-=head2 ripemd160_file_base64
+=head2 ripemd160_file_b64
 
 Reads file (defined by filename or filehandle) content, and returns its RIPEMD160 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $ripemd160_base64 = ripemd160_file_base64('filename.dat');
+ $ripemd160_b64 = ripemd160_file_b64('filename.dat');
  #or
- $ripemd160_base64 = ripemd160_file_base64(*FILEHANDLE);
+ $ripemd160_b64 = ripemd160_file_b64(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -182,7 +182,7 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 b64digest
 
- $result_base64 = $d->b64digest();
+ $result_b64 = $d->b64digest();
 
 =head1 SEE ALSO
 

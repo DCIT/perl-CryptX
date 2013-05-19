@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( md4 md4_hex md4_base64 md4_file md4_file_hex md4_file_base64 )] );
+our %EXPORT_TAGS = ( all => [qw( md4 md4_hex md4_b64 md4_file md4_file_hex md4_file_b64 )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -19,11 +19,11 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
 sub md4             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub md4_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub md4_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
+sub md4_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
 
 sub md4_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub md4_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub md4_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
+sub md4_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +36,20 @@ Crypt::Digest::MD4 - Hash function MD4 [size: 128 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::MD4 qw( md4 md4_hex md4_base64 md4_file md4_file_hex md4_file_base64 );
+   use Crypt::Digest::MD4 qw( md4 md4_hex md4_b64 md4_file md4_file_hex md4_file_b64 );
 
    # calculate digest from string/buffer
    $md4_raw = md4('data string');
    $md4_hex = md4_hex('data string');
-   $md4_b64 = md4_base64('data string');
+   $md4_b64 = md4_b64('data string');
    # calculate digest from file
    $md4_raw = md4_file('filename.dat');
    $md4_hex = md4_file_hex('filename.dat');
-   $md4_b64 = md4_file_base64('filename.dat');
+   $md4_b64 = md4_file_b64('filename.dat');
    # calculate digest from filehandle
    $md4_raw = md4_file(*FILEHANDLE);
    $md4_hex = md4_file_hex(*FILEHANDLE);
-   $md4_b64 = md4_file_base64(*FILEHANDLE);
+   $md4_b64 = md4_file_b64(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::MD4;
@@ -72,7 +72,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::MD4 qw(md4 md4_hex md4_base64 md4_file md4_file_hex md4_file_base64);
+  use Crypt::Digest::MD4 qw(md4 md4_hex md4_b64 md4_file md4_file_hex md4_file_b64);
 
 Or all of them at once:
 
@@ -96,13 +96,13 @@ Logically joins all arguments into a single string, and returns its MD4 digest e
  #or
  $md4_hex = md4_hex('any data', 'more data', 'even more data');
 
-=head2 md4_base64
+=head2 md4_b64
 
 Logically joins all arguments into a single string, and returns its MD4 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $md4_base64 = md4_base64('data string');
+ $md4_b64 = md4_b64('data string');
  #or
- $md4_base64 = md4_base64('any data', 'more data', 'even more data');
+ $md4_b64 = md4_b64('any data', 'more data', 'even more data');
 
 =head2 md4_file
 
@@ -122,13 +122,13 @@ Reads file (defined by filename or filehandle) content, and returns its MD4 dige
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
-=head2 md4_file_base64
+=head2 md4_file_b64
 
 Reads file (defined by filename or filehandle) content, and returns its MD4 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $md4_base64 = md4_file_base64('filename.dat');
+ $md4_b64 = md4_file_b64('filename.dat');
  #or
- $md4_base64 = md4_file_base64(*FILEHANDLE);
+ $md4_b64 = md4_file_b64(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -182,7 +182,7 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 b64digest
 
- $result_base64 = $d->b64digest();
+ $result_b64 = $d->b64digest();
 
 =head1 SEE ALSO
 

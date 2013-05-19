@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( whirlpool whirlpool_hex whirlpool_base64 whirlpool_file whirlpool_file_hex whirlpool_file_base64 )] );
+our %EXPORT_TAGS = ( all => [qw( whirlpool whirlpool_hex whirlpool_b64 whirlpool_file whirlpool_file_hex whirlpool_file_b64 )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -19,11 +19,11 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
 sub whirlpool             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub whirlpool_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub whirlpool_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
+sub whirlpool_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
 
 sub whirlpool_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub whirlpool_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub whirlpool_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
+sub whirlpool_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +36,20 @@ Crypt::Digest::Whirlpool - Hash function Whirlpool [size: 512 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::Whirlpool qw( whirlpool whirlpool_hex whirlpool_base64 whirlpool_file whirlpool_file_hex whirlpool_file_base64 );
+   use Crypt::Digest::Whirlpool qw( whirlpool whirlpool_hex whirlpool_b64 whirlpool_file whirlpool_file_hex whirlpool_file_b64 );
 
    # calculate digest from string/buffer
    $whirlpool_raw = whirlpool('data string');
    $whirlpool_hex = whirlpool_hex('data string');
-   $whirlpool_b64 = whirlpool_base64('data string');
+   $whirlpool_b64 = whirlpool_b64('data string');
    # calculate digest from file
    $whirlpool_raw = whirlpool_file('filename.dat');
    $whirlpool_hex = whirlpool_file_hex('filename.dat');
-   $whirlpool_b64 = whirlpool_file_base64('filename.dat');
+   $whirlpool_b64 = whirlpool_file_b64('filename.dat');
    # calculate digest from filehandle
    $whirlpool_raw = whirlpool_file(*FILEHANDLE);
    $whirlpool_hex = whirlpool_file_hex(*FILEHANDLE);
-   $whirlpool_b64 = whirlpool_file_base64(*FILEHANDLE);
+   $whirlpool_b64 = whirlpool_file_b64(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::Whirlpool;
@@ -72,7 +72,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::Whirlpool qw(whirlpool whirlpool_hex whirlpool_base64 whirlpool_file whirlpool_file_hex whirlpool_file_base64);
+  use Crypt::Digest::Whirlpool qw(whirlpool whirlpool_hex whirlpool_b64 whirlpool_file whirlpool_file_hex whirlpool_file_b64);
 
 Or all of them at once:
 
@@ -96,13 +96,13 @@ Logically joins all arguments into a single string, and returns its Whirlpool di
  #or
  $whirlpool_hex = whirlpool_hex('any data', 'more data', 'even more data');
 
-=head2 whirlpool_base64
+=head2 whirlpool_b64
 
 Logically joins all arguments into a single string, and returns its Whirlpool digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $whirlpool_base64 = whirlpool_base64('data string');
+ $whirlpool_b64 = whirlpool_b64('data string');
  #or
- $whirlpool_base64 = whirlpool_base64('any data', 'more data', 'even more data');
+ $whirlpool_b64 = whirlpool_b64('any data', 'more data', 'even more data');
 
 =head2 whirlpool_file
 
@@ -122,13 +122,13 @@ Reads file (defined by filename or filehandle) content, and returns its Whirlpoo
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
-=head2 whirlpool_file_base64
+=head2 whirlpool_file_b64
 
 Reads file (defined by filename or filehandle) content, and returns its Whirlpool digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $whirlpool_base64 = whirlpool_file_base64('filename.dat');
+ $whirlpool_b64 = whirlpool_file_b64('filename.dat');
  #or
- $whirlpool_base64 = whirlpool_file_base64(*FILEHANDLE);
+ $whirlpool_b64 = whirlpool_file_b64(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -182,7 +182,7 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 b64digest
 
- $result_base64 = $d->b64digest();
+ $result_b64 = $d->b64digest();
 
 =head1 SEE ALSO
 

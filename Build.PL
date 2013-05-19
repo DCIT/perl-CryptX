@@ -1,3 +1,5 @@
+use 5.008008;
+
 use strict;
 use warnings;
 use Module::Build;
@@ -61,6 +63,7 @@ my $builder = $class->new(
   extra_compiler_flags => $flags,
   c_source             => $src,
   requires             => {
+    'perl'          => '5.008008',
     'MIME::Base64'  => 0,
   },
   build_requires       => {

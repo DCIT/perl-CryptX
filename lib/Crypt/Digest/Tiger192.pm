@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( tiger192 tiger192_hex tiger192_base64 tiger192_file tiger192_file_hex tiger192_file_base64 )] );
+our %EXPORT_TAGS = ( all => [qw( tiger192 tiger192_hex tiger192_b64 tiger192_file tiger192_file_hex tiger192_file_b64 )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -19,11 +19,11 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 
 sub tiger192             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub tiger192_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub tiger192_base64      { Crypt::Digest::digest_data_base64(__PACKAGE__, @_) }
+sub tiger192_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
 
 sub tiger192_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub tiger192_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub tiger192_file_base64 { Crypt::Digest::digest_file_base64(__PACKAGE__, @_) }
+sub tiger192_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +36,20 @@ Crypt::Digest::Tiger192 - Hash function Tiger-192 [size: 192 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::Tiger192 qw( tiger192 tiger192_hex tiger192_base64 tiger192_file tiger192_file_hex tiger192_file_base64 );
+   use Crypt::Digest::Tiger192 qw( tiger192 tiger192_hex tiger192_b64 tiger192_file tiger192_file_hex tiger192_file_b64 );
 
    # calculate digest from string/buffer
    $tiger192_raw = tiger192('data string');
    $tiger192_hex = tiger192_hex('data string');
-   $tiger192_b64 = tiger192_base64('data string');
+   $tiger192_b64 = tiger192_b64('data string');
    # calculate digest from file
    $tiger192_raw = tiger192_file('filename.dat');
    $tiger192_hex = tiger192_file_hex('filename.dat');
-   $tiger192_b64 = tiger192_file_base64('filename.dat');
+   $tiger192_b64 = tiger192_file_b64('filename.dat');
    # calculate digest from filehandle
    $tiger192_raw = tiger192_file(*FILEHANDLE);
    $tiger192_hex = tiger192_file_hex(*FILEHANDLE);
-   $tiger192_b64 = tiger192_file_base64(*FILEHANDLE);
+   $tiger192_b64 = tiger192_file_b64(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::Tiger192;
@@ -72,7 +72,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::Tiger192 qw(tiger192 tiger192_hex tiger192_base64 tiger192_file tiger192_file_hex tiger192_file_base64);
+  use Crypt::Digest::Tiger192 qw(tiger192 tiger192_hex tiger192_b64 tiger192_file tiger192_file_hex tiger192_file_b64);
 
 Or all of them at once:
 
@@ -96,13 +96,13 @@ Logically joins all arguments into a single string, and returns its Tiger192 dig
  #or
  $tiger192_hex = tiger192_hex('any data', 'more data', 'even more data');
 
-=head2 tiger192_base64
+=head2 tiger192_b64
 
 Logically joins all arguments into a single string, and returns its Tiger192 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $tiger192_base64 = tiger192_base64('data string');
+ $tiger192_b64 = tiger192_b64('data string');
  #or
- $tiger192_base64 = tiger192_base64('any data', 'more data', 'even more data');
+ $tiger192_b64 = tiger192_b64('any data', 'more data', 'even more data');
 
 =head2 tiger192_file
 
@@ -122,13 +122,13 @@ Reads file (defined by filename or filehandle) content, and returns its Tiger192
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
-=head2 tiger192_file_base64
+=head2 tiger192_file_b64
 
 Reads file (defined by filename or filehandle) content, and returns its Tiger192 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $tiger192_base64 = tiger192_file_base64('filename.dat');
+ $tiger192_b64 = tiger192_file_b64('filename.dat');
  #or
- $tiger192_base64 = tiger192_file_base64(*FILEHANDLE);
+ $tiger192_b64 = tiger192_file_b64(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -182,7 +182,7 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 b64digest
 
- $result_base64 = $d->b64digest();
+ $result_b64 = $d->b64digest();
 
 =head1 SEE ALSO
 
