@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its SHA1 digest 
 
  $sha1_hex = sha1_hex('data string');
  #or
- $sha1_hex = sha1('any data', 'more data', 'even more data');
+ $sha1_hex = sha1_hex('any data', 'more data', 'even more data');
 
 =head2 sha1_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its SHA1 digest 
 
  $sha1_base64 = sha1_base64('data string');
  #or
- $sha1_base64 = sha1('any data', 'more data', 'even more data');
+ $sha1_base64 = sha1_base64('any data', 'more data', 'even more data');
 
 =head2 sha1_file
 

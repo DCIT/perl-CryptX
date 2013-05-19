@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its SHA256 diges
 
  $sha256_hex = sha256_hex('data string');
  #or
- $sha256_hex = sha256('any data', 'more data', 'even more data');
+ $sha256_hex = sha256_hex('any data', 'more data', 'even more data');
 
 =head2 sha256_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its SHA256 diges
 
  $sha256_base64 = sha256_base64('data string');
  #or
- $sha256_base64 = sha256('any data', 'more data', 'even more data');
+ $sha256_base64 = sha256_base64('any data', 'more data', 'even more data');
 
 =head2 sha256_file
 

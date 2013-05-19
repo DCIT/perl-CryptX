@@ -34,9 +34,9 @@ Crypt::Mac::XCBC - Message authentication code XCBC
    use Crypt::Mac::XCBC qw( xcbc xcbc_hex );
 
    # calculate MAC from string/buffer
-   $xcbc_raw = xcbc($cipher_name, $key, 'data string');
-   $xcbc_hex = xcbc_hex($cipher_name, $key, 'data string');
-   $xcbc_b64 = xcbc_b64($cipher_name, $key, 'data string');
+   $xcbc_raw = xcbc($cipher_name, $key, 'data buffer');
+   $xcbc_hex = xcbc_hex($cipher_name, $key, 'data buffer');
+   $xcbc_b64 = xcbc_b64($cipher_name, $key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::XCBC;
@@ -71,7 +71,7 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its XCBC message authentication code encoded as a binary string.
 
- $xcbc_raw = xcbc($cipher_name, $key, 'data string');
+ $xcbc_raw = xcbc($cipher_name, $key, 'data buffer');
  #or
  $xcbc_raw = xcbc($cipher_name, $key, 'any data', 'more data', 'even more data');
 
@@ -79,17 +79,17 @@ Logically joins all arguments into a single string, and returns its XCBC message
 
 Logically joins all arguments into a single string, and returns its XCBC message authentication code encoded as a hexadecimal string.
 
- $xcbc_hex = xcbc($cipher_name, $key, 'data string');
+ $xcbc_hex = xcbc_hex($cipher_name, $key, 'data buffer');
  #or
- $xcbc_hex = xcbc($cipher_name, $key, 'any data', 'more data', 'even more data');
+ $xcbc_hex = xcbc_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 xcbc_b64
 
 Logically joins all arguments into a single string, and returns its XCBC message authentication code encoded as a BASE64 string.
 
- $xcbc_b64 = xcbc($cipher_name, $key, 'data string');
+ $xcbc_b64 = xcbc_b64($cipher_name, $key, 'data buffer');
  #or
- $xcbc_b64 = xcbc($cipher_name, $key, 'any data', 'more data', 'even more data');
+ $xcbc_b64 = xcbc_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 

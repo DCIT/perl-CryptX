@@ -34,14 +34,14 @@ Crypt::Mac::HMAC - Message authentication code HMAC
    use Crypt::Mac::HMAC qw( hmac hmac_hex );
 
    # calculate MAC from string/buffer
-   $hmac_raw = hmac($hash_name, $key, 'data string');
-   $hmac_hex = hmac_hex($hash_name, $key, 'data string');
-   $hmac_b64 = hmac_b64($hash_name, $key, 'data string');
+   $hmac_raw = hmac('SHA256', $key, 'data buffer');
+   $hmac_hex = hmac_hex('SHA256', $key, 'data buffer');
+   $hmac_b64 = hmac_b64('SHA256', $key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::HMAC;
 
-   $d = Crypt::Mac::HMAC->new($hash_name, $key);
+   $d = Crypt::Mac::HMAC->new('SHA256', $key);
    $d->add('any data');
    $d->addfile('filename.dat');
    $d->addfile(*FILEHANDLE);
@@ -71,7 +71,7 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a binary string.
 
- $hmac_raw = hmac($hash_name, $key, 'data string');
+ $hmac_raw = hmac($hash_name, $key, 'data buffer');
  #or
  $hmac_raw = hmac($hash_name, $key, 'any data', 'more data', 'even more data');
 
@@ -79,17 +79,17 @@ Logically joins all arguments into a single string, and returns its HMAC message
 
 Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a hexadecimal string.
 
- $hmac_hex = hmac($hash_name, $key, 'data string');
+ $hmac_hex = hmac_hex($hash_name, $key, 'data buffer');
  #or
- $hmac_hex = hmac($hash_name, $key, 'any data', 'more data', 'even more data');
+ $hmac_hex = hmac_hex($hash_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 hmac_b64
 
 Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a BASE64 string.
 
- $hmac_b64 = hmac($hash_name, $key, 'data string');
+ $hmac_b64 = hmac_b64($hash_name, $key, 'data buffer');
  #or
- $hmac_b64 = hmac($hash_name, $key, 'any data', 'more data', 'even more data');
+ $hmac_b64 = hmac_b64($hash_name, $key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 

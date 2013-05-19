@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its Tiger192 dig
 
  $tiger192_hex = tiger192_hex('data string');
  #or
- $tiger192_hex = tiger192('any data', 'more data', 'even more data');
+ $tiger192_hex = tiger192_hex('any data', 'more data', 'even more data');
 
 =head2 tiger192_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its Tiger192 dig
 
  $tiger192_base64 = tiger192_base64('data string');
  #or
- $tiger192_base64 = tiger192('any data', 'more data', 'even more data');
+ $tiger192_base64 = tiger192_base64('any data', 'more data', 'even more data');
 
 =head2 tiger192_file
 

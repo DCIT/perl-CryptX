@@ -32,9 +32,9 @@ Crypt::Mac::Pelican - Message authentication code Pelican (AES based MAC)
    use Crypt::Mac::Pelican qw( pelican pelican_hex );
 
    # calculate MAC from string/buffer
-   $pelican_raw = pelican($key, 'data string');
-   $pelican_hex = pelican_hex($key, 'data string');
-   $pelican_b64 = pelican_b64($key, 'data string');
+   $pelican_raw = pelican($key, 'data buffer');
+   $pelican_hex = pelican_hex($key, 'data buffer');
+   $pelican_b64 = pelican_b64($key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::Pelican;
@@ -69,7 +69,7 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a binary string.
 
- $pelican_raw = pelican($key, 'data string');
+ $pelican_raw = pelican($key, 'data buffer');
  #or
  $pelican_raw = pelican($key, 'any data', 'more data', 'even more data');
 
@@ -77,17 +77,17 @@ Logically joins all arguments into a single string, and returns its Pelican mess
 
 Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a hexadecimal string.
 
- $pelican_hex = pelican($key, 'data string');
+ $pelican_hex = pelican_hex($key, 'data buffer');
  #or
- $pelican_hex = pelican($key, 'any data', 'more data', 'even more data');
+ $pelican_hex = pelican_hex($key, 'any data', 'more data', 'even more data');
 
 =head2 pelican_b64
 
 Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a BASE64 string.
 
- $pelican_b64 = pelican($key, 'data string');
+ $pelican_b64 = pelican_b64($key, 'data buffer');
  #or
- $pelican_b64 = pelican($key, 'any data', 'more data', 'even more data');
+ $pelican_b64 = pelican_b64($key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 

@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its SHA224 diges
 
  $sha224_hex = sha224_hex('data string');
  #or
- $sha224_hex = sha224('any data', 'more data', 'even more data');
+ $sha224_hex = sha224_hex('any data', 'more data', 'even more data');
 
 =head2 sha224_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its SHA224 diges
 
  $sha224_base64 = sha224_base64('data string');
  #or
- $sha224_base64 = sha224('any data', 'more data', 'even more data');
+ $sha224_base64 = sha224_base64('any data', 'more data', 'even more data');
 
 =head2 sha224_file
 

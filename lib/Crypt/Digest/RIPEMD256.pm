@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its RIPEMD256 di
 
  $ripemd256_hex = ripemd256_hex('data string');
  #or
- $ripemd256_hex = ripemd256('any data', 'more data', 'even more data');
+ $ripemd256_hex = ripemd256_hex('any data', 'more data', 'even more data');
 
 =head2 ripemd256_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its RIPEMD256 di
 
  $ripemd256_base64 = ripemd256_base64('data string');
  #or
- $ripemd256_base64 = ripemd256('any data', 'more data', 'even more data');
+ $ripemd256_base64 = ripemd256_base64('any data', 'more data', 'even more data');
 
 =head2 ripemd256_file
 

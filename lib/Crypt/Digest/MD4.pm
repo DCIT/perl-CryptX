@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its MD4 digest e
 
  $md4_hex = md4_hex('data string');
  #or
- $md4_hex = md4('any data', 'more data', 'even more data');
+ $md4_hex = md4_hex('any data', 'more data', 'even more data');
 
 =head2 md4_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its MD4 digest e
 
  $md4_base64 = md4_base64('data string');
  #or
- $md4_base64 = md4('any data', 'more data', 'even more data');
+ $md4_base64 = md4_base64('any data', 'more data', 'even more data');
 
 =head2 md4_file
 

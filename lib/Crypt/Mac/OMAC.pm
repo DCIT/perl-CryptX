@@ -34,9 +34,9 @@ Crypt::Mac::OMAC - Message authentication code OMAC
    use Crypt::Mac::OMAC qw( omac omac_hex );
 
    # calculate MAC from string/buffer
-   $omac_raw = omac($cipher_name, $key, 'data string');
-   $omac_hex = omac_hex($cipher_name, $key, 'data string');
-   $omac_b64 = omac_b64($cipher_name, $key, 'data string');
+   $omac_raw = omac($cipher_name, $key, 'data buffer');
+   $omac_hex = omac_hex($cipher_name, $key, 'data buffer');
+   $omac_b64 = omac_b64($cipher_name, $key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::OMAC;
@@ -71,7 +71,7 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its OMAC message authentication code encoded as a binary string.
 
- $omac_raw = omac($cipher_name, $key, 'data string');
+ $omac_raw = omac($cipher_name, $key, 'data buffer');
  #or
  $omac_raw = omac($cipher_name, $key, 'any data', 'more data', 'even more data');
 
@@ -79,17 +79,17 @@ Logically joins all arguments into a single string, and returns its OMAC message
 
 Logically joins all arguments into a single string, and returns its OMAC message authentication code encoded as a hexadecimal string.
 
- $omac_hex = omac($cipher_name, $key, 'data string');
+ $omac_hex = omac_hex($cipher_name, $key, 'data buffer');
  #or
- $omac_hex = omac($cipher_name, $key, 'any data', 'more data', 'even more data');
+ $omac_hex = omac_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 omac_b64
 
 Logically joins all arguments into a single string, and returns its OMAC message authentication code encoded as a BASE64 string.
 
- $omac_b64 = omac($cipher_name, $key, 'data string');
+ $omac_b64 = omac_b64($cipher_name, $key, 'data buffer');
  #or
- $omac_b64 = omac($cipher_name, $key, 'any data', 'more data', 'even more data');
+ $omac_b64 = omac_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 

@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its CHAES digest
 
  $chaes_hex = chaes_hex('data string');
  #or
- $chaes_hex = chaes('any data', 'more data', 'even more data');
+ $chaes_hex = chaes_hex('any data', 'more data', 'even more data');
 
 =head2 chaes_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its CHAES digest
 
  $chaes_base64 = chaes_base64('data string');
  #or
- $chaes_base64 = chaes('any data', 'more data', 'even more data');
+ $chaes_base64 = chaes_base64('any data', 'more data', 'even more data');
 
 =head2 chaes_file
 

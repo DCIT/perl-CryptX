@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its SHA384 diges
 
  $sha384_hex = sha384_hex('data string');
  #or
- $sha384_hex = sha384('any data', 'more data', 'even more data');
+ $sha384_hex = sha384_hex('any data', 'more data', 'even more data');
 
 =head2 sha384_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its SHA384 diges
 
  $sha384_base64 = sha384_base64('data string');
  #or
- $sha384_base64 = sha384('any data', 'more data', 'even more data');
+ $sha384_base64 = sha384_base64('any data', 'more data', 'even more data');
 
 =head2 sha384_file
 

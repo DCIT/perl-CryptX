@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its SHA512 diges
 
  $sha512_hex = sha512_hex('data string');
  #or
- $sha512_hex = sha512('any data', 'more data', 'even more data');
+ $sha512_hex = sha512_hex('any data', 'more data', 'even more data');
 
 =head2 sha512_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its SHA512 diges
 
  $sha512_base64 = sha512_base64('data string');
  #or
- $sha512_base64 = sha512('any data', 'more data', 'even more data');
+ $sha512_base64 = sha512_base64('any data', 'more data', 'even more data');
 
 =head2 sha512_file
 

@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its MD5 digest e
 
  $md5_hex = md5_hex('data string');
  #or
- $md5_hex = md5('any data', 'more data', 'even more data');
+ $md5_hex = md5_hex('any data', 'more data', 'even more data');
 
 =head2 md5_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its MD5 digest e
 
  $md5_base64 = md5_base64('data string');
  #or
- $md5_base64 = md5('any data', 'more data', 'even more data');
+ $md5_base64 = md5_base64('any data', 'more data', 'even more data');
 
 =head2 md5_file
 

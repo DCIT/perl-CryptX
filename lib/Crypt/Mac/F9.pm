@@ -34,9 +34,9 @@ Crypt::Mac::F9 - Message authentication code F9
    use Crypt::Mac::F9 qw( f9 f9_hex );
 
    # calculate MAC from string/buffer
-   $f9_raw = f9($cipher_name, $key, 'data string');
-   $f9_hex = f9_hex($cipher_name, $key, 'data string');
-   $f9_b64 = f9_b64($cipher_name, $key, 'data string');
+   $f9_raw = f9($cipher_name, $key, 'data buffer');
+   $f9_hex = f9_hex($cipher_name, $key, 'data buffer');
+   $f9_b64 = f9_b64($cipher_name, $key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::F9;
@@ -71,7 +71,7 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a binary string.
 
- $f9_raw = f9($cipher_name, $key, 'data string');
+ $f9_raw = f9($cipher_name, $key, 'data buffer');
  #or
  $f9_raw = f9($cipher_name, $key, 'any data', 'more data', 'even more data');
 
@@ -79,17 +79,17 @@ Logically joins all arguments into a single string, and returns its F9 message a
 
 Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a hexadecimal string.
 
- $f9_hex = f9($cipher_name, $key, 'data string');
+ $f9_hex = f9_hex($cipher_name, $key, 'data buffer');
  #or
- $f9_hex = f9($cipher_name, $key, 'any data', 'more data', 'even more data');
+ $f9_hex = f9_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 f9_b64
 
 Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a BASE64 string.
 
- $f9_b64 = f9($cipher_name, $key, 'data string');
+ $f9_b64 = f9_b64($cipher_name, $key, 'data buffer');
  #or
- $f9_b64 = f9($cipher_name, $key, 'any data', 'more data', 'even more data');
+ $f9_b64 = f9_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 

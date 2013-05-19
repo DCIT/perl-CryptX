@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its MD2 digest e
 
  $md2_hex = md2_hex('data string');
  #or
- $md2_hex = md2('any data', 'more data', 'even more data');
+ $md2_hex = md2_hex('any data', 'more data', 'even more data');
 
 =head2 md2_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its MD2 digest e
 
  $md2_base64 = md2_base64('data string');
  #or
- $md2_base64 = md2('any data', 'more data', 'even more data');
+ $md2_base64 = md2_base64('any data', 'more data', 'even more data');
 
 =head2 md2_file
 

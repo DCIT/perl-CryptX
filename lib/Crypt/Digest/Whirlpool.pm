@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its Whirlpool di
 
  $whirlpool_hex = whirlpool_hex('data string');
  #or
- $whirlpool_hex = whirlpool('any data', 'more data', 'even more data');
+ $whirlpool_hex = whirlpool_hex('any data', 'more data', 'even more data');
 
 =head2 whirlpool_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its Whirlpool di
 
  $whirlpool_base64 = whirlpool_base64('data string');
  #or
- $whirlpool_base64 = whirlpool('any data', 'more data', 'even more data');
+ $whirlpool_base64 = whirlpool_base64('any data', 'more data', 'even more data');
 
 =head2 whirlpool_file
 

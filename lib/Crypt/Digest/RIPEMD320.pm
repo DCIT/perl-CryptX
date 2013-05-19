@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its RIPEMD320 di
 
  $ripemd320_hex = ripemd320_hex('data string');
  #or
- $ripemd320_hex = ripemd320('any data', 'more data', 'even more data');
+ $ripemd320_hex = ripemd320_hex('any data', 'more data', 'even more data');
 
 =head2 ripemd320_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its RIPEMD320 di
 
  $ripemd320_base64 = ripemd320_base64('data string');
  #or
- $ripemd320_base64 = ripemd320('any data', 'more data', 'even more data');
+ $ripemd320_base64 = ripemd320_base64('any data', 'more data', 'even more data');
 
 =head2 ripemd320_file
 

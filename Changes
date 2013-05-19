@@ -1,10 +1,13 @@
 Changes for CryptX
 
 TODO:
-        - http://www.cpantesters.org/cpan/report/f9dc6958-accc-11e2-99fc-de953c106faf
+        - http://www.cpantesters.org/cpan/report/f9dc6958-accc-11e2-99fc-de953c106faf (perhaps do not support 5.6.x)
         - maybe add xxx_b64url alternatives (e.g. sha1_b64url ...)
         - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - croak when mode does not call start_(en|de)crypt
+
+0.009   2013/05/XXX
+        - doc fixes
 
 0.008   2013/05/02
         - fixed prng test failures

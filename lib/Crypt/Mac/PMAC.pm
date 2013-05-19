@@ -34,9 +34,9 @@ Crypt::Mac::PMAC - Message authentication code PMAC
    use Crypt::Mac::PMAC qw( pmac pmac_hex );
 
    # calculate MAC from string/buffer
-   $pmac_raw = pmac($cipher_name, $key, 'data string');
-   $pmac_hex = pmac_hex($cipher_name, $key, 'data string');
-   $pmac_b64 = pmac_b64($cipher_name, $key, 'data string');
+   $pmac_raw = pmac($cipher_name, $key, 'data buffer');
+   $pmac_hex = pmac_hex($cipher_name, $key, 'data buffer');
+   $pmac_b64 = pmac_b64($cipher_name, $key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::PMAC;
@@ -71,7 +71,7 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a binary string.
 
- $pmac_raw = pmac($cipher_name, $key, 'data string');
+ $pmac_raw = pmac($cipher_name, $key, 'data buffer');
  #or
  $pmac_raw = pmac($cipher_name, $key, 'any data', 'more data', 'even more data');
 
@@ -79,17 +79,17 @@ Logically joins all arguments into a single string, and returns its PMAC message
 
 Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a hexadecimal string.
 
- $pmac_hex = pmac($cipher_name, $key, 'data string');
+ $pmac_hex = pmac_hex($cipher_name, $key, 'data buffer');
  #or
- $pmac_hex = pmac($cipher_name, $key, 'any data', 'more data', 'even more data');
+ $pmac_hex = pmac_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 pmac_b64
 
 Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a BASE64 string.
 
- $pmac_b64 = pmac($cipher_name, $key, 'data string');
+ $pmac_b64 = pmac_b64($cipher_name, $key, 'data buffer');
  #or
- $pmac_b64 = pmac($cipher_name, $key, 'any data', 'more data', 'even more data');
+ $pmac_b64 = pmac_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 

@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
  $[%lc_name%]_hex = [%lc_name%]_hex('data string');
  #or
- $[%lc_name%]_hex = [%lc_name%]('any data', 'more data', 'even more data');
+ $[%lc_name%]_hex = [%lc_name%]_hex('any data', 'more data', 'even more data');
 
 =head2 [%lc_name%]_base64
 
@@ -102,7 +102,7 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
  $[%lc_name%]_base64 = [%lc_name%]_base64('data string');
  #or
- $[%lc_name%]_base64 = [%lc_name%]('any data', 'more data', 'even more data');
+ $[%lc_name%]_base64 = [%lc_name%]_base64('any data', 'more data', 'even more data');
 
 =head2 [%lc_name%]_file
 
