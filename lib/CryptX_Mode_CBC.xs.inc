@@ -48,7 +48,7 @@ _start(Crypt::Mode::CBC self, int dir, SV * key, SV * iv)
         if (i_len != (STRLEN)cipher_descriptor[self->cipher_id].block_length) {
           croak ("FATAL: sizeof(iv) should be equal to blocksize (%d)", cipher_descriptor[self->cipher_id].block_length);
         }
-        rv = cbc_start(self->cipher_id, i, k, k_len, self->cipher_rounds, &self->state);
+        rv = cbc_start(self->cipher_id, i, k, (unsigned long)k_len, self->cipher_rounds, &self->state);
         if (rv != CRYPT_OK) {
           croak("FATAL: cbc_start failed: %s", error_to_string(rv));
         }
@@ -62,7 +62,7 @@ _encrypt(Crypt::Mode::CBC self, SV * data)
     CODE:
     {
         int rv, has_tmp_block, blen;
-        unsigned int i;
+        unsigned long i;
 
         STRLEN in_data_len, in_data_start;
         unsigned char *in_data, *out_data, tmp_block[MAXBLOCKSIZE];
@@ -90,12 +90,12 @@ _encrypt(Crypt::Mode::CBC self, SV * data)
             }
             else { /* not enough data to fill pad */
               Copy(in_data, self->pad+self->padlen, in_data_len, unsigned char);
-              self->padlen += in_data_len;
+              self->padlen += (int)in_data_len;
               in_data_len = 0;
             }
           } /* padlen > 0 */
           
-          i = (in_data_len % blen);
+          i = (unsigned long)(in_data_len % blen);
           if (in_data_len>0 && i>0) { /* save tail of data into pad */
             Copy(in_data+in_data_start+in_data_len-i, self->pad, i, unsigned char);
             self->padlen = i;
@@ -103,7 +103,7 @@ _encrypt(Crypt::Mode::CBC self, SV * data)
           }
           
           if (in_data_len>0) {
-            i = has_tmp_block ? in_data_len + blen : in_data_len;
+            i = (unsigned long)(has_tmp_block ? in_data_len + blen : in_data_len);
             RETVAL = NEWSV(0, i);
             SvPOK_only(RETVAL);
             SvCUR_set(RETVAL, i);
@@ -113,7 +113,7 @@ _encrypt(Crypt::Mode::CBC self, SV * data)
               Copy(tmp_block, out_data, blen, unsigned char);
               out_data += blen;
             }
-            rv = cbc_encrypt(in_data+in_data_start, out_data, in_data_len, &self->state);
+            rv = cbc_encrypt(in_data+in_data_start, out_data, (unsigned long)in_data_len, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: cbc_encrypt failed: %s", error_to_string(rv));
           } /* in_data_len>0 */
           else if (has_tmp_block) {
@@ -202,14 +202,14 @@ _decrypt(Crypt::Mode::CBC self, SV * data)
             }
             else { /* not enough data to fill pad */
               Copy(in_data, self->pad+self->padlen, in_data_len, unsigned char);
-              self->padlen += in_data_len;
+              self->padlen += (int)in_data_len;
               in_data_len = 0;
             }
           } /* padlen > 0 */
           
           /* here: a/ padlen==1..16 && in_data_len==0; b/ padlen==0 && in_data_len>0 */
           if (in_data_len>0) {
-            i = (in_data_len % blen);
+            i = (unsigned long)(in_data_len % blen);
             if (i>0) { /* save tail of data into pad */
               Copy(in_data+in_data_start+in_data_len-i, self->pad, i, unsigned char);
               self->padlen = i;
@@ -224,7 +224,7 @@ _decrypt(Crypt::Mode::CBC self, SV * data)
               self->padlen = blen;
               in_data_len -= blen;
             }
-            i = has_tmp_block ? in_data_len + blen : in_data_len;
+            i = (unsigned long)(has_tmp_block ? in_data_len + blen : in_data_len);
             if (i == 0) {
               RETVAL = newSVpvn("", 0);
             }
@@ -237,7 +237,7 @@ _decrypt(Crypt::Mode::CBC self, SV * data)
                 Copy(tmp_block, out_data, blen, unsigned char);
                 out_data += blen;
               }
-              rv = cbc_decrypt(in_data+in_data_start, out_data, in_data_len, &self->state);
+              rv = cbc_decrypt(in_data+in_data_start, out_data, (unsigned long)in_data_len, &self->state);
               if (rv != CRYPT_OK) croak("FATAL: cbc_decrypt failed: %s", error_to_string(rv));
             }
           } /* in_data_len>0 */

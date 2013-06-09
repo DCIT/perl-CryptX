@@ -38,7 +38,7 @@ _import(Crypt::PK::ECC self, SV * key_data)
         
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         ecc_free(&self->key);
-        rv = ecc_import(data, data_len, &self->key);
+        rv = ecc_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_import failed: %s", error_to_string(rv));
         RETVAL = 1; /* xxx */
     }
@@ -55,7 +55,7 @@ import_key_x963(Crypt::PK::ECC self, SV * key_data)
         
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         ecc_free(&self->key);
-        rv = ecc_ansi_x963_import(data, data_len, &self->key);
+        rv = ecc_ansi_x963_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_ansi_x963_import failed: %s", error_to_string(rv));
         RETVAL = 1; /* xxx */
     }
@@ -133,7 +133,7 @@ _encrypt(Crypt::PK::ECC self, SV * data, char * hash_name)
         
         hash_id = find_hash(hash_name);
         if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
-        rv = ecc_encrypt_key(data_ptr, data_len, buffer, &buffer_len,
+        rv = ecc_encrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                              &self->yarrow_prng_state, self->yarrow_prng_index,
                              hash_id, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_encrypt_key failed: %s", error_to_string(rv));
@@ -154,7 +154,7 @@ _decrypt(Crypt::PK::ECC self, SV * data)
         
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
-        rv = ecc_decrypt_key(data_ptr, data_len, buffer, &buffer_len, &self->key);
+        rv = ecc_decrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_decrypt_key_ex failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
     }
@@ -173,7 +173,7 @@ _sign(Crypt::PK::ECC self, SV * data)
         
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         
-        rv = ecc_sign_hash(data_ptr, data_len, buffer, &buffer_len,
+        rv = ecc_sign_hash(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                            &self->yarrow_prng_state, self->yarrow_prng_index,
                            &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_sign_hash_ex failed: %s", error_to_string(rv));
@@ -196,7 +196,7 @@ _verify(Crypt::PK::ECC self, SV * sig, SV * data)
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
         
         RETVAL = 1;
-        rv = ecc_verify_hash(sig_ptr, sig_len, data_ptr, data_len, &stat, &self->key);
+        rv = ecc_verify_hash(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
         if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
     }
     OUTPUT:

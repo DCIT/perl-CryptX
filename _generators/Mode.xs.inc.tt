@@ -67,7 +67,7 @@ _start(Crypt::Mode::[%orig_name%] self, int dir, SV * key, SV * iv)
         }
 
 [%-IF lc_name == 'ctr' %]
-        rv = [%lc_name%]_start(self->cipher_id, i, k, k_len, self->cipher_rounds, self->ctr_mode_param, &self->state);
+        rv = [%lc_name%]_start(self->cipher_id, i, k, (int)k_len, self->cipher_rounds, self->ctr_mode_param, &self->state);
 [%-ELSIF lc_name == 'xts' %]
         rv = _XXX_XXX_XXX_;
 [%-ELSIF lc_name == 'f8' %]
@@ -75,7 +75,7 @@ _start(Crypt::Mode::[%orig_name%] self, int dir, SV * key, SV * iv)
 [%-ELSIF lc_name == 'lrw' %]
         rv = _XXX_XXX_XXX_;
 [%-ELSE%]
-        rv = [%lc_name%]_start(self->cipher_id, i, k, k_len, self->cipher_rounds, &self->state);
+        rv = [%lc_name%]_start(self->cipher_id, i, k, (int)k_len, self->cipher_rounds, &self->state);
 [%-END%]
         if (rv != CRYPT_OK) {
           croak("FATAL: [%lc_name%]_start failed: %s", error_to_string(rv));
@@ -103,11 +103,11 @@ _crypt(Crypt::Mode::[%orig_name%] self, SV * data)
           out_data = (unsigned char *)SvPV_nolen(RETVAL);
 
           if (self->direction == 1) {
-            rv = [%lc_name%]_encrypt(in_data, out_data, in_data_len, &self->state);
+            rv = [%lc_name%]_encrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_encrypt failed: %s", error_to_string(rv));
           }
           else if (self->direction == -1) {
-            rv = [%lc_name%]_decrypt(in_data, out_data, in_data_len, &self->state);
+            rv = [%lc_name%]_decrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_decrypt failed: %s", error_to_string(rv));
           }
           else {

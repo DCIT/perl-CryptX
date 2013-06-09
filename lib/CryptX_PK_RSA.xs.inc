@@ -39,7 +39,7 @@ _import(Crypt::PK::RSA self, SV * key_data)
         
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         rsa_free(&self->key);
-        rv = rsa_import(data, data_len, &self->key);
+        rv = rsa_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: rsa_import failed: %s", error_to_string(rv));
         RETVAL = 1; /* xxx */
     }
@@ -107,14 +107,14 @@ _encrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
           hash_id = find_hash(oaep_hash);
           if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
           lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
-          rv = rsa_encrypt_key_ex(data_ptr, data_len, buffer, &buffer_len, lparam_ptr, lparam_len,
+          rv = rsa_encrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
                                   &self->yarrow_prng_state, self->yarrow_prng_index,
                                   hash_id, LTC_PKCS_1_OAEP, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_encrypt_key_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
-          rv = rsa_encrypt_key_ex(data_ptr, data_len, buffer, &buffer_len, NULL, 0,
+          rv = rsa_encrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, NULL, 0,
                                   &self->yarrow_prng_state, self->yarrow_prng_index,
                                   0, LTC_PKCS_1_V1_5, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_encrypt_key_ex failed: %s", error_to_string(rv));
@@ -122,7 +122,7 @@ _encrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
         }
         else if (strnEQ(padding, "none", 4)) {
           /* raw RSA */
-          rv = ltc_mp.rsa_me(data_ptr, data_len, buffer, &buffer_len, PK_PUBLIC, &self->key);
+          rv = ltc_mp.rsa_me(data_ptr, (unsigned long)data_len, buffer, &buffer_len, PK_PUBLIC, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_me failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
@@ -152,14 +152,14 @@ _decrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
           hash_id = find_hash(oaep_hash);
           if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
           lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
-          rv = rsa_decrypt_key_ex(data_ptr, data_len, buffer, &buffer_len, lparam_ptr, lparam_len,
+          rv = rsa_decrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
                                   hash_id, LTC_PKCS_1_OAEP, &stat, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_decrypt_key_ex failed: %s", error_to_string(rv));
           if (stat != 1) croak("FATAL: rsa_decrypt - not valid OAEP packet");
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
-          rv = rsa_decrypt_key_ex(data_ptr, data_len, buffer, &buffer_len, NULL, 0,
+          rv = rsa_decrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, NULL, 0,
                                   0, LTC_PKCS_1_V1_5, &stat, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_decrypt_key_ex failed: %s", error_to_string(rv));
           if (stat != 1) croak("FATAL: rsa_decrypt - invalid");
@@ -167,7 +167,7 @@ _decrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
         }
         else if (strnEQ(padding, "none", 4)) {
           /* raw RSA */
-          rv = ltc_mp.rsa_me(data_ptr, data_len, buffer, &buffer_len, PK_PRIVATE, &self->key);
+          rv = ltc_mp.rsa_me(data_ptr, (unsigned long)data_len, buffer, &buffer_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_me failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
@@ -194,14 +194,14 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name, unsigned
         if (strnEQ(padding, "pss", 3)) {
           hash_id = find_hash(hash_name);
           if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
-          rv = rsa_sign_hash_ex(data_ptr, data_len, buffer, &buffer_len, LTC_PKCS_1_PSS,
+          rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_PSS,
                                 &self->yarrow_prng_state, self->yarrow_prng_index,
                                 hash_id, saltlen, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_sign_hash_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
-          rv = rsa_sign_hash_ex(data_ptr, data_len, buffer, &buffer_len, LTC_PKCS_1_V1_5,
+          rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_V1_5,
                                 NULL, 0, 0, saltlen, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_sign_hash_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
@@ -230,12 +230,12 @@ _verify(Crypt::PK::RSA self, SV * sig, SV * data, char * padding, char * hash_na
         if (strnEQ(padding, "pss", 3)) {
           hash_id = find_hash(hash_name);
           if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
-          rv = rsa_verify_hash_ex(sig_ptr, sig_len, data_ptr, data_len, LTC_PKCS_1_PSS,
+          rv = rsa_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_PKCS_1_PSS,
                                 hash_id, saltlen, &stat, &self->key);
           if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
         }
         else if (strnEQ(padding, "v1.5", 4)) {
-          rv = rsa_verify_hash_ex(sig_ptr, sig_len, data_ptr, data_len, LTC_PKCS_1_V1_5,
+          rv = rsa_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_PKCS_1_V1_5,
                                   0, saltlen, &stat, &self->key);
           if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
         }

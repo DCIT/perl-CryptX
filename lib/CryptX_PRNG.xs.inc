@@ -23,7 +23,7 @@ _new(IV curpid, char * prng_name, SV * entropy=&PL_sv_undef)
 
         if(SvOK(entropy)) {
           ent = (unsigned char *) SvPVbyte(entropy, ent_len);
-          rv = RETVAL->desc->add_entropy(ent, ent_len, &RETVAL->state);
+          rv = RETVAL->desc->add_entropy(ent, (unsigned long)ent_len, &RETVAL->state);
           if (rv != CRYPT_OK) croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
         }
         else {          
@@ -54,7 +54,7 @@ add_entropy(Crypt::PRNG self, SV * entropy=&PL_sv_undef)
         int rv;
         if(SvOK(entropy)) {
           in_buffer = (unsigned char *) SvPVbyte(entropy, in_len);
-          rv = self->desc->add_entropy(in_buffer, in_len, &self->state);
+          rv = self->desc->add_entropy(in_buffer, (unsigned long)in_len, &self->state);
           if (rv != CRYPT_OK) croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
         }
         else {
@@ -67,7 +67,7 @@ add_entropy(Crypt::PRNG self, SV * entropy=&PL_sv_undef)
     }
 
 SV *
-_bytes(Crypt::PRNG self, IV curpid, UV output_len)
+_bytes(Crypt::PRNG self, IV curpid, STRLEN output_len)
     CODE:
     {
         int rv_len;
@@ -85,7 +85,7 @@ _bytes(Crypt::PRNG self, IV curpid, UV output_len)
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, output_len);
         rdata = (unsigned char *)SvPV_nolen(RETVAL);
-        rv_len = (self->desc->read)(rdata, output_len, &self->state);
+        rv_len = (self->desc->read)(rdata, (unsigned long)output_len, &self->state);
         if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
     }
     OUTPUT:
@@ -118,7 +118,7 @@ _double(Crypt::PRNG self, IV curpid, ...)
     CODE:
     {
         int i;
-        UV a, b;
+        unsigned long a, b;     /* 32bit is enough */
         unsigned char rdata[7]; /* for double we need 53 bits */
         unsigned char entropy_buf[32];
 
@@ -131,8 +131,8 @@ _double(Crypt::PRNG self, IV curpid, ...)
 
         i = (self->desc->read)(rdata, 7, &self->state);
         if (i != 7) croak("FATAL: PRNG_read failed");
-        a = (((UV)(rdata[0])<<16) + ((UV)(rdata[1])<<8) + ((UV)(rdata[2]))) & 0x1FFFFF;           /* 21 bits */
-        b = ((UV)(rdata[3])<<24) + ((UV)(rdata[4])<<16) + ((UV)(rdata[5])<<8) + ((UV)(rdata[6])); /* 32 bits */
+        a = (((unsigned long)(rdata[0])<<16) + ((unsigned long)(rdata[1])<<8) + ((unsigned long)(rdata[2]))) & 0x1FFFFF;                      /* 21 bits */
+        b = ((unsigned long)(rdata[3])<<24) + ((unsigned long)(rdata[4])<<16) + ((unsigned long)(rdata[5])<<8) + ((unsigned long)(rdata[6])); /* 32 bits */
         RETVAL = ( (NV)a * 4294967296.0 + (NV)b ) / 9007199254740992.0;                           /* (a * 2^32 + b) / 2^53 */
         if (items>2 && SvOK(ST(2))) RETVAL = RETVAL * SvNV(ST(2));
     }

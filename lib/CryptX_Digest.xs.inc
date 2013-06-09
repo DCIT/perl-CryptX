@@ -58,7 +58,7 @@ add(Crypt::Digest self, ...)
         for(i=1; i<items; i++) {
           in = (unsigned char *)SvPVbyte(ST(i), inlen);
           if (inlen>0) {
-            rv = self->desc->process(&self->state, in, inlen);
+            rv = self->desc->process(&self->state, in, (unsigned long)inlen);
             if (rv != CRYPT_OK) croak("FATAL: digest process failed: %s", error_to_string(rv));
           }
         }

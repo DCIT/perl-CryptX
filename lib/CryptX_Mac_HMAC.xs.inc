@@ -20,7 +20,7 @@ _new(char * hash_name, SV * key)
         Newz(0, RETVAL, 1, struct hmac_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = hmac_init(&RETVAL->state, id, k, k_len);
+        rv = hmac_init(&RETVAL->state, id, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) croak("FATAL: hmac_init failed: %s", error_to_string(rv));
     }
     OUTPUT:
@@ -49,8 +49,8 @@ _add_single(Crypt::Mac::HMAC self, SV * data)
         unsigned char *in_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);        
-        if (in_data_len>=0) {
-          rv = hmac_process(&self->state, in_data, in_data_len);
+        if (in_data_len>0) {
+          rv = hmac_process(&self->state, in_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) croak("FATAL: hmac_process failed: %s", error_to_string(rv));
         }
     }

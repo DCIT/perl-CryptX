@@ -20,7 +20,7 @@ _new(char * cipher_name, SV * key)
         Newz(0, RETVAL, 1, struct omac_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = omac_init(&RETVAL->state, id, k, k_len);
+        rv = omac_init(&RETVAL->state, id, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) croak("FATAL: omac_init failed: %s", error_to_string(rv));
     }
     OUTPUT:
@@ -49,8 +49,8 @@ _add_single(Crypt::Mac::OMAC self, SV * data)
         unsigned char *in_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);        
-        if (in_data_len>=0) {
-          rv = omac_process(&self->state, in_data, in_data_len);
+        if (in_data_len>0) {
+          rv = omac_process(&self->state, in_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) croak("FATAL: omac_process failed: %s", error_to_string(rv));
         }
     }

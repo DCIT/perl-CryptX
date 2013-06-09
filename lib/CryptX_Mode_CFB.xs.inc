@@ -47,7 +47,7 @@ _start(Crypt::Mode::CFB self, int dir, SV * key, SV * iv)
           croak ("FATAL: sizeof(iv) should be equal to blocksize (%d)", cipher_descriptor[self->cipher_id].block_length);
         }
 
-        rv = cfb_start(self->cipher_id, i, k, k_len, self->cipher_rounds, &self->state);
+        rv = cfb_start(self->cipher_id, i, k, (int)k_len, self->cipher_rounds, &self->state);
         if (rv != CRYPT_OK) {
           croak("FATAL: cfb_start failed: %s", error_to_string(rv));
         }
@@ -74,11 +74,11 @@ _crypt(Crypt::Mode::CFB self, SV * data)
           out_data = (unsigned char *)SvPV_nolen(RETVAL);
 
           if (self->direction == 1) {
-            rv = cfb_encrypt(in_data, out_data, in_data_len, &self->state);
+            rv = cfb_encrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: cfb_encrypt failed: %s", error_to_string(rv));
           }
           else if (self->direction == -1) {
-            rv = cfb_decrypt(in_data, out_data, in_data_len, &self->state);
+            rv = cfb_decrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: cfb_decrypt failed: %s", error_to_string(rv));
           }
           else {

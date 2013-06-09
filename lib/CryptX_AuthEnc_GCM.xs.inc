@@ -18,7 +18,7 @@ _new(char * cipher_name, SV * key)
         Newz(0, RETVAL, 1, struct gcm_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        if (gcm_init(&RETVAL->state, id, k, k_len) != CRYPT_OK) {
+        if (gcm_init(&RETVAL->state, id, k, (unsigned long)k_len) != CRYPT_OK) {
           croak("FATAL: gcm setup failed");
         }
     }
@@ -69,7 +69,7 @@ encrypt_add(Crypt::AuthEnc::GCM self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPV_nolen(RETVAL);
-          rv = gcm_process(&self->state, in_data, in_data_len, out_data, GCM_ENCRYPT);
+          rv = gcm_process(&self->state, in_data, (unsigned long)in_data_len, out_data, GCM_ENCRYPT);
           if (rv != CRYPT_OK) croak("FATAL: encrypt_add/gcm_process failed: %s", error_to_string(rv)); 
         }
     }
@@ -85,7 +85,7 @@ iv_add(Crypt::AuthEnc::GCM self, SV * data)
         unsigned char *in_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        rv = gcm_add_iv(&self->state, in_data, in_data_len);
+        rv = gcm_add_iv(&self->state, in_data, (unsigned long)in_data_len);
         if (rv != CRYPT_OK) croak("FATAL: gcm_add_iv failed: %s", error_to_string(rv)); 
         RETVAL = rv;
     }
@@ -101,7 +101,7 @@ adata_add(Crypt::AuthEnc::GCM self, SV * data)
         unsigned char *in_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        rv = gcm_add_aad(&self->state, in_data, in_data_len);
+        rv = gcm_add_aad(&self->state, in_data, (unsigned long)in_data_len);
         if (rv != CRYPT_OK) croak("FATAL: gcm_add_aad failed: %s", error_to_string(rv)); 
         RETVAL = rv;
     }
@@ -125,7 +125,7 @@ decrypt_add(Crypt::AuthEnc::GCM self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPV_nolen(RETVAL);
-          rv = gcm_process(&self->state, out_data, in_data_len, in_data, GCM_DECRYPT);
+          rv = gcm_process(&self->state, out_data, (unsigned long)in_data_len, in_data, GCM_DECRYPT);
           if (rv != CRYPT_OK) croak("FATAL: encrypt_add/gcm_process failed: %s", error_to_string(rv));
         }
     }

@@ -4,6 +4,10 @@ TODO:
         - maybe add xxx_b64url alternatives (e.g. sha1_b64url ...)
         - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - croak when mode does not call start_(en|de)crypt
+        - make random_string faster (implement in XS)
+
+0.010   2013/06/XX
+        - fixing various compiler warnings
 
 0.009   2013/05/19
         - doc fixes

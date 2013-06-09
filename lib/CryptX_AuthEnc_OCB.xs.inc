@@ -21,7 +21,7 @@ _new(char * cipher_name, SV * key, SV * nonce)
         Newz(0, RETVAL, 1, struct ocb_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        if (ocb3_init(&RETVAL->state, id, k, k_len, n, n_len) != CRYPT_OK) {
+        if (ocb3_init(&RETVAL->state, id, k, (unsigned long)k_len, n, (unsigned long)n_len) != CRYPT_OK) {
           croak("FATAL: ocb setup failed");
         }
     }
@@ -53,7 +53,7 @@ adata_add(Crypt::AuthEnc::OCB self, SV * data)
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
 
         if (in_data_len>0) {
-          rv = ocb3_add_aad(&self->state, in_data, in_data_len);
+          rv = ocb3_add_aad(&self->state, in_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) croak("FATAL: ocb3_add_aad failed: %s", error_to_string(rv)); 
         }
     }
@@ -79,7 +79,7 @@ encrypt_add(Crypt::AuthEnc::OCB self, SV * data)
           if (in_data_len % (&self->state)->block_len)
             croak ("FATAL: sizeof(data) should be multiple of blocksize (%d)", (&self->state)->block_len);
 
-          rv = ocb3_encrypt(&self->state, in_data, in_data_len, out_data);
+          rv = ocb3_encrypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
           if (rv != CRYPT_OK) croak("FATAL: ocb3_encrypt failed: %s", error_to_string(rv)); 
         }
     }
@@ -105,7 +105,7 @@ encrypt_last(Crypt::AuthEnc::OCB self, SV * data)
           RETVAL = newSVpvn("", 0);
           out_data = NULL;
         }
-        rv = ocb3_encrypt_last(&self->state, in_data, in_data_len, out_data);
+        rv = ocb3_encrypt_last(&self->state, in_data, (unsigned long)in_data_len, out_data);
         if (rv != CRYPT_OK) croak("FATAL: ocb3_encrypt_last failed: %s", error_to_string(rv)); 
     }
     OUTPUT:
@@ -132,7 +132,7 @@ decrypt_add(Crypt::AuthEnc::OCB self, SV * data)
           if (in_data_len % (&self->state)->block_len)
             croak ("FATAL: sizeof(data) should be multiple of blocksize (%d)", (&self->state)->block_len);
 
-          rv = ocb3_decrypt(&self->state, in_data, in_data_len, out_data);
+          rv = ocb3_decrypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
           if (rv != CRYPT_OK) croak("FATAL: ocb3_decrypt failed: %s", error_to_string(rv)); 
         }
     }
@@ -158,7 +158,7 @@ decrypt_last(Crypt::AuthEnc::OCB self, SV * data)
           RETVAL = newSVpvn("", 0);
           out_data = NULL;
         }
-        rv = ocb3_decrypt_last(&self->state, in_data, in_data_len, out_data);
+        rv = ocb3_decrypt_last(&self->state, in_data, (unsigned long)in_data_len, out_data);
         if (rv != CRYPT_OK) croak("FATAL: ocb3_encrypt_last failed: %s", error_to_string(rv)); 
     }
     OUTPUT:

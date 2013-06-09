@@ -29,7 +29,7 @@ _pkcs_5_alg1(SV * password, SV * salt, int iteration_count, char * hash_name, in
         Newz(0, output, output_len, unsigned char);
         if (!output) croak("FATAL: Newz failed [%ld]", output_len);
         
-        rv = pkcs_5_alg1(password_ptr, password_len, salt_ptr, iteration_count, id, output, &output_len);
+        rv = pkcs_5_alg1(password_ptr, (unsigned long)password_len, salt_ptr, iteration_count, id, output, &output_len);
         if (rv != CRYPT_OK) croak("FATAL: pkcs_5_alg1 process failed: %s", error_to_string(rv));
         
         RETVAL = newSVpvn((char *)output, output_len);
@@ -66,7 +66,7 @@ _pkcs_5_alg2(SV * password, SV * salt, int iteration_count, char * hash_name, in
         Newz(0, output, output_len, unsigned char);
         if (!output) croak("FATAL: Newz failed [%ld]", output_len);
         
-        rv = pkcs_5_alg2(password_ptr, password_len, salt_ptr, salt_len, iteration_count, id, output, &output_len);
+        rv = pkcs_5_alg2(password_ptr, (unsigned long)password_len, salt_ptr, (unsigned long)salt_len, iteration_count, id, output, &output_len);
         if (rv != CRYPT_OK) croak("FATAL: pkcs_5_alg2 process failed: %s", error_to_string(rv));
         
         RETVAL = newSVpvn((char *)output, output_len);
@@ -99,7 +99,7 @@ _hkdf_extract(char * hash_name, SV * salt, SV * in)
         salt_ptr = (unsigned char *)SvPVbyte(salt, salt_len);
         
         output_len = sizeof(output);
-        rv = hkdf_extract(id, salt_ptr, salt_len, in_ptr, in_len, output, &output_len);
+        rv = hkdf_extract(id, salt_ptr, (unsigned long)salt_len, in_ptr, (unsigned long)in_len, output, &output_len);
         if (rv != CRYPT_OK) croak("FATAL: hkdf_extract process failed: %s", error_to_string(rv));
         
         RETVAL = newSVpvn((char *)output, output_len);
@@ -132,7 +132,7 @@ _hkdf_expand(char * hash_name, SV * info, SV * in, unsigned long output_len)
         Newz(0, output, output_len, unsigned char);
         if (!output) croak("FATAL: Newz failed [%ld]", output_len);
         
-        rv = hkdf_expand(id, info_ptr, info_len, in_ptr, in_len, output, output_len);
+        rv = hkdf_expand(id, info_ptr, (unsigned long)info_len, in_ptr, (unsigned long)in_len, output, output_len);
         if (rv != CRYPT_OK) croak("FATAL: hkdf_expand process failed: %s", error_to_string(rv));
         
         RETVAL = newSVpvn((char *)output, output_len);
@@ -170,7 +170,7 @@ _hkdf(char * hash_name, SV * salt, SV * info, SV * in, unsigned long output_len)
         Newz(0, output, output_len, unsigned char);
         if (!output) croak("FATAL: Newz failed [%ld]", output_len);
         
-        rv = hkdf(id, salt_ptr, salt_len, info_ptr, info_len, in_ptr, in_len, output, output_len);
+        rv = hkdf(id, salt_ptr, (unsigned long)salt_len, info_ptr, (unsigned long)info_len, in_ptr, (unsigned long)in_len, output, output_len);
         if (rv != CRYPT_OK) croak("FATAL: hkdf_expand process failed: %s", error_to_string(rv));
         
         RETVAL = newSVpvn((char *)output, output_len);

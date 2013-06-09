@@ -27,7 +27,7 @@ _new(char * cipher_name, SV * key, SV * nonce, SV * header=&PL_sv_undef)
         Newz(0, RETVAL, 1, struct eax_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        if (eax_init(&RETVAL->state, id, k, k_len, n, n_len, h, h_len) != CRYPT_OK) {
+        if (eax_init(&RETVAL->state, id, k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len) != CRYPT_OK) {
           croak("FATAL: eax setup failed");
         }
     }
@@ -65,7 +65,7 @@ encrypt_add(Crypt::AuthEnc::EAX self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPV_nolen(RETVAL);
-          rv = eax_encrypt(&self->state, in_data, out_data, in_data_len);
+          rv = eax_encrypt(&self->state, in_data, out_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) croak("FATAL: eax_encrypt failed: %s", error_to_string(rv)); 
         }
     }
@@ -89,7 +89,7 @@ decrypt_add(Crypt::AuthEnc::EAX self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPV_nolen(RETVAL);
-          rv = eax_decrypt(&self->state, in_data, out_data, in_data_len);
+          rv = eax_decrypt(&self->state, in_data, out_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) croak("FATAL: eax_decrypt failed: %s", error_to_string(rv)); 
         }
     }
@@ -146,7 +146,7 @@ header_add(Crypt::AuthEnc::EAX self, SV * header)
         STRLEN h_len;
         unsigned char *h;
         h = (unsigned char *)SvPVbyte(header, h_len);
-        RETVAL = eax_addheader(&self->state, h, h_len);
+        RETVAL = eax_addheader(&self->state, h, (unsigned long)h_len);
     }
     OUTPUT:
         RETVAL

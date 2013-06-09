@@ -16,7 +16,7 @@ _new(SV * key)
         Newz(0, RETVAL, 1, struct pelican_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = pelican_init(&RETVAL->state, k, k_len);        
+        rv = pelican_init(&RETVAL->state, k, (unsigned long)k_len);        
         if (rv != CRYPT_OK) croak("FATAL: pelican_init failed: %s", error_to_string(rv));
     }
     OUTPUT:
@@ -45,8 +45,8 @@ _add_single(Crypt::Mac::Pelican self, SV * data)
         unsigned char *in_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);        
-        if (in_data_len>=0) {
-          rv = pelican_process(&self->state, in_data, in_data_len);
+        if (in_data_len>0) {
+          rv = pelican_process(&self->state, in_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) croak("FATAL: pelican_process failed: %s", error_to_string(rv));
         }
     }

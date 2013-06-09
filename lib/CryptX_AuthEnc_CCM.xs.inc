@@ -28,7 +28,8 @@ _memory_encrypt(char *cipher_name, SV *key, SV *nonce, SV *header, unsigned long
         
         if(tag_len<4 || tag_len>16) tag_len = 16;
         
-        rv = ccm_memory(id, k, k_len, NULL, n, n_len, h, h_len, pt, pt_len, (unsigned char *)SvPV_nolen(ct), tag, &tag_len, CCM_ENCRYPT);
+        rv = ccm_memory(id, k, (unsigned long)k_len, NULL, n, (unsigned long)n_len, h, (unsigned long)h_len,
+                        pt, (unsigned long)pt_len, (unsigned char *)SvPV_nolen(ct), tag, &tag_len, CCM_ENCRYPT);
         if (rv != CRYPT_OK) croak("FATAL: ccm_memory failed: %s", error_to_string(rv));
         
         XPUSHs(sv_2mortal(ct));
@@ -75,9 +76,10 @@ _memory_decrypt(char *cipher_name, SV *key, SV *nonce, SV *header, SV *ciphertex
         SvPOK_only(pt);
         SvCUR_set(pt, ct_len);
         
-        xtag_len = t_len;
+        xtag_len = (unsigned long)t_len;
                 
-        rv = ccm_memory(id, k, k_len, NULL, n, n_len, h, h_len, (unsigned char *)SvPV_nolen(pt), ct_len, ct, xtag, &xtag_len, CCM_DECRYPT);
+        rv = ccm_memory(id, k, (unsigned long)k_len, NULL, n, (unsigned long)n_len, h, (unsigned long)h_len,
+                        (unsigned char *)SvPV_nolen(pt), (unsigned long)ct_len, ct, xtag, &xtag_len, CCM_DECRYPT);
         if (rv != CRYPT_OK) croak("FATAL: ccm_memory failed: %s", error_to_string(rv));
         
         if (t_len!=xtag_len) {

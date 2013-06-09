@@ -23,7 +23,7 @@ _new(cipher_name, key, rounds=0)
 
         RETVAL->id = id;
         RETVAL->desc = &cipher_descriptor[id];
-        rv = RETVAL->desc->setup(key_data, key_len, rounds, &RETVAL->skey);
+        rv = RETVAL->desc->setup(key_data, (int)key_len, rounds, &RETVAL->skey);
         if(rv!=CRYPT_OK) croak("FATAL: cipher setup failed: %s", error_to_string(rv));
     }
     OUTPUT:

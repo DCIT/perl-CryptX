@@ -52,7 +52,7 @@ _start(Crypt::Mode::CTR self, int dir, SV * key, SV * iv)
           croak ("FATAL: sizeof(iv) should be equal to blocksize (%d)", cipher_descriptor[self->cipher_id].block_length);
         }
 
-        rv = ctr_start(self->cipher_id, i, k, k_len, self->cipher_rounds, self->ctr_mode_param, &self->state);
+        rv = ctr_start(self->cipher_id, i, k, (int)k_len, self->cipher_rounds, self->ctr_mode_param, &self->state);
         if (rv != CRYPT_OK) {
           croak("FATAL: ctr_start failed: %s", error_to_string(rv));
         }
@@ -79,11 +79,11 @@ _crypt(Crypt::Mode::CTR self, SV * data)
           out_data = (unsigned char *)SvPV_nolen(RETVAL);
 
           if (self->direction == 1) {
-            rv = ctr_encrypt(in_data, out_data, in_data_len, &self->state);
+            rv = ctr_encrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: ctr_encrypt failed: %s", error_to_string(rv));
           }
           else if (self->direction == -1) {
-            rv = ctr_decrypt(in_data, out_data, in_data_len, &self->state);
+            rv = ctr_decrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: ctr_decrypt failed: %s", error_to_string(rv));
           }
           else {
