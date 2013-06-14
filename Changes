@@ -6,7 +6,7 @@ TODO:
         - croak when mode does not call start_(en|de)crypt
         - make random_string faster (implement in XS)
 
-0.010   2013/06/XX
+0.011   2013/06/15
         - fixing various compiler warnings
 
 0.009   2013/05/19
