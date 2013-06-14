@@ -127,6 +127,8 @@ sub _slurp_file {
   return $string;
 }
 
+sub CLONE_SKIP { 1 } # prevent cloning
+
 1;
 
 =pod

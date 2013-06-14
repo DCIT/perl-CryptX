@@ -56,6 +56,6 @@ sub _finish {
   return undef;
 }
 
-sub CLONE_SKIP { 1 } # XXX-FIXME for now just prevent cloning
+sub CLONE_SKIP { 1 } # prevent cloning
 
 1;

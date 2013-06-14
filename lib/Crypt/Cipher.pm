@@ -79,7 +79,7 @@ sub default_rounds {
   return _default_rounds_by_name(_trans_cipher_name($self));
 }
 
-sub CLONE_SKIP { 1 } # XXX-FIXME for now just prevent cloning
+sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
 
