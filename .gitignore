@@ -2,12 +2,14 @@
 *.obj
 *.pdb
 *.old
+*.ccs
 *.tmp
 *.bak
 *.zip
 *.gz
-_tmp
-tmp.*
+_tmp*
+_build*
+tmp*
 generators/_tmp
 _build
 blib
@@ -20,3 +22,4 @@ META.yml
 MANIFEST
 lib/CryptX.c
 CryptX-*
+poznamky.txt
