@@ -8,6 +8,9 @@ TODO:
         - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
         - solaris failure: http://ppm4.activestate.com/sun4-solaris/5.14/1400/M/MI/MIK/CryptX-0.011.d/log-20130615T021640.txt
 
+0.012   2013/06/XXX
+        - README, LICENSE etc. to improve CPANTS score
+
 0.011   2013/06/15
         - fixing various compiler warnings
 
