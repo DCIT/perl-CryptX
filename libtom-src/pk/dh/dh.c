@@ -601,6 +601,6 @@ done:
    return err;
 }
 
-#include "dh_sys.h"
+#include "dh_sys.c.inc"
 
 #endif

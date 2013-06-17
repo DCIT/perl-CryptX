@@ -88,7 +88,7 @@ const struct ltc_cipher_descriptor aes_enc_desc =
 
 #endif
 
-#include "aes_tab.h"
+#include "aes_tab.c.inc"
 
 static ulong32 setup_mix(ulong32 temp)
 {

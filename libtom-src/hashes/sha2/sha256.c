@@ -328,7 +328,7 @@ int  sha256_test(void)
 }
 
 #ifdef LTC_SHA224
-#include "sha224.h"
+#include "sha224.c.inc"
 #endif
 
 #endif
