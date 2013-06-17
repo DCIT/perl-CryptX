@@ -19,7 +19,7 @@
 
 #define ENCRYPT_ONLY
 #define PELI_TAB
-#include "../../ciphers/aes/aes_tab.c.inc"
+#include "../../ciphers/aes/aes_tab.h"
 
 /**
    Initialize a Pelican state
