@@ -83,10 +83,10 @@ _memory_decrypt(char *cipher_name, SV *key, SV *nonce, SV *header, SV *ciphertex
         if (rv != CRYPT_OK) croak("FATAL: ccm_memory failed: %s", error_to_string(rv));
         
         if (t_len!=xtag_len) {
-          XPUSHs(sv_2mortal(newSVpv(NULL,0))); /* undef */
+          XPUSHs(sv_2mortal(newSVpvn(NULL,0))); /* undef */
         }
         else if (memNE(t, xtag, xtag_len)) {
-          XPUSHs(sv_2mortal(newSVpv(NULL,0))); /* undef */
+          XPUSHs(sv_2mortal(newSVpvn(NULL,0))); /* undef */
         }
         else {        
           XPUSHs(sv_2mortal(pt));

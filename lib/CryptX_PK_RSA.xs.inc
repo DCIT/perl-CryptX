@@ -70,7 +70,7 @@ export_key_der(Crypt::PK::RSA self, char * type)
         unsigned char out[4096];
         unsigned long int out_len = 4096;
         
-        RETVAL = newSVpv(NULL, 0); /* undef */
+        RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(type, "private", 7)) {
           rv = rsa_export(out, &out_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_export(PK_PRIVATE) failed: %s", error_to_string(rv));
@@ -102,7 +102,7 @@ _encrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
         
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         
-        RETVAL = newSVpv(NULL, 0); /* undef */
+        RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "oaep", 4)) {
           hash_id = find_hash(oaep_hash);
           if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
@@ -147,7 +147,7 @@ _decrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
         
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         
-        RETVAL = newSVpv(NULL, 0); /* undef */
+        RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "oaep", 4)) {
           hash_id = find_hash(oaep_hash);
           if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
@@ -190,7 +190,7 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name, unsigned
         
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         
-        RETVAL = newSVpv(NULL, 0); /* undef */
+        RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "pss", 3)) {
           hash_id = find_hash(hash_name);
           if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);

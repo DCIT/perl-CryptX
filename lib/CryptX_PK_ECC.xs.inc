@@ -86,7 +86,7 @@ export_key_der(Crypt::PK::ECC self, char * type)
         unsigned char out[4096];
         unsigned long int out_len = 4096;
         
-        RETVAL = newSVpv(NULL, 0); /* undef */
+        RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(type, "private", 7)) {
           rv = ecc_export(out, &out_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_export(PK_PRIVATE) failed: %s", error_to_string(rv));

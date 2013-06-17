@@ -35,6 +35,9 @@ Crypt::PK::DH          T_PTROBJ
 #pointer with automatic NULL<->undef conversion on input/output
 unsigned char *		T_PTR_OR_NULL
 
+#perl 5.6.2 hack
+STRLEN                  T_UV
+
 ###########################
 INPUT
 
