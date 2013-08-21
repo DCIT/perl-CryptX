@@ -44,6 +44,7 @@ sub string_from {
   my ($self, $chars, $len) = @_;
   
   $len = 20 unless defined $len;
+  return unless $len>0;
   
   my @ch = split(//, $chars);
   my $max_index = scalar(@ch)-1;
