@@ -20,12 +20,27 @@ sub new {
   return  $self;
 }
 
+sub generate_key {
+  my $self = shift;
+  $self->_generate_key(@_);
+  return $self;
+}
+
 sub import_key {
-  my ($self, $data) = @_;
-  croak "FATAL: undefined key" unless $data;
-  $data = _slurp_file($data) if -f $data;
+  my ($self, $key) = @_;
+  croak "FATAL: undefined key" unless $key;
+  my $data;
+  if (ref($key) eq 'SCALAR') {
+    $data = $$key;
+  }
+  elsif (-f $key) {
+    $data = _slurp_file($key);
+  }
+  else {
+    croak "FATAL: non-existing file '$key'";
+  }
   ### no PEM support
-  #if ($data =~ /-----BEGIN (EC PRIVATE|EC PUBLIC|PRIVATE|PUBLIC) KEY-----(.*?)-----END/sg) {
+  #if ($data && $data =~ /-----BEGIN (EC PRIVATE|EC PUBLIC|PRIVATE|PUBLIC) KEY-----(.*?)-----END/sg) {
   #  $data = decode_base64($2);
   #}
   croak "FATAL: invalid key format" unless $data;
@@ -193,7 +208,16 @@ Elliptic curve Diffie-Hellman (ECDH) - construct a Diffie-Hellman shared secret 
 
 =head2 new
 
+  my $pk = Crypt::PK::ECC->new();
+  #or
+  my $pk = Crypt::PK::ECC->new($priv_or_pub_key_filename);
+  #or
+  my $pk = Crypt::PK::ECC->new(\$buffer_containing_priv_or_pub_key);
+
 =head2 generate_key
+
+Uses Yarrow-based cryptographically strong random number generator seeded with
+random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
  $pk->generate_key($keysize);
  # $keysize .. key size in bytes: 14, 16, 20, 24, 28, 32, 48 or 65
@@ -210,15 +234,27 @@ See L<http://csrc.nist.gov/publications/fips/fips186-3/fips_186-3.pdf> and L<htt
 
 =head2 import_key
 
+  $pk->import_key($filename);
+  #or
+  $pk->import_key(\$buffer_containing_key);
+
 =head2 import_key_x963
 
-ANSI X9.63 Import (public key only)
+ANSI X9.63 Import (public key only) - can load data exported by C<export_key_x963>
+
+ $pk->import_key(\$buffer_containing_pub_key_ansi_x963);
 
 =head2 export_key_der
+
+ my $private_der = $pk->export_key_der('private');
+ #or
+ my $public_der = $pk->export_key_der('public');
 
 =head2 export_key_x963
 
 ANSI X9.63 Export (public key only)
+
+ my $public_ansi_x963 = $pk->export_key_x963();
 
 =head2 encrypt
 
@@ -230,7 +266,16 @@ ANSI X9.63 Export (public key only)
 
 =head2 shared_secret
 
+  # Alice having her priv key $pk and Bob's public key $pkb
+  my $pk  = Crypt::PK::ECC->new($priv_key_filename);
+  my $pkb = Crypt::PK::ECC->new($pub_key_filename);
+  my $shared_secret = $pk->shared_secret($pkb);
+
+  # Bob having his priv key $pk and Alice's public key $pka
+  my $pk = Crypt::PK::ECC->new($priv_key_filename);
+  my $pka = Crypt::PK::ECC->new($pub_key_filename);
+  my $shared_secret = $pk->shared_secret($pka);  # same value as computed by Alice
+
 =head2 is_private
 
 =head2 size
-

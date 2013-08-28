@@ -17,7 +17,7 @@ _new()
         RETVAL
 
 int
-generate_key(Crypt::PK::DSA self, int group_size=30, int modulus_size=256)
+_generate_key(Crypt::PK::DSA self, int group_size=30, int modulus_size=256)
     CODE:
     {
         int rv;
@@ -48,7 +48,7 @@ _import(Crypt::PK::DSA self, SV * key_data)
 int
 is_private(Crypt::PK::DSA self)
     CODE:
-        if (self->key.type == -1 || self->key.qord <= 0) croak("FATAL: is_private failed: no key loaded");
+        if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
         RETVAL = (self->key.type == PK_PRIVATE) ? 1 : 0;
     OUTPUT:
         RETVAL
@@ -56,7 +56,7 @@ is_private(Crypt::PK::DSA self)
 int
 size(Crypt::PK::DSA self)
     CODE:
-        if (self->key.type == -1 || self->key.qord <= 0) croak("FATAL: size failed: no key loaded");
+        if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
         RETVAL = ltc_mp.unsigned_size(self->key.g);
     OUTPUT:
         RETVAL

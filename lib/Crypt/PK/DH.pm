@@ -20,10 +20,25 @@ sub new {
   return  $self;
 }
 
+sub generate_key {
+  my $self = shift;
+  $self->_generate_key(@_);
+  return $self;
+}
+
 sub import_key {
-  my ($self, $data) = @_;
-  croak "FATAL: undefined key" unless $data;
-  $data = _slurp_file($data) if -f $data;
+  my ($self, $key) = @_;
+  croak "FATAL: undefined key" unless $key;
+  my $data;
+  if (ref($key) eq 'SCALAR') {
+    $data = $$key;
+  }
+  elsif (-f $key) {
+    $data = _slurp_file($key);
+  }
+  else {
+    croak "FATAL: non-existing file '$key'";
+  }
   croak "FATAL: invalid key format" unless $data;
   $self->_import($data);
   return $self;
@@ -171,7 +186,16 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
 
 =head2 new
 
+  my $pk = Crypt::PK::DH->new();
+  #or
+  my $pk = Crypt::PK::DH->new($priv_or_pub_key_filename);
+  #or
+  my $pk = Crypt::PK::DH->new(\$buffer_containing_priv_or_pub_key);
+
 =head2 generate_key
+
+Uses Yarrow-based cryptographically strong random number generator seeded with
+random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
  $pk->generate_key($keysize);
  # $keysize:
@@ -187,7 +211,15 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
 
 =head2 import_key
 
+  $pk->import_key($filename);
+  #or
+  $pk->import_key(\$buffer_containing_key);
+
 =head2 export_key
+
+ my $private = $pk->export_key('private');
+ #or
+ my $public = $pk->export_key('public');
 
 =head2 encrypt
 
@@ -198,6 +230,16 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
 =head2 verify
 
 =head2 shared_secret
+
+  # Alice having her priv key $pk and Bob's public key $pkb
+  my $pk  = Crypt::PK::DH->new($priv_key_filename);
+  my $pkb = Crypt::PK::DH->new($pub_key_filename);
+  my $shared_secret = $pk->shared_secret($pkb);
+
+  # Bob having his priv key $pk and Alice's public key $pka
+  my $pk = Crypt::PK::DH->new($priv_key_filename);
+  my $pka = Crypt::PK::DH->new($pub_key_filename);
+  my $shared_secret = $pk->shared_secret($pka);  # same value as computed by Alice
 
 =head2 is_private
 

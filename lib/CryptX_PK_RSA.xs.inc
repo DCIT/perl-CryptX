@@ -17,7 +17,7 @@ _new()
         RETVAL
 
 int
-generate_key(Crypt::PK::RSA self, int key_size=256, long key_e=65537)
+_generate_key(Crypt::PK::RSA self, int key_size=256, long key_e=65537)
     CODE:
     {
         int rv;
@@ -49,7 +49,7 @@ _import(Crypt::PK::RSA self, SV * key_data)
 int
 is_private(Crypt::PK::RSA self)
     CODE:
-        if (self->key.type == -1 || self->key.N == NULL) croak("FATAL: is_private failed: no key loaded");
+        if (self->key.type == -1 || self->key.N == NULL) XSRETURN_UNDEF;
         RETVAL = (self->key.type == PK_PRIVATE) ? 1 : 0;
     OUTPUT:
         RETVAL
@@ -57,12 +57,12 @@ is_private(Crypt::PK::RSA self)
 int
 size(Crypt::PK::RSA self)
     CODE:
-        if (self->key.type == -1 || self->key.N == NULL) croak("FATAL: size failed: no key loaded");
+        if (self->key.type == -1 || self->key.N == NULL) XSRETURN_UNDEF;
         RETVAL = ltc_mp.unsigned_size(self->key.N);
     OUTPUT:
         RETVAL
 
-SV *
+SV*
 export_key_der(Crypt::PK::RSA self, char * type)
     CODE:
     {
@@ -191,9 +191,9 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name, unsigned
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         
         RETVAL = newSVpvn(NULL, 0); /* undef */
+        hash_id = find_hash(hash_name);
+        if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
         if (strnEQ(padding, "pss", 3)) {
-          hash_id = find_hash(hash_name);
-          if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_PSS,
                                 &self->yarrow_prng_state, self->yarrow_prng_index,
                                 hash_id, saltlen, &self->key);
@@ -202,7 +202,8 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name, unsigned
         }
         else if (strnEQ(padding, "v1.5", 4)) {
           rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_V1_5,
-                                NULL, 0, 0, saltlen, &self->key);
+                                &self->yarrow_prng_state, self->yarrow_prng_index,
+                                hash_id, 0, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_sign_hash_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
@@ -227,16 +228,16 @@ _verify(Crypt::PK::RSA self, SV * sig, SV * data, char * padding, char * hash_na
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
         
         RETVAL = 1;
+        hash_id = find_hash(hash_name);
+        if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
         if (strnEQ(padding, "pss", 3)) {
-          hash_id = find_hash(hash_name);
-          if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_PKCS_1_PSS,
                                 hash_id, saltlen, &stat, &self->key);
           if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
         }
         else if (strnEQ(padding, "v1.5", 4)) {
           rv = rsa_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_PKCS_1_V1_5,
-                                  0, saltlen, &stat, &self->key);
+                                hash_id, 0, &stat, &self->key);
           if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
         }
         else {

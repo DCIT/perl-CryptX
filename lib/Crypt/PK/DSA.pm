@@ -34,11 +34,26 @@ sub export_key_pem {
          "-----END PUBLIC KEY-----\n " if $type eq 'public';
 }
 
+sub generate_key {
+  my $self = shift;
+  $self->_generate_key(@_);
+  return $self;
+}
+
 sub import_key {
-  my ($self, $data) = @_;
-  croak "FATAL: undefined key" unless $data;
-  $data = _slurp_file($data) if -f $data;
-  if ($data =~ /-----BEGIN (DSA PRIVATE|DSA PUBLIC|PRIVATE|PUBLIC) KEY-----(.*?)-----END/sg) {
+  my ($self, $key) = @_;
+  croak "FATAL: undefined key" unless $key;
+  my $data;
+  if (ref($key) eq 'SCALAR') {
+    $data = $$key;
+  }
+  elsif (-f $key) {
+    $data = _slurp_file($key);
+  }
+  else {
+    croak "FATAL: non-existing file '$key'";
+  }
+  if ($data && $data =~ /-----BEGIN (DSA PRIVATE|DSA PUBLIC|PRIVATE|PUBLIC) KEY-----(.*?)-----END/sg) {
     $data = decode_base64($2);
   }
   croak "FATAL: invalid key format" unless $data;
@@ -137,11 +152,6 @@ Crypt::PK::DSA - Public key cryptography based on DSA
  my $pub = Crypt::PK::DSA->new('Alice_pub_dsa1.der');
  $pub->verify($sig, $message) or die "ERROR";
  
- #Shared secret
- my $priv = Crypt::PK::DSA->new('Alice_priv_dsa1.der');
- my $pub = Crypt::PK::DSA->new('Bob_pub_dsa1.der'); 
- my $shared_secret = $priv->shared_secret($pub);
-
  #Key generation
  my $pk = Crypt::PK::DSA->new();
  $pk->generate_key(30, 256);
@@ -161,9 +171,6 @@ Crypt::PK::DSA - Public key cryptography based on DSA
  my $sig = dsa_sign('Alice_priv_dsa1.der', $message);
  #Signature: Bob (received $message + $sig)
  dsa_verify('Alice_pub_dsa1.der', $sig, $message) or die "ERROR";
- 
- #Shared secret
- my $shared_secret = dsa_shared_secret('Alice_priv_dsa1.der', 'Bob_pub_dsa1.der');
 
 =head1 FUNCTIONS
 
@@ -186,15 +193,20 @@ Generate DSA signature.
 
 Verify DSA signature.
 
-=head2 dsa_shared_secret
-
-Establish shared secret with a private and public DSA key.
-
 =head1 METHODS
 
 =head2 new
 
+  my $pk = Crypt::PK::DSA->new();
+  #or
+  my $pk = Crypt::PK::DSA->new($priv_or_pub_key_filename);
+  #or
+  my $pk = Crypt::PK::DSA->new(\$buffer_containing_priv_or_pub_key);
+
 =head2 generate_key
+
+Uses Yarrow-based cryptographically strong random number generator seeded with
+random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
  $pk->generate_key($group_size, $modulus_size);
  # $group_size  ... 15 < $group_size < 1024
@@ -208,9 +220,21 @@ Establish shared secret with a private and public DSA key.
 
 =head2 import_key
 
+  $pk->import_key($filename);
+  #or
+  $pk->import_key(\$buffer_containing_key);
+
 =head2 export_key_der
 
+ my $private_der = $pk->export_key_der('private');
+ #or
+ my $public_der = $pk->export_key_der('public');
+
 =head2 export_key_pem
+
+ my $private_pem = $pk->export_key_pem('private');
+ #or
+ my $public_pem = $pk->export_key_pem('public');
 
 =head2 encrypt
 
@@ -219,8 +243,6 @@ Establish shared secret with a private and public DSA key.
 =head2 sign
 
 =head2 verify
-
-=head2 shared_secret
 
 =head2 is_private
 

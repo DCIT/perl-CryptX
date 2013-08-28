@@ -17,7 +17,7 @@ _new()
         RETVAL
 
 int
-generate_key(Crypt::PK::DH self, int key_size=256)
+_generate_key(Crypt::PK::DH self, int key_size=256)
     CODE:
     {
         int rv;
@@ -48,7 +48,7 @@ _import(Crypt::PK::DH self, SV * key_data)
 int
 is_private(Crypt::PK::DH self)
     CODE:
-        if (self->key.type == -1) croak("FATAL: is_private failed: no key loaded");
+        if (self->key.type == -1) XSRETURN_UNDEF;
         RETVAL = (self->key.type == PK_PRIVATE) ? 1 : 0;
     OUTPUT:
         RETVAL
@@ -56,7 +56,7 @@ is_private(Crypt::PK::DH self)
 int
 size(Crypt::PK::DH self)
     CODE:
-        if (self->key.type == -1) croak("FATAL: size failed: no key loaded");
+        if (self->key.type == -1) XSRETURN_UNDEF;
         RETVAL = dh_get_size(&self->key);
     OUTPUT:
         RETVAL

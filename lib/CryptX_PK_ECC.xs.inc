@@ -17,7 +17,7 @@ _new()
         RETVAL
 
 int
-generate_key(Crypt::PK::ECC self, int key_size=32)
+_generate_key(Crypt::PK::ECC self, int key_size=32)
     CODE:
     {
         int rv;
@@ -65,7 +65,7 @@ import_key_x963(Crypt::PK::ECC self, SV * key_data)
 int
 is_private(Crypt::PK::ECC self)
     CODE:
-        if (self->key.type == -1) croak("FATAL: is_private failed: no key loaded");
+        if (self->key.type == -1) XSRETURN_UNDEF;
         RETVAL = (self->key.type == PK_PRIVATE) ? 1 : 0;
     OUTPUT:
         RETVAL
@@ -73,7 +73,7 @@ is_private(Crypt::PK::ECC self)
 int
 size(Crypt::PK::ECC self)
     CODE:
-        if (self->key.type == -1) croak("FATAL: size failed: no key loaded");
+        if (self->key.type == -1) XSRETURN_UNDEF;
         RETVAL = ecc_get_size(&self->key);
     OUTPUT:
         RETVAL
