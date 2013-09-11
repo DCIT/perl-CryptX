@@ -93,6 +93,27 @@ b64mac(Crypt::Mac::F9 self)
         RETVAL
 
 SV *
+b64umac(Crypt::Mac::F9 self)
+    CODE:
+    {
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long mac_len;
+        int rv;
+        unsigned long outlen;
+        char mac_base64[MAXBLOCKSIZE*2 + 1];
+
+        mac_len = sizeof(mac);
+        rv = f9_done(&self->state, mac, &mac_len);
+        if (rv != CRYPT_OK) croak("FATAL: f9_done failed: %s", error_to_string(rv));
+        outlen = sizeof(mac_base64);
+        rv = base64url_encode(mac, mac_len, (unsigned char*)mac_base64, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));         
+        RETVAL = newSVpvn(mac_base64, outlen);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
 hexmac(Crypt::Mac::F9 self)
     CODE:
     {

@@ -122,6 +122,27 @@ b64digest(self)
     OUTPUT:
         RETVAL
 
+SV *
+b64udigest(self)
+        Crypt::Digest self
+    CODE:
+    {
+        int rv;
+        unsigned long outlen;
+        unsigned char hash[MAXBLOCKSIZE];
+        char hash_base64[MAXBLOCKSIZE*2 + 1];
+        
+        rv = self->desc->done(&self->state, hash);
+        if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
+        
+        outlen = sizeof(hash_base64);
+        rv = base64url_encode(hash, self->desc->hashsize, (unsigned char *)hash_base64, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn(hash_base64, outlen);
+    }
+    OUTPUT:
+        RETVAL
+
 int
 _hashsize(self)
         Crypt::Digest self

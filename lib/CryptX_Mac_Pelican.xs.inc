@@ -89,6 +89,27 @@ b64mac(Crypt::Mac::Pelican self)
         RETVAL
 
 SV *
+b64umac(Crypt::Mac::Pelican self)
+    CODE:
+    {
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long mac_len;
+        int rv;
+        unsigned long outlen;
+        char mac_base64[MAXBLOCKSIZE*2 + 1];
+
+        mac_len = 16;
+        rv = pelican_done(&self->state, mac);
+        if (rv != CRYPT_OK) croak("FATAL: pelican_done failed: %s", error_to_string(rv));
+        outlen = sizeof(mac_base64);
+        rv = base64url_encode(mac, mac_len, (unsigned char*)mac_base64, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));         
+        RETVAL = newSVpvn(mac_base64, outlen);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
 hexmac(Crypt::Mac::Pelican self)
     CODE:
     {
