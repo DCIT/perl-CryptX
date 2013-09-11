@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( sha224 sha224_hex sha224_b64 sha224_file sha224_file_hex sha224_file_b64 )] );
+our %EXPORT_TAGS = ( all => [qw( sha224 sha224_hex sha224_b64 sha224_b64u sha224_file sha224_file_hex sha224_file_b64 sha224_file_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -20,10 +20,12 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 sub sha224             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub sha224_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
 sub sha224_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
+sub sha224_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
 
 sub sha224_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub sha224_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
 sub sha224_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
+sub sha224_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +38,24 @@ Crypt::Digest::SHA224 - Hash function SHA-224 [size: 224 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::SHA224 qw( sha224 sha224_hex sha224_b64 sha224_file sha224_file_hex sha224_file_b64 );
+   use Crypt::Digest::SHA224 qw( sha224 sha224_hex sha224_b64 sha224_b64u 
+                                        sha224_file sha224_file_hex sha224_file_b64 sha224_file_b64u );
 
    # calculate digest from string/buffer
-   $sha224_raw = sha224('data string');
-   $sha224_hex = sha224_hex('data string');
-   $sha224_b64 = sha224_b64('data string');
+   $sha224_raw  = sha224('data string');
+   $sha224_hex  = sha224_hex('data string');
+   $sha224_b64  = sha224_b64('data string');
+   $sha224_b64u = sha224_b64u('data string');
    # calculate digest from file
-   $sha224_raw = sha224_file('filename.dat');
-   $sha224_hex = sha224_file_hex('filename.dat');
-   $sha224_b64 = sha224_file_b64('filename.dat');
+   $sha224_raw  = sha224_file('filename.dat');
+   $sha224_hex  = sha224_file_hex('filename.dat');
+   $sha224_b64  = sha224_file_b64('filename.dat');
+   $sha224_b64u = sha224_file_b64u('filename.dat');
    # calculate digest from filehandle
-   $sha224_raw = sha224_file(*FILEHANDLE);
-   $sha224_hex = sha224_file_hex(*FILEHANDLE);
-   $sha224_b64 = sha224_file_b64(*FILEHANDLE);
+   $sha224_raw  = sha224_file(*FILEHANDLE);
+   $sha224_hex  = sha224_file_hex(*FILEHANDLE);
+   $sha224_b64  = sha224_file_b64(*FILEHANDLE);
+   $sha224_b64u = sha224_file_b64u(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::SHA224;
@@ -58,9 +64,10 @@ Crypt::Digest::SHA224 - Hash function SHA-224 [size: 224 bits]
    $d->add('any data');
    $d->addfile('filename.dat');
    $d->addfile(*FILEHANDLE);
-   $result_raw = $d->digest;    # raw bytes
-   $result_hex = $d->hexdigest; # hexadecimal form
-   $result_b64 = $d->b64digest; # Base64 form
+   $result_raw  = $d->digest;     # raw bytes
+   $result_hex  = $d->hexdigest;  # hexadecimal form
+   $result_b64  = $d->b64digest;  # Base64 form
+   $result_b64u = $d->b64udigest; # Base64 URL Safe form
 
 =head1 DESCRIPTION
 
@@ -72,7 +79,8 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::SHA224 qw(sha224 sha224_hex sha224_b64 sha224_file sha224_file_hex sha224_file_b64);
+  use Crypt::Digest::SHA224 qw(sha224 sha224_hex sha224_b64 sha224_b64u
+                                      sha224_file sha224_file_hex sha224_file_b64 sha224_file_b64u);
 
 Or all of them at once:
 
@@ -104,6 +112,14 @@ Logically joins all arguments into a single string, and returns its SHA224 diges
  #or
  $sha224_b64 = sha224_b64('any data', 'more data', 'even more data');
 
+=head2 sha224_b64u
+
+Logically joins all arguments into a single string, and returns its SHA224 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+ $sha224_b64url = sha224_b64u('data string');
+ #or
+ $sha224_b64url = sha224_b64u('any data', 'more data', 'even more data');
+
 =head2 sha224_file
 
 Reads file (defined by filename or filehandle) content, and returns its SHA224 digest encoded as a binary string.
@@ -129,6 +145,14 @@ Reads file (defined by filename or filehandle) content, and returns its SHA224 d
  $sha224_b64 = sha224_file_b64('filename.dat');
  #or
  $sha224_b64 = sha224_file_b64(*FILEHANDLE);
+
+=head2 sha224_file_b64u
+
+Reads file (defined by filename or filehandle) content, and returns its SHA224 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+ $sha224_b64url = sha224_file_b64u('filename.dat');
+ #or
+ $sha224_b64url = sha224_file_b64u(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -183,6 +207,10 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 =head2 b64digest
 
  $result_b64 = $d->b64digest();
+
+=head2 b64udigest
+
+ $result_b64url = $d->b64udigest();
 
 =head1 SEE ALSO
 

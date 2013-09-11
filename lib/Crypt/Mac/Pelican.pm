@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( pelican pelican_hex pelican_b64 )] );
+our %EXPORT_TAGS = ( all => [qw( pelican pelican_hex pelican_b64 pelican_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -15,8 +15,9 @@ use base 'Crypt::Mac';
 
 sub new { my $class = shift; _new(@_) }
 sub pelican { Crypt::Mac::Pelican->new(shift)->add(@_)->mac }
-sub pelican_hex { Crypt::Mac::Pelican->new(shift)->add(@_)->hexmac }
-sub pelican_b64 { Crypt::Mac::Pelican->new(shift)->add(@_)->b64mac }
+sub pelican_hex  { Crypt::Mac::Pelican->new(shift)->add(@_)->hexmac }
+sub pelican_b64  { Crypt::Mac::Pelican->new(shift)->add(@_)->b64mac }
+sub pelican_b64u { Crypt::Mac::Pelican->new(shift)->add(@_)->b64umac }
 
 1;
 
@@ -32,9 +33,10 @@ Crypt::Mac::Pelican - Message authentication code Pelican (AES based MAC)
    use Crypt::Mac::Pelican qw( pelican pelican_hex );
 
    # calculate MAC from string/buffer
-   $pelican_raw = pelican($key, 'data buffer');
-   $pelican_hex = pelican_hex($key, 'data buffer');
-   $pelican_b64 = pelican_b64($key, 'data buffer');
+   $pelican_raw  = pelican($key, 'data buffer');
+   $pelican_hex  = pelican_hex($key, 'data buffer');
+   $pelican_b64  = pelican_b64($key, 'data buffer');
+   $pelican_b64u = pelican_b64u($key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::Pelican;
@@ -43,9 +45,10 @@ Crypt::Mac::Pelican - Message authentication code Pelican (AES based MAC)
    $d->add('any data');
    $d->addfile('filename.dat');
    $d->addfile(*FILEHANDLE);
-   $result_raw = $d->mac;    # raw bytes
-   $result_hex = $d->hexmac; # hexadecimal form
-   $result_b64 = $d->b64mac; # Base64 form
+   $result_raw  = $d->mac;     # raw bytes
+   $result_hex  = $d->hexmac;  # hexadecimal form
+   $result_b64  = $d->b64mac;  # Base64 form
+   $result_b64u = $d->b64umac; # Base64 URL Safe form
 
 =head1 DESCRIPTION
 
@@ -83,15 +86,21 @@ Logically joins all arguments into a single string, and returns its Pelican mess
 
 =head2 pelican_b64
 
-Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a BASE64 string.
+Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a Base64 string.
 
  $pelican_b64 = pelican_b64($key, 'data buffer');
  #or
  $pelican_b64 = pelican_b64($key, 'any data', 'more data', 'even more data');
 
-=head1 METHODS
+=head2 pelican_b64u
 
-The OO interface provides the same set of functions as L<Crypt::Mac>.
+Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+ $pelican_b64url = pelican_b64u($key, 'data buffer');
+ #or
+ $pelican_b64url = pelican_b64u($key, 'any data', 'more data', 'even more data');
+
+=head1 METHODS
 
 =head2 new
 
@@ -128,6 +137,10 @@ The OO interface provides the same set of functions as L<Crypt::Mac>.
 =head2 b64mac
 
  $result_b64 = $d->b64mac();
+
+=head2 b64umac
+
+ $result_b64url = $d->b64umac();
 
 =head1 SEE ALSO
 

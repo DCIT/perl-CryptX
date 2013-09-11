@@ -13,6 +13,9 @@ TODO:
           DSA: my $sig = $pr1->sign("message");
           RSA: my $k = Crypt::PK::RSA->new; $k->generate_key(256, 65537);
 
+0.014   2013/09/XXX
+        - Crypt::Digest::NNN and Crypt::Mac::NNN now can produce Base64-URL-Safe encoded digest/mac
+
 0.013   2013/08/28
         - DSA/RSA/ECC/DH - importing keys from string changed - now: $pk->import_key(\$buffer_with_key)
         - DSA/RSA/ECC/DH - size() and is_private() now return undef if no key loaded

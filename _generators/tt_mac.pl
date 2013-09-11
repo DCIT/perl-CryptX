@@ -8,7 +8,7 @@ use File::Slurp;
 use File::Copy;
 use File::Spec::Functions qw(catfile catdir abs2rel canonpath);
 use Data::Dump 'pp';
-use MIME::Base64;
+use MIME::Base64 qw(encode_base64 encode_base64url);
 
 sub equal_files {
   my $d1 = sha1_hex(read_file(shift, binmode => ':raw'));
@@ -72,6 +72,7 @@ for my $n (keys %list) {
       }
     }
     $_->{b64mac} = encode_base64(pack("H*", $_->{mac}),'') for (@{$data->{t_strings}});
+    $_->{b64umac} = encode_base64url(pack("H*", $_->{mac}),'') for (@{$data->{t_strings}});
     $data->{t_strings_count} = defined $data->{t_strings} ? scalar(@{$data->{t_strings}}) : 0;
     
     my $t_out = catfile($outdir_t, "mac_".lc($n).".t");

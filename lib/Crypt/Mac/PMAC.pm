@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( pmac pmac_hex pmac_b64 )] );
+our %EXPORT_TAGS = ( all => [qw( pmac pmac_hex pmac_b64 pmac_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -17,8 +17,9 @@ use Crypt::Cipher;
 
 sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
 sub pmac { Crypt::Mac::PMAC->new(shift, shift)->add(@_)->mac }
-sub pmac_hex { Crypt::Mac::PMAC->new(shift, shift)->add(@_)->hexmac }
-sub pmac_b64 { Crypt::Mac::PMAC->new(shift, shift)->add(@_)->b64mac }
+sub pmac_hex  { Crypt::Mac::PMAC->new(shift, shift)->add(@_)->hexmac }
+sub pmac_b64  { Crypt::Mac::PMAC->new(shift, shift)->add(@_)->b64mac }
+sub pmac_b64u { Crypt::Mac::PMAC->new(shift, shift)->add(@_)->b64umac }
 
 1;
 
@@ -34,9 +35,10 @@ Crypt::Mac::PMAC - Message authentication code PMAC
    use Crypt::Mac::PMAC qw( pmac pmac_hex );
 
    # calculate MAC from string/buffer
-   $pmac_raw = pmac($cipher_name, $key, 'data buffer');
-   $pmac_hex = pmac_hex($cipher_name, $key, 'data buffer');
-   $pmac_b64 = pmac_b64($cipher_name, $key, 'data buffer');
+   $pmac_raw  = pmac($cipher_name, $key, 'data buffer');
+   $pmac_hex  = pmac_hex($cipher_name, $key, 'data buffer');
+   $pmac_b64  = pmac_b64($cipher_name, $key, 'data buffer');
+   $pmac_b64u = pmac_b64u($cipher_name, $key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::PMAC;
@@ -45,9 +47,10 @@ Crypt::Mac::PMAC - Message authentication code PMAC
    $d->add('any data');
    $d->addfile('filename.dat');
    $d->addfile(*FILEHANDLE);
-   $result_raw = $d->mac;    # raw bytes
-   $result_hex = $d->hexmac; # hexadecimal form
-   $result_b64 = $d->b64mac; # Base64 form
+   $result_raw  = $d->mac;     # raw bytes
+   $result_hex  = $d->hexmac;  # hexadecimal form
+   $result_b64  = $d->b64mac;  # Base64 form
+   $result_b64u = $d->b64umac; # Base64 URL Safe form
 
 =head1 DESCRIPTION
 
@@ -85,15 +88,21 @@ Logically joins all arguments into a single string, and returns its PMAC message
 
 =head2 pmac_b64
 
-Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a BASE64 string.
+Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a Base64 string.
 
  $pmac_b64 = pmac_b64($cipher_name, $key, 'data buffer');
  #or
  $pmac_b64 = pmac_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 
-=head1 METHODS
+=head2 pmac_b64u
 
-The OO interface provides the same set of functions as L<Crypt::Mac>.
+Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+ $pmac_b64url = pmac_b64u($cipher_name, $key, 'data buffer');
+ #or
+ $pmac_b64url = pmac_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
+
+=head1 METHODS
 
 =head2 new
 
@@ -130,6 +139,10 @@ The OO interface provides the same set of functions as L<Crypt::Mac>.
 =head2 b64mac
 
  $result_b64 = $d->b64mac();
+
+=head2 b64umac
+
+ $result_b64url = $d->b64umac();
 
 =head1 SEE ALSO
 

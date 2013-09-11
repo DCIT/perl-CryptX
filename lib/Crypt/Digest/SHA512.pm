@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( sha512 sha512_hex sha512_b64 sha512_file sha512_file_hex sha512_file_b64 )] );
+our %EXPORT_TAGS = ( all => [qw( sha512 sha512_hex sha512_b64 sha512_b64u sha512_file sha512_file_hex sha512_file_b64 sha512_file_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -20,10 +20,12 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 sub sha512             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub sha512_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
 sub sha512_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
+sub sha512_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
 
 sub sha512_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub sha512_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
 sub sha512_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
+sub sha512_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +38,24 @@ Crypt::Digest::SHA512 - Hash function SHA-512 [size: 512 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::SHA512 qw( sha512 sha512_hex sha512_b64 sha512_file sha512_file_hex sha512_file_b64 );
+   use Crypt::Digest::SHA512 qw( sha512 sha512_hex sha512_b64 sha512_b64u 
+                                        sha512_file sha512_file_hex sha512_file_b64 sha512_file_b64u );
 
    # calculate digest from string/buffer
-   $sha512_raw = sha512('data string');
-   $sha512_hex = sha512_hex('data string');
-   $sha512_b64 = sha512_b64('data string');
+   $sha512_raw  = sha512('data string');
+   $sha512_hex  = sha512_hex('data string');
+   $sha512_b64  = sha512_b64('data string');
+   $sha512_b64u = sha512_b64u('data string');
    # calculate digest from file
-   $sha512_raw = sha512_file('filename.dat');
-   $sha512_hex = sha512_file_hex('filename.dat');
-   $sha512_b64 = sha512_file_b64('filename.dat');
+   $sha512_raw  = sha512_file('filename.dat');
+   $sha512_hex  = sha512_file_hex('filename.dat');
+   $sha512_b64  = sha512_file_b64('filename.dat');
+   $sha512_b64u = sha512_file_b64u('filename.dat');
    # calculate digest from filehandle
-   $sha512_raw = sha512_file(*FILEHANDLE);
-   $sha512_hex = sha512_file_hex(*FILEHANDLE);
-   $sha512_b64 = sha512_file_b64(*FILEHANDLE);
+   $sha512_raw  = sha512_file(*FILEHANDLE);
+   $sha512_hex  = sha512_file_hex(*FILEHANDLE);
+   $sha512_b64  = sha512_file_b64(*FILEHANDLE);
+   $sha512_b64u = sha512_file_b64u(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::SHA512;
@@ -58,9 +64,10 @@ Crypt::Digest::SHA512 - Hash function SHA-512 [size: 512 bits]
    $d->add('any data');
    $d->addfile('filename.dat');
    $d->addfile(*FILEHANDLE);
-   $result_raw = $d->digest;    # raw bytes
-   $result_hex = $d->hexdigest; # hexadecimal form
-   $result_b64 = $d->b64digest; # Base64 form
+   $result_raw  = $d->digest;     # raw bytes
+   $result_hex  = $d->hexdigest;  # hexadecimal form
+   $result_b64  = $d->b64digest;  # Base64 form
+   $result_b64u = $d->b64udigest; # Base64 URL Safe form
 
 =head1 DESCRIPTION
 
@@ -72,7 +79,8 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::SHA512 qw(sha512 sha512_hex sha512_b64 sha512_file sha512_file_hex sha512_file_b64);
+  use Crypt::Digest::SHA512 qw(sha512 sha512_hex sha512_b64 sha512_b64u
+                                      sha512_file sha512_file_hex sha512_file_b64 sha512_file_b64u);
 
 Or all of them at once:
 
@@ -104,6 +112,14 @@ Logically joins all arguments into a single string, and returns its SHA512 diges
  #or
  $sha512_b64 = sha512_b64('any data', 'more data', 'even more data');
 
+=head2 sha512_b64u
+
+Logically joins all arguments into a single string, and returns its SHA512 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+ $sha512_b64url = sha512_b64u('data string');
+ #or
+ $sha512_b64url = sha512_b64u('any data', 'more data', 'even more data');
+
 =head2 sha512_file
 
 Reads file (defined by filename or filehandle) content, and returns its SHA512 digest encoded as a binary string.
@@ -129,6 +145,14 @@ Reads file (defined by filename or filehandle) content, and returns its SHA512 d
  $sha512_b64 = sha512_file_b64('filename.dat');
  #or
  $sha512_b64 = sha512_file_b64(*FILEHANDLE);
+
+=head2 sha512_file_b64u
+
+Reads file (defined by filename or filehandle) content, and returns its SHA512 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+ $sha512_b64url = sha512_file_b64u('filename.dat');
+ #or
+ $sha512_b64url = sha512_file_b64u(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -183,6 +207,10 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 =head2 b64digest
 
  $result_b64 = $d->b64digest();
+
+=head2 b64udigest
+
+ $result_b64url = $d->b64udigest();
 
 =head1 SEE ALSO
 

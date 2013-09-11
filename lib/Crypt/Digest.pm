@@ -144,10 +144,10 @@ Crypt::Digest - Generic interface to hash/digest functions
    $d->add('any data');
    $d->addfile('filename.dat');
    $d->addfile(*FILEHANDLE);
-   $result_raw  = $d->digest;    # raw bytes
-   $result_hex  = $d->hexdigest; # hexadecimal form
-   $result_b64  = $d->b64digest; # Base64 form
-   $result_b64u = $d->b64digest; # Base64 URL Safe form
+   $result_raw  = $d->digest;     # raw bytes
+   $result_hex  = $d->hexdigest;  # hexadecimal form
+   $result_b64  = $d->b64digest;  # Base64 form
+   $result_b64u = $d->b64udigest; # Base64 URL Safe form
  
 =head1 DESCRIPTION
 

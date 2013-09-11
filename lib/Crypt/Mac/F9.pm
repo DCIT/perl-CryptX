@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( f9 f9_hex f9_b64 )] );
+our %EXPORT_TAGS = ( all => [qw( f9 f9_hex f9_b64 f9_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -17,8 +17,9 @@ use Crypt::Cipher;
 
 sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
 sub f9 { Crypt::Mac::F9->new(shift, shift)->add(@_)->mac }
-sub f9_hex { Crypt::Mac::F9->new(shift, shift)->add(@_)->hexmac }
-sub f9_b64 { Crypt::Mac::F9->new(shift, shift)->add(@_)->b64mac }
+sub f9_hex  { Crypt::Mac::F9->new(shift, shift)->add(@_)->hexmac }
+sub f9_b64  { Crypt::Mac::F9->new(shift, shift)->add(@_)->b64mac }
+sub f9_b64u { Crypt::Mac::F9->new(shift, shift)->add(@_)->b64umac }
 
 1;
 
@@ -34,9 +35,10 @@ Crypt::Mac::F9 - Message authentication code F9
    use Crypt::Mac::F9 qw( f9 f9_hex );
 
    # calculate MAC from string/buffer
-   $f9_raw = f9($cipher_name, $key, 'data buffer');
-   $f9_hex = f9_hex($cipher_name, $key, 'data buffer');
-   $f9_b64 = f9_b64($cipher_name, $key, 'data buffer');
+   $f9_raw  = f9($cipher_name, $key, 'data buffer');
+   $f9_hex  = f9_hex($cipher_name, $key, 'data buffer');
+   $f9_b64  = f9_b64($cipher_name, $key, 'data buffer');
+   $f9_b64u = f9_b64u($cipher_name, $key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::F9;
@@ -45,9 +47,10 @@ Crypt::Mac::F9 - Message authentication code F9
    $d->add('any data');
    $d->addfile('filename.dat');
    $d->addfile(*FILEHANDLE);
-   $result_raw = $d->mac;    # raw bytes
-   $result_hex = $d->hexmac; # hexadecimal form
-   $result_b64 = $d->b64mac; # Base64 form
+   $result_raw  = $d->mac;     # raw bytes
+   $result_hex  = $d->hexmac;  # hexadecimal form
+   $result_b64  = $d->b64mac;  # Base64 form
+   $result_b64u = $d->b64umac; # Base64 URL Safe form
 
 =head1 DESCRIPTION
 
@@ -85,15 +88,21 @@ Logically joins all arguments into a single string, and returns its F9 message a
 
 =head2 f9_b64
 
-Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a BASE64 string.
+Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a Base64 string.
 
  $f9_b64 = f9_b64($cipher_name, $key, 'data buffer');
  #or
  $f9_b64 = f9_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 
-=head1 METHODS
+=head2 f9_b64u
 
-The OO interface provides the same set of functions as L<Crypt::Mac>.
+Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+ $f9_b64url = f9_b64u($cipher_name, $key, 'data buffer');
+ #or
+ $f9_b64url = f9_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
+
+=head1 METHODS
 
 =head2 new
 
@@ -130,6 +139,10 @@ The OO interface provides the same set of functions as L<Crypt::Mac>.
 =head2 b64mac
 
  $result_b64 = $d->b64mac();
+
+=head2 b64umac
+
+ $result_b64url = $d->b64umac();
 
 =head1 SEE ALSO
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( hmac hmac_hex hmac_b64 )] );
+our %EXPORT_TAGS = ( all => [qw( hmac hmac_hex hmac_b64 hmac_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -17,8 +17,9 @@ use Crypt::Digest;
 
 sub new { my $class = shift; _new(Crypt::Digest::_trans_digest_name(shift), @_) }
 sub hmac { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->mac }
-sub hmac_hex { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->hexmac }
-sub hmac_b64 { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->b64mac }
+sub hmac_hex  { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->hexmac }
+sub hmac_b64  { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->b64mac }
+sub hmac_b64u { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->b64umac }
 
 1;
 
@@ -34,9 +35,10 @@ Crypt::Mac::HMAC - Message authentication code HMAC
    use Crypt::Mac::HMAC qw( hmac hmac_hex );
 
    # calculate MAC from string/buffer
-   $hmac_raw = hmac('SHA256', $key, 'data buffer');
-   $hmac_hex = hmac_hex('SHA256', $key, 'data buffer');
-   $hmac_b64 = hmac_b64('SHA256', $key, 'data buffer');
+   $hmac_raw  = hmac('SHA256', $key, 'data buffer');
+   $hmac_hex  = hmac_hex('SHA256', $key, 'data buffer');
+   $hmac_b64  = hmac_b64('SHA256', $key, 'data buffer');
+   $hmac_b64u = hmac_b64u('SHA256', $key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::HMAC;
@@ -45,9 +47,10 @@ Crypt::Mac::HMAC - Message authentication code HMAC
    $d->add('any data');
    $d->addfile('filename.dat');
    $d->addfile(*FILEHANDLE);
-   $result_raw = $d->mac;    # raw bytes
-   $result_hex = $d->hexmac; # hexadecimal form
-   $result_b64 = $d->b64mac; # Base64 form
+   $result_raw  = $d->mac;     # raw bytes
+   $result_hex  = $d->hexmac;  # hexadecimal form
+   $result_b64  = $d->b64mac;  # Base64 form
+   $result_b64u = $d->b64umac; # Base64 URL Safe form
 
 =head1 DESCRIPTION
 
@@ -85,15 +88,21 @@ Logically joins all arguments into a single string, and returns its HMAC message
 
 =head2 hmac_b64
 
-Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a BASE64 string.
+Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a Base64 string.
 
  $hmac_b64 = hmac_b64($hash_name, $key, 'data buffer');
  #or
  $hmac_b64 = hmac_b64($hash_name, $key, 'any data', 'more data', 'even more data');
 
-=head1 METHODS
+=head2 hmac_b64u
 
-The OO interface provides the same set of functions as L<Crypt::Mac>.
+Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+ $hmac_b64url = hmac_b64u($hash_name, $key, 'data buffer');
+ #or
+ $hmac_b64url = hmac_b64u($hash_name, $key, 'any data', 'more data', 'even more data');
+
+=head1 METHODS
 
 =head2 new
 
@@ -130,6 +139,10 @@ The OO interface provides the same set of functions as L<Crypt::Mac>.
 =head2 b64mac
 
  $result_b64 = $d->b64mac();
+
+=head2 b64umac
+
+ $result_b64url = $d->b64umac();
 
 =head1 SEE ALSO
 

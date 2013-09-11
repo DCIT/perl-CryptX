@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( whirlpool whirlpool_hex whirlpool_b64 whirlpool_file whirlpool_file_hex whirlpool_file_b64 )] );
+our %EXPORT_TAGS = ( all => [qw( whirlpool whirlpool_hex whirlpool_b64 whirlpool_b64u whirlpool_file whirlpool_file_hex whirlpool_file_b64 whirlpool_file_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -20,10 +20,12 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 sub whirlpool             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub whirlpool_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
 sub whirlpool_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
+sub whirlpool_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
 
 sub whirlpool_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub whirlpool_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
 sub whirlpool_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
+sub whirlpool_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +38,24 @@ Crypt::Digest::Whirlpool - Hash function Whirlpool [size: 512 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::Whirlpool qw( whirlpool whirlpool_hex whirlpool_b64 whirlpool_file whirlpool_file_hex whirlpool_file_b64 );
+   use Crypt::Digest::Whirlpool qw( whirlpool whirlpool_hex whirlpool_b64 whirlpool_b64u 
+                                        whirlpool_file whirlpool_file_hex whirlpool_file_b64 whirlpool_file_b64u );
 
    # calculate digest from string/buffer
-   $whirlpool_raw = whirlpool('data string');
-   $whirlpool_hex = whirlpool_hex('data string');
-   $whirlpool_b64 = whirlpool_b64('data string');
+   $whirlpool_raw  = whirlpool('data string');
+   $whirlpool_hex  = whirlpool_hex('data string');
+   $whirlpool_b64  = whirlpool_b64('data string');
+   $whirlpool_b64u = whirlpool_b64u('data string');
    # calculate digest from file
-   $whirlpool_raw = whirlpool_file('filename.dat');
-   $whirlpool_hex = whirlpool_file_hex('filename.dat');
-   $whirlpool_b64 = whirlpool_file_b64('filename.dat');
+   $whirlpool_raw  = whirlpool_file('filename.dat');
+   $whirlpool_hex  = whirlpool_file_hex('filename.dat');
+   $whirlpool_b64  = whirlpool_file_b64('filename.dat');
+   $whirlpool_b64u = whirlpool_file_b64u('filename.dat');
    # calculate digest from filehandle
-   $whirlpool_raw = whirlpool_file(*FILEHANDLE);
-   $whirlpool_hex = whirlpool_file_hex(*FILEHANDLE);
-   $whirlpool_b64 = whirlpool_file_b64(*FILEHANDLE);
+   $whirlpool_raw  = whirlpool_file(*FILEHANDLE);
+   $whirlpool_hex  = whirlpool_file_hex(*FILEHANDLE);
+   $whirlpool_b64  = whirlpool_file_b64(*FILEHANDLE);
+   $whirlpool_b64u = whirlpool_file_b64u(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::Whirlpool;
@@ -58,9 +64,10 @@ Crypt::Digest::Whirlpool - Hash function Whirlpool [size: 512 bits]
    $d->add('any data');
    $d->addfile('filename.dat');
    $d->addfile(*FILEHANDLE);
-   $result_raw = $d->digest;    # raw bytes
-   $result_hex = $d->hexdigest; # hexadecimal form
-   $result_b64 = $d->b64digest; # Base64 form
+   $result_raw  = $d->digest;     # raw bytes
+   $result_hex  = $d->hexdigest;  # hexadecimal form
+   $result_b64  = $d->b64digest;  # Base64 form
+   $result_b64u = $d->b64udigest; # Base64 URL Safe form
 
 =head1 DESCRIPTION
 
@@ -72,7 +79,8 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::Whirlpool qw(whirlpool whirlpool_hex whirlpool_b64 whirlpool_file whirlpool_file_hex whirlpool_file_b64);
+  use Crypt::Digest::Whirlpool qw(whirlpool whirlpool_hex whirlpool_b64 whirlpool_b64u
+                                      whirlpool_file whirlpool_file_hex whirlpool_file_b64 whirlpool_file_b64u);
 
 Or all of them at once:
 
@@ -104,6 +112,14 @@ Logically joins all arguments into a single string, and returns its Whirlpool di
  #or
  $whirlpool_b64 = whirlpool_b64('any data', 'more data', 'even more data');
 
+=head2 whirlpool_b64u
+
+Logically joins all arguments into a single string, and returns its Whirlpool digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+ $whirlpool_b64url = whirlpool_b64u('data string');
+ #or
+ $whirlpool_b64url = whirlpool_b64u('any data', 'more data', 'even more data');
+
 =head2 whirlpool_file
 
 Reads file (defined by filename or filehandle) content, and returns its Whirlpool digest encoded as a binary string.
@@ -129,6 +145,14 @@ Reads file (defined by filename or filehandle) content, and returns its Whirlpoo
  $whirlpool_b64 = whirlpool_file_b64('filename.dat');
  #or
  $whirlpool_b64 = whirlpool_file_b64(*FILEHANDLE);
+
+=head2 whirlpool_file_b64u
+
+Reads file (defined by filename or filehandle) content, and returns its Whirlpool digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+ $whirlpool_b64url = whirlpool_file_b64u('filename.dat');
+ #or
+ $whirlpool_b64url = whirlpool_file_b64u(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -183,6 +207,10 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 =head2 b64digest
 
  $result_b64 = $d->b64digest();
+
+=head2 b64udigest
+
+ $result_b64url = $d->b64udigest();
 
 =head1 SEE ALSO
 

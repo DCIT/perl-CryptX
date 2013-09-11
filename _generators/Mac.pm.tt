@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_b64 )] );
+our %EXPORT_TAGS = ( all => [qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_b64 [%lc_name%]_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -18,20 +18,23 @@ use Crypt::Digest;
 
 sub new { my $class = shift; _new(Crypt::Digest::_trans_digest_name(shift), @_) }
 sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->mac }
-sub [%lc_name%]_hex { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->hexmac }
-sub [%lc_name%]_b64 { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64mac }
+sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->hexmac }
+sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64mac }
+sub [%lc_name%]_b64u { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64umac }
 [%-ELSIF lc_name == 'pelican' %]
 sub new { my $class = shift; _new(@_) }
 sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->mac }
-sub [%lc_name%]_hex { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->hexmac }
-sub [%lc_name%]_b64 { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->b64mac }
+sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->hexmac }
+sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->b64mac }
+sub [%lc_name%]_b64u { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->b64umac }
 [%-ELSE%]
 use Crypt::Cipher;
 
 sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
 sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->mac }
-sub [%lc_name%]_hex { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->hexmac }
-sub [%lc_name%]_b64 { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64mac }
+sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->hexmac }
+sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64mac }
+sub [%lc_name%]_b64u { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64umac }
 [%-END%]
 
 1;
@@ -49,17 +52,20 @@ Crypt::Mac::[%orig_name%] - [%info%]
 
    # calculate MAC from string/buffer
 [%-IF lc_name == 'hmac' %]
-   $[%lc_name%]_raw = [%lc_name%]('SHA256', $key, 'data buffer');
-   $[%lc_name%]_hex = [%lc_name%]_hex('SHA256', $key, 'data buffer');
-   $[%lc_name%]_b64 = [%lc_name%]_b64('SHA256', $key, 'data buffer');
+   $[%lc_name%]_raw  = [%lc_name%]('SHA256', $key, 'data buffer');
+   $[%lc_name%]_hex  = [%lc_name%]_hex('SHA256', $key, 'data buffer');
+   $[%lc_name%]_b64  = [%lc_name%]_b64('SHA256', $key, 'data buffer');
+   $[%lc_name%]_b64u = [%lc_name%]_b64u('SHA256', $key, 'data buffer');
 [%-ELSIF lc_name == 'pelican' %]
-   $[%lc_name%]_raw = [%lc_name%]($key, 'data buffer');
-   $[%lc_name%]_hex = [%lc_name%]_hex($key, 'data buffer');
-   $[%lc_name%]_b64 = [%lc_name%]_b64($key, 'data buffer');
+   $[%lc_name%]_raw  = [%lc_name%]($key, 'data buffer');
+   $[%lc_name%]_hex  = [%lc_name%]_hex($key, 'data buffer');
+   $[%lc_name%]_b64  = [%lc_name%]_b64($key, 'data buffer');
+   $[%lc_name%]_b64u = [%lc_name%]_b64u($key, 'data buffer');
 [%-ELSE%]
-   $[%lc_name%]_raw = [%lc_name%]($cipher_name, $key, 'data buffer');
-   $[%lc_name%]_hex = [%lc_name%]_hex($cipher_name, $key, 'data buffer');
-   $[%lc_name%]_b64 = [%lc_name%]_b64($cipher_name, $key, 'data buffer');
+   $[%lc_name%]_raw  = [%lc_name%]($cipher_name, $key, 'data buffer');
+   $[%lc_name%]_hex  = [%lc_name%]_hex($cipher_name, $key, 'data buffer');
+   $[%lc_name%]_b64  = [%lc_name%]_b64($cipher_name, $key, 'data buffer');
+   $[%lc_name%]_b64u = [%lc_name%]_b64u($cipher_name, $key, 'data buffer');
 [%-END%]
 
    ### OO interface:
@@ -75,9 +81,10 @@ Crypt::Mac::[%orig_name%] - [%info%]
    $d->add('any data');
    $d->addfile('filename.dat');
    $d->addfile(*FILEHANDLE);
-   $result_raw = $d->mac;    # raw bytes
-   $result_hex = $d->hexmac; # hexadecimal form
-   $result_b64 = $d->b64mac; # Base64 form
+   $result_raw  = $d->mac;     # raw bytes
+   $result_hex  = $d->hexmac;  # hexadecimal form
+   $result_b64  = $d->b64mac;  # Base64 form
+   $result_b64u = $d->b64umac; # Base64 URL Safe form
 
 =head1 DESCRIPTION
 
@@ -135,7 +142,7 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 =head2 [%lc_name%]_b64
 
-Logically joins all arguments into a single string, and returns its [%orig_name%] message authentication code encoded as a BASE64 string.
+Logically joins all arguments into a single string, and returns its [%orig_name%] message authentication code encoded as a Base64 string.
 
 [%-IF lc_name == 'hmac' %]
  $[%lc_name%]_b64 = [%lc_name%]_b64($hash_name, $key, 'data buffer');
@@ -151,9 +158,25 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
  $[%lc_name%]_b64 = [%lc_name%]_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 [%-END%]
 
-=head1 METHODS
+=head2 [%lc_name%]_b64u
 
-The OO interface provides the same set of functions as L<Crypt::Mac>.
+Logically joins all arguments into a single string, and returns its [%orig_name%] message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+[%-IF lc_name == 'hmac' %]
+ $[%lc_name%]_b64url = [%lc_name%]_b64u($hash_name, $key, 'data buffer');
+ #or
+ $[%lc_name%]_b64url = [%lc_name%]_b64u($hash_name, $key, 'any data', 'more data', 'even more data');
+[%-ELSIF lc_name == 'pelican' %]
+ $[%lc_name%]_b64url = [%lc_name%]_b64u($key, 'data buffer');
+ #or
+ $[%lc_name%]_b64url = [%lc_name%]_b64u($key, 'any data', 'more data', 'even more data');
+[%-ELSE%]
+ $[%lc_name%]_b64url = [%lc_name%]_b64u($cipher_name, $key, 'data buffer');
+ #or
+ $[%lc_name%]_b64url = [%lc_name%]_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
+[%-END%]
+
+=head1 METHODS
 
 =head2 new
 
@@ -196,6 +219,10 @@ The OO interface provides the same set of functions as L<Crypt::Mac>.
 =head2 b64mac
 
  $result_b64 = $d->b64mac();
+
+=head2 b64umac
+
+ $result_b64url = $d->b64umac();
 
 =head1 SEE ALSO
 

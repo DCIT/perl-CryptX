@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( ripemd256 ripemd256_hex ripemd256_b64 ripemd256_file ripemd256_file_hex ripemd256_file_b64 )] );
+our %EXPORT_TAGS = ( all => [qw( ripemd256 ripemd256_hex ripemd256_b64 ripemd256_b64u ripemd256_file ripemd256_file_hex ripemd256_file_b64 ripemd256_file_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -20,10 +20,12 @@ sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 sub ripemd256             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
 sub ripemd256_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
 sub ripemd256_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
+sub ripemd256_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
 
 sub ripemd256_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
 sub ripemd256_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
 sub ripemd256_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
+sub ripemd256_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
 
 1;
 
@@ -36,20 +38,24 @@ Crypt::Digest::RIPEMD256 - Hash function RIPEMD-256 [size: 256 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::RIPEMD256 qw( ripemd256 ripemd256_hex ripemd256_b64 ripemd256_file ripemd256_file_hex ripemd256_file_b64 );
+   use Crypt::Digest::RIPEMD256 qw( ripemd256 ripemd256_hex ripemd256_b64 ripemd256_b64u 
+                                        ripemd256_file ripemd256_file_hex ripemd256_file_b64 ripemd256_file_b64u );
 
    # calculate digest from string/buffer
-   $ripemd256_raw = ripemd256('data string');
-   $ripemd256_hex = ripemd256_hex('data string');
-   $ripemd256_b64 = ripemd256_b64('data string');
+   $ripemd256_raw  = ripemd256('data string');
+   $ripemd256_hex  = ripemd256_hex('data string');
+   $ripemd256_b64  = ripemd256_b64('data string');
+   $ripemd256_b64u = ripemd256_b64u('data string');
    # calculate digest from file
-   $ripemd256_raw = ripemd256_file('filename.dat');
-   $ripemd256_hex = ripemd256_file_hex('filename.dat');
-   $ripemd256_b64 = ripemd256_file_b64('filename.dat');
+   $ripemd256_raw  = ripemd256_file('filename.dat');
+   $ripemd256_hex  = ripemd256_file_hex('filename.dat');
+   $ripemd256_b64  = ripemd256_file_b64('filename.dat');
+   $ripemd256_b64u = ripemd256_file_b64u('filename.dat');
    # calculate digest from filehandle
-   $ripemd256_raw = ripemd256_file(*FILEHANDLE);
-   $ripemd256_hex = ripemd256_file_hex(*FILEHANDLE);
-   $ripemd256_b64 = ripemd256_file_b64(*FILEHANDLE);
+   $ripemd256_raw  = ripemd256_file(*FILEHANDLE);
+   $ripemd256_hex  = ripemd256_file_hex(*FILEHANDLE);
+   $ripemd256_b64  = ripemd256_file_b64(*FILEHANDLE);
+   $ripemd256_b64u = ripemd256_file_b64u(*FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest::RIPEMD256;
@@ -58,9 +64,10 @@ Crypt::Digest::RIPEMD256 - Hash function RIPEMD-256 [size: 256 bits]
    $d->add('any data');
    $d->addfile('filename.dat');
    $d->addfile(*FILEHANDLE);
-   $result_raw = $d->digest;    # raw bytes
-   $result_hex = $d->hexdigest; # hexadecimal form
-   $result_b64 = $d->b64digest; # Base64 form
+   $result_raw  = $d->digest;     # raw bytes
+   $result_hex  = $d->hexdigest;  # hexadecimal form
+   $result_b64  = $d->b64digest;  # Base64 form
+   $result_b64u = $d->b64udigest; # Base64 URL Safe form
 
 =head1 DESCRIPTION
 
@@ -72,7 +79,8 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Digest::RIPEMD256 qw(ripemd256 ripemd256_hex ripemd256_b64 ripemd256_file ripemd256_file_hex ripemd256_file_b64);
+  use Crypt::Digest::RIPEMD256 qw(ripemd256 ripemd256_hex ripemd256_b64 ripemd256_b64u
+                                      ripemd256_file ripemd256_file_hex ripemd256_file_b64 ripemd256_file_b64u);
 
 Or all of them at once:
 
@@ -104,6 +112,14 @@ Logically joins all arguments into a single string, and returns its RIPEMD256 di
  #or
  $ripemd256_b64 = ripemd256_b64('any data', 'more data', 'even more data');
 
+=head2 ripemd256_b64u
+
+Logically joins all arguments into a single string, and returns its RIPEMD256 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+ $ripemd256_b64url = ripemd256_b64u('data string');
+ #or
+ $ripemd256_b64url = ripemd256_b64u('any data', 'more data', 'even more data');
+
 =head2 ripemd256_file
 
 Reads file (defined by filename or filehandle) content, and returns its RIPEMD256 digest encoded as a binary string.
@@ -129,6 +145,14 @@ Reads file (defined by filename or filehandle) content, and returns its RIPEMD25
  $ripemd256_b64 = ripemd256_file_b64('filename.dat');
  #or
  $ripemd256_b64 = ripemd256_file_b64(*FILEHANDLE);
+
+=head2 ripemd256_file_b64u
+
+Reads file (defined by filename or filehandle) content, and returns its RIPEMD256 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+
+ $ripemd256_b64url = ripemd256_file_b64u('filename.dat');
+ #or
+ $ripemd256_b64url = ripemd256_file_b64u(*FILEHANDLE);
 
 =head1 METHODS
 
@@ -183,6 +207,10 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 =head2 b64digest
 
  $result_b64 = $d->b64digest();
+
+=head2 b64udigest
+
+ $result_b64url = $d->b64udigest();
 
 =head1 SEE ALSO
 
