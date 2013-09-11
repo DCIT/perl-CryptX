@@ -12,7 +12,7 @@ TODO:
             RSA: my $k = Crypt::PK::RSA->new; $k->generate_key(256, 65537);
         - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
 
-0.013_1 2013/09/11
+0.014   2013/09/XXX
         - Crypt::Digest::NNN + Crypt::Mac::NNN - can produce Base64-URL-Safe encoded digest/mac
         - Crypt::PRNG + Crypt::PRNG::NNN - Base64-URL-Safe encoded random bytes (random_bytes_b64u/bytes_b64u)
         - Crypt::PK::RSA/DSA/DH/ECC - sign/verify replaced by sign_message/verify_message + sign_hash/verify_hash
