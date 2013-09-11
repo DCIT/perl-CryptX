@@ -202,17 +202,61 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
 
 =head2 dh_encrypt
 
+DH based encryption. See method L</encrypt> below.
+
+ my $ct = dh_encrypt($pub_key_filename, $message);
+ #or
+ my $ct = dh_encrypt(\$buffer_containing_pub_key, $message);
+
 =head2 dh_decrypt
 
+DH based decryption. See method L</decrypt> below.
+
+ my $pt = dh_decrypt($priv_key_filename, $ciphertext);
+ #or
+ my $pt = dh_decrypt(\$buffer_containing_priv_key, $ciphertext);
+
 =head2 dh_sign_message
+
+Generate DH signature. See method L</sign_message> below.
+
+ my $sig = dh_sign_message($priv_key_filename, $message);
+ #or
+ my $sig = dh_sign_message(\$buffer_containing_priv_key, $message);
+ #or
+ my $sig = dh_sign_message($priv_key, $message, $hash_name);
+
+=head2 dh_verify_message
+
+Verify DH signature. See method L</verify_message> below.
+
+ dh_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
+ #or
+ dh_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
+ #or
+ dh_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
+
+=head2 dh_sign_hash
+
+Generate DH signature. See method L</sign_hash> below.
+
+ my $sig = dh_sign_hash($priv_key_filename, $message_hash);
+ #or
+ my $sig = dh_sign_hash(\$buffer_containing_priv_key, $message_hash);
 
 =head2 dh_verify_hash
 
-=head2 dh_sign_message
+Verify DH signature. See method L</verify_hash> below.
 
-=head2 dh_verify_hash
+ dh_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
+ #or
+ dh_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
 
 =head2 dh_shared_secret
+
+DH based shared secret generation. See method L</shared_secret> below.
+
+ my $shared_secret = dh_shared_secret('Alice_priv_dh1.der', 'Bob_pub_dh1.der');
 
 =head1 METHODS
 
@@ -255,15 +299,41 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 encrypt
 
+ my $pk = Crypt::PK::DH->new($pub_key_filename);
+ my $ct = $pk->encrypt($message);
+
 =head2 decrypt
+
+ my $pk = Crypt::PK::DH->new($priv_key_filename);
+ my $pt = $pk->decrypt($ciphertext);
 
 =head2 sign_message
 
+ my $pk = Crypt::PK::DH->new($priv_key_filename);
+ my $signature = $priv->sign_message($message);
+ #or
+ my $signature = $priv->sign_message($message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+
 =head2 verify_message
+
+ my $pk = Crypt::PK::DH->new($pub_key_filename);
+ my $valid = $pub->verify_message($signature, $message)
+ #or
+ my $valid = $pub->verify_message($signature, $message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
 
 =head2 sign_hash
 
+ my $pk = Crypt::PK::DH->new($priv_key_filename);
+ my $signature = $priv->sign_hash($message_hash);
+
 =head2 verify_hash
+
+ my $pk = Crypt::PK::DH->new($pub_key_filename);
+ my $valid = $pub->verify_hash($signature, $message_hash);
 
 =head2 shared_secret
 

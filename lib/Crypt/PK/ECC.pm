@@ -214,31 +214,61 @@ all of the Diffie-Hellman routines (ECDH).
 
 Elliptic Curve Diffie-Hellman (ECDH) encryption.
 
-ECCDH Encryption is performed by producing a random key, hashing it, and XOR'ing the digest against the plaintext.
+ECCDH Encryption is performed by producing a random key, hashing it, and XOR'ing the digest against the plaintext. See method L</encrypt> below.
+
+ my $ct = ecc_encrypt($pub_key_filename, $message);
+ #or
+ my $ct = ecc_encrypt(\$buffer_containing_pub_key, $message);
 
 =head2 ecc_decrypt
 
-Elliptic Curve Diffie-Hellman (ECDH) decryption
+Elliptic Curve Diffie-Hellman (ECDH) decryption. See method L</decrypt> below.
+
+ my $pt = ecc_decrypt($priv_key_filename, $ciphertext);
+ #or
+ my $pt = ecc_decrypt(\$buffer_containing_priv_key, $ciphertext);
 
 =head2 ecc_sign_message
 
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation. See method L</sign_message> below.
+
+ my $sig = ecc_sign_message($priv_key_filename, $message);
+ #or
+ my $sig = ecc_sign_message(\$buffer_containing_priv_key, $message);
+ #or
+ my $sig = ecc_sign_message($priv_key, $message, $hash_name);
 
 =head2 ecc_verify_message
 
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification. See method L</verify_message> below.
+
+ ecc_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
+ #or
+ ecc_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
+ #or
+ ecc_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
 
 =head2 ecc_sign_hash
 
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation. See method L</sign_hash> below.
+
+ my $sig = ecc_sign_hash($priv_key_filename, $message_hash);
+ #or
+ my $sig = ecc_sign_hash(\$buffer_containing_priv_key, $message_hash);
 
 =head2 ecc_verify_hash
 
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification
+Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification. See method L</verify_hash> below.
+
+ ecc_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
+ #or
+ ecc_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
 
 =head2 ecc_shared_secret
 
-Elliptic curve Diffie-Hellman (ECDH) - construct a Diffie-Hellman shared secret with a private and public ECC key.
+Elliptic curve Diffie-Hellman (ECDH) - construct a Diffie-Hellman shared secret with a private and public ECC key. See method L</shared_secret> below.
+
+ my $shared_secret = ecc_shared_secret('Alice_priv_ecc1.der', 'Bob_pub_ecc1.der');
 
 =head1 METHODS
 
@@ -294,15 +324,41 @@ ANSI X9.63 Export (public key only)
 
 =head2 encrypt
 
+ my $pk = Crypt::PK::ECC->new($pub_key_filename);
+ my $ct = $pk->encrypt($message);
+
 =head2 decrypt
+
+ my $pk = Crypt::PK::ECC->new($priv_key_filename);
+ my $pt = $pk->decrypt($ciphertext);
 
 =head2 sign_message
 
+ my $pk = Crypt::PK::ECC->new($priv_key_filename);
+ my $signature = $priv->sign_message($message);
+ #or
+ my $signature = $priv->sign_message($message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+
 =head2 verify_message
+
+ my $pk = Crypt::PK::ECC->new($pub_key_filename);
+ my $valid = $pub->verify_message($signature, $message)
+ #or
+ my $valid = $pub->verify_message($signature, $message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
 
 =head2 sign_hash
 
+ my $pk = Crypt::PK::ECC->new($priv_key_filename);
+ my $signature = $priv->sign_hash($message_hash);
+
 =head2 verify_hash
+
+ my $pk = Crypt::PK::ECC->new($pub_key_filename);
+ my $valid = $pub->verify_hash($signature, $message_hash);
 
 =head2 shared_secret
 
