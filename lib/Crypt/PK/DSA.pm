@@ -209,14 +209,21 @@ Uses Yarrow-based cryptographically strong random number generator seeded with
 random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
  $pk->generate_key($group_size, $modulus_size);
- # $group_size  ... 15 < $group_size < 1024
- # $modulus_size .. ($modulus_size - $group_size) < 512
+ # $group_size  ... in bytes .. 15 < $group_size < 1024
+ # $modulus_size .. in bytes .. ($modulus_size - $group_size) < 512
  
- # Bits of Security  $group_size  $modulus_size
- # 80                20           128
- # 120               30           256
- # 140               35           384
- # 160               40           512
+ ### Bits of Security according to libtomcrypt documentation
+ # 80 bits   => generate_key(20, 128)
+ # 120 bits  => generate_key(30, 256)
+ # 140 bits  => generate_key(35, 384)
+ # 160 bits  => generate_key(40, 512)
+ 
+ ### Sizes according section 4.2 of FIPS 186-4
+ # (L and N are the bit lengths of p and q respectively)
+ # L = 1024, N = 160 => generate_key(20, 128)
+ # L = 2048, N = 224 => generate_key(28, 256)
+ # L = 2048, N = 256 => generate_key(32, 256)
+ # L = 3072, N = 256 => generate_key(32, 384)
 
 =head2 import_key
 
