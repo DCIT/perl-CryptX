@@ -371,7 +371,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
  my $hash = $pk->key2hash;
  
- returns hash like this (or undef if no key loaded):
+ # returns hash like this (or undef if no key loaded):
  {
    type => 1,  # integer: 1 .. private, 0 .. public
    # all the rest are hex strings  
