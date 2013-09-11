@@ -268,7 +268,11 @@ Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification. See
 
 Elliptic curve Diffie-Hellman (ECDH) - construct a Diffie-Hellman shared secret with a private and public ECC key. See method L</shared_secret> below.
 
+ #on Alice side
  my $shared_secret = ecc_shared_secret('Alice_priv_ecc1.der', 'Bob_pub_ecc1.der');
+ 
+ #on Bob side
+ my $shared_secret = ecc_shared_secret('Bob_priv_ecc1.der', 'Alice_pub_ecc1.der');
 
 =head1 METHODS
 

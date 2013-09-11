@@ -65,7 +65,7 @@ int
 size_q(Crypt::PK::DSA self)
     CODE:
         if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
-        RETVAL = ltc_mp.unsigned_size(self->key.q);
+        RETVAL = self->key.qord;
     OUTPUT:
         RETVAL
 
