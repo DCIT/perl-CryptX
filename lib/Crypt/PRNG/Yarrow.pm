@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw(random_bytes random_bytes_hex random_bytes_b64 random_string random_string_from rand irand)] );
+our %EXPORT_TAGS = ( all => [qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand)] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -23,6 +23,7 @@ use base 'Crypt::PRNG';
   sub random_bytes       { return $fetch_RNG->()->bytes(@_) }
   sub random_bytes_hex   { return $fetch_RNG->()->bytes_hex(@_) }
   sub random_bytes_b64   { return $fetch_RNG->()->bytes_b64(@_) }
+  sub random_bytes_b64u  { return $fetch_RNG->()->bytes_b64u(@_) }
   sub random_string_from { return $fetch_RNG->()->string_from(@_) }
   sub random_string      { return $fetch_RNG->()->string(@_) }
 }
@@ -44,6 +45,7 @@ Crypt::PRNG::Yarrow - Cryptographically secure PRNG based on Yarrow algorithm
    $octets = random_bytes(45);
    $hex_string = random_bytes_hex(45);
    $base64_string = random_bytes_b64(45);
+   $base64url_string = random_bytes_b64u(45);
    $alphanumeric_string = random_string(30);
    $string = random_string_from('ACGT', 64);
    $floating_point_number_0_to_1 = rand;
@@ -60,6 +62,7 @@ Crypt::PRNG::Yarrow - Cryptographically secure PRNG based on Yarrow algorithm
    $octets = $prng->bytes(45);
    $hex_string = $prng->bytes_hex(45);
    $base64_string = $prng->bytes_b64(45);
+   $base64url_string = $prng->bytes_b64u(45);
    $alphanumeric_string = $prng->string(30);
    $string = $prng->string_from('ACGT', 64);
    $floating_point_number_0_to_1 = rand;
@@ -80,6 +83,8 @@ All methods and functions are the same as for L<Crypt::PRNG>.
 
 =head2 random_bytes_b64
 
+=head2 random_bytes_b64u
+
 =head2 random_string
 
 =head2 random_string_from
@@ -97,6 +102,8 @@ All methods and functions are the same as for L<Crypt::PRNG>.
 =head2 bytes_hex
 
 =head2 bytes_b64
+
+=head2 bytes_b64u
 
 =head2 string
 

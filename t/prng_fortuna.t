@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::PRNG::Fortuna qw(random_bytes random_bytes_hex random_bytes_b64 random_string random_string_from rand irand);
+use Crypt::PRNG::Fortuna qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand);
 
 my $r = Crypt::PRNG::Fortuna->new();
 ok($r, 'new');
@@ -53,14 +53,16 @@ ok($r, 'new');
   like($r->string(45), qr/^[A-Z-a-z0-9]+$/, 'string');
   like($r->string_from("ABC,.-", 45), qr/^[ABC,\,\.\-]+$/, 'string');
   is(length $r->bytes(55), 55, "bytes");
-  is(length $r->bytes_hex(55), 110, "bytes_hex");
-  is(length $r->bytes_b64(60), 80, "bytes_b64");
+  like($r->bytes_hex(55),  qr/^[0-9A-Fa-f]{110}$/,    "bytes_hex");
+  like($r->bytes_b64(60),  qr/^[A-Za-z0-9+\/=]{80}$/, "bytes_b64");
+  like($r->bytes_b64u(60), qr/^[A-Za-z0-9_-]{80}$/,   "bytes_b64u");
   
   like(random_string(45), qr/^[A-Z-a-z0-9]+$/, 'string');
   like(random_string_from("ABC,.-", 45), qr/^[ABC,\,\.\-]+$/, 'string');
   is(length random_bytes(55), 55, "bytes");
-  is(length random_bytes_hex(55), 110, "bytes_hex");
-  is(length random_bytes_b64(60), 80, "bytes_b64");
+  like(random_bytes_hex(55),  qr/^[0-9A-Fa-f]{110}$/,    "bytes_hex");
+  like(random_bytes_b64(60),  qr/^[A-Za-z0-9+\/=]{80}$/, "bytes_b64");
+  like(random_bytes_b64u(60), qr/^[A-Za-z0-9_-]{80}$/,   "bytes_b64u");
 }
 
 done_testing;

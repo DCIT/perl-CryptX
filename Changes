@@ -15,6 +15,7 @@ TODO:
 
 0.014   2013/09/XXX
         - Crypt::Digest::NNN and Crypt::Mac::NNN now can produce Base64-URL-Safe encoded digest/mac
+        - Crypt::PRNG and Crypt::PRNG::NNN now can produce Base64-URL-Safe encoded random bytes (random_bytes_b64u/bytes_b64u)
 
 0.013   2013/08/28
         - DSA/RSA/ECC/DH - importing keys from string changed - now: $pk->import_key(\$buffer_with_key)

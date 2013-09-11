@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw(random_bytes random_bytes_hex random_bytes_b64 random_string random_string_from rand irand)] );
+our %EXPORT_TAGS = ( all => [qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand)] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use MIME::Base64 qw(encode_base64);
+use MIME::Base64 qw(encode_base64 encode_base64url);
 
 sub _trans_prng_name {
   my $name = shift;
@@ -34,6 +34,8 @@ sub double { return shift->_double($$, shift) }
 sub bytes_hex { return unpack("H*", shift->bytes(shift)) }
 
 sub bytes_b64 { return encode_base64(shift->bytes(shift), "") }
+
+sub bytes_b64u { return encode_base64url(shift->bytes(shift), "") }
 
 sub string {
   my ($self, $len) = @_;
@@ -83,6 +85,7 @@ sub CLONE_SKIP { 1 } # prevent cloning
   sub random_bytes       { return $fetch_RNG->()->bytes(@_) }
   sub random_bytes_hex   { return $fetch_RNG->()->bytes_hex(@_) }
   sub random_bytes_b64   { return $fetch_RNG->()->bytes_b64(@_) }
+  sub random_bytes_b64u  { return $fetch_RNG->()->bytes_b64u(@_) }
   sub random_string_from { return $fetch_RNG->()->string_from(@_) }
   sub random_string      { return $fetch_RNG->()->string(@_) }
 }
@@ -98,11 +101,13 @@ Crypt::PRNG - Cryptographically secure random number generator
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::PRNG qw(random_bytes random_bytes_hex random_bytes_b64 random_string random_string_from rand irand);
+   use Crypt::PRNG qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u
+                      random_string random_string_from rand irand);
 
    $octets = random_bytes(45);
    $hex_string = random_bytes_hex(45);
    $base64_string = random_bytes_b64(45);
+   $base64url_string = random_bytes_b64u(45);
    $alphanumeric_string = random_string(30);
    $string = random_string_from('ACGT', 64);
    $floating_point_number_0_to_1 = rand;
@@ -121,6 +126,7 @@ Crypt::PRNG - Cryptographically secure random number generator
    $octets = $prng->bytes(45);
    $hex_string = $prng->bytes_hex(45);
    $base64_string = $prng->bytes_b64(45);
+   $base64url_string = $prng->bytes_b64u(45);
    $alphanumeric_string = $prng->string(30);
    $string = $prng->string_from('ACGT', 64);
    $floating_point_number_0_to_1 = $prng->double;
@@ -150,6 +156,12 @@ Returns C<$length> random octects encoded as hexadecimal string.
    $base64_string = random_bytes_b64($length);
 
 Returns C<$length> random octects Base64 encoded.
+
+=head2 random_bytes_b64u
+
+   $base64url_string = random_bytes_b64u($length);
+
+Returns C<$length> random octects Base64 URL Safe (RFC 4648 section 5) encoded.
 
 =head2 random_string_from
 
@@ -223,6 +235,12 @@ See L<random_bytes_hex|/random_bytes_hex>
    $base64_string = $prng->bytes_b64($length);
 
 See L<random_bytes_b64|/random_bytes_b64>
+
+=head2 bytes_b64u
+
+   $base64url_string = $prng->bytes_b64u($length);
+
+See L<random_bytes_b64u|/random_bytes_b64u>
 
 =head2 string
 
