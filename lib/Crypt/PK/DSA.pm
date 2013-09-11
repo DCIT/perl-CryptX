@@ -72,32 +72,38 @@ sub decrypt {
   return $self->_decrypt($data);
 }
 
+sub _truncate {
+  my ($self, $hash) = @_;
+  ### section 4.6 of FIPS 186-4
+  # let N be the bit length of q
+  # z = the leftmost min(N, outlen) bits of Hash(M).
+  my $q = $self->size_q; # = size in bytes
+  return $hash if $q >= length($hash);
+  return substr($hash, 0, $q);
+}
+
 sub sign_message {
   my ($self, $data, $hash_name) = @_;
   $hash_name ||= 'SHA1';
   my $data_hash = digest_data($hash_name, $data);
-  #XXX truncation
-  return $self->_sign($data_hash);
+  return $self->_sign($self->_truncate($data_hash));
 }
 
 sub sign_hash {
   my ($self, $data_hash) = @_;
-  #XXX truncation
-  return $self->_sign($data_hash);
+  return $self->_sign($self->_truncate($data_hash));
 }
 
 sub verify_message {
   my ($self, $sig, $data, $hash_name) = @_;
   $hash_name ||= 'SHA1';
   my $data_hash = digest_data($hash_name, $data);
-  #XXX truncation
-  return $self->_verify($sig, $data_hash);
+  return $self->_verify($sig, $self->_truncate($data_hash));
 }
 
 sub verify_hash {
   my ($self, $sig, $data_hash) = @_;
-  #XXX truncation
-  return $self->_verify($sig, $data_hash);
+  return $self->_verify($sig, $self->_truncate($data_hash));
 }
 
 ### FUNCTIONS
@@ -360,3 +366,19 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
  my $size = $pk->is_private;
  # returns key size in bytes or undef if no key loaded
+
+=head2 key2hash
+
+ my $hash = $pk->key2hash;
+ 
+ returns hash like this (or undef if no key loaded):
+ {
+   type => 1,  # integer: 1 .. private, 0 .. public
+   qord => 30, # integer: order of the sub-group
+   # all the rest are hex strings  
+   g => "847E8896D12C9BF18FE283AE7AD58ED7F3...", #generator
+   p => "AAF839A764E04D80824B79FA1F0496C093...", #prime used to generate the sub-group
+   q => "D05C4CB45F29D353442F1FEC43A6BE2BE8...", #large prime that generats the field the contains the sub-group
+   x => "6C801901AC74E2DC714D75A9F6969483CF...", #private key
+   y => "8F7604D77FA62C7539562458A63C7611B7...", #public key
+ }

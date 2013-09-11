@@ -4,6 +4,7 @@
 
 #undef LTC_SOURCE
 #include "tomcrypt.h"
+#include "tommath.h"
 
 typedef struct cipher_struct {          /* used by Crypt::Cipher */
   symmetric_key skey;

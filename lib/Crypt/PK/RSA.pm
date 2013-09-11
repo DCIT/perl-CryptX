@@ -432,3 +432,21 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
  my $size = $pk->is_private;
  # returns key size in bytes or undef if no key loaded
+
+=head2 key2hash
+
+ my $hash = $pk->key2hash;
+ 
+ returns hash like this (or undef if no key loaded):
+ {
+   type => 1,  # integer: 1 .. private, 0 .. public
+   # all the rest are hex strings  
+   e  => "10001", #public exponent
+   d  => "9ED5C3D3F866E06957CA0E9478A273C39BBDA4EEAC5B...", #private exponent
+   N  => "D0A5CCCAE03DF9C2F5C4C8C0CE840D62CDE279990DC6...", #modulus
+   p  => "D3EF0028FFAB508E2773C659E428A80FB0E9211346B4...", #p factor of N
+   q  => "FC07E46B163CAB6A83B8E467D169534B2077DCDEECAE...", #q factor of N
+   qP => "88C6D406F833DF73C8B734548E0385261AD51F4187CF...", #1/q mod p CRT param
+   dP => "486F142FEF0A1F53269AC43D2EE4D263E2841B60DA36...", #d mod (p - 1) CRT param
+   dQ => "4597284B2968B72C4212DB7E8F24360B987B80514DA9...", #d mod (q - 1) CRT param
+ }

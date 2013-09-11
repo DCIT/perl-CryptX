@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::PK::DSA qw(dsa_encrypt dsa_decrypt dsa_sign dsa_verify);
+use Crypt::PK::DSA qw(dsa_encrypt dsa_decrypt dsa_sign_message dsa_verify_message);
 
 {
   my $k;
@@ -68,9 +68,9 @@ use Crypt::PK::DSA qw(dsa_encrypt dsa_decrypt dsa_sign dsa_verify);
   ok(length $ct > 200, 'encrypt ' . length($ct));
   is($pt, "secret message", 'decrypt');
  
-  my $sig = $pr1->sign("message");
+  my $sig = $pr1->sign_message("message");
   ok(length $sig > 60, 'sign ' . length($sig));
-  ok($pu1->verify($sig, "message"), 'verify');
+  ok($pu1->verify_message($sig, "message"), 'verify');
  
   my $pr2 = Crypt::PK::DSA->new;
   $pr2->import_key('t/data/cryptx_priv_dsa2.der');
@@ -98,9 +98,9 @@ use Crypt::PK::DSA qw(dsa_encrypt dsa_decrypt dsa_sign dsa_verify);
   ok($ct, 'dsa_encrypt');
   my $pt = dsa_decrypt('t/data/cryptx_priv_dsa1.der', $ct);
   ok($pt, 'dsa_decrypt');
-  my $sig = dsa_sign('t/data/cryptx_priv_dsa1.der', 'test string');
-  ok($sig, 'dsa_sign');
-  ok(dsa_verify('t/data/cryptx_pub_dsa1.der', $sig, 'test string'), 'dsa_verify');
+  my $sig = dsa_sign_message('t/data/cryptx_priv_dsa1.der', 'test string');
+  ok($sig, 'dsa_sign_message');
+  ok(dsa_verify_message('t/data/cryptx_pub_dsa1.der', $sig, 'test string'), 'dsa_verify_message');
 }
 
 done_testing;

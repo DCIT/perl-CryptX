@@ -61,6 +61,85 @@ size(Crypt::PK::DSA self)
     OUTPUT:
         RETVAL
 
+int
+size_q(Crypt::PK::DSA self)
+    CODE:
+        if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
+        RETVAL = ltc_mp.unsigned_size(self->key.q);
+    OUTPUT:
+        RETVAL
+
+SV*
+key2hash(Crypt::PK::DSA self)
+    INIT:
+        HV *rv_hash;
+        unsigned char buf[20001];
+    CODE:
+        if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
+        rv_hash = newHV();
+        /* =====> g */
+        if (ltc_mp.unsigned_size(self->key.g)>10000) {
+          croak("FATAL: key2hash failed - 'g' too big number");        
+        }
+        if (ltc_mp.unsigned_size(self->key.g)>0) {
+          mp_tohex(self->key.g, buf);
+          hv_store(rv_hash, "g", 1, newSVpv(buf, strlen(buf)), 0);
+        }
+        else{
+          hv_store(rv_hash, "g", 1, newSVpv("", 0), 0);
+        }
+        /* =====> q */
+        if (ltc_mp.unsigned_size(self->key.q)>10000) {
+          croak("FATAL: key2hash failed - 'q' too big number");        
+        }
+        if (ltc_mp.unsigned_size(self->key.q)>0) {
+          mp_tohex(self->key.q, buf);
+          hv_store(rv_hash, "q", 1, newSVpv(buf, strlen(buf)), 0);
+        }
+        else{
+          hv_store(rv_hash, "q", 1, newSVpv("", 0), 0);
+        }
+        /* =====> p */
+        if (ltc_mp.unsigned_size(self->key.p)>10000) {
+          croak("FATAL: key2hash failed - 'p' too big number");        
+        }
+        if (ltc_mp.unsigned_size(self->key.p)>0) {
+          mp_tohex(self->key.p, buf);
+          hv_store(rv_hash, "p", 1, newSVpv(buf, strlen(buf)), 0);
+        }
+        else{
+          hv_store(rv_hash, "p", 1, newSVpv("", 0), 0);
+        }
+        /* =====> x */
+        if (ltc_mp.unsigned_size(self->key.x)>10000) {
+          croak("FATAL: key2hash failed - 'x' too big number");        
+        }
+        if (ltc_mp.unsigned_size(self->key.x)>0) {
+          mp_tohex(self->key.x, buf);
+          hv_store(rv_hash, "x", 1, newSVpv(buf, strlen(buf)), 0);
+        }
+        else{
+          hv_store(rv_hash, "x", 1, newSVpv("", 0), 0);
+        }
+        /* =====> y */
+        if (ltc_mp.unsigned_size(self->key.y)>10000) {
+          croak("FATAL: key2hash failed - 'y' too big number");        
+        }
+        if (ltc_mp.unsigned_size(self->key.y)>0) {
+          mp_tohex(self->key.y, buf);
+          hv_store(rv_hash, "y", 1, newSVpv(buf, strlen(buf)), 0);
+        }
+        else{
+          hv_store(rv_hash, "y", 1, newSVpv("", 0), 0);
+        }
+        /* =====> qord */
+        hv_store(rv_hash, "qord", 4, newSViv(self->key.qord), 0);
+        /* =====> type */
+        hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
+        RETVAL = newRV_noinc((SV*)rv_hash);
+    OUTPUT:
+        RETVAL
+
 SV *
 export_key_der(Crypt::PK::DSA self, char * type)
     CODE:
