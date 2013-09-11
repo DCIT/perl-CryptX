@@ -3,19 +3,19 @@ Changes for CryptX
 TODO:
         - consider: RSA->check_key, RSA password protected keys
         - consider: PK->encrypt|decrypt ... add $armour param and make it compatible with Crypt::RSA
-        - maybe add xxx_b64url alternatives (e.g. sha1_b64url ...)
         - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - croak when mode does not call start_(en|de)crypt
         - make random_string faster (implement in XS)
-        - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
         - solaris failure: http://ppm4.activestate.com/sun4-solaris/5.14/1400/M/MI/MIK/CryptX-0.011.d/log-20130615T021640.txt
         - solaris failure: http://ppm4.activestate.com/sun4-solaris/5.12/1200/M/MI/MIK/CryptX-0.012.d/log-20130617T182847.txt (after rsa.t ok 29 - verify, dsa.t ok 27 - decrypt)
-          DSA: my $sig = $pr1->sign("message");
-          RSA: my $k = Crypt::PK::RSA->new; $k->generate_key(256, 65537);
+            DSA: my $sig = $pr1->sign("message");
+            RSA: my $k = Crypt::PK::RSA->new; $k->generate_key(256, 65537);
+        - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
 
-0.014   2013/09/XXX
+0.014   2013/09/11
         - Crypt::Digest::NNN and Crypt::Mac::NNN now can produce Base64-URL-Safe encoded digest/mac
-        - Crypt::PRNG and Crypt::PRNG::NNN now can produce Base64-URL-Safe encoded random bytes (random_bytes_b64u/bytes_b64u)
+        - Crypt::PRNG and Crypt::PRNG::NNN Base64-URL-Safe encoded random bytes (random_bytes_b64u/bytes_b64u)
+        - documentation fixes
 
 0.013   2013/08/28
         - DSA/RSA/ECC/DH - importing keys from string changed - now: $pk->import_key(\$buffer_with_key)
