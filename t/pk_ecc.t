@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign ecc_verify ecc_shared_secret);
+use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_shared_secret);
 
 {
   my $k;
@@ -52,9 +52,9 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign ecc_verify ecc_shared_sec
   ok(length $ct > 100, 'encrypt ' . length($ct));
   is($pt, "secret message", 'decrypt');
  
-  my $sig = $pr1->sign("message");
+  my $sig = $pr1->sign_message("message");
   ok(length $sig > 60, 'sign ' . length($sig));
-  ok($pu1->verify($sig, "message"), 'verify');
+  ok($pu1->verify_message($sig, "message"), 'verify');
  
   my $pr2 = Crypt::PK::ECC->new;
   $pr2->import_key('t/data/cryptx_priv_ecc2.der');
@@ -82,9 +82,9 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign ecc_verify ecc_shared_sec
   ok($ct, 'ecc_encrypt');
   my $pt = ecc_decrypt('t/data/cryptx_priv_ecc1.der', $ct);
   ok($pt, 'ecc_decrypt');
-  my $sig = ecc_sign('t/data/cryptx_priv_ecc1.der', 'test string');
-  ok($sig, 'ecc_sign');
-  ok(ecc_verify('t/data/cryptx_pub_ecc1.der', $sig, 'test string'), 'ecc_verify');
+  my $sig = ecc_sign_message('t/data/cryptx_priv_ecc1.der', 'test string');
+  ok($sig, 'ecc_sign_message');
+  ok(ecc_verify_message('t/data/cryptx_pub_ecc1.der', $sig, 'test string'), 'ecc_verify_message');
   
   my $ss1 = ecc_shared_secret('t/data/cryptx_priv_ecc1.der', 't/data/cryptx_pub_ecc2.der');
   my $ss2 = ecc_shared_secret('t/data/cryptx_priv_ecc2.der', 't/data/cryptx_pub_ecc1.der');

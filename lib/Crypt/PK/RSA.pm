@@ -439,7 +439,8 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  
  # returns hash like this (or undef if no key loaded):
  {
-   type => 1,  # integer: 1 .. private, 0 .. public
+   type => 1,   # integer: 1 .. private, 0 .. public
+   size => 256, # integer: key size in bytes
    # all the rest are hex strings  
    e  => "10001", #public exponent
    d  => "9ED5C3D3F866E06957CA0E9478A273C39BBDA4EEAC5B...", #private exponent

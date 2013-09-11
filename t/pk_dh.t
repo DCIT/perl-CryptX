@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::PK::DH qw(dh_encrypt dh_decrypt dh_sign dh_verify dh_shared_secret);
+use Crypt::PK::DH qw(dh_encrypt dh_decrypt dh_sign_message dh_verify_message dh_shared_secret);
 
 {
   my $k;
@@ -36,9 +36,9 @@ use Crypt::PK::DH qw(dh_encrypt dh_decrypt dh_sign dh_verify dh_shared_secret);
   ok(length $ct > 100, 'encrypt ' . length($ct));
   is($pt, "secret message", 'decrypt');
  
-  my $sig = $pr1->sign("message");
+  my $sig = $pr1->sign_message("message");
   ok(length $sig > 60, 'sign ' . length($sig));
-  ok($pu1->verify($sig, "message"), 'verify');
+  ok($pu1->verify_message($sig, "message"), 'verify');
  
   my $pr2 = Crypt::PK::DH->new;
   $pr2->import_key('t/data/cryptx_priv_dh2.bin');
@@ -64,9 +64,9 @@ use Crypt::PK::DH qw(dh_encrypt dh_decrypt dh_sign dh_verify dh_shared_secret);
   ok($ct, 'dh_encrypt');
   my $pt = dh_decrypt('t/data/cryptx_priv_dh1.bin', $ct);
   ok($pt, 'dh_decrypt');
-  my $sig = dh_sign('t/data/cryptx_priv_dh1.bin', 'test string');
-  ok($sig, 'dh_sign');
-  ok(dh_verify('t/data/cryptx_pub_dh1.bin', $sig, 'test string'), 'dh_verify');
+  my $sig = dh_sign_message('t/data/cryptx_priv_dh1.bin', 'test string');
+  ok($sig, 'dh_sign_message');
+  ok(dh_verify_message('t/data/cryptx_pub_dh1.bin', $sig, 'test string'), 'dh_verify_message');
   
   my $ss1 = dh_shared_secret('t/data/cryptx_priv_dh1.bin', 't/data/cryptx_pub_dh2.bin');
   my $ss2 = dh_shared_secret('t/data/cryptx_priv_dh2.bin', 't/data/cryptx_pub_dh1.bin');

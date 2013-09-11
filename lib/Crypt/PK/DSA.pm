@@ -89,16 +89,16 @@ sub sign_message {
   return $self->_sign($self->_truncate($data_hash));
 }
 
-sub sign_hash {
-  my ($self, $data_hash) = @_;
-  return $self->_sign($self->_truncate($data_hash));
-}
-
 sub verify_message {
   my ($self, $sig, $data, $hash_name) = @_;
   $hash_name ||= 'SHA1';
   my $data_hash = digest_data($hash_name, $data);
   return $self->_verify($sig, $self->_truncate($data_hash));
+}
+
+sub sign_hash {
+  my ($self, $data_hash) = @_;
+  return $self->_sign($self->_truncate($data_hash));
 }
 
 sub verify_hash {
@@ -373,7 +373,8 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  
  # returns hash like this (or undef if no key loaded):
  {
-   type => 1,  # integer: 1 .. private, 0 .. public
+   type => 1,   # integer: 1 .. private, 0 .. public
+   size => 256, # integer: key size in bytes
    # all the rest are hex strings  
    p => "AAF839A764E04D80824B79FA1F0496C093...", #prime modulus
    q => "D05C4CB45F29D353442F1FEC43A6BE2BE8...", #prime divisor

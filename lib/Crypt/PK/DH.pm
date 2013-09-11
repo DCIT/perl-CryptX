@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( dh_encrypt dh_decrypt dh_sign dh_verify dh_shared_secret )] );
+our %EXPORT_TAGS = ( all => [qw( dh_encrypt dh_decrypt dh_sign_message dh_verify_message dh_sign_hash dh_verify_hash dh_shared_secret )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use Crypt::Digest;
+use Crypt::Digest 'digest_data';
 use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
 
@@ -55,14 +55,28 @@ sub decrypt {
   return $self->_decrypt($data);
 }
 
-sub sign {
-  my ($self, $data) = @_;  
-  return $self->_sign($data);
+sub sign_message {
+  my ($self, $data, $hash_name) = @_;
+  $hash_name ||= 'SHA1';
+  my $data_hash = digest_data($hash_name, $data);
+  return $self->_sign($data_hash);
 }
 
-sub verify {
-  my ($self, $sig, $data) = @_;  
-  return $self->_verify($sig, $data);
+sub verify_message {
+  my ($self, $sig, $data, $hash_name) = @_;
+  $hash_name ||= 'SHA1';
+  my $data_hash = digest_data($hash_name, $data);
+  return $self->_verify($sig, $data_hash);
+}
+
+sub sign_hash {
+  my ($self, $data_hash) = @_;
+  return $self->_sign($data_hash);
+}
+
+sub verify_hash {
+  my ($self, $sig, $data_hash) = @_;  
+  return $self->_verify($sig, $data_hash);
 }
 
 ### FUNCTIONS
@@ -81,18 +95,32 @@ sub dh_decrypt {
   return $key->decrypt(@_);
 }
 
-sub dh_sign {
+sub dh_sign_message {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
-  return $key->sign(@_);
+  return $key->sign_message(@_);
 }
 
-sub dh_verify {
+sub dh_verify_message {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__; 
-  return $key->verify(@_);
+  return $key->verify_message(@_);
+}
+
+sub dh_sign_hash {
+  my $key = shift;
+  $key = __PACKAGE__->new($key) unless ref $key;
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
+  return $key->sign_hash(@_);
+}
+
+sub dh_verify_hash {
+  my $key = shift;
+  $key = __PACKAGE__->new($key) unless ref $key;
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__; 
+  return $key->verify_hash(@_);
 }
 
 sub dh_shared_secret {
@@ -138,11 +166,11 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
   
  #Signature: Alice
  my $priv = Crypt::PK::DH->new('Alice_priv_dh1.der');
- my $sig = $priv->sign($message);
+ my $sig = $priv->sign_message($message);
  #
  #Signature: Bob (received $message + $sig)
  my $pub = Crypt::PK::DH->new('Alice_pub_dh1.der');
- $pub->verify($sig, $message) or die "ERROR";
+ $pub->verify_message($sig, $message) or die "ERROR";
  
  #Shared secret
  my $priv = Crypt::PK::DH->new('Alice_priv_dh1.der');
@@ -163,9 +191,9 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
  my $pt = dh_decrypt('Bob_priv_dh1.der', $ct);
   
  #Signature: Alice
- my $sig = dh_sign('Alice_priv_dh1.der', $message);
+ my $sig = dh_sign_message('Alice_priv_dh1.der', $message);
  #Signature: Bob (received $message + $sig)
- dh_verify('Alice_pub_dh1.der', $sig, $message) or die "ERROR";
+ dh_verify_message('Alice_pub_dh1.der', $sig, $message) or die "ERROR";
  
  #Shared secret
  my $shared_secret = dh_shared_secret('Alice_priv_dh1.der', 'Bob_pub_dh1.der');
@@ -176,9 +204,13 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
 
 =head2 dh_decrypt
 
-=head2 dh_sign
+=head2 dh_sign_message
 
-=head2 dh_verify
+=head2 dh_verify_hash
+
+=head2 dh_sign_message
+
+=head2 dh_verify_hash
 
 =head2 dh_shared_secret
 
@@ -225,9 +257,13 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 decrypt
 
-=head2 sign
+=head2 sign_message
 
-=head2 verify
+=head2 verify_message
+
+=head2 sign_hash
+
+=head2 verify_hash
 
 =head2 shared_secret
 
@@ -243,5 +279,25 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 is_private
 
+ my $rv = $pk->is_private;
+ # 1 .. private key loaded
+ # 0 .. public key loaded
+ # undef .. no key loaded
+
 =head2 size
 
+ my $size = $pk->is_private;
+ # returns key size in bytes or undef if no key loaded
+
+=head2 key2hash
+
+ my $hash = $pk->key2hash;
+ 
+ # returns hash like this (or undef if no key loaded):
+ {
+   type => 0,
+   size => 256,
+   name => "DH-2048",
+   x => "FBC1062F73B9A17BB8473A2F5A074911FA7F20D28FB...",
+   y => "AB9AAA40774D3CD476B52F82E7EE2D8A8D40CD88BF4...",
+}
