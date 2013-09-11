@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign rsa_verify);
+use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_message rsa_sign_hash rsa_verify_hash);
 
 {
   my $k;
@@ -68,9 +68,9 @@ use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign rsa_verify);
   ok(length $ct > 200, 'encrypt ' . length($ct));
   is($pt, "secret message", 'decrypt');
  
-  my $sig = $pr1->sign("message");
+  my $sig = $pr1->sign_message("message");
   ok(length $sig > 60, 'sign ' . length($sig));
-  ok($pu1->verify($sig, "message"), 'verify');
+  ok($pu1->verify_message($sig, "message"), 'verify');
 }
 
 {
@@ -89,9 +89,9 @@ use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign rsa_verify);
   ok($ct, 'rsa_encrypt');
   my $pt = rsa_decrypt('t/data/cryptx_priv_rsa1.der', $ct, 'none');
   ok($pt, 'rsa_decrypt');
-  my $sig = rsa_sign('t/data/cryptx_priv_rsa1.der', 'test string');
-  ok($sig, 'rsa_sign');
-  ok(rsa_verify('t/data/cryptx_pub_rsa1.der', $sig, 'test string'), 'rsa_verify');
+  my $sig = rsa_sign_message('t/data/cryptx_priv_rsa1.der', 'test string');
+  ok($sig, 'rsa_sign_message');
+  ok(rsa_verify_message('t/data/cryptx_pub_rsa1.der', $sig, 'test string'), 'rsa_verify_message');
 }
 
 done_testing;

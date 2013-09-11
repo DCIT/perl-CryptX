@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our %EXPORT_TAGS = ( all => [qw( rsa_encrypt rsa_decrypt rsa_sign rsa_verify )] );
+our %EXPORT_TAGS = ( all => [qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_message rsa_sign_hash rsa_verify_hash)] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use Crypt::Digest;
+use Crypt::Digest 'digest_data';
 use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
 
@@ -84,8 +84,8 @@ sub decrypt {
   return $self->_decrypt($data, $padding, $hash_name, $lparam);
 }
 
-sub sign {
-  my ($self, $data, $padding, $hash_name, $saltlen) = @_;
+sub sign_hash {
+  my ($self, $data, $hash_name, $padding, $saltlen) = @_;
   $saltlen ||= 12;
   $padding ||= 'pss';
   $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
@@ -93,13 +93,31 @@ sub sign {
   return $self->_sign($data, $padding, $hash_name, $saltlen);
 }
 
-sub verify {
-  my ($self, $sig, $data, $padding, $hash_name, $saltlen) = @_;
+sub sign_message {
+  my ($self, $data, $hash_name, $padding, $saltlen) = @_;
+  $saltlen ||= 12;
+  $padding ||= 'pss';
+  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
+  
+  return $self->_sign(digest_data($hash_name, $data), $padding, $hash_name, $saltlen);
+}
+
+sub verify_hash {
+  my ($self, $sig, $data, $hash_name, $padding, $saltlen) = @_;
   $saltlen ||= 12;
   $padding ||= 'pss';
   $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
   
   return $self->_verify($sig, $data, $padding, $hash_name, $saltlen);
+}
+
+sub verify_message {
+  my ($self, $sig, $data, $hash_name, $padding, $saltlen) = @_;
+  $saltlen ||= 12;
+  $padding ||= 'pss';
+  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
+  
+  return $self->_verify($sig, digest_data($hash_name, $data), $padding, $hash_name, $saltlen);
 }
 
 ### FUNCTIONS
@@ -118,18 +136,32 @@ sub rsa_decrypt {
   return $key->decrypt(@_);
 }
 
-sub rsa_sign {
+sub rsa_sign_hash {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
-  return $key->sign(@_);
+  return $key->sign_hash(@_);
 }
 
-sub rsa_verify {
+sub rsa_verify_hash {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__; 
-  return $key->verify(@_);
+  return $key->verify_hash(@_);
+}
+
+sub rsa_sign_message {
+  my $key = shift;
+  $key = __PACKAGE__->new($key) unless ref $key;
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
+  return $key->sign_message(@_);
+}
+
+sub rsa_verify_message {
+  my $key = shift;
+  $key = __PACKAGE__->new($key) unless ref $key;
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__; 
+  return $key->verify_message(@_);
 }
 
 sub _slurp_file {
@@ -166,11 +198,11 @@ Crypt::PK::RSA - Public key cryptography based on RSA
   
  #Signature: Alice
  my $priv = Crypt::PK::RSA->new('Alice_priv_rsa1.der');
- my $sig = $priv->sign($message);
+ my $sig = $priv->sign_message($message);
  #
  #Signature: Bob (received $message + $sig)
  my $pub = Crypt::PK::RSA->new('Alice_pub_rsa1.der');
- $pub->verify($sig, $message) or die "ERROR";
+ $pub->verify_message($sig, $message) or die "ERROR";
  
  #Key generation
  my $pk = Crypt::PK::RSA->new();
@@ -188,15 +220,15 @@ Crypt::PK::RSA - Public key cryptography based on RSA
  my $pt = rsa_decrypt('Bob_priv_rsa1.der', $ct);
   
  #Signature: Alice
- my $sig = rsa_sign('Alice_priv_rsa1.der', $message);
+ my $sig = rsa_sign_message('Alice_priv_rsa1.der', $message);
  #Signature: Bob (received $message + $sig)
- rsa_verify('Alice_pub_rsa1.der', $sig, $message) or die "ERROR";
+ rsa_verify_message('Alice_pub_rsa1.der', $sig, $message) or die "ERROR";
  
 =head1 FUNCTIONS
 
 =head2 rsa_encrypt
 
-See method L<encrypt> below.
+See method L</encrypt> below.
 
  my $ct = rsa_encrypt($pub_key_filename, $message);
  #or
@@ -208,7 +240,7 @@ See method L<encrypt> below.
 
 =head2 rsa_decrypt
 
-See method L<decrypt> below.
+See method L</decrypt> below.
 
  my $pt = rsa_decrypt($priv_key_filename, $ciphertext);
  #or
@@ -218,33 +250,61 @@ See method L<decrypt> below.
  #or
  my $pt = rsa_decrypt($priv_key, $ciphertext, 'oaep', $hash_name, $lparam);
 
-=head2 rsa_sign
+=head2 rsa_sign_message
 
-See method L<sign> below.
+See method L</sign_message> below.
 
- my $sig = rsa_sign($priv_key_filename, $message);
+ my $sig = rsa_sign_message($priv_key_filename, $message);
  #or
- my $sig = rsa_sign(\$buffer_containing_priv_key, $message);
+ my $sig = rsa_sign_message(\$buffer_containing_priv_key, $message);
  #or
- my $sig = rsa_sign($priv_key, $message, $padding);
+ my $sig = rsa_sign_message($priv_key, $message, $hash_name);
  #or
- my $sig = rsa_sign($priv_key, $message, $padding, $hash_name);
+ my $sig = rsa_sign_message($priv_key, $message, $hash_name, $padding);
  #or
- my $sig = rsa_sign($priv_key, $message, 'pss', $hash_name, $saltlen);
+ my $sig = rsa_sign_message($priv_key, $message, $hash_name, 'pss', $saltlen);
 
-=head2 rsa_verify
+=head2 rsa_verify_message
 
-See method L<verify> below.
+See method L</verify_message> below.
 
- rsa_verify($pub_key_filename, $signature, $message) or die "ERROR";
+ rsa_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
  #or
- rsa_verify(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
+ rsa_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
  #or
- rsa_verify($pub_key, $signature, $message, $padding) or die "ERROR";
+ rsa_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
  #or
- rsa_verify($pub_key, $signature, $message, $padding, $hash_name) or die "ERROR";
+ rsa_verify_message($pub_key, $signature, $message, $hash_name, $padding) or die "ERROR";
  #or
- rsa_verify($pub_key, $signature, $message, 'pss', $hash_name, $saltlen) or die "ERROR";
+ rsa_verify_message($pub_key, $signature, $message, $hash_name, 'pss', $saltlen) or die "ERROR";
+
+=head2 rsa_sign_hash
+
+See method L</sign_hash> below.
+
+ my $sig = rsa_sign_hash($priv_key_filename, $message_hash);
+ #or
+ my $sig = rsa_sign_hash(\$buffer_containing_priv_key, $message);
+ #or
+ my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name);
+ #or
+ my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name, $padding);
+ #or
+ my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name, 'pss', $saltlen);
+
+=head2 rsa_verify_hash
+
+See method L</verify_hash> below.
+
+ rsa_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
+ #or
+ rsa_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
+ #or
+ rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name) or die "ERROR";
+ #or
+ rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name, $padding) or die "ERROR";
+ #or
+ rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name, 'pss', $saltlen) or die "ERROR";
 
 =head1 METHODS
 
@@ -307,33 +367,59 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  
  #NOTE: $padding, $hash_name, $lparam - see encrypt method
 
-=head2 sign
+=head2 sign_message
 
  my $pk = Crypt::PK::RSA->new($priv_key_filename);
- my $signature = $priv->sign($message);
+ my $signature = $priv->sign_message($message);
  #or
- my $signature = $priv->sign($message, $padding);
+ my $signature = $priv->sign_message($message, $hash_name);
  #or
- my $signature = $priv->sign($message, $padding, $hash_name);
+ my $signature = $priv->sign_message($message, $hash_name, $padding);
  #or
- my $signature = $priv->sign($message, 'pss', $hash_name, $saltlen);
+ my $signature = $priv->sign_message($message, $hash_name, 'pss', $saltlen);
  
+ # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
  # $padding ................. 'pss' (DEFAULT) or 'v1.5'
- # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' (any hash supported by Crypt::Digest)
  # $saltlen (only for pss) .. DEFAULT is 12
 
-=head2 verify
+=head2 sign_hash
+
+ my $pk = Crypt::PK::RSA->new($priv_key_filename);
+ my $signature = $priv->sign_hash($message_hash);
+ #or
+ my $signature = $priv->sign_hash($message_hash, $hash_name);
+ #or
+ my $signature = $priv->sign_hash($message_hash, $hash_name, $padding);
+ #or
+ my $signature = $priv->sign_hash($message_hash, $hash_name, 'pss', $saltlen);
+ 
+ #NOTE: $hash_name, $padding, $saltlen - see sign_message method
+
+=head2 verify_message
 
  my $pk = Crypt::PK::RSA->new($pub_key_filename);
- my $valid = $pub->verify($signature, $message)
+ my $valid = $pub->verify_message($signature, $message)
  #or
- my $valid = $pub->verify($signature, $message, $padding)
+ my $valid = $pub->verify_message($signature, $message, $padding)
  #or
- my $valid = $pub->verify($signature, $message, $padding, $hash_name);
+ my $valid = $pub->verify_message($signature, $message, $padding, $hash_name);
  #or
- my $valid = $pub->verify($signature, $message, 'pss', $hash_name, $saltlen);
+ my $valid = $pub->verify_message($signature, $message, 'pss', $hash_name, $saltlen);
  
- #NOTE: $padding, $hash_name, $saltlen - see sign method
+ #NOTE: $hash_name, $padding, $saltlen - see sign_message method
+
+=head2 verify_hash
+
+ my $pk = Crypt::PK::RSA->new($pub_key_filename);
+ my $valid = $pub->verify_hash($signature, $message)
+ #or
+ my $valid = $pub->verify_hash($signature, $message, $padding)
+ #or
+ my $valid = $pub->verify_hash($signature, $message, $padding, $hash_name);
+ #or
+ my $valid = $pub->verify_hash($signature, $message, 'pss', $hash_name, $saltlen);
+ 
+ #NOTE: $hash_name, $padding, $saltlen - see sign_message method
 
 =head2 is_private
 

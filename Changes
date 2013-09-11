@@ -2,7 +2,7 @@ Changes for CryptX
 
 TODO:
         - consider: RSA->check_key, RSA password protected keys
-        - consider: PK->encrypt|decrypt ... add $armour param and make it compatible with Crypt::RSA
+        - consider: PK->encrypt|decrypt ... add 'armour' param and make it compatible with Crypt::RSA
         - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - croak when mode does not call start_(en|de)crypt
         - make random_string faster (implement in XS)
@@ -13,8 +13,9 @@ TODO:
         - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
 
 0.014   2013/09/11
-        - Crypt::Digest::NNN and Crypt::Mac::NNN now can produce Base64-URL-Safe encoded digest/mac
-        - Crypt::PRNG and Crypt::PRNG::NNN Base64-URL-Safe encoded random bytes (random_bytes_b64u/bytes_b64u)
+        - Crypt::Digest::NNN + Crypt::Mac::NNN - can produce Base64-URL-Safe encoded digest/mac
+        - Crypt::PRNG + Crypt::PRNG::NNN - Base64-URL-Safe encoded random bytes (random_bytes_b64u/bytes_b64u)
+        - Crypt::PK::RSA - sign/verify replaced by sign_message/verify_message + sign_hash/verify_hash
         - documentation fixes
 
 0.013   2013/08/28
