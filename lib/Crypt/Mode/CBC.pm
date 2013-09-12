@@ -57,7 +57,7 @@ This module implements CBC cipher mode. B<NOTE:> it works only with ciphers from
  #               1 PKCS5 padding, Crypt::CBC's "standard" - DEFAULT
  #               2 Crypt::CBC's "oneandzeroes"
  # $cipher_rounds ... optional num of rounds for given cipher
- 
+
 =head2 encrypt
 
    my $ciphertext = $m->encrypt($plaintext, $key, $iv);

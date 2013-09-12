@@ -44,15 +44,15 @@ sub string {
 
 sub string_from {
   my ($self, $chars, $len) = @_;
-  
+
   $len = 20 unless defined $len;
   return unless $len>0;
-  
+
   my @ch = split(//, $chars);
   my $max_index = scalar(@ch)-1;
-  
+
   my $mask;
-  for my $n (1..31) { 
+  for my $n (1..31) {
     $mask = (1<<$n) - 1;
     last if $mask >= $max_index;
   }
@@ -79,7 +79,7 @@ sub CLONE_SKIP { 1 } # prevent cloning
   my $fetch_RNG = sub { # Lazily, instantiate the RNG object, but only once.
     $RNG_object = Crypt::PRNG->new unless defined $RNG_object && ref($RNG_object) ne 'SCALAR';
     return $RNG_object;
-  }; 
+  };
   sub rand               { return $fetch_RNG->()->double(@_) }
   sub irand              { return $fetch_RNG->()->int32() }
   sub random_bytes       { return $fetch_RNG->()->bytes(@_) }
@@ -122,7 +122,7 @@ Crypt::PRNG - Cryptographically secure random number generator
    $prng = Crypt::PRNG->new("RC4");
    #or
    $prng = Crypt::PRNG->new("RC4", "some data used for seeding PRNG");
-   
+
    $octets = $prng->bytes(45);
    $hex_string = $prng->bytes_hex(45);
    $base64_string = $prng->bytes_b64(45);
@@ -217,7 +217,7 @@ If C<$seed> is not specified the PRNG is automatically seeded with 32bytes rando
 If called without parameter it uses 32bytes random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 B<BEWARE:> you probably do not need this function at all as the module does automatic seeding on initialization as well as reseeding after fork and thread creation.
-    
+
 =head2 bytes
 
    $octets = $prng->bytes($length);
@@ -259,7 +259,7 @@ See L<random_string_from|/random_string_from>
 =head2 double
 
    $n = $prng->double;
-   #or   
+   #or
    $n = $prng->double($limit);
 
 See L<rand|/rand>

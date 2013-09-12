@@ -50,7 +50,7 @@ This module implements CFB cipher mode. B<NOTE:> it works only with ciphers from
  my $m = Crypt::Mode::CFB->new('AES', $cipher_rounds);
 
  # $cipher_rounds ... optional num of rounds for given cipher
- 
+
 =head2 encrypt
 
    my $ciphertext = $m->encrypt($plaintext, $key, $iv);

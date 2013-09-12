@@ -26,7 +26,7 @@ Crypt::Cipher::RC6 - Symetric cipher RC6, key size: 64-1024 bits (Crypt::CBC com
 
   ### example 1
   use Crypt::Mode::CBC;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('RC6');
@@ -35,7 +35,7 @@ Crypt::Cipher::RC6 - Symetric cipher RC6, key size: 64-1024 bits (Crypt::CBC com
   ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::RC6;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::RC6', -key=>$key, -iv=>$iv );

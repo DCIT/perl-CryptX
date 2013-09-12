@@ -438,12 +438,12 @@ Loads private or public key in DER or PEM format (password protected keys are no
 =head2 key2hash
 
  my $hash = $pk->key2hash;
- 
+
  # returns hash like this (or undef if no key loaded):
  {
    type => 1,   # integer: 1 .. private, 0 .. public
    size => 256, # integer: key size in bytes
-   # all the rest are hex strings  
+   # all the rest are hex strings
    e  => "10001", #public exponent
    d  => "9ED5C3D3F866E06957CA0E9478A273C39BBDA4EEAC5B...", #private exponent
    N  => "D0A5CCCAE03DF9C2F5C4C8C0CE840D62CDE279990DC6...", #modulus

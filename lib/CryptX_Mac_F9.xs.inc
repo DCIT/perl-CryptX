@@ -8,7 +8,7 @@ _new(char * cipher_name, SV * key)
     {
         STRLEN k_len=0;
         unsigned char *k=NULL;
-        int rv;        
+        int rv;
         int id;
 
         id = find_cipher(cipher_name);
@@ -48,7 +48,7 @@ _add_single(Crypt::Mac::F9 self, SV * data)
         STRLEN in_data_len;
         unsigned char *in_data;
 
-        in_data = (unsigned char *)SvPVbyte(data, in_data_len);        
+        in_data = (unsigned char *)SvPVbyte(data, in_data_len);
         if (in_data_len>0) {
           rv = f9_process(&self->state, in_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) croak("FATAL: f9_process failed: %s", error_to_string(rv));
@@ -86,7 +86,7 @@ b64mac(Crypt::Mac::F9 self)
         if (rv != CRYPT_OK) croak("FATAL: f9_done failed: %s", error_to_string(rv));
         outlen = sizeof(mac_base64);
         rv = base64_encode(mac, mac_len, (unsigned char*)mac_base64, &outlen);
-        if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));         
+        if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
         RETVAL = newSVpvn(mac_base64, outlen);
     }
     OUTPUT:
@@ -107,7 +107,7 @@ b64umac(Crypt::Mac::F9 self)
         if (rv != CRYPT_OK) croak("FATAL: f9_done failed: %s", error_to_string(rv));
         outlen = sizeof(mac_base64);
         rv = base64url_encode(mac, mac_len, (unsigned char*)mac_base64, &outlen);
-        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));         
+        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
         RETVAL = newSVpvn(mac_base64, outlen);
     }
     OUTPUT:

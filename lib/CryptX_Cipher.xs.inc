@@ -11,10 +11,10 @@ _new(cipher_name, key, rounds=0)
         unsigned char *key_data=NULL;
         int rv;
         int id;
-        
+
         if (!SvPOK (key)) croak("FATAL: key must be string scalar");
         key_data = (unsigned char *)SvPVbyte(key, key_len);
-        
+
         id = find_cipher(cipher_name);
         if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
@@ -125,10 +125,10 @@ _block_length_by_name(cipher_name)
     CODE:
     {
         int rv, id;
-        
+
         id = find_cipher(cipher_name);
         if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
-        
+
         rv = cipher_descriptor[id].block_length;
         if (!rv) XSRETURN_UNDEF;
         RETVAL = rv;
@@ -142,10 +142,10 @@ _min_key_length_by_name(cipher_name)
     CODE:
     {
         int rv, id;
-        
+
         id = find_cipher(cipher_name);
         if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
-        
+
         rv = cipher_descriptor[id].min_key_length;
         if (!rv) XSRETURN_UNDEF;
         RETVAL = rv;
@@ -159,10 +159,10 @@ _max_key_length_by_name(cipher_name)
     CODE:
     {
         int rv, id;
-        
+
         id = find_cipher(cipher_name);
         if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
-        
+
         rv = cipher_descriptor[id].max_key_length;
         if (!rv) XSRETURN_UNDEF;
         RETVAL = rv;
@@ -176,10 +176,10 @@ _default_rounds_by_name(cipher_name)
     CODE:
     {
         int rv, id;
-        
+
         id = find_cipher(cipher_name);
         if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
-        
+
         rv = cipher_descriptor[id].default_rounds;
         if (!rv) XSRETURN_UNDEF;
         RETVAL = rv;

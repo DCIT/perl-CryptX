@@ -57,7 +57,7 @@ sub hashsize {
   }
   else {
     my $pkg = shift;
-    unshift @_, ($pkg eq 'Crypt::Digest' ? _trans_digest_name(shift) : _trans_digest_name($pkg));  
+    unshift @_, ($pkg eq 'Crypt::Digest' ? _trans_digest_name(shift) : _trans_digest_name($pkg));
     ###return _hashsize_by_name(@_);
     goto \&_hashsize_by_name;             # keep the real caller for croak()
   }
@@ -65,24 +65,24 @@ sub hashsize {
 
 sub addfile {
   my ($self, $file) = @_;
-  
+
   my $handle;
   if (ref(\$file) eq 'SCALAR') {        #filename
     open($handle, "<", $file) || croak "FATAL: cannot open '$file': $!";
     binmode($handle);
   }
-  else {                                #handle    
+  else {                                #handle
     $handle = $file
-  }  
+  }
   croak "FATAL: invalid handle" unless defined $handle;
-  
+
   my $n;
   my $buf = "";
   while (($n = read($handle, $buf, 32*1024))) {
     $self->add($buf)
   }
   croak "FATAL: read failed: $!" unless defined $n;
-  
+
   return $self;
 }
 
@@ -120,12 +120,12 @@ Crypt::Digest - Generic interface to hash/digest functions
    ### Functional interface:
    use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u
                          digest_file digest_file_hex digest_file_b64 digest_file_b64u );
-   
+
    # calculate digest from string/buffer
    $digest_raw  = digest_data('SHA1', 'data string');
    $digest_hex  = digest_data_hex('SHA1', 'data string');
-   $digest_b64  = digest_data_b64('SHA1', 'data string');  
-   $digest_b64u = digest_data_b64u('SHA1', 'data string');  
+   $digest_b64  = digest_data_b64('SHA1', 'data string');
+   $digest_b64u = digest_data_b64u('SHA1', 'data string');
    # calculate digest from file
    $digest_raw  = digest_file('SHA1', 'filename.dat');
    $digest_hex  = digest_file_hex('SHA1', 'filename.dat');
@@ -134,12 +134,12 @@ Crypt::Digest - Generic interface to hash/digest functions
    # calculate digest from filehandle
    $digest_raw  = digest_file('SHA1', *FILEHANDLE);
    $digest_hex  = digest_file_hex('SHA1', *FILEHANDLE);
-   $digest_b64  = digest_file_b64('SHA1', *FILEHANDLE);   
-   $digest_b64u = digest_file_b64u('SHA1', *FILEHANDLE);   
+   $digest_b64  = digest_file_b64('SHA1', *FILEHANDLE);
+   $digest_b64u = digest_file_b64u('SHA1', *FILEHANDLE);
 
    ### OO interface:
    use Crypt::Digest;
-   
+
    $d = Crypt::Digest->new('SHA1');
    $d->add('any data');
    $d->addfile('filename.dat');
@@ -148,7 +148,7 @@ Crypt::Digest - Generic interface to hash/digest functions
    $result_hex  = $d->hexdigest;  # hexadecimal form
    $result_b64  = $d->b64digest;  # Base64 form
    $result_b64u = $d->b64udigest; # Base64 URL Safe form
- 
+
 =head1 DESCRIPTION
 
 Provides an interface to various hash/digest algorithms.
@@ -161,19 +161,19 @@ You can export selected functions:
 
   use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u
                         digest_file digest_file_hex digest_file_b64 digest_file_b64u );
-  
+
 Or all of them at once:
 
   use Crypt::Digest ':all';
- 
+
 =head1 FUNCTIONS
 
 Please note that all functions take as its first argument the algoritm name, supported values are:
 
- 'CHAES', 'MD2', 'MD4', 'MD5', 'RIPEMD128', 'RIPEMD160', 
+ 'CHAES', 'MD2', 'MD4', 'MD5', 'RIPEMD128', 'RIPEMD160',
  'RIPEMD256', 'RIPEMD320', 'SHA1', 'SHA224', 'SHA256',
  'SHA384', 'SHA512', 'Tiger192', 'Whirlpool'
- 
+
  (simply any <FUNCNAME> for which there is Crypt::Digest::<FUNCNAME> module)
 
 =head2 digest_data
@@ -181,7 +181,7 @@ Please note that all functions take as its first argument the algoritm name, sup
 Logically joins all arguments into a single string, and returns its SHA1 digest encoded as a binary string.
 
  $digest_raw = digest_data('SHA1', 'data string');
- #or 
+ #or
  $digest_raw = digest_data('SHA1', 'any data', 'more data', 'even more data');
 
 =head2 digest_data_hex
@@ -189,7 +189,7 @@ Logically joins all arguments into a single string, and returns its SHA1 digest 
 Logically joins all arguments into a single string, and returns its SHA1 digest encoded as a hexadecimal string.
 
  $digest_hex = digest_data_hex('SHA1', 'data string');
- #or 
+ #or
  $digest_hex = digest_data_hex('SHA1', 'any data', 'more data', 'even more data');
 
 =head2 digest_data_b64
@@ -197,7 +197,7 @@ Logically joins all arguments into a single string, and returns its SHA1 digest 
 Logically joins all arguments into a single string, and returns its SHA1 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
  $digest_b64 = digest_data_b64('SHA1', 'data string');
- #or 
+ #or
  $digest_b64 = digest_data_b64('SHA1', 'any data', 'more data', 'even more data');
 
 =head2 digest_data_b64u
@@ -205,7 +205,7 @@ Logically joins all arguments into a single string, and returns its SHA1 digest 
 Logically joins all arguments into a single string, and returns its SHA1 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
  $digest_b64url = digest_data_b64u('SHA1', 'data string');
- #or 
+ #or
  $digest_b64url = digest_data_b64u('SHA1', 'any data', 'more data', 'even more data');
 
 =head2 digest_file
@@ -234,7 +234,7 @@ Reads file (defined by filename or filehandle) content, and returns its digest e
  #or
  $digest_b64 = digest_file_b64('SHA1', *FILEHANDLE);
 
-=head2 digest_file_b64u 
+=head2 digest_file_b64u
 
 Reads file (defined by filename or filehandle) content, and returns its digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
@@ -249,8 +249,8 @@ Reads file (defined by filename or filehandle) content, and returns its digest e
 Constructor, returns a reference to the digest object.
 
  $d = Crypt::Digest->new($name);
- # $name could be: 'CHAES', 'MD2', 'MD4', 'MD5', 'RIPEMD128', 'RIPEMD160', 
- #                 'RIPEMD256', 'RIPEMD320', 'SHA1', 'SHA224', 'SHA256', 
+ # $name could be: 'CHAES', 'MD2', 'MD4', 'MD5', 'RIPEMD128', 'RIPEMD160',
+ #                 'RIPEMD256', 'RIPEMD320', 'SHA1', 'SHA224', 'SHA256',
  #                 'SHA384', 'SHA512', 'Tiger192', 'Whirlpool'
  #
  # simply any <FUNCNAME> for which there is Crypt::Digest::<FUNCNAME> module
@@ -275,12 +275,12 @@ The return value is the digest object itself.
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
- 
+
 Note that all the following cases are equivalent:
 
  # case 1
  $d->add('aa', 'bb', 'cc');
- 
+
  # case 2
  $d->add('aa');
  $d->add('bb');

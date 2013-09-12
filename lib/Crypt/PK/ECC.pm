@@ -13,7 +13,7 @@ use Crypt::Digest 'digest_data';
 use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
 
-sub new { 
+sub new {
   my ($class, $f) = @_;
   my $self = _new();
   $self->import_key($f) if $f;
@@ -50,12 +50,12 @@ sub import_key {
 
 sub encrypt {
   my ($self, $data, $hash_name) = @_;
-  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');  
+  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
   return $self->_encrypt($data, $hash_name);
 }
 
 sub decrypt {
-  my ($self, $data) = @_; 
+  my ($self, $data) = @_;
   return $self->_decrypt($data);
 }
 
@@ -79,7 +79,7 @@ sub sign_hash {
 }
 
 sub verify_hash {
-  my ($self, $sig, $data_hash) = @_;  
+  my ($self, $sig, $data_hash) = @_;
   return $self->_verify($sig, $data_hash);
 }
 
@@ -95,35 +95,35 @@ sub ecc_encrypt {
 sub ecc_decrypt {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->decrypt(@_);
 }
 
 sub ecc_sign_message {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_message(@_);
 }
 
 sub ecc_verify_message {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__; 
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_message(@_);
 }
 
 sub ecc_sign_hash {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;  
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_hash(@_);
 }
 
 sub ecc_verify_hash {
   my $key = shift;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__; 
+  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_hash(@_);
 }
 
@@ -159,15 +159,15 @@ Crypt::PK::ECC - Public key cryptography based on EC
 =head1 SYNOPSIS
 
  ### OO interface
- 
+
  #Encryption: Alice
- my $pub = Crypt::PK::ECC->new('Bob_pub_ecc1.der'); 
+ my $pub = Crypt::PK::ECC->new('Bob_pub_ecc1.der');
  my $ct = $pub->encrypt("secret message");
  #
  #Encryption: Bob (received ciphertext $ct)
  my $priv = Crypt::PK::ECC->new('Bob_priv_ecc1.der');
  my $pt = $priv->decrypt($ct);
-  
+
  #Signature: Alice
  my $priv = Crypt::PK::ECC->new('Alice_priv_ecc1.der');
  my $sig = $priv->sign_message($message);
@@ -175,10 +175,10 @@ Crypt::PK::ECC - Public key cryptography based on EC
  #Signature: Bob (received $message + $sig)
  my $pub = Crypt::PK::ECC->new('Alice_pub_ecc1.der');
  $pub->verify_message($sig, $message) or die "ERROR";
- 
+
  #Shared secret
  my $priv = Crypt::PK::ECC->new('Alice_priv_ecc1.der');
- my $pub = Crypt::PK::ECC->new('Bob_pub_ecc1.der'); 
+ my $pub = Crypt::PK::ECC->new('Bob_pub_ecc1.der');
  my $shared_secret = $priv->shared_secret($pub);
 
  #Key generation
@@ -189,23 +189,23 @@ Crypt::PK::ECC - Public key cryptography based on EC
  my $public_ansi_x963 = $pk->export_key_x963();
 
  ### Functional interface
- 
+
  #Encryption: Alice
  my $ct = ecc_encrypt('Bob_pub_ecc1.der', "secret message");
  #Encryption: Bob (received ciphertext $ct)
  my $pt = ecc_decrypt('Bob_priv_ecc1.der', $ct);
-  
+
  #Signature: Alice
  my $sig = ecc_sign_message('Alice_priv_ecc1.der', $message);
  #Signature: Bob (received $message + $sig)
  ecc_verify_message('Alice_pub_ecc1.der', $sig, $message) or die "ERROR";
- 
+
  #Shared secret
  my $shared_secret = ecc_shared_secret('Alice_priv_ecc1.der', 'Bob_pub_ecc1.der');
 
 =head1 DESCRIPTION
 
-The module provides a set of core ECC functions as well that are designed to be the Elliptic Curve analogy of 
+The module provides a set of core ECC functions as well that are designed to be the Elliptic Curve analogy of
 all of the Diffie-Hellman routines (ECDH).
 
 =head1 FUNCTIONS
@@ -219,7 +219,7 @@ Elliptic Curve Diffie-Hellman (ECDH) encryption as implemented by libtomcrypt. S
  my $ct = ecc_encrypt(\$buffer_containing_pub_key, $message);
  #or
  my $ct = ecc_encrypt($pub_key_filename, $message, $hash_name);
- 
+
  #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 ECCDH Encryption is performed by producing a random key, hashing it, and XOR'ing the digest against the plaintext.
@@ -274,7 +274,7 @@ Elliptic curve Diffie-Hellman (ECDH) - construct a Diffie-Hellman shared secret 
 
  #on Alice side
  my $shared_secret = ecc_shared_secret('Alice_priv_ecc1.der', 'Bob_pub_ecc1.der');
- 
+
  #on Bob side
  my $shared_secret = ecc_shared_secret('Bob_priv_ecc1.der', 'Alice_pub_ecc1.der');
 
@@ -303,7 +303,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  #   32 => use curve P-256 recommended by FIPS 186-3
  #   48 => use curve P-384 recommended by FIPS 186-3
  #   65 => use curve P-521 recommended by FIPS 186-3
- 
+
 See L<http://csrc.nist.gov/publications/fips/fips186-3/fips_186-3.pdf> and L<http://www.secg.org/collateral/sec2_final.pdf>
 
 =head2 import_key
@@ -338,7 +338,7 @@ ANSI X9.63 Export (public key only)
  my $ct = $pk->encrypt($message);
  #or
  my $ct = $pk->encrypt($message, $hash_name);
- 
+
  #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 decrypt
@@ -401,7 +401,7 @@ ANSI X9.63 Export (public key only)
 =head2 key2hash
 
  my $hash = $pk->key2hash;
- 
+
  # returns hash like this (or undef if no key loaded):
  {
    type => 1,  # integer: 1 .. private, 0 .. public

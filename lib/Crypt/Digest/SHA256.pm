@@ -38,7 +38,7 @@ Crypt::Digest::SHA256 - Hash function SHA-256 [size: 256 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::SHA256 qw( sha256 sha256_hex sha256_b64 sha256_b64u 
+   use Crypt::Digest::SHA256 qw( sha256 sha256_hex sha256_b64 sha256_b64u
                                         sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u );
 
    # calculate digest from string/buffer

@@ -20,7 +20,7 @@ sub gcm_encrypt_authenticate {
   my $iv = shift;
   my $adata = shift;
   my $plaintext = shift;
-  
+
   my $m = Crypt::AuthEnc::GCM->new($cipher_name, $key);
   $m->iv_add($iv);
   $m->adata_add(defined $adata ? $adata : ''); #XXX-TODO if no aad we have to pass empty string
@@ -55,7 +55,7 @@ Crypt::AuthEnc::GCM - Authenticated encryption in GCM mode
 =head1 SYNOPSIS
 
  ### OO interface
- 
+
  # encrypt and authenticate
  my $ae = Crypt::AuthEnc::GCM->new("AES", $key);
  $ae->iv_add('data_iv1');
@@ -80,13 +80,13 @@ Crypt::AuthEnc::GCM - Authenticated encryption in GCM mode
 
  ### functional interface
  use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate gcm_decrypt_verify);
- 
+
  my ($ciphertext, $tag) = gcm_encrypt_authenticate('AES', $key, $iv, $adata, $plaintext);
  my $plaintext = gcm_decrypt_verify('AES', $key, $iv, $adata, $ciphertext, $tag);
- 
+
 =head1 DESCRIPTION
 
-Galois/Counter Mode (GCM) - provides encryption and authentication.  
+Galois/Counter Mode (GCM) - provides encryption and authentication.
 
 =head1 EXPORT
 
@@ -101,7 +101,7 @@ You can export selected functions:
 =head2 gcm_encrypt_authenticate
 
  my ($ciphertext, $tag) = gcm_encrypt_authenticate($cipher, $key, $iv, $adata, $plaintext);
- 
+
  # $cipher .. 'AES' or name of any other cipher with 16-byte block len
  # $key ..... AES key of proper length (128/192/256bits)
  # $iv ...... initial vector
@@ -110,7 +110,7 @@ You can export selected functions:
 =head2 gcm_decrypt_verify
 
  my $plaintext = gcm_decrypt_verify($cipher, $key, $iv, $adata, $ciphertext, $tag);
- 
+
  # on error returns undef
 
 =head1 METHODS
@@ -118,7 +118,7 @@ You can export selected functions:
 =head2 new
 
  my $ae = Crypt::AuthEnc::GCM->new($cipher, $key);
- 
+
  # $cipher .. 'AES' or name of any other cipher
  # $key ..... encryption key of proper length
 

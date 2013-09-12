@@ -221,7 +221,7 @@ DSA based encryption as implemented by libtomcrypt. See method L</encrypt> below
  my $ct = dsa_encrypt(\$buffer_containing_pub_key, $message);
  #or
  my $ct = dsa_encrypt($pub_key_filename, $message, $hash_name);
- 
+
  #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared DSA key is computed, and
@@ -329,7 +329,7 @@ Loads private or public key in DER or PEM format (password protected keys are no
  my $ct = $pk->encrypt($message);
  #or
  my $ct = $pk->encrypt($message, $hash_name);
- 
+
  #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 decrypt
@@ -380,12 +380,12 @@ Loads private or public key in DER or PEM format (password protected keys are no
 =head2 key2hash
 
  my $hash = $pk->key2hash;
- 
+
  # returns hash like this (or undef if no key loaded):
  {
    type => 1,   # integer: 1 .. private, 0 .. public
    size => 256, # integer: key size in bytes
-   # all the rest are hex strings  
+   # all the rest are hex strings
    p => "AAF839A764E04D80824B79FA1F0496C093...", #prime modulus
    q => "D05C4CB45F29D353442F1FEC43A6BE2BE8...", #prime divisor
    g => "847E8896D12C9BF18FE283AE7AD58ED7F3...", #generator of a subgroup of order q in GF(p)

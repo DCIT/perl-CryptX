@@ -72,7 +72,7 @@ Crypt::KeyDerivation - PBKDF1, PBKFD2 and HKDF key derivation functions
 
   ### HKDF & co.
   $derived_key3 = hkdf($keying_material, $salt, $hash_name, $len, $info);
-  $prk  = hkdf_extract($keying_material, $salt, $hash_name);  
+  $prk  = hkdf_extract($keying_material, $salt, $hash_name);
   $okm1 = hkdf_expand($prk, $hash_name, $len, $info);
 
 =head1 DESCRIPTION
@@ -100,7 +100,7 @@ B<BEWARE:> if you are not sure, do not use C<pbkdf1> but rather choose C<pbkdf2>
   $derived_key = pbkdf1($password, $salt, $iteration_count);
   #or
   $derived_key = pbkdf1($password, $salt);
-  
+
   # $password ......... input keying material  (password)
   # $salt ............. salt/nonce (expected length: 8)
   # $iteration_count .. optional, DEFAULT: 5000
@@ -116,7 +116,7 @@ B<BEWARE:> if you are not sure, do not use C<pbkdf1> but rather choose C<pbkdf2>
   $derived_key = pbkdf2($password, $salt, $iteration_count);
   #or
   $derived_key = pbkdf2($password, $salt);
-  
+
   # $password ......... input keying material (password)
   # $salt ............. salt/nonce
   # $iteration_count .. optional, DEFAULT: 5000
@@ -144,7 +144,7 @@ B<BEWARE:> if you are not sure, do not use C<pbkdf1> but rather choose C<pbkdf2>
   $prk  = hkdf_extract($password, $salt, $hash_name);
   #or
   $prk  = hkdf_extract($password, $salt, $hash_name);
-  
+
   # $password ... input keying material (password)
   # $salt ....... salt/nonce, if undef defaults to HashLen zero octets
   # $hash_name .. optional, DEFAULT: 'SHA256'

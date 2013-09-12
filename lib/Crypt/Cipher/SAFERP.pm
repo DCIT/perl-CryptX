@@ -26,7 +26,7 @@ Crypt::Cipher::SAFERP - Symetric cipher SAFER+, key size: 128/192/256 bits (Cryp
 
   ### example 1
   use Crypt::Mode::CBC;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('SAFERP');
@@ -35,7 +35,7 @@ Crypt::Cipher::SAFERP - Symetric cipher SAFER+, key size: 128/192/256 bits (Cryp
   ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::SAFERP;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::SAFERP', -key=>$key, -iv=>$iv );

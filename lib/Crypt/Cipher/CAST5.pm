@@ -26,7 +26,7 @@ Crypt::Cipher::CAST5 - Symetric cipher CAST5 (aka CAST-128), key size: 40-128 bi
 
   ### example 1
   use Crypt::Mode::CBC;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('CAST5');
@@ -35,7 +35,7 @@ Crypt::Cipher::CAST5 - Symetric cipher CAST5 (aka CAST-128), key size: 40-128 bi
   ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::CAST5;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::CAST5', -key=>$key, -iv=>$iv );

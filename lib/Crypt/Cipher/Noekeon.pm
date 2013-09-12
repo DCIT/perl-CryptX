@@ -26,7 +26,7 @@ Crypt::Cipher::Noekeon - Symetric cipher Noekeon, key size: 128 bits (Crypt::CBC
 
   ### example 1
   use Crypt::Mode::CBC;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('Noekeon');
@@ -35,7 +35,7 @@ Crypt::Cipher::Noekeon - Symetric cipher Noekeon, key size: 128 bits (Crypt::CBC
   ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::Noekeon;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::Noekeon', -key=>$key, -iv=>$iv );

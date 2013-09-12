@@ -16,7 +16,7 @@ sub add {
 
 sub addfile {
   my ($self, $file) = @_;
-  
+
   my $handle;
   if (ref(\$file) eq 'SCALAR') {
     #filename
@@ -26,16 +26,16 @@ sub addfile {
   else {
     #handle
     $handle = $file
-  }  
+  }
   die "FATAL: invalid handle" unless defined $handle;
-  
+
   my $n;
   my $buf = "";
   while (($n = read($handle, $buf, 32*1024))) {
     $self->_add_single($buf)
   }
   die "FATAL: read failed: $!" unless defined $n;
-  
+
   return $self;
 }
 

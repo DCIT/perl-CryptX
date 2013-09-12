@@ -38,7 +38,7 @@ Crypt::Digest::MD2 - Hash function MD2 [size: 128 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::MD2 qw( md2 md2_hex md2_b64 md2_b64u 
+   use Crypt::Digest::MD2 qw( md2 md2_hex md2_b64 md2_b64u
                                         md2_file md2_file_hex md2_file_b64 md2_file_b64u );
 
    # calculate digest from string/buffer

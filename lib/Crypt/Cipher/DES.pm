@@ -26,7 +26,7 @@ Crypt::Cipher::DES - Symetric cipher DES, key size: 64[56] bits (Crypt::CBC comp
 
   ### example 1
   use Crypt::Mode::CBC;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('DES');
@@ -35,7 +35,7 @@ Crypt::Cipher::DES - Symetric cipher DES, key size: 64[56] bits (Crypt::CBC comp
   ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::DES;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::DES', -key=>$key, -iv=>$iv );

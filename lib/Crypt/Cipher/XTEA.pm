@@ -26,7 +26,7 @@ Crypt::Cipher::XTEA - Symetric cipher XTEA, key size: 128 bits (Crypt::CBC compl
 
   ### example 1
   use Crypt::Mode::CBC;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('XTEA');
@@ -35,7 +35,7 @@ Crypt::Cipher::XTEA - Symetric cipher XTEA, key size: 128 bits (Crypt::CBC compl
   ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::XTEA;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::XTEA', -key=>$key, -iv=>$iv );

@@ -30,7 +30,7 @@ sub eax_encrypt_authenticate {
   my $nonce = shift;
   my $header = shift;
   my $plaintext = shift;
-  
+
   my $m = Crypt::AuthEnc::EAX->new($cipher_name, $key, $nonce);
   $m->header_add($header) if defined $header;
   my $ct = $m->encrypt_add($plaintext);
@@ -65,7 +65,7 @@ Crypt::AuthEnc::EAX - Authenticated encryption in EAX mode
 
  ### example 1
  use Crypt::AuthEnc::EAX;
- 
+
  # encrypt + authenticate
  my $ae = Crypt::AuthEnc::EAX->new("AES", $key, $nonce);
  $ae->header_add('headerdata part1');
@@ -90,13 +90,13 @@ Crypt::AuthEnc::EAX - Authenticated encryption in EAX mode
 
  ### example 2
  use Crypt::AuthEnc::EAX qw(eax_encrypt_authenticate eax_decrypt_verify);
- 
+
  my ($ciphertext, $tag) = eax_encrypt_authenticate('AES', $key, $nonce, $header, $plaintext);
  my $plaintext = eax_decrypt_verify('AES', $key, $nonce, $header, $ciphertext, $tag);
 
 =head1 DESCRIPTION
 
-EAX is a mode that requires a cipher, CTR and OMAC support and provides encryption and authentication.  
+EAX is a mode that requires a cipher, CTR and OMAC support and provides encryption and authentication.
 It is initialized with a random nonce that can be shared publicly, a header which can be fixed and public,
 and a random secret symmetric key.
 
@@ -113,7 +113,7 @@ You can export selected functions:
 =head2 eax_encrypt_authenticate
 
  my ($ciphertext, $tag) = eax_encrypt_authenticate($cipher, $key, $nonce, $header, $plaintext);
- 
+
  # $cipher .. 'AES' or name of any other cipher with 16-byte block len
  # $key ..... AES key of proper length (128/192/256bits)
  # $nonce ... unique nonce/salt (no need to keep it secret)
@@ -122,7 +122,7 @@ You can export selected functions:
 =head2 eax_decrypt_verify
 
   my $plaintext = eax_decrypt_verify($cipher, $key, $nonce, $header, $ciphertext, $tag);
-  
+
   # on error returns undef
 
 =head1 METHODS
@@ -132,7 +132,7 @@ You can export selected functions:
  my $ae = Crypt::AuthEnc::EAX->new($cipher, $key, $nonce);
  #or
  my $ae = Crypt::AuthEnc::EAX->new($cipher, $key, $nonce, $header);
- 
+
  # $cipher .. 'AES' or name of any other cipher with 16-byte block len
  # $key ..... AES key of proper length (128/192/256bits)
  # $nonce ... unique nonce/salt (no need to keep it secret)

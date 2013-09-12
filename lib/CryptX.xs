@@ -206,7 +206,7 @@ BOOT:
     if(register_hash(&sha384_desc)==-1)        { croak("FATAL: cannot register_hash sha384"); }
     if(register_hash(&sha512_desc)==-1)        { croak("FATAL: cannot register_hash sha512"); }
     if(register_hash(&tiger_desc)==-1)         { croak("FATAL: cannot register_hash tiger"); }
-    if(register_hash(&whirlpool_desc)==-1)     { croak("FATAL: cannot register_hash whirlpool"); }    
+    if(register_hash(&whirlpool_desc)==-1)     { croak("FATAL: cannot register_hash whirlpool"); }
     /* --- */
     if(chc_register(find_cipher("aes"))==-1)   { croak("FATAL: chc_register failed"); }
     /* --- */
@@ -245,7 +245,7 @@ INCLUDE: CryptX_Mac_OMAC.xs.inc
 INCLUDE: CryptX_Mac_Pelican.xs.inc
 INCLUDE: CryptX_Mac_PMAC.xs.inc
 INCLUDE: CryptX_Mac_XCBC.xs.inc
- 
+
 INCLUDE: CryptX_Mode_CBC.xs.inc
 INCLUDE: CryptX_Mode_ECB.xs.inc
 INCLUDE: CryptX_Mode_CFB.xs.inc

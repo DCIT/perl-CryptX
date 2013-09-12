@@ -4,7 +4,7 @@ Crypt::PK::ECC
 _new()
     CODE:
     {
-        int rv;        
+        int rv;
         Newz(0, RETVAL, 1, struct ecc_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->key.type = -1;
@@ -35,7 +35,7 @@ _import(Crypt::PK::ECC self, SV * key_data)
         int rv;
         unsigned char *data=NULL;
         STRLEN data_len=0;
-        
+
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         ecc_free(&self->key);
         rv = ecc_import(data, (unsigned long)data_len, &self->key);
@@ -52,7 +52,7 @@ import_key_x963(Crypt::PK::ECC self, SV * key_data)
         int rv;
         unsigned char *data=NULL;
         STRLEN data_len=0;
-        
+
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         ecc_free(&self->key);
         rv = ecc_ansi_x963_import(data, (unsigned long)data_len, &self->key);
@@ -90,7 +90,7 @@ key2hash(Crypt::PK::ECC self)
         /* =====> k */
         siz = (self->key.k) ? ltc_mp.unsigned_size(self->key.k) : 0;
         if (siz>10000) {
-          croak("FATAL: key2hash failed - 'k' too big number");        
+          croak("FATAL: key2hash failed - 'k' too big number");
         }
         if (siz>0) {
           mp_tohex(self->key.k, buf);
@@ -102,7 +102,7 @@ key2hash(Crypt::PK::ECC self)
         /* =====> pub_x */
         siz = (self->key.pubkey.x) ? ltc_mp.unsigned_size(self->key.pubkey.x) : 0;
         if (siz>10000) {
-          croak("FATAL: key2hash failed - 'pub_x' too big number");        
+          croak("FATAL: key2hash failed - 'pub_x' too big number");
         }
         if (siz>0) {
           mp_tohex(self->key.pubkey.x, buf);
@@ -114,7 +114,7 @@ key2hash(Crypt::PK::ECC self)
         /* =====> pub_y */
         siz = (self->key.pubkey.y) ? ltc_mp.unsigned_size(self->key.pubkey.y) : 0;
         if (siz>10000) {
-          croak("FATAL: key2hash failed - 'pub_y' too big number");        
+          croak("FATAL: key2hash failed - 'pub_y' too big number");
         }
         if (siz>0) {
           mp_tohex(self->key.pubkey.y, buf);
@@ -126,7 +126,7 @@ key2hash(Crypt::PK::ECC self)
         /* =====> pub_z */
         siz = (self->key.pubkey.z) ? ltc_mp.unsigned_size(self->key.pubkey.z) : 0;
         if (siz>10000) {
-          croak("FATAL: key2hash failed - 'pub_z' too big number");        
+          croak("FATAL: key2hash failed - 'pub_z' too big number");
         }
         if (siz>0) {
           mp_tohex(self->key.pubkey.z, buf);
@@ -160,7 +160,7 @@ export_key_der(Crypt::PK::ECC self, char * type)
         int rv;
         unsigned char out[4096];
         unsigned long int out_len = 4096;
-        
+
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(type, "private", 7)) {
           rv = ecc_export(out, &out_len, PK_PRIVATE, &self->key);
@@ -186,7 +186,7 @@ export_key_x963(Crypt::PK::ECC self)
         int rv;
         unsigned char out[4096];
         unsigned long int out_len = 4096;
-        
+
         rv = ecc_ansi_x963_export(&self->key, out, &out_len);
         if (rv != CRYPT_OK) croak("FATAL: ecc_ansi_x963_export failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)out, out_len);
@@ -203,9 +203,9 @@ _encrypt(Crypt::PK::ECC self, SV * data, char * hash_name)
         STRLEN data_len=0;
         unsigned char buffer[1024];
         unsigned long buffer_len = 1024;
-        
+
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
-        
+
         hash_id = find_hash(hash_name);
         if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
         rv = ecc_encrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
@@ -226,7 +226,7 @@ _decrypt(Crypt::PK::ECC self, SV * data)
         STRLEN data_len=0;
         unsigned char buffer[1024];
         unsigned long buffer_len = 1024;
-        
+
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
         rv = ecc_decrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &self->key);
@@ -245,9 +245,9 @@ _sign(Crypt::PK::ECC self, SV * data)
         STRLEN data_len=0;
         unsigned char buffer[1024];
         unsigned long buffer_len = 1024;
-        
+
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
-        
+
         rv = ecc_sign_hash(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                            &self->yarrow_prng_state, self->yarrow_prng_index,
                            &self->key);
@@ -266,10 +266,10 @@ _verify(Crypt::PK::ECC self, SV * sig, SV * data)
         STRLEN data_len=0;
         unsigned char *sig_ptr=NULL;
         STRLEN sig_len=0;
-        
+
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
-        
+
         RETVAL = 1;
         rv = ecc_verify_hash(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
         if (rv != CRYPT_OK || stat != 1) RETVAL = 0;

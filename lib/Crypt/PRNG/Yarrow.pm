@@ -12,12 +12,12 @@ use CryptX;
 use base 'Crypt::PRNG';
 
 {
-  ### stolen from Bytes::Random::Secure  
+  ### stolen from Bytes::Random::Secure
   my $RNG_object = undef;
   my $fetch_RNG = sub { # Lazily, instantiate the RNG object, but only once.
     $RNG_object = Crypt::PRNG::Yarrow->new unless defined $RNG_object && ref($RNG_object) ne 'SCALAR';
     return $RNG_object;
-  }; 
+  };
   sub rand               { return $fetch_RNG->()->double(@_) }
   sub irand              { return $fetch_RNG->()->int32(@_) }
   sub random_bytes       { return $fetch_RNG->()->bytes(@_) }
@@ -58,7 +58,7 @@ Crypt::PRNG::Yarrow - Cryptographically secure PRNG based on Yarrow algorithm
    $prng = Crypt::PRNG::Yarrow->new;
    #or
    $prng = Crypt::PRNG::Yarrow->new("some data used for seeding PRNG");
-   
+
    $octets = $prng->bytes(45);
    $hex_string = $prng->bytes_hex(45);
    $base64_string = $prng->bytes_b64(45);

@@ -26,7 +26,7 @@ Crypt::Cipher::Camellia - Symetric cipher Camellia, key size: 128/192/256 bits (
 
   ### example 1
   use Crypt::Mode::CBC;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('Camellia');
@@ -35,7 +35,7 @@ Crypt::Cipher::Camellia - Symetric cipher Camellia, key size: 128/192/256 bits (
   ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::Camellia;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::Camellia', -key=>$key, -iv=>$iv );

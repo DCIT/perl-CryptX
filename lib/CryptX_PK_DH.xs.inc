@@ -4,7 +4,7 @@ Crypt::PK::DH
 _new()
     CODE:
     {
-        int rv;        
+        int rv;
         Newz(0, RETVAL, 1, struct dh_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->key.type = -1;
@@ -35,7 +35,7 @@ _import(Crypt::PK::DH self, SV * key_data)
         int rv;
         unsigned char *data=NULL;
         STRLEN data_len=0;
-        
+
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         dh_free(&self->key);
         rv = dh_import(data, (unsigned long)data_len, &self->key);
@@ -73,7 +73,7 @@ key2hash(Crypt::PK::DH self)
         /* =====> x */
         siz = (self->key.x) ? ltc_mp.unsigned_size(self->key.x) : 0;
         if (siz>10000) {
-          croak("FATAL: key2hash failed - 'x' too big number");        
+          croak("FATAL: key2hash failed - 'x' too big number");
         }
         if (siz>0) {
           mp_tohex(self->key.x, buf);
@@ -85,7 +85,7 @@ key2hash(Crypt::PK::DH self)
         /* =====> y */
         siz = (self->key.y) ? ltc_mp.unsigned_size(self->key.y) : 0;
         if (siz>10000) {
-          croak("FATAL: key2hash failed - 'y' too big number");        
+          croak("FATAL: key2hash failed - 'y' too big number");
         }
         if (siz>0) {
           mp_tohex(self->key.y, buf);
@@ -112,7 +112,7 @@ export_key(Crypt::PK::DH self, char * type)
         int rv;
         unsigned char out[4096];
         unsigned long int out_len = 4096;
-        
+
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(type, "private", 7)) {
           rv = dh_export(out, &out_len, PK_PRIVATE, &self->key);
@@ -140,9 +140,9 @@ _encrypt(Crypt::PK::DH self, SV * data, char * hash_name)
         STRLEN data_len=0;
         unsigned char buffer[1024];
         unsigned long buffer_len = 1024;
-        
+
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
-        
+
         hash_id = find_hash(hash_name);
         if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
         rv = dh_encrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
@@ -163,7 +163,7 @@ _decrypt(Crypt::PK::DH self, SV * data)
         STRLEN data_len=0;
         unsigned char buffer[1024];
         unsigned long buffer_len = 1024;
-        
+
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
         rv = dh_decrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &self->key);
@@ -182,9 +182,9 @@ _sign(Crypt::PK::DH self, SV * data)
         STRLEN data_len=0;
         unsigned char buffer[1024];
         unsigned long buffer_len = 1024;
-        
+
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
-        
+
         rv = dh_sign_hash(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                            &self->yarrow_prng_state, self->yarrow_prng_index,
                            &self->key);
@@ -203,10 +203,10 @@ _verify(Crypt::PK::DH self, SV * sig, SV * data)
         STRLEN data_len=0;
         unsigned char *sig_ptr=NULL;
         STRLEN sig_len=0;
-        
+
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
-        
+
         RETVAL = 1;
         rv = dh_verify_hash(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
         if (rv != CRYPT_OK || stat != 1) RETVAL = 0;

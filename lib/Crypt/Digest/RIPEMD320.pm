@@ -38,7 +38,7 @@ Crypt::Digest::RIPEMD320 - Hash function RIPEMD-320 [size: 320 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::RIPEMD320 qw( ripemd320 ripemd320_hex ripemd320_b64 ripemd320_b64u 
+   use Crypt::Digest::RIPEMD320 qw( ripemd320 ripemd320_hex ripemd320_b64 ripemd320_b64u
                                         ripemd320_file ripemd320_file_hex ripemd320_file_b64 ripemd320_file_b64u );
 
    # calculate digest from string/buffer

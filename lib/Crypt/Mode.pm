@@ -31,7 +31,7 @@ sub start_decrypt {
   return $self;
 }
 
-sub finish { 
+sub finish {
   shift->_finish(@_);
 }
 

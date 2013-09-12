@@ -26,7 +26,7 @@ Crypt::Cipher::Skipjack - Symetric cipher Skipjack, key size: 80 bits (Crypt::CB
 
   ### example 1
   use Crypt::Mode::CBC;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('Skipjack');
@@ -35,7 +35,7 @@ Crypt::Cipher::Skipjack - Symetric cipher Skipjack, key size: 80 bits (Crypt::CB
   ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::Skipjack;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::Skipjack', -key=>$key, -iv=>$iv );

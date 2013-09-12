@@ -94,21 +94,21 @@ _encrypt(Crypt::Mode::CBC self, SV * data)
               in_data_len = 0;
             }
           } /* padlen > 0 */
-          
+
           i = (unsigned long)(in_data_len % blen);
           if (in_data_len>0 && i>0) { /* save tail of data into pad */
             Copy(in_data+in_data_start+in_data_len-i, self->pad, i, unsigned char);
             self->padlen = i;
             in_data_len -= i;
           }
-          
+
           if (in_data_len>0) {
             i = (unsigned long)(has_tmp_block ? in_data_len + blen : in_data_len);
             RETVAL = NEWSV(0, i);
             SvPOK_only(RETVAL);
             SvCUR_set(RETVAL, i);
             out_data = (unsigned char *)SvPV_nolen(RETVAL);
-  
+
             if (has_tmp_block) {
               Copy(tmp_block, out_data, blen, unsigned char);
               out_data += blen;
@@ -133,10 +133,10 @@ _finish_enc(Crypt::Mode::CBC self)
     {
         unsigned char tmp_block[MAXBLOCKSIZE];
         int rv, blen, i, j;
-        
+
         blen = (&self->state)->blocklen;
         if (self->padlen<0 || self->padlen>=blen) croak("FATAL: invalid padlen");
-        
+
         if(self->padding_mode == 1) { /* pkcs5|7 padding */
           i = blen - self->padlen;
           if (i == 0) i = blen;
@@ -148,13 +148,13 @@ _finish_enc(Crypt::Mode::CBC self)
           self->pad[self->padlen] = 0x80;
           for(j=self->padlen+1; j<blen; j++) self->pad[j] = 0;
           rv = cbc_encrypt(self->pad, tmp_block, blen, &self->state);
-          if (rv != CRYPT_OK) croak("FATAL: cbc_encrypt failed: %s", error_to_string(rv));        
+          if (rv != CRYPT_OK) croak("FATAL: cbc_encrypt failed: %s", error_to_string(rv));
         }
         else {
           if (self->padlen>0) croak("FATAL: cbc_encrypt, input data length not multiple of %d", blen);
           blen = 0;
         }
-        
+
         RETVAL = newSVpvn((char*)tmp_block, blen);
     }
     OUTPUT:
@@ -179,7 +179,7 @@ _decrypt(Crypt::Mode::CBC self, SV * data)
           RETVAL = newSVpvn("", 0);
         }
         else {
-          
+
           if(self->padlen == blen) {
             rv = cbc_decrypt(self->pad, tmp_block, blen, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: cbc_decrypt failed: %s", error_to_string(rv));
@@ -206,7 +206,7 @@ _decrypt(Crypt::Mode::CBC self, SV * data)
               in_data_len = 0;
             }
           } /* padlen > 0 */
-          
+
           /* here: a/ padlen==1..16 && in_data_len==0; b/ padlen==0 && in_data_len>0 */
           if (in_data_len>0) {
             i = (unsigned long)(in_data_len % blen);
@@ -216,7 +216,7 @@ _decrypt(Crypt::Mode::CBC self, SV * data)
               in_data_len -= i;
             }
           }
-        
+
           if (in_data_len>0) {
             if(self->padlen == 0 && self->padding_mode !=0) {
               /* in case of padding keep full pad if no more data */
@@ -257,11 +257,11 @@ SV *
 _finish_dec(Crypt::Mode::CBC self)
     CODE:
     {
-        unsigned char tmp_block[MAXBLOCKSIZE];        
+        unsigned char tmp_block[MAXBLOCKSIZE];
         unsigned char i;
         int rv, rv_len, blen;
-        
-        rv_len = 0;        
+
+        rv_len = 0;
         if (self->padlen > 0) {
           blen = (&self->state)->blocklen;
           if (self->padlen != blen) croak("FATAL: cipher text length has to be multiple of %d (%d)", blen, self->padlen);

@@ -38,7 +38,7 @@ Crypt::Digest::MD4 - Hash function MD4 [size: 128 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::MD4 qw( md4 md4_hex md4_b64 md4_b64u 
+   use Crypt::Digest::MD4 qw( md4 md4_hex md4_b64 md4_b64u
                                         md4_file md4_file_hex md4_file_b64 md4_file_b64u );
 
    # calculate digest from string/buffer

@@ -38,7 +38,7 @@ Crypt::Digest::CHAES - Hash function - CipherHash based on AES [size: 128 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::CHAES qw( chaes chaes_hex chaes_b64 chaes_b64u 
+   use Crypt::Digest::CHAES qw( chaes chaes_hex chaes_b64 chaes_b64u
                                         chaes_file chaes_file_hex chaes_file_b64 chaes_file_b64u );
 
    # calculate digest from string/buffer

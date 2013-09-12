@@ -20,7 +20,7 @@ sub ocb_encrypt_authenticate {
   my $nonce = shift;
   my $aad = shift;
   my $plaintext = shift;
-  
+
   my $m = Crypt::AuthEnc::OCB->new($cipher_name, $key, $nonce);
   $m->adata_add($aad) if defined $aad;
   my $ct = $m->encrypt_last($plaintext);
@@ -54,7 +54,7 @@ Crypt::AuthEnc::OCB - Authenticated encryption in OCBv3 mode
 
  ### OO interface
  use Crypt::AuthEnc::OCB;
- 
+
  my $ae = Crypt::AuthEnc::OCB->new("AES", $key, $nonce);
  $ae->adata_add('aad1');
  $ae->adata_add('aad2');
@@ -75,7 +75,7 @@ Crypt::AuthEnc::OCB - Authenticated encryption in OCBv3 mode
 
  ### functional interface
  use Crypt::AuthEnc::OCB qw(ocb_encrypt_authenticate ocb_decrypt_verify);
- 
+
  my ($ciphertext, $tag) = ocb_encrypt_authenticate('AES', $key, $nonce, $aad, $plaintext);
  my $plaintext = ocb_decrypt_verify('AES', $key, $nonce, $aad, $ciphertext, $tag);
 
@@ -96,7 +96,7 @@ You can export selected functions:
 =head2 ocb_encrypt_authenticate
 
  my ($ciphertext, $tag) = ocb_encrypt_authenticate($cipher, $key, $nonce, $aad, $plaintext);
- 
+
  # $cipher .. 'AES' or name of any other cipher with 16-byte block len
  # $key ..... AES key of proper length (128/192/256bits)
  # $nonce ... unique nonce/salt (no need to keep it secret)
@@ -105,7 +105,7 @@ You can export selected functions:
 =head2 ocb_decrypt_verify
 
   my $plaintext = ocb_decrypt_verify($cipher, $key, $nonce, $aad, $ciphertext, $tag);
-  
+
   # on error returns undef
 
 =head1 METHODS
@@ -113,7 +113,7 @@ You can export selected functions:
 =head2 new
 
  my $ae = Crypt::AuthEnc::OCB->new($cipher, $key, $nonce);
- 
+
  # $cipher .. 'AES' or name of any other cipher with 16-byte block len
  # $key ..... AES key of proper length (128/192/256bits)
  # $nonce ... unique nonce/salt (no need to keep it secret)
@@ -125,7 +125,7 @@ You can export selected functions:
 =head2 encrypt_add
 
  $ciphertext = $ae->encrypt_add($data);         #can be called multiple times
- 
+
  #BEWARE: size of $data has to be multiple of blocklen (16 for AES)
 
 =head2 encrypt_last
@@ -139,7 +139,7 @@ You can export selected functions:
 =head2 decrypt_add
 
  $plaintext = $ae->decrypt_add($ciphertext);    #can be called multiple times
- 
+
  #BEWARE: size of $ciphertext has to be multiple of blocklen (16 for AES)
 
 =head2 encrypt_last

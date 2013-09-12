@@ -11,7 +11,7 @@ _new(IV curpid, char * prng_name, SV * entropy=&PL_sv_undef)
 
         Newz(0, RETVAL, 1, struct prng_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
-        
+
         id = find_prng(prng_name);
         if(id==-1) croak("FATAL: find_prng failed for '%s'", prng_name);
         RETVAL->id = id;
@@ -26,7 +26,7 @@ _new(IV curpid, char * prng_name, SV * entropy=&PL_sv_undef)
           rv = RETVAL->desc->add_entropy(ent, (unsigned long)ent_len, &RETVAL->state);
           if (rv != CRYPT_OK) croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
         }
-        else {          
+        else {
           if (rng_get_bytes(entropy_buf, 32, NULL) != 32) croak("FATAL: rng_get_bytes failed: %s", error_to_string(rv));
           rv = RETVAL->desc->add_entropy(entropy_buf, 32, &RETVAL->state);
           if (rv != CRYPT_OK) croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
@@ -73,14 +73,14 @@ _bytes(Crypt::PRNG self, IV curpid, STRLEN output_len)
         int rv_len;
         unsigned char *rdata;
         unsigned char entropy_buf[32];
-        
+
         if (self->last_pid != curpid) {
           rng_get_bytes(entropy_buf, 32, NULL);
           self->desc->add_entropy(entropy_buf, 32, &self->state);
           self->desc->ready(&self->state);
           self->last_pid = curpid;
         }
-        
+
         RETVAL = NEWSV(0, output_len);
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, output_len);

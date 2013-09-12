@@ -8,7 +8,7 @@ _new(SV * key)
     {
         STRLEN k_len=0;
         unsigned char *k=NULL;
-        int rv;        
+        int rv;
 
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
@@ -16,7 +16,7 @@ _new(SV * key)
         Newz(0, RETVAL, 1, struct pelican_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = pelican_init(&RETVAL->state, k, (unsigned long)k_len);        
+        rv = pelican_init(&RETVAL->state, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) croak("FATAL: pelican_init failed: %s", error_to_string(rv));
     }
     OUTPUT:
@@ -44,7 +44,7 @@ _add_single(Crypt::Mac::Pelican self, SV * data)
         STRLEN in_data_len;
         unsigned char *in_data;
 
-        in_data = (unsigned char *)SvPVbyte(data, in_data_len);        
+        in_data = (unsigned char *)SvPVbyte(data, in_data_len);
         if (in_data_len>0) {
           rv = pelican_process(&self->state, in_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) croak("FATAL: pelican_process failed: %s", error_to_string(rv));
@@ -82,7 +82,7 @@ b64mac(Crypt::Mac::Pelican self)
         if (rv != CRYPT_OK) croak("FATAL: pelican_done failed: %s", error_to_string(rv));
         outlen = sizeof(mac_base64);
         rv = base64_encode(mac, mac_len, (unsigned char*)mac_base64, &outlen);
-        if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));         
+        if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
         RETVAL = newSVpvn(mac_base64, outlen);
     }
     OUTPUT:
@@ -103,7 +103,7 @@ b64umac(Crypt::Mac::Pelican self)
         if (rv != CRYPT_OK) croak("FATAL: pelican_done failed: %s", error_to_string(rv));
         outlen = sizeof(mac_base64);
         rv = base64url_encode(mac, mac_len, (unsigned char*)mac_base64, &outlen);
-        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));         
+        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
         RETVAL = newSVpvn(mac_base64, outlen);
     }
     OUTPUT:

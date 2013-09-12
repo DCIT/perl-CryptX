@@ -50,14 +50,14 @@ This module implements CTR cipher mode. B<NOTE:> it works only with ciphers from
  my $m = Crypt::Mode::CTR->new($cipher_name, $ctr_mode, $ctr_width);
  #or
  my $m = Crypt::Mode::CTR->new($cipher_name, $ctr_mode, $ctr_width, $cipher_rounds);
- 
+
  # $ctr_mode .... 0 little-endian counter (DEFAULT)
  #                1 big-endian counter
  #                2 little-endian + RFC3686 incrementing
  #                3 big-endian + RFC3686 incrementing
  # $ctr_width ... counter width in bytes (DEFAULT = full block width)
  # $cipher_rounds ... optional num of rounds for given cipher
- 
+
 =head2 encrypt
 
    my $ciphertext = $m->encrypt($plaintext, $key, $iv);

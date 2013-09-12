@@ -38,7 +38,7 @@ Crypt::Digest::SHA224 - Hash function SHA-224 [size: 224 bits]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Digest::SHA224 qw( sha224 sha224_hex sha224_b64 sha224_b64u 
+   use Crypt::Digest::SHA224 qw( sha224 sha224_hex sha224_b64 sha224_b64u
                                         sha224_file sha224_file_hex sha224_file_b64 sha224_file_b64u );
 
    # calculate digest from string/buffer

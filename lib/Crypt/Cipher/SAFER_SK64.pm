@@ -26,7 +26,7 @@ Crypt::Cipher::SAFER_SK64 - Symetric cipher SAFER_SK64, key size: 64 bits (Crypt
 
   ### example 1
   use Crypt::Mode::CBC;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('SAFER_SK64');
@@ -35,7 +35,7 @@ Crypt::Cipher::SAFER_SK64 - Symetric cipher SAFER_SK64, key size: 64 bits (Crypt
   ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::SAFER_SK64;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::SAFER_SK64', -key=>$key, -iv=>$iv );

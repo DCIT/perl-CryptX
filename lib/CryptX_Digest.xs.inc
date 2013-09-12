@@ -54,7 +54,7 @@ add(Crypt::Digest self, ...)
         STRLEN inlen;
         int rv, i;
         unsigned char *in;
-        
+
         for(i=1; i<items; i++) {
           in = (unsigned char *)SvPVbyte(ST(i), inlen);
           if (inlen>0) {
@@ -72,7 +72,7 @@ digest(self)
     {
         unsigned char hash[MAXBLOCKSIZE];
         int rv;
-        
+
         rv = self->desc->done(&self->state, hash);
         if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char *) hash, self->desc->hashsize);
@@ -89,10 +89,10 @@ hexdigest(self)
         unsigned long i;
         unsigned char hash[MAXBLOCKSIZE];
         char hash_hex[MAXBLOCKSIZE*2 + 1];
-        
+
         rv = self->desc->done(&self->state, hash);
         if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
-        
+
         hash_hex[0] = '\0';
         for(i=0; i<self->desc->hashsize; i++)
             sprintf(&hash_hex[2*i], "%02x", hash[i]);
@@ -110,10 +110,10 @@ b64digest(self)
         unsigned long outlen;
         unsigned char hash[MAXBLOCKSIZE];
         char hash_base64[MAXBLOCKSIZE*2 + 1];
-        
+
         rv = self->desc->done(&self->state, hash);
         if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
-        
+
         outlen = sizeof(hash_base64);
         rv = base64_encode(hash, self->desc->hashsize, (unsigned char *)hash_base64, &outlen);
         if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
@@ -131,10 +131,10 @@ b64udigest(self)
         unsigned long outlen;
         unsigned char hash[MAXBLOCKSIZE];
         char hash_base64[MAXBLOCKSIZE*2 + 1];
-        
+
         rv = self->desc->done(&self->state, hash);
         if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
-        
+
         outlen = sizeof(hash_base64);
         rv = base64url_encode(hash, self->desc->hashsize, (unsigned char *)hash_base64, &outlen);
         if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
@@ -157,10 +157,10 @@ _hashsize_by_name(digest_name)
     CODE:
     {
         int rv, id;
-        
+
         id = find_hash(digest_name);
         if(id==-1) croak("FATAL: find_digest failed for '%s'", digest_name);
-        
+
         rv = hash_descriptor[id].hashsize;
         if (!rv) croak("FATAL: invalid hashsize for '%s'", digest_name);;
         RETVAL = rv;
