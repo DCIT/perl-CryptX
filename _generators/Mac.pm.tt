@@ -226,11 +226,11 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
-=item L<CryptX|CryptX>, L<Crypt::Mac|Crypt::Mac>
+=item * L<CryptX|CryptX>, L<Crypt::Mac|Crypt::Mac>
 [% FOREACH v IN urls %]
-=item L<[%v%]|[%v%]>
+=item * L<[%v%]|[%v%]>
 [% END %]
 =back
 

@@ -351,13 +351,13 @@ Returns the digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
-=item L<CryptX|CryptX>
+=item * L<CryptX|CryptX>
 
-=item L<Crypt::Digest|Crypt::Digest> tries to be compatible with L<Digest|Digest> interface.
+=item * L<Crypt::Digest|Crypt::Digest> tries to be compatible with L<Digest|Digest> interface.
 
-=item Check subclasses like L<Crypt::Digest::SHA1|Crypt::Digest::SHA1>, L<Crypt::Digest::MD5|Crypt::Digest::MD5>, ...
+=item * Check subclasses like L<Crypt::Digest::SHA1|Crypt::Digest::SHA1>, L<Crypt::Digest::MD5|Crypt::Digest::MD5>, ...
 
 =back
 

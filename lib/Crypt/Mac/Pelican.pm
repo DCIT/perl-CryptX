@@ -144,9 +144,9 @@ Logically joins all arguments into a single string, and returns its Pelican mess
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
-=item L<CryptX|CryptX>, L<Crypt::Mac|Crypt::Mac>
+=item * L<CryptX|CryptX>, L<Crypt::Mac|Crypt::Mac>
 
 =back
 

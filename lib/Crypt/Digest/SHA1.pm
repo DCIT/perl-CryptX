@@ -214,11 +214,11 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
-=item L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
 
-=item L<http://en.wikipedia.org/wiki/SHA-1|http://en.wikipedia.org/wiki/SHA-1>
+=item * L<http://en.wikipedia.org/wiki/SHA-1|http://en.wikipedia.org/wiki/SHA-1>
 
 =back
 

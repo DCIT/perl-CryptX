@@ -166,10 +166,10 @@ You can export selected functions:
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
-=item L<CryptX|CryptX>, L<Crypt::Mode::CCM|Crypt::Mode::CCM>, L<Crypt::Mode::GCM|Crypt::Mode::GCM>, L<Crypt::Mode::OCB|Crypt::Mode::OCB>
+=item * L<CryptX|CryptX>, L<Crypt::Mode::CCM|Crypt::Mode::CCM>, L<Crypt::Mode::GCM|Crypt::Mode::GCM>, L<Crypt::Mode::OCB|Crypt::Mode::OCB>
 
-=item L<https://en.wikipedia.org/wiki/EAX_mode|https://en.wikipedia.org/wiki/EAX_mode>
+=item * L<https://en.wikipedia.org/wiki/EAX_mode|https://en.wikipedia.org/wiki/EAX_mode>
 
 =back

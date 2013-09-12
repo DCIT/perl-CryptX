@@ -61,9 +61,15 @@ This module implements OFB cipher mode. B<NOTE:> it works only with ciphers from
 
 =head2 start_encrypt
 
+See example below L</finish>.
+
 =head2 start_decrypt
 
+See example below L</finish>.
+
 =head2 add
+
+See example below L</finish>.
 
 =head2 finish
 
@@ -81,8 +87,8 @@ This module implements OFB cipher mode. B<NOTE:> it works only with ciphers from
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
-=item L<CryptX|CryptX>
+=item * L<CryptX|CryptX>
 
 =back

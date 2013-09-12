@@ -124,7 +124,7 @@ Provides an interface to various symetric cipher algorithms.
 
 B<BEWARE:> This module implements just elementary "one-block-(en|de)cryption" operation - if you want to
 encrypt/decrypt generic data you have to use some of the cipher block modes - check for example
-L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CBC|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC>.
+L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CBC|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC> (which will be slower).
 
 =head1 METHODS
 
@@ -205,9 +205,9 @@ Returns default number of rounds for given cipher. NOTE: only some cipher (e.g. 
 
 =over
 
-=item L<CryptX|CryptX>
+=item * L<CryptX|CryptX>
 
-=item Check subclasses like L<Crypt::Cipher::AES|Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish|Crypt::Cipher::Blowfish>, ...
+=item * Check subclasses like L<Crypt::Cipher::AES|Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish|Crypt::Cipher::Blowfish>, ...
 
 =back
 

@@ -47,7 +47,7 @@ This module implements the Khazad cipher. Provided interface is compliant with L
 
 B<BEWARE:> This module implements just elementary "one-block-(en|de)cryption" operation - if you want to
 encrypt/decrypt generic data you have to use some of the cipher block modes - check for example
-L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC>.
+L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC> (which will be slower).
 
 =head1 METHODS
 
@@ -109,9 +109,9 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 
 =over
 
-=item L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
+=item * L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
 
-=item L<http://en.wikipedia.org/wiki/KHAZAD|http://en.wikipedia.org/wiki/KHAZAD>
+=item * L<http://en.wikipedia.org/wiki/KHAZAD|http://en.wikipedia.org/wiki/KHAZAD>
 
 =back
 
