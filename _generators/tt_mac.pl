@@ -23,11 +23,11 @@ warn "STARTED: outdir_l='$outdir_l' outdir_t='$outdir_t'\n";
 
 my %list = (
         F9      => { info=>'Message authentication code F9', urls=>[] },
-        HMAC    => { info=>'Message authentication code HMAC', urls=>[] },
-        OMAC    => { info=>'Message authentication code OMAC', urls=>[] },
-        Pelican => { info=>'Message authentication code Pelican (AES based MAC)', urls=>[] },
-        PMAC    => { info=>'Message authentication code PMAC', urls=>[] },
-        XCBC    => { info=>'Message authentication code XCBC', urls=>[] },
+        HMAC    => { info=>'Message authentication code HMAC', urls=>['https://en.wikipedia.org/wiki/Hmac', 'https://tools.ietf.org/html/rfc2104'] },
+        OMAC    => { info=>'Message authentication code OMAC', urls=>['https://en.wikipedia.org/wiki/OMAC_%28cryptography%29'] },
+        Pelican => { info=>'Message authentication code Pelican (AES based MAC)', urls=>['http://eprint.iacr.org/2005/088.pdf'] },
+        PMAC    => { info=>'Message authentication code PMAC', urls=>['https://en.wikipedia.org/wiki/PMAC_%28cryptography%29'] },
+        XCBC    => { info=>'Message authentication code XCBC (RFC 3566)', urls=>['https://www.ietf.org/rfc/rfc3566.txt'] },
 );
 
 my @test_strings = ( '', '123', "test\0test\0test\n");

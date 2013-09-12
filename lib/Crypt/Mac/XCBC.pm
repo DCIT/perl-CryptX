@@ -27,7 +27,7 @@ sub xcbc_b64u { Crypt::Mac::XCBC->new(shift, shift)->add(@_)->b64umac }
 
 =head1 NAME
 
-Crypt::Mac::XCBC - Message authentication code XCBC
+Crypt::Mac::XCBC - Message authentication code XCBC (RFC 3566)
 
 =head1 SYNOPSIS
 
@@ -149,6 +149,8 @@ Logically joins all arguments into a single string, and returns its XCBC message
 =over
 
 =item * L<CryptX|CryptX>
+
+=item * L<https://www.ietf.org/rfc/rfc3566.txt|https://www.ietf.org/rfc/rfc3566.txt>
 
 =back
 

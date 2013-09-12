@@ -42,7 +42,7 @@ Crypt::Mode::ECB - Block cipher mode ECB [Electronic codebook]
 =head1 DESCRIPTION
 
 This module implements ECB cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).
-BEWARE: ECB is inherently insecure, if you are not sure go for L<Crypt::Mode::CBC>!
+B<BEWARE: ECB is inherently insecure>, if you are not sure go for L<Crypt::Mode::CBC>!
 
 =head1 METHODS
 
@@ -102,5 +102,7 @@ See example below L</finish>.
 =item * L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
 
 =item * L<Crypt::Cipher::AES|Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish|Crypt::Cipher::Blowfish>, ...
+
+=item * L<https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_codebook_.28ECB.29|https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_codebook_.28ECB.29>
 
 =back

@@ -22,24 +22,24 @@ warn "STARTED: outdir_l='$outdir_l' outdir_t='$outdir_t'\n";
 my %list = (
         CBC => { info=>'Block cipher mode CBC [Cipher-block chaining]',
                  desc=>"This module implements CBC cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).",
-                 url=>'https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher-block_chaining_.28CBC.29',
+                 urls=>['https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher-block_chaining_.28CBC.29'],
                },
         CFB => { info=>'Block cipher mode CFB [Cipher feedback]',
                  desc=>"This module implements CFB cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).",
-                 url=>'https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_feedback_.28CFB.29',
+                 urls=>['https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_feedback_.28CFB.29'],
                },
         CTR => { info=>'Block cipher mode CTR [Counter mode]',
                  desc=>"This module implements CTR cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).",
-                 url=>'https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Counter_.28CTR.29',
+                 urls=>['https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Counter_.28CTR.29'],
                },
         ECB => { info=>'Block cipher mode ECB [Electronic codebook]',
                  desc=>"This module implements ECB cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).\n".
-                       "BEWARE: ECB is inherently insecure, if you are not sure go for L<Crypt::Mode::CBC>!",
-                 url=>'https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_codebook_.28ECB.29',
+                       "B<BEWARE: ECB is inherently insecure>, if you are not sure go for L<Crypt::Mode::CBC>!",
+                 urls=>['https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_codebook_.28ECB.29'],
                },
         OFB => { info=>'Block cipher mode OFB [Output feedback]',
                  desc=>"This module implements OFB cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).",
-                 url=>'https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Output_feedback_.28OFB.29',
+                 urls=>['https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Output_feedback_.28OFB.29'],
                },
 #        F8  => { info=>'Block cipher mode F8',
 #                 desc=>q[xxx-desc-goes here]},
@@ -59,6 +59,7 @@ for my $n (keys %list) {
     lc_name   => lc($n),
     info      => $list{$n}->{info},
     desc      => $list{$n}->{desc},
+    urls      => $list{$n}->{urls},
   };
 
   if ($outdir_t) {

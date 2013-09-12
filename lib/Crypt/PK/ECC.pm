@@ -421,3 +421,15 @@ ANSI X9.63 Export (public key only)
    pub_y => "78FC34C6A320E22672A96EBB6DA48387A40541A3D7E5CFAE0D58A513E38C8888",
    pub_z => "1",
  }
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<https://en.wikipedia.org/wiki/Elliptic_curve_cryptography|https://en.wikipedia.org/wiki/Elliptic_curve_cryptography>
+
+=item * L<https://en.wikipedia.org/wiki/Elliptic_curve_Diffie%E2%80%93Hellman|https://en.wikipedia.org/wiki/Elliptic_curve_Diffie%E2%80%93Hellman>
+
+=item * L<https://en.wikipedia.org/wiki/ECDSA|https://en.wikipedia.org/wiki/ECDSA>
+
+=back

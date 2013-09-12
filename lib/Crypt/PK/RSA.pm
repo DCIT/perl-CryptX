@@ -453,3 +453,11 @@ Loads private or public key in DER or PEM format (password protected keys are no
    dP => "486F142FEF0A1F53269AC43D2EE4D263E2841B60DA36...", #d mod (p - 1) CRT param
    dQ => "4597284B2968B72C4212DB7E8F24360B987B80514DA9...", #d mod (q - 1) CRT param
  }
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<https://en.wikipedia.org/wiki/RSA_%28algorithm%29|https://en.wikipedia.org/wiki/RSA_%28algorithm%29>
+
+=back

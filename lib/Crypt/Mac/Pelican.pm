@@ -148,6 +148,8 @@ Logically joins all arguments into a single string, and returns its Pelican mess
 
 =item * L<CryptX|CryptX>
 
+=item * L<http://eprint.iacr.org/2005/088.pdf|http://eprint.iacr.org/2005/088.pdf>
+
 =back
 
 =cut

@@ -388,3 +388,11 @@ Loads private or public key (exported by L</export_key>).
    x => "FBC1062F73B9A17BB8473A2F5A074911FA7F20D28FB...", #private key
    y => "AB9AAA40774D3CD476B52F82E7EE2D8A8D40CD88BF4...", #public key
 }
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange|https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange>
+
+=back

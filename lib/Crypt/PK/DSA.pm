@@ -392,3 +392,11 @@ Loads private or public key in DER or PEM format (password protected keys are no
    x => "6C801901AC74E2DC714D75A9F6969483CF...", #private key, random  0 < x < q
    y => "8F7604D77FA62C7539562458A63C7611B7...", #public key, where y = g^x mod p
  }
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<https://en.wikipedia.org/wiki/Digital_Signature_Algorithm|https://en.wikipedia.org/wiki/Digital_Signature_Algorithm>
+
+=back
