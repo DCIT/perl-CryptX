@@ -5,10 +5,9 @@ TODO:
         - consider: PK->encrypt|decrypt ... add 'armour' param and make it compatible with Crypt::RSA
         - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - croak when mode does not call start_(en|de)crypt
-        - make random_string faster (implement in XS)
         - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
 
-0.015   2013/09/11
+0.015   2013/09/12
         - only documentation fixes
 
 0.014   2013/09/11
