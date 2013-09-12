@@ -148,7 +148,7 @@ Logically joins all arguments into a single string, and returns its HMAC message
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Mac|Crypt::Mac>
+=item * L<CryptX|CryptX>
 
 =back
 

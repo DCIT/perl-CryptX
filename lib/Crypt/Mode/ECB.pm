@@ -99,6 +99,8 @@ See example below L</finish>.
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
+
+=item * L<Crypt::Cipher::AES|Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish|Crypt::Cipher::Blowfish>, ...
 
 =back

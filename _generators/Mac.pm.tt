@@ -228,7 +228,7 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Mac|Crypt::Mac>
+=item * L<CryptX|CryptX>
 [% FOREACH v IN urls %]
 =item * L<[%v%]|[%v%]>
 [% END %]

@@ -79,40 +79,80 @@ All methods and functions are the same as for L<Crypt::PRNG>.
 
 =head2 random_bytes
 
+See L<Crypt::PRNG/random_bytes>.
+
 =head2 random_bytes_hex
+
+See L<Crypt::PRNG/random_bytes_hex>.
 
 =head2 random_bytes_b64
 
+See L<Crypt::PRNG/random_bytes_b64>.
+
 =head2 random_bytes_b64u
+
+See L<Crypt::PRNG/random_bytes_b64u>.
 
 =head2 random_string
 
+See L<Crypt::PRNG/random_string>.
+
 =head2 random_string_from
+
+See L<Crypt::PRNG/random_string_from>.
 
 =head2 rand
 
+See L<Crypt::PRNG/rand>.
+
 =head2 irand
+
+See L<Crypt::PRNG/irand>.
 
 =head1 METHODS
 
 =head1 new
 
+See L<Crypt::PRNG/new>.
+
 =head2 bytes
+
+See L<Crypt::PRNG/bytes>.
 
 =head2 bytes_hex
 
+See L<Crypt::PRNG/bytes_hex>.
+
 =head2 bytes_b64
+
+See L<Crypt::PRNG/bytes_b64>.
 
 =head2 bytes_b64u
 
+See L<Crypt::PRNG/bytes_b64u>.
+
 =head2 string
+
+See L<Crypt::PRNG/string>.
 
 =head2 string_from
 
+See L<Crypt::PRNG/string_from>.
+
 =head2 double
+
+See L<Crypt::PRNG/double>.
 
 =head2 int32
 
+See L<Crypt::PRNG/int32>.
+
 =head1 SEE ALSO
 
-L<Crypt::PRNG>
+=over
+
+=item * L<Crypt::PRNG>
+
+=item * L<https://en.wikipedia.org/wiki/Yarrow_algorithm|https://en.wikipedia.org/wiki/Yarrow_algorithm>
+
+=back
