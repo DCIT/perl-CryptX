@@ -212,17 +212,21 @@ all of the Diffie-Hellman routines (ECDH).
 
 =head2 ecc_encrypt
 
-Elliptic Curve Diffie-Hellman (ECDH) encryption.
-
-ECCDH Encryption is performed by producing a random key, hashing it, and XOR'ing the digest against the plaintext. See method L</encrypt> below.
+Elliptic Curve Diffie-Hellman (ECDH) encryption as implemented by libtomcrypt. See method L</encrypt> below.
 
  my $ct = ecc_encrypt($pub_key_filename, $message);
  #or
  my $ct = ecc_encrypt(\$buffer_containing_pub_key, $message);
+ #or
+ my $ct = ecc_encrypt($pub_key_filename, $message, $hash_name);
+ 
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+
+ECCDH Encryption is performed by producing a random key, hashing it, and XOR'ing the digest against the plaintext.
 
 =head2 ecc_decrypt
 
-Elliptic Curve Diffie-Hellman (ECDH) decryption. See method L</decrypt> below.
+Elliptic Curve Diffie-Hellman (ECDH) decryption as implemented by libtomcrypt. See method L</decrypt> below.
 
  my $pt = ecc_decrypt($priv_key_filename, $ciphertext);
  #or
@@ -304,13 +308,15 @@ See L<http://csrc.nist.gov/publications/fips/fips186-3/fips_186-3.pdf> and L<htt
 
 =head2 import_key
 
+Loads private or public key in DER format (exported by L</export_key_der>).
+
   $pk->import_key($filename);
   #or
   $pk->import_key(\$buffer_containing_key);
 
 =head2 import_key_x963
 
-ANSI X9.63 Import (public key only) - can load data exported by C<export_key_x963>
+ANSI X9.63 Import (public key only) - can load data exported by L</export_key_x963>.
 
  $pk->import_key(\$buffer_containing_pub_key_ansi_x963);
 
@@ -330,6 +336,10 @@ ANSI X9.63 Export (public key only)
 
  my $pk = Crypt::PK::ECC->new($pub_key_filename);
  my $ct = $pk->encrypt($message);
+ #or
+ my $ct = $pk->encrypt($message, $hash_name);
+ 
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 decrypt
 
@@ -343,7 +353,7 @@ ANSI X9.63 Export (public key only)
  #or
  my $signature = $priv->sign_message($message, $hash_name);
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 verify_message
 
@@ -352,7 +362,7 @@ ANSI X9.63 Export (public key only)
  #or
  my $valid = $pub->verify_message($signature, $message, $hash_name);
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 sign_hash
 
@@ -385,7 +395,7 @@ ANSI X9.63 Export (public key only)
 
 =head2 size
 
- my $size = $pk->is_private;
+ my $size = $pk->size;
  # returns key size in bytes or undef if no key loaded
 
 =head2 key2hash
@@ -394,8 +404,9 @@ ANSI X9.63 Export (public key only)
  
  # returns hash like this (or undef if no key loaded):
  {
-   type => 1,
-   size => 32,
+   type => 1,  # integer: 1 .. private, 0 .. public
+   size => 32, # integer: key (curve) size in bytes
+   #curve parameters
    curve_name  => "ECC-256",
    curve_size  => 32,
    curve_B     => "5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B",
@@ -403,7 +414,9 @@ ANSI X9.63 Export (public key only)
    curve_Gy    => "4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5",
    curve_order => "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551",
    curve_prime => "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF",
+   #private key
    k => "A7F43ACD4A05D69AE4597E6E723EB5F1E9B9B7EAA51B6DE83CF36F9687B57DEE",
+   #public key point coordinates
    pub_x => "AB53ED5D16CE550BAAF16BA4F161332AAD56D63790629C27871ED515D4FC229C",
    pub_y => "78FC34C6A320E22672A96EBB6DA48387A40541A3D7E5CFAE0D58A513E38C8888",
    pub_z => "1",

@@ -214,18 +214,22 @@ Crypt::PK::DSA - Public key cryptography based on DSA
 
 =head2 dsa_encrypt
 
-DSA based encryption. See method L</encrypt> below.
+DSA based encryption as implemented by libtomcrypt. See method L</encrypt> below.
 
- my $pt = dsa_decrypt($priv_key_filename, $ciphertext);
+ my $ct = dsa_encrypt($pub_key_filename, $message);
  #or
- my $pt = dsa_decrypt(\$buffer_containing_priv_key, $ciphertext);
+ my $ct = dsa_encrypt(\$buffer_containing_pub_key, $message);
+ #or
+ my $ct = dsa_encrypt($pub_key_filename, $message, $hash_name);
+ 
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
-Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared key is computed, and
+Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared DSA key is computed, and
 the hash of the shared key XOR'ed against the plaintext forms the ciphertext.
 
 =head2 dsa_decrypt
 
-DSA based decryption. See method L</decrypt> below.
+DSA based decryption as implemented by libtomcrypt. See method L</decrypt> below.
 
  my $pt = dsa_decrypt($priv_key_filename, $ciphertext);
  #or
@@ -301,6 +305,8 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 import_key
 
+Loads private or public key in DER or PEM format (password protected keys are not supported).
+
   $pk->import_key($filename);
   #or
   $pk->import_key(\$buffer_containing_key);
@@ -321,6 +327,10 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
  my $pk = Crypt::PK::DSA->new($pub_key_filename);
  my $ct = $pk->encrypt($message);
+ #or
+ my $ct = $pk->encrypt($message, $hash_name);
+ 
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 decrypt
 
@@ -334,7 +344,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  #or
  my $signature = $priv->sign_message($message, $hash_name);
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 verify_message
 
@@ -343,7 +353,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  #or
  my $valid = $pub->verify_message($signature, $message, $hash_name);
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 sign_hash
 
@@ -364,7 +374,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 size
 
- my $size = $pk->is_private;
+ my $size = $pk->size;
  # returns key size in bytes or undef if no key loaded
 
 =head2 key2hash

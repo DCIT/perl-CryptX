@@ -327,6 +327,8 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 import_key
 
+Loads private or public key in DER or PEM format (password protected keys are not supported).
+
   $pk->import_key($priv_or_pub_key_filename);
   #or
   $pk->import_key(\$buffer_containing_priv_or_pub_key);
@@ -430,7 +432,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 size
 
- my $size = $pk->is_private;
+ my $size = $pk->size;
  # returns key size in bytes or undef if no key loaded
 
 =head2 key2hash

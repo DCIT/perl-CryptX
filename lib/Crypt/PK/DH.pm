@@ -209,6 +209,11 @@ DH based encryption as implemented by libtomcrypt. See method L</encrypt> below.
  my $ct = dh_encrypt(\$buffer_containing_pub_key, $message);
  #or
  my $ct = dh_encrypt($pub_key_filename, $message, $hash_name);
+ 
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ 
+Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared DH key is computed, and
+the hash of the shared key XOR'ed against the plaintext forms the ciphertext.
 
 =head2 dh_decrypt
 
@@ -293,6 +298,8 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 import_key
 
+Loads private or public key (exported by L</export_key>).
+
   $pk->import_key($filename);
   #or
   $pk->import_key(\$buffer_containing_key);
@@ -310,7 +317,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  #or
  my $ct = $pk->encrypt($message, $hash_name);
  
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 decrypt
 
@@ -324,7 +331,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  #or
  my $signature = $priv->sign_message($message, $hash_name);
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 verify_message
 
@@ -333,7 +340,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  #or
  my $valid = $pub->verify_message($signature, $message, $hash_name);
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by L<Crypt::Digest>
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 sign_hash
 
@@ -366,7 +373,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 size
 
- my $size = $pk->is_private;
+ my $size = $pk->size;
  # returns key size in bytes or undef if no key loaded
 
 =head2 key2hash
@@ -375,9 +382,9 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  
  # returns hash like this (or undef if no key loaded):
  {
-   type => 0,
-   size => 256,
-   name => "DH-2048",
-   x => "FBC1062F73B9A17BB8473A2F5A074911FA7F20D28FB...",
-   y => "AB9AAA40774D3CD476B52F82E7EE2D8A8D40CD88BF4...",
+   type => 0,   # integer: 1 .. private, 0 .. public
+   size => 256, # integer: key size in bytes
+   name => "DH-2048", # internal libtomcrypt name
+   x => "FBC1062F73B9A17BB8473A2F5A074911FA7F20D28FB...", #private key
+   y => "AB9AAA40774D3CD476B52F82E7EE2D8A8D40CD88BF4...", #public key
 }
