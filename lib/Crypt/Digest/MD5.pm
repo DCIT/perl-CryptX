@@ -39,7 +39,7 @@ Crypt::Digest::MD5 - Hash function MD5 [size: 128 bits]
 
    ### Functional interface:
    use Crypt::Digest::MD5 qw( md5 md5_hex md5_b64 md5_b64u
-                                        md5_file md5_file_hex md5_file_b64 md5_file_b64u );
+                                md5_file md5_file_hex md5_file_b64 md5_file_b64u );
 
    # calculate digest from string/buffer
    $md5_raw  = md5('data string');

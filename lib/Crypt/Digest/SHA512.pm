@@ -39,7 +39,7 @@ Crypt::Digest::SHA512 - Hash function SHA-512 [size: 512 bits]
 
    ### Functional interface:
    use Crypt::Digest::SHA512 qw( sha512 sha512_hex sha512_b64 sha512_b64u
-                                        sha512_file sha512_file_hex sha512_file_b64 sha512_file_b64u );
+                                sha512_file sha512_file_hex sha512_file_b64 sha512_file_b64u );
 
    # calculate digest from string/buffer
    $sha512_raw  = sha512('data string');

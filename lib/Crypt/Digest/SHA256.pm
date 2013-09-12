@@ -39,7 +39,7 @@ Crypt::Digest::SHA256 - Hash function SHA-256 [size: 256 bits]
 
    ### Functional interface:
    use Crypt::Digest::SHA256 qw( sha256 sha256_hex sha256_b64 sha256_b64u
-                                        sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u );
+                                sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u );
 
    # calculate digest from string/buffer
    $sha256_raw  = sha256('data string');

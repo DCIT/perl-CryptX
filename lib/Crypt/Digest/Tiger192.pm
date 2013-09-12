@@ -39,7 +39,7 @@ Crypt::Digest::Tiger192 - Hash function Tiger-192 [size: 192 bits]
 
    ### Functional interface:
    use Crypt::Digest::Tiger192 qw( tiger192 tiger192_hex tiger192_b64 tiger192_b64u
-                                        tiger192_file tiger192_file_hex tiger192_file_b64 tiger192_file_b64u );
+                                tiger192_file tiger192_file_hex tiger192_file_b64 tiger192_file_b64u );
 
    # calculate digest from string/buffer
    $tiger192_raw  = tiger192('data string');

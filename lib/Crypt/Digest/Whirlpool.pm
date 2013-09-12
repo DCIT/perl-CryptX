@@ -39,7 +39,7 @@ Crypt::Digest::Whirlpool - Hash function Whirlpool [size: 512 bits]
 
    ### Functional interface:
    use Crypt::Digest::Whirlpool qw( whirlpool whirlpool_hex whirlpool_b64 whirlpool_b64u
-                                        whirlpool_file whirlpool_file_hex whirlpool_file_b64 whirlpool_file_b64u );
+                                whirlpool_file whirlpool_file_hex whirlpool_file_b64 whirlpool_file_b64u );
 
    # calculate digest from string/buffer
    $whirlpool_raw  = whirlpool('data string');

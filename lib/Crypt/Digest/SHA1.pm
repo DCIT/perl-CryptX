@@ -39,7 +39,7 @@ Crypt::Digest::SHA1 - Hash function SHA-1 [size: 160 bits]
 
    ### Functional interface:
    use Crypt::Digest::SHA1 qw( sha1 sha1_hex sha1_b64 sha1_b64u
-                                        sha1_file sha1_file_hex sha1_file_b64 sha1_file_b64u );
+                                sha1_file sha1_file_hex sha1_file_b64 sha1_file_b64u );
 
    # calculate digest from string/buffer
    $sha1_raw  = sha1('data string');

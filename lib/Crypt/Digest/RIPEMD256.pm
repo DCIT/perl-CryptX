@@ -39,7 +39,7 @@ Crypt::Digest::RIPEMD256 - Hash function RIPEMD-256 [size: 256 bits]
 
    ### Functional interface:
    use Crypt::Digest::RIPEMD256 qw( ripemd256 ripemd256_hex ripemd256_b64 ripemd256_b64u
-                                        ripemd256_file ripemd256_file_hex ripemd256_file_b64 ripemd256_file_b64u );
+                                ripemd256_file ripemd256_file_hex ripemd256_file_b64 ripemd256_file_b64u );
 
    # calculate digest from string/buffer
    $ripemd256_raw  = ripemd256('data string');

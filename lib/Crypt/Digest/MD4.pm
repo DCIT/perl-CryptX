@@ -39,7 +39,7 @@ Crypt::Digest::MD4 - Hash function MD4 [size: 128 bits]
 
    ### Functional interface:
    use Crypt::Digest::MD4 qw( md4 md4_hex md4_b64 md4_b64u
-                                        md4_file md4_file_hex md4_file_b64 md4_file_b64u );
+                                md4_file md4_file_hex md4_file_b64 md4_file_b64u );
 
    # calculate digest from string/buffer
    $md4_raw  = md4('data string');

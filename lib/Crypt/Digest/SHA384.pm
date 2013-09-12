@@ -39,7 +39,7 @@ Crypt::Digest::SHA384 - Hash function SHA-384 [size: 384 bits]
 
    ### Functional interface:
    use Crypt::Digest::SHA384 qw( sha384 sha384_hex sha384_b64 sha384_b64u
-                                        sha384_file sha384_file_hex sha384_file_b64 sha384_file_b64u );
+                                sha384_file sha384_file_hex sha384_file_b64 sha384_file_b64u );
 
    # calculate digest from string/buffer
    $sha384_raw  = sha384('data string');
