@@ -70,7 +70,7 @@ Crypt::Mode::[%orig_name%] - [%info%]
  my $m = Crypt::Mode::[%orig_name%]->new($cipher_name, $ctr_mode, $ctr_width);
  #or
  my $m = Crypt::Mode::[%orig_name%]->new($cipher_name, $ctr_mode, $ctr_width, $cipher_rounds);
- 
+
  # $ctr_mode .... 0 little-endian counter (DEFAULT)
  #                1 big-endian counter
  #                2 little-endian + RFC3686 incrementing
@@ -95,7 +95,7 @@ Crypt::Mode::[%orig_name%] - [%info%]
 
  # $cipher_rounds ... optional num of rounds for given cipher
 [%-END%]
- 
+
 =head2 encrypt
 
 [%-IF lc_name == 'ecb' %]

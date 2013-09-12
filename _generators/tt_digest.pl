@@ -45,7 +45,7 @@ my @test_files = bsd_glob("$FindBin::Bin/../t/data/*.file");
 
 for my $n (keys %list) {
   warn "Processing digest: '$n'\n";
-  
+
   my $data = {
     comment   => "### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!",
     orig_name => $n,
@@ -56,13 +56,13 @@ for my $n (keys %list) {
     desc      => $list{$n}->{desc},
     urls      => $list{$n}->{urls},
   };
-  
+
   if ($outdir_t) {
     require Crypt::Digest;
     Crypt::Digest::import(':all');
     for (@test_strings) {
-      push @{$data->{t_strings}}, { data=>pp($_), 
-                                    hex=>Crypt::Digest::digest_data_hex($n, $_), 
+      push @{$data->{t_strings}}, { data=>pp($_),
+                                    hex=>Crypt::Digest::digest_data_hex($n, $_),
                                     base64=>Crypt::Digest::digest_data_b64($n, $_),
                                     base64url=>Crypt::Digest::digest_data_b64u($n, $_),
                                   };
@@ -70,11 +70,11 @@ for my $n (keys %list) {
     for (@test_files) {
       $_ =~ s|\\|/|g;
       push @{$data->{t_files}}, { file=>$_,
-                                  hex=>Crypt::Digest::digest_file_hex($n, "$FindBin::Bin/../$_"), 
+                                  hex=>Crypt::Digest::digest_file_hex($n, "$FindBin::Bin/../$_"),
                                   base64=>Crypt::Digest::digest_file_b64($n, "$FindBin::Bin/../$_"),
                                   base64url=>Crypt::Digest::digest_file_b64u($n, "$FindBin::Bin/../$_"),
                                 };
-    }  
+    }
     $data->{t_files_count} = scalar(@{$data->{t_files}});
     $data->{t_strings_count} = scalar(@{$data->{t_strings}});
     $data->{hashsize} = Crypt::Digest->hashsize($n);
@@ -85,7 +85,7 @@ for my $n (keys %list) {
     copy("$t_out.$$", $t_out) and warn("Writting '$t_out'\n") unless equal_files("$t_out.$$", $t_out);
     unlink "$t_out.$$";
   }
-  
+
   if ($outdir_l) {
     my $pm_out = catfile($outdir_l, "Crypt", "Digest", "$n.pm");
     my $pm_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";

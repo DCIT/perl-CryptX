@@ -42,7 +42,7 @@ for my $n (keys %list) {
     info      => $list{$n}->{info},
     urls      => $list{$n}->{urls},
   };
-  
+
   if($outdir_t) {
     require Crypt::Mac::HMAC;
     require Crypt::Mac::F9;
@@ -74,14 +74,14 @@ for my $n (keys %list) {
     $_->{b64mac} = encode_base64(pack("H*", $_->{mac}),'') for (@{$data->{t_strings}});
     $_->{b64umac} = encode_base64url(pack("H*", $_->{mac}),'') for (@{$data->{t_strings}});
     $data->{t_strings_count} = defined $data->{t_strings} ? scalar(@{$data->{t_strings}}) : 0;
-    
+
     my $t_out = catfile($outdir_t, "mac_".lc($n).".t");
     my $t_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
     $t_tt->process("$FindBin::Bin/Mac.t.tt", $data, "$t_out.$$") || die $t_tt->error(), "\n";
     copy("$t_out.$$", $t_out) and warn("Writting '$t_out'\n") unless equal_files("$t_out.$$", $t_out);
     unlink "$t_out.$$";
   }
-  
+
   if ($outdir_l) {
     my $pm_out = catfile($outdir_l, "Crypt", "Mac", "$n.pm");
     my $pm_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
@@ -95,5 +95,5 @@ for my $n (keys %list) {
     copy("$xs_out.$$", $xs_out) and warn("Writting '$xs_out'\n") unless equal_files("$xs_out.$$", $xs_out);
     unlink "$xs_out.$$";
   }
-  
+
 }

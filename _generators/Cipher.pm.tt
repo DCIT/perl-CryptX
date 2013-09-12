@@ -26,7 +26,7 @@ Crypt::Cipher::[%orig_name%] - [%info%]
 
   ### example 1
   use Crypt::Mode::CBC;
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('[%orig_name%]');
@@ -35,7 +35,7 @@ Crypt::Cipher::[%orig_name%] - [%info%]
   ### example 2
   use Crypt::CBC;
   use Crypt::Cipher::[%orig_name%];
-  
+
   my $key = '...'; # length has to be valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::[%orig_name%]', -key=>$key, -iv=>$iv );
@@ -107,7 +107,7 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
 =item L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
 [% FOREACH v IN urls %]

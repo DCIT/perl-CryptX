@@ -91,31 +91,40 @@ Crypt::Cipher - Generic interface to cipher functions
 
 =head1 SYNOPSIS
 
-   #### example 1
+   #### example 1 (encrypting single block)
    use Crypt::Cipher;
 
-   $key = 'K' x 32; # 256 bits
-   $c = Crypt::Cipher->new('AES', $key);
-   $blocksize = $c->blocksize;
-   $ciphertext = $c->encrypt('plain text block'); #encrypt 1 block
-   $plaintext = $c->decrypt($ciphertext);         #decrypt 1 block
+   my $key = '...'; # length has to be valid key size for this cipher
+   my $c = Crypt::Cipher->new('AES', $key);
+   my $blocksize  = $c->blocksize;
+   my $ciphertext = $c->encrypt('plain text block'); #encrypt 1 block
+   my $plaintext  = $c->decrypt($ciphertext);         #decrypt 1 block
 
-   #### example 2 (compatibility with Crypt::CBC)
+   ### example 2 (using CBC mode)
+   use Crypt::Mode::CBC;
+
+   my $key = '...'; # length has to be valid key size for this cipher
+   my $iv = '...';  # 16 bytes
+   my $cbc = Crypt::Mode::CBC->new('AES');
+   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
+
+   #### example 3 (compatibility with Crypt::CBC)
    use Crypt::CBC;
    use Crypt::Cipher;
 
    my $key = '...'; # length has to be valid key size for this cipher
+   my $iv = '...';  # 16 bytes
    my $cipher = Crypt::Cipher('AES', $key);
-   my $cbc = Crypt::CBC->new( -cipher=>$cipher );
+   my $cbc = Crypt::CBC->new( -cipher=>$cipher, -iv=>$iv );
    my $ciphertext = $cbc->encrypt("secret data");
 
 =head1 DESCRIPTION
 
 Provides an interface to various symetric cipher algorithms.
 
-B<BEWARE:> This module implements just elementary one-block (usually 8 or 16 byte) encryption/encryption
-operation - if you want to encrypt/decrypt generic data of "any length" you have to use some of the cipher
-block modes - check for example L<Crypt::Mode::CBC|Crypt::Mode::CBC>.
+B<BEWARE:> This module implements just elementary "one-block-(en|de)cryption" operation - if you want to
+encrypt/decrypt generic data you have to use some of the cipher block modes - check for example
+L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CBC|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC>.
 
 =head1 METHODS
 
@@ -194,7 +203,7 @@ Returns default number of rounds for given cipher. NOTE: only some cipher (e.g. 
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
 =item L<CryptX|CryptX>
 

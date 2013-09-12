@@ -47,7 +47,7 @@ This module implements the RC2 cipher. Provided interface is compliant with L<Cr
 
 B<BEWARE:> This module implements just elementary "one-block-(en|de)cryption" operation - if you want to
 encrypt/decrypt generic data you have to use some of the cipher block modes - check for example
-L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CBC|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC>.
+L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC>.
 
 =head1 METHODS
 
@@ -107,7 +107,7 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CBC|Crypt::Mode::CTR> or L<
 
 =head1 SEE ALSO
 
-=over 4
+=over
 
 =item L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
 

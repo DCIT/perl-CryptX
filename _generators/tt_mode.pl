@@ -20,32 +20,32 @@ my $outdir_t = ($ARGV[0] eq 'install_tests') ? catdir($FindBin::Bin, "..", "t") 
 warn "STARTED: outdir_l='$outdir_l' outdir_t='$outdir_t'\n";
 
 my %list = (
-        CBC => { info=>'Block cipher mode CBC [Cipher-block chaining]', 
+        CBC => { info=>'Block cipher mode CBC [Cipher-block chaining]',
                  desc=>"This module implements CBC cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).",
                  url=>'https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher-block_chaining_.28CBC.29',
                },
-        CFB => { info=>'Block cipher mode CFB [Cipher feedback]', 
+        CFB => { info=>'Block cipher mode CFB [Cipher feedback]',
                  desc=>"This module implements CFB cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).",
                  url=>'https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_feedback_.28CFB.29',
                },
-        CTR => { info=>'Block cipher mode CTR [Counter mode]', 
+        CTR => { info=>'Block cipher mode CTR [Counter mode]',
                  desc=>"This module implements CTR cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).",
                  url=>'https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Counter_.28CTR.29',
                },
-        ECB => { info=>'Block cipher mode ECB [Electronic codebook]', 
+        ECB => { info=>'Block cipher mode ECB [Electronic codebook]',
                  desc=>"This module implements ECB cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).\n".
                        "BEWARE: ECB is inherently insecure, if you are not sure go for L<Crypt::Mode::CBC>!",
                  url=>'https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_codebook_.28ECB.29',
                },
-        OFB => { info=>'Block cipher mode OFB [Output feedback]', 
+        OFB => { info=>'Block cipher mode OFB [Output feedback]',
                  desc=>"This module implements OFB cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).",
                  url=>'https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Output_feedback_.28OFB.29',
                },
-#        F8  => { info=>'Block cipher mode F8', 
+#        F8  => { info=>'Block cipher mode F8',
 #                 desc=>q[xxx-desc-goes here]},
-#        LRW => { info=>'Block cipher mode LRW [Liskov, Rivest, Wagner]', 
+#        LRW => { info=>'Block cipher mode LRW [Liskov, Rivest, Wagner]',
 #                 desc=>q[xxx-desc-goes here]},
-#        XTS => { info=>'Block cipher mode XTS [XEX-based tweaked-codebook mode with ciphertext stealing]', 
+#        XTS => { info=>'Block cipher mode XTS [XEX-based tweaked-codebook mode with ciphertext stealing]',
 #                 desc=>q[xxx-desc-goes here]},
 );
 
@@ -60,7 +60,7 @@ for my $n (keys %list) {
     info      => $list{$n}->{info},
     desc      => $list{$n}->{desc},
   };
-   
+
   if ($outdir_t) {
     #require Crypt::...
 
@@ -73,7 +73,7 @@ for my $n (keys %list) {
 
   if ($outdir_l) {
     if (1) {  # if($n ne 'CBC' || $n ne 'ECB') {
-      my $xs_out = catfile($outdir_l, "CryptX_Mode_$n.xs.inc");  
+      my $xs_out = catfile($outdir_l, "CryptX_Mode_$n.xs.inc");
       my $xs_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
       if ($n eq 'CBC' || $n eq 'ECB') {
         $xs_tt->process("$FindBin::Bin/Mode_p.xs.inc.tt", $data, "$xs_out.$$") || die $xs_tt->error(), "\n";
@@ -84,7 +84,7 @@ for my $n (keys %list) {
       copy("$xs_out.$$", $xs_out) and warn("Writting '$xs_out'\n") unless equal_files("$xs_out.$$", $xs_out);
       unlink "$xs_out.$$";
     }
-    
+
     my $pm_out = catfile($outdir_l, "Crypt", "Mode", "$n.pm");
     my $pm_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
     $pm_tt->process("$FindBin::Bin/Mode.pm.tt", $data, "$pm_out.$$") || die $pm_tt->error(), "\n";

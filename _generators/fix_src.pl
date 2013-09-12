@@ -12,9 +12,9 @@ sub replace_text {
   my ($dir, $oldstring, $newstring) = @_;
   my @files;
   warn "replace: '$oldstring' > '$newstring'\n";
-  find({ wanted=>sub { push @files, $_ if /\.c$/ }, no_chdir=>1 }, $dir); 
+  find({ wanted=>sub { push @files, $_ if /\.c$/ }, no_chdir=>1 }, $dir);
   #warn "replace: count=",scalar(@files),"\n";
-  for my $m (sort @files) { 
+  for my $m (sort @files) {
     my $txt1 = read_file($m, binmode => ':utf8');
     my $txt2 = $txt1;
     $txt2 =~ s/\Q$oldstring\E/$newstring/g;
@@ -26,7 +26,7 @@ sub replace_text {
 sub remove_files {
   my ($dir, $re) = @_;
   my @files;
-  find({ wanted=>sub { push @files, $_ }, no_chdir=>1 }, $dir); 
+  find({ wanted=>sub { push @files, $_ }, no_chdir=>1 }, $dir);
   for my $m (sort @files) {
     warn "unlink $m" if $m =~ $re;
     unlink $m if $m =~ $re;
@@ -59,7 +59,7 @@ for my $f (@rename2inc) {
   my (undef, undef, $file) = File::Spec->splitpath($src);
   my $dst = "$src.inc";
   rename($src, $dst);
-  replace_text($srcdir, "$file\"", "$file.inc\"");  
+  replace_text($srcdir, "$file\"", "$file.inc\"");
 }
 
 remove_files($srcdir, qr/_test\.c$/);
