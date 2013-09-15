@@ -8,7 +8,7 @@ TODO:
         - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
 
 0.016   2013/09/15
-        - added missing test for key2hash, sign_has, verify_hash
+        - added missing test for key2hash, sign_hash, verify_hash
         - fixed build failures on VC6
 
 0.015   2013/09/12
