@@ -71,7 +71,7 @@ size_q(Crypt::PK::DSA self)
 
 SV*
 key2hash(Crypt::PK::DSA self)
-    INIT:
+    PREINIT:
         HV *rv_hash;
         long siz;
         unsigned char buf[20001];

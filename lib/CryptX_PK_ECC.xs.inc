@@ -80,7 +80,7 @@ size(Crypt::PK::ECC self)
 
 SV*
 key2hash(Crypt::PK::ECC self)
-    INIT:
+    PREINIT:
         HV *rv_hash;
         long siz;
         unsigned char buf[20001];

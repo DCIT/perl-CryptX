@@ -5,6 +5,12 @@ int base64_encode(const unsigned char *in,  unsigned long len,
 
 int base64_decode(const unsigned char *in,  unsigned long len,
                         unsigned char *out, unsigned long *outlen);
+
+int base64url_encode(const unsigned char *in,  unsigned long len,
+                        unsigned char *out, unsigned long *outlen);
+
+int base64url_decode(const unsigned char *in,  unsigned long len,
+                        unsigned char *out, unsigned long *outlen);
 #endif
 
 /* ---- MEM routines ---- */

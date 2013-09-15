@@ -64,7 +64,7 @@ size(Crypt::PK::RSA self)
 
 SV*
 key2hash(Crypt::PK::RSA self)
-    INIT:
+    PREINIT:
         HV *rv_hash;
         long siz;
         unsigned char buf[20001];

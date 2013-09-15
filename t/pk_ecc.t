@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_shared_secret);
+use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret);
 
 {
   my $k;
@@ -11,6 +11,7 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   ok($k, 'load cryptx_priv_ecc1.der');
   ok($k->is_private, 'is_private cryptx_priv_ecc1.der');
   is($k->size, 32, 'size');
+  is(uc($k->key2hash->{pub_x}), 'AB53ED5D16CE550BAAF16BA4F161332AAD56D63790629C27871ED515D4FC229C', 'key2hash');
 
   $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc2.der');
   ok($k, 'load cryptx_priv_ecc2.der');
@@ -53,8 +54,13 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   is($pt, "secret message", 'decrypt');
  
   my $sig = $pr1->sign_message("message");
-  ok(length $sig > 60, 'sign ' . length($sig));
-  ok($pu1->verify_message($sig, "message"), 'verify');
+  ok(length $sig > 60, 'sign_message ' . length($sig));
+  ok($pu1->verify_message($sig, "message"), 'verify_message');
+
+  my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
+  $sig = $pr1->sign_hash($hash, 'SHA1');
+  ok(length $sig > 60, 'sign_hash ' . length($sig));
+  ok($pu1->verify_hash($sig, $hash, 'SHA1'), 'verify_hash'); 
  
   my $pr2 = Crypt::PK::ECC->new;
   $pr2->import_key('t/data/cryptx_priv_ecc2.der');
@@ -85,6 +91,10 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   my $sig = ecc_sign_message('t/data/cryptx_priv_ecc1.der', 'test string');
   ok($sig, 'ecc_sign_message');
   ok(ecc_verify_message('t/data/cryptx_pub_ecc1.der', $sig, 'test string'), 'ecc_verify_message');
+  my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
+  $sig = ecc_sign_hash('t/data/cryptx_priv_ecc1.der', $hash, 'SHA1');
+  ok($sig, 'ecc_sign_hash');
+  ok(ecc_verify_hash('t/data/cryptx_pub_ecc1.der', $sig, $hash, 'SHA1'), 'ecc_verify_hash');
   
   my $ss1 = ecc_shared_secret('t/data/cryptx_priv_ecc1.der', 't/data/cryptx_pub_ecc2.der');
   my $ss2 = ecc_shared_secret('t/data/cryptx_priv_ecc2.der', 't/data/cryptx_pub_ecc1.der');
