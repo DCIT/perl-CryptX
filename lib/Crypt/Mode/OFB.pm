@@ -57,7 +57,7 @@ This module implements OFB cipher mode. B<NOTE:> it works only with ciphers from
 
 =head2 decrypt
 
-   my $plaintext = $m->encrypt($ciphertext, $key, $iv);
+   my $plaintext = $m->decrypt($ciphertext, $key, $iv);
 
 =head2 start_encrypt
 

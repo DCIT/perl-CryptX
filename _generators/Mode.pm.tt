@@ -109,7 +109,7 @@ Crypt::Mode::[%orig_name%] - [%info%]
 [%-IF lc_name == 'ecb' %]
    my $plaintext = $m->decrypt($ciphertext, $key);
 [%-ELSE%]
-   my $plaintext = $m->encrypt($ciphertext, $key, $iv);
+   my $plaintext = $m->decrypt($ciphertext, $key, $iv);
 [%-END%]
 
 =head2 start_encrypt
