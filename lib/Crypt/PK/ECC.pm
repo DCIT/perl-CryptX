@@ -9,6 +9,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
+use Crypt::PK;
 use Crypt::Digest 'digest_data';
 use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
@@ -34,7 +35,7 @@ sub import_key {
     $data = $$key;
   }
   elsif (-f $key) {
-    $data = _slurp_file($key);
+    $data = Crypt::PK::_slurp_file($key);
   }
   else {
     croak "FATAL: non-existing file '$key'";
@@ -134,16 +135,6 @@ sub ecc_shared_secret {
   carp "FATAL: invalid 'privkey' param" unless ref($privkey) eq __PACKAGE__ && $privkey->is_private;
   carp "FATAL: invalid 'pubkey' param"  unless ref($pubkey)  eq __PACKAGE__;
   return $privkey->shared_secret($pubkey);
-}
-
-sub _slurp_file {
-  my $f = shift;
-  local $/ = undef;
-  open FILE, "<", $f or croak "FATAL: couldn't open file: $!";
-  binmode FILE;
-  my $string = <FILE>;
-  close FILE;
-  return $string;
 }
 
 sub CLONE_SKIP { 1 } # prevent cloning

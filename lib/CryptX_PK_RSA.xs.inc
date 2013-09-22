@@ -40,7 +40,8 @@ _import(Crypt::PK::RSA self, SV * key_data)
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         rsa_free(&self->key);
         rv = rsa_import(data, (unsigned long)data_len, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: rsa_import failed: %s", error_to_string(rv));
+        //if (rv != CRYPT_OK) { warn("x\n"); rsa_free(&self->key); croak("FATAL: rsa_import failed: %s", error_to_string(rv)); }
+        if (rv != CRYPT_OK) { warn("x\n"); croak("FATAL: rsa_import failed: %s", error_to_string(rv)); }
         RETVAL = 1; /* xxx */
     }
     OUTPUT:
@@ -363,6 +364,6 @@ _verify(Crypt::PK::RSA self, SV * sig, SV * data, char * padding, char * hash_na
 void
 DESTROY(Crypt::PK::RSA self)
     CODE:
-        rsa_free(&self->key);
+        /* rsa_free(&self->key); */ /* XXX-HACK segfaults */
         Safefree(self);
 

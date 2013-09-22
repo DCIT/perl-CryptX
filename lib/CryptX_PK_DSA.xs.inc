@@ -258,6 +258,6 @@ _verify(Crypt::PK::DSA self, SV * sig, SV * data)
 void
 DESTROY(Crypt::PK::DSA self)
     CODE:
-        dsa_free(&self->key);
+        /* dsa_free(&self->key); */ /* XXX-HACK segfaults */
         Safefree(self);
 
