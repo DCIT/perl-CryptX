@@ -366,7 +366,6 @@ Support for password protected PEM keys
  
  # supported ciphers: 'DES-CBC'
  #                    'DES-EDE3-CBC'
- #                    'DES-EDE3'
  #                    'SEED-CBC'
  #                    'AES-128-CBC'
  #                    'AES-192-CBC'
