@@ -42,3 +42,11 @@ sub addfile {
 sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
+
+__END__
+ 
+=head1 NAME
+ 
+Crypt::mode - [internal only]
+ 
+=cut

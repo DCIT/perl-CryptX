@@ -102,3 +102,11 @@ sub _asn1_to_pem {
 }
 
 1;
+
+__END__
+ 
+=head1 NAME
+ 
+Crypt::PK - [internal only]
+ 
+=cut

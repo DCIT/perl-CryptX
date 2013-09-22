@@ -7,7 +7,7 @@ TODO:
         - croak when mode does not call start_(en|de)crypt
         - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
 
-0.017   2013/XXXXX
+0.016_1 2013/09/22
         - support for import/export of password protected RSA/DSA keys
         - RSA: added - export_key_pem('public_x509')
 

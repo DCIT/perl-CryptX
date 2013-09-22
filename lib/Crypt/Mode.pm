@@ -59,3 +59,11 @@ sub _finish {
 sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
+
+__END__
+ 
+=head1 NAME
+ 
+Crypt::Mode - [internal only]
+ 
+=cut
