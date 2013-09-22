@@ -15,9 +15,9 @@ use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
 
 sub new {
-  my ($class, $f) = @_;
+  my ($class, $f, $p) = @_;
   my $self = _new();
-  $self->import_key($f) if $f;
+  $self->import_key($f, $p) if $f;
   return  $self;
 }
 
@@ -32,8 +32,10 @@ sub export_key_pem {
   return Crypt::PK::_asn1_to_pem($key, "RSA PRIVATE KEY", $password, $cipher) if $type eq 'private';
 
   # PKCS#1 RSAPublicKey* (PEM header: BEGIN RSA PUBLIC KEY)
-  # X.509 SubjectPublicKeyInfo** (PEM header: BEGIN PUBLIC KEY)
   return Crypt::PK::_asn1_to_pem($key, "RSA PUBLIC KEY") if $type eq 'public';
+  # X.509 SubjectPublicKeyInfo** (PEM header: BEGIN PUBLIC KEY)
+  return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public_x509';
+  
 }
 
 sub generate_key {
@@ -343,6 +345,32 @@ Support for password protected PEM keys
  my $private_pem = $pk->export_key_pem('private');
  #or
  my $public_pem = $pk->export_key_pem('public');
+ #or
+ my $public_pem = $pk->export_key_pem('public_x509');
+
+With parameter C<'public'> uses header and footer lines:
+
+  -----BEGIN RSA PUBLIC KEY------
+  -----END RSA PUBLIC KEY------
+
+With parameter C<'public_x509'> uses header and footer lines:
+
+  -----BEGIN PUBLIC KEY------
+  -----END PUBLIC KEY------
+
+Support for password protected PEM keys
+
+ my $private_pem = $pk->export_key_pem('private', $password);
+ #or
+ my $private_pem = $pk->export_key_pem('private', $password, $cipher);
+ 
+ # supported ciphers: 'DES-CBC'
+ #                    'DES-EDE3-CBC'
+ #                    'DES-EDE3'
+ #                    'SEED-CBC'
+ #                    'AES-128-CBC'
+ #                    'AES-192-CBC'
+ #                    'AES-256-CBC' (DEFAULT)
 
 =head2 encrypt
 

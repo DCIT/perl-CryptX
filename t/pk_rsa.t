@@ -86,6 +86,7 @@ use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_messag
   ok($k->is_private, 'is_private');
   ok($k->export_key_pem('private'), 'export_key_pem pri');
   ok($k->export_key_pem('public'), 'export_key_pem pub');
+  ok($k->export_key_pem('public_x509'), 'export_key_pem pub_x509');
   ok($k->export_key_der('private'), 'export_key_der pri');
   ok($k->export_key_der('public'), 'export_key_der pub');
 }

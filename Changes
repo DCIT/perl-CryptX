@@ -1,11 +1,15 @@
 Changes for CryptX
 
 TODO:
-        - consider: RSA->check_key, RSA password protected keys
-        - consider: PK->encrypt|decrypt ... add 'armour' param and make it compatible with Crypt::RSA
+        - fix crash/memleak/or_what_it_is related to rsa_free/dsa_free
+        - RSA->check_key (basic check + extented primality test)
         - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - croak when mode does not call start_(en|de)crypt
         - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
+
+0.017   2013/XXXXX
+        - support for import/export of password protected RSA/DSA keys
+        - RSA: added - export_key_pem('public_x509')
 
 0.016   2013/09/15
         - added missing test for key2hash, sign_hash, verify_hash

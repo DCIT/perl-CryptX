@@ -35,8 +35,7 @@ sub _name2mode {
   $klen = $klen ? int($klen/8) : Crypt::Cipher::min_keysize($cipher);
   my $ilen = Crypt::Cipher::blocksize($cipher);
   croak "FATAL: unsupported cipher '$cipher_name'" unless $klen && $ilen;
-  
-   
+
   return (Crypt::Mode::CBC->new($cipher), $klen, $ilen) if $mode eq 'CBC';
   return (Crypt::Mode::CFB->new($cipher), $klen, $ilen) if $mode eq 'CFB';
   return (Crypt::Mode::ECB->new($cipher), $klen, $ilen) if $mode eq 'ECB';
@@ -45,7 +44,7 @@ sub _name2mode {
 
 sub _password2key {
   my ($password, $klen, $iv, $hash) = @_;
-  my $salt = substr($iv,0,8);
+  my $salt = substr($iv, 0, 8);
   my $key = '';
   while (length($key) < $klen) {
     $key .= digest_data($hash, $key . $password . $salt);
@@ -55,23 +54,23 @@ sub _password2key {
 
 sub _pem_to_asn1 {
   my ($data, $password) = @_;
-  
+
   my ($begin, $object, $headers, $content, $end) = $data =~ m/(-----BEGIN ([^\n\-]+)-----)\n(.*?\n\n)?(.+)(-----END .*?-----)/s;
   return $content unless $content;
   $content = decode_base64($content);
-  
+
   my ($ptype, $cipher_name, $iv_hex);
   for my $h (split /\n/, $headers//'') {
     my ($k, $v) = split /:\s*/, $h, 2;
     $ptype = $v if $k eq 'Proc-Type';
     ($cipher_name, $iv_hex) = $v =~ /^\s*(.*?)\s*,\s*([0-9a-fA-F]+)\s*$/ if $k eq 'DEK-Info';
   }
-  
+
   if ($cipher_name && $iv_hex && $ptype && $ptype eq '4,ENCRYPTED') {
     croak "FATAL: encrypted PEM but no password provided" unless defined $password;
     my $iv = pack("H*", $iv_hex);
     my ($mode, $klen) = _name2mode($cipher_name);
-    my $key = _password2key($password, $klen, $iv, 'MD5');    
+    my $key = _password2key($password, $klen, $iv, 'MD5');
     return $mode->decrypt($content, $key, $iv);
   }
 
@@ -87,11 +86,11 @@ sub _asn1_to_pem {
     $cipher_name ||= 'AES-256-CBC';
     my ($mode, $klen, $ilen) = _name2mode($cipher_name);
     my $iv = random_bytes($ilen);
-    my $key = _password2key($password, $klen, $iv, 'MD5');    
+    my $key = _password2key($password, $klen, $iv, 'MD5');
     $content = $mode->encrypt($data, $key, $iv);
     push @headers, 'Proc-Type: 4,ENCRYPTED', "DEK-Info: ".uc($cipher_name).",".unpack("H*", $iv);
   }
-  
+
   my $rv = "-----BEGIN $header_name-----\n";
   if (@headers) {
     $rv .= "$_\n" for @headers;

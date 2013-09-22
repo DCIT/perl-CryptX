@@ -15,9 +15,9 @@ use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64);
 
 sub new {
-  my ($class, $f) = @_;
+  my ($class, $f, $p) = @_;
   my $self = _new();
-  $self->import_key($f) if $f;
+  $self->import_key($f, $p) if $f;
   return  $self;
 }
 
@@ -319,6 +319,20 @@ Support for password protected PEM keys
  my $private_pem = $pk->export_key_pem('private');
  #or
  my $public_pem = $pk->export_key_pem('public');
+
+Support for password protected PEM keys
+
+ my $private_pem = $pk->export_key_pem('private', $password);
+ #or
+ my $private_pem = $pk->export_key_pem('private', $password, $cipher);
+ 
+ # supported ciphers: 'DES-CBC'
+ #                    'DES-EDE3-CBC'
+ #                    'DES-EDE3'
+ #                    'SEED-CBC'
+ #                    'AES-128-CBC'
+ #                    'AES-192-CBC'
+ #                    'AES-256-CBC' (DEFAULT)
 
 =head2 encrypt
 
