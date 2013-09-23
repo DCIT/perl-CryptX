@@ -35,7 +35,7 @@ sub remove_files {
 
 ### MAIN
 
-my $srcdir = catdir($FindBin::Bin, "..", "libtomcrypt-src");
+my $srcdir = catdir($FindBin::Bin, "..", "src/ltc");
 
 my @lines = read_file("$srcdir/headers/tomcrypt_custom.h");
 @lines = map { s|^([\t\s]*)#define LTC_YARROW_AES \d+|$1#define LTC_YARROW_AES 3|; $_ } @lines;

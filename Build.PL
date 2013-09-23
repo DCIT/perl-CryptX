@@ -4,9 +4,7 @@ use warnings;
 use Module::Build;
 use Config;
 
-my $src = 'libtom-src';
-my $flags = '-Ilibtom-src/headers -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -Ilibtom-src -DLTM_DESC';
-
+my $flags = '-Isrc/ltc/headers -Isrc/ltm -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC';
 #$flags .= ' -DLTC_NO_ASM';
 #$flags .= ' -Wall';
 
@@ -61,7 +59,7 @@ my $builder = $class->new(
   license              => 'perl',
   create_readme        => 1,
   extra_compiler_flags => $flags,
-  c_source             => $src,
+  c_source             => 'src',
   requires             => {
     'perl'          => '5.006',
     'MIME::Base64'  => '3.11',  # we need: encode_base64url

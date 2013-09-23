@@ -1,8 +1,8 @@
 @echo off
 echo STARTED...
-xcopy /Y y:\_repos\libtommath\*.c y:\_repos\_mygit\perl-cryptx\libtommath-src
-xcopy /Y y:\_repos\libtommath\*.h y:\_repos\_mygit\perl-cryptx\libtommath-src
-xcopy /Y /E y:\_repos\libtomcrypt\src\* y:\_repos\_mygit\perl-cryptx\libtomcrypt-src
+xcopy /Y y:\_repos\libtommath\*.c d:\git\cryptx\src\ltm
+xcopy /Y y:\_repos\libtommath\*.h d:\git\cryptx\src\ltm
+xcopy /Y /E y:\_repos\libtomcrypt\src\* d:\git\cryptx\src\ltc
 perl fix_src.pl
 echo DONE!
 pause
