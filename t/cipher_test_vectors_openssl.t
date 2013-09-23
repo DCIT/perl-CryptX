@@ -20,6 +20,7 @@ while (my $l = <DATA>) {
   $flag = ($flag && $flag eq ':1') ? 1 : 0;
   $cipher_name = uc($cipher_name);
   next if $cipher_name =~ /^(DESX-CBC|RC4)$/;
+  next if $cipher_name =~ /CAMELLIA/; #XXX-FIXME
   die "UNEXPECTED '$l'" unless $cipher_name;
   my ($cipher, undef, $klen, $mode) = $cipher_name =~ /^(AES|DES|DES-EDE3|SEED|CAMELLIA)(-(\d+))?-(CBC|CFB|ECB|OFB|CTR)$/i;
   die "UNKNOWN CIPHER '$cipher_name'" unless $cipher;
