@@ -37,7 +37,7 @@ _import(Crypt::PK::ECC self, SV * key_data)
         STRLEN data_len=0;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        ecc_free(&self->key);
+        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
         rv = ecc_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_import failed: %s", error_to_string(rv));
         RETVAL = 1; /* xxx */
@@ -54,7 +54,7 @@ import_key_x963(Crypt::PK::ECC self, SV * key_data)
         STRLEN data_len=0;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        ecc_free(&self->key);
+        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
         rv = ecc_ansi_x963_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_ansi_x963_import failed: %s", error_to_string(rv));
         RETVAL = 1; /* xxx */
@@ -295,6 +295,6 @@ shared_secret(Crypt::PK::ECC self, Crypt::PK::ECC pubkey)
 void
 DESTROY(Crypt::PK::ECC self)
     CODE:
-        ecc_free(&self->key);
+        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
         Safefree(self);
 

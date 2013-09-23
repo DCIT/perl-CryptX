@@ -37,7 +37,7 @@ _import(Crypt::PK::DSA self, SV * key_data)
         STRLEN data_len=0;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        dsa_free(&self->key);
+        if (self->key.type != -1) { dsa_free(&self->key); self->key.type = -1; }
         rv = dsa_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dsa_import failed: %s", error_to_string(rv));
         RETVAL = 1; /* xxx */
@@ -258,6 +258,6 @@ _verify(Crypt::PK::DSA self, SV * sig, SV * data)
 void
 DESTROY(Crypt::PK::DSA self)
     CODE:
-        /* dsa_free(&self->key); */ /* XXX-HACK segfaults */
+        if (self->key.type != -1) { dsa_free(&self->key); self->key.type = -1; }
         Safefree(self);
 

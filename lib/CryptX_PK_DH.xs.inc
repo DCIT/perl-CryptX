@@ -37,7 +37,7 @@ _import(Crypt::PK::DH self, SV * key_data)
         STRLEN data_len=0;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        dh_free(&self->key);
+        if (self->key.type != -1) { dh_free(&self->key); self->key.type = -1; }
         rv = dh_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dh_import failed: %s", error_to_string(rv));
         RETVAL = 1; /* xxx */
@@ -232,6 +232,6 @@ shared_secret(Crypt::PK::DH self, Crypt::PK::DH pubkey)
 void
 DESTROY(Crypt::PK::DH self)
     CODE:
-        dh_free(&self->key);
+        if (self->key.type != -1) { dh_free(&self->key); self->key.type = -1; }
         Safefree(self);
 
