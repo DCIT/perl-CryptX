@@ -60,7 +60,7 @@ sub _pem_to_asn1 {
   $content = decode_base64($content);
 
   my ($ptype, $cipher_name, $iv_hex);
-  for my $h (split /\n/, $headers//'') {
+  for my $h (split /\n/, ($headers||'')) {
     my ($k, $v) = split /:\s*/, $h, 2;
     $ptype = $v if $k eq 'Proc-Type';
     ($cipher_name, $iv_hex) = $v =~ /^\s*(.*?)\s*,\s*([0-9a-fA-F]+)\s*$/ if $k eq 'DEK-Info';
