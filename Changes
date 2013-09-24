@@ -7,16 +7,18 @@ TODO:
         - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - croak when mode does not call start_(en|de)crypt
         - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
-        - misc patches
-          https://secure.ucc.asn.au/hg/dropbear/rev/9a789fc03f40?revcount=240          
+        - better primality testing: 
+          http://questhub.io/realm/perl/quest/519032ee1088c76505000035
+        - misc libtomcrypt patches:
+          https://secure.ucc.asn.au/hg/dropbear/rev/9a789fc03f40?revcount=240 (free rsa key)
 
-0.017   2013/09/24
+0.016_4 2013/09/24
         - lowering MIME::Base64 version requirement
         - support for import/export of password protected RSA/DSA keys
         - RSA: added - export_key_pem('public_x509')
         - better handling of dh_free/rsa_free/dsa_free/ecc_free
         - added openssl test vectors
-        - fixing compiler warnings (RSA/DSA/ECC/DH)
+        - fixed compiler warnings (RSA/DSA/ECC/DH)
 
 0.016   2013/09/15
         - added missing test for key2hash, sign_hash, verify_hash
