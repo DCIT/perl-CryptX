@@ -67,34 +67,6 @@ static const unsigned char map_base64url[256] = {
 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
 255, 255, 255, 255 };
 
-/**
-   base64 decode a block of memory
-   @param in       The base64 data to decode
-   @param inlen    The length of the base64 data
-   @param out      [out] The destination of the binary decoded data
-   @param outlen   [in/out] The max size and resulting size of the decoded data
-   @return CRYPT_OK if successful
-*/
-int base64_decode(const unsigned char *in,  unsigned long inlen, 
-                        unsigned char *out, unsigned long *outlen)
-{
-    return base64_decode_internal(in, inlen, out, outlen, map_base64);
-}
-
-/**
-   base64 (URL Safe, RFC 4648 section 5) decode a block of memory
-   @param in       The base64 data to decode
-   @param inlen    The length of the base64 data
-   @param out      [out] The destination of the binary decoded data
-   @param outlen   [in/out] The max size and resulting size of the decoded data
-   @return CRYPT_OK if successful
-*/
-int base64url_decode(const unsigned char *in,  unsigned long inlen, 
-                           unsigned char *out, unsigned long *outlen)
-{
-    return base64_decode_internal(in, inlen, out, outlen, map_base64url);
-}
-
 int base64_decode_internal(const unsigned char *in,  unsigned long inlen,
                                  unsigned char *out, unsigned long *outlen,
                            const unsigned char *map)
@@ -140,6 +112,34 @@ int base64_decode_internal(const unsigned char *in,  unsigned long inlen,
    }
    *outlen = z;
    return CRYPT_OK;
+}
+
+/**
+   base64 decode a block of memory
+   @param in       The base64 data to decode
+   @param inlen    The length of the base64 data
+   @param out      [out] The destination of the binary decoded data
+   @param outlen   [in/out] The max size and resulting size of the decoded data
+   @return CRYPT_OK if successful
+*/
+int base64_decode(const unsigned char *in,  unsigned long inlen, 
+                        unsigned char *out, unsigned long *outlen)
+{
+    return base64_decode_internal(in, inlen, out, outlen, map_base64);
+}
+
+/**
+   base64 (URL Safe, RFC 4648 section 5) decode a block of memory
+   @param in       The base64 data to decode
+   @param inlen    The length of the base64 data
+   @param out      [out] The destination of the binary decoded data
+   @param outlen   [in/out] The max size and resulting size of the decoded data
+   @return CRYPT_OK if successful
+*/
+int base64url_decode(const unsigned char *in,  unsigned long inlen, 
+                           unsigned char *out, unsigned long *outlen)
+{
+    return base64_decode_internal(in, inlen, out, outlen, map_base64url);
 }
 
 #endif

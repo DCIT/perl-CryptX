@@ -9,7 +9,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use MIME::Base64 qw(encode_base64 encode_base64url);
+use MIME::Base64 qw(encode_base64);
 
 sub _trans_prng_name {
   my $name = shift;
@@ -35,7 +35,7 @@ sub bytes_hex { return unpack("H*", shift->bytes(shift)) }
 
 sub bytes_b64 { return encode_base64(shift->bytes(shift), "") }
 
-sub bytes_b64u { return encode_base64url(shift->bytes(shift), "") }
+sub bytes_b64u { return _base64url_enc(shift->bytes(shift), "") }
 
 sub string {
   my ($self, $len) = @_;
@@ -88,6 +88,16 @@ sub CLONE_SKIP { 1 } # prevent cloning
   sub random_bytes_b64u  { return $fetch_RNG->()->bytes_b64u(@_) }
   sub random_string_from { return $fetch_RNG->()->string_from(@_) }
   sub random_string      { return $fetch_RNG->()->string(@_) }
+}
+
+# Base64 URL Safe hack as encode_base64url requires MIME::Base64 3.11+
+sub _base64url_enc {
+    # RFC 4648 Base64 URL Safe - https://tools.ietf.org/html/rfc4648#page-7
+    my $data = shift;
+    my $b64 = encode_base64($data, '');
+    $b64 =~ s/=+\z//;
+    $b64 =~ tr[+/][-_];
+    return $b64;
 }
 
 1;

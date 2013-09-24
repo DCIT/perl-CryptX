@@ -83,7 +83,8 @@ key2hash(Crypt::PK::ECC self)
     PREINIT:
         HV *rv_hash;
         long siz;
-        unsigned char buf[20001];
+        char buf[20001];
+        SV **not_used;
     CODE:
         if (self->key.type == -1) XSRETURN_UNDEF;
         rv_hash = newHV();
@@ -94,10 +95,10 @@ key2hash(Crypt::PK::ECC self)
         }
         if (siz>0) {
           mp_tohex(self->key.k, buf);
-          hv_store(rv_hash, "k", 1, newSVpv(buf, strlen(buf)), 0);
+          not_used = hv_store(rv_hash, "k", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
-          hv_store(rv_hash, "k", 1, newSVpv("", 0), 0);
+          not_used = hv_store(rv_hash, "k", 1, newSVpv("", 0), 0);
         }
         /* =====> pub_x */
         siz = (self->key.pubkey.x) ? ltc_mp.unsigned_size(self->key.pubkey.x) : 0;
@@ -106,10 +107,10 @@ key2hash(Crypt::PK::ECC self)
         }
         if (siz>0) {
           mp_tohex(self->key.pubkey.x, buf);
-          hv_store(rv_hash, "pub_x", 5, newSVpv(buf, strlen(buf)), 0);
+          not_used = hv_store(rv_hash, "pub_x", 5, newSVpv(buf, strlen(buf)), 0);
         }
         else{
-          hv_store(rv_hash, "pub_x", 5, newSVpv("", 0), 0);
+          not_used = hv_store(rv_hash, "pub_x", 5, newSVpv("", 0), 0);
         }
         /* =====> pub_y */
         siz = (self->key.pubkey.y) ? ltc_mp.unsigned_size(self->key.pubkey.y) : 0;
@@ -118,10 +119,10 @@ key2hash(Crypt::PK::ECC self)
         }
         if (siz>0) {
           mp_tohex(self->key.pubkey.y, buf);
-          hv_store(rv_hash, "pub_y", 5, newSVpv(buf, strlen(buf)), 0);
+          not_used = hv_store(rv_hash, "pub_y", 5, newSVpv(buf, strlen(buf)), 0);
         }
         else{
-          hv_store(rv_hash, "pub_y", 5, newSVpv("", 0), 0);
+          not_used = hv_store(rv_hash, "pub_y", 5, newSVpv("", 0), 0);
         }
         /* =====> pub_z */
         siz = (self->key.pubkey.z) ? ltc_mp.unsigned_size(self->key.pubkey.z) : 0;
@@ -130,25 +131,26 @@ key2hash(Crypt::PK::ECC self)
         }
         if (siz>0) {
           mp_tohex(self->key.pubkey.z, buf);
-          hv_store(rv_hash, "pub_z", 5, newSVpv(buf, strlen(buf)), 0);
+          not_used = hv_store(rv_hash, "pub_z", 5, newSVpv(buf, strlen(buf)), 0);
         }
         else{
-          hv_store(rv_hash, "pub_z", 5, newSVpv("", 0), 0);
+          not_used = hv_store(rv_hash, "pub_z", 5, newSVpv("", 0), 0);
         }
         /* =====> curve_... */
         if (self->key.idx>=0) {
-          hv_store(rv_hash, "curve_name",  10, newSVpv(self->key.dp->name,  strlen(self->key.dp->name)), 0);
-          hv_store(rv_hash, "curve_prime", 11, newSVpv(self->key.dp->prime, strlen(self->key.dp->prime)), 0);
-          hv_store(rv_hash, "curve_B",      7, newSVpv(self->key.dp->B,     strlen(self->key.dp->B)), 0);
-          hv_store(rv_hash, "curve_order", 11, newSVpv(self->key.dp->order, strlen(self->key.dp->order)), 0);
-          hv_store(rv_hash, "curve_Gx",     8, newSVpv(self->key.dp->Gx,    strlen(self->key.dp->Gx)), 0);
-          hv_store(rv_hash, "curve_Gy",     8, newSVpv(self->key.dp->Gy,    strlen(self->key.dp->Gy)), 0);
-          hv_store(rv_hash, "curve_size",  10, newSViv(self->key.dp->size), 0);
+          not_used = hv_store(rv_hash, "curve_name",  10, newSVpv(self->key.dp->name,  strlen(self->key.dp->name)), 0);
+          not_used = hv_store(rv_hash, "curve_prime", 11, newSVpv(self->key.dp->prime, strlen(self->key.dp->prime)), 0);
+          not_used = hv_store(rv_hash, "curve_B",      7, newSVpv(self->key.dp->B,     strlen(self->key.dp->B)), 0);
+          not_used = hv_store(rv_hash, "curve_order", 11, newSVpv(self->key.dp->order, strlen(self->key.dp->order)), 0);
+          not_used = hv_store(rv_hash, "curve_Gx",     8, newSVpv(self->key.dp->Gx,    strlen(self->key.dp->Gx)), 0);
+          not_used = hv_store(rv_hash, "curve_Gy",     8, newSVpv(self->key.dp->Gy,    strlen(self->key.dp->Gy)), 0);
+          not_used = hv_store(rv_hash, "curve_size",  10, newSViv(self->key.dp->size), 0);
         }
         /* =====> size */
-        hv_store(rv_hash, "size", 4, newSViv(ecc_get_size(&self->key)), 0);
+        not_used = hv_store(rv_hash, "size", 4, newSViv(ecc_get_size(&self->key)), 0);
         /* =====> type */
-        hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
+        not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
+        if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */
         RETVAL = newRV_noinc((SV*)rv_hash);
     OUTPUT:
         RETVAL

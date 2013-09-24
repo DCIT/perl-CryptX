@@ -62,12 +62,12 @@ my $builder = $class->new(
   c_source             => 'src',
   requires             => {
     'perl'          => '5.006',
-    'MIME::Base64'  => '3.11',  # we need: encode_base64url
+    'MIME::Base64'  => 0,
     'Exporter'      => '5.59',  # we need: use Exporter 'import';
   },
   build_requires       => {
     'Module::Build' => 0,
-    'MIME::Base64'  => '3.11',  # we need: encode_base64url
+    'MIME::Base64'  => 0,
     'Test::More'    => '0.88',  # we need: done_testing
     'File::Find'    => 0,
   },

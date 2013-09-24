@@ -66,7 +66,8 @@ key2hash(Crypt::PK::DH self)
     PREINIT:
         HV *rv_hash;
         long siz;
-        unsigned char buf[20001];
+        char buf[20001];
+        SV **not_used;
     CODE:
         if (self->key.type == -1) XSRETURN_UNDEF;
         rv_hash = newHV();
@@ -77,10 +78,10 @@ key2hash(Crypt::PK::DH self)
         }
         if (siz>0) {
           mp_tohex(self->key.x, buf);
-          hv_store(rv_hash, "x", 1, newSVpv(buf, strlen(buf)), 0);
+          not_used = hv_store(rv_hash, "x", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
-          hv_store(rv_hash, "x", 1, newSVpv("", 0), 0);
+          not_used = hv_store(rv_hash, "x", 1, newSVpv("", 0), 0);
         }
         /* =====> y */
         siz = (self->key.y) ? ltc_mp.unsigned_size(self->key.y) : 0;
@@ -89,18 +90,19 @@ key2hash(Crypt::PK::DH self)
         }
         if (siz>0) {
           mp_tohex(self->key.y, buf);
-          hv_store(rv_hash, "y", 1, newSVpv(buf, strlen(buf)), 0);
+          not_used = hv_store(rv_hash, "y", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
-          hv_store(rv_hash, "y", 1, newSVpv("", 0), 0);
+          not_used = hv_store(rv_hash, "y", 1, newSVpv("", 0), 0);
         }
         /* =====> name */
         snprintf(buf, sizeof(buf), "DH-%d", dh_get_size(&self->key)*8);
-        hv_store(rv_hash, "name", 4, newSVpv(buf, strlen(buf)), 0);
+        not_used = hv_store(rv_hash, "name", 4, newSVpv(buf, strlen(buf)), 0);
         /* =====> size */
-        hv_store(rv_hash, "size", 4, newSViv(dh_get_size(&self->key)), 0);
+        not_used = hv_store(rv_hash, "size", 4, newSViv(dh_get_size(&self->key)), 0);
         /* =====> type */
-        hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
+        not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
+        if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */
         RETVAL = newRV_noinc((SV*)rv_hash);
     OUTPUT:
         RETVAL

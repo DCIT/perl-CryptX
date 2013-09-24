@@ -10,11 +10,13 @@ TODO:
         - misc patches
           https://secure.ucc.asn.au/hg/dropbear/rev/9a789fc03f40?revcount=240          
 
-0.016_2 2013/09/23
+0.017   2013/09/24
+        - lowering MIME::Base64 version requirement
         - support for import/export of password protected RSA/DSA keys
         - RSA: added - export_key_pem('public_x509')
         - better handling of dh_free/rsa_free/dsa_free/ecc_free
         - added openssl test vectors
+        - fixing compiler warnings (RSA/DSA/ECC/DH)
 
 0.016   2013/09/15
         - added missing test for key2hash, sign_hash, verify_hash
