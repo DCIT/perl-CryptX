@@ -322,7 +322,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 import_key
 
-Loads private or public key in DER or PEM format (password protected keys are not supported).
+Loads private or public key in DER or PEM format.
 
   $pk->import_key($priv_or_pub_key_filename);
   #or
