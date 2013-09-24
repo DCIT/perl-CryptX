@@ -31,7 +31,7 @@ sub _name2mode {
   #my ($cipher, undef, $klen, $mode) = $cipher_name =~ /^(AES|CAMELLIA|DES|DES-EDE3|SEED)(-(\d+))?-(CBC|CFB|ECB|OFB)$/i;
   my ($cipher, undef, $klen, $mode) = $cipher_name =~ /^(AES|DES|DES-EDE3|SEED)(-(\d+))?-(CBC|CFB|ECB|OFB)$/i;
   croak "FATAL: unsupported cipher '$cipher_name'" unless $cipher && $mode;
-  $cipher = $trans{$cipher} // $cipher;
+  $cipher = $trans{$cipher} || $cipher;
   $klen = $klen ? int($klen/8) : Crypt::Cipher::min_keysize($cipher);
   my $ilen = Crypt::Cipher::blocksize($cipher);
   croak "FATAL: unsupported cipher '$cipher_name'" unless $klen && $ilen;

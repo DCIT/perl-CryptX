@@ -24,6 +24,7 @@ while (my $l = <DATA>) {
   die "UNEXPECTED '$l'" unless $cipher_name;
   my ($cipher, undef, $klen, $mode) = $cipher_name =~ /^(AES|DES|DES-EDE3|SEED|CAMELLIA)(-(\d+))?-(CBC|CFB|ECB|OFB|CTR)$/i;
   die "UNKNOWN CIPHER '$cipher_name'" unless $cipher;
+  $klen ||= 'n.a.';
   $cipher = 'DES_EDE' if $cipher eq 'DES-EDE3';
   $key = pack("H*", $key);
   $iv  = pack("H*", $iv);
@@ -32,32 +33,32 @@ while (my $l = <DATA>) {
   if ($mode eq 'CBC') {
     my $ciphertext = Crypt::Mode::CBC->new($cipher,0)->encrypt($pt, $key, $iv);
     my $plaintext  = Crypt::Mode::CBC->new($cipher,0)->decrypt($ct, $key, $iv);
-    is(unpack('H*', $ciphertext), unpack('H*', $ct), "encrypt: [$cipher-$mode]");
-    is(unpack('H*', $plaintext),  unpack('H*', $pt), "decrypt: [$cipher-$mode]");
+    is(unpack('H*', $ciphertext), unpack('H*', $ct), "encrypt: [$cipher-$mode] $klen");
+    is(unpack('H*', $plaintext),  unpack('H*', $pt), "decrypt: [$cipher-$mode] $klen");
   }
   elsif ($mode eq 'ECB') {
     my $ciphertext = Crypt::Mode::ECB->new($cipher,0)->encrypt($pt, $key);
     my $plaintext  = Crypt::Mode::ECB->new($cipher,0)->decrypt($ct, $key);
-    is(unpack('H*', $ciphertext), unpack('H*', $ct), "encrypt: [$cipher-$mode]");
-    is(unpack('H*', $plaintext),  unpack('H*', $pt), "decrypt: [$cipher-$mode]");
+    is(unpack('H*', $ciphertext), unpack('H*', $ct), "encrypt: [$cipher-$mode] $klen");
+    is(unpack('H*', $plaintext),  unpack('H*', $pt), "decrypt: [$cipher-$mode] $klen");
   }
   elsif ($mode eq 'CFB') {
     my $ciphertext = Crypt::Mode::CFB->new($cipher)->encrypt($pt, $key, $iv);
     my $plaintext  = Crypt::Mode::CFB->new($cipher)->decrypt($ct, $key, $iv);
-    is(unpack('H*', $ciphertext), unpack('H*', $ct), "encrypt: [$cipher-$mode]");
-    is(unpack('H*', $plaintext),  unpack('H*', $pt), "decrypt: [$cipher-$mode]");
+    is(unpack('H*', $ciphertext), unpack('H*', $ct), "encrypt: [$cipher-$mode] $klen");
+    is(unpack('H*', $plaintext),  unpack('H*', $pt), "decrypt: [$cipher-$mode] $klen");
   }
   elsif ($mode eq 'OFB') {
     my $ciphertext = Crypt::Mode::OFB->new($cipher)->encrypt($pt, $key, $iv);
     my $plaintext  = Crypt::Mode::OFB->new($cipher)->decrypt($ct, $key, $iv);
-    is(unpack('H*', $ciphertext), unpack('H*', $ct), "encrypt: [$cipher-$mode]");
-    is(unpack('H*', $plaintext),  unpack('H*', $pt), "decrypt: [$cipher-$mode]");
+    is(unpack('H*', $ciphertext), unpack('H*', $ct), "encrypt: [$cipher-$mode] $klen");
+    is(unpack('H*', $plaintext),  unpack('H*', $pt), "decrypt: [$cipher-$mode] $klen");
   }
   elsif ($mode eq 'CTR') {
     my $ciphertext = Crypt::Mode::CTR->new($cipher,1)->encrypt($pt, $key, $iv);
     my $plaintext  = Crypt::Mode::CTR->new($cipher,1)->decrypt($ct, $key, $iv);
-    is(unpack('H*', $ciphertext), unpack('H*', $ct), "encrypt: [$cipher-$mode]");
-    is(unpack('H*', $plaintext),  unpack('H*', $pt), "decrypt: [$cipher-$mode]");
+    is(unpack('H*', $ciphertext), unpack('H*', $ct), "encrypt: [$cipher-$mode] $klen");
+    is(unpack('H*', $plaintext),  unpack('H*', $pt), "decrypt: [$cipher-$mode] $klen");
   }
   else {
     die "UNKNOWN MODE '$mode'";

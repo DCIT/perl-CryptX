@@ -536,8 +536,15 @@ int camellia_ecb_decrypt(const unsigned char *ct, unsigned char *pt, symmetric_k
 {
    ulong64 L, R;
    ulong32 a, b;
+   int i;
+   typedef union {
+     ulong64 l;
+     unsigned char c[8];
+   } xxx;
+   xxx D;
 
    LOAD64H(R, ct+0); LOAD64H(L, ct+8); 
+//fprintf(stderr,"01:"); D.l = R; for(i=7;i>=0;i--) fprintf(stderr, "%x",D.c[i]); D.l = L; for(i=7;i>=0;i--) fprintf(stderr, "%x",D.c[i]); fprintf(stderr,"\n");
    L ^= skey->camellia.kw[3];
    R ^= skey->camellia.kw[2];
 

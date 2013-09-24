@@ -7,6 +7,8 @@ TODO:
         - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - croak when mode does not call start_(en|de)crypt
         - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
+        - misc patches
+          https://secure.ucc.asn.au/hg/dropbear/rev/9a789fc03f40?revcount=240          
 
 0.016_2 2013/09/23
         - support for import/export of password protected RSA/DSA keys
