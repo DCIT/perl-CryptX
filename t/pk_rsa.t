@@ -78,7 +78,7 @@ use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_messag
   ok(length $sig > 60, 'sign_hash ' . length($sig));
   ok($pu1->verify_hash($sig, $hash, 'SHA1'), 'verify_hash');
 }
-
+#XXX-FIXME somwhere here a crash happens on solaris - http://ppm4.activestate.com/sun4-solaris/5.14/1400/M/MI/MIK/CryptX-0.017.d/log-20130924T103600.txt
 {
   my $k = Crypt::PK::RSA->new;
   $k->generate_key(256, 65537);

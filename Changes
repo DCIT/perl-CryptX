@@ -7,6 +7,10 @@ TODO:
         - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - croak when mode does not call start_(en|de)crypt
         - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
+        - solaris crash:
+          - http://ppm4.activestate.com/sun4-solaris/5.14/1400/M/MI/MIK/CryptX-0.017.d/log-20130924T103600.txt
+          - t/pk_rsa.t crashes after: ok 32 - verify_hash
+          - t/pk_dsa.t crashes after: ok 28 - decrypt
         - better primality testing: http://questhub.io/realm/perl/quest/519032ee1088c76505000035
         - libtomcrypt patch: https://secure.ucc.asn.au/hg/dropbear/rev/9a789fc03f40?revcount=240 (free rsa key)
 

@@ -68,7 +68,7 @@ use Crypt::PK::DSA qw(dsa_encrypt dsa_decrypt dsa_sign_message dsa_verify_messag
   my $pt = $pr1->decrypt($ct);
   ok(length $ct > 200, 'encrypt ' . length($ct));
   is($pt, "secret message", 'decrypt');
- 
+  #XXX-FIXME somwhere here a crash happens on solaris - http://ppm4.activestate.com/sun4-solaris/5.14/1400/M/MI/MIK/CryptX-0.017.d/log-20130924T103600.txt
   my $sig = $pr1->sign_message("message");
   ok(length $sig > 60, 'sign_message ' . length($sig));
   ok($pu1->verify_message($sig, "message"), 'verify_message');
