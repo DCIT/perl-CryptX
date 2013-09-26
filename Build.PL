@@ -74,6 +74,11 @@ my $builder = $class->new(
   configure_requires   => {
     'Module::Build' => 0,
   },
+  meta_merge => {
+    resources  => {
+      repository => 'https://github.com/DCIT/perl-CryptX',
+    }
+  },
 );
 
 $builder->create_build_script;
