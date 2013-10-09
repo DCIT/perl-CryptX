@@ -72,7 +72,7 @@ key2hash(Crypt::PK::DH self)
         if (self->key.type == -1) XSRETURN_UNDEF;
         rv_hash = newHV();
         /* =====> x */
-        siz = (self->key.x) ? ltc_mp.unsigned_size(self->key.x) : 0;
+        siz = (self->key.x) ? mp_unsigned_bin_size(self->key.x) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'x' too big number");
         }
@@ -84,7 +84,7 @@ key2hash(Crypt::PK::DH self)
           not_used = hv_store(rv_hash, "x", 1, newSVpv("", 0), 0);
         }
         /* =====> y */
-        siz = (self->key.y) ? ltc_mp.unsigned_size(self->key.y) : 0;
+        siz = (self->key.y) ? mp_unsigned_bin_size(self->key.y) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'y' too big number");
         }

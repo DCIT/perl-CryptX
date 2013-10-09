@@ -58,7 +58,7 @@ int
 size(Crypt::PK::RSA self)
     CODE:
         if (self->key.type == -1 || self->key.N == NULL) XSRETURN_UNDEF;
-        RETVAL = ltc_mp.unsigned_size(self->key.N);
+        RETVAL = mp_unsigned_bin_size(self->key.N);
     OUTPUT:
         RETVAL
 
@@ -73,7 +73,7 @@ key2hash(Crypt::PK::RSA self)
         if (self->key.type == -1 || self->key.N == NULL) XSRETURN_UNDEF;
         rv_hash = newHV();
         /* =====> e */
-        siz = (self->key.e) ? ltc_mp.unsigned_size(self->key.e) : 0;
+        siz = (self->key.e) ? mp_unsigned_bin_size(self->key.e) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'e' too big number");
         }
@@ -85,7 +85,7 @@ key2hash(Crypt::PK::RSA self)
           not_used = hv_store(rv_hash, "e", 1, newSVpv("", 0), 0);
         }
         /* =====> d */
-        siz = (self->key.d) ? ltc_mp.unsigned_size(self->key.d) : 0;
+        siz = (self->key.d) ? mp_unsigned_bin_size(self->key.d) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'd' too big number");
         }
@@ -97,7 +97,7 @@ key2hash(Crypt::PK::RSA self)
           not_used = hv_store(rv_hash, "d", 1, newSVpv("", 0), 0);
         }
         /* =====> N */
-        siz = (self->key.N) ? ltc_mp.unsigned_size(self->key.N) : 0;
+        siz = (self->key.N) ? mp_unsigned_bin_size(self->key.N) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'N' too big number");
         }
@@ -109,7 +109,7 @@ key2hash(Crypt::PK::RSA self)
           not_used = hv_store(rv_hash, "N", 1, newSVpv("", 0), 0);
         }
         /* =====> q */
-        siz = (self->key.q) ? ltc_mp.unsigned_size(self->key.q) : 0;
+        siz = (self->key.q) ? mp_unsigned_bin_size(self->key.q) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'q' too big number");
         }
@@ -121,7 +121,7 @@ key2hash(Crypt::PK::RSA self)
           not_used = hv_store(rv_hash, "q", 1, newSVpv("", 0), 0);
         }
         /* =====> p */
-        siz = (self->key.p) ? ltc_mp.unsigned_size(self->key.p) : 0;
+        siz = (self->key.p) ? mp_unsigned_bin_size(self->key.p) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'p' too big number");
         }
@@ -133,7 +133,7 @@ key2hash(Crypt::PK::RSA self)
           not_used = hv_store(rv_hash, "p", 1, newSVpv("", 0), 0);
         }
         /* =====> qP */
-        siz = (self->key.qP) ? ltc_mp.unsigned_size(self->key.qP) : 0;
+        siz = (self->key.qP) ? mp_unsigned_bin_size(self->key.qP) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'qP' too big number");
         }
@@ -145,7 +145,7 @@ key2hash(Crypt::PK::RSA self)
           not_used = hv_store(rv_hash, "qP", 2, newSVpv("", 0), 0);
         }
         /* =====> dP */
-        siz = (self->key.dP) ? ltc_mp.unsigned_size(self->key.dP) : 0;
+        siz = (self->key.dP) ? mp_unsigned_bin_size(self->key.dP) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'dP' too big number");
         }
@@ -157,7 +157,7 @@ key2hash(Crypt::PK::RSA self)
           not_used = hv_store(rv_hash, "dP", 2, newSVpv("", 0), 0);
         }
         /* =====> dQ */
-        siz = (self->key.dQ) ? ltc_mp.unsigned_size(self->key.dQ) : 0;
+        siz = (self->key.dQ) ? mp_unsigned_bin_size(self->key.dQ) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'dQ' too big number");
         }
@@ -169,7 +169,7 @@ key2hash(Crypt::PK::RSA self)
           not_used = hv_store(rv_hash, "dQ", 2, newSVpv("", 0), 0);
         }
         /* =====> size */
-        not_used = hv_store(rv_hash, "size", 4, newSViv(ltc_mp.unsigned_size(self->key.N)), 0);
+        not_used = hv_store(rv_hash, "size", 4, newSViv(mp_unsigned_bin_size(self->key.N)), 0);
         /* =====> type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
         if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */

@@ -89,7 +89,7 @@ key2hash(Crypt::PK::ECC self)
         if (self->key.type == -1) XSRETURN_UNDEF;
         rv_hash = newHV();
         /* =====> k */
-        siz = (self->key.k) ? ltc_mp.unsigned_size(self->key.k) : 0;
+        siz = (self->key.k) ? mp_unsigned_bin_size(self->key.k) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'k' too big number");
         }
@@ -101,7 +101,7 @@ key2hash(Crypt::PK::ECC self)
           not_used = hv_store(rv_hash, "k", 1, newSVpv("", 0), 0);
         }
         /* =====> pub_x */
-        siz = (self->key.pubkey.x) ? ltc_mp.unsigned_size(self->key.pubkey.x) : 0;
+        siz = (self->key.pubkey.x) ? mp_unsigned_bin_size(self->key.pubkey.x) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'pub_x' too big number");
         }
@@ -113,7 +113,7 @@ key2hash(Crypt::PK::ECC self)
           not_used = hv_store(rv_hash, "pub_x", 5, newSVpv("", 0), 0);
         }
         /* =====> pub_y */
-        siz = (self->key.pubkey.y) ? ltc_mp.unsigned_size(self->key.pubkey.y) : 0;
+        siz = (self->key.pubkey.y) ? mp_unsigned_bin_size(self->key.pubkey.y) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'pub_y' too big number");
         }
@@ -125,7 +125,7 @@ key2hash(Crypt::PK::ECC self)
           not_used = hv_store(rv_hash, "pub_y", 5, newSVpv("", 0), 0);
         }
         /* =====> pub_z */
-        siz = (self->key.pubkey.z) ? ltc_mp.unsigned_size(self->key.pubkey.z) : 0;
+        siz = (self->key.pubkey.z) ? mp_unsigned_bin_size(self->key.pubkey.z) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'pub_z' too big number");
         }
