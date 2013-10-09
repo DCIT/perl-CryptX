@@ -110,7 +110,7 @@ int dsa_make_key(prng_state *prng, int wprng, int group_size, int modulus_size, 
          goto error;
       }
       if ((err = mp_read_unsigned_bin(key->x, buf, group_size)) != CRYPT_OK)           { goto error; }
-   } while (mp_cmp_d(key->x, 1) != LTC_MP_GT);
+   } while (mp_cmp_d(key->x, 1) != LTC_MP_GT || mp_cmp(key->x, key->q) != LTC_MP_LT);
    if ((err = mp_exptmod(key->g, key->x, key->p, key->y)) != CRYPT_OK)                 { goto error; }
   
    key->type = PK_PRIVATE;
