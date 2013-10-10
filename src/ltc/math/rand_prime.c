@@ -13,14 +13,25 @@
 /**
   @file rand_prime.c
   Generate a random prime, Tom St Denis
-*/  
+*/
 
 #define USE_BBS 1
+
+struct rng_data {
+   prng_state *prng;
+   int         wprng;
+};
+
+static int rand_prime_helper(unsigned char *dst, int len, void *dat)
+{
+   return (int)prng_descriptor[((struct rng_data *)dat)->wprng].read(dst, len, ((struct rng_data *)dat)->prng);
+}
 
 int rand_prime(void *N, long len, prng_state *prng, int wprng)
 {
    int            err, res, type;
    unsigned char *buf;
+   struct rng_data rng;
 
    LTC_ARGCHK(N != NULL);
 
@@ -33,14 +44,18 @@ int rand_prime(void *N, long len, prng_state *prng, int wprng)
    }
 
    /* allow sizes between 2 and 512 bytes for a prime size */
-   if (len < 2 || len > 512) { 
+   if (len < 2 || len > 512) {
       return CRYPT_INVALID_PRIME_SIZE;
    }
-   
+
    /* valid PRNG? Better be! */
    if ((err = prng_is_valid(wprng)) != CRYPT_OK) {
-      return err; 
+      return err;
    }
+
+   /* setup rng struct - used later for callback */
+   rng.prng  = prng;
+   rng.wprng = wprng;
 
    /* allocate buffer to work with */
    buf = XCALLOC(1, len);
@@ -58,7 +73,7 @@ int rand_prime(void *N, long len, prng_state *prng, int wprng)
       /* munge bits */
       buf[0]     |= 0x80 | 0x40;
       buf[len-1] |= 0x01 | ((type & USE_BBS) ? 0x02 : 0x00);
- 
+
       /* load value */
       if ((err = mp_read_unsigned_bin(N, buf, len)) != CRYPT_OK) {
          XFREE(buf);
@@ -66,7 +81,7 @@ int rand_prime(void *N, long len, prng_state *prng, int wprng)
       }
 
       /* test */
-      if ((err = mp_prime_is_prime(N, 8, &res)) != CRYPT_OK) {
+      if ((err = mp_prime_is_prime_ex(N, 0, &res, rand_prime_helper, &rng)) != CRYPT_OK) {
          XFREE(buf);
          return err;
       }
@@ -79,7 +94,7 @@ int rand_prime(void *N, long len, prng_state *prng, int wprng)
    XFREE(buf);
    return CRYPT_OK;
 }
-      
+
 
 
 /* $Source$ */

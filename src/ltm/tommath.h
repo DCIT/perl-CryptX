@@ -471,10 +471,21 @@ int mp_prime_is_divisible(mp_int *a, int *result);
  */
 int mp_prime_fermat(mp_int *a, mp_int *b, int *result);
 
+/* performs Lucas test of "a".
+ * Sets result to 0 if composite or 1 if probable prime
+ */
+int mp_prime_lucas (mp_int * a, int level, int *result);
+
 /* performs one Miller-Rabin test of "a" using base "b".
  * Sets result to 0 if composite or 1 if probable prime
  */
 int mp_prime_miller_rabin(mp_int *a, mp_int *b, int *result);
+
+/* performs one Miller-Rabin test of "a" using base "t"
+ * random bases chosen from [2, a-2].
+ * Sets result to 0 if composite or 1 if probable prime
+ */
+int mp_prime_miller_rabin_random(mp_int *a, int t, int *result, ltm_prime_callback cb, void *dat);
 
 /* This gives [for a given bit size] the number of trials required
  * such that Miller-Rabin gives a prob of failure lower than 2^-96 
@@ -489,6 +500,13 @@ int mp_prime_rabin_miller_trials(int size);
  * Sets result to 1 if probably prime, 0 otherwise
  */
 int mp_prime_is_prime(mp_int *a, int t, int *result);
+
+/* performs extended primality tests
+ * Miller-Rabin (t random or fixed bases) + Lucas
+ *
+ * Sets result to 1 if probably prime, 0 otherwise
+ */
+int mp_prime_is_prime_ex(mp_int *a, int t, int *result, ltm_prime_callback cb, void *dat);
 
 /* finds the next prime after the number "a" using "t" trials
  * of Miller-Rabin.

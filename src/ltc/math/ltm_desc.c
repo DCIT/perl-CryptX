@@ -410,6 +410,12 @@ static int isprime(void *a, int *b)
    return err;
 }
 
+static int isprime_ex(void *a, int t, int *r, int (*cb)(unsigned char *, int, void *), void *dat)
+{
+  LTC_ARGCHK(a != NULL);
+  return mpi_to_ltc_error(mp_prime_is_prime_ex(a, t, r, cb, dat));
+}
+
 static int set_rand(void *a, int size)
 {
    LTC_ARGCHK(a != NULL);
@@ -468,6 +474,7 @@ const ltc_math_descriptor ltm_desc = {
 
    &exptmod,
    &isprime,
+   &isprime_ex,
 
 #ifdef LTC_MECC
 #ifdef LTC_MECC_FP

@@ -17,6 +17,16 @@
 
 #ifdef LTC_MDSA
 
+struct rng_data {
+   prng_state *prng;
+   int         wprng;
+};
+
+static int rand_prime_helper(unsigned char *dst, int len, void *dat)
+{
+   return (int)prng_descriptor[((struct rng_data *)dat)->wprng].read(dst, len, ((struct rng_data *)dat)->prng);
+}
+
 /**
   Create a DSA key
   @param prng          An active PRNG state
@@ -31,6 +41,7 @@ int dsa_make_key(prng_state *prng, int wprng, int group_size, int modulus_size, 
    void           *tmp, *tmp2;
    int            err, res, q_size;
    unsigned char *buf;
+   struct rng_data rng;
 
    LTC_ARGCHK(key  != NULL);
    LTC_ARGCHK(ltc_mp.name != NULL);
@@ -40,8 +51,12 @@ int dsa_make_key(prng_state *prng, int wprng, int group_size, int modulus_size, 
       return err;
    }
 
+   /* setup rng struct - used later for callback */
+   rng.prng  = prng;
+   rng.wprng = wprng;
+
    /* check size */
-   if (group_size >= LTC_MDSA_MAX_GROUP || group_size <= 15 || 
+   if (group_size >= LTC_MDSA_MAX_GROUP || group_size <= 15 ||
        group_size >= modulus_size || (modulus_size - group_size) >= LTC_MDSA_DELTA) {
       return CRYPT_INVALID_ARG;
    }
@@ -82,7 +97,7 @@ int dsa_make_key(prng_state *prng, int wprng, int group_size, int modulus_size, 
 
    /* now loop until p is prime */
    for (;;) {
-       if ((err = mp_prime_is_prime(key->p, 8, &res)) != CRYPT_OK)                     { goto error; }
+       if ((err = mp_prime_is_prime_ex(key->p, 0, &res, rand_prime_helper, &rng)) != CRYPT_OK)     { goto error; }
        if (res == LTC_MP_YES) break;
 
        /* add 2q to p and 2 to tmp2 */
@@ -101,8 +116,8 @@ int dsa_make_key(prng_state *prng, int wprng, int group_size, int modulus_size, 
    /* at this point tmp generates a group of order q mod p */
    mp_exch(tmp, key->g);
 
-   /* so now we have our DH structure, generator g, order q, modulus p 
-      Now we need a random exponent [mod q] and it's power g^x mod p 
+   /* so now we have our DH structure, generator g, order q, modulus p
+      Now we need a random exponent [mod q] and it's power g^x mod p
     */
    q_size = mp_unsigned_bin_size(key->q);
    do {
@@ -113,7 +128,7 @@ int dsa_make_key(prng_state *prng, int wprng, int group_size, int modulus_size, 
       if ((err = mp_read_unsigned_bin(key->x, buf, q_size)) != CRYPT_OK)           { goto error; }
    } while (mp_cmp_d(key->x, 1) != LTC_MP_GT || mp_cmp(key->x, key->q) != LTC_MP_LT);
    if ((err = mp_exptmod(key->g, key->x, key->p, key->y)) != CRYPT_OK)                 { goto error; }
-  
+
    key->type = PK_PRIVATE;
    key->qord = group_size;
 
@@ -123,9 +138,9 @@ int dsa_make_key(prng_state *prng, int wprng, int group_size, int modulus_size, 
 
    err = CRYPT_OK;
    goto done;
-error: 
+error:
     mp_clear_multi(key->g, key->q, key->p, key->x, key->y, NULL);
-done: 
+done:
     mp_clear_multi(tmp, tmp2, NULL);
     XFREE(buf);
     return err;

@@ -331,6 +331,16 @@ typedef struct {
    */
    int (*isprime)(void *a, int *b);
 
+   /** Primality testing (extended version)
+       @param a     The integer to test
+       @param b     Number of tests test
+       @param c     The destination of the result (FP_YES if prime)
+       @param d     callback
+       @param e     callback data
+       @return CRYPT_OK on success
+   */
+   int (*isprime_ex)(void *a, int b, int *c, int (*d)(unsigned char *, int, void *), void *e);  
+
 /* ----  (optional) ecc point math ---- */
 
    /** ECC GF(p) point multiplication (from the NIST curves)
@@ -517,6 +527,7 @@ extern const ltc_math_descriptor gmp_desc;
 
 #define mp_exptmod(a,b,c,d)          ltc_mp.exptmod(a,b,c,d)
 #define mp_prime_is_prime(a, b, c)   ltc_mp.isprime(a, c)
+#define mp_prime_is_prime_ex(a, b, c, d, e)   ltc_mp.isprime_ex(a, b, c, d, e)
 
 #define mp_iszero(a)                 (mp_cmp_d(a, 0) == LTC_MP_EQ ? LTC_MP_YES : LTC_MP_NO)
 #define mp_isodd(a)                  (mp_get_digit_count(a) > 0 ? (mp_get_digit(a, 0) & 1 ? LTC_MP_YES : LTC_MP_NO) : LTC_MP_NO)
