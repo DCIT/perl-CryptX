@@ -1,7 +1,6 @@
 Changes for CryptX
 
 TODO:
-        - CRITICAL: fix broken camellia
         - more investigation crash/memleak/or_what_it_is related to rsa_free/dsa_free
         - RSA->check_key (basic check + extented primality test)
         - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
@@ -13,6 +12,9 @@ TODO:
           - t/pk_dsa.t crashes after: ok 28 - decrypt
         - better primality testing: http://questhub.io/realm/perl/quest/519032ee1088c76505000035
         - libtomcrypt patch: https://secure.ucc.asn.au/hg/dropbear/rev/9a789fc03f40?revcount=240 (free rsa key)
+
+0.019   2013/10/20
+        - fixed broken CAMELLIA implementation
 
 0.018   2013/10/18
         - DSA: make_key + sign_hash fixes
