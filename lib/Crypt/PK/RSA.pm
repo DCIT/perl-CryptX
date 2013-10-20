@@ -367,6 +367,9 @@ Support for password protected PEM keys
  # supported ciphers: 'DES-CBC'
  #                    'DES-EDE3-CBC'
  #                    'SEED-CBC'
+ #                    'CAMELLIA-128-CBC'
+ #                    'CAMELLIA-192-CBC'
+ #                    'CAMELLIA-256-CBC'
  #                    'AES-128-CBC'
  #                    'AES-192-CBC'
  #                    'AES-256-CBC' (DEFAULT)
