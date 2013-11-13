@@ -140,6 +140,7 @@ key2hash(Crypt::PK::ECC self)
         if (self->key.idx>=0) {
           not_used = hv_store(rv_hash, "curve_name",  10, newSVpv(self->key.dp->name,  strlen(self->key.dp->name)), 0);
           not_used = hv_store(rv_hash, "curve_prime", 11, newSVpv(self->key.dp->prime, strlen(self->key.dp->prime)), 0);
+          not_used = hv_store(rv_hash, "curve_A",      7, newSVpv(self->key.dp->A,     strlen(self->key.dp->A)), 0);
           not_used = hv_store(rv_hash, "curve_B",      7, newSVpv(self->key.dp->B,     strlen(self->key.dp->B)), 0);
           not_used = hv_store(rv_hash, "curve_order", 11, newSVpv(self->key.dp->order, strlen(self->key.dp->order)), 0);
           not_used = hv_store(rv_hash, "curve_Gx",     8, newSVpv(self->key.dp->Gx,    strlen(self->key.dp->Gx)), 0);

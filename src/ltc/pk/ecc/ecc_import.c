@@ -9,7 +9,7 @@
  * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 - 3x + b
+/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
  *
  * All curves taken from NIST recommendation paper of July 1999
  * Available at http://csrc.nist.gov/cryptval/dss.htm
@@ -19,53 +19,55 @@
 /**
   @file ecc_import.c
   ECC Crypto, Tom St Denis
-*/  
+*/
 
 #ifdef LTC_MECC
 
 static int is_point(ecc_key *key)
 {
-   void *prime, *b, *t1, *t2;
+   void *prime, *a, *b, *t1, *t2;
    int err;
-   
-   if ((err = mp_init_multi(&prime, &b, &t1, &t2, NULL)) != CRYPT_OK) {
+
+   if ((err = mp_init_multi(&prime, &a, &b, &t1, &t2, NULL)) != CRYPT_OK) {
       return err;
    }
-   
-   /* load prime and b */
+
+   /* load prime, a and b */
    if ((err = mp_read_radix(prime, key->dp->prime, 16)) != CRYPT_OK)                          { goto error; }
    if ((err = mp_read_radix(b, key->dp->B, 16)) != CRYPT_OK)                                  { goto error; }
-   
+   if ((err = mp_read_radix(a, key->dp->A, 16)) != CRYPT_OK)                                  { goto error; }
+
    /* compute y^2 */
    if ((err = mp_sqr(key->pubkey.y, t1)) != CRYPT_OK)                                         { goto error; }
-   
+
    /* compute x^3 */
    if ((err = mp_sqr(key->pubkey.x, t2)) != CRYPT_OK)                                         { goto error; }
    if ((err = mp_mod(t2, prime, t2)) != CRYPT_OK)                                             { goto error; }
    if ((err = mp_mul(key->pubkey.x, t2, t2)) != CRYPT_OK)                                     { goto error; }
-   
+
    /* compute y^2 - x^3 */
    if ((err = mp_sub(t1, t2, t1)) != CRYPT_OK)                                                { goto error; }
-   
-   /* compute y^2 - x^3 + 3x */
-   if ((err = mp_add(t1, key->pubkey.x, t1)) != CRYPT_OK)                                     { goto error; }
-   if ((err = mp_add(t1, key->pubkey.x, t1)) != CRYPT_OK)                                     { goto error; }
-   if ((err = mp_add(t1, key->pubkey.x, t1)) != CRYPT_OK)                                     { goto error; }
-   if ((err = mp_mod(t1, prime, t1)) != CRYPT_OK)                                             { goto error; }
+
+   /* compute y^2 - x^3 - a*x */
+   if ((err = mp_submod(prime, a, prime, t2)) != CRYPT_OK)                                    { goto error; }
+   if ((err = mp_mulmod(t2, key->pubkey.x, prime, t2)) != CRYPT_OK)                           { goto error; }
+   if ((err = mp_addmod(t1, t2, prime, t1)) != CRYPT_OK)                                      { goto error; }
+
+   /* adjust range (0, prime) */
    while (mp_cmp_d(t1, 0) == LTC_MP_LT) {
       if ((err = mp_add(t1, prime, t1)) != CRYPT_OK)                                          { goto error; }
    }
    while (mp_cmp(t1, prime) != LTC_MP_LT) {
       if ((err = mp_sub(t1, prime, t1)) != CRYPT_OK)                                          { goto error; }
    }
-   
+
    /* compare to b */
    if (mp_cmp(t1, b) != LTC_MP_EQ) {
       err = CRYPT_INVALID_PACKET;
    } else {
       err = CRYPT_OK;
    }
-   
+
 error:
    mp_clear_multi(prime, b, t1, t2, NULL);
    return err;
@@ -107,7 +109,7 @@ int ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, co
    }
 
    /* find out what type of key it is */
-   if ((err = der_decode_sequence_multi(in, inlen, 
+   if ((err = der_decode_sequence_multi(in, inlen,
                                   LTC_ASN1_BIT_STRING, 1UL, &flags,
                                   LTC_ASN1_EOL,        0UL, NULL)) != CRYPT_OK) {
       goto done;
@@ -153,7 +155,7 @@ int ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, co
    }
    /* set z */
    if ((err = mp_set(key->pubkey.z, 1)) != CRYPT_OK) { goto done; }
-   
+
    /* is it a point on the curve?  */
    if ((err = is_point(key)) != CRYPT_OK) {
       goto done;

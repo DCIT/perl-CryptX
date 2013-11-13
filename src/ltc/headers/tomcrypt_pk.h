@@ -219,6 +219,9 @@ typedef struct {
    /** The prime that defines the field the curve is in (encoded in hex) */
    char *prime;
 
+   /** The fields A param (hex) */
+   char *A;
+
    /** The fields B param (hex) */
    char *B;
 
