@@ -8,8 +8,8 @@
  * The library is free for all purposes without any express
  * guarantee it works.
  */
- 
- /* ideas from Dana Jacobsen's 
+
+ /* ideas from Dana Jacobsen's
   * https://github.com/danaj/Math-Prime-Util-GMP
   */
 
@@ -17,23 +17,29 @@ int mp_prime_is_prime_ex(mp_int * a, int t, int *result, ltm_prime_callback cb, 
 {
   mp_int b;
   int ix, err, res, abits, atests;
+  mp_digit maxp, r;
 
-  /* default */
-  *result = MP_NO;
+  maxp = ltm_prime_tab[PRIME_SIZE-1];   /* max. predefined prime number */
+  *result = MP_NO;                      /* default */
 
-  /* test if a is equal to any of the first N primes */
-  for (ix = 0; ix < PRIME_SIZE; ix++) {
+  /* special case: a <= max_predef_prime */
+  if (mp_cmp_d(a, maxp+1) == MP_LT) {
+    /* test if a is equal to any of the first N primes */
+    for (ix = 0; ix < PRIME_SIZE; ix++) {
       if (mp_cmp_d(a, ltm_prime_tab[ix]) == MP_EQ)                      { *result = MP_YES; return MP_OKAY; }
+    }
+    /* here it must be composite */
+    return MP_OKAY;
   }
 
-  /* try division by first N primes */
-  err = mp_prime_is_divisible(a, &res);
-  if (err != MP_OKAY)                                                   { return err; }
-  if (res == MP_YES)                                                    { return MP_OKAY; }
-
-  /* if a < N-th-prime*N-th-prime then it is composite */
-  ix = ltm_prime_tab[PRIME_SIZE-1] * ltm_prime_tab[PRIME_SIZE-1];
-  if (mp_cmp_d(a, ix) == MP_EQ)                                         { return MP_OKAY; }
+  /* go through all known predefined primes - BEWARE: max_predef_prime should never go over 65536 */
+  for (ix = 0; ix < PRIME_SIZE; ix++) {
+    /* return YES if A < p[ix]*p[ix] */
+    if (mp_cmp_d(a, ltm_prime_tab[ix]*ltm_prime_tab[ix]) == MP_LT)      { *result = MP_YES; return MP_OKAY; }
+    /* return NO if A % p[ix] == 0 */
+    if ((err = mp_mod_d(a, ltm_prime_tab[ix], &r)) != MP_OKAY)          { return err; }
+    if (r == 0)                                                         { return MP_OKAY; }
+  }
 
   /* init b */
   if ((err = mp_init(&b)) != MP_OKAY)                                   { return err; }
