@@ -18,3 +18,30 @@ openssl gendsa -passout pass:secret -aes256 -out dsa-aes256.pem dsa-param.pem
 openssl gendsa -passout pass:secret -camellia128 -out dsa-camellia128.pem dsa-param.pem
 openssl gendsa -passout pass:secret -camellia192 -out dsa-camellia192.pem dsa-param.pem
 openssl gendsa -passout pass:secret -camellia256 -out dsa-camellia256.pem dsa-param.pem
+
+openssl ecparam -list_curves
+openssl ecparam -out openssl_ec_secp112r1.pem -name secp112r1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp112r2.pem -name secp112r2 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp128r1.pem -name secp128r1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp128r2.pem -name secp128r2 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp160k1.pem -name secp160k1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp160r1.pem -name secp160r1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp160r2.pem -name secp160r2 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp192k1.pem -name secp192k1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp224k1.pem -name secp224k1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp224r1.pem -name secp224r1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp256k1.pem -name secp256k1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp384r1.pem -name secp384r1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp521r1.pem -name secp521r1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime192v1.pem -name prime192v1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime192v2.pem -name prime192v2 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime192v3.pem -name prime192v3 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime239v1.pem -name prime239v1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime239v2.pem -name prime239v2 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime239v3.pem -name prime239v3 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime256v1.pem -name prime256v1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls6.pem -name wap-wsg-idm-ecid-wtls6 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls7.pem -name wap-wsg-idm-ecid-wtls7 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls8.pem -name wap-wsg-idm-ecid-wtls8 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls9.pem -name wap-wsg-idm-ecid-wtls9 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls12.pem -name wap-wsg-idm-ecid-wtls12 -genkey -param_enc explicit
