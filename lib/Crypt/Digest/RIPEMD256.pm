@@ -184,9 +184,9 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 add_bits
 
- $d->add_bits("111100001010");
+ $d->add_bits($bit_string);   # e.g. $d->add_bits("111100001010");
  #or
- $d->add_bits("\xF0\xA0", 16);
+ $d->add_bits($data, $nbits); # e.g. $d->add_bits("\xF0\xA0", 16);
 
 =head2 hashsize
 
