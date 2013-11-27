@@ -21,12 +21,6 @@ sub new {
   return  $self;
 }
 
-sub generate_key {
-  my $self = shift;
-  $self->_generate_key(@_);
-  return $self;
-}
-
 sub import_key {
   my ($self, $key) = @_;
   croak "FATAL: undefined key" unless $key;
@@ -41,8 +35,7 @@ sub import_key {
     croak "FATAL: non-existing file '$key'";
   }
   croak "FATAL: invalid key format" unless $data;
-  $self->_import($data);
-  return $self;
+  return $self->_import($data);
 }
 
 sub encrypt {

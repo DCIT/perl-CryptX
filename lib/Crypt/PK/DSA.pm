@@ -29,12 +29,6 @@ sub export_key_pem {
   return Crypt::PK::_asn1_to_pem($key, "DSA PUBLIC KEY") if $type eq 'public';
 }
 
-sub generate_key {
-  my $self = shift;
-  $self->_generate_key(@_);
-  return $self;
-}
-
 sub import_key {
   my ($self, $key, $password) = @_;
   croak "FATAL: undefined key" unless $key;
@@ -52,8 +46,7 @@ sub import_key {
     $data = Crypt::PK::_pem_to_asn1($data, $password);
   }
   croak "FATAL: invalid key format" unless $data;
-  $self->_import($data);
-  return $self;
+  return $self->_import($data);
 }
 
 sub encrypt {

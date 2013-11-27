@@ -16,21 +16,19 @@ _new()
     OUTPUT:
         RETVAL
 
-int
-_generate_key(Crypt::PK::DSA self, int group_size=30, int modulus_size=256)
-    CODE:
+void
+generate_key(Crypt::PK::DSA self, int group_size=30, int modulus_size=256)
+    PPCODE:
     {
         int rv;
         rv = dsa_make_key(&self->yarrow_prng_state, self->yarrow_prng_index, group_size, modulus_size, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dsa_make_key failed: %s", error_to_string(rv));
-        RETVAL = 1; /* xxx */
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
-int
+void
 _import(Crypt::PK::DSA self, SV * key_data)
-    CODE:
+    PPCODE:
     {
         int rv;
         unsigned char *data=NULL;
@@ -40,10 +38,8 @@ _import(Crypt::PK::DSA self, SV * key_data)
         if (self->key.type != -1) { dsa_free(&self->key); self->key.type = -1; }
         rv = dsa_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dsa_import failed: %s", error_to_string(rv));
-        RETVAL = 1; /* xxx */
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
 int
 is_private(Crypt::PK::DSA self)

@@ -16,21 +16,19 @@ _new()
     OUTPUT:
         RETVAL
 
-int
-_generate_key(Crypt::PK::ECC self, int key_size=32)
-    CODE:
+void
+generate_key(Crypt::PK::ECC self, int key_size=32)
+    PPCODE:
     {
         int rv;
         rv = ecc_make_key(&self->yarrow_prng_state, self->yarrow_prng_index, key_size, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_make_key failed: %s", error_to_string(rv));
-        RETVAL = 1; /* xxx */
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
-int
+void
 _import(Crypt::PK::ECC self, SV * key_data)
-    CODE:
+    PPCODE:
     {
         int rv;
         unsigned char *data=NULL;
@@ -40,10 +38,8 @@ _import(Crypt::PK::ECC self, SV * key_data)
         if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
         rv = ecc_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_import failed: %s", error_to_string(rv));
-        RETVAL = 1; /* xxx */
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
 int
 import_key_x963(Crypt::PK::ECC self, SV * key_data)

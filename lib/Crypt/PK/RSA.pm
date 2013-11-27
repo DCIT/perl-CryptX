@@ -34,14 +34,7 @@ sub export_key_pem {
   # PKCS#1 RSAPublicKey* (PEM header: BEGIN RSA PUBLIC KEY)
   return Crypt::PK::_asn1_to_pem($key, "RSA PUBLIC KEY") if $type eq 'public';
   # X.509 SubjectPublicKeyInfo** (PEM header: BEGIN PUBLIC KEY)
-  return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public_x509';
-  
-}
-
-sub generate_key {
-  my $self = shift;
-  $self->_generate_key(@_);
-  return $self;
+  return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public_x509';  
 }
 
 sub import_key {
@@ -61,8 +54,7 @@ sub import_key {
     $data = Crypt::PK::_pem_to_asn1($data, $password);
   }
   croak "FATAL: invalid key format" unless $data;
-  $self->_import($data);
-  return $self;
+  return $self->_import($data);
 }
 
 sub encrypt {
