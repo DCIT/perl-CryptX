@@ -7,8 +7,15 @@ _new()
         int rv;
         Newz(0, RETVAL, 1, struct ecc_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
-        RETVAL->key.type = -1;
         RETVAL->yarrow_prng_index = find_prng("yarrow");
+        RETVAL->key.type = -1;
+        RETVAL->dp.name  = NULL;
+        RETVAL->dp.prime = NULL;
+        RETVAL->dp.A     = NULL;
+        RETVAL->dp.B     = NULL;
+        RETVAL->dp.order = NULL;
+        RETVAL->dp.Gx    = NULL;
+        RETVAL->dp.Gy    = NULL;
         if(RETVAL->yarrow_prng_index==-1) croak("FATAL: find_prng('yarrow') failed");
         rv = rng_make_prng(128, RETVAL->yarrow_prng_index, &RETVAL->yarrow_prng_state, NULL);
         if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
@@ -17,12 +24,77 @@ _new()
         RETVAL
 
 void
-generate_key(Crypt::PK::ECC self, int key_size=32)
+generate_key_old(Crypt::PK::ECC self, int key_size=32)
     PPCODE:
     {
         int rv;
+        _ecc_free_key(&self->key, &self->dp);
         rv = ecc_make_key(&self->yarrow_prng_state, self->yarrow_prng_index, key_size, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_make_key failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
+    }
+
+void
+generate_key(Crypt::PK::ECC self, SV *param)
+    PPCODE:
+    {
+        int rv;
+        HV *h;
+        SV **sv_size, **sv_name, **sv_prime, **sv_A, **sv_B, **sv_order, **sv_Gx, **sv_Gy;
+        char *ch_name, *ch_prime, *ch_A, *ch_B, *ch_order, *ch_Gx, *ch_Gy;
+        STRLEN l_name, l_prime, l_A, l_B, l_order, l_Gx, l_Gy;
+
+        if (SvIOK(param)) {
+          int key_size = SvIV(param);
+          if (key_size<=0 || key_size>65) croak("FATAL: generate_key_ex: invalid key_size");
+          _ecc_free_key(&self->key, &self->dp);
+          rv = ecc_make_key(&self->yarrow_prng_state, self->yarrow_prng_index, key_size, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_make_key failed: %s", error_to_string(rv));
+        }
+        else if (SvROK(param)) {
+          if ((h = (HV*)(SvRV(param)))              == NULL) croak("FATAL: generate_key_ex: param is not valid hashref");
+          if ((sv_size  = hv_fetchs(h, "size",  0)) == NULL) croak("FATAL: generate_key_ex: missing param size");
+          if ((sv_name  = hv_fetchs(h, "name",  0)) == NULL) croak("FATAL: generate_key_ex: missing param name");
+          if ((sv_prime = hv_fetchs(h, "prime", 0)) == NULL) croak("FATAL: generate_key_ex: missing param prime");
+          if ((sv_A     = hv_fetchs(h, "A",     0)) == NULL) croak("FATAL: generate_key_ex: missing param A");
+          if ((sv_B     = hv_fetchs(h, "B",     0)) == NULL) croak("FATAL: generate_key_ex: missing param B");
+          if ((sv_order = hv_fetchs(h, "order", 0)) == NULL) croak("FATAL: generate_key_ex: missing param order");
+          if ((sv_Gx    = hv_fetchs(h, "Gx",    0)) == NULL) croak("FATAL: generate_key_ex: missing param Gx");
+          if ((sv_Gy    = hv_fetchs(h, "Gy",    0)) == NULL) croak("FATAL: generate_key_ex: missing param Gy");
+
+          if (!SvOK(*sv_size )) croak("FATAL: generate_key_ex: undefined param size");
+          if (!SvOK(*sv_name )) croak("FATAL: generate_key_ex: undefined param name");
+          if (!SvOK(*sv_prime)) croak("FATAL: generate_key_ex: undefined param prime");
+          if (!SvOK(*sv_A    )) croak("FATAL: generate_key_ex: undefined param A");
+          if (!SvOK(*sv_B    )) croak("FATAL: generate_key_ex: undefined param B");
+          if (!SvOK(*sv_order)) croak("FATAL: generate_key_ex: undefined param order");
+          if (!SvOK(*sv_Gx   )) croak("FATAL: generate_key_ex: undefined param Gx");
+          if (!SvOK(*sv_Gy   )) croak("FATAL: generate_key_ex: undefined param Gy");
+
+          self->dp.size = SvIVX(*sv_size);
+          ch_name  = SvPV(*sv_name,  l_name);
+          ch_prime = SvPV(*sv_prime, l_prime);
+          ch_A     = SvPV(*sv_A,     l_A);
+          ch_B     = SvPV(*sv_B,     l_B);
+          ch_order = SvPV(*sv_order, l_order);
+          ch_Gx    = SvPV(*sv_Gx,    l_Gx);
+          ch_Gy    = SvPV(*sv_Gy,    l_Gy);
+
+          _ecc_free_key(&self->key, &self->dp);
+          Newz(0, (self->dp.name),  1+l_name,  char); Copy(ch_name,  self->dp.name,  l_name,  char);
+          Newz(0, (self->dp.prime), 1+l_prime, char); Copy(ch_prime, self->dp.prime, l_prime, char);
+          Newz(0, (self->dp.A),     1+l_A,     char); Copy(ch_A,     self->dp.A,     l_A,     char);
+          Newz(0, (self->dp.B),     1+l_B,     char); Copy(ch_B,     self->dp.B,     l_B,     char);
+          Newz(0, (self->dp.order), 1+l_order, char); Copy(ch_order, self->dp.order, l_order, char);
+          Newz(0, (self->dp.Gx),    1+l_Gx,    char); Copy(ch_Gx,    self->dp.Gx,    l_Gx,    char);
+          Newz(0, (self->dp.Gy),    1+l_Gy,    char); Copy(ch_Gy,    self->dp.Gy,    l_Gy,    char);
+
+          rv = ecc_make_key_ex(&self->yarrow_prng_state, self->yarrow_prng_index, &self->key, &self->dp);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_make_key_ex failed: %s", error_to_string(rv));
+        }
+        else {
+          croak("FATAL: generate_key_ex: param has to be integer or hashref");
+        }
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -35,7 +107,7 @@ _import(Crypt::PK::ECC self, SV * key_data)
         STRLEN data_len=0;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
+        _ecc_free_key(&self->key, &self->dp);
         rv = ecc_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_import failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
@@ -50,7 +122,7 @@ import_key_x963(Crypt::PK::ECC self, SV * key_data)
         STRLEN data_len=0;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
+        _ecc_free_key(&self->key, &self->dp);
         rv = ecc_ansi_x963_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_ansi_x963_import failed: %s", error_to_string(rv));
         RETVAL = 1; /* xxx */
@@ -133,7 +205,7 @@ key2hash(Crypt::PK::ECC self)
           not_used = hv_store(rv_hash, "pub_z", 5, newSVpv("", 0), 0);
         }
         /* =====> curve_... */
-        if (self->key.idx>=0) {
+        if (self->key.dp) {
           not_used = hv_store(rv_hash, "curve_name",  10, newSVpv(self->key.dp->name,  strlen(self->key.dp->name)), 0);
           not_used = hv_store(rv_hash, "curve_prime", 11, newSVpv(self->key.dp->prime, strlen(self->key.dp->prime)), 0);
           not_used = hv_store(rv_hash, "curve_A",      7, newSVpv(self->key.dp->A,     strlen(self->key.dp->A)), 0);
@@ -294,6 +366,6 @@ shared_secret(Crypt::PK::ECC self, Crypt::PK::ECC pubkey)
 void
 DESTROY(Crypt::PK::ECC self)
     CODE:
-        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
+        _ecc_free_key(&self->key, &self->dp);
         Safefree(self);
 

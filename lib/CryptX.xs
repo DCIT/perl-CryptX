@@ -162,8 +162,25 @@ typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
   prng_state yarrow_prng_state;
   int yarrow_prng_index;
   ecc_key key;
+  ltc_ecc_set_type dp;
   int id;
 } *Crypt__PK__ECC;
+
+void _ecc_free_key(ecc_key *key, ltc_ecc_set_type *dp)
+{
+  if (dp->name ) Safefree(dp->name );
+  if (dp->prime) Safefree(dp->prime);
+  if (dp->A    ) Safefree(dp->A    );
+  if (dp->B    ) Safefree(dp->B    );
+  if (dp->order) Safefree(dp->order);
+  if (dp->Gx   ) Safefree(dp->Gx   );
+  if (dp->Gy   ) Safefree(dp->Gy   );
+  if (key->type != -1) {
+    ecc_free(key);
+    key->type = -1;
+    key->dp = NULL;
+  }
+}
 
 MODULE = CryptX       PACKAGE = CryptX      PREFIX = CryptX_
 
