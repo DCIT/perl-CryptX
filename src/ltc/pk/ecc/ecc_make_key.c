@@ -97,10 +97,18 @@ int ecc_make_key_ex(prng_state *prng, int wprng, ecc_key *key, const ltc_ecc_set
    if ((err = mp_set(base->z, 1)) != CRYPT_OK)                                                  { goto errkey; }
    if ((err = mp_read_unsigned_bin(key->k, (unsigned char *)buf, keysize)) != CRYPT_OK)         { goto errkey; }
 
-   /* the key should be smaller than the order of base point */
-   if (mp_cmp(key->k, order) != LTC_MP_LT) {
-       if((err = mp_mod(key->k, order, key->k)) != CRYPT_OK)                                    { goto errkey; }
-   }
+   /* ECC key pair generation according to FIPS-186-4 (B.4.2 Key Pair Generation by Testing Candidates):
+    * the generated private key k should be the range [1, order–1]
+    *  a/ N = bitlen(order)
+    *  b/ generate N random bits and convert them into big integer k
+    *  c/ if k not in [1, order-1] go to b/
+    *  e/ Q = k*G
+    */
+   do {
+     /* generate random k: 0 <= k < order */
+     if ((err = rand_bn_range(key->k, order, prng, wprng)) != CRYPT_OK)                         { goto errkey; }
+   } while (mp_iszero(key->k));
+
    /* make the public key */
    if ((err = mp_read_radix(a, (char *)key->dp->A, 16)) != CRYPT_OK)                            { goto errkey; }
    if ((err = ltc_mp.ecc_ptmul(key->k, base, &key->pubkey, a, prime, 1)) != CRYPT_OK)           { goto errkey; }
