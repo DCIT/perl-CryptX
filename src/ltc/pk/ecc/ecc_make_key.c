@@ -51,7 +51,7 @@ int ecc_make_key_ex(prng_state *prng, int wprng, ecc_key *key, const ltc_ecc_set
    ecc_point     *base;
    void          *prime, *order, *a;
    unsigned char *buf;
-   int            keysize;
+   int            keysize, orderbits;
 
    LTC_ARGCHK(key         != NULL);
    LTC_ARGCHK(ltc_mp.name != NULL);
@@ -104,10 +104,10 @@ int ecc_make_key_ex(prng_state *prng, int wprng, ecc_key *key, const ltc_ecc_set
     *  c/ if k not in [1, order-1] go to b/
     *  e/ Q = k*G
     */
+   orderbits = mp_count_bits(order);
    do {
-     /* generate random k: 0 <= k < order */
-     if ((err = rand_bn_range(key->k, order, prng, wprng)) != CRYPT_OK)                         { goto errkey; }
-   } while (mp_iszero(key->k));
+     if ((err = rand_bn_bits(key->k, orderbits, prng, wprng)) != CRYPT_OK)                      { goto errkey; }
+   } while (mp_iszero(key->k) || mp_cmp(key->k, order) != LTC_MP_LT);
 
    /* make the public key */
    if ((err = mp_read_radix(a, (char *)key->dp->A, 16)) != CRYPT_OK)                            { goto errkey; }
