@@ -1,6 +1,7 @@
 Changes for CryptX
 
 TODO:
+        - ECC: export/import keys with curve params
         - more investigation crash/memleak/or_what_it_is related to rsa_free/dsa_free
         - RSA->check_key (basic check + extented primality test)
         - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
