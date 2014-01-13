@@ -1,0 +1,166 @@
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis
+ *
+ * LibTomCrypt is a library that provides various cryptographic
+ * algorithms in a highly modular and flexible manner.
+ *
+ * The library is free for all purposes without any express
+ * guarantee it works.
+ *
+ * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
+ */
+
+/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
+ *
+ */
+
+#include "tomcrypt.h"
+
+#ifdef LTC_MECC
+
+static int _populate_dp(void *a, void *b, void *prime, void *order, void *gx, void *gy, int cofactor, ltc_ecc_set_type *dp)
+{
+  unsigned char buf[ECC_BUF_SIZE];
+  unsigned long len;
+
+  /* a */
+  mp_tohex(a, (char *)buf);
+  len = strlen((char *)buf);
+  if ((dp->A = XMALLOC(1+len)) == NULL)         goto cleanup1;
+  strncpy(dp->A, (char*)buf, 1+len);
+  /* b */
+  mp_tohex(b, (char *)buf);
+  len = strlen((char *)buf);
+  if ((dp->B = XMALLOC(1+len)) == NULL)         goto cleanup2;
+  strncpy(dp->B, (char*)buf, 1+len);
+  /* order */
+  mp_tohex(order, (char *)buf);
+  len = strlen((char *)buf);
+  if ((dp->order = XMALLOC(1+len)) == NULL)     goto cleanup3;
+  strncpy(dp->order, (char*)buf, 1+len);
+  /* prime */
+  mp_tohex(prime, (char *)buf);
+  len = strlen((char *)buf);
+  if ((dp->prime = XMALLOC(1+len)) == NULL)     goto cleanup4;
+  strncpy(dp->prime, (char*)buf, 1+len);
+  /* gx */
+  mp_tohex(gx, (char *)buf);
+  len = strlen((char *)buf);
+  if ((dp->Gx = XMALLOC(1+len)) == NULL)        goto cleanup5;
+  strncpy(dp->Gx, (char*)buf, 1+len);
+  /* gy */
+  mp_tohex(gy, (char *)buf);
+  len = strlen((char *)buf);
+  if ((dp->Gy = XMALLOC(1+len)) == NULL)        goto cleanup6;
+  strncpy(dp->Gy, (char*)buf, 1+len);
+  /* cofactor & size */
+  dp->cofactor = cofactor;
+  dp->size = mp_unsigned_bin_size(prime);
+  /* name */
+  if ((dp->name = XMALLOC(7)) == NULL)          goto cleanup7;
+  strcpy(dp->name, "custom");  /* XXX-TODO check this */
+  /* done - success */
+  return CRYPT_OK;
+
+  XFREE(dp->name);
+cleanup7:
+  XFREE(dp->Gy);
+cleanup6:
+  XFREE(dp->Gx);
+cleanup5:
+  XFREE(dp->prime);
+cleanup4:
+  XFREE(dp->order);
+cleanup3:
+  XFREE(dp->B);
+cleanup2:
+  XFREE(dp->A);
+cleanup1:
+  return CRYPT_MEM;
+}
+
+int ecc_import_full(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp)
+{
+  void *prime, *order, *a, *b, *gx, *gy;
+  ltc_asn1_list seq_fieldid[3], seq_curve[3], seq_ecparams[7], seq_priv[5];
+  unsigned char bin_a[ECC_MAXSIZE], bin_b[ECC_MAXSIZE], bin_k[ECC_MAXSIZE], bin_g[2*ECC_MAXSIZE+1], bin_xy[2*ECC_MAXSIZE+2];
+  unsigned long len_a, len_b, len_k, len_g, len_xy;
+  unsigned long cofactor = 0, ecver = 0, pkver = 0, tmpoid[16];
+  /*oid_st oid;*/
+  int err;
+
+  if ((err = mp_init_multi(&prime, &order, &a, &b, &gx, &gy, NULL)) != CRYPT_OK)       return err;
+
+  /* ECParameters SEQUENCE */
+  LTC_SET_ASN1(seq_ecparams, 0, LTC_ASN1_SHORT_INTEGER,     &ecver,       1UL);
+  LTC_SET_ASN1(seq_ecparams, 1, LTC_ASN1_SEQUENCE,          seq_fieldid,  2UL);
+  LTC_SET_ASN1(seq_ecparams, 2, LTC_ASN1_SEQUENCE,          seq_curve,    2UL);
+  LTC_SET_ASN1(seq_ecparams, 3, LTC_ASN1_OCTET_STRING,      bin_g,        (unsigned long)2*ECC_MAXSIZE+1);
+  LTC_SET_ASN1(seq_ecparams, 4, LTC_ASN1_INTEGER,           order,        1UL);
+  LTC_SET_ASN1(seq_ecparams, 5, LTC_ASN1_SHORT_INTEGER,     &cofactor,    1UL);
+  /* FieldID SEQUENCE */
+  LTC_SET_ASN1(seq_fieldid,  0, LTC_ASN1_OBJECT_IDENTIFIER, tmpoid,       16UL);
+  LTC_SET_ASN1(seq_fieldid,  1, LTC_ASN1_INTEGER,           prime,        1UL);
+  /* Curve SEQUENCE */
+  LTC_SET_ASN1(seq_curve,    0, LTC_ASN1_OCTET_STRING,      bin_a,        (unsigned long)ECC_MAXSIZE);
+  LTC_SET_ASN1(seq_curve,    1, LTC_ASN1_OCTET_STRING,      bin_b,        (unsigned long)ECC_MAXSIZE);
+
+  len_xy = sizeof(bin_xy);
+  /* try to load public key */
+  err = der_decode_subject_public_key_info(in, inlen, PKA_EC, bin_xy, &len_xy, LTC_ASN1_SEQUENCE, seq_ecparams, 6);
+  if (err == CRYPT_OK) {
+    len_a = seq_curve[0].size;
+    len_b = seq_curve[1].size;
+    len_g = seq_ecparams[3].size;
+    /* create bignums */
+    if ((err = mp_read_unsigned_bin(a, bin_a, len_a)) != CRYPT_OK)                  { goto error; }
+    if ((err = mp_read_unsigned_bin(b, bin_b, len_b)) != CRYPT_OK)                  { goto error; }
+    if ((err = ecc_import_point(bin_g, len_g, prime, a, b, gx, gy)) != CRYPT_OK)    { goto error; }
+    /* load curve parameters */
+    if ((err = _populate_dp(a, b, prime, order, gx, gy, cofactor, dp)) != CRYPT_OK) { goto error; }
+    /* load public key */
+    if ((err = ecc_import_raw(bin_xy, len_xy, key, dp)) != CRYPT_OK)                { goto error; }
+  }
+  else {
+    /* ECPrivateKey SEQUENCE */
+    LTC_SET_ASN1(seq_priv,     0, LTC_ASN1_SHORT_INTEGER,     &pkver,       1UL);
+    LTC_SET_ASN1(seq_priv,     1, LTC_ASN1_OCTET_STRING,      bin_k,        (unsigned long)ECC_MAXSIZE);
+    LTC_SET_ASN1(seq_priv,     2, LTC_ASN1_SEQUENCE,          seq_ecparams, 6UL);
+    LTC_SET_ASN1(seq_priv,     3, LTC_ASN1_RAW_BIT_STRING,    bin_xy,       (unsigned long)8*(2*ECC_MAXSIZE+2));
+    /* ECParameters SEQUENCE */
+    LTC_SET_ASN1(seq_ecparams, 0, LTC_ASN1_SHORT_INTEGER,     &ecver,       1UL);
+    LTC_SET_ASN1(seq_ecparams, 1, LTC_ASN1_SEQUENCE,          seq_fieldid,  2UL);
+    LTC_SET_ASN1(seq_ecparams, 2, LTC_ASN1_SEQUENCE,          seq_curve,    2UL);
+    LTC_SET_ASN1(seq_ecparams, 3, LTC_ASN1_OCTET_STRING,      bin_g,        (unsigned long)2*ECC_MAXSIZE+1);
+    LTC_SET_ASN1(seq_ecparams, 4, LTC_ASN1_INTEGER,           order,        1UL);
+    LTC_SET_ASN1(seq_ecparams, 5, LTC_ASN1_SHORT_INTEGER,     &cofactor,    1UL);
+    /* FieldID SEQUENCE */
+    LTC_SET_ASN1(seq_fieldid,  0, LTC_ASN1_OBJECT_IDENTIFIER, tmpoid,       16UL);
+    LTC_SET_ASN1(seq_fieldid,  1, LTC_ASN1_INTEGER,           prime,        1UL);
+    /* Curve SEQUENCE */
+    LTC_SET_ASN1(seq_curve,    0, LTC_ASN1_OCTET_STRING,      bin_a,        (unsigned long)ECC_MAXSIZE);
+    LTC_SET_ASN1(seq_curve,    1, LTC_ASN1_OCTET_STRING,      bin_b,        (unsigned long)ECC_MAXSIZE);
+
+    /* try to load private key */
+    if ((err = der_decode_sequence(in, inlen, seq_priv, 3)) != CRYPT_OK)          { goto error; }
+    len_k  = seq_priv[1].size;
+    len_xy = seq_priv[3].size;
+    len_a  = seq_curve[0].size;
+    len_b  = seq_curve[1].size;
+    len_g  = seq_ecparams[3].size;
+    /* create bignums */
+    if ((err = mp_read_unsigned_bin(a, bin_a, len_a)) != CRYPT_OK)                  { goto error; }
+    if ((err = mp_read_unsigned_bin(b, bin_b, len_b)) != CRYPT_OK)                  { goto error; }
+    if ((err = ecc_import_point(bin_g, len_g, prime, a, b, gx, gy)) != CRYPT_OK)    { goto error; }
+    /* load curve parameters */
+    if ((err = _populate_dp(a, b, prime, order, gx, gy, cofactor, dp)) != CRYPT_OK) { goto error; }
+    /* load private+public key */
+    if ((err = ecc_import_raw(bin_k, len_k, key, dp)) != CRYPT_OK)                  { goto error; }
+  }
+
+  err = CRYPT_OK;
+error:
+  mp_clear_multi(prime, order, a, b, gx, gy, NULL);
+  return err;
+}
+
+#endif
