@@ -297,9 +297,10 @@ int ecc_ansi_x963_import(const unsigned char *in, unsigned long inlen, ecc_key *
 int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
 
 int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
-int ecc_import_full(const unsigned char *in, unsigned long inlen, ecc_key *key);
+int ecc_import_full(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
 
 int ecc_export_point(unsigned char *out, unsigned long *outlen, void *x, void *y, unsigned long size, int compressed);
+int ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y);
 int ecc_export_raw(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
 int ecc_import_raw(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
 
