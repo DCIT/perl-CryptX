@@ -3,7 +3,7 @@ Changes for CryptX
 TODO:
         - ECC: export/import keys with curve params
         - more investigation crash/memleak/or_what_it_is related to rsa_free/dsa_free
-        - RSA->check_key (basic check + extented primality test)
+        - RSA->verify_key (basic check + extented primality test)
         - croak with the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - croak when mode does not call start_(en|de)crypt
         - "libtom-src/bn_mp_invmod.c", line 37: warning: statement not reached
@@ -13,6 +13,14 @@ TODO:
           - t/pk_dsa.t crashes after: ok 28 - decrypt
         - better primality testing: http://questhub.io/realm/perl/quest/519032ee1088c76505000035
         - libtomcrypt patch: https://secure.ucc.asn.au/hg/dropbear/rev/9a789fc03f40?revcount=240 (free rsa key)
+        - DSA: generate_key($p, $q, $g), generate_key(\$dsa_params_der), generate_key($dsa_params_file)
+          DSA-Params ::= SEQUENCE {
+                p  INTEGER,
+                q  INTEGER,
+                g  INTEGER
+          }
+        - DH: generate_key($p, $q), generate_key(\$dh_params_der), generate_key($dh_params_file)
+        - DH: key2hash should dump p, q
 
 0.019   2013/10/20
         - fixed broken CAMELLIA implementation

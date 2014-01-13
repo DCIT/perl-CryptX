@@ -46,7 +46,7 @@ _import(Crypt::PK::ECC self, SV * key_data)
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         _ecc_free_key(&self->key, &self->dp);
-        rv = ecc_import_full(data, (unsigned long)data_len, &self->key);
+        rv = ecc_import_full(data, (unsigned long)data_len, &self->key, &self->dp);
         if (rv != CRYPT_OK) croak("FATAL: ecc_import_full failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
