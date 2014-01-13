@@ -45,3 +45,14 @@ openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls7.pem -name wap-wsg-idm-eci
 openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls8.pem -name wap-wsg-idm-ecid-wtls8 -genkey -param_enc explicit
 openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls9.pem -name wap-wsg-idm-ecid-wtls9 -genkey -param_enc explicit
 openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls12.pem -name wap-wsg-idm-ecid-wtls12 -genkey -param_enc explicit
+
+
+openssl ecparam -out openssl_ec1.key.pem -name secp384r1 -genkey -param_enc explicit
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -out openssl_ec1.pri.pem
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -conv_form compressed -out openssl_ec1.pric.pem
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -pubout -out openssl_ec1.pub.pem
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -pubout -conv_form compressed -out openssl_ec1.pubc.pem
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -outform der -out openssl_ec1.pri.der
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -outform der -conv_form compressed -out openssl_ec1.pric.der
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -outform der -pubout -out openssl_ec1.pub.der
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -outform der -pubout -conv_form compressed -out openssl_ec1.pubc.der
