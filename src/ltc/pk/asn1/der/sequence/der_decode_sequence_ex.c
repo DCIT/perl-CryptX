@@ -93,6 +93,20 @@ int der_decode_sequence_ex(const unsigned char *in, unsigned long  inlen,
           break;
        }
 
+       /* handle context specific tags - just skip the tag + len bytes */
+       z = 0;
+       if (list[i].tag > 0 && list[i].tag == in[x + z++]) {
+         if (in[x+z] & 0x80) {
+            y = in[x + z++] & 0x7F;
+            if (y == 0 || y > 2) { return CRYPT_INVALID_PACKET; }
+            z += y;
+         } else {
+            z++;
+         }
+         x     += z;
+         inlen -= z;
+       }
+
        switch (type) {
            case LTC_ASN1_BOOLEAN:
                z = inlen;

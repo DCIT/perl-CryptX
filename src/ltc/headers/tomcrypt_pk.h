@@ -486,7 +486,7 @@ typedef struct ltc_asn1_list_ {
    /** Flag used to indicate optional items in ASN.1 sequences */
    int           optional;
    /** Flag used to indicate context specific tags on ASN.1 sequence items */
-   int           tag;
+   unsigned char tag;
    /** prev/next entry in the list */
    struct ltc_asn1_list_ *prev, *next, *child, *parent;
 } ltc_asn1_list;
