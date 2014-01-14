@@ -45,7 +45,7 @@ int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
           break;
        }
 
-       if (!list[i].used) continue; /* some items may be optional */
+       if (!list[i].used && list[i].optional) continue; /* some items may be optional */
 
        switch (type) {
            case LTC_ASN1_BOOLEAN:
