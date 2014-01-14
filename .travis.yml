@@ -1,0 +1,22 @@
+language: perl
+perl:
+  - "5.8"
+  - "5.10"
+  - "5.12"
+  - "5.14"
+  - "5.16"
+  - "5.18"
+
+before_install:
+# install deps
+  - cat ./cpan-deps | cpanm --sudo --notest -v
+  - cat ./cpan-deps
+  - dpkg -l
+
+install:
+  - perl ./Build.PL
+  - ./Build
+  - sudo ./Build install
+
+script:
+  - prove
