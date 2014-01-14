@@ -45,6 +45,8 @@ int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
           break;
        }
 
+       if (!list[i].used) continue; /* some items may be optional */
+
        switch (type) {
            case LTC_ASN1_BOOLEAN:
               if ((err = der_length_boolean(&x)) != CRYPT_OK) {
@@ -67,6 +69,7 @@ int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
                y += x;
                break;
 
+           case LTC_ASN1_RAW_BIT_STRING:
            case LTC_ASN1_BIT_STRING:
                if ((err = der_length_bit_string(size, &x)) != CRYPT_OK) {
                   goto LBL_ERR;

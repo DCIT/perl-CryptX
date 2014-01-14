@@ -483,6 +483,10 @@ typedef struct ltc_asn1_list_ {
    unsigned long size;
    /** The used flag, this is used by the CHOICE ASN.1 type to indicate which choice was made */
    int           used;
+   /** Flag used to indicate optional items in ASN.1 sequences */
+   int           optional;
+   /** Flag used to indicate context specific tags on ASN.1 sequence items */
+   int           tag;
    /** prev/next entry in the list */
    struct ltc_asn1_list_ *prev, *next, *child, *parent;
 } ltc_asn1_list;
@@ -495,6 +499,8 @@ typedef struct ltc_asn1_list_ {
       LTC_MACRO_list[LTC_MACRO_temp].data = (void*)(Data);  \
       LTC_MACRO_list[LTC_MACRO_temp].size = (Size);  \
       LTC_MACRO_list[LTC_MACRO_temp].used = 0;       \
+      LTC_MACRO_list[LTC_MACRO_temp].tag = 0;        \
+      LTC_MACRO_list[LTC_MACRO_temp].optional = 0;   \
    } while (0);
 
 /* SEQUENCE */
