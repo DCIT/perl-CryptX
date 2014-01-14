@@ -129,6 +129,8 @@ int ecc_import_full(const unsigned char *in, unsigned long inlen, ecc_key *key, 
     LTC_SET_ASN1(seq_priv,     1, LTC_ASN1_OCTET_STRING,      bin_k,        (unsigned long)ECC_MAXSIZE);
     LTC_SET_ASN1(seq_priv,     2, LTC_ASN1_SEQUENCE,          seq_ecparams, 6UL);
     LTC_SET_ASN1(seq_priv,     3, LTC_ASN1_RAW_BIT_STRING,    bin_xy,       (unsigned long)8*(2*ECC_MAXSIZE+2));
+    seq_priv[2].tag = 0xA0;
+    seq_priv[3].tag = 0xA1;
     /* ECParameters SEQUENCE */
     LTC_SET_ASN1(seq_ecparams, 0, LTC_ASN1_SHORT_INTEGER,     &ecver,       1UL);
     LTC_SET_ASN1(seq_ecparams, 1, LTC_ASN1_SEQUENCE,          seq_fieldid,  2UL);
