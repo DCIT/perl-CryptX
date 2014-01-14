@@ -514,8 +514,8 @@ int der_decode_sequence_ex(const unsigned char *in, unsigned long  inlen,
 
 #define der_decode_sequence(in, inlen, list, outlen) der_decode_sequence_ex(in, inlen, list, outlen, 1)
 
-int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
-                        unsigned long *outlen);
+int der_length_sequence(ltc_asn1_list *list, unsigned long inlen, unsigned long *outlen);
+int der_length_sequence_ex(ltc_asn1_list *list, unsigned long inlen, unsigned long *outlen, unsigned long *payloadlen);
 
 /* SUBJECT PUBLIC KEY INFO */
 int der_encode_subject_public_key_info(unsigned char *out, unsigned long *outlen,
