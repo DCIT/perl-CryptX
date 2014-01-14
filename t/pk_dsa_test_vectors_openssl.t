@@ -32,9 +32,11 @@ for my $h (@$data) {
   my $dsa_pub  = Crypt::PK::DSA->new->import_key(\pack("H*",$h->{PUB_DER}));
   my $dsa_pri_h = $dsa_pri->key2hash;
   my $dsa_pub_h = $dsa_pub->key2hash;
-  is($dsa_pri_h->{x}, uc $h->{PRI} =~ s/^0+//r, "$h->{PRI_FILE}/PRI");
-  is($dsa_pri_h->{y}, uc $h->{PUB} =~ s/^0+//r, "$h->{PRI_FILE}/PUB");
-  is($dsa_pub_h->{y}, uc $h->{PUB} =~ s/^0+//r, "$h->{PUB_FILE}/PUB");
+  $h->{PRI} =~ s/^0+//;
+  $h->{PUB} =~ s/^0+//;
+  is($dsa_pri_h->{x}, $h->{PRI}, "$h->{PRI_FILE}/PRI");
+  is($dsa_pri_h->{y}, $h->{PUB}, "$h->{PRI_FILE}/PUB");
+  is($dsa_pub_h->{y}, $h->{PUB}, "$h->{PUB_FILE}/PUB");
   ok( $dsa_pub->verify_message(pack("H*", $h->{DSA_SHA1}), 'test-data', 'SHA1'), "$h->{PRI_FILE}/DSA_SHA1");
   ok( $dsa_pub->verify_message(pack("H*", $h->{DSA_SHA256}), 'test-data', 'SHA256'), "$h->{PRI_FILE}/DSA_SHA256");
 }
