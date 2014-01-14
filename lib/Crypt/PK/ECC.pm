@@ -334,8 +334,16 @@ sub new {
   return  $self;
 }
 
+sub export_key_pem {
+  my ($self, $type, $password, $cipher) = @_;
+  my $key = $self->export_key_der($type||'');
+  return undef unless $key;
+  return Crypt::PK::_asn1_to_pem($key, "EC PRIVATE KEY", $password, $cipher) if $type eq 'private';  
+  return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public' || $type eq 'public_compressed';
+}
+
 sub import_key {
-  my ($self, $key) = @_;
+  my ($self, $key, $password) = @_;
   croak "FATAL: undefined key" unless $key;
   my $data;
   if (ref($key) eq 'SCALAR') {
@@ -347,10 +355,9 @@ sub import_key {
   else {
     croak "FATAL: non-existing file '$key'";
   }
-  ### no PEM support
-  #if ($data && $data =~ /-----BEGIN (EC PRIVATE|EC PUBLIC|PRIVATE|PUBLIC) KEY-----(.*?)-----END/sg) {
-  #  $data = decode_base64($2);
-  #}
+  if ($data && $data =~ /-----BEGIN (EC PRIVATE|EC PUBLIC|PRIVATE|PUBLIC) KEY-----(.*?)-----END/sg) {
+    $data = Crypt::PK::_pem_to_asn1($data, $password);
+  }
   croak "FATAL: invalid key format" unless $data;
   return $self->_import($data);
 }
@@ -500,6 +507,8 @@ Crypt::PK::ECC - Public key cryptography based on EC
  $pk->generate_key('secp160r1');
  my $private_der = $pk->export_key_der('private');
  my $public_der = $pk->export_key_der('public');
+ my $private_pem = $pk->export_key_pem('private');
+ my $public_pem = $pk->export_key_pem('public');
  my $public_raw = $pk->export_key_raw('public');
 
  ### Functional interface
@@ -666,11 +675,17 @@ See L<http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf>, L<http://www.s
 
 =head2 import_key
 
-Loads private or public key in DER format (exported by L</export_key_der>).
+Loads private or public key in DER or PEM format.
 
   $pk->import_key($filename);
   #or
   $pk->import_key(\$buffer_containing_key);
+
+Support for password protected PEM keys
+
+  $pk->import_key($pem_filename, $password);
+  #or
+  $pk->import_key(\$buffer_containing_pem_key, $password);
 
 =head2 import_key_raw
 
@@ -685,6 +700,28 @@ Import raw public/private key - can load data exported by L</export_key_raw>.
  my $private_der = $pk->export_key_der('private');
  #or
  my $public_der = $pk->export_key_der('public');
+
+=head2 export_key_pem
+
+ my $private_pem = $pk->export_key_pem('private');
+ #or
+ my $public_pem = $pk->export_key_pem('public');
+
+Support for password protected PEM keys
+
+ my $private_pem = $pk->export_key_pem('private', $password);
+ #or
+ my $private_pem = $pk->export_key_pem('private', $password, $cipher);
+ 
+ # supported ciphers: 'DES-CBC'
+ #                    'DES-EDE3-CBC'
+ #                    'SEED-CBC'
+ #                    'CAMELLIA-128-CBC'
+ #                    'CAMELLIA-192-CBC'
+ #                    'CAMELLIA-256-CBC'
+ #                    'AES-128-CBC'
+ #                    'AES-192-CBC'
+ #                    'AES-256-CBC' (DEFAULT)
 
 =head2 export_key_raw
 

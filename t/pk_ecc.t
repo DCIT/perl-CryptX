@@ -25,6 +25,7 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   ok($k, 'load cryptx_pub_ecc2.der');
   ok(!$k->is_private, 'is_private cryptx_pub_ecc2.der');
    
+  ### XXX-TODO regenerate keys
   # $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc1.pem');
   # ok($k, 'load cryptx_priv_ecc1.pem');
   # ok($k->is_private, 'is_private cryptx_priv_ecc1.pem');
@@ -40,6 +41,19 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   # $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.pem');
   # ok($k, 'load cryptx_pub_ecc2.pem');
   # ok(!$k->is_private, 'is_private cryptx_pub_ecc2.pem');
+  # $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.pem');
+
+  ### XXX-TODO private key PEM/DER not finished yet
+  #for (qw(openssl_ec1.key.pem openssl_ec1.pri.der openssl_ec1.pri.pem openssl_ec1.pric.der openssl_ec1.pric.pem)) {
+  #  $k = Crypt::PK::ECC->new("t/data/$_");
+  #  ok($k, "load $_");
+  #  ok($k->is_private, 'is_private $_');
+  #}
+  for (qw(openssl_ec1.pub.pem openssl_ec1.pub.der openssl_ec1.pubc.der openssl_ec1.pubc.pem)) {
+    $k = Crypt::PK::ECC->new("t/data/$_");
+    ok($k, "load $_");
+    ok(!$k->is_private, 'is_private $_');
+  }
 }
 
 {
