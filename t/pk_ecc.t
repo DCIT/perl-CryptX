@@ -49,11 +49,11 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   #  ok($k, "load $_");
   #  ok($k->is_private, 'is_private $_');
   #}
-  for (qw(openssl_ec1.pub.pem openssl_ec1.pub.der openssl_ec1.pubc.der openssl_ec1.pubc.pem)) {
-    $k = Crypt::PK::ECC->new("t/data/$_");
-    ok($k, "load $_");
-    ok(!$k->is_private, 'is_private $_');
-  }
+  #for (qw(openssl_ec1.pub.pem openssl_ec1.pub.der openssl_ec1.pubc.der openssl_ec1.pubc.pem)) {
+  #  $k = Crypt::PK::ECC->new("t/data/$_");
+  #  ok($k, "load $_");
+  #  ok(!$k->is_private, 'is_private $_');
+  #}
 }
 
 {
