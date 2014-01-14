@@ -28,3 +28,4 @@ lib/CryptX.c$
 ^tmp*
 ^poznamky*
 \.stackdump$
+^.travis*
