@@ -362,23 +362,6 @@ sub import_key {
   return $self->_import($data);
 }
 
-sub import_key_backcompat {
-  my ($self, $key) = @_;
-  croak "FATAL: undefined key" unless $key;
-  my $data;
-  if (ref($key) eq 'SCALAR') {
-    $data = $$key;
-  }
-  elsif (-f $key) {
-    $data = Crypt::PK::_slurp_file($key);
-  }
-  else {
-    croak "FATAL: non-existing file '$key'";
-  }
-  croak "FATAL: invalid key format" unless $data;
-  return $self->_import_backcompat($data);
-}
-
 sub encrypt {
   my ($self, $data, $hash_name) = @_;
   $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');

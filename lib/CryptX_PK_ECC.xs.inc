@@ -52,21 +52,6 @@ _import(Crypt::PK::ECC self, SV * key_data)
     }
 
 void
-_import_backcompat(Crypt::PK::ECC self, SV * key_data)
-    PPCODE:
-    {
-        int rv;
-        unsigned char *data=NULL;
-        STRLEN data_len=0;
-
-        data = (unsigned char *)SvPVbyte(key_data, data_len);
-        _ecc_free_key(&self->key, &self->dp);
-        rv = ecc_import(data, (unsigned long)data_len, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: ecc_import failed: %s", error_to_string(rv));
-        XPUSHs(ST(0)); /* return self */
-    }
-
-void
 import_key_raw(Crypt::PK::ECC self, SV * key_data, SV * curve)
     PPCODE:
     {

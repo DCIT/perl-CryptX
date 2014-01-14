@@ -7,48 +7,50 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
 {
   my $k;
 
-  $k = Crypt::PK::ECC->new->import_key_backcompat('t/data/cryptx_priv_ecc1.der');       #XXX-TODO-FIXME
+  $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc1.der');
   ok($k, 'load cryptx_priv_ecc1.der');
   ok($k->is_private, 'is_private cryptx_priv_ecc1.der');
   is($k->size, 32, 'size');
-  is(uc($k->key2hash->{pub_x}), 'AB53ED5D16CE550BAAF16BA4F161332AAD56D63790629C27871ED515D4FC229C', 'key2hash');
+  is(uc($k->key2hash->{pub_x}), 'C068B754877A4AB328A569BAC6D464A81B17E527D2D652572ABB11BDA3572D50', 'key2hash');
 
-  $k = Crypt::PK::ECC->new->import_key_backcompat('t/data/cryptx_priv_ecc2.der');       #XXX-TODO-FIXME
+  $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc2.der');
   ok($k, 'load cryptx_priv_ecc2.der');
   ok($k->is_private, 'is_private cryptx_priv_ecc2.der');
   
-  $k = Crypt::PK::ECC->new->import_key_backcompat('t/data/cryptx_pub_ecc1.der');        #XXX-TODO-FIXME
+  $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc1.der');
   ok($k, 'load cryptx_pub_ecc1.der');
   ok(!$k->is_private, 'is_private cryptx_pub_ecc1.der');
   
-  $k = Crypt::PK::ECC->new->import_key_backcompat('t/data/cryptx_pub_ecc2.der');        #XXX-TODO-FIXME
+  $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.der');
   ok($k, 'load cryptx_pub_ecc2.der');
   ok(!$k->is_private, 'is_private cryptx_pub_ecc2.der');
    
   ### XXX-TODO regenerate keys
-  # $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc1.pem');
-  # ok($k, 'load cryptx_priv_ecc1.pem');
-  # ok($k->is_private, 'is_private cryptx_priv_ecc1.pem');
+  $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc1.pem');
+  ok($k, 'load cryptx_priv_ecc1.pem');
+  ok($k->is_private, 'is_private cryptx_priv_ecc1.pem');
   
-  # $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc2.pem');
-  # ok($k, 'load cryptx_priv_ecc2.pem');
-  # ok($k->is_private, 'is_private cryptx_priv_ecc2.pem');
+  $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc2.pem');
+  ok($k, 'load cryptx_priv_ecc2.pem');
+  ok($k->is_private, 'is_private cryptx_priv_ecc2.pem');
   
-  # $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc1.pem');
-  # ok($k, 'load cryptx_pub_ecc1.pem');
-  # ok(!$k->is_private, 'is_private cryptx_pub_ecc1.pem');
+  $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc1.pem');
+  ok($k, 'load cryptx_pub_ecc1.pem');
+  ok(!$k->is_private, 'is_private cryptx_pub_ecc1.pem');
   
-  # $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.pem');
-  # ok($k, 'load cryptx_pub_ecc2.pem');
-  # ok(!$k->is_private, 'is_private cryptx_pub_ecc2.pem');
-  # $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.pem');
+  $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.pem');
+  ok($k, 'load cryptx_pub_ecc2.pem');
+  ok(!$k->is_private, 'is_private cryptx_pub_ecc2.pem');
+  $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.pem');
 
-  for (qw(openssl_ec1.pub.pem openssl_ec1.pub.der openssl_ec1.pubc.der openssl_ec1.pubc.pem)) {
+  for (qw( openssl_ec1.pub.pem openssl_ec1.pub.der openssl_ec1.pubc.der openssl_ec1.pubc.pem
+           cryptx_pub_ecc1_OLD.der cryptx_pub_ecc1_OLD.pem cryptx_pub_ecc2_OLD.der cryptx_pub_ecc2_OLD.pem )) {
     $k = Crypt::PK::ECC->new("t/data/$_");
     ok($k, "load $_");
     ok(!$k->is_private, "is_private $_");
   }
-  for (qw(openssl_ec1.pri.der openssl_ec1.pri.pem openssl_ec1.pric.der openssl_ec1.pric.pem openssl_ec1.key.pem)) {
+  for (qw( openssl_ec1.pri.der openssl_ec1.pri.pem openssl_ec1.pric.der openssl_ec1.pric.pem openssl_ec1.key.pem
+           cryptx_priv_ecc1_OLD.der cryptx_priv_ecc1_OLD.pem cryptx_priv_ecc2_OLD.der cryptx_priv_ecc2_OLD.pem )) {
     $k = Crypt::PK::ECC->new("t/data/$_");
     ok($k, "load $_");
     ok($k->is_private, "is_private $_");
@@ -57,13 +59,13 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
 
 {
   my $pr1 = Crypt::PK::ECC->new;
-  $pr1->import_key_backcompat('t/data/cryptx_priv_ecc1.der');                   #XXX-TODO-FIXME
+  $pr1->import_key('t/data/cryptx_priv_ecc1.der');
   my $pu1 = Crypt::PK::ECC->new;
-  $pu1->import_key_backcompat('t/data/cryptx_pub_ecc1.der');                    #XXX-TODO-FIXME
+  $pu1->import_key('t/data/cryptx_pub_ecc1.der');
  
   my $ct = $pu1->encrypt("secret message");
   my $pt = $pr1->decrypt($ct);
-  ok(length $ct > 100, 'encrypt ' . length($ct));
+  ok(length $ct > 80, 'encrypt ' . length($ct));
   is($pt, "secret message", 'decrypt');
  
   my $sig = $pr1->sign_message("message");
@@ -76,9 +78,9 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   ok($pu1->verify_hash($sig, $hash, 'SHA1'), 'verify_hash'); 
  
   my $pr2 = Crypt::PK::ECC->new;
-  $pr2->import_key_backcompat('t/data/cryptx_priv_ecc2.der');                   #XXX-TODO-FIXME
+  $pr2->import_key('t/data/cryptx_priv_ecc2.der');
   my $pu2 = Crypt::PK::ECC->new;
-  $pu2->import_key_backcompat('t/data/cryptx_pub_ecc2.der');                    #XXX-TODO-FIXME
+  $pu2->import_key('t/data/cryptx_pub_ecc2.der');
  
   my $ss1 = $pr1->shared_secret($pu2);
   my $ss2 = $pr2->shared_secret($pu1);
@@ -96,23 +98,22 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   ok($k->export_key_der('public'), 'export_key_der pub');
 }
 
-#{
-#XXX-TODO-FIXME keys t/data/* has to be in new format
-#  my $ct = ecc_encrypt('t/data/cryptx_pub_ecc1.der', 'test string');
-#  ok($ct, 'ecc_encrypt');
-#  my $pt = ecc_decrypt('t/data/cryptx_priv_ecc1.der', $ct);
-#  ok($pt, 'ecc_decrypt');
-#  my $sig = ecc_sign_message('t/data/cryptx_priv_ecc1.der', 'test string');
-#  ok($sig, 'ecc_sign_message');
-#  ok(ecc_verify_message('t/data/cryptx_pub_ecc1.der', $sig, 'test string'), 'ecc_verify_message');
-#  my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-#  $sig = ecc_sign_hash('t/data/cryptx_priv_ecc1.der', $hash, 'SHA1');
-#  ok($sig, 'ecc_sign_hash');
-#  ok(ecc_verify_hash('t/data/cryptx_pub_ecc1.der', $sig, $hash, 'SHA1'), 'ecc_verify_hash');
-#  
-#  my $ss1 = ecc_shared_secret('t/data/cryptx_priv_ecc1.der', 't/data/cryptx_pub_ecc2.der');
-#  my $ss2 = ecc_shared_secret('t/data/cryptx_priv_ecc2.der', 't/data/cryptx_pub_ecc1.der');
-#  is(unpack("H*",$ss1), unpack("H*",$ss2), 'shared_secret');
-#}
+{
+  my $ct = ecc_encrypt('t/data/cryptx_pub_ecc1.der', 'test string');
+  ok($ct, 'ecc_encrypt');
+  my $pt = ecc_decrypt('t/data/cryptx_priv_ecc1.der', $ct);
+  ok($pt, 'ecc_decrypt');
+  my $sig = ecc_sign_message('t/data/cryptx_priv_ecc1.der', 'test string');
+  ok($sig, 'ecc_sign_message');
+  ok(ecc_verify_message('t/data/cryptx_pub_ecc1.der', $sig, 'test string'), 'ecc_verify_message');
+  my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
+  $sig = ecc_sign_hash('t/data/cryptx_priv_ecc1.der', $hash, 'SHA1');
+  ok($sig, 'ecc_sign_hash');
+  ok(ecc_verify_hash('t/data/cryptx_pub_ecc1.der', $sig, $hash, 'SHA1'), 'ecc_verify_hash');
+  
+  my $ss1 = ecc_shared_secret('t/data/cryptx_priv_ecc1.der', 't/data/cryptx_pub_ecc2.der');
+  my $ss2 = ecc_shared_secret('t/data/cryptx_priv_ecc2.der', 't/data/cryptx_pub_ecc1.der');
+  is(unpack("H*",$ss1), unpack("H*",$ss2), 'shared_secret');
+}
 
 done_testing;
