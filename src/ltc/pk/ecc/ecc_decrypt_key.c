@@ -89,7 +89,7 @@ int ecc_decrypt_key(const unsigned char *in,  unsigned long  inlen,
    }
 
    /* import ECC key from packet */
-   if ((err = ecc_import(decode[1].data, decode[1].size, &pubkey)) != CRYPT_OK) {
+   if ((err = ecc_import_raw(decode[1].data, decode[1].size, &pubkey, key->dp)) != CRYPT_OK) {
       goto LBL_ERR;
    }
 

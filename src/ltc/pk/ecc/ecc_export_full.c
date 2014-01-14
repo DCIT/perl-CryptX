@@ -127,6 +127,8 @@ int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key
       LTC_SET_ASN1(seq_priv, 1, LTC_ASN1_OCTET_STRING,    bin_k,        len_k);
       LTC_SET_ASN1(seq_priv, 2, LTC_ASN1_SEQUENCE,        seq_ecparams, 6UL);
       LTC_SET_ASN1(seq_priv, 3, LTC_ASN1_RAW_BIT_STRING,  bin_xy,       8*len_xy);
+      seq_priv[2].tag = 0xA0;
+      seq_priv[3].tag = 0xA1;
 
       err = der_encode_sequence(seq_priv, 4, out, outlen);
   }

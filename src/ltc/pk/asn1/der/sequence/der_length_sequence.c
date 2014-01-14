@@ -24,11 +24,16 @@
    @param outlen [out] The length required in octets to store it 
    @return CRYPT_OK on success
 */
-int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
-                        unsigned long *outlen) 
+
+int der_length_sequence(ltc_asn1_list *list, unsigned long inlen, unsigned long *outlen)
+{
+  return der_length_sequence_ex(list, inlen, outlen, NULL);
+}
+
+int der_length_sequence_ex(ltc_asn1_list *list, unsigned long inlen, unsigned long *outlen, unsigned long *payloadlen) 
 {
    int           err, type;
-   unsigned long size, x, y, i;
+   unsigned long size, x, y, z, i;
    void          *data;
 
    LTC_ARGCHK(list    != NULL);
@@ -45,28 +50,25 @@ int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
           break;
        }
 
-       if (!list[i].used && list[i].optional) continue; /* some items may be optional */
+       if (!list[i].used && list[i].optional) continue; /* some items may be optional during import */
 
        switch (type) {
            case LTC_ASN1_BOOLEAN:
-              if ((err = der_length_boolean(&x)) != CRYPT_OK) {
-                 goto LBL_ERR;
-              }
-              y += x;
-              break;
-          
+               if ((err = der_length_boolean(&x)) != CRYPT_OK) {
+                  goto LBL_ERR;
+               }
+               break;
+
            case LTC_ASN1_INTEGER:
                if ((err = der_length_integer(data, &x)) != CRYPT_OK) {
                   goto LBL_ERR;
                }
-               y += x;
                break;
 
            case LTC_ASN1_SHORT_INTEGER:
                if ((err = der_length_short_integer(*((unsigned long *)data), &x)) != CRYPT_OK) {
                   goto LBL_ERR;
                }
-               y += x;
                break;
 
            case LTC_ASN1_RAW_BIT_STRING:
@@ -74,53 +76,46 @@ int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
                if ((err = der_length_bit_string(size, &x)) != CRYPT_OK) {
                   goto LBL_ERR;
                }
-               y += x;
                break;
 
            case LTC_ASN1_OCTET_STRING:
                if ((err = der_length_octet_string(size, &x)) != CRYPT_OK) {
                   goto LBL_ERR;
                }
-               y += x;
                break;
 
            case LTC_ASN1_NULL:
-               y += 2;
+               x = 2;
                break;
 
            case LTC_ASN1_OBJECT_IDENTIFIER:
                if ((err = der_length_object_identifier(data, size, &x)) != CRYPT_OK) {
                   goto LBL_ERR;
                }
-               y += x;
                break;
 
            case LTC_ASN1_IA5_STRING:
                if ((err = der_length_ia5_string(data, size, &x)) != CRYPT_OK) {
                   goto LBL_ERR;
                }
-               y += x;
                break;
 
            case LTC_ASN1_PRINTABLE_STRING:
                if ((err = der_length_printable_string(data, size, &x)) != CRYPT_OK) {
                   goto LBL_ERR;
                }
-               y += x;
                break;
 
            case LTC_ASN1_UTCTIME:
                if ((err = der_length_utctime(data, &x)) != CRYPT_OK) {
                   goto LBL_ERR;
                }
-               y += x;
                break;
 
            case LTC_ASN1_UTF8_STRING:
                if ((err = der_length_utf8_string(data, size, &x)) != CRYPT_OK) {
                   goto LBL_ERR;
                }
-               y += x;
                break;
 
            case LTC_ASN1_SET:
@@ -129,17 +124,39 @@ int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
                if ((err = der_length_sequence(data, size, &x)) != CRYPT_OK) {
                   goto LBL_ERR;
                }
-               y += x;
                break;
 
-          
            default:
                err = CRYPT_INVALID_ARG;
                goto LBL_ERR;
        }
-   }
+       
+       /* handle context specific tags */
+       if (list[i].tag > 0) {
+         z = x;
+         /* calc tag size */
+         if (x < 128) {
+            x += 2;
+         } else if (x < 256) {
+            /* 0x30 0x81 LL */
+            x += 3;
+         } else if (x < 65536UL) {
+            /* 0x30 0x82 LL LL */
+            x += 4;
+         } else if (x < 16777216UL) {
+            /* 0x30 0x83 LL LL LL */
+            x += 5;
+         } else {
+            err = CRYPT_INVALID_ARG;
+            goto LBL_ERR;
+         }
+       }
 
+       y += x;
+   }
+   
    /* calc header size */
+   z = y;
    if (y < 128) {
       y += 2;
    } else if (y < 256) {
@@ -155,8 +172,8 @@ int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
       err = CRYPT_INVALID_ARG;
       goto LBL_ERR;
    }
-
    /* store size */
+   if (payloadlen) *payloadlen = z;
    *outlen = y;
    err     = CRYPT_OK;
 
