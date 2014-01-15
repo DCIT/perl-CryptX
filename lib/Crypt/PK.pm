@@ -54,7 +54,8 @@ sub _password2key {
 sub _pem_to_asn1 {
   my ($data, $password) = @_;
 
-  my ($begin, $object, $headers, $content, $end) = $data =~ m/(-----BEGIN ([^\n\-]+KEY)-----)\n(.*?\n\n)?(.+)(-----END .*?-----)/s;
+  my ($begin, $object, $headers, $content, $end) = $data =~ m/(-----BEGIN ([^\r\n\-]+KEY)-----)\r?\n(.*?\r?\n\r?\n)?(.+)(-----END [^\r\n\-]*-----)/s;
+
   return $content unless $content;
   $content = decode_base64($content);
 

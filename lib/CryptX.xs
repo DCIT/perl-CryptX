@@ -294,8 +294,7 @@ BOOT:
 #endif
 
 int
-CryptX_test(s)
-        int  s
+CryptX_test(int s)
     CODE:
         RETVAL = s+1; /*xxx*/
     OUTPUT:
