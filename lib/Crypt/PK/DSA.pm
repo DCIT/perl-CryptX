@@ -188,67 +188,6 @@ Crypt::PK::DSA - Public key cryptography based on DSA
  #Signature: Bob (received $message + $sig)
  dsa_verify_message('Alice_pub_dsa1.der', $sig, $message) or die "ERROR";
 
-=head1 FUNCTIONS
-
-=head2 dsa_encrypt
-
-DSA based encryption as implemented by libtomcrypt. See method L</encrypt> below.
-
- my $ct = dsa_encrypt($pub_key_filename, $message);
- #or
- my $ct = dsa_encrypt(\$buffer_containing_pub_key, $message);
- #or
- my $ct = dsa_encrypt($pub_key_filename, $message, $hash_name);
-
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
-
-Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared DSA key is computed, and
-the hash of the shared key XOR'ed against the plaintext forms the ciphertext.
-
-=head2 dsa_decrypt
-
-DSA based decryption as implemented by libtomcrypt. See method L</decrypt> below.
-
- my $pt = dsa_decrypt($priv_key_filename, $ciphertext);
- #or
- my $pt = dsa_decrypt(\$buffer_containing_priv_key, $ciphertext);
-
-=head2 dsa_sign_message
-
-Generate DSA signature. See method L</sign_message> below.
-
- my $sig = dsa_sign_message($priv_key_filename, $message);
- #or
- my $sig = dsa_sign_message(\$buffer_containing_priv_key, $message);
- #or
- my $sig = dsa_sign_message($priv_key, $message, $hash_name);
-
-=head2 dsa_verify_message
-
-Verify DSA signature. See method L</verify_message> below.
-
- dsa_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
- #or
- dsa_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
- #or
- dsa_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
-
-=head2 dsa_sign_hash
-
-Generate DSA signature. See method L</sign_hash> below.
-
- my $sig = dsa_sign_hash($priv_key_filename, $message_hash);
- #or
- my $sig = dsa_sign_hash(\$buffer_containing_priv_key, $message_hash);
-
-=head2 dsa_verify_hash
-
-Verify DSA signature. See method L</verify_hash> below.
-
- dsa_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
- #or
- dsa_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
-
 =head1 METHODS
 
 =head2 new
@@ -398,6 +337,67 @@ Support for password protected PEM keys
    x => "6C801901AC74E2DC714D75A9F6969483CF...", #private key, random  0 < x < q
    y => "8F7604D77FA62C7539562458A63C7611B7...", #public key, where y = g^x mod p
  }
+
+=head1 FUNCTIONS
+
+=head2 dsa_encrypt
+
+DSA based encryption as implemented by libtomcrypt. See method L</encrypt> below.
+
+ my $ct = dsa_encrypt($pub_key_filename, $message);
+ #or
+ my $ct = dsa_encrypt(\$buffer_containing_pub_key, $message);
+ #or
+ my $ct = dsa_encrypt($pub_key_filename, $message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+
+Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared DSA key is computed, and
+the hash of the shared key XOR'ed against the plaintext forms the ciphertext.
+
+=head2 dsa_decrypt
+
+DSA based decryption as implemented by libtomcrypt. See method L</decrypt> below.
+
+ my $pt = dsa_decrypt($priv_key_filename, $ciphertext);
+ #or
+ my $pt = dsa_decrypt(\$buffer_containing_priv_key, $ciphertext);
+
+=head2 dsa_sign_message
+
+Generate DSA signature. See method L</sign_message> below.
+
+ my $sig = dsa_sign_message($priv_key_filename, $message);
+ #or
+ my $sig = dsa_sign_message(\$buffer_containing_priv_key, $message);
+ #or
+ my $sig = dsa_sign_message($priv_key, $message, $hash_name);
+
+=head2 dsa_verify_message
+
+Verify DSA signature. See method L</verify_message> below.
+
+ dsa_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
+ #or
+ dsa_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
+ #or
+ dsa_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
+
+=head2 dsa_sign_hash
+
+Generate DSA signature. See method L</sign_hash> below.
+
+ my $sig = dsa_sign_hash($priv_key_filename, $message_hash);
+ #or
+ my $sig = dsa_sign_hash(\$buffer_containing_priv_key, $message_hash);
+
+=head2 dsa_verify_hash
+
+Verify DSA signature. See method L</verify_hash> below.
+
+ dsa_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
+ #or
+ dsa_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
 
 =head1 SEE ALSO
 

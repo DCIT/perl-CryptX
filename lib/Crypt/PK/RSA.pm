@@ -205,111 +205,9 @@ Crypt::PK::RSA - Public key cryptography based on RSA
  #Signature: Bob (received $message + $sig)
  rsa_verify_message('Alice_pub_rsa1.der', $sig, $message) or die "ERROR";
 
-=head1 FUNCTIONS
+=head1 DESCRIPTION
 
-=head2 rsa_encrypt
-
-RSA based encryption. See method L</encrypt> below.
-
- my $ct = rsa_encrypt($pub_key_filename, $message);
- #or
- my $ct = rsa_encrypt(\$buffer_containing_pub_key, $message);
- #or
- my $ct = rsa_encrypt($pub_key, $message, $padding);
- #or
- my $ct = rsa_encrypt($pub_key, $message, 'oaep', $hash_name, $lparam);
-
- # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none'
- # $hash_name (only for oaep) .. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $lparam (only for oaep) ..... DEFAULT is empty string
-
-=head2 rsa_decrypt
-
-RSA based decryption. See method L</decrypt> below.
-
- my $pt = rsa_decrypt($priv_key_filename, $ciphertext);
- #or
- my $pt = rsa_decrypt(\$buffer_containing_priv_key, $ciphertext);
- #or
- my $pt = rsa_decrypt($priv_key, $ciphertext, $padding);
- #or
- my $pt = rsa_decrypt($priv_key, $ciphertext, 'oaep', $hash_name, $lparam);
-
- # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none'
- # $hash_name (only for oaep) .. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $lparam (only for oaep) ..... DEFAULT is empty string
-
-=head2 rsa_sign_message
-
-Generate RSA signature. See method L</sign_message> below.
-
- my $sig = rsa_sign_message($priv_key_filename, $message);
- #or
- my $sig = rsa_sign_message(\$buffer_containing_priv_key, $message);
- #or
- my $sig = rsa_sign_message($priv_key, $message, $hash_name);
- #or
- my $sig = rsa_sign_message($priv_key, $message, $hash_name, $padding);
- #or
- my $sig = rsa_sign_message($priv_key, $message, $hash_name, 'pss', $saltlen);
-
- # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5'
- # $saltlen (only for pss) .. DEFAULT is 12
-
-=head2 rsa_verify_message
-
-Verify RSA signature. See method L</verify_message> below.
-
- rsa_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
- #or
- rsa_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
- #or
- rsa_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
- #or
- rsa_verify_message($pub_key, $signature, $message, $hash_name, $padding) or die "ERROR";
- #or
- rsa_verify_message($pub_key, $signature, $message, $hash_name, 'pss', $saltlen) or die "ERROR";
-
- # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5'
- # $saltlen (only for pss) .. DEFAULT is 12
-
-=head2 rsa_sign_hash
-
-Generate RSA signature. See method L</sign_hash> below.
-
- my $sig = rsa_sign_hash($priv_key_filename, $message_hash);
- #or
- my $sig = rsa_sign_hash(\$buffer_containing_priv_key, $message_hash);
- #or
- my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name);
- #or
- my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name, $padding);
- #or
- my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name, 'pss', $saltlen);
-
- # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5'
- # $saltlen (only for pss) .. DEFAULT is 12
-
-=head2 rsa_verify_hash
-
-Verify RSA signature. See method L</verify_hash> below.
-
- rsa_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
- #or
- rsa_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
- #or
- rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name) or die "ERROR";
- #or
- rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name, $padding) or die "ERROR";
- #or
- rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name, 'pss', $saltlen) or die "ERROR";
-
- # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5'
- # $saltlen (only for pss) .. DEFAULT is 12
+The module provides a full featured RSA implementation.
 
 =head1 METHODS
 
@@ -506,6 +404,112 @@ Support for password protected PEM keys
    dP => "486F142FEF0A1F53269AC43D2EE4D263E2841B60DA36...", #d mod (p - 1) CRT param
    dQ => "4597284B2968B72C4212DB7E8F24360B987B80514DA9...", #d mod (q - 1) CRT param
  }
+
+=head1 FUNCTIONS
+
+=head2 rsa_encrypt
+
+RSA based encryption. See method L</encrypt> below.
+
+ my $ct = rsa_encrypt($pub_key_filename, $message);
+ #or
+ my $ct = rsa_encrypt(\$buffer_containing_pub_key, $message);
+ #or
+ my $ct = rsa_encrypt($pub_key, $message, $padding);
+ #or
+ my $ct = rsa_encrypt($pub_key, $message, 'oaep', $hash_name, $lparam);
+
+ # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none'
+ # $hash_name (only for oaep) .. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $lparam (only for oaep) ..... DEFAULT is empty string
+
+=head2 rsa_decrypt
+
+RSA based decryption. See method L</decrypt> below.
+
+ my $pt = rsa_decrypt($priv_key_filename, $ciphertext);
+ #or
+ my $pt = rsa_decrypt(\$buffer_containing_priv_key, $ciphertext);
+ #or
+ my $pt = rsa_decrypt($priv_key, $ciphertext, $padding);
+ #or
+ my $pt = rsa_decrypt($priv_key, $ciphertext, 'oaep', $hash_name, $lparam);
+
+ # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none'
+ # $hash_name (only for oaep) .. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $lparam (only for oaep) ..... DEFAULT is empty string
+
+=head2 rsa_sign_message
+
+Generate RSA signature. See method L</sign_message> below.
+
+ my $sig = rsa_sign_message($priv_key_filename, $message);
+ #or
+ my $sig = rsa_sign_message(\$buffer_containing_priv_key, $message);
+ #or
+ my $sig = rsa_sign_message($priv_key, $message, $hash_name);
+ #or
+ my $sig = rsa_sign_message($priv_key, $message, $hash_name, $padding);
+ #or
+ my $sig = rsa_sign_message($priv_key, $message, $hash_name, 'pss', $saltlen);
+
+ # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $saltlen (only for pss) .. DEFAULT is 12
+
+=head2 rsa_verify_message
+
+Verify RSA signature. See method L</verify_message> below.
+
+ rsa_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
+ #or
+ rsa_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
+ #or
+ rsa_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
+ #or
+ rsa_verify_message($pub_key, $signature, $message, $hash_name, $padding) or die "ERROR";
+ #or
+ rsa_verify_message($pub_key, $signature, $message, $hash_name, 'pss', $saltlen) or die "ERROR";
+
+ # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $saltlen (only for pss) .. DEFAULT is 12
+
+=head2 rsa_sign_hash
+
+Generate RSA signature. See method L</sign_hash> below.
+
+ my $sig = rsa_sign_hash($priv_key_filename, $message_hash);
+ #or
+ my $sig = rsa_sign_hash(\$buffer_containing_priv_key, $message_hash);
+ #or
+ my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name);
+ #or
+ my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name, $padding);
+ #or
+ my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name, 'pss', $saltlen);
+
+ # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $saltlen (only for pss) .. DEFAULT is 12
+
+=head2 rsa_verify_hash
+
+Verify RSA signature. See method L</verify_hash> below.
+
+ rsa_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
+ #or
+ rsa_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
+ #or
+ rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name) or die "ERROR";
+ #or
+ rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name, $padding) or die "ERROR";
+ #or
+ rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name, 'pss', $saltlen) or die "ERROR";
+
+ # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $saltlen (only for pss) .. DEFAULT is 12
 
 =head1 OpenSSL interoperability
 

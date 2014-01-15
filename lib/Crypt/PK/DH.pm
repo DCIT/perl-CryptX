@@ -182,77 +182,6 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
  #Shared secret
  my $shared_secret = dh_shared_secret('Alice_priv_dh1.key', 'Bob_pub_dh1.key');
 
-=head1 FUNCTIONS
-
-=head2 dh_encrypt
-
-DH based encryption as implemented by libtomcrypt. See method L</encrypt> below.
-
- my $ct = dh_encrypt($pub_key_filename, $message);
- #or
- my $ct = dh_encrypt(\$buffer_containing_pub_key, $message);
- #or
- my $ct = dh_encrypt($pub_key_filename, $message, $hash_name);
-
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
-
-Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared DH key is computed, and
-the hash of the shared key XOR'ed against the plaintext forms the ciphertext.
-
-=head2 dh_decrypt
-
-DH based decryption as implemented by libtomcrypt. See method L</decrypt> below.
-
- my $pt = dh_decrypt($priv_key_filename, $ciphertext);
- #or
- my $pt = dh_decrypt(\$buffer_containing_priv_key, $ciphertext);
-
-=head2 dh_sign_message
-
-Generate DH signature as implemented by libtomcrypt. See method L</sign_message> below.
-
- my $sig = dh_sign_message($priv_key_filename, $message);
- #or
- my $sig = dh_sign_message(\$buffer_containing_priv_key, $message);
- #or
- my $sig = dh_sign_message($priv_key, $message, $hash_name);
-
-=head2 dh_verify_message
-
-Verify DH signature as implemented by libtomcrypt. See method L</verify_message> below.
-
- dh_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
- #or
- dh_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
- #or
- dh_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
-
-=head2 dh_sign_hash
-
-Generate DH signature as implemented by libtomcrypt. See method L</sign_hash> below.
-
- my $sig = dh_sign_hash($priv_key_filename, $message_hash);
- #or
- my $sig = dh_sign_hash(\$buffer_containing_priv_key, $message_hash);
-
-=head2 dh_verify_hash
-
-Verify DH signature as implemented by libtomcrypt. See method L</verify_hash> below.
-
- dh_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
- #or
- dh_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
-
-=head2 dh_shared_secret
-
-DH based shared secret generation. See method L</shared_secret> below.
-
- #on Alice side
- my $shared_secret = dh_shared_secret('Alice_priv_dh1.key', 'Bob_pub_dh1.key');
-
- #on Bob side
- my $shared_secret = dh_shared_secret('Bob_priv_dh1.key', 'Alice_pub_dh1.key');
-
 =head1 METHODS
 
 =head2 new
@@ -372,6 +301,77 @@ Loads private or public key (exported by L</export_key>).
    x => "FBC1062F73B9A17BB8473A2F5A074911FA7F20D28FB...", #private key
    y => "AB9AAA40774D3CD476B52F82E7EE2D8A8D40CD88BF4...", #public key
 }
+
+=head1 FUNCTIONS
+
+=head2 dh_encrypt
+
+DH based encryption as implemented by libtomcrypt. See method L</encrypt> below.
+
+ my $ct = dh_encrypt($pub_key_filename, $message);
+ #or
+ my $ct = dh_encrypt(\$buffer_containing_pub_key, $message);
+ #or
+ my $ct = dh_encrypt($pub_key_filename, $message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+
+Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared DH key is computed, and
+the hash of the shared key XOR'ed against the plaintext forms the ciphertext.
+
+=head2 dh_decrypt
+
+DH based decryption as implemented by libtomcrypt. See method L</decrypt> below.
+
+ my $pt = dh_decrypt($priv_key_filename, $ciphertext);
+ #or
+ my $pt = dh_decrypt(\$buffer_containing_priv_key, $ciphertext);
+
+=head2 dh_sign_message
+
+Generate DH signature as implemented by libtomcrypt. See method L</sign_message> below.
+
+ my $sig = dh_sign_message($priv_key_filename, $message);
+ #or
+ my $sig = dh_sign_message(\$buffer_containing_priv_key, $message);
+ #or
+ my $sig = dh_sign_message($priv_key, $message, $hash_name);
+
+=head2 dh_verify_message
+
+Verify DH signature as implemented by libtomcrypt. See method L</verify_message> below.
+
+ dh_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
+ #or
+ dh_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
+ #or
+ dh_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
+
+=head2 dh_sign_hash
+
+Generate DH signature as implemented by libtomcrypt. See method L</sign_hash> below.
+
+ my $sig = dh_sign_hash($priv_key_filename, $message_hash);
+ #or
+ my $sig = dh_sign_hash(\$buffer_containing_priv_key, $message_hash);
+
+=head2 dh_verify_hash
+
+Verify DH signature as implemented by libtomcrypt. See method L</verify_hash> below.
+
+ dh_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
+ #or
+ dh_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
+
+=head2 dh_shared_secret
+
+DH based shared secret generation. See method L</shared_secret> below.
+
+ #on Alice side
+ my $shared_secret = dh_shared_secret('Alice_priv_dh1.key', 'Bob_pub_dh1.key');
+
+ #on Bob side
+ my $shared_secret = dh_shared_secret('Bob_priv_dh1.key', 'Alice_pub_dh1.key');
 
 =head1 SEE ALSO
 
