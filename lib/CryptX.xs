@@ -2,6 +2,10 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#define NEED_sv_2pvbyte
+#define NEED_sv_2pv_flags_GLOBAL
+#include "ppport.h"
+
 #undef LTC_SOURCE
 #include "tomcrypt.h"
 #include "tommath.h"
