@@ -2,8 +2,9 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#define NEED_sv_2pvbyte
+#define NEED_sv_2pvbyte_GLOBAL
 #define NEED_sv_2pv_flags_GLOBAL
+#define NEED_newRV_noinc_GLOBAL
 #include "ppport.h"
 
 #undef LTC_SOURCE
@@ -173,7 +174,7 @@ typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
 ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
 {
   HV *h;
-  SV *param, **ref;
+  SV *param, **pref;
   SV **sv_cofactor, **sv_prime, **sv_A, **sv_B, **sv_order, **sv_Gx, **sv_Gy;
   int err;
   char *ch_name;
@@ -182,9 +183,9 @@ ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
   if (SvPOK(curve)) {
     ch_name = SvPV(curve, l_name);
     if ((h = get_hv("Crypt::PK::ECC::curve", 0)) == NULL) croak("FATAL: generate_key_ex: no curve register");
-    if ((ref = hv_fetch(h, ch_name, l_name, 0)) == NULL)  croak("FATAL: generate_key_ex: unknown curve/1 '%s'", ch_name);
-    if (!SvOK(*ref)) croak("FATAL: generate_key_ex: unknown curve/2 '%s'", ch_name);
-    param = *ref;
+    if ((pref = hv_fetch(h, ch_name, l_name, 0)) == NULL)  croak("FATAL: generate_key_ex: unknown curve/1 '%s'", ch_name);
+    if (!SvOK(*pref)) croak("FATAL: generate_key_ex: unknown curve/2 '%s'", ch_name);
+    param = *pref;
   }
   else if (SvROK(curve)) {
     param = curve;
