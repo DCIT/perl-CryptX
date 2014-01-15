@@ -23,3 +23,8 @@ MANIFEST
 lib/CryptX.c
 CryptX-*
 poznamky.txt
+t/openssl/*.der
+t/openssl/*.pem
+t/openssl/*.data
+t/openssl/*.sig
+t/openssl/*.rsa
