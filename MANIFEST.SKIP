@@ -29,8 +29,4 @@ lib/CryptX.c$
 ^poznamky*
 \.stackdump$
 ^.travis*
-t/openssl/.*\.der$
-t/openssl/.*\.pem$
-t/openssl/.*\.data$
-t/openssl/.*\.sig$
-t/openssl/.*\.rsa$
+t/openssl/.*$
