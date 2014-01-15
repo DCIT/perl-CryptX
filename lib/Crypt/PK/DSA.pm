@@ -417,7 +417,7 @@ Verify DSA signature. See method L</verify_hash> below.
  ### let's have:
  # DSA private key in PEM format - dsakey.priv.pem
  # DSA public key in PEM format  - dsakey.pub.pem
- # data file to be signed or encrypted - input.data
+ # data file to be signed - input.data
 
 =head2 Sign by OpenSSL, verify by Crypt::PK::DSA
 
