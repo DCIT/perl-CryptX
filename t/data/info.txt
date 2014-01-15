@@ -19,6 +19,16 @@ openssl gendsa -passout pass:secret -camellia128 -out dsa-camellia128.pem dsa-pa
 openssl gendsa -passout pass:secret -camellia192 -out dsa-camellia192.pem dsa-param.pem
 openssl gendsa -passout pass:secret -camellia256 -out dsa-camellia256.pem dsa-param.pem
 
+openssl ecparam -out tmp.pem -name secp128r2 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -des3 -out ec-des3.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp160k1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -des -out ec-des.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp160r1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -seed -out ec-seed.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp160r2 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -aes128 -out ec-aes128.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp192k1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -aes192 -out ec-aes192.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp224k1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -aes256 -out ec-aes256.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp224r1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -camellia128 -out ec-camellia128.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp256k1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -camellia192 -out ec-camellia192.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp384r1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -camellia256 -out ec-camellia256.pem -in tmp.pem
+
 openssl ecparam -list_curves
 openssl ecparam -out openssl_ec_secp112r1.pem -name secp112r1 -genkey -param_enc explicit
 openssl ecparam -out openssl_ec_secp112r2.pem -name secp112r2 -genkey -param_enc explicit

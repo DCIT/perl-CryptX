@@ -328,9 +328,9 @@ our %curve = (
 );
 
 sub new {
-  my ($class, $f) = @_;
+  my ($class, $f, $p) = @_;
   my $self = _new();
-  $self->import_key($f) if $f;
+  $self->import_key($f, $p) if $f;
   return  $self;
 }
 
