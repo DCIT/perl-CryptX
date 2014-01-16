@@ -112,7 +112,7 @@ See L<Crypt::PRNG/irand>.
 
 =head1 METHODS
 
-=head1 new
+=head2 new
 
 See L<Crypt::PRNG/new>.
 

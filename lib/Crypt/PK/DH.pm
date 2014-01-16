@@ -267,15 +267,15 @@ Loads private or public key (exported by L</export_key>).
 
 =head2 shared_secret
 
-  # Alice having her priv key $pk and Bob's public key $pkb
-  my $pk  = Crypt::PK::DH->new($priv_key_filename);
-  my $pkb = Crypt::PK::DH->new($pub_key_filename);
-  my $shared_secret = $pk->shared_secret($pkb);
+ # Alice having her priv key $pk and Bob's public key $pkb
+ my $pk  = Crypt::PK::DH->new($priv_key_filename);
+ my $pkb = Crypt::PK::DH->new($pub_key_filename);
+ my $shared_secret = $pk->shared_secret($pkb);
 
-  # Bob having his priv key $pk and Alice's public key $pka
-  my $pk = Crypt::PK::DH->new($priv_key_filename);
-  my $pka = Crypt::PK::DH->new($pub_key_filename);
-  my $shared_secret = $pk->shared_secret($pka);  # same value as computed by Alice
+ # Bob having his priv key $pk and Alice's public key $pka
+ my $pk = Crypt::PK::DH->new($priv_key_filename);
+ my $pka = Crypt::PK::DH->new($pub_key_filename);
+ my $shared_secret = $pk->shared_secret($pka);  # same value as computed by Alice
 
 =head2 is_private
 

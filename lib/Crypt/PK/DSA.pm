@@ -270,7 +270,7 @@ Support for password protected PEM keys
  my $private_pem = $pk->export_key_pem('private', $password);
  #or
  my $private_pem = $pk->export_key_pem('private', $password, $cipher);
- 
+
  # supported ciphers: 'DES-CBC'
  #                    'DES-EDE3-CBC'
  #                    'SEED-CBC'
@@ -430,7 +430,7 @@ Verify signature (Perl code):
  use Crypt::PK::DSA;
  use Crypt::Digest 'digest_file';
  use File::Slurp 'read_file';
-  
+
  my $pkdsa = Crypt::PK::DSA->new("dsakey.pub.pem");
  my $signature = read_file("input.sha1-dsa.sig", binmode=>':raw');
  my $valid = $pkdsa->verify_hash($signature, digest_file("SHA1", "input.data"), "SHA1", "v1.5");
@@ -443,7 +443,7 @@ Create signature (Perl code):
  use Crypt::PK::DSA;
  use Crypt::Digest 'digest_file';
  use File::Slurp 'write_file';
-  
+
  my $pkdsa = Crypt::PK::DSA->new("dsakey.priv.pem");
  my $signature = $pkdsa->sign_hash(digest_file("SHA1", "input.data"), "SHA1", "v1.5");
  write_file("input.sha1-dsa.sig", {binmode=>':raw'}, $signature);
@@ -458,7 +458,7 @@ Generate keys (Perl code):
 
  use Crypt::PK::DSA;
  use File::Slurp 'write_file';
-  
+
  my $pkdsa = Crypt::PK::DSA->new;
  $pkdsa->generate_key(20, 128);
  write_file("dsakey.pub.der",  {binmode=>':raw'}, $pkdsa->export_key_der('public'));
@@ -489,7 +489,7 @@ Load keys (Perl code):
 
  use Crypt::PK::DSA;
  use File::Slurp 'write_file';
- 
+
  my $pkdsa = Crypt::PK::DSA->new;
  $pkdsa->import_key("dsakey.pub.der");
  $pkdsa->import_key("dsakey.priv.der");

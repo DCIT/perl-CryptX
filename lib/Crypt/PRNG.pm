@@ -212,7 +212,7 @@ Returns a random unsigned 32bit integer - range 0 .. 0xFFFFFFFF.
 
 =head1 METHODS
 
-=head1 new
+=head2 new
 
    $prng = Crypt::PRNG->new;
    #or

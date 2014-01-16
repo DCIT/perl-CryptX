@@ -580,7 +580,7 @@ The following pre-defined C<$curve_name> values are supported:
  'prime239v2'
  'prime239v3'
  'prime256v1' 
- 
+
 Using custom curve parameters:
 
  $pk->generate_key({ prime    => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF',
@@ -590,7 +590,7 @@ Using custom curve parameters:
                      Gy       => '38A90F22637337334B49DCB66A6DC8F9978ACA7648A943B0',
                      order    => 'FFFFFFFFFFFFFFFFFFFFFFFF7A62D031C83F4294F640EC13',
                      cofactor => 1 });
- 
+
 See L<http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf>, L<http://www.secg.org/collateral/sec2_final.pdf>, L<http://www.ecc-brainpool.org/download/Domain-parameters.pdf>
 
 =head2 import_key
@@ -632,7 +632,7 @@ Support for password protected PEM keys
  my $private_pem = $pk->export_key_pem('private', $password);
  #or
  my $private_pem = $pk->export_key_pem('private', $password, $cipher);
- 
+
  # supported ciphers: 'DES-CBC'
  #                    'DES-EDE3-CBC'
  #                    'SEED-CBC'
@@ -834,7 +834,7 @@ Verify signature (Perl code):
  use Crypt::PK::ECC;
  use Crypt::Digest 'digest_file';
  use File::Slurp 'read_file';
-  
+
  my $pkec = Crypt::PK::ECC->new("eckey.pub.pem");
  my $signature = read_file("input.sha1-ec.sig", binmode=>':raw');
  my $valid = $pkec->verify_hash($signature, digest_file("SHA1", "input.data"), "SHA1", "v1.5");
@@ -847,7 +847,7 @@ Create signature (Perl code):
  use Crypt::PK::ECC;
  use Crypt::Digest 'digest_file';
  use File::Slurp 'write_file';
-  
+
  my $pkec = Crypt::PK::ECC->new("eckey.priv.pem");
  my $signature = $pkec->sign_hash(digest_file("SHA1", "input.data"), "SHA1", "v1.5");
  write_file("input.sha1-ec.sig", {binmode=>':raw'}, $signature);
@@ -862,7 +862,7 @@ Generate keys (Perl code):
 
  use Crypt::PK::ECC;
  use File::Slurp 'write_file';
- 
+
  my $pkec = Crypt::PK::ECC->new;
  $pkec->generate_key('secp160k1');
  write_file("eckey.pub.der",  {binmode=>':raw'}, $pkec->export_key_der('public'));
@@ -897,7 +897,7 @@ Load keys (Perl code):
 
  use Crypt::PK::ECC;
  use File::Slurp 'write_file';
- 
+
  my $pkec = Crypt::PK::ECC->new;
  $pkec->import_key("eckey.pub.der");
  $pkec->import_key("eckey.pubc.der");
