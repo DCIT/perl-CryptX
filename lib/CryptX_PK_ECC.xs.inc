@@ -11,7 +11,6 @@ _new()
         RETVAL->key.type = -1;
         ecc_dp_init(&RETVAL->dp);
         if(RETVAL->yarrow_prng_index==-1) croak("FATAL: find_prng('yarrow') failed");
-        /* add random entropy */
         rv = rng_make_prng(256, RETVAL->yarrow_prng_index, &RETVAL->yarrow_prng_state, NULL);
         if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
     }
@@ -23,16 +22,14 @@ generate_key(Crypt::PK::ECC self, SV *curve)
     PPCODE:
     {
         int rv;
-       
-        /* add a small random entropy before generating key (not necessary) */
+        /* add a small random entropy before generating key - not necessary as we have initialized prng with 256bit entropy in _new() */
         rv = rng_make_prng(64, self->yarrow_prng_index, &self->yarrow_prng_state, NULL);
         if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
-
+        /* setup dp structure */
         _ecc_set_dp_from_SV(&self->dp, curve); /* croaks on error */
-
+        /* gen the key */
         rv = ecc_make_key_ex(&self->yarrow_prng_state, self->yarrow_prng_index, &self->key, &self->dp);
         if (rv != CRYPT_OK) croak("FATAL: ecc_make_key_ex failed: %s", error_to_string(rv));
-        
         XPUSHs(ST(0)); /* return self */
     }
 
