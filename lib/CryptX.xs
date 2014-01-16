@@ -220,7 +220,7 @@ ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
                     SvPV_nolen(*sv_order),
                     SvPV_nolen(*sv_Gx),
                     SvPV_nolen(*sv_Gy),
-                    SvIV(*sv_cofactor), 
+                    (unsigned long)SvUV(*sv_cofactor), 
                     ch_name );
   return err == CRYPT_OK ? dp : NULL;
 }

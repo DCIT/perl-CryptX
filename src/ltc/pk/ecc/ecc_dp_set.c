@@ -16,19 +16,19 @@
 
 #ifdef LTC_MECC
 
-int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, char *ch_order, char *ch_Gx, char *ch_Gy, int cofactor, char *ch_name)
+int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, char *ch_order, char *ch_Gx, char *ch_Gy, unsigned long cofactor, char *ch_name)
 {
   unsigned long l_name, l_prime, l_A, l_B, l_order, l_Gx, l_Gy;
   
-  if (!dp || !ch_prime || !ch_A || !ch_B || !ch_order || !ch_Gx || !ch_Gy || cofactor<=0) return CRYPT_INVALID_ARG;
+  if (!dp || !ch_prime || !ch_A || !ch_B || !ch_order || !ch_Gx || !ch_Gy || cofactor==0) return CRYPT_INVALID_ARG;
   
-  l_name  = strlen(ch_name);
-  l_prime = strlen(ch_prime);
-  l_A     = strlen(ch_A);
-  l_B     = strlen(ch_B);
-  l_order = strlen(ch_order);
-  l_Gx    = strlen(ch_Gx);
-  l_Gy    = strlen(ch_Gy);
+  l_name  = (unsigned long)strlen(ch_name);
+  l_prime = (unsigned long)strlen(ch_prime);
+  l_A     = (unsigned long)strlen(ch_A);
+  l_B     = (unsigned long)strlen(ch_B);
+  l_order = (unsigned long)strlen(ch_order);
+  l_Gx    = (unsigned long)strlen(ch_Gx);
+  l_Gy    = (unsigned long)strlen(ch_Gy);
        
   dp->cofactor = cofactor;
   

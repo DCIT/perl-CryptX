@@ -49,7 +49,7 @@ int ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
    void          *r, *s, *v, *w, *u1, *u2, *e, *p, *m, *a;
    void          *mp;
    int           err;
-   int           pbits, pbytes, i, shift_right;
+   unsigned long pbits, pbytes, i, shift_right;
    unsigned char ch, buf[MAXBLOCKSIZE];
 
    LTC_ARGCHK(sig  != NULL);
@@ -106,7 +106,7 @@ int ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
    pbits = mp_count_bits(p);
    pbytes = (pbits+7) >> 3;
    if (pbits > hashlen*8) {
-     if ((err = mp_read_unsigned_bin(e, (unsigned char *)hash, (int)hashlen)) != CRYPT_OK)              { goto error; }
+     if ((err = mp_read_unsigned_bin(e, (unsigned char *)hash, hashlen)) != CRYPT_OK)              { goto error; }
    }
    else if (pbits % 8 == 0) {
      if ((err = mp_read_unsigned_bin(e, (unsigned char *)hash, pbytes)) != CRYPT_OK)                    { goto error; }

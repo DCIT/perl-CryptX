@@ -17,39 +17,39 @@
 
 #ifdef LTC_MECC
 
-static int _populate_dp(void *a, void *b, void *prime, void *order, void *gx, void *gy, int cofactor, ltc_ecc_set_type *dp)
+static int _populate_dp(void *a, void *b, void *prime, void *order, void *gx, void *gy, unsigned long cofactor, ltc_ecc_set_type *dp)
 {
   unsigned char buf[ECC_BUF_SIZE];
   unsigned long len;
 
   /* a */
   mp_tohex(a, (char *)buf);
-  len = strlen((char *)buf);
+  len = (unsigned long)strlen((char *)buf);
   if ((dp->A = XMALLOC(1+len)) == NULL)         goto cleanup1;
   strncpy(dp->A, (char*)buf, 1+len);
   /* b */
   mp_tohex(b, (char *)buf);
-  len = strlen((char *)buf);
+  len = (unsigned long)strlen((char *)buf);
   if ((dp->B = XMALLOC(1+len)) == NULL)         goto cleanup2;
   strncpy(dp->B, (char*)buf, 1+len);
   /* order */
   mp_tohex(order, (char *)buf);
-  len = strlen((char *)buf);
+  len = (unsigned long)strlen((char *)buf);
   if ((dp->order = XMALLOC(1+len)) == NULL)     goto cleanup3;
   strncpy(dp->order, (char*)buf, 1+len);
   /* prime */
   mp_tohex(prime, (char *)buf);
-  len = strlen((char *)buf);
+  len = (unsigned long)strlen((char *)buf);
   if ((dp->prime = XMALLOC(1+len)) == NULL)     goto cleanup4;
   strncpy(dp->prime, (char*)buf, 1+len);
   /* gx */
   mp_tohex(gx, (char *)buf);
-  len = strlen((char *)buf);
+  len = (unsigned long)strlen((char *)buf);
   if ((dp->Gx = XMALLOC(1+len)) == NULL)        goto cleanup5;
   strncpy(dp->Gx, (char*)buf, 1+len);
   /* gy */
   mp_tohex(gy, (char *)buf);
-  len = strlen((char *)buf);
+  len = (unsigned long)strlen((char *)buf);
   if ((dp->Gy = XMALLOC(1+len)) == NULL)        goto cleanup6;
   strncpy(dp->Gy, (char*)buf, 1+len);
   /* cofactor & size */

@@ -39,7 +39,7 @@ int ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
    ecc_key       pubkey;
    void          *r, *s, *e, *p;
    int           err;
-   int           pbits, pbytes, i, shift_right;
+   unsigned long pbits, pbytes, i, shift_right;
    unsigned char ch, buf[MAXBLOCKSIZE];
 
    LTC_ARGCHK(in     != NULL);
@@ -71,7 +71,7 @@ int ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
    pbits = mp_count_bits(p);
    pbytes = (pbits+7) >> 3;
       if (pbits > inlen*8) {
-     if ((err = mp_read_unsigned_bin(e, (unsigned char *)in, (int)inlen)) != CRYPT_OK)        { goto errnokey; }
+     if ((err = mp_read_unsigned_bin(e, (unsigned char *)in, inlen)) != CRYPT_OK)        { goto errnokey; }
    }
    else if (pbits % 8 == 0) {
      if ((err = mp_read_unsigned_bin(e, (unsigned char *)in, pbytes)) != CRYPT_OK)            { goto errnokey; }

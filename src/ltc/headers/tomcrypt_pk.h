@@ -240,7 +240,7 @@ typedef struct {
    char *Gy;
    
    /** The co-factor */
-   int cofactor;
+   unsigned long cofactor;
 } ltc_ecc_set_type;
 
 /** A point on a ECC curve, stored in Jacbobian format such that (x,y,z) => (x/z^2, y/z^3, 1) when interpretted as affine */
@@ -281,7 +281,7 @@ void ecc_sizes(int *low, int *high);
 int  ecc_get_size(ecc_key *key);
 
 int ecc_dp_init(ltc_ecc_set_type *dp);
-int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, char *ch_order, char *ch_Gx, char *ch_Gy, int cofactor, char *ch_name);
+int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, char *ch_order, char *ch_Gx, char *ch_Gy, unsigned long cofactor, char *ch_name);
 int ecc_dp_clear(ltc_ecc_set_type *dp);
 
 int  ecc_make_key(prng_state *prng, int wprng, int keysize, ecc_key *key);

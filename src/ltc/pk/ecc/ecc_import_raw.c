@@ -18,7 +18,8 @@
 
 int ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y)
 {
-  int err, size;
+  int err;
+  unsigned long size;
   void *t1, *t2;
   
   /* init key + temporary numbers */
@@ -84,7 +85,8 @@ cleanup:
 
 int ecc_import_raw(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp)
 {
-   int err, size = 0, type = -1;
+   int err, type = -1;
+   unsigned long size = 0;
    void *prime, *a, *b;
    ecc_point *base;
 
@@ -97,7 +99,7 @@ int ecc_import_raw(const unsigned char *in, unsigned long inlen, ecc_key *key, l
       return CRYPT_MEM;
    }
    
-   if (inlen == dp->size) {
+   if (inlen == (unsigned long)dp->size) {
      /* read PRIVATE key */
      type = PK_PRIVATE;
      size = inlen;
