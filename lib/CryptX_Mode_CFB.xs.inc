@@ -82,7 +82,7 @@ _crypt(Crypt::Mode::CFB self, SV * data)
             if (rv != CRYPT_OK) croak("FATAL: cfb_decrypt failed: %s", error_to_string(rv));
           }
           else {
-            croak("FATAL: cfb_crypt failed: call start() first");
+            croak("FATAL: cfb_crypt failed: call start_encrypt or start_decrypt first");
           }
         }
     }

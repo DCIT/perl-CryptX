@@ -82,7 +82,7 @@ _crypt(Crypt::Mode::OFB self, SV * data)
             if (rv != CRYPT_OK) croak("FATAL: ofb_decrypt failed: %s", error_to_string(rv));
           }
           else {
-            croak("FATAL: ofb_crypt failed: call start() first");
+            croak("FATAL: ofb_crypt failed: call start_encrypt or start_decrypt first");
           }
         }
     }
