@@ -13,7 +13,7 @@ TODO:
           - t/pk_dsa.t crashes after: ok 28 - decrypt
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
 
-0.020   2014/01/XXX
+0.020   2014/01/18
         - INCOMPATIBLE CHANGE: huge redesign of Crypt::PK::ECC
         - ECC now supports curves y^2 = x^3 + a*x + b
         - ECC you can use custom curves
