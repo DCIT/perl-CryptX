@@ -65,7 +65,7 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
  
   my $ct = $pu1->encrypt("secret message");
   my $pt = $pr1->decrypt($ct);
-  ok(length $ct > 80, 'encrypt ' . length($ct));
+  ok(length $ct > 30, 'encrypt ' . length($ct));
   is($pt, "secret message", 'decrypt');
  
   my $sig = $pr1->sign_message("message");
