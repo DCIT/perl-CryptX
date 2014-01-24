@@ -84,6 +84,7 @@ int mp_sqrtmod_prime(mp_int *n, mp_int *prime, mp_int *ret)
   /* M = S */
   if ((res = mp_set_int(&two, 2)) != MP_OKAY)                   goto cleanup;
 
+  res = MP_VAL;
   while (1) {
     if ((res = mp_copy(&T, &t1)) != MP_OKAY)                    goto cleanup;
     i = 0;
@@ -113,7 +114,6 @@ int mp_sqrtmod_prime(mp_int *n, mp_int *prime, mp_int *ret)
     /* M = i */
   }
 
-  res = MP_VAL;
 cleanup:
   mp_clear_multi(&t1, &C, &Q, &S, &Z, &M, &T, &R, &two, NULL);
   return res;

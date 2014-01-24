@@ -61,7 +61,7 @@ static int _populate_dp(void *a, void *b, void *prime, void *order, void *gx, vo
   /* done - success */
   return CRYPT_OK;
 
-  XFREE(dp->name);
+  /* XFREE(dp->name); **** warning: statement not reached *** */
 cleanup7:
   XFREE(dp->Gy);
 cleanup6:
