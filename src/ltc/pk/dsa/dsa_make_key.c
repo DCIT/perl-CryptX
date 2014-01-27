@@ -45,7 +45,7 @@ int dsa_make_params(prng_state *prng, int wprng, int group_size, int modulus_siz
   unsigned char *wbuf, *sbuf, digest[MAXBLOCKSIZE];
   void *t2L1, *t2N1, *t2q, *t2seedlen, *U, *W, *X, *c, *h, *e, *seedinc;
   struct rng_data rng;
-  
+
   /* check prng */
   if ((err = prng_is_valid(wprng)) != CRYPT_OK) {
     return err;
