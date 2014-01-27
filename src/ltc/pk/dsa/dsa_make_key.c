@@ -17,16 +17,6 @@
 
 #ifdef LTC_MDSA
 
-struct rng_data {
-  prng_state *prng;
-  int wprng;
-};
-
-static int rng_helper(unsigned char *dst, int len, void *dat)
-{
-  return (int)prng_descriptor[((struct rng_data *)dat)->wprng].read(dst, len, ((struct rng_data *)dat)->prng);
-}
-
 /**
   Create DSA parameters
   @param prng          An active PRNG state
@@ -44,7 +34,7 @@ int dsa_make_params(prng_state *prng, int wprng, int group_size, int modulus_siz
   int err, res, mr_tests_q, mr_tests_p, found_p, found_q, hash;
   unsigned char *wbuf, *sbuf, digest[MAXBLOCKSIZE];
   void *t2L1, *t2N1, *t2q, *t2seedlen, *U, *W, *X, *c, *h, *e, *seedinc;
-  struct rng_data rng;
+  rand_helper_st rng;
 
   /* check prng */
   if ((err = prng_is_valid(wprng)) != CRYPT_OK) {
@@ -144,7 +134,7 @@ int dsa_make_params(prng_state *prng, int wprng, int group_size, int modulus_siz
       if ((err = mp_mod(U, t2N1, U)) != CRYPT_OK)                                { goto cleanup; }
       if ((err = mp_add(t2N1, U, q)) != CRYPT_OK)                                { goto cleanup; }
       if (!mp_isodd(q)) mp_add_d(q, 1, q);
-      err = mp_prime_is_prime_ex(q, mr_tests_q, &res, rng_helper, &rng);
+      err = mp_prime_is_prime_ex(q, mr_tests_q, &res, rand_helper, &rng);
       if (err != CRYPT_OK)                                                       { goto cleanup; }
       if (res == LTC_MP_YES) found_q = 1;
     }
@@ -173,7 +163,7 @@ int dsa_make_params(prng_state *prng, int wprng, int group_size, int modulus_siz
       if ((err = mp_sub(X, p, p))    != CRYPT_OK)                                { goto cleanup; }
       if (mp_cmp(p, t2L1) != LTC_MP_LT) {
         /* p >= 2^(L-1) */
-        err = mp_prime_is_prime_ex(p, mr_tests_p, &res, rng_helper, &rng);
+        err = mp_prime_is_prime_ex(p, mr_tests_p, &res, rand_helper, &rng);
         if (err != CRYPT_OK)                                                     { goto cleanup; }
         if (res == LTC_MP_YES) found_p = 1;
       }

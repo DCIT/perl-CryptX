@@ -17,21 +17,16 @@
 
 #define USE_BBS 1
 
-struct rng_data {
-   prng_state *prng;
-   int         wprng;
-};
-
-static int rand_prime_helper(unsigned char *dst, int len, void *dat)
+int rand_helper(unsigned char *dst, int len, void *dat)
 {
-   return (int)prng_descriptor[((struct rng_data *)dat)->wprng].read(dst, len, ((struct rng_data *)dat)->prng);
+   return (int)prng_descriptor[((rand_helper_st *)dat)->wprng].read(dst, len, ((rand_helper_st *)dat)->prng);
 }
 
 int rand_prime(void *N, long len, prng_state *prng, int wprng)
 {
    int            err, res, type;
    unsigned char *buf;
-   struct rng_data rng;
+   rand_helper_st rng;
 
    LTC_ARGCHK(N != NULL);
 
@@ -81,7 +76,7 @@ int rand_prime(void *N, long len, prng_state *prng, int wprng)
       }
 
       /* test */
-      if ((err = mp_prime_is_prime_ex(N, 0, &res, rand_prime_helper, &rng)) != CRYPT_OK) {
+      if ((err = mp_prime_is_prime_ex(N, 0, &res, rand_helper, &rng)) != CRYPT_OK) {
          XFREE(buf);
          return err;
       }

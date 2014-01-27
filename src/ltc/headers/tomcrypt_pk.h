@@ -6,6 +6,12 @@ enum {
    PK_PUBLIC_COMPRESSED=2  /* used only when exporting public ECC key */
 };
 
+typedef struct rand_helper {
+   prng_state *prng;
+   int         wprng;
+} rand_helper_st;
+
+int rand_helper(unsigned char *dst, int len, void *dat);
 int rand_prime(void *N, long len, prng_state *prng, int wprng);
 int rand_bn_bits(void *N, int bits, prng_state *prng, int wprng);
 int rand_bn_range(void *N, void *limit, prng_state *prng, int wprng);
