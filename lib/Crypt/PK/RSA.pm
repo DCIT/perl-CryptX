@@ -24,7 +24,7 @@ sub new {
 sub export_key_pem {
   my ($self, $type, $password, $cipher) = @_;
   my $key = $self->export_key_der($type||'');
-  return undef unless $key;
+  return unless $key;
 
   # PKCS#1 RSAPrivateKey** (PEM header: BEGIN RSA PRIVATE KEY)
   # PKCS#8 PrivateKeyInfo* (PEM header: BEGIN PRIVATE KEY)

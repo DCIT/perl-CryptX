@@ -24,7 +24,7 @@ sub new {
 sub export_key_pem {
   my ($self, $type, $password, $cipher) = @_;
   my $key = $self->export_key_der($type||'');
-  return undef unless $key;
+  return unless $key;
   return Crypt::PK::_asn1_to_pem($key, "DSA PRIVATE KEY", $password, $cipher) if $type eq 'private';  
   return Crypt::PK::_asn1_to_pem($key, "DSA PUBLIC KEY") if $type eq 'public';
   return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public_x509';

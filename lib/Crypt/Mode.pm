@@ -44,16 +44,18 @@ sub add {
 
 sub _crypt {
   my $self = shift;
-  return $self->_encrypt(@_) if $self->_get_dir == 1;
-  return $self->_decrypt(@_) if $self->_get_dir == -1;
-  return undef;
+  my $dir = $self->_get_dir;
+  return $self->_encrypt(@_) if $dir == 1;
+  return $self->_decrypt(@_) if $dir == -1;
+  return;
 }
 
 sub _finish {
   my $self = shift;
-  return $self->_finish_enc(@_) if $self->_get_dir == 1;
-  return $self->_finish_dec(@_) if $self->_get_dir == -1;
-  return undef;
+  my $dir = $self->_get_dir;
+  return $self->_finish_enc(@_) if $dir == 1;
+  return $self->_finish_dec(@_) if $dir == -1;
+  return;
 }
 
 sub CLONE_SKIP { 1 } # prevent cloning
