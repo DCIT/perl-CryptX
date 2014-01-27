@@ -17,10 +17,10 @@ sub _slurp_file {
   my $f = shift;
   croak "FATAL: non-existing file '$f'" unless -f $f;
   local $/ = undef;
-  open FILE, "<", $f or croak "FATAL: couldn't open file: $!";
-  binmode FILE;
-  my $string = <FILE>;
-  close FILE;
+  open my $fh, "<", $f or croak "FATAL: couldn't open file: $!";
+  binmode $fh;
+  my $string = readline($fh);
+  close $fh;
   return $string;
 }
 
