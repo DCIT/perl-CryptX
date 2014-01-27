@@ -67,7 +67,7 @@ _encrypt(Crypt::Mode::CBC self, SV * data)
         STRLEN in_data_len, in_data_start;
         unsigned char *in_data, *out_data, tmp_block[MAXBLOCKSIZE];
 
-        if (self->direction != 1) croak("FATAL: encrypt error, call start('enc') first (%d)", self->direction);
+        if (self->direction != 1) croak("FATAL: encrypt error, call start_encrypt first (%d)", self->direction);
 
         blen = (&self->state)->blocklen;
         in_data_start = 0;
@@ -155,6 +155,7 @@ _finish_enc(Crypt::Mode::CBC self)
           blen = 0;
         }
 
+        self->direction = 0;
         RETVAL = newSVpvn((char*)tmp_block, blen);
     }
     OUTPUT:
@@ -169,7 +170,7 @@ _decrypt(Crypt::Mode::CBC self, SV * data)
         STRLEN in_data_len, in_data_start;
         unsigned char *in_data, *out_data, tmp_block[MAXBLOCKSIZE];
 
-        if (self->direction != -1) croak("FATAL: decrypt error, call start('dec') first (%d)", self->direction);
+        if (self->direction != -1) croak("FATAL: decrypt error, call start_decryt first (%d)", self->direction);
 
         blen = (&self->state)->blocklen;
         in_data_start = 0;
@@ -281,6 +282,8 @@ _finish_dec(Crypt::Mode::CBC self)
             if (rv_len<0) rv_len = 0;
           }
         }
+
+        self->direction = 0;
         RETVAL = newSVpvn((char*)tmp_block, rv_len);
     }
     OUTPUT:

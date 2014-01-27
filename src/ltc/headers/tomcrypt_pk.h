@@ -2,14 +2,19 @@
 
 enum {
    PK_PUBLIC=0,
-   PK_PRIVATE=1
+   PK_PRIVATE=1,
+   PK_PUBLIC_COMPRESSED=2  /* used only when exporting public ECC key */
 };
 
 int rand_prime(void *N, long len, prng_state *prng, int wprng);
+int rand_bn_bits(void *N, int bits, prng_state *prng, int wprng);
+int rand_bn_range(void *N, void *limit, prng_state *prng, int wprng);
 
 enum {
    PKA_RSA,
-   PKA_DSA
+   PKA_DSA,
+   PKA_EC,
+   EC_PRIME_FIELD
 };
 
 typedef struct Oid {
@@ -219,6 +224,9 @@ typedef struct {
    /** The prime that defines the field the curve is in (encoded in hex) */
    char *prime;
 
+   /** The fields A param (hex) */
+   char *A;
+
    /** The fields B param (hex) */
    char *B;
 
@@ -230,6 +238,9 @@ typedef struct {
 
    /** The y co-ordinate of the base point on the curve (hex) */
    char *Gy;
+   
+   /** The co-factor */
+   unsigned long cofactor;
 } ltc_ecc_set_type;
 
 /** A point on a ECC curve, stored in Jacbobian format such that (x,y,z) => (x/z^2, y/z^3, 1) when interpretted as affine */
@@ -269,6 +280,10 @@ int  ecc_test(void);
 void ecc_sizes(int *low, int *high);
 int  ecc_get_size(ecc_key *key);
 
+int ecc_dp_init(ltc_ecc_set_type *dp);
+int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, char *ch_order, char *ch_Gx, char *ch_Gy, unsigned long cofactor, char *ch_name);
+int ecc_dp_clear(ltc_ecc_set_type *dp);
+
 int  ecc_make_key(prng_state *prng, int wprng, int keysize, ecc_key *key);
 int  ecc_make_key_ex(prng_state *prng, int wprng, ecc_key *key, const ltc_ecc_set_type *dp);
 void ecc_free(ecc_key *key);
@@ -280,6 +295,14 @@ int  ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, c
 int ecc_ansi_x963_export(ecc_key *key, unsigned char *out, unsigned long *outlen);
 int ecc_ansi_x963_import(const unsigned char *in, unsigned long inlen, ecc_key *key);
 int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
+
+int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
+int ecc_import_full(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
+
+int ecc_export_point(unsigned char *out, unsigned long *outlen, void *x, void *y, unsigned long size, int compressed);
+int ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y);
+int ecc_export_raw(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
+int ecc_import_raw(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
 
 int  ecc_shared_secret(ecc_key *private_key, ecc_key *public_key,
                        unsigned char *out, unsigned long *outlen);
@@ -301,23 +324,26 @@ int  ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
                      const unsigned char *hash, unsigned long hashlen,
                      int *stat, ecc_key *key);
 
+int ecc_verify_key(ecc_key *key);
+
 /* low level functions */
 ecc_point *ltc_ecc_new_point(void);
 void       ltc_ecc_del_point(ecc_point *p);
 int        ltc_ecc_is_valid_idx(int n);
+int        ltc_ecc_is_point(const ltc_ecc_set_type *dp, void *x, void *y);
 
 /* point ops (mp == montgomery digit) */
 #if !defined(LTC_MECC_ACCEL) || defined(LTM_LTC_DESC) || defined(GMP_LTC_DESC)
 /* R = 2P */
-int ltc_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, void *modulus, void *mp);
+int ltc_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, void *a, void *modulus, void *mp);
 
 /* R = P + Q */
-int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void *modulus, void *mp);
+int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void *a, void *modulus, void *mp);
 #endif
 
 #if defined(LTC_MECC_FP)
 /* optimized point multiplication using fixed point cache (HAC algorithm 14.117) */
-int ltc_ecc_fp_mulmod(void *k, ecc_point *G, ecc_point *R, void *modulus, int map);
+int ltc_ecc_fp_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, int map);
 
 /* functions for saving/loading/freeing/adding to fixed point cache */
 int ltc_ecc_fp_save_state(unsigned char **out, unsigned long *outlen);
@@ -330,20 +356,19 @@ void ltc_ecc_fp_tablelock(int lock);
 #endif
 
 /* R = kG */
-int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *modulus, int map);
+int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, int map);
 
 #ifdef LTC_ECC_SHAMIR
 /* kA*A + kB*B = C */
 int ltc_ecc_mul2add(ecc_point *A, void *kA,
                     ecc_point *B, void *kB,
-                    ecc_point *C,
-                         void *modulus);
+                    ecc_point *C, void *a, void *modulus);
 
 #ifdef LTC_MECC_FP
 /* Shamir's trick with optimized point multiplication using fixed point cache */
 int ltc_ecc_fp_mul2add(ecc_point *A, void *kA,
                        ecc_point *B, void *kB,
-                       ecc_point *C, void *modulus);
+                       ecc_point *C, void *a, void *modulus);
 #endif
 
 #endif
@@ -458,6 +483,10 @@ typedef struct ltc_asn1_list_ {
    unsigned long size;
    /** The used flag, this is used by the CHOICE ASN.1 type to indicate which choice was made */
    int           used;
+   /** Flag used to indicate optional items in ASN.1 sequences */
+   int           optional;
+   /** Flag used to indicate context specific tags on ASN.1 sequence items */
+   unsigned char tag;
    /** prev/next entry in the list */
    struct ltc_asn1_list_ *prev, *next, *child, *parent;
 } ltc_asn1_list;
@@ -470,6 +499,8 @@ typedef struct ltc_asn1_list_ {
       LTC_MACRO_list[LTC_MACRO_temp].data = (void*)(Data);  \
       LTC_MACRO_list[LTC_MACRO_temp].size = (Size);  \
       LTC_MACRO_list[LTC_MACRO_temp].used = 0;       \
+      LTC_MACRO_list[LTC_MACRO_temp].tag = 0;        \
+      LTC_MACRO_list[LTC_MACRO_temp].optional = 0;   \
    } while (0);
 
 /* SEQUENCE */
@@ -483,8 +514,8 @@ int der_decode_sequence_ex(const unsigned char *in, unsigned long  inlen,
 
 #define der_decode_sequence(in, inlen, list, outlen) der_decode_sequence_ex(in, inlen, list, outlen, 1)
 
-int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
-                        unsigned long *outlen);
+int der_length_sequence(ltc_asn1_list *list, unsigned long inlen, unsigned long *outlen);
+int der_length_sequence_ex(ltc_asn1_list *list, unsigned long inlen, unsigned long *outlen, unsigned long *payloadlen);
 
 /* SUBJECT PUBLIC KEY INFO */
 int der_encode_subject_public_key_info(unsigned char *out, unsigned long *outlen,

@@ -24,15 +24,10 @@ sub new {
 sub export_key_pem {
   my ($self, $type, $password, $cipher) = @_;
   my $key = $self->export_key_der($type||'');
-  return undef unless $key;
+  return unless $key;
   return Crypt::PK::_asn1_to_pem($key, "DSA PRIVATE KEY", $password, $cipher) if $type eq 'private';  
   return Crypt::PK::_asn1_to_pem($key, "DSA PUBLIC KEY") if $type eq 'public';
-}
-
-sub generate_key {
-  my $self = shift;
-  $self->_generate_key(@_);
-  return $self;
+  return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public_x509';
 }
 
 sub import_key {
@@ -52,8 +47,7 @@ sub import_key {
     $data = Crypt::PK::_pem_to_asn1($data, $password);
   }
   croak "FATAL: invalid key format" unless $data;
-  $self->_import($data);
-  return $self;
+  return $self->_import($data);
 }
 
 sub encrypt {
@@ -195,67 +189,6 @@ Crypt::PK::DSA - Public key cryptography based on DSA
  #Signature: Bob (received $message + $sig)
  dsa_verify_message('Alice_pub_dsa1.der', $sig, $message) or die "ERROR";
 
-=head1 FUNCTIONS
-
-=head2 dsa_encrypt
-
-DSA based encryption as implemented by libtomcrypt. See method L</encrypt> below.
-
- my $ct = dsa_encrypt($pub_key_filename, $message);
- #or
- my $ct = dsa_encrypt(\$buffer_containing_pub_key, $message);
- #or
- my $ct = dsa_encrypt($pub_key_filename, $message, $hash_name);
-
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
-
-Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared DSA key is computed, and
-the hash of the shared key XOR'ed against the plaintext forms the ciphertext.
-
-=head2 dsa_decrypt
-
-DSA based decryption as implemented by libtomcrypt. See method L</decrypt> below.
-
- my $pt = dsa_decrypt($priv_key_filename, $ciphertext);
- #or
- my $pt = dsa_decrypt(\$buffer_containing_priv_key, $ciphertext);
-
-=head2 dsa_sign_message
-
-Generate DSA signature. See method L</sign_message> below.
-
- my $sig = dsa_sign_message($priv_key_filename, $message);
- #or
- my $sig = dsa_sign_message(\$buffer_containing_priv_key, $message);
- #or
- my $sig = dsa_sign_message($priv_key, $message, $hash_name);
-
-=head2 dsa_verify_message
-
-Verify DSA signature. See method L</verify_message> below.
-
- dsa_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
- #or
- dsa_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
- #or
- dsa_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
-
-=head2 dsa_sign_hash
-
-Generate DSA signature. See method L</sign_hash> below.
-
- my $sig = dsa_sign_hash($priv_key_filename, $message_hash);
- #or
- my $sig = dsa_sign_hash(\$buffer_containing_priv_key, $message_hash);
-
-=head2 dsa_verify_hash
-
-Verify DSA signature. See method L</verify_hash> below.
-
- dsa_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
- #or
- dsa_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
-
 =head1 METHODS
 
 =head2 new
@@ -319,16 +252,31 @@ Support for password protected PEM keys
  my $private_pem = $pk->export_key_pem('private');
  #or
  my $public_pem = $pk->export_key_pem('public');
+ #or
+ my $public_pem = $pk->export_key_pem('public_x509');
+
+With parameter C<'public'> uses header and footer lines:
+
+  -----BEGIN DSA PUBLIC KEY------
+  -----END DSA PUBLIC KEY------
+
+With parameter C<'public_x509'> uses header and footer lines:
+
+  -----BEGIN PUBLIC KEY------
+  -----END PUBLIC KEY------
 
 Support for password protected PEM keys
 
  my $private_pem = $pk->export_key_pem('private', $password);
  #or
  my $private_pem = $pk->export_key_pem('private', $password, $cipher);
- 
+
  # supported ciphers: 'DES-CBC'
  #                    'DES-EDE3-CBC'
  #                    'SEED-CBC'
+ #                    'CAMELLIA-128-CBC'
+ #                    'CAMELLIA-192-CBC'
+ #                    'CAMELLIA-256-CBC'
  #                    'AES-128-CBC'
  #                    'AES-192-CBC'
  #                    'AES-256-CBC' (DEFAULT)
@@ -402,6 +350,152 @@ Support for password protected PEM keys
    x => "6C801901AC74E2DC714D75A9F6969483CF...", #private key, random  0 < x < q
    y => "8F7604D77FA62C7539562458A63C7611B7...", #public key, where y = g^x mod p
  }
+
+=head1 FUNCTIONS
+
+=head2 dsa_encrypt
+
+DSA based encryption as implemented by libtomcrypt. See method L</encrypt> below.
+
+ my $ct = dsa_encrypt($pub_key_filename, $message);
+ #or
+ my $ct = dsa_encrypt(\$buffer_containing_pub_key, $message);
+ #or
+ my $ct = dsa_encrypt($pub_key_filename, $message, $hash_name);
+
+ #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+
+Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared DSA key is computed, and
+the hash of the shared key XOR'ed against the plaintext forms the ciphertext.
+
+=head2 dsa_decrypt
+
+DSA based decryption as implemented by libtomcrypt. See method L</decrypt> below.
+
+ my $pt = dsa_decrypt($priv_key_filename, $ciphertext);
+ #or
+ my $pt = dsa_decrypt(\$buffer_containing_priv_key, $ciphertext);
+
+=head2 dsa_sign_message
+
+Generate DSA signature. See method L</sign_message> below.
+
+ my $sig = dsa_sign_message($priv_key_filename, $message);
+ #or
+ my $sig = dsa_sign_message(\$buffer_containing_priv_key, $message);
+ #or
+ my $sig = dsa_sign_message($priv_key, $message, $hash_name);
+
+=head2 dsa_verify_message
+
+Verify DSA signature. See method L</verify_message> below.
+
+ dsa_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
+ #or
+ dsa_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
+ #or
+ dsa_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
+
+=head2 dsa_sign_hash
+
+Generate DSA signature. See method L</sign_hash> below.
+
+ my $sig = dsa_sign_hash($priv_key_filename, $message_hash);
+ #or
+ my $sig = dsa_sign_hash(\$buffer_containing_priv_key, $message_hash);
+
+=head2 dsa_verify_hash
+
+Verify DSA signature. See method L</verify_hash> below.
+
+ dsa_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
+ #or
+ dsa_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
+
+=head1 OpenSSL interoperability
+
+ ### let's have:
+ # DSA private key in PEM format - dsakey.priv.pem
+ # DSA public key in PEM format  - dsakey.pub.pem
+ # data file to be signed - input.data
+
+=head2 Sign by OpenSSL, verify by Crypt::PK::DSA
+
+Create signature (from commandline):
+
+ openssl dgst -sha1 -sign dsakey.priv.pem -out input.sha1-dsa.sig input.data
+
+Verify signature (Perl code):
+
+ use Crypt::PK::DSA;
+ use Crypt::Digest 'digest_file';
+ use File::Slurp 'read_file';
+
+ my $pkdsa = Crypt::PK::DSA->new("dsakey.pub.pem");
+ my $signature = read_file("input.sha1-dsa.sig", binmode=>':raw');
+ my $valid = $pkdsa->verify_hash($signature, digest_file("SHA1", "input.data"), "SHA1", "v1.5");
+ print $valid ? "SUCCESS" : "FAILURE";
+
+=head2 Sign by Crypt::PK::DSA, verify by OpenSSL
+
+Create signature (Perl code):
+
+ use Crypt::PK::DSA;
+ use Crypt::Digest 'digest_file';
+ use File::Slurp 'write_file';
+
+ my $pkdsa = Crypt::PK::DSA->new("dsakey.priv.pem");
+ my $signature = $pkdsa->sign_hash(digest_file("SHA1", "input.data"), "SHA1", "v1.5");
+ write_file("input.sha1-dsa.sig", {binmode=>':raw'}, $signature);
+
+Verify signature (from commandline):
+
+ openssl dgst -sha1 -verify dsakey.pub.pem -signature input.sha1-dsa.sig input.data
+
+=head2 Keys generated by Crypt::PK::DSA
+
+Generate keys (Perl code):
+
+ use Crypt::PK::DSA;
+ use File::Slurp 'write_file';
+
+ my $pkdsa = Crypt::PK::DSA->new;
+ $pkdsa->generate_key(20, 128);
+ write_file("dsakey.pub.der",  {binmode=>':raw'}, $pkdsa->export_key_der('public'));
+ write_file("dsakey.priv.der", {binmode=>':raw'}, $pkdsa->export_key_der('private'));
+ write_file("dsakey.pub.pem",  $pkdsa->export_key_pem('public_x509'));
+ write_file("dsakey.priv.pem", $pkdsa->export_key_pem('private'));
+ write_file("dsakey-passwd.priv.pem", $pkdsa->export_key_pem('private', 'secret'));
+
+Use keys by OpenSSL:
+
+ openssl dsa -in dsakey.priv.der -text -inform der
+ openssl dsa -in dsakey.priv.pem -text
+ openssl dsa -in dsakey-passwd.priv.pem -text -inform pem -passin pass:secret
+ openssl dsa -in dsakey.pub.der -pubin -text -inform der
+ openssl dsa -in dsakey.pub.pem -pubin -text 
+
+=head2 Keys generated by OpenSSL
+
+Generate keys:
+
+ openssl dsaparam -genkey -out dsakey.priv.pem 1024
+ openssl dsa -in dsakey.priv.pem -out dsakey.priv.der -outform der
+ openssl dsa -in dsakey.priv.pem -out dsakey.pub.pem -pubout
+ openssl dsa -in dsakey.priv.pem -out dsakey.pub.der -outform der -pubout
+ openssl dsa -in dsakey.priv.pem -passout pass:secret -des3 -out dsakey-passwd.priv.pem
+
+Load keys (Perl code):
+
+ use Crypt::PK::DSA;
+ use File::Slurp 'write_file';
+
+ my $pkdsa = Crypt::PK::DSA->new;
+ $pkdsa->import_key("dsakey.pub.der");
+ $pkdsa->import_key("dsakey.priv.der");
+ $pkdsa->import_key("dsakey.pub.pem");
+ $pkdsa->import_key("dsakey.priv.pem");
+ $pkdsa->import_key("dsakey-passwd.priv.pem", "secret");
 
 =head1 SEE ALSO
 

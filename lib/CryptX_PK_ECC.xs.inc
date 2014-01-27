@@ -7,60 +7,64 @@ _new()
         int rv;
         Newz(0, RETVAL, 1, struct ecc_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
-        RETVAL->key.type = -1;
         RETVAL->yarrow_prng_index = find_prng("yarrow");
+        RETVAL->key.type = -1;
+        ecc_dp_init(&RETVAL->dp);
         if(RETVAL->yarrow_prng_index==-1) croak("FATAL: find_prng('yarrow') failed");
-        rv = rng_make_prng(128, RETVAL->yarrow_prng_index, &RETVAL->yarrow_prng_state, NULL);
+        rv = rng_make_prng(256, RETVAL->yarrow_prng_index, &RETVAL->yarrow_prng_state, NULL);
         if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
     }
     OUTPUT:
         RETVAL
 
-int
-_generate_key(Crypt::PK::ECC self, int key_size=32)
-    CODE:
+void
+generate_key(Crypt::PK::ECC self, SV *curve)
+    PPCODE:
     {
         int rv;
-        rv = ecc_make_key(&self->yarrow_prng_state, self->yarrow_prng_index, key_size, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: ecc_make_key failed: %s", error_to_string(rv));
-        RETVAL = 1; /* xxx */
+        /* add a small random entropy before generating key - not necessary as we have initialized prng with 256bit entropy in _new() */
+        rv = rng_make_prng(64, self->yarrow_prng_index, &self->yarrow_prng_state, NULL);
+        if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
+        /* setup dp structure */
+        _ecc_set_dp_from_SV(&self->dp, curve); /* croaks on error */
+        /* gen the key */
+        rv = ecc_make_key_ex(&self->yarrow_prng_state, self->yarrow_prng_index, &self->key, &self->dp);
+        if (rv != CRYPT_OK) croak("FATAL: ecc_make_key_ex failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
-int
+void
 _import(Crypt::PK::ECC self, SV * key_data)
-    CODE:
+    PPCODE:
     {
         int rv;
         unsigned char *data=NULL;
         STRLEN data_len=0;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
-        rv = ecc_import(data, (unsigned long)data_len, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: ecc_import failed: %s", error_to_string(rv));
-        RETVAL = 1; /* xxx */
+        _ecc_free_key(&self->key, &self->dp);
+        rv = ecc_import_full(data, (unsigned long)data_len, &self->key, &self->dp);
+        if (rv != CRYPT_OK) croak("FATAL: ecc_import_full failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
-int
-import_key_x963(Crypt::PK::ECC self, SV * key_data)
-    CODE:
+void
+import_key_raw(Crypt::PK::ECC self, SV * key_data, SV * curve)
+    PPCODE:
     {
         int rv;
         unsigned char *data=NULL;
         STRLEN data_len=0;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
-        rv = ecc_ansi_x963_import(data, (unsigned long)data_len, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: ecc_ansi_x963_import failed: %s", error_to_string(rv));
-        RETVAL = 1; /* xxx */
+        _ecc_free_key(&self->key, &self->dp);
+        
+        _ecc_set_dp_from_SV(&self->dp, curve); /* croaks on error */
+        
+        rv = ecc_import_raw(data, (unsigned long)data_len, &self->key, &self->dp);
+        if (rv != CRYPT_OK) croak("FATAL: ecc_import_raw failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
 int
 is_private(Crypt::PK::ECC self)
@@ -124,27 +128,24 @@ key2hash(Crypt::PK::ECC self)
         else{
           not_used = hv_store(rv_hash, "pub_y", 5, newSVpv("", 0), 0);
         }
-        /* =====> pub_z */
-        siz = (self->key.pubkey.z) ? mp_unsigned_bin_size(self->key.pubkey.z) : 0;
-        if (siz>10000) {
-          croak("FATAL: key2hash failed - 'pub_z' too big number");
-        }
-        if (siz>0) {
-          mp_tohex(self->key.pubkey.z, buf);
-          not_used = hv_store(rv_hash, "pub_z", 5, newSVpv(buf, strlen(buf)), 0);
-        }
-        else{
-          not_used = hv_store(rv_hash, "pub_z", 5, newSVpv("", 0), 0);
-        }
         /* =====> curve_... */
-        if (self->key.idx>=0) {
+        if (self->key.dp) {
           not_used = hv_store(rv_hash, "curve_name",  10, newSVpv(self->key.dp->name,  strlen(self->key.dp->name)), 0);
           not_used = hv_store(rv_hash, "curve_prime", 11, newSVpv(self->key.dp->prime, strlen(self->key.dp->prime)), 0);
+          not_used = hv_store(rv_hash, "curve_A",      7, newSVpv(self->key.dp->A,     strlen(self->key.dp->A)), 0);
           not_used = hv_store(rv_hash, "curve_B",      7, newSVpv(self->key.dp->B,     strlen(self->key.dp->B)), 0);
           not_used = hv_store(rv_hash, "curve_order", 11, newSVpv(self->key.dp->order, strlen(self->key.dp->order)), 0);
           not_used = hv_store(rv_hash, "curve_Gx",     8, newSVpv(self->key.dp->Gx,    strlen(self->key.dp->Gx)), 0);
           not_used = hv_store(rv_hash, "curve_Gy",     8, newSVpv(self->key.dp->Gy,    strlen(self->key.dp->Gy)), 0);
-          not_used = hv_store(rv_hash, "curve_size",  10, newSViv(self->key.dp->size), 0);
+          not_used = hv_store(rv_hash, "curve_cofactor", 14, newSViv(self->key.dp->cofactor), 0);
+          {
+            mp_int p_num;
+            mp_init(&p_num);
+            mp_read_radix(&p_num, self->key.dp->prime, 16);
+            not_used = hv_store(rv_hash, "curve_bytes", 11, newSViv(mp_unsigned_bin_size(&p_num)), 0);
+            not_used = hv_store(rv_hash, "curve_bits",  10, newSViv(mp_count_bits(&p_num)), 0);
+            mp_clear(&p_num);
+          }
         }
         /* =====> size */
         not_used = hv_store(rv_hash, "size", 4, newSViv(ecc_get_size(&self->key)), 0);
@@ -165,12 +166,12 @@ export_key_der(Crypt::PK::ECC self, char * type)
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(type, "private", 7)) {
-          rv = ecc_export(out, &out_len, PK_PRIVATE, &self->key);
+          rv = ecc_export_full(out, &out_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_export(PK_PRIVATE) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "public", 6)) {
-          rv = ecc_export(out, &out_len, PK_PUBLIC, &self->key);
+          rv = ecc_export_full(out, &out_len, PK_PUBLIC, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_export(PK_PUBLIC) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
@@ -182,16 +183,32 @@ export_key_der(Crypt::PK::ECC self, char * type)
         RETVAL
 
 SV *
-export_key_x963(Crypt::PK::ECC self)
+export_key_raw(Crypt::PK::ECC self, char * type)
     CODE:
     {
         int rv;
         unsigned char out[4096];
-        unsigned long int out_len = 4096;
+        unsigned long int out_len = sizeof(out);
 
-        rv = ecc_ansi_x963_export(&self->key, out, &out_len);
-        if (rv != CRYPT_OK) croak("FATAL: ecc_ansi_x963_export failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn((char*)out, out_len);
+        RETVAL = newSVpvn(NULL, 0); /* undef */
+        if (strnEQ(type, "private", 7)) {
+          rv = ecc_export_raw(out, &out_len, PK_PRIVATE, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_export_raw(private) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
+        }
+        else if (strnEQ(type, "public_compressed", 17)) {
+          rv = ecc_export_raw(out, &out_len, PK_PUBLIC_COMPRESSED, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_export_raw(public_compressed) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
+        }
+        else if (strnEQ(type, "public", 6)) {
+          rv = ecc_export_raw(out, &out_len, PK_PUBLIC, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_export_raw(public) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
+        }
+        else {
+          croak("FATAL: export_key_raw invalid type '%s'", type);
+        }
     }
     OUTPUT:
         RETVAL
@@ -297,6 +314,6 @@ shared_secret(Crypt::PK::ECC self, Crypt::PK::ECC pubkey)
 void
 DESTROY(Crypt::PK::ECC self)
     CODE:
-        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
+        _ecc_free_key(&self->key, &self->dp);
         Safefree(self);
 

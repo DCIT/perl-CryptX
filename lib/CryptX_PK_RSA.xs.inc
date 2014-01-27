@@ -10,28 +10,30 @@ _new()
         RETVAL->key.type = -1;
         RETVAL->yarrow_prng_index = find_prng("yarrow");
         if(RETVAL->yarrow_prng_index==-1) croak("FATAL: find_prng('yarrow') failed");
-        rv = rng_make_prng(128, RETVAL->yarrow_prng_index, &RETVAL->yarrow_prng_state, NULL);
+        rv = rng_make_prng(256, RETVAL->yarrow_prng_index, &RETVAL->yarrow_prng_state, NULL);
         if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
     }
     OUTPUT:
         RETVAL
 
-int
-_generate_key(Crypt::PK::RSA self, int key_size=256, long key_e=65537)
-    CODE:
+void
+generate_key(Crypt::PK::RSA self, int key_size=256, long key_e=65537)
+    PPCODE:
     {
-        int rv;
         /* key_size is in octets */
+        int rv;
+        /* add a small random entropy before generating key - not necessary as we have initialized prng with 256bit entropy in _new() */
+        rv = rng_make_prng(64, self->yarrow_prng_index, &self->yarrow_prng_state, NULL);
+        if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
+        /* gen the key */
         rv = rsa_make_key(&self->yarrow_prng_state, self->yarrow_prng_index, key_size, key_e, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: rsa_make_key failed: %s", error_to_string(rv));
-        RETVAL = 1; /* xxx */
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
-int
+void
 _import(Crypt::PK::RSA self, SV * key_data)
-    CODE:
+    PPCODE:
     {
         int rv;
         unsigned char *data=NULL;
@@ -41,10 +43,8 @@ _import(Crypt::PK::RSA self, SV * key_data)
         if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
         rv = rsa_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: rsa_import failed: %s", error_to_string(rv));
-        RETVAL = 1; /* xxx */
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
 int
 is_private(Crypt::PK::RSA self)

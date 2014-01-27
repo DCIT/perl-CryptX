@@ -213,8 +213,10 @@ int camellia_setup(const unsigned char *key, int keylen, int num_rounds, symmetr
    int           x;
    ulong64       A, B;
    
-//   LTC_ARGCHK(key  != NULL);
-//   LTC_ARGCHK(skey != NULL);
+/*
+   LTC_ARGCHK(key  != NULL);
+   LTC_ARGCHK(skey != NULL);
+*/
 
    /* Valid sizes (in bytes) are 16, 24, 32 */
    if (keylen != 16 && keylen != 24 && keylen != 32) {
@@ -619,10 +621,10 @@ int camellia_ecb_decrypt(const unsigned char *ct, unsigned char *pt, symmetric_k
    L ^= F(R ^ skey->camellia.k[1]);
    R ^= F(L ^ skey->camellia.k[0]);
 
-   L ^= skey->camellia.kw[1];
-   R ^= skey->camellia.kw[0];
+   R ^= skey->camellia.kw[1];
+   L ^= skey->camellia.kw[0];
 
-   STORE64H(R, pt+0); STORE64H(L, pt+8);
+   STORE64H(R, pt+8); STORE64H(L, pt+0);
 
    return CRYPT_OK;
 }

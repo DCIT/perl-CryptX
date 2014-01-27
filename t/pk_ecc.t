@@ -11,7 +11,7 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   ok($k, 'load cryptx_priv_ecc1.der');
   ok($k->is_private, 'is_private cryptx_priv_ecc1.der');
   is($k->size, 32, 'size');
-  is(uc($k->key2hash->{pub_x}), 'AB53ED5D16CE550BAAF16BA4F161332AAD56D63790629C27871ED515D4FC229C', 'key2hash');
+  is(uc($k->key2hash->{pub_x}), 'C068B754877A4AB328A569BAC6D464A81B17E527D2D652572ABB11BDA3572D50', 'key2hash');
 
   $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc2.der');
   ok($k, 'load cryptx_priv_ecc2.der');
@@ -25,21 +25,36 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   ok($k, 'load cryptx_pub_ecc2.der');
   ok(!$k->is_private, 'is_private cryptx_pub_ecc2.der');
    
-  # $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc1.pem');
-  # ok($k, 'load cryptx_priv_ecc1.pem');
-  # ok($k->is_private, 'is_private cryptx_priv_ecc1.pem');
+  ### XXX-TODO regenerate keys
+  $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc1.pem');
+  ok($k, 'load cryptx_priv_ecc1.pem');
+  ok($k->is_private, 'is_private cryptx_priv_ecc1.pem');
   
-  # $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc2.pem');
-  # ok($k, 'load cryptx_priv_ecc2.pem');
-  # ok($k->is_private, 'is_private cryptx_priv_ecc2.pem');
+  $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc2.pem');
+  ok($k, 'load cryptx_priv_ecc2.pem');
+  ok($k->is_private, 'is_private cryptx_priv_ecc2.pem');
   
-  # $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc1.pem');
-  # ok($k, 'load cryptx_pub_ecc1.pem');
-  # ok(!$k->is_private, 'is_private cryptx_pub_ecc1.pem');
+  $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc1.pem');
+  ok($k, 'load cryptx_pub_ecc1.pem');
+  ok(!$k->is_private, 'is_private cryptx_pub_ecc1.pem');
   
-  # $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.pem');
-  # ok($k, 'load cryptx_pub_ecc2.pem');
-  # ok(!$k->is_private, 'is_private cryptx_pub_ecc2.pem');
+  $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.pem');
+  ok($k, 'load cryptx_pub_ecc2.pem');
+  ok(!$k->is_private, 'is_private cryptx_pub_ecc2.pem');
+  $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.pem');
+
+  for (qw( openssl_ec1.pub.pem openssl_ec1.pub.der openssl_ec1.pubc.der openssl_ec1.pubc.pem
+           cryptx_pub_ecc1_OLD.der cryptx_pub_ecc1_OLD.pem cryptx_pub_ecc2_OLD.der cryptx_pub_ecc2_OLD.pem )) {
+    $k = Crypt::PK::ECC->new("t/data/$_");
+    ok($k, "load $_");
+    ok(!$k->is_private, "is_private $_");
+  }
+  for (qw( openssl_ec1.pri.der openssl_ec1.pri.pem openssl_ec1.pric.der openssl_ec1.pric.pem openssl_ec1.key.pem
+           cryptx_priv_ecc1_OLD.der cryptx_priv_ecc1_OLD.pem cryptx_priv_ecc2_OLD.der cryptx_priv_ecc2_OLD.pem )) {
+    $k = Crypt::PK::ECC->new("t/data/$_");
+    ok($k, "load $_");
+    ok($k->is_private, "is_private $_");
+  }
 }
 
 {
@@ -50,7 +65,7 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
  
   my $ct = $pu1->encrypt("secret message");
   my $pt = $pr1->decrypt($ct);
-  ok(length $ct > 100, 'encrypt ' . length($ct));
+  ok(length $ct > 30, 'encrypt ' . length($ct));
   is($pt, "secret message", 'decrypt');
  
   my $sig = $pr1->sign_message("message");
@@ -74,7 +89,7 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
 
 {
   my $k = Crypt::PK::ECC->new;
-  $k->generate_key(32);
+  $k->generate_key('secp224r1');
   ok($k, 'generate_key');
   ok($k->is_private, 'is_private');
   #ok($k->export_key_pem('private'), 'export_key_pem pri');

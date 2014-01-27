@@ -46,20 +46,27 @@ sub string_from {
   my ($self, $chars, $len) = @_;
 
   $len = 20 unless defined $len;
-  return unless $len>0;
+  return unless $len > 0;
+  return unless length($chars) > 0;
 
   my @ch = split(//, $chars);
-  my $max_index = scalar(@ch)-1;
-
+  my $max_index = $#ch;
+  return if $max_index > 65535;
+  
   my $mask;
   for my $n (1..31) {
     $mask = (1<<$n) - 1;
     last if $mask >= $max_index;
   }
 
+  my $upck = ($max_index > 255) ? "n*" : "C*";
+  my $l = $len * 2;
+
   my $rv = '';
+  my @r;
   while (length $rv < $len) {
-    my $i = $self->int32 & $mask;
+    @r = unpack($upck, $self->bytes($l)) if scalar @r == 0;
+    my $i = (shift @r) & $mask;
     next if $i > $max_index;
     $rv .= $ch[$i];
   }
@@ -205,7 +212,7 @@ Returns a random unsigned 32bit integer - range 0 .. 0xFFFFFFFF.
 
 =head1 METHODS
 
-=head1 new
+=head2 new
 
    $prng = Crypt::PRNG->new;
    #or

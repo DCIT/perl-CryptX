@@ -2,6 +2,11 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#define NEED_sv_2pvbyte_GLOBAL
+#define NEED_sv_2pv_flags_GLOBAL
+#define NEED_newRV_noinc_GLOBAL
+#include "ppport.h"
+
 #undef LTC_SOURCE
 #include "tomcrypt.h"
 #include "tommath.h"
@@ -162,8 +167,75 @@ typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
   prng_state yarrow_prng_state;
   int yarrow_prng_index;
   ecc_key key;
+  ltc_ecc_set_type dp;
   int id;
 } *Crypt__PK__ECC;
+
+ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
+{
+  HV *h;
+  SV *param, **pref;
+  SV **sv_cofactor, **sv_prime, **sv_A, **sv_B, **sv_order, **sv_Gx, **sv_Gy;
+  int err;
+  char *ch_name;
+  STRLEN l_name;
+
+  if (SvPOK(curve)) {
+    ch_name = SvPV(curve, l_name);
+    if ((h = get_hv("Crypt::PK::ECC::curve", 0)) == NULL) croak("FATAL: generate_key_ex: no curve register");
+    if ((pref = hv_fetch(h, ch_name, l_name, 0)) == NULL)  croak("FATAL: generate_key_ex: unknown curve/1 '%s'", ch_name);
+    if (!SvOK(*pref)) croak("FATAL: generate_key_ex: unknown curve/2 '%s'", ch_name);
+    param = *pref;
+  }
+  else if (SvROK(curve)) {
+    param = curve;
+    ch_name = "custom";
+  }
+  else {
+    croak("FATAL: curve has to be a string or a hashref");
+  }
+
+  if ((h = (HV*)(SvRV(param))) == NULL) croak("FATAL: ecparams: param is not valid hashref");
+
+  if ((sv_prime    = hv_fetchs(h, "prime",    0)) == NULL) croak("FATAL: ecparams: missing param prime");
+  if ((sv_A        = hv_fetchs(h, "A",        0)) == NULL) croak("FATAL: ecparams: missing param A");
+  if ((sv_B        = hv_fetchs(h, "B",        0)) == NULL) croak("FATAL: ecparams: missing param B");
+  if ((sv_order    = hv_fetchs(h, "order",    0)) == NULL) croak("FATAL: ecparams: missing param order");
+  if ((sv_Gx       = hv_fetchs(h, "Gx",       0)) == NULL) croak("FATAL: ecparams: missing param Gx");
+  if ((sv_Gy       = hv_fetchs(h, "Gy",       0)) == NULL) croak("FATAL: ecparams: missing param Gy");
+  if ((sv_cofactor = hv_fetchs(h, "cofactor", 0)) == NULL) croak("FATAL: ecparams: missing param cofactor");
+
+  if (!SvOK(*sv_prime   )) croak("FATAL: ecparams: undefined param prime");
+  if (!SvOK(*sv_A       )) croak("FATAL: ecparams: undefined param A");
+  if (!SvOK(*sv_B       )) croak("FATAL: ecparams: undefined param B");
+  if (!SvOK(*sv_order   )) croak("FATAL: ecparams: undefined param order");
+  if (!SvOK(*sv_Gx      )) croak("FATAL: ecparams: undefined param Gx");
+  if (!SvOK(*sv_Gy      )) croak("FATAL: ecparams: undefined param Gy");
+  if (!SvOK(*sv_cofactor)) croak("FATAL: ecparams: undefined param cofactor");
+
+  err = ecc_dp_set( dp,
+                    SvPV_nolen(*sv_prime),
+                    SvPV_nolen(*sv_A),
+                    SvPV_nolen(*sv_B),
+                    SvPV_nolen(*sv_order),
+                    SvPV_nolen(*sv_Gx),
+                    SvPV_nolen(*sv_Gy),
+                    (unsigned long)SvUV(*sv_cofactor), 
+                    ch_name );
+  return err == CRYPT_OK ? dp : NULL;
+}
+
+void _ecc_free_key(ecc_key *key, ltc_ecc_set_type *dp)
+{
+  if(dp) {
+    ecc_dp_clear(dp);
+  }
+  if (key->type != -1) {
+    ecc_free(key);
+    key->type = -1;
+    key->dp = NULL;
+  }
+}
 
 MODULE = CryptX       PACKAGE = CryptX      PREFIX = CryptX_
 
@@ -222,8 +294,7 @@ BOOT:
 #endif
 
 int
-CryptX_test(s)
-        int  s
+CryptX_test(int s)
     CODE:
         RETVAL = s+1; /*xxx*/
     OUTPUT:

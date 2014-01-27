@@ -46,7 +46,7 @@ sub CLONE_SKIP { 1 } # prevent cloning
 __END__
  
 =head1 NAME
- 
+
 Crypt::mode - [internal only]
- 
+
 =cut

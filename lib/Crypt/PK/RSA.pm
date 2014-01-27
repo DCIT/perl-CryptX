@@ -24,8 +24,8 @@ sub new {
 sub export_key_pem {
   my ($self, $type, $password, $cipher) = @_;
   my $key = $self->export_key_der($type||'');
-  return undef unless $key;
-  
+  return unless $key;
+
   # PKCS#1 RSAPrivateKey** (PEM header: BEGIN RSA PRIVATE KEY)
   # PKCS#8 PrivateKeyInfo* (PEM header: BEGIN PRIVATE KEY)
   # PKCS#8 EncryptedPrivateKeyInfo** (PEM header: BEGIN ENCRYPTED PRIVATE KEY)
@@ -34,14 +34,7 @@ sub export_key_pem {
   # PKCS#1 RSAPublicKey* (PEM header: BEGIN RSA PUBLIC KEY)
   return Crypt::PK::_asn1_to_pem($key, "RSA PUBLIC KEY") if $type eq 'public';
   # X.509 SubjectPublicKeyInfo** (PEM header: BEGIN PUBLIC KEY)
-  return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public_x509';
-  
-}
-
-sub generate_key {
-  my $self = shift;
-  $self->_generate_key(@_);
-  return $self;
+  return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public_x509';  
 }
 
 sub import_key {
@@ -61,8 +54,7 @@ sub import_key {
     $data = Crypt::PK::_pem_to_asn1($data, $password);
   }
   croak "FATAL: invalid key format" unless $data;
-  $self->_import($data);
-  return $self;
+  return $self->_import($data);
 }
 
 sub encrypt {
@@ -213,87 +205,9 @@ Crypt::PK::RSA - Public key cryptography based on RSA
  #Signature: Bob (received $message + $sig)
  rsa_verify_message('Alice_pub_rsa1.der', $sig, $message) or die "ERROR";
 
-=head1 FUNCTIONS
+=head1 DESCRIPTION
 
-=head2 rsa_encrypt
-
-RSA based encryption. See method L</encrypt> below.
-
- my $ct = rsa_encrypt($pub_key_filename, $message);
- #or
- my $ct = rsa_encrypt(\$buffer_containing_pub_key, $message);
- #or
- my $ct = rsa_encrypt($pub_key, $message, $padding);
- #or
- my $ct = rsa_encrypt($pub_key, $message, 'oaep', $hash_name, $lparam);
-
-=head2 rsa_decrypt
-
-RSA based decryption. See method L</decrypt> below.
-
- my $pt = rsa_decrypt($priv_key_filename, $ciphertext);
- #or
- my $pt = rsa_decrypt(\$buffer_containing_priv_key, $ciphertext);
- #or
- my $pt = rsa_decrypt($priv_key, $ciphertext, $padding);
- #or
- my $pt = rsa_decrypt($priv_key, $ciphertext, 'oaep', $hash_name, $lparam);
-
-=head2 rsa_sign_message
-
-Generate RSA signature. See method L</sign_message> below.
-
- my $sig = rsa_sign_message($priv_key_filename, $message);
- #or
- my $sig = rsa_sign_message(\$buffer_containing_priv_key, $message);
- #or
- my $sig = rsa_sign_message($priv_key, $message, $hash_name);
- #or
- my $sig = rsa_sign_message($priv_key, $message, $hash_name, $padding);
- #or
- my $sig = rsa_sign_message($priv_key, $message, $hash_name, 'pss', $saltlen);
-
-=head2 rsa_verify_message
-
-Verify RSA signature. See method L</verify_message> below.
-
- rsa_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
- #or
- rsa_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
- #or
- rsa_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
- #or
- rsa_verify_message($pub_key, $signature, $message, $hash_name, $padding) or die "ERROR";
- #or
- rsa_verify_message($pub_key, $signature, $message, $hash_name, 'pss', $saltlen) or die "ERROR";
-
-=head2 rsa_sign_hash
-
-Generate RSA signature. See method L</sign_hash> below.
-
- my $sig = rsa_sign_hash($priv_key_filename, $message_hash);
- #or
- my $sig = rsa_sign_hash(\$buffer_containing_priv_key, $message_hash);
- #or
- my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name);
- #or
- my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name, $padding);
- #or
- my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name, 'pss', $saltlen);
-
-=head2 rsa_verify_hash
-
-Verify RSA signature. See method L</verify_hash> below.
-
- rsa_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
- #or
- rsa_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
- #or
- rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name) or die "ERROR";
- #or
- rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name, $padding) or die "ERROR";
- #or
- rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name, 'pss', $saltlen) or die "ERROR";
+The module provides a full featured RSA implementation.
 
 =head1 METHODS
 
@@ -363,10 +277,13 @@ Support for password protected PEM keys
  my $private_pem = $pk->export_key_pem('private', $password);
  #or
  my $private_pem = $pk->export_key_pem('private', $password, $cipher);
- 
+
  # supported ciphers: 'DES-CBC'
  #                    'DES-EDE3-CBC'
  #                    'SEED-CBC'
+ #                    'CAMELLIA-128-CBC'
+ #                    'CAMELLIA-192-CBC'
+ #                    'CAMELLIA-256-CBC'
  #                    'AES-128-CBC'
  #                    'AES-192-CBC'
  #                    'AES-256-CBC' (DEFAULT)
@@ -393,7 +310,9 @@ Support for password protected PEM keys
  #or
  my $pt = $pk->decrypt($ciphertext, 'oaep', $hash_name, $lparam);
 
- #NOTE: $padding, $hash_name, $lparam - see encrypt method
+ # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none'
+ # $hash_name (only for oaep) .. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $lparam (only for oaep) ..... DEFAULT is empty string
 
 =head2 sign_message
 
@@ -415,13 +334,15 @@ Support for password protected PEM keys
  my $pk = Crypt::PK::RSA->new($pub_key_filename);
  my $valid = $pub->verify_message($signature, $message);
  #or
- my $valid = $pub->verify_message($signature, $message, $padding);
+ my $valid = $pub->verify_message($signature, $message, $hash_name);
  #or
- my $valid = $pub->verify_message($signature, $message, $padding, $hash_name);
+ my $valid = $pub->verify_message($signature, $message, $hash_name, $padding);
  #or
- my $valid = $pub->verify_message($signature, $message, 'pss', $hash_name, $saltlen);
+ my $valid = $pub->verify_message($signature, $message, $hash_name, 'pss', $saltlen);
 
- #NOTE: $hash_name, $padding, $saltlen - see sign_message method
+ # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $saltlen (only for pss) .. DEFAULT is 12
 
 =head2 sign_hash
 
@@ -434,20 +355,24 @@ Support for password protected PEM keys
  #or
  my $signature = $priv->sign_hash($message_hash, $hash_name, 'pss', $saltlen);
 
- #NOTE: $hash_name, $padding, $saltlen - see sign_message method
+ # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $saltlen (only for pss) .. DEFAULT is 12
 
 =head2 verify_hash
 
  my $pk = Crypt::PK::RSA->new($pub_key_filename);
  my $valid = $pub->verify_hash($signature, $message_hash);
  #or
- my $valid = $pub->verify_hash($signature, $message_hash, $padding);
+ my $valid = $pub->verify_hash($signature, $message_hash, $hash_name);
  #or
- my $valid = $pub->verify_hash($signature, $message_hash, $padding, $hash_name);
+ my $valid = $pub->verify_hash($signature, $message_hash, $hash_name, $padding);
  #or
- my $valid = $pub->verify_hash($signature, $message_hash, 'pss', $hash_name, $saltlen);
+ my $valid = $pub->verify_hash($signature, $message_hash, $hash_name, 'pss', $saltlen);
 
- #NOTE: $hash_name, $padding, $saltlen - see sign_message method
+ # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $saltlen (only for pss) .. DEFAULT is 12
 
 =head2 is_private
 
@@ -479,6 +404,229 @@ Support for password protected PEM keys
    dP => "486F142FEF0A1F53269AC43D2EE4D263E2841B60DA36...", #d mod (p - 1) CRT param
    dQ => "4597284B2968B72C4212DB7E8F24360B987B80514DA9...", #d mod (q - 1) CRT param
  }
+
+=head1 FUNCTIONS
+
+=head2 rsa_encrypt
+
+RSA based encryption. See method L</encrypt> below.
+
+ my $ct = rsa_encrypt($pub_key_filename, $message);
+ #or
+ my $ct = rsa_encrypt(\$buffer_containing_pub_key, $message);
+ #or
+ my $ct = rsa_encrypt($pub_key, $message, $padding);
+ #or
+ my $ct = rsa_encrypt($pub_key, $message, 'oaep', $hash_name, $lparam);
+
+ # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none'
+ # $hash_name (only for oaep) .. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $lparam (only for oaep) ..... DEFAULT is empty string
+
+=head2 rsa_decrypt
+
+RSA based decryption. See method L</decrypt> below.
+
+ my $pt = rsa_decrypt($priv_key_filename, $ciphertext);
+ #or
+ my $pt = rsa_decrypt(\$buffer_containing_priv_key, $ciphertext);
+ #or
+ my $pt = rsa_decrypt($priv_key, $ciphertext, $padding);
+ #or
+ my $pt = rsa_decrypt($priv_key, $ciphertext, 'oaep', $hash_name, $lparam);
+
+ # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none'
+ # $hash_name (only for oaep) .. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $lparam (only for oaep) ..... DEFAULT is empty string
+
+=head2 rsa_sign_message
+
+Generate RSA signature. See method L</sign_message> below.
+
+ my $sig = rsa_sign_message($priv_key_filename, $message);
+ #or
+ my $sig = rsa_sign_message(\$buffer_containing_priv_key, $message);
+ #or
+ my $sig = rsa_sign_message($priv_key, $message, $hash_name);
+ #or
+ my $sig = rsa_sign_message($priv_key, $message, $hash_name, $padding);
+ #or
+ my $sig = rsa_sign_message($priv_key, $message, $hash_name, 'pss', $saltlen);
+
+ # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $saltlen (only for pss) .. DEFAULT is 12
+
+=head2 rsa_verify_message
+
+Verify RSA signature. See method L</verify_message> below.
+
+ rsa_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
+ #or
+ rsa_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
+ #or
+ rsa_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
+ #or
+ rsa_verify_message($pub_key, $signature, $message, $hash_name, $padding) or die "ERROR";
+ #or
+ rsa_verify_message($pub_key, $signature, $message, $hash_name, 'pss', $saltlen) or die "ERROR";
+
+ # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $saltlen (only for pss) .. DEFAULT is 12
+
+=head2 rsa_sign_hash
+
+Generate RSA signature. See method L</sign_hash> below.
+
+ my $sig = rsa_sign_hash($priv_key_filename, $message_hash);
+ #or
+ my $sig = rsa_sign_hash(\$buffer_containing_priv_key, $message_hash);
+ #or
+ my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name);
+ #or
+ my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name, $padding);
+ #or
+ my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name, 'pss', $saltlen);
+
+ # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $saltlen (only for pss) .. DEFAULT is 12
+
+=head2 rsa_verify_hash
+
+Verify RSA signature. See method L</verify_hash> below.
+
+ rsa_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
+ #or
+ rsa_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
+ #or
+ rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name) or die "ERROR";
+ #or
+ rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name, $padding) or die "ERROR";
+ #or
+ rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name, 'pss', $saltlen) or die "ERROR";
+
+ # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $saltlen (only for pss) .. DEFAULT is 12
+
+=head1 OpenSSL interoperability
+
+ ### let's have:
+ # RSA private key in PEM format - rsakey.priv.pem
+ # RSA public key in PEM format  - rsakey.pub.pem
+ # data file to be signed or encrypted - input.data
+
+=head2 Encrypt by OpenSSL, decrypt by Crypt::PK::RSA
+
+Create encrypted file (from commandline):
+
+ openssl rsautl -encrypt -inkey rsakey.pub.pem -pubin -out input.encrypted.rsa -in input.data
+
+Decrypt file (Perl code):
+
+  use Crypt::PK::RSA;
+  use File::Slurp 'read_file';
+
+  my $pkrsa = Crypt::PK::RSA->new("rsakey.priv.pem");
+  my $encfile = read_file("input.encrypted.rsa", binmode=>':raw');
+  my $plaintext = $pkrsa->decrypt($encfile, 'v1.5');
+  print $plaintext;
+
+=head2 Encrypt by Crypt::PK::RSA, decrypt by OpenSSL
+
+Create encrypted file (Perl code):
+
+  use Crypt::PK::RSA;
+  use File::Slurp 'write_file';
+
+  my $plaintext = 'secret message';
+  my $pkrsa = Crypt::PK::RSA->new("rsakey.pub.pem");
+  my $encrypted = $pkrsa->encrypt($plaintext, 'v1.5');
+  write_file("input.encrypted.rsa", {binmode=>':raw'}, $encrypted);
+
+Decrypt file (from commandline):
+
+ openssl rsautl -decrypt -inkey rsakey.priv.pem -in input.encrypted.rsa
+
+=head2 Sign by OpenSSL, verify by Crypt::PK::RSA
+
+Create signature (from commandline):
+
+ openssl dgst -sha1 -sign rsakey.priv.pem -out input.sha1-rsa.sig input.data
+
+Verify signature (Perl code):
+
+ use Crypt::PK::RSA;
+ use Crypt::Digest 'digest_file';
+ use File::Slurp 'read_file';
+
+ my $pkrsa = Crypt::PK::RSA->new("rsakey.pub.pem");
+ my $signature = read_file("input.sha1-rsa.sig", binmode=>':raw');
+ my $valid = $pkrsa->verify_hash($signature, digest_file("SHA1", "input.data"), "SHA1", "v1.5");
+ print $valid ? "SUCCESS" : "FAILURE";
+
+=head2 Sign by Crypt::PK::RSA, verify by OpenSSL
+
+Create signature (Perl code):
+
+ use Crypt::PK::RSA;
+ use Crypt::Digest 'digest_file';
+ use File::Slurp 'write_file';
+
+ my $pkrsa = Crypt::PK::RSA->new("rsakey.priv.pem");
+ my $signature = $pkrsa->sign_hash(digest_file("SHA1", "input.data"), "SHA1", "v1.5");
+ write_file("input.sha1-rsa.sig", {binmode=>':raw'}, $signature);
+
+Verify signature (from commandline):
+
+ openssl dgst -sha1 -verify rsakey.pub.pem -signature input.sha1-rsa.sig input.data
+
+=head2 Keys generated by Crypt::PK::RSA
+
+Generate keys (Perl code):
+
+ use Crypt::PK::RSA;
+ use File::Slurp 'write_file';
+
+ my $pkrsa = Crypt::PK::RSA->new;
+ $pkrsa->generate_key(256, 65537);
+ write_file("rsakey.pub.der",  {binmode=>':raw'}, $pkrsa->export_key_der('public'));
+ write_file("rsakey.priv.der", {binmode=>':raw'}, $pkrsa->export_key_der('private'));
+ write_file("rsakey.pub.pem",  $pkrsa->export_key_pem('public_x509'));
+ write_file("rsakey.priv.pem", $pkrsa->export_key_pem('private'));
+ write_file("rsakey-passwd.priv.pem", $pkrsa->export_key_pem('private', 'secret'));
+
+Use keys by OpenSSL:
+
+ openssl rsa -in rsakey.priv.der -text -inform der
+ openssl rsa -in rsakey.priv.pem -text
+ openssl rsa -in rsakey-passwd.priv.pem -text -inform pem -passin pass:secret
+ openssl rsa -in rsakey.pub.der -pubin -text -inform der
+ openssl rsa -in rsakey.pub.pem -pubin -text 
+
+=head2 Keys generated by OpenSSL
+
+Generate keys:
+
+ openssl genrsa -out rsakey.priv.pem 1024
+ openssl rsa -in rsakey.priv.pem -out rsakey.priv.der -outform der
+ openssl rsa -in rsakey.priv.pem -out rsakey.pub.pem -pubout
+ openssl rsa -in rsakey.priv.pem -out rsakey.pub.der -outform der -pubout
+ openssl rsa -in rsakey.priv.pem -passout pass:secret -des3 -out rsakey-passwd.priv.pem
+
+Load keys (Perl code):
+
+ use Crypt::PK::RSA;
+ use File::Slurp 'write_file';
+
+ my $pkrsa = Crypt::PK::RSA->new;
+ $pkrsa->import_key("rsakey.pub.der");
+ $pkrsa->import_key("rsakey.priv.der");
+ $pkrsa->import_key("rsakey.pub.pem");
+ $pkrsa->import_key("rsakey.priv.pem");
+ $pkrsa->import_key("rsakey-passwd.priv.pem", "secret");
 
 =head1 SEE ALSO
 

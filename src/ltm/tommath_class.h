@@ -106,6 +106,7 @@
 #define BN_MP_SQR_C
 #define BN_MP_SQRMOD_C
 #define BN_MP_SQRT_C
+#define BN_MP_SQRTMOD_PRIME_C
 #define BN_MP_SUB_C
 #define BN_MP_SUB_D_C
 #define BN_MP_SUBMOD_C
@@ -823,6 +824,18 @@
    #define BN_MP_CMP_MAG_C
    #define BN_MP_EXCH_C
    #define BN_MP_CLEAR_C
+#endif
+
+#if defined(BN_MP_SQRTMOD_PRIME_C)
+   #define BN_MP_JACOBI_C
+   #define BN_MP_ZERO_C
+   #define BN_MP_SET_INT_C
+   #define BN_MP_COPY_C
+   #define BN_MP_SUB_C
+   #define BN_MP_SUB_D_C
+   #define BN_MP_DIV_2_C
+   #define BN_MP_ADD_D_C
+   #define BN_MP_EXPTMOD_C
 #endif
 
 #if defined(BN_MP_SUB_C)

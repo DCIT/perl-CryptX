@@ -1,0 +1,68 @@
+openssl genrsa -passout pass:secret -des3 -out rsa-des3.pem 1024
+openssl genrsa -passout pass:secret -des -out rsa-des.pem 1024
+openssl genrsa -passout pass:secret -seed -out rsa-seed.pem 1024
+openssl genrsa -passout pass:secret -aes128 -out rsa-aes128.pem 1024
+openssl genrsa -passout pass:secret -aes192 -out rsa-aes192.pem 1024
+openssl genrsa -passout pass:secret -aes256 -out rsa-aes256.pem 1024
+openssl genrsa -passout pass:secret -camellia128 -out rsa-camellia128.pem 1024
+openssl genrsa -passout pass:secret -camellia192 -out rsa-camellia192.pem 1024
+openssl genrsa -passout pass:secret -camellia256 -out rsa-camellia256.pem 1024
+
+openssl dsaparam -out dsa-param.pem -outform pem 1024
+openssl gendsa -passout pass:secret -des3 -out dsa-des3.pem dsa-param.pem
+openssl gendsa -passout pass:secret -des -out dsa-des.pem dsa-param.pem
+openssl gendsa -passout pass:secret -seed -out dsa-seed.pem dsa-param.pem
+openssl gendsa -passout pass:secret -aes128 -out dsa-aes128.pem dsa-param.pem
+openssl gendsa -passout pass:secret -aes192 -out dsa-aes192.pem dsa-param.pem
+openssl gendsa -passout pass:secret -aes256 -out dsa-aes256.pem dsa-param.pem
+openssl gendsa -passout pass:secret -camellia128 -out dsa-camellia128.pem dsa-param.pem
+openssl gendsa -passout pass:secret -camellia192 -out dsa-camellia192.pem dsa-param.pem
+openssl gendsa -passout pass:secret -camellia256 -out dsa-camellia256.pem dsa-param.pem
+
+openssl ecparam -out tmp.pem -name secp128r2 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -des3 -out ec-des3.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp160k1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -des -out ec-des.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp160r1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -seed -out ec-seed.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp160r2 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -aes128 -out ec-aes128.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp192k1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -aes192 -out ec-aes192.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp224k1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -aes256 -out ec-aes256.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp224r1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -camellia128 -out ec-camellia128.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp256k1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -camellia192 -out ec-camellia192.pem -in tmp.pem
+openssl ecparam -out tmp.pem -name secp384r1 -genkey -param_enc explicit && openssl ec -param_enc explicit -passout pass:secret -camellia256 -out ec-camellia256.pem -in tmp.pem
+
+openssl ecparam -list_curves
+openssl ecparam -out openssl_ec_secp112r1.pem -name secp112r1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp112r2.pem -name secp112r2 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp128r1.pem -name secp128r1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp128r2.pem -name secp128r2 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp160k1.pem -name secp160k1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp160r1.pem -name secp160r1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp160r2.pem -name secp160r2 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp192k1.pem -name secp192k1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp224k1.pem -name secp224k1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp224r1.pem -name secp224r1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp256k1.pem -name secp256k1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp384r1.pem -name secp384r1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_secp521r1.pem -name secp521r1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime192v1.pem -name prime192v1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime192v2.pem -name prime192v2 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime192v3.pem -name prime192v3 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime239v1.pem -name prime239v1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime239v2.pem -name prime239v2 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime239v3.pem -name prime239v3 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_prime256v1.pem -name prime256v1 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls6.pem -name wap-wsg-idm-ecid-wtls6 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls7.pem -name wap-wsg-idm-ecid-wtls7 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls8.pem -name wap-wsg-idm-ecid-wtls8 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls9.pem -name wap-wsg-idm-ecid-wtls9 -genkey -param_enc explicit
+openssl ecparam -out openssl_ec_wap-wsg-idm-ecid-wtls12.pem -name wap-wsg-idm-ecid-wtls12 -genkey -param_enc explicit
+
+
+openssl ecparam -out openssl_ec1.key.pem -name secp384r1 -genkey -param_enc explicit
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -out openssl_ec1.pri.pem
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -conv_form compressed -out openssl_ec1.pric.pem
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -pubout -out openssl_ec1.pub.pem
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -pubout -conv_form compressed -out openssl_ec1.pubc.pem
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -outform der -out openssl_ec1.pri.der
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -outform der -conv_form compressed -out openssl_ec1.pric.der
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -outform der -pubout -out openssl_ec1.pub.der
+openssl ec -in openssl_ec1.key.pem -param_enc explicit -outform der -pubout -conv_form compressed -out openssl_ec1.pubc.der

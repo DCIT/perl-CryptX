@@ -350,7 +350,7 @@
 /* #define LTC_MECC_FP */
 
 /* Timing Resistant? */
-/* #define LTC_ECC_TIMING_RESISTANT */
+#define LTC_ECC_TIMING_RESISTANT
 
 #endif /* LTC_NO_PK */
 

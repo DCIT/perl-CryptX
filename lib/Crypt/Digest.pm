@@ -308,9 +308,9 @@ B<BEWARE:> You have to make sure that the filehandle is in binary mode before yo
 This method is available mostly for compatibility with other Digest::SOMETHING modules on CPAN, you are very unlikely to need it.
 The return value is the digest object itself.
 
- $d->add_bits("111100001010");
+ $d->add_bits($bit_string);   # e.g. $d->add_bits("111100001010");
  #or
- $d->add_bits("\xF0\xA0", 16);
+ $d->add_bits($data, $nbits); # e.g. $d->add_bits("\xF0\xA0", 16);
 
 B<BEWARE:> It is not possible to add bits that are not a multiple of 8.
 

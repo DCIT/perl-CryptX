@@ -17,10 +17,10 @@ sub _slurp_file {
   my $f = shift;
   croak "FATAL: non-existing file '$f'" unless -f $f;
   local $/ = undef;
-  open FILE, "<", $f or croak "FATAL: couldn't open file: $!";
-  binmode FILE;
-  my $string = <FILE>;
-  close FILE;
+  open my $fh, "<", $f or croak "FATAL: couldn't open file: $!";
+  binmode $fh;
+  my $string = readline($fh);
+  close $fh;
   return $string;
 }
 
@@ -28,8 +28,7 @@ sub _name2mode {
   my $cipher_name = uc(shift);
   my %trans = ( 'DES-EDE3' => 'DES_EDE' );
 
-  #my ($cipher, undef, $klen, $mode) = $cipher_name =~ /^(AES|CAMELLIA|DES|DES-EDE3|SEED)(-(\d+))?-(CBC|CFB|ECB|OFB)$/i;
-  my ($cipher, undef, $klen, $mode) = $cipher_name =~ /^(AES|DES|DES-EDE3|SEED)(-(\d+))?-(CBC|CFB|ECB|OFB)$/i;
+  my ($cipher, undef, $klen, $mode) = $cipher_name =~ /^(AES|CAMELLIA|DES|DES-EDE3|SEED)(-(\d+))?-(CBC|CFB|ECB|OFB)$/i;
   croak "FATAL: unsupported cipher '$cipher_name'" unless $cipher && $mode;
   $cipher = $trans{$cipher} || $cipher;
   $klen = $klen ? int($klen/8) : Crypt::Cipher::min_keysize($cipher);
@@ -55,7 +54,8 @@ sub _password2key {
 sub _pem_to_asn1 {
   my ($data, $password) = @_;
 
-  my ($begin, $object, $headers, $content, $end) = $data =~ m/(-----BEGIN ([^\n\-]+)-----)\n(.*?\n\n)?(.+)(-----END .*?-----)/s;
+  my ($begin, $object, $headers, $content, $end) = $data =~ m/(-----BEGIN ([^\r\n\-]+KEY)-----)\r?\n(.*?\r?\n\r?\n)?(.+)(-----END [^\r\n\-]*-----)/s;
+
   return $content unless $content;
   $content = decode_base64($content);
 
@@ -104,9 +104,9 @@ sub _asn1_to_pem {
 1;
 
 __END__
- 
+
 =head1 NAME
- 
+
 Crypt::PK - [internal only]
- 
+
 =cut

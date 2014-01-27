@@ -172,7 +172,7 @@ if (B_0 == NULL) {
    }
 
 } else {
-   // B_0 != NULL
+   /* B_0 != NULL */
    XMEMCPY(PAD, B_0, 16);
 }
 

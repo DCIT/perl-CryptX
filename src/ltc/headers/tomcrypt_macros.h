@@ -263,7 +263,7 @@ asm __volatile__ (             \
 
 #elif !defined(__STRICT_ANSI__) && defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)) && !defined(INTEL_CC) && !defined(LTC_NO_ASM)
 
-static inline unsigned ROL(unsigned word, int i)
+static inline ulong32 ROL(ulong32 word, int i)
 {
    asm ("roll %%cl,%0"
       :"=r" (word)
@@ -271,7 +271,7 @@ static inline unsigned ROL(unsigned word, int i)
    return word;
 }
 
-static inline unsigned ROR(unsigned word, int i)
+static inline ulong32 ROR(ulong32 word, int i)
 {
    asm ("rorl %%cl,%0"
       :"=r" (word)
@@ -281,7 +281,7 @@ static inline unsigned ROR(unsigned word, int i)
 
 #ifndef LTC_NO_ROLC
 
-static inline unsigned ROLc(unsigned word, const int i)
+static inline ulong32 ROLc(ulong32 word, const int i)
 {
    asm ("roll %2,%0"
       :"=r" (word)
@@ -289,7 +289,7 @@ static inline unsigned ROLc(unsigned word, const int i)
    return word;
 }
 
-static inline unsigned RORc(unsigned word, const int i)
+static inline ulong32 RORc(ulong32 word, const int i)
 {
    asm ("rorl %2,%0"
       :"=r" (word)
@@ -306,7 +306,7 @@ static inline unsigned RORc(unsigned word, const int i)
 
 #elif !defined(__STRICT_ANSI__) && defined(LTC_PPC32)
 
-static inline unsigned ROL(unsigned word, int i)
+static inline ulong32 ROL(ulong32 word, int i)
 {
    asm ("rotlw %0,%0,%2"
       :"=r" (word)
@@ -314,7 +314,7 @@ static inline unsigned ROL(unsigned word, int i)
    return word;
 }
 
-static inline unsigned ROR(unsigned word, int i)
+static inline ulong32 ROR(ulong32 word, int i)
 {
    asm ("rotlw %0,%0,%2"
       :"=r" (word)
@@ -324,7 +324,7 @@ static inline unsigned ROR(unsigned word, int i)
 
 #ifndef LTC_NO_ROLC
 
-static inline unsigned ROLc(unsigned word, const int i)
+static inline ulong32 ROLc(ulong32 word, const int i)
 {
    asm ("rotlwi %0,%0,%2"
       :"=r" (word)
@@ -332,7 +332,7 @@ static inline unsigned ROLc(unsigned word, const int i)
    return word;
 }
 
-static inline unsigned RORc(unsigned word, const int i)
+static inline ulong32 RORc(ulong32 word, const int i)
 {
    asm ("rotrwi %0,%0,%2"
       :"=r" (word)
@@ -362,7 +362,7 @@ static inline unsigned RORc(unsigned word, const int i)
 /* 64-bit Rotates */
 #if !defined(__STRICT_ANSI__) && defined(__GNUC__) && defined(__x86_64__) && !defined(LTC_NO_ASM)
 
-static inline unsigned long ROL64(unsigned long word, int i)
+static inline ulong64 ROL64(ulong64 word, int i)
 {
    asm("rolq %%cl,%0"
       :"=r" (word)
@@ -370,7 +370,7 @@ static inline unsigned long ROL64(unsigned long word, int i)
    return word;
 }
 
-static inline unsigned long ROR64(unsigned long word, int i)
+static inline ulong64 ROR64(ulong64 word, int i)
 {
    asm("rorq %%cl,%0"
       :"=r" (word)
@@ -380,7 +380,7 @@ static inline unsigned long ROR64(unsigned long word, int i)
 
 #ifndef LTC_NO_ROLC
 
-static inline unsigned long ROL64c(unsigned long word, const int i)
+static inline ulong64 ROL64c(ulong64 word, const int i)
 {
    asm("rolq %2,%0"
       :"=r" (word)
@@ -388,7 +388,7 @@ static inline unsigned long ROL64c(unsigned long word, const int i)
    return word;
 }
 
-static inline unsigned long ROR64c(unsigned long word, const int i)
+static inline ulong64 ROR64c(ulong64 word, const int i)
 {
    asm("rorq %2,%0"
       :"=r" (word)
