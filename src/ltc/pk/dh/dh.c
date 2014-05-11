@@ -14,234 +14,11 @@
   @file dh.c
   DH crypto, Tom St Denis
 */
-  
-#ifdef MDH
 
-   /* size of a packet header in bytes */
-    #define PACKET_SIZE            4
-
-    /* Section tags */
-    #define PACKET_SECT_DH         1
-
-    /* Subsection Tags for the first three sections */
-    #define PACKET_SUB_KEY         0
-    #define PACKET_SUB_ENCRYPTED   1
-    #define PACKET_SUB_SIGNED      2
-    #define PACKET_SUB_ENC_KEY     3
-
-#define OUTPUT_BIGNUM(num, out, y, z)                                                             \
-{                                                                                                 \
-      if ((y + 4) > *outlen) { return CRYPT_BUFFER_OVERFLOW; }                                    \
-      z = (unsigned long)mp_unsigned_bin_size(num);                                               \
-      STORE32L(z, out+y);                                                                         \
-      y += 4;                                                                                     \
-      if ((y + z) > *outlen) { return CRYPT_BUFFER_OVERFLOW; }                                    \
-      if ((err = mp_to_unsigned_bin(num, out+y)) != CRYPT_OK) { return err; }    \
-      y += z;                                                                                     \
-}
-
-#define INPUT_BIGNUM(num, in, x, y, inlen)                       \
-{                                                                \
-     /* load value */                                            \
-     if ((y + 4) > inlen) {                                      \
-        err = CRYPT_INVALID_PACKET;                              \
-        goto error;                                              \
-     }                                                           \
-     LOAD32L(x, in+y);                                           \
-     y += 4;                                                     \
-                                                                 \
-     /* sanity check... */                                       \
-     if ((x+y) > inlen) {                                        \
-        err = CRYPT_INVALID_PACKET;                              \
-        goto error;                                              \
-     }                                                           \
-                                                                 \
-     /* load it */                                               \
-     if ((err = mp_read_unsigned_bin(num, (unsigned char *)in+y, (int)x)) != CRYPT_OK) {\
-        goto error;                                              \
-     }                                                           \
-     y += x;                                                     \
-}
-
-static void packet_store_header(unsigned char *dst, int section, int subsection)
-{
-   LTC_ARGCHK(dst != NULL);
-
-   /* store version number */
-   dst[0] = (unsigned char)(CRYPT&255);
-   dst[1] = (unsigned char)((CRYPT>>8)&255);
-
-   /* store section and subsection */
-   dst[2] = (unsigned char)(section & 255);
-   dst[3] = (unsigned char)(subsection & 255);
-
-}
-
-static int packet_valid_header(unsigned char *src, int section, int subsection)
-{
-   unsigned long ver;
-
-   LTC_ARGCHK(src != NULL);
-
-   /* check version */
-   ver = ((unsigned long)src[0]) | ((unsigned long)src[1] << 8U);
-   if (CRYPT < ver) {
-      return CRYPT_INVALID_PACKET;
-   }
-
-   /* check section and subsection */
-   if (section != (int)src[2] || subsection != (int)src[3]) {
-      return CRYPT_INVALID_PACKET;
-   }
-
-   return CRYPT_OK;
-}
+#ifdef LTC_MDH
 
 
-/* max export size we'll encounter (smaller than this but lets round up a bit) */
-#define DH_BUF_SIZE 1200
-
-/* This holds the key settings.  ***MUST*** be organized by size from smallest to largest. */
-static const struct {
-    int size;
-    char *name, *base, *prime;
-} sets[] = {
-#ifdef DH768
-{
-   96,
-   "DH-768",
-   "4",
-   "F///////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "//////m3wvV"
-},
-#endif
-#ifdef DH1024
-{
-   128,
-   "DH-1024",
-   "4",
-   "F///////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////m3C47"
-},
-#endif
-#ifdef DH1280
-{
-   160,
-   "DH-1280",
-   "4",
-   "F///////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "//////////////////////////////m4kSN"
-},
-#endif
-#ifdef DH1536
-{
-   192,
-   "DH-1536",
-   "4",
-   "F///////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////m5uqd"
-},
-#endif
-#ifdef DH1792
-{
-   224,
-   "DH-1792",
-   "4",
-   "F///////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "//////////////////////////////////////////////////////mT/sd"
-},
-#endif
-#ifdef DH2048
-{
-   256,
-   "DH-2048",
-   "4",
-   "3///////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "/////////////////////////////////////////m8MPh"
-},
-#endif
-#ifdef DH2560
-{
-   320,
-   "DH-2560",
-   "4",
-   "3///////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "/////mKFpF"
-},
-#endif
-#ifdef DH3072
-{
-   384,
-   "DH-3072",
-   "4",
-   "3///////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "/////////////////////////////m32nN"
-},
-#endif
-#ifdef DH4096
-{
-   512,
-   "DH-4096",
-   "4",
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "////////////////////////////////////////////////////////////"
-   "/////////////////////m8pOF"
-},
-#endif
-{
-   0,
-   NULL,
-   NULL,
-   NULL
-}
-};
-
-static int is_valid_idx(int n)
-{
-   int x;
-
-   for (x = 0; sets[x].size; x++);
-   if ((n < 0) || (n >= x)) {
-      return 0;
-   }
-   return 1;
-}
+#include "dh_static.h"
 
 /**
    Test the DH sub-system (can take a while)
@@ -318,7 +95,7 @@ void dh_sizes(int *low, int *high)
 int dh_get_size(dh_key *key)
 {
     LTC_ARGCHK(key != NULL);
-    if (is_valid_idx(key->idx) == 1) {
+    if (dh_is_valid_idx(key->idx) == 1) {
         return sets[key->idx].size;
     } else {
         return INT_MAX; /* large value that would cause dh_make_key() to fail */
@@ -367,12 +144,12 @@ int dh_make_key(prng_state *prng, int wprng, int keysize, dh_key *key)
 
    /* make up random string */
    if ( rng_make_prng( keysize, wprng, prng, NULL) != CRYPT_OK) {
-      err = CRYPT_ERROR_READPRNG; 
+      err = CRYPT_ERROR_READPRNG;
       goto error2;
    }
 
    if (prng_descriptor[wprng].read(buf, keysize, prng) != (unsigned long)keysize) {
-      err = CRYPT_ERROR_READPRNG; 
+      err = CRYPT_ERROR_READPRNG;
       goto error2;
    }
 
@@ -407,7 +184,7 @@ error2:
 /**
   Free the allocated ram for a DH key
   @param key   The key which you wish to free
-*/ 
+*/
 void dh_free(dh_key *key)
 {
    LTC_ARGCHK(key != NULL);
@@ -442,7 +219,7 @@ int dh_export(unsigned char *out, unsigned long *outlen, int type, dh_key *key)
    if (*outlen < (PACKET_SIZE + 2)) {
       return CRYPT_BUFFER_OVERFLOW;
    }
-   
+
    if (type == PK_PRIVATE && key->type != PK_PRIVATE) {
       return CRYPT_PK_NOT_PRIVATE;
    }
@@ -523,7 +300,7 @@ int dh_import(const unsigned char *in, unsigned long inlen, dh_key *key)
    }
 
    /* is the key idx valid? */
-   if (is_valid_idx(key->idx) != 1) {
+   if (dh_is_valid_idx(key->idx) != 1) {
       err = CRYPT_PK_TYPE_MISMATCH;
       goto error;
    }
@@ -550,7 +327,7 @@ error:
 /**
    Create a DH shared secret.
    @param private_key     The private DH key in the pair
-   @param public_key      The public DH key in the pair 
+   @param public_key      The public DH key in the pair
    @param out             [out] The destination of the shared data
    @param outlen          [in/out] The max size and resulting size of the shared data.
    @return CRYPT_OK if successful
@@ -601,6 +378,4 @@ done:
    return err;
 }
 
-#include "dh_sys.c.inc"
-
-#endif
+#endif /* LTC_MDH */

@@ -66,6 +66,19 @@
 #define XQSORT qsort
 #endif
 
+/* shortcut to disable automatic inclusion */
+#if defined LTC_NOTHING && !defined LTC_EASY
+  #define LTC_NO_MATH
+  #define LTC_NO_CIPHERS
+  #define LTC_NO_MODES
+  #define LTC_NO_HASHES
+  #define LTC_NO_MACS
+  #define LTC_NO_PRNGS
+  #define LTC_NO_PK
+  #define LTC_NO_PKCS
+  #define LTC_NO_MISC
+#endif /* LTC_NOTHING */
+
 /* Easy button? */
 #ifdef LTC_EASY
    #define LTC_NO_CIPHERS
@@ -100,15 +113,20 @@
    #define LTC_NO_PK
    #define LTC_MRSA
    #define LTC_MECC
-#endif
 
-/* Use small code where possible */
-/* #define LTC_SMALL_CODE */
+   #define LTC_NO_MISC
+   #define LTC_BASE64
+#endif
 
 /* Enable self-test test vector checking */
 #ifndef LTC_NO_TEST
    #define LTC_TEST
 #endif
+/* Enable extended self-tests */
+/* #define LTC_TEST_EXT */
+
+/* Use small code where possible */
+/* #define LTC_SMALL_CODE */
 
 /* clean the stack of functions which put private information on stack */
 /* #define LTC_CLEAN_STACK */
@@ -124,6 +142,20 @@
 
 /* disable BSWAP on x86 */
 /* #define LTC_NO_BSWAP */
+
+/* ---> math provider? <--- */
+#ifndef LTC_NO_MATH
+
+/* LibTomMath */
+/* #define LTM_DESC */
+
+/* TomsFastMath */
+/* #define TFM_DESC */
+
+#endif /* LTC_NO_MATH */
+
+/* GNU Multiple Precision Arithmetic Library */
+/* #define GMP_DESC */
 
 /* ---> Symmetric Block Ciphers <--- */
 #ifndef LTC_NO_CIPHERS
@@ -145,7 +177,7 @@
    #define LTC_TWOFISH_SMALL
 #endif
 /* #define LTC_TWOFISH_SMALL */
-/* LTC_DES includes EDE triple-LTC_DES */
+/* LTC_DES includes EDE triple-DES */
 #define LTC_DES
 #define LTC_CAST5
 #define LTC_NOEKEON
@@ -219,16 +251,9 @@
 #define LTC_F9_MODE
 #define LTC_PELICAN
 
-#if defined(LTC_PELICAN) && !defined(LTC_RIJNDAEL)
-   #error Pelican-MAC requires LTC_RIJNDAEL
-#endif
-
 /* ---> Encrypt + Authenticate Modes <--- */
 
 #define LTC_EAX_MODE
-#if defined(LTC_EAX_MODE) && !(defined(LTC_CTR_MODE) && defined(LTC_OMAC))
-   #error LTC_EAX_MODE requires CTR and LTC_OMAC mode
-#endif
 
 #define LTC_OCB_MODE
 #define LTC_OCB3_MODE
@@ -247,9 +272,6 @@
 
 #endif /* LTC_NO_MACS */
 
-/* Various tidbits of modern neatoness */
-#define LTC_BASE64
-
 /* --> Pseudo Random Number Generators <--- */
 #ifndef LTC_NO_PRNGS
 
@@ -258,13 +280,9 @@
 /* which descriptor of AES to use?  */
 /* 0 = rijndael_enc 1 = aes_enc, 2 = rijndael [full], 3 = aes [full] */
 #ifdef ENCRYPT_ONLY
-  #define LTC_YARROW_AES 3
+  #define LTC_YARROW_AES 0
 #else
-  #define LTC_YARROW_AES 3
-#endif
-
-#if defined(LTC_YARROW) && !defined(LTC_CTR_MODE)
-   #error LTC_YARROW requires LTC_CTR_MODE chaining mode to be defined!
+  #define LTC_YARROW_AES 2
 #endif
 
 /* a PRNG that simply reads from an available system source */
@@ -290,30 +308,21 @@
 
 #endif /* LTC_NO_PRNGS */
 
-/* ---> math provider? <--- */
-#ifndef LTC_NO_MATH
-
-/* LibTomMath */
-/* #define LTM_DESC */
-
-/* TomsFastMath */
-/* #define TFM_DESC */
-
-#endif /* LTC_NO_MATH */
-
 /* ---> Public Key Crypto <--- */
 #ifndef LTC_NO_PK
 
 /* Include RSA support */
 #define LTC_MRSA
 
-/* Enable RSA blinding when doing private key operations? */
-/* #define LTC_RSA_BLINDING */
+#ifndef LTC_NO_RSA_BLINDING
+/* Enable RSA blinding when doing private key operations by default */
+#define LTC_RSA_BLINDING
+#endif  /* LTC_NO_RSA_BLINDING */
 
 /* Include Diffie-Hellman support */
 #ifndef GMP_DESC
 /* is_prime fails for GMP */
-#define MDH
+#define LTC_MDH
 /* Supported Key Sizes */
 #define DH768
 #define DH1024
@@ -342,19 +351,21 @@
 /* use Shamir's trick for point mul (speeds up signature verification) */
 #define LTC_ECC_SHAMIR
 
-#if defined(TFM_LTC_DESC) && defined(LTC_MECC)
+#if defined(TFM_DESC) && defined(LTC_MECC)
    #define LTC_MECC_ACCEL
 #endif
 
 /* do we want fixed point ECC */
 /* #define LTC_MECC_FP */
 
-/* Timing Resistant? */
+#ifndef LTC_NO_ECC_TIMING_RESISTANT
+/* Enable ECC timing resistant version by default */
 #define LTC_ECC_TIMING_RESISTANT
+#endif
 
 #endif /* LTC_NO_PK */
 
-/* LTC_PKCS #1 (RSA) and #5 (Password Handling) stuff */
+/* PKCS #1 (RSA) and #5 (Password Handling) stuff */
 #ifndef LTC_NO_PKCS
 
 #define LTC_PKCS_1
@@ -365,12 +376,22 @@
 
 #endif /* LTC_NO_PKCS */
 
-/* LTC_HKDF Key Derivation/Expansion stuff */
+/* misc stuff */
+#ifndef LTC_NO_MISC
+
+/* Various tidbits of modern neatoness */
+#define LTC_BASE64
+/* ... and it's URL safe version */
+#define LTC_BASE64_URL
+
+/* Keep LTC_NO_HKDF for compatibility reasons
+ * superseeded by LTC_NO_MISC*/
 #ifndef LTC_NO_HKDF
-
+/* HKDF Key Derivation/Expansion stuff */
 #define LTC_HKDF
-
 #endif /* LTC_NO_HKDF */
+
+#endif /* LTC_NO_MISC */
 
 /* cleanup */
 
@@ -400,6 +421,18 @@
 #if defined(TFM_DESC) && defined(LTC_RSA_BLINDING)
     #warning RSA blinding currently not supported in combination with TFM
     #undef LTC_RSA_BLINDING
+#endif
+
+#if defined(LTC_PELICAN) && !defined(LTC_RIJNDAEL)
+   #error Pelican-MAC requires LTC_RIJNDAEL
+#endif
+
+#if defined(LTC_EAX_MODE) && !(defined(LTC_CTR_MODE) && defined(LTC_OMAC))
+   #error LTC_EAX_MODE requires CTR and LTC_OMAC mode
+#endif
+
+#if defined(LTC_YARROW) && !defined(LTC_CTR_MODE)
+   #error LTC_YARROW requires LTC_CTR_MODE chaining mode to be defined!
 #endif
 
 #if defined(LTC_DER) && !defined(MPI)
