@@ -19,6 +19,9 @@
 
 /**
    CCM encrypt/decrypt and produce an authentication tag
+
+     *1 'pt' and 'ct' can both be 'in' or 'out', depending on 'direction'
+
    @param cipher     The index of the cipher desired
    @param key        The secret key to use
    @param keylen     The length of the secret key (octets)
@@ -27,9 +30,9 @@
    @param noncelen   The length of the nonce
    @param header     The header for the session
    @param headerlen  The length of the header (octets)
-   @param pt         [out] The plaintext
+   @param pt         [*1] The plaintext
    @param ptlen      The length of the plaintext (octets)
-   @param ct         [out] The ciphertext
+   @param ct         [*1] The ciphertext
    @param tag        [out] The destination tag
    @param taglen     [in/out] The max size and resulting size of the authentication tag
    @param direction  Encrypt or Decrypt direction (0 or 1)
@@ -95,7 +98,7 @@ int ccm_memory(int cipher,
            nonce,  noncelen,
            header, headerlen,
            pt,     ptlen,
-           ct, 
+           ct,
            tag,    taglen,
            direction);
    }
@@ -174,7 +177,7 @@ int ccm_memory(int cipher,
    /* handle header */
    if (headerlen > 0) {
       x = 0;
-      
+
       /* store length */
       if (headerlen < ((1UL<<16) - (1UL<<8))) {
          PAD[x++] ^= (headerlen>>8) & 255;
@@ -213,7 +216,7 @@ int ccm_memory(int cipher,
 
    /* flags */
    ctr[x++] = (unsigned char)L-1;
- 
+
    /* nonce */
    for (y = 0; y < (16 - (L+1)); ++y) {
       ctr[x++] = nonce[y];
@@ -305,7 +308,7 @@ int ccm_memory(int cipher,
           }
           PAD[x++] ^= b;
       }
-             
+
       if (x != 0) {
          if ((err = cipher_descriptor[cipher].ecb_encrypt(PAD, PAD, skey)) != CRYPT_OK) {
             goto error;

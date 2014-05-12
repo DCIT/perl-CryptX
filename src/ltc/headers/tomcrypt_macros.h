@@ -1,67 +1,50 @@
-/* fix for MSVC ...evil! */
-#ifdef _MSC_VER
-   #define CONST64(n) n ## ui64
-   typedef unsigned __int64 ulong64;
-#else
-   #define CONST64(n) n ## ULL
-   typedef unsigned long long ulong64;
-#endif
-
-/* this is the "32-bit at least" data type
- * Re-define it to suit your platform but it must be at least 32-bits
- */
-#if defined(__x86_64__) || (defined(__sparc__) && defined(__arch64__))
-   typedef unsigned ulong32;
-#else
-   typedef unsigned long ulong32;
-#endif
 
 /* ---- HELPER MACROS ---- */
 #ifdef ENDIAN_NEUTRAL
 
 #define STORE32L(x, y)                                                                     \
-     { (y)[3] = (unsigned char)(((x)>>24)&255); (y)[2] = (unsigned char)(((x)>>16)&255);   \
-       (y)[1] = (unsigned char)(((x)>>8)&255); (y)[0] = (unsigned char)((x)&255); }
+  do { (y)[3] = (unsigned char)(((x)>>24)&255); (y)[2] = (unsigned char)(((x)>>16)&255);   \
+       (y)[1] = (unsigned char)(((x)>>8)&255); (y)[0] = (unsigned char)((x)&255); } while(0)
 
 #define LOAD32L(x, y)                            \
-     { x = ((unsigned long)((y)[3] & 255)<<24) | \
-           ((unsigned long)((y)[2] & 255)<<16) | \
-           ((unsigned long)((y)[1] & 255)<<8)  | \
-           ((unsigned long)((y)[0] & 255)); }
+  do { x = ((ulong32)((y)[3] & 255)<<24) | \
+           ((ulong32)((y)[2] & 255)<<16) | \
+           ((ulong32)((y)[1] & 255)<<8)  | \
+           ((ulong32)((y)[0] & 255)); } while(0)
 
 #define STORE64L(x, y)                                                                     \
-     { (y)[7] = (unsigned char)(((x)>>56)&255); (y)[6] = (unsigned char)(((x)>>48)&255);   \
+  do { (y)[7] = (unsigned char)(((x)>>56)&255); (y)[6] = (unsigned char)(((x)>>48)&255);   \
        (y)[5] = (unsigned char)(((x)>>40)&255); (y)[4] = (unsigned char)(((x)>>32)&255);   \
        (y)[3] = (unsigned char)(((x)>>24)&255); (y)[2] = (unsigned char)(((x)>>16)&255);   \
-       (y)[1] = (unsigned char)(((x)>>8)&255); (y)[0] = (unsigned char)((x)&255); }
+       (y)[1] = (unsigned char)(((x)>>8)&255); (y)[0] = (unsigned char)((x)&255); } while(0)
 
 #define LOAD64L(x, y)                                                       \
-     { x = (((ulong64)((y)[7] & 255))<<56)|(((ulong64)((y)[6] & 255))<<48)| \
+  do { x = (((ulong64)((y)[7] & 255))<<56)|(((ulong64)((y)[6] & 255))<<48)| \
            (((ulong64)((y)[5] & 255))<<40)|(((ulong64)((y)[4] & 255))<<32)| \
            (((ulong64)((y)[3] & 255))<<24)|(((ulong64)((y)[2] & 255))<<16)| \
-           (((ulong64)((y)[1] & 255))<<8)|(((ulong64)((y)[0] & 255))); }
+           (((ulong64)((y)[1] & 255))<<8)|(((ulong64)((y)[0] & 255))); } while(0)
 
 #define STORE32H(x, y)                                                                     \
-     { (y)[0] = (unsigned char)(((x)>>24)&255); (y)[1] = (unsigned char)(((x)>>16)&255);   \
-       (y)[2] = (unsigned char)(((x)>>8)&255); (y)[3] = (unsigned char)((x)&255); }
+  do { (y)[0] = (unsigned char)(((x)>>24)&255); (y)[1] = (unsigned char)(((x)>>16)&255);   \
+       (y)[2] = (unsigned char)(((x)>>8)&255); (y)[3] = (unsigned char)((x)&255); } while(0)
 
 #define LOAD32H(x, y)                            \
-     { x = ((unsigned long)((y)[0] & 255)<<24) | \
-           ((unsigned long)((y)[1] & 255)<<16) | \
-           ((unsigned long)((y)[2] & 255)<<8)  | \
-           ((unsigned long)((y)[3] & 255)); }
+  do { x = ((ulong32)((y)[0] & 255)<<24) | \
+           ((ulong32)((y)[1] & 255)<<16) | \
+           ((ulong32)((y)[2] & 255)<<8)  | \
+           ((ulong32)((y)[3] & 255)); } while(0)
 
 #define STORE64H(x, y)                                                                     \
-   { (y)[0] = (unsigned char)(((x)>>56)&255); (y)[1] = (unsigned char)(((x)>>48)&255);     \
+do { (y)[0] = (unsigned char)(((x)>>56)&255); (y)[1] = (unsigned char)(((x)>>48)&255);     \
      (y)[2] = (unsigned char)(((x)>>40)&255); (y)[3] = (unsigned char)(((x)>>32)&255);     \
      (y)[4] = (unsigned char)(((x)>>24)&255); (y)[5] = (unsigned char)(((x)>>16)&255);     \
-     (y)[6] = (unsigned char)(((x)>>8)&255); (y)[7] = (unsigned char)((x)&255); }
+     (y)[6] = (unsigned char)(((x)>>8)&255); (y)[7] = (unsigned char)((x)&255); } while(0)
 
 #define LOAD64H(x, y)                                                      \
-   { x = (((ulong64)((y)[0] & 255))<<56)|(((ulong64)((y)[1] & 255))<<48) | \
+do { x = (((ulong64)((y)[0] & 255))<<56)|(((ulong64)((y)[1] & 255))<<48) | \
          (((ulong64)((y)[2] & 255))<<40)|(((ulong64)((y)[3] & 255))<<32) | \
          (((ulong64)((y)[4] & 255))<<24)|(((ulong64)((y)[5] & 255))<<16) | \
-         (((ulong64)((y)[6] & 255))<<8)|(((ulong64)((y)[7] & 255))); }
+         (((ulong64)((y)[6] & 255))<<8)|(((ulong64)((y)[7] & 255))); } while(0)
 
 #endif /* ENDIAN_NEUTRAL */
 
@@ -70,12 +53,12 @@
 #ifdef LTC_HAVE_BSWAP_BUILTIN
 
 #define STORE32H(x, y)                          \
-   { ulong32 __t = __builtin_bswap32 ((x));     \
-      XMEMCPY ((y), &__t, 4); }
+do { ulong32 __t = __builtin_bswap32 ((x));     \
+      XMEMCPY ((y), &__t, 4); } while(0)
 
 #define LOAD32H(x, y)                           \
-   { XMEMCPY (&(x), (y), 4);                    \
-      (x) = __builtin_bswap32 ((x)); }
+do { XMEMCPY (&(x), (y), 4);                    \
+      (x) = __builtin_bswap32 ((x)); } while(0)
 
 #elif !defined(LTC_NO_BSWAP) && (defined(INTEL_CC) || (defined(__GNUC__) && (defined(__DJGPP__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__i386__) || defined(__x86_64__))))
 
@@ -95,26 +78,26 @@ asm __volatile__ (             \
 #else
 
 #define STORE32H(x, y)                                                                     \
-     { (y)[0] = (unsigned char)(((x)>>24)&255); (y)[1] = (unsigned char)(((x)>>16)&255);   \
-       (y)[2] = (unsigned char)(((x)>>8)&255); (y)[3] = (unsigned char)((x)&255); }
+  do { (y)[0] = (unsigned char)(((x)>>24)&255); (y)[1] = (unsigned char)(((x)>>16)&255);   \
+       (y)[2] = (unsigned char)(((x)>>8)&255); (y)[3] = (unsigned char)((x)&255); } while(0)
 
 #define LOAD32H(x, y)                            \
-     { x = ((unsigned long)((y)[0] & 255)<<24) | \
-           ((unsigned long)((y)[1] & 255)<<16) | \
-           ((unsigned long)((y)[2] & 255)<<8)  | \
-           ((unsigned long)((y)[3] & 255)); }
+  do { x = ((ulong32)((y)[0] & 255)<<24) | \
+           ((ulong32)((y)[1] & 255)<<16) | \
+           ((ulong32)((y)[2] & 255)<<8)  | \
+           ((ulong32)((y)[3] & 255)); } while(0)
 
 #endif
 
 #ifdef LTC_HAVE_BSWAP_BUILTIN
 
 #define STORE64H(x, y)                          \
-   { ulong64 __t = __builtin_bswap64 ((x));     \
-      XMEMCPY ((y), &__t, 8); }
+do { ulong64 __t = __builtin_bswap64 ((x));     \
+      XMEMCPY ((y), &__t, 8); } while(0)
 
 #define LOAD64H(x, y)                           \
-   { XMEMCPY (&(x), (y), 8);                    \
-      (x) = __builtin_bswap64 ((x)); }
+do { XMEMCPY (&(x), (y), 8);                    \
+      (x) = __builtin_bswap64 ((x)); } while(0)
 
 /* x86_64 processor */
 #elif !defined(LTC_NO_BSWAP) && (defined(__GNUC__) && defined(__x86_64__))
@@ -135,52 +118,52 @@ asm __volatile__ (             \
 #else
 
 #define STORE64H(x, y)                                                                     \
-   { (y)[0] = (unsigned char)(((x)>>56)&255); (y)[1] = (unsigned char)(((x)>>48)&255);     \
+do { (y)[0] = (unsigned char)(((x)>>56)&255); (y)[1] = (unsigned char)(((x)>>48)&255);     \
      (y)[2] = (unsigned char)(((x)>>40)&255); (y)[3] = (unsigned char)(((x)>>32)&255);     \
      (y)[4] = (unsigned char)(((x)>>24)&255); (y)[5] = (unsigned char)(((x)>>16)&255);     \
-     (y)[6] = (unsigned char)(((x)>>8)&255); (y)[7] = (unsigned char)((x)&255); }
+     (y)[6] = (unsigned char)(((x)>>8)&255); (y)[7] = (unsigned char)((x)&255); } while(0)
 
 #define LOAD64H(x, y)                                                      \
-   { x = (((ulong64)((y)[0] & 255))<<56)|(((ulong64)((y)[1] & 255))<<48) | \
+do { x = (((ulong64)((y)[0] & 255))<<56)|(((ulong64)((y)[1] & 255))<<48) | \
          (((ulong64)((y)[2] & 255))<<40)|(((ulong64)((y)[3] & 255))<<32) | \
          (((ulong64)((y)[4] & 255))<<24)|(((ulong64)((y)[5] & 255))<<16) | \
-         (((ulong64)((y)[6] & 255))<<8)|(((ulong64)((y)[7] & 255))); }
+         (((ulong64)((y)[6] & 255))<<8)|(((ulong64)((y)[7] & 255))); } while(0)
 
 #endif
 
 #ifdef ENDIAN_32BITWORD
 
 #define STORE32L(x, y)        \
-     { ulong32  __t = (x); XMEMCPY(y, &__t, 4); }
+  do { ulong32  __t = (x); XMEMCPY(y, &__t, 4); } while(0)
 
 #define LOAD32L(x, y)         \
-     XMEMCPY(&(x), y, 4);
+  do { XMEMCPY(&(x), y, 4); } while(0)
 
 #define STORE64L(x, y)                                                                     \
-     { (y)[7] = (unsigned char)(((x)>>56)&255); (y)[6] = (unsigned char)(((x)>>48)&255);   \
+  do { (y)[7] = (unsigned char)(((x)>>56)&255); (y)[6] = (unsigned char)(((x)>>48)&255);   \
        (y)[5] = (unsigned char)(((x)>>40)&255); (y)[4] = (unsigned char)(((x)>>32)&255);   \
        (y)[3] = (unsigned char)(((x)>>24)&255); (y)[2] = (unsigned char)(((x)>>16)&255);   \
-       (y)[1] = (unsigned char)(((x)>>8)&255); (y)[0] = (unsigned char)((x)&255); }
+       (y)[1] = (unsigned char)(((x)>>8)&255); (y)[0] = (unsigned char)((x)&255); } while(0)
 
 #define LOAD64L(x, y)                                                       \
-     { x = (((ulong64)((y)[7] & 255))<<56)|(((ulong64)((y)[6] & 255))<<48)| \
+  do { x = (((ulong64)((y)[7] & 255))<<56)|(((ulong64)((y)[6] & 255))<<48)| \
            (((ulong64)((y)[5] & 255))<<40)|(((ulong64)((y)[4] & 255))<<32)| \
            (((ulong64)((y)[3] & 255))<<24)|(((ulong64)((y)[2] & 255))<<16)| \
-           (((ulong64)((y)[1] & 255))<<8)|(((ulong64)((y)[0] & 255))); }
+           (((ulong64)((y)[1] & 255))<<8)|(((ulong64)((y)[0] & 255))); } while(0)
 
 #else /* 64-bit words then  */
 
 #define STORE32L(x, y)        \
-     { ulong32 __t = (x); XMEMCPY(y, &__t, 4); }
+  do { ulong32 __t = (x); XMEMCPY(y, &__t, 4); } while(0)
 
 #define LOAD32L(x, y)         \
-     { XMEMCPY(&(x), y, 4); x &= 0xFFFFFFFF; }
+  do { XMEMCPY(&(x), y, 4); x &= 0xFFFFFFFF; } while(0)
 
 #define STORE64L(x, y)        \
-     { ulong64 __t = (x); XMEMCPY(y, &__t, 8); }
+  do { ulong64 __t = (x); XMEMCPY(y, &__t, 8); } while(0)
 
 #define LOAD64L(x, y)         \
-    { XMEMCPY(&(x), y, 8); }
+  do { XMEMCPY(&(x), y, 8); } while(0)
 
 #endif /* ENDIAN_64BITWORD */
 
@@ -188,60 +171,60 @@ asm __volatile__ (             \
 
 #ifdef ENDIAN_BIG
 #define STORE32L(x, y)                                                                     \
-     { (y)[3] = (unsigned char)(((x)>>24)&255); (y)[2] = (unsigned char)(((x)>>16)&255);   \
-       (y)[1] = (unsigned char)(((x)>>8)&255); (y)[0] = (unsigned char)((x)&255); }
+  do { (y)[3] = (unsigned char)(((x)>>24)&255); (y)[2] = (unsigned char)(((x)>>16)&255);   \
+       (y)[1] = (unsigned char)(((x)>>8)&255); (y)[0] = (unsigned char)((x)&255); } while(0)
 
 #define LOAD32L(x, y)                            \
-     { x = ((unsigned long)((y)[3] & 255)<<24) | \
-           ((unsigned long)((y)[2] & 255)<<16) | \
-           ((unsigned long)((y)[1] & 255)<<8)  | \
-           ((unsigned long)((y)[0] & 255)); }
+  do { x = ((ulong32)((y)[3] & 255)<<24) | \
+           ((ulong32)((y)[2] & 255)<<16) | \
+           ((ulong32)((y)[1] & 255)<<8)  | \
+           ((ulong32)((y)[0] & 255)); } while(0)
 
 #define STORE64L(x, y)                                                                     \
-   { (y)[7] = (unsigned char)(((x)>>56)&255); (y)[6] = (unsigned char)(((x)>>48)&255);     \
+do { (y)[7] = (unsigned char)(((x)>>56)&255); (y)[6] = (unsigned char)(((x)>>48)&255);     \
      (y)[5] = (unsigned char)(((x)>>40)&255); (y)[4] = (unsigned char)(((x)>>32)&255);     \
      (y)[3] = (unsigned char)(((x)>>24)&255); (y)[2] = (unsigned char)(((x)>>16)&255);     \
-     (y)[1] = (unsigned char)(((x)>>8)&255); (y)[0] = (unsigned char)((x)&255); }
+     (y)[1] = (unsigned char)(((x)>>8)&255); (y)[0] = (unsigned char)((x)&255); } while(0)
 
 #define LOAD64L(x, y)                                                      \
-   { x = (((ulong64)((y)[7] & 255))<<56)|(((ulong64)((y)[6] & 255))<<48) | \
+do { x = (((ulong64)((y)[7] & 255))<<56)|(((ulong64)((y)[6] & 255))<<48) | \
          (((ulong64)((y)[5] & 255))<<40)|(((ulong64)((y)[4] & 255))<<32) | \
          (((ulong64)((y)[3] & 255))<<24)|(((ulong64)((y)[2] & 255))<<16) | \
-         (((ulong64)((y)[1] & 255))<<8)|(((ulong64)((y)[0] & 255))); }
+         (((ulong64)((y)[1] & 255))<<8)|(((ulong64)((y)[0] & 255))); } while(0)
 
 #ifdef ENDIAN_32BITWORD
 
 #define STORE32H(x, y)        \
-     { ulong32 __t = (x); XMEMCPY(y, &__t, 4); }
+  do { ulong32 __t = (x); XMEMCPY(y, &__t, 4); } while(0)
 
 #define LOAD32H(x, y)         \
-     XMEMCPY(&(x), y, 4);
+  do { XMEMCPY(&(x), y, 4); } while(0)
 
 #define STORE64H(x, y)                                                                     \
-     { (y)[0] = (unsigned char)(((x)>>56)&255); (y)[1] = (unsigned char)(((x)>>48)&255);   \
+  do { (y)[0] = (unsigned char)(((x)>>56)&255); (y)[1] = (unsigned char)(((x)>>48)&255);   \
        (y)[2] = (unsigned char)(((x)>>40)&255); (y)[3] = (unsigned char)(((x)>>32)&255);   \
        (y)[4] = (unsigned char)(((x)>>24)&255); (y)[5] = (unsigned char)(((x)>>16)&255);   \
-       (y)[6] = (unsigned char)(((x)>>8)&255);  (y)[7] = (unsigned char)((x)&255); }
+       (y)[6] = (unsigned char)(((x)>>8)&255);  (y)[7] = (unsigned char)((x)&255); } while(0)
 
 #define LOAD64H(x, y)                                                       \
-     { x = (((ulong64)((y)[0] & 255))<<56)|(((ulong64)((y)[1] & 255))<<48)| \
+  do { x = (((ulong64)((y)[0] & 255))<<56)|(((ulong64)((y)[1] & 255))<<48)| \
            (((ulong64)((y)[2] & 255))<<40)|(((ulong64)((y)[3] & 255))<<32)| \
            (((ulong64)((y)[4] & 255))<<24)|(((ulong64)((y)[5] & 255))<<16)| \
-           (((ulong64)((y)[6] & 255))<<8)| (((ulong64)((y)[7] & 255))); }
+           (((ulong64)((y)[6] & 255))<<8)| (((ulong64)((y)[7] & 255))); } while(0)
 
 #else /* 64-bit words then  */
 
 #define STORE32H(x, y)        \
-     { ulong32 __t = (x); XMEMCPY(y, &__t, 4); }
+  do { ulong32 __t = (x); XMEMCPY(y, &__t, 4); } while(0)
 
 #define LOAD32H(x, y)         \
-     { XMEMCPY(&(x), y, 4); x &= 0xFFFFFFFF; }
+  do { XMEMCPY(&(x), y, 4); x &= 0xFFFFFFFF; } while(0)
 
 #define STORE64H(x, y)        \
-     { ulong64 __t = (x); XMEMCPY(y, &__t, 8); }
+  do { ulong64 __t = (x); XMEMCPY(y, &__t, 8); } while(0)
 
 #define LOAD64H(x, y)         \
-    { XMEMCPY(&(x), y, 8); }
+  do { XMEMCPY(&(x), y, 8); } while(0)
 
 #endif /* ENDIAN_64BITWORD */
 #endif /* ENDIAN_BIG */
@@ -351,10 +334,10 @@ static inline ulong32 RORc(ulong32 word, const int i)
 #else
 
 /* rotates the hard way */
-#define ROL(x, y) ( (((unsigned long)(x)<<(unsigned long)((y)&31)) | (((unsigned long)(x)&0xFFFFFFFFUL)>>(unsigned long)(32-((y)&31)))) & 0xFFFFFFFFUL)
-#define ROR(x, y) ( ((((unsigned long)(x)&0xFFFFFFFFUL)>>(unsigned long)((y)&31)) | ((unsigned long)(x)<<(unsigned long)(32-((y)&31)))) & 0xFFFFFFFFUL)
-#define ROLc(x, y) ( (((unsigned long)(x)<<(unsigned long)((y)&31)) | (((unsigned long)(x)&0xFFFFFFFFUL)>>(unsigned long)(32-((y)&31)))) & 0xFFFFFFFFUL)
-#define RORc(x, y) ( ((((unsigned long)(x)&0xFFFFFFFFUL)>>(unsigned long)((y)&31)) | ((unsigned long)(x)<<(unsigned long)(32-((y)&31)))) & 0xFFFFFFFFUL)
+#define ROL(x, y) ( (((ulong32)(x)<<(ulong32)((y)&31)) | (((ulong32)(x)&0xFFFFFFFFUL)>>(ulong32)(32-((y)&31)))) & 0xFFFFFFFFUL)
+#define ROR(x, y) ( ((((ulong32)(x)&0xFFFFFFFFUL)>>(ulong32)((y)&31)) | ((ulong32)(x)<<(ulong32)(32-((y)&31)))) & 0xFFFFFFFFUL)
+#define ROLc(x, y) ( (((ulong32)(x)<<(ulong32)((y)&31)) | (((ulong32)(x)&0xFFFFFFFFUL)>>(ulong32)(32-((y)&31)))) & 0xFFFFFFFFUL)
+#define RORc(x, y) ( ((((ulong32)(x)&0xFFFFFFFFUL)>>(ulong32)((y)&31)) | ((ulong32)(x)<<(ulong32)(32-((y)&31)))) & 0xFFFFFFFFUL)
 
 #endif
 
