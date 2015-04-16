@@ -92,11 +92,18 @@ int rsa_verify_hash_ex(const unsigned char *sig,      unsigned long siglen,
 
   if (padding == LTC_PKCS_1_PSS) {
     /* PSS decode and verify it */
-    err = pkcs_1_pss_decode(hash, hashlen, tmpbuf, x, saltlen, hash_idx, modulus_bitlen, stat);
+
+    if(modulus_bitlen%8 == 1){
+      err = pkcs_1_pss_decode(hash, hashlen, tmpbuf+1, x-1, saltlen, hash_idx, modulus_bitlen, stat);
+    }
+    else{
+      err = pkcs_1_pss_decode(hash, hashlen, tmpbuf, x, saltlen, hash_idx, modulus_bitlen, stat);
+    }
+
   } else {
     /* PKCS #1 v1.5 decode it */
     unsigned char *out;
-    unsigned long outlen, loid[16];
+    unsigned long outlen, loid[16], reallen;
     int           decoded;
     ltc_asn1_list digestinfo[2], siginfo[2];
 
@@ -120,29 +127,35 @@ int rsa_verify_hash_ex(const unsigned char *sig,      unsigned long siglen,
     }
 
     /* now we must decode out[0...outlen-1] using ASN.1, test the OID and then test the hash */
-    /* construct the SEQUENCE 
+    /* construct the SEQUENCE
       SEQUENCE {
          SEQUENCE {hashoid OID
                    blah    NULL
          }
-         hash    OCTET STRING 
+         hash    OCTET STRING
       }
    */
     LTC_SET_ASN1(digestinfo, 0, LTC_ASN1_OBJECT_IDENTIFIER, loid, sizeof(loid)/sizeof(loid[0]));
     LTC_SET_ASN1(digestinfo, 1, LTC_ASN1_NULL,              NULL,                          0);
     LTC_SET_ASN1(siginfo,    0, LTC_ASN1_SEQUENCE,          digestinfo,                    2);
     LTC_SET_ASN1(siginfo,    1, LTC_ASN1_OCTET_STRING,      tmpbuf,                        siglen);
-   
+
     if ((err = der_decode_sequence(out, outlen, siginfo, 2)) != CRYPT_OK) {
        XFREE(out);
        goto bail_2;
     }
 
+    if ((err = der_length_sequence(siginfo, 2, &reallen)) != CRYPT_OK) {
+       XFREE(out);
+       goto bail_2;
+    }
+
     /* test OID */
-    if ((digestinfo[0].size == hash_descriptor[hash_idx].OIDlen) &&
-        (XMEMCMP(digestinfo[0].data, hash_descriptor[hash_idx].OID, sizeof(unsigned long) * hash_descriptor[hash_idx].OIDlen) == 0) &&
+    if ((reallen == outlen) &&
+        (digestinfo[0].size == hash_descriptor[hash_idx].OIDlen) &&
+        (XMEM_NEQ(digestinfo[0].data, hash_descriptor[hash_idx].OID, sizeof(unsigned long) * hash_descriptor[hash_idx].OIDlen) == 0) &&
         (siginfo[1].size == hashlen) &&
-        (XMEMCMP(siginfo[1].data, hash, hashlen) == 0)) {
+        (XMEM_NEQ(siginfo[1].data, hash, hashlen) == 0)) {
        *stat = 1;
     }
 

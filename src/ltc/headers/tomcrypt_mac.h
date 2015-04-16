@@ -259,6 +259,44 @@ void ocb3_int_xor_blocks(unsigned char *out, const unsigned char *block_a, const
 #define CCM_ENCRYPT 0
 #define CCM_DECRYPT 1
 
+typedef struct {
+   symmetric_key       K;
+   int                 cipher,               /* which cipher */
+                       taglen,               /* length of the tag */
+                       x;                    /* index in PAD */
+
+   unsigned long       L,                    /* L value */
+                       ptlen,                /* length that will be enc / dec */
+                       current_ptlen,        /* current processed length */
+                       aadlen,               /* length of the aad */
+                       current_aadlen,       /* length of the currently provided add */
+                       noncelen;             /* length of the nonce */
+
+   unsigned char       PAD[16],
+                       ctr[16],
+                       CTRPAD[16],
+                       CTRlen;
+} ccm_state;
+
+int ccm_init(ccm_state *ccm, int cipher,
+             const unsigned char *key, int keylen, int ptlen, int taglen, int aad_len);
+
+int ccm_reset(ccm_state *ccm);
+
+int ccm_add_nonce(ccm_state *ccm,
+                  const unsigned char *nonce,     unsigned long noncelen);
+
+int ccm_add_aad(ccm_state *ccm,
+                const unsigned char *adata,  unsigned long adatalen);
+
+int ccm_process(ccm_state *ccm,
+                unsigned char *pt,     unsigned long ptlen,
+                unsigned char *ct,
+                int direction);
+
+int ccm_done(ccm_state *ccm,
+             unsigned char *tag,    unsigned long *taglen);
+
 int ccm_memory(int cipher,
     const unsigned char *key,    unsigned long keylen,
     symmetric_key       *uskey,
@@ -278,7 +316,7 @@ int ccm_memory_ex(int cipher,
           unsigned char *ct,
           unsigned char *tag,    unsigned long *taglen,
                     int  direction,
-    const unsigned char *B_0,
+    const unsigned char *B0,
     const unsigned char *CTR,
                     int  ctrwidth);
 
@@ -292,7 +330,7 @@ void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *
 
 
 /* table shared between GCM and LRW */
-#if defined(LTC_GCM_TABLES) || defined(LRW_TABLES) || ((defined(LTC_GCM_MODE) || defined(LTC_GCM_MODE)) && defined(LTC_FAST))
+#if defined(LTC_GCM_TABLES) || defined(LTC_LRW_TABLES) || ((defined(LTC_GCM_MODE) || defined(LTC_GCM_MODE)) && defined(LTC_FAST))
 extern const unsigned char gcm_shift_table[];
 #endif
 

@@ -9,8 +9,10 @@
  * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
+/* Implements ECC over Z/pZ for curve y^2 = x^3 - 3x + b
  *
+ * All curves taken from NIST recommendation paper of July 1999
+ * Available at http://csrc.nist.gov/cryptval/dss.htm
  */
 #include "tomcrypt.h"
 
@@ -39,8 +41,6 @@ int ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
    ecc_key       pubkey;
    void          *r, *s, *e, *p;
    int           err;
-   unsigned long pbits, pbytes, i, shift_right;
-   unsigned char ch, buf[MAXBLOCKSIZE];
 
    LTC_ARGCHK(in     != NULL);
    LTC_ARGCHK(out    != NULL);
@@ -61,30 +61,13 @@ int ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
       return err;
    }
 
+   /* get the hash and load it as a bignum into 'e' */
    /* init the bignums */
    if ((err = mp_init_multi(&r, &s, &p, &e, NULL)) != CRYPT_OK) { 
       return err;
    }
    if ((err = mp_read_radix(p, (char *)key->dp->order, 16)) != CRYPT_OK)                      { goto errnokey; }
-   
-   /* get the hash and load it as a bignum into 'e' */
-   pbits = mp_count_bits(p);
-   pbytes = (pbits+7) >> 3;
-      if (pbits > inlen*8) {
-     if ((err = mp_read_unsigned_bin(e, (unsigned char *)in, inlen)) != CRYPT_OK)        { goto errnokey; }
-   }
-   else if (pbits % 8 == 0) {
-     if ((err = mp_read_unsigned_bin(e, (unsigned char *)in, pbytes)) != CRYPT_OK)            { goto errnokey; }
-   }
-   else {
-     shift_right = 8 - pbits % 8;
-     for (i=0, ch=0; i<pbytes; i++) {
-       buf[i] = ch;
-       ch = (in[i] << (8-shift_right));
-       buf[i] = buf[i] ^ (in[i] >> shift_right);
-     }
-     if ((err = mp_read_unsigned_bin(e, (unsigned char *)buf, pbytes)) != CRYPT_OK)           { goto errnokey; }
-   }
+   if ((err = mp_read_unsigned_bin(e, (unsigned char *)in, (int)inlen)) != CRYPT_OK)          { goto errnokey; }
 
    /* make up a key and export the public copy */
    for (;;) {

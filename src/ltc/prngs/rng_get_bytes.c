@@ -10,6 +10,7 @@
  */
 #include "tomcrypt.h"
 
+#ifdef LTC_RNG_GET_BYTES
 /**
    @file rng_get_bytes.c
    portable way to get secure random bits to feed a PRNG (Tom St Denis)
@@ -20,15 +21,18 @@
 static unsigned long rng_nix(unsigned char *buf, unsigned long len,
                              void (*callback)(void))
 {
+    LTC_UNUSED_PARAM(callback);
 #ifdef LTC_NO_FILE
+    LTC_UNUSED_PARAM(buf);
+    LTC_UNUSED_PARAM(len);
     return 0;
 #else
     FILE *f;
     unsigned long x;
-#ifdef TRY_URANDOM_FIRST
+#ifdef LTC_TRY_URANDOM_FIRST
     f = fopen("/dev/urandom", "rb");
     if (f == NULL)
-#endif /* TRY_URANDOM_FIRST */
+#endif /* LTC_TRY_URANDOM_FIRST */
        f = fopen("/dev/random", "rb");
 
     if (f == NULL) {
@@ -103,6 +107,7 @@ static unsigned long rng_ansic(unsigned char *buf, unsigned long len,
 static unsigned long rng_win32(unsigned char *buf, unsigned long len,
                                void (*callback)(void))
 {
+   LTC_UNUSED_PARAM(callback);
    HCRYPTPROV hProv = 0;
    if (!CryptAcquireContext(&hProv, NULL, MS_DEF_PROV, PROV_RSA_FULL,
                             (CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET)) &&
@@ -146,6 +151,7 @@ unsigned long rng_get_bytes(unsigned char *out, unsigned long outlen,
 #endif
    return 0;
 }
+#endif /* #ifdef LTC_RNG_GET_BYTES */
 
 /* $Source$ */
 /* $Revision$ */

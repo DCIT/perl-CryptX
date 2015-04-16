@@ -9,16 +9,17 @@
  * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
+/* Implements ECC over Z/pZ for curve y^2 = x^3 - 3x + b
  *
+ * All curves taken from NIST recommendation paper of July 1999
+ * Available at http://csrc.nist.gov/cryptval/dss.htm
  */
-
 #include "tomcrypt.h"
 
 /**
   @file ltc_ecc_projective_add_point.c
   ECC Crypto, Tom St Denis
-*/  
+*/
 
 #if defined(LTC_MECC) && (!defined(LTC_MECC_ACCEL) || defined(LTM_DESC))
 
@@ -31,7 +32,7 @@
    @param mp       The "b" value from montgomery_setup()
    @return CRYPT_OK on success
 */
-int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void *a, void *modulus, void *mp)
+int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void *modulus, void *mp)
 {
    void  *t1, *t2, *x, *y, *z;
    int    err;
@@ -45,15 +46,15 @@ int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void 
    if ((err = mp_init_multi(&t1, &t2, &x, &y, &z, NULL)) != CRYPT_OK) {
       return err;
    }
-   
+
    /* should we dbl instead? */
    if ((err = mp_sub(modulus, Q->y, t1)) != CRYPT_OK)                          { goto done; }
 
-   if ( (mp_cmp(P->x, Q->x) == LTC_MP_EQ) && 
+   if ( (mp_cmp(P->x, Q->x) == LTC_MP_EQ) &&
         (Q->z != NULL && mp_cmp(P->z, Q->z) == LTC_MP_EQ) &&
         (mp_cmp(P->y, Q->y) == LTC_MP_EQ || mp_cmp(P->y, t1) == LTC_MP_EQ)) {
         mp_clear_multi(t1, t2, x, y, z, NULL);
-        return ltc_ecc_projective_dbl_point(P, R, a, modulus, mp);
+        return ltc_ecc_projective_dbl_point(P, R, modulus, mp);
    }
 
    if ((err = mp_copy(P->x, x)) != CRYPT_OK)                                   { goto done; }
@@ -143,7 +144,7 @@ int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void 
    /* T1 = T1 * X  */
    if ((err = mp_mul(t1, x, t1)) != CRYPT_OK)                                  { goto done; }
    if ((err = mp_montgomery_reduce(t1, modulus, mp)) != CRYPT_OK)              { goto done; }
- 
+
    /* X = Y*Y */
    if ((err = mp_sqr(y, x)) != CRYPT_OK)                                       { goto done; }
    if ((err = mp_montgomery_reduce(x, modulus, mp)) != CRYPT_OK)               { goto done; }
@@ -157,7 +158,7 @@ int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void 
    if ((err = mp_sub(t2, x, t2)) != CRYPT_OK)                                  { goto done; }
    if (mp_cmp_d(t2, 0) == LTC_MP_LT) {
       if ((err = mp_add(t2, modulus, t2)) != CRYPT_OK)                         { goto done; }
-   } 
+   }
    /* T2 = T2 - X */
    if ((err = mp_sub(t2, x, t2)) != CRYPT_OK)                                  { goto done; }
    if (mp_cmp_d(t2, 0) == LTC_MP_LT) {

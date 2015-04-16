@@ -80,7 +80,7 @@ typedef struct {
      @param n  The number of the digit to fetch
      @return  The bits_per_digit  sized n'th digit of a
    */
-   unsigned long (*get_digit)(void *a, int n);
+   ltc_mp_digit (*get_digit)(void *a, int n);
 
    /** Get the number of digits that represent the number
      @param a   The number to count
@@ -218,14 +218,6 @@ typedef struct {
    */
    int (*sqr)(void *a, void *b);
 
-   /** Square root (mod prime)
-     @param a    The integer to compute square root mod prime from
-     @param b    The prime
-     @param c    The destination
-     @return CRYPT_OK on success
-   */
-   int (*sqrtmod_prime)(void *a, void *b, void *c);
-
    /** Divide an integer
      @param a    The dividend
      @param b    The divisor
@@ -334,20 +326,11 @@ typedef struct {
 
    /** Primality testing
        @param a     The integer to test
-       @param b     The destination of the result (FP_YES if prime)
-       @return CRYPT_OK on success
-   */
-   int (*isprime)(void *a, int *b);
-
-   /** Primality testing (extended version)
-       @param a     The integer to test
-       @param b     Number of tests test
+       @param b     The number of tests that shall be executed
        @param c     The destination of the result (FP_YES if prime)
-       @param d     callback
-       @param e     callback data
        @return CRYPT_OK on success
    */
-   int (*isprime_ex)(void *a, int b, int *c, int (*d)(unsigned char *, int, void *), void *e);  
+   int (*isprime)(void *a, int b, int *c);
 
 /* ----  (optional) ecc point math ---- */
 
@@ -359,28 +342,26 @@ typedef struct {
        @param map Boolean indicated whether to map back to affine or not (can be ignored if you work in affine only)
        @return CRYPT_OK on success
    */
-   int (*ecc_ptmul)(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, int map);
+   int (*ecc_ptmul)(void *k, ecc_point *G, ecc_point *R, void *modulus, int map);
 
    /** ECC GF(p) point addition
        @param P    The first point
        @param Q    The second point
        @param R    The destination of P + Q
-       @param a    ECC curve parameter a (if NULL we assume a == -3)
        @param modulus  The modulus
        @param mp   The "b" value from montgomery_setup()
        @return CRYPT_OK on success
    */
-   int (*ecc_ptadd)(ecc_point *P, ecc_point *Q, ecc_point *R, void *a, void *modulus, void *mp);
+   int (*ecc_ptadd)(ecc_point *P, ecc_point *Q, ecc_point *R, void *modulus, void *mp);
 
    /** ECC GF(p) point double
        @param P    The first point
        @param R    The destination of 2P
-       @param a    ECC curve parameter a (if NULL we assume a == -3)
-       @param modulus  The modulus of the field the ECC curve is in
+       @param modulus  The modulus
        @param mp   The "b" value from montgomery_setup()
        @return CRYPT_OK on success
    */
-   int (*ecc_ptdbl)(ecc_point *P, ecc_point *R, void *a, void *modulus, void *mp);
+   int (*ecc_ptdbl)(ecc_point *P, ecc_point *R, void *modulus, void *mp);
 
    /** ECC mapping from projective to affine, currently uses (x,y,z) => (x/z^2, y/z^3, 1)
        @param P     The point to map
@@ -404,7 +385,6 @@ typedef struct {
    int (*ecc_mul2add)(ecc_point *A, void *kA,
                       ecc_point *B, void *kB,
                       ecc_point *C,
-                           void *a,
                            void *modulus);
 
 /* ---- (optional) rsa optimized math (for internal CRT) ---- */
@@ -518,7 +498,6 @@ extern const ltc_math_descriptor gmp_desc;
 #define mp_mul(a, b, c)              ltc_mp.mul(a, b, c)
 #define mp_mul_d(a, b, c)            ltc_mp.muli(a, b, c)
 #define mp_sqr(a, b)                 ltc_mp.sqr(a, b)
-#define mp_sqrtmod_prime(a, b, c)    ltc_mp.sqrtmod_prime(a, b, c)
 #define mp_div(a, b, c, d)           ltc_mp.mpdiv(a, b, c, d)
 #define mp_div_2(a, b)               ltc_mp.div_2(a, b)
 #define mp_mod(a, b, c)              ltc_mp.mpdiv(a, b, NULL, c)
@@ -538,12 +517,11 @@ extern const ltc_math_descriptor gmp_desc;
 #define mp_montgomery_free(a)        ltc_mp.montgomery_deinit(a)
 
 #define mp_exptmod(a,b,c,d)          ltc_mp.exptmod(a,b,c,d)
-#define mp_prime_is_prime(a, b, c)   ltc_mp.isprime(a, c)
-#define mp_prime_is_prime_ex(a, b, c, d, e)   ltc_mp.isprime_ex(a, b, c, d, e)
+#define mp_prime_is_prime(a, b, c)   ltc_mp.isprime(a, b, c)
 
 #define mp_iszero(a)                 (mp_cmp_d(a, 0) == LTC_MP_EQ ? LTC_MP_YES : LTC_MP_NO)
 #define mp_isodd(a)                  (mp_get_digit_count(a) > 0 ? (mp_get_digit(a, 0) & 1 ? LTC_MP_YES : LTC_MP_NO) : LTC_MP_NO)
-#define mp_exch(a, b)                do { void *ABC__tmp = a; a = b; b = ABC__tmp; } while(0);
+#define mp_exch(a, b)                do { void *ABC__tmp = a; a = b; b = ABC__tmp; } while(0)
 
 #define mp_tohex(a, b)               mp_toradix(a, b, 16)
 

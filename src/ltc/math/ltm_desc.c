@@ -25,7 +25,7 @@ static const struct {
 };
 
 /**
-   Convert a MPI error to a LTC error (Possibly the most powerful function ever!  Oh wait... no) 
+   Convert a MPI error to a LTC error (Possibly the most powerful function ever!  Oh wait... no)
    @param err    The error to convert
    @return The equivalent LTC error code or CRYPT_ERROR if none found
 */
@@ -34,7 +34,7 @@ static int mpi_to_ltc_error(int err)
    int x;
 
    for (x = 0; x < (int)(sizeof(mpi_to_ltc_codes)/sizeof(mpi_to_ltc_codes[0])); x++) {
-       if (err == mpi_to_ltc_codes[x].mpi_code) { 
+       if (err == mpi_to_ltc_codes[x].mpi_code) {
           return mpi_to_ltc_codes[x].ltc_code;
        }
    }
@@ -51,7 +51,7 @@ static int init(void **a)
    if (*a == NULL) {
       return CRYPT_MEM;
    }
-   
+
    if ((err = mpi_to_ltc_error(mp_init(*a))) != CRYPT_OK) {
       XFREE(*a);
    }
@@ -100,7 +100,7 @@ static unsigned long get_int(void *a)
    return mp_get_int(a);
 }
 
-static unsigned long get_digit(void *a, int n)
+static ltc_mp_digit get_digit(void *a, int n)
 {
    mp_int *A;
    LTC_ARGCHK(a != NULL);
@@ -115,7 +115,7 @@ static int get_digit_count(void *a)
    A = a;
    return A->used;
 }
-   
+
 static int compare(void *a, void *b)
 {
    int ret;
@@ -211,7 +211,7 @@ static int add(void *a, void *b, void *c)
    LTC_ARGCHK(c != NULL);
    return mpi_to_ltc_error(mp_add(a, b, c));
 }
-  
+
 static int addi(void *a, unsigned long b, void *c)
 {
    LTC_ARGCHK(a != NULL);
@@ -259,15 +259,6 @@ static int sqr(void *a, void *b)
    return mpi_to_ltc_error(mp_sqr(a, b));
 }
 
-/* sqrtmod_prime */
-static int sqrtmod_prime(void *a, void *b, void *c)
-{
-   LTC_ARGCHK(a != NULL);
-   LTC_ARGCHK(b != NULL);
-   LTC_ARGCHK(c != NULL);
-   return mpi_to_ltc_error(mp_sqrtmod_prime(a, b, c));
-}
-
 /* div */
 static int divide(void *a, void *b, void *c, void *d)
 {
@@ -297,7 +288,7 @@ static int modi(void *a, unsigned long b, unsigned long *c)
    }
    *c = tmp;
    return CRYPT_OK;
-}  
+}
 
 /* gcd */
 static int gcd(void *a, void *b, void *c)
@@ -407,22 +398,19 @@ static int exptmod(void *a, void *b, void *c, void *d)
    LTC_ARGCHK(c != NULL);
    LTC_ARGCHK(d != NULL);
    return mpi_to_ltc_error(mp_exptmod(a,b,c,d));
-}   
+}
 
-static int isprime(void *a, int *b)
+static int isprime(void *a, int b, int *c)
 {
    int err;
    LTC_ARGCHK(a != NULL);
-   LTC_ARGCHK(b != NULL);
-   err = mpi_to_ltc_error(mp_prime_is_prime(a, 8, b));
-   *b = (*b == MP_YES) ? LTC_MP_YES : LTC_MP_NO;
+   LTC_ARGCHK(c != NULL);
+   if (b == 0) {
+       b = 8;
+   } /* if */
+   err = mpi_to_ltc_error(mp_prime_is_prime(a, b, c));
+   *c = (*c == MP_YES) ? LTC_MP_YES : LTC_MP_NO;
    return err;
-}
-
-static int isprime_ex(void *a, int t, int *r, int (*cb)(unsigned char *, int, void *), void *dat)
-{
-  LTC_ARGCHK(a != NULL);
-  return mpi_to_ltc_error(mp_prime_is_prime_ex(a, t, r, cb, dat));
 }
 
 static int set_rand(void *a, int size)
@@ -466,7 +454,6 @@ const ltc_math_descriptor ltm_desc = {
    &mul,
    &muli,
    &sqr,
-   &sqrtmod_prime,
    &divide,
    &div_2,
    &modi,
@@ -476,7 +463,7 @@ const ltc_math_descriptor ltm_desc = {
    &mulmod,
    &sqrmod,
    &invmod,
-   
+
    &montgomery_setup,
    &montgomery_normalization,
    &montgomery_reduce,
@@ -484,12 +471,11 @@ const ltc_math_descriptor ltm_desc = {
 
    &exptmod,
    &isprime,
-   &isprime_ex,
 
 #ifdef LTC_MECC
 #ifdef LTC_MECC_FP
    &ltc_ecc_fp_mulmod,
-#else   
+#else
    &ltc_ecc_mulmod,
 #endif
    &ltc_ecc_projective_add_point,
@@ -516,7 +502,7 @@ const ltc_math_descriptor ltm_desc = {
 #endif
    &addmod,
    &submod,
-   
+
    &set_rand,
 
 };

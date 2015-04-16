@@ -44,7 +44,7 @@ int ccm_memory_ex(int cipher,
           unsigned char *ct,
           unsigned char *tag,    unsigned long *taglen,
                     int  direction,
-    const unsigned char *B_0,
+    const unsigned char *B0,
     const unsigned char *CTR,
                     int  ctrwidth)
 {
@@ -98,7 +98,7 @@ int ccm_memory_ex(int cipher,
            nonce,  noncelen,
            header, headerlen,
            pt,     ptlen,
-           ct, 
+           ct,
            tag,    taglen,
            direction);
    }
@@ -144,7 +144,7 @@ int ccm_memory_ex(int cipher,
    /* form B_0 == flags | Nonce N | l(m) */
    x = 0;
 
-if (B_0 == NULL) {
+if (B0 == NULL) {
    PAD[x++] = (unsigned char)(((headerlen > 0) ? (1<<6) : 0) |
             (((*taglen - 2)>>1)<<3)        |
             (L-1));
@@ -172,8 +172,8 @@ if (B_0 == NULL) {
    }
 
 } else {
-   /* B_0 != NULL */
-   XMEMCPY(PAD, B_0, 16);
+   // B0 != NULL
+   XMEMCPY(PAD, B0, 16);
 }
 
    /* encrypt PAD */
@@ -184,7 +184,7 @@ if (B_0 == NULL) {
    /* handle header */
    if (headerlen > 0) {
       x = 0;
-      
+
 #if 0
       /* store length */
       if (headerlen < ((1UL<<16) - (1UL<<8))) {
@@ -221,12 +221,12 @@ if (B_0 == NULL) {
    }
 
    /* setup the ctr counter */
-if (CTR == NULL) { 
+if (CTR == NULL) {
    x = 0;
 
    /* flags */
    ctr[x++] = (unsigned char)L-1;
- 
+
    /* nonce */
    for (y = 0; y < (16 - (L+1)); ++y) {
       ctr[x++] = nonce[y];
@@ -250,7 +250,7 @@ if (CTR == NULL) {
           if (direction == CCM_ENCRYPT) {
              for (; y < (ptlen & ~15); y += 16) {
                 /* increment the ctr? */
-                for (z = 15; z > 15-ctrwidth; z--) {
+                for (z = 15; (int)z > (int)(15-ctrwidth); z--) {
                     ctr[z] = (ctr[z] + 1) & 255;
                     if (ctr[z]) break;
                 }
@@ -270,7 +270,7 @@ if (CTR == NULL) {
          } else {
              for (; y < (ptlen & ~15); y += 16) {
                 /* increment the ctr? */
-                for (z = 15; z > 15-ctrwidth; z--) {
+                for (z = 15; (int)z > (int)(15-ctrwidth); z--) {
                     ctr[z] = (ctr[z] + 1) & 255;
                     if (ctr[z]) break;
                 }
@@ -294,7 +294,7 @@ if (CTR == NULL) {
       for (; y < ptlen; y++) {
           /* increment the ctr? */
           if (CTRlen == 16) {
-             for (z = 15; z > 15-ctrwidth; z--) {
+             for (z = 15; (int)z > (int)(15-ctrwidth); z--) {
                  ctr[z] = (ctr[z] + 1) & 255;
                  if (ctr[z]) break;
              }
@@ -321,7 +321,7 @@ if (CTR == NULL) {
           }
           PAD[x++] ^= b;
       }
-             
+
       if (x != 0) {
          if ((err = cipher_descriptor[cipher].ecb_encrypt(PAD, PAD, skey)) != CRYPT_OK) {
             goto error;
@@ -329,17 +329,17 @@ if (CTR == NULL) {
       }
    }
 
-// grab the CTR 
-memcpy(ctrcopy, ctr, 16);
+   // grab the CTR
+   XMEMCPY(ctrcopy, ctr, 16);
 
    /* setup CTR for the TAG (zero the count) */
-if (CTR == NULL) {
-   for (y = 15; y > 15 - L; y--) {
-      ctr[y] = 0x00;
+   if (CTR == NULL) {
+      for (y = 15; y > 15 - L; y--) {
+         ctr[y] = 0x00;
+      }
+   } else {
+      XMEMCPY(ctr, CTR, 16);
    }
-} else {
-   XMEMCPY(ctr, CTR, 16);
-}
 
    if ((err = cipher_descriptor[cipher].ecb_encrypt(ctr, CTRPAD, skey)) != CRYPT_OK) {
       goto error;
@@ -356,7 +356,7 @@ if (CTR == NULL) {
    *taglen = x;
 
 if (CTR != NULL) {
-  for (z = 15; z > 15-ctrwidth; z--) {
+  for (z = 15; (int)z > (int)(15-ctrwidth); z--) {
      ctrcopy[z] = (ctrcopy[z] + 1) & 255;
      if (ctrcopy[z]) break;
   }

@@ -9,6 +9,7 @@
  */
 #include "tomcrypt.h"
 
+#ifdef LTC_DER
 static const oid_st rsa_oid = {
    { 1, 2, 840, 113549, 1, 1, 1  },
    7,
@@ -16,16 +17,6 @@ static const oid_st rsa_oid = {
 
 static const oid_st dsa_oid = {
    { 1, 2, 840, 10040, 4, 1  },
-   6,
-};
-
-static const oid_st ec_oid = {
-   { 1, 2, 840, 10045, 2, 1 },
-   6,
-};
-
-static const oid_st ec_primef = {
-   { 1, 2, 840, 10045, 1, 1 },
    6,
 };
 
@@ -37,19 +28,14 @@ int pk_get_oid(int pk, oid_st *st)
 {
    switch (pk) {
       case PKA_RSA:
-         memcpy(st, &rsa_oid, sizeof(*st));
+         XMEMCPY(st, &rsa_oid, sizeof(*st));
          break;
       case PKA_DSA:
-         memcpy(st, &dsa_oid, sizeof(*st));
-         break;
-      case PKA_EC:
-         memcpy(st, &ec_oid, sizeof(*st));
-         break;
-      case EC_PRIME_FIELD:
-         memcpy(st, &ec_primef, sizeof(*st));
+         XMEMCPY(st, &dsa_oid, sizeof(*st));
          break;
       default:
          return CRYPT_INVALID_ARG;
    }
    return CRYPT_OK;
 }
+#endif

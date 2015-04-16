@@ -9,15 +9,17 @@
  * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
+/* Implements ECC over Z/pZ for curve y^2 = x^3 - 3x + b
  *
+ * All curves taken from NIST recommendation paper of July 1999
+ * Available at http://csrc.nist.gov/cryptval/dss.htm
  */
 #include "tomcrypt.h"
 
 /**
   @file ltc_ecc_mulmod.c
   ECC Crypto, Tom St Denis
-*/  
+*/
 
 #ifdef LTC_MECC
 #ifndef LTC_ECC_TIMING_RESISTANT
@@ -26,7 +28,7 @@
 #define WINSIZE 4
 
 /**
-   Perform a point multiplication 
+   Perform a point multiplication
    @param k    The scalar to multiply by
    @param G    The base point
    @param R    [out] Destination for kG
@@ -34,12 +36,12 @@
    @param map      Boolean whether to map back to affine or not (1==map, 0 == leave in projective)
    @return CRYPT_OK on success
 */
-int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, int map)
+int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *modulus, int map)
 {
    ecc_point *tG, *M[8];
    int        i, j, err;
    void       *mu, *mp;
-   unsigned long buf;
+   ltc_mp_digit buf;
    int        first, bitbuf, bitcpy, bitcnt, mode, digidx;
 
    LTC_ARGCHK(k       != NULL);
@@ -60,7 +62,7 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
       mp_clear(mu);
       return err;
    }
-  
+
   /* alloc ram for window temps */
   for (i = 0; i < 8; i++) {
       M[i] = ltc_ecc_new_point();
@@ -83,23 +85,23 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
       if ((err = mp_copy(G->x, tG->x)) != CRYPT_OK)                                  { goto done; }
       if ((err = mp_copy(G->y, tG->y)) != CRYPT_OK)                                  { goto done; }
       if ((err = mp_copy(G->z, tG->z)) != CRYPT_OK)                                  { goto done; }
-   } else {      
+   } else {
       if ((err = mp_mulmod(G->x, mu, modulus, tG->x)) != CRYPT_OK)                   { goto done; }
       if ((err = mp_mulmod(G->y, mu, modulus, tG->y)) != CRYPT_OK)                   { goto done; }
       if ((err = mp_mulmod(G->z, mu, modulus, tG->z)) != CRYPT_OK)                   { goto done; }
    }
    mp_clear(mu);
    mu = NULL;
-   
+
    /* calc the M tab, which holds kG for k==8..15 */
    /* M[0] == 8G */
-   if ((err = ltc_mp.ecc_ptdbl(tG, M[0], a, modulus, mp)) != CRYPT_OK)              { goto done; }
-   if ((err = ltc_mp.ecc_ptdbl(M[0], M[0], a, modulus, mp)) != CRYPT_OK)            { goto done; }
-   if ((err = ltc_mp.ecc_ptdbl(M[0], M[0], a, modulus, mp)) != CRYPT_OK)            { goto done; }
+   if ((err = ltc_mp.ecc_ptdbl(tG, M[0], modulus, mp)) != CRYPT_OK)                 { goto done; }
+   if ((err = ltc_mp.ecc_ptdbl(M[0], M[0], modulus, mp)) != CRYPT_OK)               { goto done; }
+   if ((err = ltc_mp.ecc_ptdbl(M[0], M[0], modulus, mp)) != CRYPT_OK)               { goto done; }
 
    /* now find (8+k)G for k=1..7 */
    for (j = 9; j < 16; j++) {
-       if ((err = ltc_mp.ecc_ptadd(M[j-9], tG, M[j-8], a, modulus, mp)) != CRYPT_OK) { goto done; }
+       if ((err = ltc_mp.ecc_ptadd(M[j-9], tG, M[j-8], modulus, mp)) != CRYPT_OK)   { goto done; }
    }
 
    /* setup sliding window */
@@ -133,7 +135,7 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
 
      /* if the bit is zero and mode == 1 then we double */
      if (mode == 1 && i == 0) {
-        if ((err = ltc_mp.ecc_ptdbl(R, R, a, modulus, mp)) != CRYPT_OK)              { goto done; }
+        if ((err = ltc_mp.ecc_ptdbl(R, R, modulus, mp)) != CRYPT_OK)                 { goto done; }
         continue;
      }
 
@@ -154,11 +156,11 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
          /* ok window is filled so double as required and add  */
          /* double first */
          for (j = 0; j < WINSIZE; j++) {
-           if ((err = ltc_mp.ecc_ptdbl(R, R, a, modulus, mp)) != CRYPT_OK)           { goto done; }
+           if ((err = ltc_mp.ecc_ptdbl(R, R, modulus, mp)) != CRYPT_OK)              { goto done; }
          }
 
          /* then add, bitbuf will be 8..15 [8..2^WINSIZE] guaranteed */
-         if ((err = ltc_mp.ecc_ptadd(R, M[bitbuf-8], R, a, modulus, mp)) != CRYPT_OK) { goto done; }
+         if ((err = ltc_mp.ecc_ptadd(R, M[bitbuf-8], R, modulus, mp)) != CRYPT_OK)   { goto done; }
        }
        /* empty window and reset */
        bitcpy = bitbuf = 0;
@@ -172,7 +174,7 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
      for (j = 0; j < bitcpy; j++) {
        /* only double if we have had at least one add first */
        if (first == 0) {
-          if ((err = ltc_mp.ecc_ptdbl(R, R, a, modulus, mp)) != CRYPT_OK)           { goto done; }
+          if ((err = ltc_mp.ecc_ptdbl(R, R, modulus, mp)) != CRYPT_OK)              { goto done; }
        }
 
        bitbuf <<= 1;
@@ -185,7 +187,7 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
             first = 0;
          } else {
             /* then add */
-            if ((err = ltc_mp.ecc_ptadd(R, tG, R, a, modulus, mp)) != CRYPT_OK)     { goto done; }
+            if ((err = ltc_mp.ecc_ptadd(R, tG, R, modulus, mp)) != CRYPT_OK)        { goto done; }
          }
        }
      }

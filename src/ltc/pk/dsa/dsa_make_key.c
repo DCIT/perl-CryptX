@@ -34,16 +34,6 @@ int dsa_make_params(prng_state *prng, int wprng, int group_size, int modulus_siz
   int err, res, mr_tests_q, mr_tests_p, found_p, found_q, hash;
   unsigned char *wbuf, *sbuf, digest[MAXBLOCKSIZE];
   void *t2L1, *t2N1, *t2q, *t2seedlen, *U, *W, *X, *c, *h, *e, *seedinc;
-  rand_helper_st rng;
-
-  /* check prng */
-  if ((err = prng_is_valid(wprng)) != CRYPT_OK) {
-    return err;
-  }
-
-  /* setup rng struct - used later for callback */
-  rng.prng = prng;
-  rng.wprng = wprng;
 
   /* check size */
   if (group_size >= LTC_MDSA_MAX_GROUP || group_size < 1 || group_size >= modulus_size) {
@@ -134,8 +124,7 @@ int dsa_make_params(prng_state *prng, int wprng, int group_size, int modulus_siz
       if ((err = mp_mod(U, t2N1, U)) != CRYPT_OK)                                { goto cleanup; }
       if ((err = mp_add(t2N1, U, q)) != CRYPT_OK)                                { goto cleanup; }
       if (!mp_isodd(q)) mp_add_d(q, 1, q);
-      err = mp_prime_is_prime_ex(q, mr_tests_q, &res, rand_helper, &rng);
-      if (err != CRYPT_OK)                                                       { goto cleanup; }
+      if ((err = mp_prime_is_prime(q, mr_tests_q, &res)) != CRYPT_OK)            { goto cleanup; }       /* XXX-TODO rounds are ignored; no Lucas test */
       if (res == LTC_MP_YES) found_q = 1;
     }
 
@@ -163,9 +152,10 @@ int dsa_make_params(prng_state *prng, int wprng, int group_size, int modulus_siz
       if ((err = mp_sub(X, p, p))    != CRYPT_OK)                                { goto cleanup; }
       if (mp_cmp(p, t2L1) != LTC_MP_LT) {
         /* p >= 2^(L-1) */
-        err = mp_prime_is_prime_ex(p, mr_tests_p, &res, rand_helper, &rng);
-        if (err != CRYPT_OK)                                                     { goto cleanup; }
-        if (res == LTC_MP_YES) found_p = 1;
+        if ((err = mp_prime_is_prime(p, mr_tests_p, &res)) != CRYPT_OK)          { goto cleanup; }       /* XXX-TODO rounds are ignored; no Lucas test */
+        if (res == LTC_MP_YES) {
+          found_p = 1;
+        }
       }
     }
   }

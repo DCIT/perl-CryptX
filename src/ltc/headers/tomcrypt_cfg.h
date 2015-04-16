@@ -56,11 +56,10 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
  */
 
 /* detect x86-32 machines somewhat */
-#if !defined(__STRICT_ANSI__) && !defined(__x86_64__) && !defined(_WIN64) && (defined(INTEL_CC) || (defined(_MSC_VER) && defined(WIN32)) || (defined(__GNUC__) && (defined(__DJGPP__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__i386__))))
+#if !defined(__STRICT_ANSI__) && !defined(_WIN64) && ((defined(_MSC_VER) && defined(WIN32)) || (defined(__GNUC__) && (defined(__DJGPP__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__i386__))))
    #define ENDIAN_LITTLE
    #define ENDIAN_32BITWORD
    #define LTC_FAST
-   #define LTC_FAST_TYPE    unsigned long
 #endif
 
 /* detects MIPS R5900 processors (PS2) */
@@ -70,19 +69,10 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 #endif
 
 /* detect amd64 */
-#ifdef _WIN64
+#if !defined(__STRICT_ANSI__) && defined(__x86_64__)
    #define ENDIAN_LITTLE
    #define ENDIAN_64BITWORD
    #define LTC_FAST
-   /* on 64bit ms windows 'unsigned long' is only 32bit we need 'long long'*/
-   #define LTC_FAST_TYPE    unsigned long long
-#else
- #if !defined(__STRICT_ANSI__) && defined(__x86_64__)
-   #define ENDIAN_LITTLE
-   #define ENDIAN_64BITWORD
-   #define LTC_FAST
-   #define LTC_FAST_TYPE    unsigned long
- #endif
 #endif
 
 /* detect PPC32 */
@@ -90,7 +80,6 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
    #define ENDIAN_BIG
    #define ENDIAN_32BITWORD
    #define LTC_FAST
-   #define LTC_FAST_TYPE    unsigned long
 #endif
 
 /* fix for MSVC ...evil! */
@@ -111,6 +100,18 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
    typedef unsigned long ulong32;
 #endif
 
+#ifdef LTC_FAST
+#if __GNUC__ < 4 /* if the compiler does not support gnu extensions, i.e. its neither clang nor gcc nor icc */
+#error the LTC_FAST hack is only available on compilers that support __attribute__((may_alias)) - disable it for your compiler, and dont worry, it won`t buy you much anyway
+#else
+#ifdef ENDIAN_64BITWORD
+typedef ulong64 __attribute__((__may_alias__)) LTC_FAST_TYPE;
+#else
+typedef ulong32 __attribute__((__may_alias__)) LTC_FAST_TYPE;
+#endif
+#endif
+#endif /* LTC_FAST */
+
 /* detect sparc and sparc64 */
 #if defined(__sparc__)
   #define ENDIAN_BIG
@@ -121,6 +122,11 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
   #endif
 #endif
 
+#ifdef ENDIAN_64BITWORD
+typedef ulong64 ltc_mp_digit;
+#else
+typedef ulong32 ltc_mp_digit;
+#endif
 
 #ifdef LTC_NO_FAST
    #ifdef LTC_FAST
@@ -152,6 +158,10 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 
 #if !(defined(ENDIAN_BIG) || defined(ENDIAN_LITTLE))
    #define ENDIAN_NEUTRAL
+#endif
+
+#if (defined(ENDIAN_32BITWORD) && defined(ENDIAN_64BITWORD))
+    #error Can not be 32 and 64 bit words...
 #endif
 
 /* gcc 4.3 and up has a bswap builtin; detect it by gcc version.

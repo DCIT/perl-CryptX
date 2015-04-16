@@ -130,8 +130,14 @@ const char *crypt_build_settings =
 #if defined(LTC_SHA384)
    "   SHA-384\n"
 #endif
+#if defined(LTC_SHA512_256)
+   "   SHA-512/256\n"
+#endif
 #if defined(LTC_SHA256)
    "   SHA-256\n"
+#endif
+#if defined(LTC_SHA512_224)
+   "   SHA-512/224\n"
 #endif
 #if defined(LTC_SHA224)
    "   SHA-224\n"
@@ -184,15 +190,11 @@ const char *crypt_build_settings =
     "   CBC\n"
 #endif
 #if defined(LTC_CTR_MODE)
-    "   CTR "
+    "   CTR\n"
 #endif
-#if defined(LTC_CTR_OLD)
-    " (CTR_OLD) "
-#endif
-    "\n"
 #if defined(LTC_LRW_MODE)
     "   LRW"
-#if defined(LRW_TABLES)
+#if defined(LTC_LRW_TABLES)
     " (tables) "
 #endif
     "\n"
@@ -269,7 +271,7 @@ const char *crypt_build_settings =
 #if defined(LTC_MRSA)
     "   RSA"
 #if defined(LTC_RSA_BLINDING)
-    "   (with blinding)"
+    " (with blinding)"
 #endif
     "\n"
 #endif
@@ -277,17 +279,23 @@ const char *crypt_build_settings =
     "   DH\n"
 #endif
 #if defined(LTC_MECC)
-    "   ECC\n"
+    "   ECC"
+#if defined(LTC_ECC_TIMING_RESISTANT)
+    " (with blinding)"
+#endif
+    "\n"
 #endif
 #if defined(LTC_MDSA)
     "   DSA\n"
 #endif
-#if defined(MKAT)
+#if defined(LTC_MKAT)
     "   Katja\n"
 #endif
 
     "\nCompiler:\n"
-#if defined(WIN32)
+#if defined(_WIN64)
+    "   WIN64 platform detected.\n"
+#elif defined(_WIN32)
     "   WIN32 platform detected.\n"
 #endif
 #if defined(__CYGWIN__)
@@ -301,17 +309,17 @@ const char *crypt_build_settings =
 #endif
 #if defined(__clang_version__)
     "   Clang compiler " __clang_version__ ".\n"
-#elif defined(__GNUC__)         /* clang also defines __GNUC__ */
-    "   GCC compiler detected.\n"
+#elif defined(INTEL_CC)
+    "   Intel C Compiler " __VERSION__ ".\n"
+#elif defined(__GNUC__)         /* clang and icc also define __GNUC__ */
+    "   GCC compiler " __VERSION__ ".\n"
 #endif
-#if defined(INTEL_CC)
-    "   Intel C Compiler detected.\n"
-#endif
+
 #if defined(__x86_64__)
     "   x86-64 detected.\n"
 #endif
 #if defined(LTC_PPC32)
-    "   PPC32 defined \n"
+    "   PPC32 detected.\n"
 #endif
 
     "\nVarious others: "
@@ -336,8 +344,8 @@ const char *crypt_build_settings =
 #if defined(MPI)
     " MPI "
 #endif
-#if defined(TRY_URANDOM_FIRST)
-    " TRY_URANDOM_FIRST "
+#if defined(LTC_TRY_URANDOM_FIRST)
+    " LTC_TRY_URANDOM_FIRST "
 #endif
 #if defined(LTC_TEST)
     " LTC_TEST "
@@ -375,14 +383,14 @@ const char *crypt_build_settings =
 #if defined(TFM_DESC)
     " TFM_DESC "
 #endif
-#if defined(LTC_MECC_ACCEL)
-    " LTC_MECC_ACCEL "
-#endif
 #if defined(GMP_DESC)
     " GMP_DESC "
 #endif
 #if defined(LTC_EASY)
     " LTC_EASY "
+#endif
+#if defined(LTC_MECC_ACCEL)
+    " LTC_MECC_ACCEL "
 #endif
 #if defined(LTC_MECC_FP)
    " LTC_MECC_FP "
@@ -391,7 +399,6 @@ const char *crypt_build_settings =
    " LTC_ECC_SHAMIR "
 #endif
     "\n"
-    "\n\n\n"
     ;
 
 

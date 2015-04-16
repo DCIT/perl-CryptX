@@ -227,6 +227,28 @@ int sha384_test(void);
 extern const struct ltc_hash_descriptor sha384_desc;
 #endif
 
+#ifdef LTC_SHA512_256
+#ifndef LTC_SHA512
+   #error LTC_SHA512 is required for LTC_SHA512_256
+#endif
+int sha512_256_init(hash_state * md);
+#define sha512_256_process sha512_process
+int sha512_256_done(hash_state * md, unsigned char *hash);
+int sha512_256_test(void);
+extern const struct ltc_hash_descriptor sha512_256_desc;
+#endif
+
+#ifdef LTC_SHA512_224
+#ifndef LTC_SHA512
+   #error LTC_SHA512 is required for LTC_SHA512_224
+#endif
+int sha512_224_init(hash_state * md);
+#define sha512_224_process sha512_process
+int sha512_224_done(hash_state * md, unsigned char *hash);
+int sha512_224_test(void);
+extern const struct ltc_hash_descriptor sha512_224_desc;
+#endif
+
 #ifdef LTC_SHA256
 int sha256_init(hash_state * md);
 int sha256_process(hash_state * md, const unsigned char *in, unsigned long inlen);
@@ -351,6 +373,9 @@ int func_name (hash_state * md, const unsigned char *in, unsigned long inlen)   
     if (md-> state_var .curlen > sizeof(md-> state_var .buf)) {                             \
        return CRYPT_INVALID_ARG;                                                            \
     }                                                                                       \
+    if ((md-> state_var .length + inlen) < md-> state_var .length) {	                    \
+      return CRYPT_HASH_OVERFLOW;                                                           \
+    }                                                                                       \
     while (inlen > 0) {                                                                     \
         if (md-> state_var .curlen == 0 && inlen >= block_size) {                           \
            if ((err = compress_name (md, (unsigned char *)in)) != CRYPT_OK) {               \
@@ -361,7 +386,7 @@ int func_name (hash_state * md, const unsigned char *in, unsigned long inlen)   
            inlen          -= block_size;                                                    \
         } else {                                                                            \
            n = MIN(inlen, (block_size - md-> state_var .curlen));                           \
-           memcpy(md-> state_var .buf + md-> state_var.curlen, in, (size_t)n);              \
+           XMEMCPY(md-> state_var .buf + md-> state_var.curlen, in, (size_t)n);              \
            md-> state_var .curlen += n;                                                     \
            in             += n;                                                             \
            inlen          -= n;                                                             \

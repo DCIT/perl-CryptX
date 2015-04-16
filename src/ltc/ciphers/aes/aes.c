@@ -12,8 +12,8 @@
 /* AES implementation by Tom St Denis
  *
  * Derived from the Public Domain source code by
- 
----  
+
+---
   * rijndael-alg-fst.c
   *
   * @version 3.0 (December 2000)
@@ -28,13 +28,13 @@
 /**
   @file aes.c
   Implementation of AES
-*/   
+*/
 
 #include "tomcrypt.h"
 
 #ifdef LTC_RIJNDAEL
 
-#ifndef ENCRYPT_ONLY 
+#ifndef ENCRYPT_ONLY
 
 #define SETUP    rijndael_setup
 #define ECB_ENC  rijndael_ecb_encrypt
@@ -205,6 +205,7 @@ int SETUP(const unsigned char *key, int keylen, int num_rounds, symmetric_key *s
         }
     } else {
        /* this can't happen */
+       /* coverity[dead_error_line] */
        return CRYPT_ERROR;
     }
 
@@ -724,6 +725,7 @@ int ECB_TEST(void)
 */
 void ECB_DONE(symmetric_key *skey)
 {
+  LTC_UNUSED_PARAM(skey);
 }
 
 

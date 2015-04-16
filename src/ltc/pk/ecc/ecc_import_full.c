@@ -171,7 +171,9 @@ int ecc_import_full(const unsigned char *in, unsigned long inlen, ecc_key *key, 
     if ((err = ecc_import_raw(bin_k, len_k, key, dp)) != CRYPT_OK)                  { goto error; }
     goto success;
   }
-  
+
+  fprintf(stderr, "XXX-DEBUG: error=%s", error_to_string(err));
+
   /* ### 3. backward compatibility - try to load old-DER format */
   if ((err = ecc_import(in, inlen, key)) != CRYPT_OK)                               { goto error; }
 
