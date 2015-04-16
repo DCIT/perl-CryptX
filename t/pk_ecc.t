@@ -116,4 +116,12 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   is(unpack("H*",$ss1), unpack("H*",$ss2), 'shared_secret');
 }
 
+{
+  my $k = Crypt::PK::ECC->new('t/data/openssl_ec-short.pem');
+  ok($k, 'load openssl_ec-short.pem');
+  ok($k->is_private, 'is_private openssl_ec-short.pem');
+  is($k->size, 32, 'size');
+  is(uc($k->key2hash->{pub_x}), 'C068B754877A4AB328A569BAC6D464A81B17E527D2D652572ABB11BDA3572D50', 'key2hash');
+}
+
 done_testing;
