@@ -1,6 +1,13 @@
 Changes for CryptX
 
 TODO:
+- Crypt::Mode::CBC;
++ use Crypt::Mode::CBC;
+
+wrong see also:
+GCM -> https://en.wikipedia.org/wiki/EAX_mode
+    -> Crypt::Mode::CCM, Crypt::Mode::GCM, Crypt::Mode::OCB (all AuthEnc)
+
         - RSA|DSA|ECC: verify_key($level) (basic check + extented primality test)
         - better primality testing: http://questhub.io/realm/perl/quest/519032ee1088c76505000035
         - DSA: generate_key($p, $q, $g), generate_key(\$dsa_params_der), generate_key($dsa_params_file)
