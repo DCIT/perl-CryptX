@@ -20,7 +20,7 @@ Crypt::Mode::OFB - Block cipher mode OFB [Output feedback]
 
 =head1 SYNOPSIS
 
-   Crypt::Mode::OFB;
+   use Crypt::Mode::OFB;
    my $m = Crypt::Mode::OFB->new('AES');
 
    #(en|de)crypt at once

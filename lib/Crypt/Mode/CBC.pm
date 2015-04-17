@@ -20,7 +20,7 @@ Crypt::Mode::CBC - Block cipher mode CBC [Cipher-block chaining]
 
 =head1 SYNOPSIS
 
-   Crypt::Mode::CBC;
+   use Crypt::Mode::CBC;
    my $m = Crypt::Mode::CBC->new('AES');
 
    #(en|de)crypt at once

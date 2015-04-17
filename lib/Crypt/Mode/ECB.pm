@@ -20,7 +20,7 @@ Crypt::Mode::ECB - Block cipher mode ECB [Electronic codebook]
 
 =head1 SYNOPSIS
 
-   Crypt::Mode::ECB;
+   use Crypt::Mode::ECB;
    my $m = Crypt::Mode::ECB->new('AES');
 
    #(en|de)crypt at once

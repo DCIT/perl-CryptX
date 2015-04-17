@@ -20,7 +20,7 @@ Crypt::Mode::CFB - Block cipher mode CFB [Cipher feedback]
 
 =head1 SYNOPSIS
 
-   Crypt::Mode::CFB;
+   use Crypt::Mode::CFB;
    my $m = Crypt::Mode::CFB->new('AES');
 
    #(en|de)crypt at once

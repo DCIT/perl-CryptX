@@ -20,7 +20,7 @@ Crypt::Mode::CTR - Block cipher mode CTR [Counter mode]
 
 =head1 SYNOPSIS
 
-   Crypt::Mode::CTR;
+   use Crypt::Mode::CTR;
    my $m = Crypt::Mode::CTR->new('AES');
 
    #(en|de)crypt at once
