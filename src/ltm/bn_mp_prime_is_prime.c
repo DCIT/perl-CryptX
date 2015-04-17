@@ -5,104 +5,76 @@
  * LibTomMath is a library that provides multiple-precision
  * integer arithmetic as well as number theoretic functionality.
  *
+ * The library was designed directly after the MPI library by
+ * Michael Fromberger but has been written from scratch with
+ * additional optimizations in place.
+ *
  * The library is free for all purposes without any express
  * guarantee it works.
+ *
+ * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
- /* ideas from Dana Jacobsen's
-  * https://github.com/danaj/Math-Prime-Util-GMP
-  */
+/* performs a variable number of rounds of Miller-Rabin
+ *
+ * Probability of error after t rounds is no more than
 
-int mp_prime_is_prime_ex(mp_int * a, int t, int *result, ltm_prime_callback cb, void *dat)
+ *
+ * Sets result to 1 if probably prime, 0 otherwise
+ */
+int mp_prime_is_prime (mp_int * a, int t, int *result)
 {
-  mp_int b;
-  int ix, err, res, abits, atests;
-  mp_digit maxp, r;
+  mp_int  b;
+  int     ix, err, res;
 
-  maxp = ltm_prime_tab[PRIME_SIZE-1];   /* max. predefined prime number */
-  *result = MP_NO;                      /* default */
+  /* default to no */
+  *result = MP_NO;
 
-  /* special case: a <= max_predef_prime */
-  if (mp_cmp_d(a, maxp+1) == MP_LT) {
-    /* test if a is equal to any of the first N primes */
-    for (ix = 0; ix < PRIME_SIZE; ix++) {
-      if (mp_cmp_d(a, ltm_prime_tab[ix]) == MP_EQ)                      { *result = MP_YES; return MP_OKAY; }
-    }
-    /* here it must be composite */
+  /* valid value of t? */
+  if (t <= 0 || t > PRIME_SIZE) {
+    return MP_VAL;
+  }
+
+  /* is the input equal to one of the primes in the table? */
+  for (ix = 0; ix < PRIME_SIZE; ix++) {
+      if (mp_cmp_d(a, ltm_prime_tab[ix]) == MP_EQ) {
+         *result = 1;
+         return MP_OKAY;
+      }
+  }
+
+  /* first perform trial division */
+  if ((err = mp_prime_is_divisible (a, &res)) != MP_OKAY) {
+    return err;
+  }
+
+  /* return if it was trivially divisible */
+  if (res == MP_YES) {
     return MP_OKAY;
   }
 
-  /* go through all known predefined primes - BEWARE: max_predef_prime should never go over 65536 */
-  for (ix = 0; ix < PRIME_SIZE; ix++) {
-    /* return YES if A < p[ix]*p[ix] */
-    if (mp_cmp_d(a, ltm_prime_tab[ix]*ltm_prime_tab[ix]) == MP_LT)      { *result = MP_YES; return MP_OKAY; }
-    /* return NO if A % p[ix] == 0 */
-    if ((err = mp_mod_d(a, ltm_prime_tab[ix], &r)) != MP_OKAY)          { return err; }
-    if (r == 0)                                                         { return MP_OKAY; }
+  /* now perform the miller-rabin rounds */
+  if ((err = mp_init (&b)) != MP_OKAY) {
+    return err;
   }
 
-  /* init b */
-  if ((err = mp_init(&b)) != MP_OKAY)                                   { return err; }
+  for (ix = 0; ix < t; ix++) {
+    /* set the prime */
+    mp_set (&b, ltm_prime_tab[ix]);
 
-  /* Miller Rabin with base 2 */
-  mp_set(&b, 2);
-  err = mp_prime_miller_rabin(a, &b, &res);
-  if (err != MP_OKAY)                                                   { goto LBL_B; }
-  if (res != MP_YES)                                                    { goto LBL_B; }
+    if ((err = mp_prime_miller_rabin (a, &b, &res)) != MP_OKAY) {
+      goto LBL_B;
+    }
 
-  /* Extra-Strong Lucas test */
-  err = mp_prime_lucas(a, 2, &res);
-  if (err != MP_OKAY)                                                   { goto LBL_B; }
-  if (res != MP_YES)                                                    { goto LBL_B; }
-
-  /* BPSW is deterministic below 2^64 */
-  if (mp_count_bits(a) <= 64)                                           { *result = MP_YES; return MP_OKAY; }
-
-  if (cb && dat) {
-    /* Miller Rabin with N random bases */
-    if (t > 0) {
-      atests = t;
-    }
-    else {
-      abits = mp_count_bits(a);
-      if      (abits <  80) atests = 5;
-      else if (abits < 105) atests = 4;
-      else if (abits < 160) atests = 3;
-      else if (abits < 413) atests = 2;
-      else                  atests = 1;
-    }
-    err = mp_prime_miller_rabin_random(a, atests, &res, cb, dat);
-    if (err != MP_OKAY)                                                 { goto LBL_B; }
-    if (res != MP_YES)                                                  { goto LBL_B; }
-  }
-  else {
-    /* Miller Rabin with first N primes */
-    if (t > 0) {
-      atests = t;
-    }
-    else {
-      abits = mp_count_bits(a);
-      atests = mp_prime_rabin_miller_trials(abits);
-    }
-    for (ix = 1; ix < atests; ix++) { /* skip ltm_prime_tab[0] (==2) as it was already tested) */
-      mp_set(&b, ltm_prime_tab[ix]);
-      if ((err = mp_prime_miller_rabin(a, &b, &res)) != MP_OKAY)          { goto LBL_B; }
-      if (res == MP_NO)                                                   { goto LBL_B; }
+    if (res == MP_NO) {
+      goto LBL_B;
     }
   }
 
-  /* passed all tests */
+  /* passed the test */
   *result = MP_YES;
-  err = MP_OKAY;
-
-LBL_B:
-  mp_clear(&b);
+LBL_B:mp_clear (&b);
   return err;
-}
-
-int mp_prime_is_prime(mp_int * a, int t, int *result)
-{
-  return mp_prime_is_prime_ex(a, t, result, NULL, NULL);
 }
 #endif
 
