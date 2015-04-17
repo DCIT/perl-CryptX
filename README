@@ -37,7 +37,8 @@ DESCRIPTION
         Crypt::Digest::RIPEMD160, Crypt::Digest::RIPEMD256,
         Crypt::Digest::RIPEMD320, Crypt::Digest::SHA1,
         Crypt::Digest::SHA224, Crypt::Digest::SHA256, Crypt::Digest::SHA384,
-        Crypt::Digest::SHA512, Crypt::Digest::Tiger192,
+        Crypt::Digest::SHA512, Crypt::Digest::SHA512_224,
+        Crypt::Digest::SHA512_256, Crypt::Digest::Tiger192,
         Crypt::Digest::Whirlpool
 
     *   Message Authentication Codes
