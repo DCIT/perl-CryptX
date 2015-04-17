@@ -20,6 +20,10 @@ lib/CryptX.c$
 \.bak$
 \.zip$
 \.gz$
+\.base$
+\.def$
+\.exp$
+\.lds$
 ^MYMETA\.json$
 ^MYMETA\.yml$
 ^Build$

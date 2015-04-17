@@ -1,6 +1,8 @@
 Changes for CryptX
 
 TODO:
+        - idea: rand_helper commit 0547bb02
+        - idea: mp_prime_lucas
         - disable LTC_FAST for gcc 3
         - add CCM interface for new-add-add-done mode
         - add SHA3
@@ -17,11 +19,11 @@ TODO:
           - t/pk_dsa.t crashes after: ok 28 - decrypt
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
 
-0.021_2 2015/04/17
+0.021_3 2015/04/17
         - new: SHA512_224 + SHA512_256
         - new: Crypt::PK::ECC now supports loading keys without explicit curve parameters (with just curve oid)
         - libtomcrypt updated to the latest develop branch, commit aeaa6d4a51 Apr 17 08:59:35 2015 +0200
-
+        - libtommath  updated to the latest develop branch, commit 0fd5e6c17f Dec 11 14:59:35 2014 +0100
         - documentation fixes
 
 0.021   2014/01/23
