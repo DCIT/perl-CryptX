@@ -11,7 +11,8 @@
 
 int mp_prime_lucas (mp_int * a, int level, int *result)
 {
-  fprintf(stderr, "XXX-DEBUG: mp_prime_lucas begin bits=%d, level=%d\n", mp_count_bits(a), level); /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+  /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+  /* fprintf(stderr, "XXX-DEBUG: mp_prime_lucas begin bits=%d, level=%d\n", mp_count_bits(a), level); */
 
   *result = MP_YES; /* XXX let's always pass */
   return MP_OKAY;
