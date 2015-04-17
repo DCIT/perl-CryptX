@@ -9,7 +9,7 @@
  * guarantee it works.
  */
 
-/* Tonelli–Shanks algorithm
+/* Tonelli-Shanks algorithm
  * https://en.wikipedia.org/wiki/Tonelli%E2%80%93Shanks_algorithm
  * https://gmplib.org/list-archives/gmp-discuss/2013-April/005300.html
  *
@@ -46,7 +46,7 @@ int mp_sqrtmod_prime(mp_int *n, mp_int *prime, mp_int *ret)
     goto cleanup;
   }
    
-  /* NOW: Tonelli–Shanks algorithm */
+  /* NOW: Tonelli-Shanks algorithm */
 
   /* factor out powers of 2 from prime-1, defining Q and S as: prime-1 = Q*2^S */
   if ((res = mp_copy(prime, &Q)) != MP_OKAY)                    goto cleanup;
