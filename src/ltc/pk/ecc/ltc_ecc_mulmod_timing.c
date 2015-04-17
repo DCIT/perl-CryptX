@@ -9,10 +9,8 @@
  * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 - 3x + b
+/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
  *
- * All curves taken from NIST recommendation paper of July 1999
- * Available at http://csrc.nist.gov/cryptval/dss.htm
  */
 #include "tomcrypt.h"
 
@@ -30,11 +28,12 @@
    @param k    The scalar to multiply by
    @param G    The base point
    @param R    [out] Destination for kG
+   @param a    ECC curve parameter a
    @param modulus  The modulus of the field the ECC curve is in
    @param map      Boolean whether to map back to affine or not (1==map, 0 == leave in projective)
    @return CRYPT_OK on success
 */
-int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *modulus, int map)
+int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, int map)
 {
    ecc_point *tG, *M[3];
    int        i, j, err;
@@ -91,7 +90,7 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *modulus, int map)
    if ((err = mp_copy(tG->y, M[0]->y)) != CRYPT_OK)                                  { goto done; }
    if ((err = mp_copy(tG->z, M[0]->z)) != CRYPT_OK)                                  { goto done; }
    /* M[1] == 2G */
-   if ((err = ltc_mp.ecc_ptdbl(tG, M[1], modulus, mp)) != CRYPT_OK)                  { goto done; }
+   if ((err = ltc_mp.ecc_ptdbl(tG, M[1], a, modulus, mp)) != CRYPT_OK)               { goto done; }
 
    /* setup sliding window */
    mode   = 0;
@@ -117,21 +116,21 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *modulus, int map)
 
       if (mode == 0 && i == 0) {
          /* dummy operations */
-         if ((err = ltc_mp.ecc_ptadd(M[0], M[1], M[2], modulus, mp)) != CRYPT_OK)    { goto done; }
-         if ((err = ltc_mp.ecc_ptdbl(M[1], M[2], modulus, mp)) != CRYPT_OK)          { goto done; }
+         if ((err = ltc_mp.ecc_ptadd(M[0], M[1], M[2], a, modulus, mp)) != CRYPT_OK) { goto done; }
+         if ((err = ltc_mp.ecc_ptdbl(M[1], M[2], a, modulus, mp)) != CRYPT_OK)       { goto done; }
          continue;
       }
 
       if (mode == 0 && i == 1) {
          mode = 1;
          /* dummy operations */
-         if ((err = ltc_mp.ecc_ptadd(M[0], M[1], M[2], modulus, mp)) != CRYPT_OK)    { goto done; }
-         if ((err = ltc_mp.ecc_ptdbl(M[1], M[2], modulus, mp)) != CRYPT_OK)          { goto done; }
+         if ((err = ltc_mp.ecc_ptadd(M[0], M[1], M[2], a, modulus, mp)) != CRYPT_OK) { goto done; }
+         if ((err = ltc_mp.ecc_ptdbl(M[1], M[2], a, modulus, mp)) != CRYPT_OK)       { goto done; }
          continue;
       }
 
-      if ((err = ltc_mp.ecc_ptadd(M[0], M[1], M[i^1], modulus, mp)) != CRYPT_OK)     { goto done; }
-      if ((err = ltc_mp.ecc_ptdbl(M[i], M[i], modulus, mp)) != CRYPT_OK)             { goto done; }
+      if ((err = ltc_mp.ecc_ptadd(M[0], M[1], M[i^1], a, modulus, mp)) != CRYPT_OK)  { goto done; }
+      if ((err = ltc_mp.ecc_ptdbl(M[i], M[i], a, modulus, mp)) != CRYPT_OK)          { goto done; }
    }
 
    /* copy result out */

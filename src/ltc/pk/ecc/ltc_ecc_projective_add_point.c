@@ -9,10 +9,8 @@
  * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 - 3x + b
+/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
  *
- * All curves taken from NIST recommendation paper of July 1999
- * Available at http://csrc.nist.gov/cryptval/dss.htm
  */
 #include "tomcrypt.h"
 
@@ -32,7 +30,7 @@
    @param mp       The "b" value from montgomery_setup()
    @return CRYPT_OK on success
 */
-int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void *modulus, void *mp)
+int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void *a, void *modulus, void *mp)
 {
    void  *t1, *t2, *x, *y, *z;
    int    err;
@@ -54,7 +52,7 @@ int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void 
         (Q->z != NULL && mp_cmp(P->z, Q->z) == LTC_MP_EQ) &&
         (mp_cmp(P->y, Q->y) == LTC_MP_EQ || mp_cmp(P->y, t1) == LTC_MP_EQ)) {
         mp_clear_multi(t1, t2, x, y, z, NULL);
-        return ltc_ecc_projective_dbl_point(P, R, modulus, mp);
+        return ltc_ecc_projective_dbl_point(P, R, a, modulus, mp);
    }
 
    if ((err = mp_copy(P->x, x)) != CRYPT_OK)                                   { goto done; }
