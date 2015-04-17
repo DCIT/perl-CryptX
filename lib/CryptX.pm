@@ -3,7 +3,7 @@ package CryptX;
 use strict;
 use warnings ;
 
-our $VERSION = '0.021';
+our $VERSION = '0.021_2';
 
 require XSLoader;
 XSLoader::load('CryptX', $VERSION);
@@ -42,7 +42,7 @@ L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt:
 
 L<Crypt::Digest::CHAES>, L<Crypt::Digest::MD2>, L<Crypt::Digest::MD4>, L<Crypt::Digest::MD5>, L<Crypt::Digest::RIPEMD128>, L<Crypt::Digest::RIPEMD160>,
 L<Crypt::Digest::RIPEMD256>, L<Crypt::Digest::RIPEMD320>, L<Crypt::Digest::SHA1>, L<Crypt::Digest::SHA224>, L<Crypt::Digest::SHA256>, L<Crypt::Digest::SHA384>,
-L<Crypt::Digest::SHA512>, L<Crypt::Digest::Tiger192>, L<Crypt::Digest::Whirlpool>
+L<Crypt::Digest::SHA512>, L<Crypt::Digest::SHA512_224>, L<Crypt::Digest::SHA512_256>, L<Crypt::Digest::Tiger192>, L<Crypt::Digest::Whirlpool>
 
 =item * Message Authentication Codes
 

@@ -277,6 +277,8 @@ BOOT:
     if(register_hash(&sha256_desc)==-1)        { croak("FATAL: cannot register_hash sha256"); }
     if(register_hash(&sha384_desc)==-1)        { croak("FATAL: cannot register_hash sha384"); }
     if(register_hash(&sha512_desc)==-1)        { croak("FATAL: cannot register_hash sha512"); }
+    if(register_hash(&sha512_224_desc)==-1)    { croak("FATAL: cannot register_hash sha512_224"); }
+    if(register_hash(&sha512_256_desc)==-1)    { croak("FATAL: cannot register_hash sha512_256"); }
     if(register_hash(&tiger_desc)==-1)         { croak("FATAL: cannot register_hash tiger"); }
     if(register_hash(&whirlpool_desc)==-1)     { croak("FATAL: cannot register_hash whirlpool"); }
     /* --- */

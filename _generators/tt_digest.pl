@@ -11,6 +11,7 @@ use Data::Dump 'pp';
 use File::Glob qw(bsd_glob);
 
 sub equal_files {
+  return 0 unless -f $_[0] && -f $_[1];
   my $d1 = sha1_hex(read_file(shift, binmode => ':raw'));
   my $d2 = sha1_hex(read_file(shift, binmode => ':raw'));
   return $d1 eq $d2;
@@ -35,6 +36,8 @@ my %list = (
         SHA256     => { ltc=>'sha256',    info=>'Hash function SHA-256 [size: 256 bits]', urls=>['http://en.wikipedia.org/wiki/SHA-2'] },
         SHA384     => { ltc=>'sha384',    info=>'Hash function SHA-384 [size: 384 bits]', urls=>['http://en.wikipedia.org/wiki/SHA-2'] },
         SHA512     => { ltc=>'sha512',    info=>'Hash function SHA-512 [size: 512 bits]', urls=>['http://en.wikipedia.org/wiki/SHA-2'] },
+        SHA512_224 => { ltc=>'sha512_224',info=>'Hash function SHA-512/224 [size: 224 bits]', urls=>['http://en.wikipedia.org/wiki/SHA-2'] },
+        SHA512_256 => { ltc=>'sha512_256',info=>'Hash function SHA-512/256 [size: 256 bits]', urls=>['http://en.wikipedia.org/wiki/SHA-2'] },
         Tiger192   => { ltc=>'tiger',     info=>'Hash function Tiger-192 [size: 192 bits]', urls=>['http://en.wikipedia.org/wiki/Tiger_(cryptography)'] },
         Whirlpool  => { ltc=>'whirlpool', info=>'Hash function Whirlpool [size: 512 bits]', urls=>['http://en.wikipedia.org/wiki/Whirlpool_(cryptography)'] },
 );
@@ -81,7 +84,7 @@ for my $n (keys %list) {
 
     my $t_out = catfile($outdir_t, "digest_".lc($n).".t");
     my $t_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
-    $t_tt->process("$FindBin::Bin/Digest.t.tt", $data, "$t_out.$$") || die $t_tt->error(), "\n";
+    $t_tt->process("$FindBin::Bin/Digest.t.tt", $data, "$t_out.$$", {binmode=>1}) || die $t_tt->error(), "\n";
     copy("$t_out.$$", $t_out) and warn("Writting '$t_out'\n") unless equal_files("$t_out.$$", $t_out);
     unlink "$t_out.$$";
   }
@@ -89,7 +92,7 @@ for my $n (keys %list) {
   if ($outdir_l) {
     my $pm_out = catfile($outdir_l, "Crypt", "Digest", "$n.pm");
     my $pm_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
-    $pm_tt->process("$FindBin::Bin/Digest.pm.tt", $data, $pm_out) || die $pm_tt->error(), "\n";
+    $pm_tt->process("$FindBin::Bin/Digest.pm.tt", $data, $pm_out, {binmode=>1}) || die $pm_tt->error(), "\n";
   }
 
 }

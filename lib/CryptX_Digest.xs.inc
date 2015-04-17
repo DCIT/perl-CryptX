@@ -62,7 +62,7 @@ add(Crypt::Digest self, ...)
             if (rv != CRYPT_OK) croak("FATAL: digest process failed: %s", error_to_string(rv));
           }
         }
-        XPUSHs(sv_2mortal(newSVsv(ST(0)))); /* XXX-HACK returning 'self' */
+        XPUSHs(ST(0)); /* return self */
     }
 
 SV *

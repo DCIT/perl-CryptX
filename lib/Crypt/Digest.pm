@@ -33,6 +33,8 @@ sub _trans_digest_name {
     RIPEMD256 => 'rmd256',
     RIPEMD320 => 'rmd320',
     TIGER192  => 'tiger',
+    SHA512_224=> 'sha512-224',
+    SHA512_256=> 'sha512-256',
   );
   $name =~ s/^Crypt::Digest:://i;
   return $trans{uc($name)} if defined $trans{uc($name)};
@@ -172,7 +174,7 @@ Please note that all functions take as its first argument the algoritm name, sup
 
  'CHAES', 'MD2', 'MD4', 'MD5', 'RIPEMD128', 'RIPEMD160',
  'RIPEMD256', 'RIPEMD320', 'SHA1', 'SHA224', 'SHA256',
- 'SHA384', 'SHA512', 'Tiger192', 'Whirlpool'
+ 'SHA384', 'SHA512', 'SHA512_224', 'SHA512_256', 'Tiger192', 'Whirlpool'
 
  (simply any <FUNCNAME> for which there is Crypt::Digest::<FUNCNAME> module)
 
@@ -250,8 +252,8 @@ Constructor, returns a reference to the digest object.
 
  $d = Crypt::Digest->new($name);
  # $name could be: 'CHAES', 'MD2', 'MD4', 'MD5', 'RIPEMD128', 'RIPEMD160',
- #                 'RIPEMD256', 'RIPEMD320', 'SHA1', 'SHA224', 'SHA256',
- #                 'SHA384', 'SHA512', 'Tiger192', 'Whirlpool'
+ #                 'RIPEMD256', 'RIPEMD320', 'SHA1', 'SHA224', 'SHA256', 'SHA384',
+ #                 'SHA512', 'SHA512_224', 'SHA512_256', 'Tiger192', 'Whirlpool'
  #
  # simply any <FUNCNAME> for which there is Crypt::Digest::<FUNCNAME> module
 
