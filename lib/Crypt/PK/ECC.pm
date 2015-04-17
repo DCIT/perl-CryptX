@@ -16,7 +16,8 @@ use MIME::Base64 qw(encode_base64 decode_base64);
 
 our %curve = (
         ### http://www.ecc-brainpool.org/download/Domain-parameters.pdf (v1.0 19.10.2005)
-        brainpoolP160r1 => {
+        brainpoolp160r1 => {
+            oid      => '1.3.36.3.3.2.8.1.1.1',
             prime    => "E95E4A5F737059DC60DFC7AD95B3D8139515620F",
             A        => "340E7BE2A280EB74E2BE61BADA745D97E8F7C300",
             B        => "1E589A8595423412134FAA2DBDEC95C8D8675E58",
@@ -25,7 +26,8 @@ our %curve = (
             order    => "E95E4A5F737059DC60DF5991D45029409E60FC09",
             cofactor => 1,
         },
-        brainpoolP192r1 => {
+        brainpoolp192r1 => {
+            oid      => '1.3.36.3.3.2.8.1.1.3',
             prime    => "C302F41D932A36CDA7A3463093D18DB78FCE476DE1A86297",
             A        => "6A91174076B1E0E19C39C031FE8685C1CAE040E5C69A28EF",
             B        => "469A28EF7C28CCA3DC721D044F4496BCCA7EF4146FBF25C9",
@@ -34,7 +36,8 @@ our %curve = (
             order    => "C302F41D932A36CDA7A3462F9E9E916B5BE8F1029AC4ACC1",
             cofactor => 1,
         },
-        brainpoolP224r1 => {
+        brainpoolp224r1 => {
+            oid      => '1.3.36.3.3.2.8.1.1.5',
             prime    => "D7C134AA264366862A18302575D1D787B09F075797DA89F57EC8C0FF",
             A        => "68A5E62CA9CE6C1C299803A6C1530B514E182AD8B0042A59CAD29F43",
             B        => "2580F63CCFE44138870713B1A92369E33E2135D266DBB372386C400B",
@@ -43,7 +46,8 @@ our %curve = (
             order    => "D7C134AA264366862A18302575D0FB98D116BC4B6DDEBCA3A5A7939F",
             cofactor => 1,
         },
-        brainpoolP256r1 => {
+        brainpoolp256r1 => {
+            oid      => '1.3.36.3.3.2.8.1.1.7',
             prime    => "A9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5377",
             A        => "7D5A0975FC2C3057EEF67530417AFFE7FB8055C126DC5C6CE94A4B44F330B5D9",
             B        => "26DC5C6CE94A4B44F330B5D9BBD77CBF958416295CF7E1CE6BCCDC18FF8C07B6",
@@ -52,7 +56,8 @@ our %curve = (
             order    => "A9FB57DBA1EEA9BC3E660A909D838D718C397AA3B561A6F7901E0E82974856A7",
             cofactor => 1,
         },
-        brainpoolP320r1 => {
+        brainpoolp320r1 => {
+            oid      => '1.3.36.3.3.2.8.1.1.9',
             prime    => "D35E472036BC4FB7E13C785ED201E065F98FCFA6F6F40DEF4F92B9EC7893EC28FCD412B1F1B32E27",
             A        => "3EE30B568FBAB0F883CCEBD46D3F3BB8A2A73513F5EB79DA66190EB085FFA9F492F375A97D860EB4",
             B        => "520883949DFDBC42D3AD198640688A6FE13F41349554B49ACC31DCCD884539816F5EB4AC8FB1F1A6",
@@ -61,7 +66,8 @@ our %curve = (
             order    => "D35E472036BC4FB7E13C785ED201E065F98FCFA5B68F12A32D482EC7EE8658E98691555B44C59311",
             cofactor => 1,
         },
-        brainpoolP384r1 => {
+        brainpoolp384r1 => {
+            oid      => '1.3.36.3.3.2.8.1.1.11',
             prime    => "8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B412B1DA197FB71123ACD3A729901D1A71874700133107EC53",
             A        => "7BC382C63D8C150C3C72080ACE05AFA0C2BEA28E4FB22787139165EFBA91F90F8AA5814A503AD4EB04A8C7DD22CE2826",
             B        => "04A8C7DD22CE28268B39B55416F0447C2FB77DE107DCD2A62E880EA53EEB62D57CB4390295DBC9943AB78696FA504C11",
@@ -70,7 +76,8 @@ our %curve = (
             order    => "8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B31F166E6CAC0425A7CF3AB6AF6B7FC3103B883202E9046565",
             cofactor => 1,
         },
-        brainpoolP512r1 => {
+        brainpoolp512r1 => {
+            oid      => '1.3.36.3.3.2.8.1.1.13',
             prime    => "AADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA703308717D4D9B009BC66842AECDA12AE6A380E62881FF2F2D82C68528AA6056583A48F3",
             A        => "7830A3318B603B89E2327145AC234CC594CBDD8D3DF91610A83441CAEA9863BC2DED5D5AA8253AA10A2EF1C98B9AC8B57F1117A72BF2C7B9E7C1AC4D77FC94CA",
             B        => "3DF91610A83441CAEA9863BC2DED5D5AA8253AA10A2EF1C98B9AC8B57F1117A72BF2C7B9E7C1AC4D77FC94CADC083E67984050B75EBAE5DD2809BD638016F723",
@@ -81,6 +88,7 @@ our %curve = (
         },
         ### http://www.secg.org/collateral/sec2_final.pdf (September 20, 2000 - Version 1.0)
         secp112r1 => {
+            oid      => '1.3.132.0.6',
             prime    => "DB7C2ABF62E35E668076BEAD208B",
             A        => "DB7C2ABF62E35E668076BEAD2088",
             B        => "659EF8BA043916EEDE8911702B22",
@@ -90,6 +98,7 @@ our %curve = (
             cofactor => 1,
         },
         secp112r2 => {
+            oid      => '1.3.132.0.7',
             prime    => "DB7C2ABF62E35E668076BEAD208B",
             A        => "6127C24C05F38A0AAAF65C0EF02C",
             B        => "51DEF1815DB5ED74FCC34C85D709",
@@ -99,6 +108,7 @@ our %curve = (
             cofactor => 4,
         },
         secp128r1 => {
+            oid      => '1.3.132.0.28',
             prime    => "FFFFFFFDFFFFFFFFFFFFFFFFFFFFFFFF",
             A        => "FFFFFFFDFFFFFFFFFFFFFFFFFFFFFFFC",
             B        => "E87579C11079F43DD824993C2CEE5ED3",
@@ -108,6 +118,7 @@ our %curve = (
             cofactor => 1,
         },
         secp128r2 => {
+            oid      => '1.3.132.0.29',
             prime    => "FFFFFFFDFFFFFFFFFFFFFFFFFFFFFFFF",
             A        => "D6031998D1B3BBFEBF59CC9BBFF9AEE1",
             B        => "5EEEFCA380D02919DC2C6558BB6D8A5D",
@@ -117,6 +128,7 @@ our %curve = (
             cofactor => 4,
         },
         secp160k1 => {
+            oid      => '1.3.132.0.9',
             prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73",
             A        => "0000000000000000000000000000000000000000",
             B        => "0000000000000000000000000000000000000007",
@@ -126,6 +138,7 @@ our %curve = (
             cofactor => 1,
         },
         secp160r1 => {
+            oid      => '1.3.132.0.8',
             prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF",
             A        => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFC",
             B        => "1C97BEFC54BD7A8B65ACF89F81D4D4ADC565FA45",
@@ -135,6 +148,7 @@ our %curve = (
             cofactor => 1,
         },
         secp160r2 => {
+            oid      => '1.3.132.0.30',
             prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73",
             A        => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC70",
             B        => "B4E134D3FB59EB8BAB57274904664D5AF50388BA",
@@ -144,6 +158,7 @@ our %curve = (
             cofactor => 1,
         },
         secp192k1 => {
+            oid      => '1.3.132.0.31',
             prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFEE37",
             A        => "000000000000000000000000000000000000000000000000",
             B        => "000000000000000000000000000000000000000000000003",
@@ -152,7 +167,8 @@ our %curve = (
             order    => "FFFFFFFFFFFFFFFFFFFFFFFE26F2FC170F69466A74DEFD8D",
             cofactor => 1,
         },
-        secp192r1 => {
+        secp192r1 => { # == NIST P-192, X9.62 prime192v1
+            oid      => '1.2.840.10045.3.1.1',
             prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF",
             A        => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC",
             B        => "64210519E59C80E70FA7E9AB72243049FEB8DEECC146B9B1",
@@ -162,6 +178,7 @@ our %curve = (
             cofactor => 1,
         },
         secp224k1 => {
+            oid      => '1.3.132.0.32',
             prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFE56D",
             A        => "00000000000000000000000000000000000000000000000000000000",
             B        => "00000000000000000000000000000000000000000000000000000005",
@@ -170,7 +187,8 @@ our %curve = (
             order    => "010000000000000000000000000001DCE8D2EC6184CAF0A971769FB1F7",
             cofactor => 1,
         },
-        secp224r1 => {
+        secp224r1 => { # == NIST P-224
+            oid      => '1.3.132.0.33',
             prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001",
             A        => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFE",
             B        => "B4050A850C04B3ABF54132565044B0B7D7BFD8BA270B39432355FFB4",
@@ -180,6 +198,7 @@ our %curve = (
             cofactor => 1,
         },
         secp256k1 => {
+            oid      => '1.3.132.0.10',
             prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F",
             A        => "0000000000000000000000000000000000000000000000000000000000000000",
             B        => "0000000000000000000000000000000000000000000000000000000000000007",
@@ -188,7 +207,8 @@ our %curve = (
             order    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141",
             cofactor => 1,
         },
-        secp256r1 => {
+        secp256r1 => { # == NIST P-256, X9.62 prime256v1
+            oid      => '1.2.840.10045.3.1.7',
             prime    => "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF",
             A        => "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC",
             B        => "5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B",
@@ -197,7 +217,8 @@ our %curve = (
             order    => "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551",
             cofactor => 1,
         },
-        secp384r1 => {
+        secp384r1 => { # == NIST P-384
+            oid      => '1.3.132.0.34',
             prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF",
             A        => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFC",
             B        => "B3312FA7E23EE7E4988E056BE3F82D19181D9C6EFE8141120314088F5013875AC656398D8A2ED19D2A85C8EDD3EC2AEF",
@@ -206,7 +227,8 @@ our %curve = (
             order    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC7634D81F4372DDF581A0DB248B0A77AECEC196ACCC52973",
             cofactor => 1,
         },
-        secp521r1 => {
+        secp521r1 => { # == NIST P-521
+            oid      => '1.3.132.0.35',
             prime    => "01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
             A        => "01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC",
             B        => "0051953EB9618E1C9A1F929A21A0B68540EEA2DA725B99B315F3B8B489918EF109E156193951EC7E937B1652C0BD3BB1BF073573DF883D2C34F1EF451FD46B503F00",
@@ -214,9 +236,10 @@ our %curve = (
             Gy       => "011839296A789A3BC0045C8A5FB42C7D1BD998F54449579B446817AFBD17273E662C97EE72995EF42640C550B9013FAD0761353C7086A272C24088BE94769FD16650",
             order    => "01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA51868783BF2F966B7FCC0148F709A5D03BB5C9B8899C47AEBB6FB71E91386409",
             cofactor => 1
-         },
-         ### http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf (July 2013)
-        nistp192 => {
+        },
+        ### http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf (July 2013)
+        nistp192 => { # == secp192r1, X9.62 prime192v1
+            oid      => '1.2.840.10045.3.1.1',
             prime    => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF',
             A        => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC',
             B        => '64210519E59C80E70FA7E9AB72243049FEB8DEECC146B9B1',
@@ -225,7 +248,8 @@ our %curve = (
             order    => 'FFFFFFFFFFFFFFFFFFFFFFFF99DEF836146BC9B1B4D22831',
             cofactor => 1,
         },
-        nistp224 => {
+        nistp224 => { # == secp224r1
+            oid      => '1.3.132.0.33',
             prime    => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001',
             A        => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFE',
             B        => 'B4050A850C04B3ABF54132565044B0B7D7BFD8BA270B39432355FFB4',
@@ -234,7 +258,8 @@ our %curve = (
             order    => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFF16A2E0B8F03E13DD29455C5C2A3D',
             cofactor => 1,
         },
-        nistp256 => {
+        nistp256 => { # == secp256r1, X9.62 prime256v1
+            oid      => '1.2.840.10045.3.1.7',
             prime    => 'FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF',
             A        => 'FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC',
             B        => '5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B',
@@ -243,7 +268,8 @@ our %curve = (
             order    => 'FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551',
             cofactor => 1,
         },
-        nistp384 => {
+        nistp384 => { # == secp384r1
+            oid      => '1.3.132.0.34',
             prime    => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF',
             A        => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFC',
             B        => 'B3312FA7E23EE7E4988E056BE3F82D19181D9C6EFE8141120314088F5013875AC656398D8A2ED19D2A85C8EDD3EC2AEF',
@@ -252,7 +278,8 @@ our %curve = (
             order    => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC7634D81F4372DDF581A0DB248B0A77AECEC196ACCC52973',
             cofactor => 1,
         },
-        nistp521 => {
+        nistp521 => { # == secp521r1
+            oid      => '1.3.132.0.35',
             prime    => '1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
             A        => '1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC',
             B        => '051953EB9618E1C9A1F929A21A0B68540EEA2DA725B99B315F3B8B489918EF109E156193951EC7E937B1652C0BD3BB1BF073573DF883D2C34F1EF451FD46B503F00',
@@ -262,7 +289,8 @@ our %curve = (
             cofactor => 1,
         },
         ### ANS X9.62 elliptic curves - http://www.flexiprovider.de/CurvesGfpX962.html
-        prime192v1 => {
+        prime192v1 => { # == secp192r1, NIST P-192
+            oid      => '1.2.840.10045.3.1.1',
             prime    => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF',
             A        => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC',
             B        => '64210519E59C80E70FA7E9AB72243049FEB8DEECC146B9B1',
@@ -272,6 +300,7 @@ our %curve = (
             cofactor => 1,
         },
         prime192v2 => {
+            oid      => '1.2.840.10045.3.1.2',
             prime    => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF',
             A        => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC',
             B        => 'CC22D6DFB95C6B25E49C0D6364A4E5980C393AA21668D953',
@@ -281,6 +310,7 @@ our %curve = (
             cofactor => 1
         },
         prime192v3 => {
+            oid      => '1.2.840.10045.3.1.3',
             prime    => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF',
             A        => 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC',
             B        => '22123DC2395A05CAA7423DAECCC94760A7D462256BD56916',
@@ -290,6 +320,7 @@ our %curve = (
             cofactor => 1,
         },
         prime239v1 => {
+            oid      => '1.2.840.10045.3.1.4',
             prime    => '7FFFFFFFFFFFFFFFFFFFFFFF7FFFFFFFFFFF8000000000007FFFFFFFFFFF',
             A        => '7FFFFFFFFFFFFFFFFFFFFFFF7FFFFFFFFFFF8000000000007FFFFFFFFFFC',
             B        => '6B016C3BDCF18941D0D654921475CA71A9DB2FB27D1D37796185C2942C0A',
@@ -299,6 +330,7 @@ our %curve = (
             cofactor => 1,
         },
         prime239v2 => {
+            oid      => '1.2.840.10045.3.1.5',
             prime    => '7FFFFFFFFFFFFFFFFFFFFFFF7FFFFFFFFFFF8000000000007FFFFFFFFFFF',
             A        => '7FFFFFFFFFFFFFFFFFFFFFFF7FFFFFFFFFFF8000000000007FFFFFFFFFFC',
             B        => '617FAB6832576CBBFED50D99F0249C3FEE58B94BA0038C7AE84C8C832F2C',
@@ -308,6 +340,7 @@ our %curve = (
             cofactor => 1,
         },
         prime239v3 => {
+            oid      => '1.2.840.10045.3.1.6',
             prime    => '7FFFFFFFFFFFFFFFFFFFFFFF7FFFFFFFFFFF8000000000007FFFFFFFFFFF',
             A        => '7FFFFFFFFFFFFFFFFFFFFFFF7FFFFFFFFFFF8000000000007FFFFFFFFFFC',
             B        => '255705FA2A306654B1F4CB03D6A750A30C250102D4988717D9BA15AB6D3E',
@@ -316,12 +349,13 @@ our %curve = (
             order    => '7FFFFFFFFFFFFFFFFFFFFFFF7FFFFF975DEB41B3A6057C3C432146526551',
             cofactor => 1,
         },
-        prime256v1 => {
+        prime256v1 => { # == secp256r1, NIST P-256
+            oid      => '1.2.840.10045.3.1.7',
             prime    => 'FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF',
             A        => 'FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC',
             B        => '5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B',
             Gx       => '6B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C296',
-            Gy       => '4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5',
+            Gy       => '4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5',
             order    => 'FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551',
             cofactor => 1,
         },
@@ -543,13 +577,13 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 The following pre-defined C<$curve_name> values are supported:
 
  # curves from http://www.ecc-brainpool.org/download/Domain-parameters.pdf
- 'brainpoolP160r1'
- 'brainpoolP192r1'
- 'brainpoolP224r1'
- 'brainpoolP256r1'
- 'brainpoolP320r1'
- 'brainpoolP384r1'
- 'brainpoolP512r1'
+ 'brainpoolp160r1'
+ 'brainpoolp192r1'
+ 'brainpoolp224r1'
+ 'brainpoolp256r1'
+ 'brainpoolp320r1'
+ 'brainpoolp384r1'
+ 'brainpoolp512r1'
  # curves from http://www.secg.org/collateral/sec2_final.pdf
  'secp112r1'
  'secp112r2'
@@ -559,27 +593,27 @@ The following pre-defined C<$curve_name> values are supported:
  'secp160r1'
  'secp160r2'
  'secp192k1'
- 'secp192r1'
+ 'secp192r1'   ... same as nistp192, prime192v1
  'secp224k1'
- 'secp224r1'
- 'secp256k1' ... used by Bitcoin
- 'secp256r1'
- 'secp384r1'
- 'secp521r1'
+ 'secp224r1'   ... same as nistp224
+ 'secp256k1'   ... used by Bitcoin
+ 'secp256r1'   ... same as nistp256, prime256v1
+ 'secp384r1'   ... same as nistp384
+ 'secp521r1'   ... same as nistp521
  #curves from http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
- 'nistp192'
- 'nistp224'
- 'nistp256'
- 'nistp384'
- 'nistp521'
+ 'nistp192'    ... same as secp192r1, prime192v1
+ 'nistp224'    ... same as secp224r1
+ 'nistp256'    ... same as secp256r1, prime256v1
+ 'nistp384'    ... same as secp384r1
+ 'nistp521'    ... same as secp521r1
  # curves from ANS X9.62
- 'prime192v1'
+ 'prime192v1'   ... same as nistp192, secp192r1
  'prime192v2'
  'prime192v3'
  'prime239v1'
  'prime239v2'
  'prime239v3'
- 'prime256v1' 
+ 'prime256v1'   ... same as nistp256, secp256r1
 
 Using custom curve parameters:
 
@@ -890,8 +924,6 @@ Generate keys:
  openssl ec -param_enc explicit -in eckey.priv.pem -out eckey.privc.der -outform der -conv_form compressed
  openssl ec -param_enc explicit -in eckey.priv.pem -out eckey.pubc.der -outform der -pubout -conv_form compressed
  openssl ec -param_enc explicit -in eckey.priv.pem -passout pass:secret -des3 -out eckey-passwd.priv.pem
-
-B<IMPORTANT:> it is necessary to use C<-param_enc explicit> option
 
 Load keys (Perl code):
 

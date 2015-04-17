@@ -116,12 +116,20 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   is(unpack("H*",$ss1), unpack("H*",$ss2), 'shared_secret');
 }
 
-{
-  my $k = Crypt::PK::ECC->new('t/data/openssl_ec-short.pem');
-  ok($k, 'load openssl_ec-short.pem');
-  ok($k->is_private, 'is_private openssl_ec-short.pem');
-  is($k->size, 32, 'size');
-  is(uc($k->key2hash->{pub_x}), 'C068B754877A4AB328A569BAC6D464A81B17E527D2D652572ABB11BDA3572D50', 'key2hash');
+for my $priv (qw/openssl_ec-short.pem openssl_ec-short.der/) {
+  my $k = Crypt::PK::ECC->new("t/data/$priv");
+  ok($k, "load $priv");
+  ok($k->is_private, "is_private $priv");
+  is($k->size, 32, "size $priv");
+  is(uc($k->key2hash->{pub_x}), 'A01532A3C0900053DE60FBEFEFCCA58793301598D308B41E6F4E364E388C2711', "key2hash $priv");
+}
+
+for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
+  my $k = Crypt::PK::ECC->new("t/data/$pub");
+  ok($k, "load $pub");
+  ok(!$k->is_private, "is_private $pub");
+  is($k->size, 32, "$pub size");
+  is(uc($k->key2hash->{pub_x}), 'A01532A3C0900053DE60FBEFEFCCA58793301598D308B41E6F4E364E388C2711', "key2hash $pub");
 }
 
 done_testing;
