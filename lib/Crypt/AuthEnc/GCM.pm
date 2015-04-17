@@ -162,8 +162,8 @@ Can be called B<after> all C<iv_add> calls but before the first C<encrypt_add> o
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Mode::CCM|Crypt::Mode::CCM>, L<Crypt::Mode::GCM|Crypt::Mode::GCM>, L<Crypt::Mode::OCB|Crypt::Mode::OCB>
+=item * L<CryptX|CryptX>, L<Crypt::Mode::CCM|Crypt::Mode::CCM>, L<Crypt::Mode::EAX|Crypt::Mode::EAX>, L<Crypt::Mode::OCB|Crypt::Mode::OCB>
 
-=item * L<https://en.wikipedia.org/wiki/EAX_mode|https://en.wikipedia.org/wiki/EAX_mode>
+=item * L<https://en.wikipedia.org/wiki/Galois/Counter_Mode>
 
 =back
