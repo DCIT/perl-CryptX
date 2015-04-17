@@ -7,7 +7,6 @@ use File::Spec::Functions qw(catfile catdir splitpath);
 use File::Slurp;
 use File::Find qw(find);
 
-
 sub replace_text {
   my ($dir, $oldstring, $newstring) = @_;
   my @files;
@@ -38,19 +37,15 @@ sub remove_files {
 my $srcdir = catdir($FindBin::Bin, "..", "src/ltc");
 
 my @lines = read_file("$srcdir/headers/tomcrypt_custom.h");
-@lines = map { s|^([\t\s]*)#define LTC_YARROW_AES \d+|$1#define LTC_YARROW_AES 3|; $_ } @lines;
 @lines = map { s|^([\t\s]*)#define LTC_NO_PROTOTYPES|$1/* #define LTC_NO_PROTOTYPES */|; $_ } @lines;
-@lines = map { s|^([\t\s]*)/\* #define LTM_DESC \*/|#define LTM_DESC|;$_ } @lines;
 write_file("$srcdir/headers/tomcrypt_custom.h", {binmode => ':raw'}, @lines);
 
 my @rename2inc = (qw[
         ciphers/aes/aes_tab.c
         ciphers/twofish/twofish_tab.c
-        hashes/sha2/sha224.c
-        hashes/sha2/sha384.c
+        ciphers/safer/safer_tab.c
         hashes/whirl/whirltab.c
         prngs/sober128tab.c
-        pk/dh/dh_sys.c
 ]);
 
 for my $f (@rename2inc) {
