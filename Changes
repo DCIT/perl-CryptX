@@ -1,13 +1,10 @@
 Changes for CryptX
 
 TODO:
-- Crypt::Mode::CBC;
-+ use Crypt::Mode::CBC;
-
-wrong see also:
-GCM -> https://en.wikipedia.org/wiki/EAX_mode
-    -> Crypt::Mode::CCM, Crypt::Mode::GCM, Crypt::Mode::OCB (all AuthEnc)
-
+        - disable LTC_FAST for gcc 3
+        - add CCM interface for new-add-add-done mode
+        - add SHA3
+        - switch yarrow > fortuna for Crypt::PK::*
         - RSA|DSA|ECC: verify_key($level) (basic check + extented primality test)
         - better primality testing: http://questhub.io/realm/perl/quest/519032ee1088c76505000035
         - DSA: generate_key($p, $q, $g), generate_key(\$dsa_params_der), generate_key($dsa_params_file)
@@ -19,6 +16,13 @@ GCM -> https://en.wikipedia.org/wiki/EAX_mode
           - t/pk_rsa.t crashes after: ok 32 - verify_hash
           - t/pk_dsa.t crashes after: ok 28 - decrypt
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
+
+0.021_2 2015/04/17
+        - new: SHA512_224 + SHA512_256
+        - new: Crypt::PK::ECC now supports loading keys without explicit curve parameters (with just curve oid)
+        - libtomcrypt updated to the latest develop branch, commit aeaa6d4a51 Apr 17 08:59:35 2015 +0200
+
+        - documentation fixes
 
 0.021   2014/01/23
         - fixed asm(...) related compiler failures
