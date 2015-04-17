@@ -20,7 +20,7 @@ Crypt::Mode::[%orig_name%] - [%info%]
 
 =head1 SYNOPSIS
 
-   Crypt::Mode::[%orig_name%];
+   use Crypt::Mode::[%orig_name%];
    my $m = Crypt::Mode::[%orig_name%]->new('AES');
 
    #(en|de)crypt at once

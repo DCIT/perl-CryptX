@@ -99,7 +99,7 @@ for my $n (keys %list) {
 
     my $t_out = catfile($outdir_t, "cipher_".lc($n).".t");
     my $t_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
-    $t_tt->process("$FindBin::Bin/Cipher.t.tt", $data, "$t_out.$$") || die $t_tt->error(), "\n";
+    $t_tt->process("$FindBin::Bin/Cipher.t.tt", $data, "$t_out.$$", {binmode=>1}) || die $t_tt->error(), "\n";
     copy("$t_out.$$", $t_out) and warn("Writting '$t_out'\n") unless equal_files("$t_out.$$", $t_out);
     unlink "$t_out.$$";
   }
@@ -107,7 +107,7 @@ for my $n (keys %list) {
   if ($outdir_l) {
     my $pm_out = catfile($outdir_l, "Crypt", "Cipher", "$n.pm");
     my $pm_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
-    $pm_tt->process("$FindBin::Bin/Cipher.pm.tt", $data, "$pm_out.$$") || die $pm_tt->error(), "\n";
+    $pm_tt->process("$FindBin::Bin/Cipher.pm.tt", $data, "$pm_out.$$", {binmode=>1}) || die $pm_tt->error(), "\n";
     copy("$pm_out.$$", $pm_out) and warn("Writting '$pm_out'\n") unless equal_files("$pm_out.$$", $pm_out);
     unlink "$pm_out.$$";
   }

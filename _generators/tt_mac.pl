@@ -77,7 +77,7 @@ for my $n (keys %list) {
 
     my $t_out = catfile($outdir_t, "mac_".lc($n).".t");
     my $t_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
-    $t_tt->process("$FindBin::Bin/Mac.t.tt", $data, "$t_out.$$") || die $t_tt->error(), "\n";
+    $t_tt->process("$FindBin::Bin/Mac.t.tt", $data, "$t_out.$$", {binmode=>1}) || die $t_tt->error(), "\n";
     copy("$t_out.$$", $t_out) and warn("Writting '$t_out'\n") unless equal_files("$t_out.$$", $t_out);
     unlink "$t_out.$$";
   }
@@ -85,13 +85,13 @@ for my $n (keys %list) {
   if ($outdir_l) {
     my $pm_out = catfile($outdir_l, "Crypt", "Mac", "$n.pm");
     my $pm_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
-    $pm_tt->process("$FindBin::Bin/Mac.pm.tt", $data, "$pm_out.$$") || die $pm_tt->error(), "\n";
+    $pm_tt->process("$FindBin::Bin/Mac.pm.tt", $data, "$pm_out.$$", {binmode=>1}) || die $pm_tt->error(), "\n";
     copy("$pm_out.$$", $pm_out) and warn("Writting '$pm_out'\n") unless equal_files("$pm_out.$$", $pm_out);
     unlink "$pm_out.$$";
 
     my $xs_out = catfile($outdir_l, "CryptX_Mac_$n.xs.inc");
     my $xs_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
-    $xs_tt->process("$FindBin::Bin/Mac.xs.inc.tt", $data, "$xs_out.$$") || die $xs_tt->error(), "\n";
+    $xs_tt->process("$FindBin::Bin/Mac.xs.inc.tt", $data, "$xs_out.$$", {binmode=>1}) || die $xs_tt->error(), "\n";
     copy("$xs_out.$$", $xs_out) and warn("Writting '$xs_out'\n") unless equal_files("$xs_out.$$", $xs_out);
     unlink "$xs_out.$$";
   }
