@@ -1,39 +1,41 @@
 ###########################
 TYPEMAP
 
-Crypt::Cipher          T_PTROBJ
-Crypt::Digest          T_PTROBJ
+Crypt::Cipher           T_PTROBJ
+Crypt::Digest           T_PTROBJ
 
-Crypt::AuthEnc::CCM    T_PTROBJ
-Crypt::AuthEnc::EAX    T_PTROBJ
-Crypt::AuthEnc::GCM    T_PTROBJ
-Crypt::AuthEnc::OCB    T_PTROBJ
+Crypt::AuthEnc::CCM     T_PTROBJ
+Crypt::AuthEnc::EAX     T_PTROBJ
+Crypt::AuthEnc::GCM     T_PTROBJ
+Crypt::AuthEnc::OCB     T_PTROBJ
 
-Crypt::Mac::F9         T_PTROBJ
-Crypt::Mac::HMAC       T_PTROBJ
-Crypt::Mac::OMAC       T_PTROBJ
-Crypt::Mac::Pelican    T_PTROBJ
-Crypt::Mac::PMAC       T_PTROBJ
-Crypt::Mac::XCBC       T_PTROBJ
+Crypt::Mac::F9          T_PTROBJ
+Crypt::Mac::HMAC        T_PTROBJ
+Crypt::Mac::OMAC        T_PTROBJ
+Crypt::Mac::Pelican     T_PTROBJ
+Crypt::Mac::PMAC        T_PTROBJ
+Crypt::Mac::XCBC        T_PTROBJ
 
-Crypt::Mode::CBC       T_PTROBJ
-Crypt::Mode::CFB       T_PTROBJ
-Crypt::Mode::CTR       T_PTROBJ
-Crypt::Mode::ECB       T_PTROBJ
-Crypt::Mode::F8        T_PTROBJ
-Crypt::Mode::LRW       T_PTROBJ
-Crypt::Mode::OFB       T_PTROBJ
-Crypt::Mode::XTS       T_PTROBJ
+Crypt::Mode::CBC        T_PTROBJ
+Crypt::Mode::CFB        T_PTROBJ
+Crypt::Mode::CTR        T_PTROBJ
+Crypt::Mode::ECB        T_PTROBJ
+Crypt::Mode::F8         T_PTROBJ
+Crypt::Mode::LRW        T_PTROBJ
+Crypt::Mode::OFB        T_PTROBJ
+Crypt::Mode::XTS        T_PTROBJ
 
-Crypt::PRNG            T_PTROBJ
+Crypt::PRNG             T_PTROBJ
 
-Crypt::PK::RSA         T_PTROBJ
-Crypt::PK::DSA         T_PTROBJ
-Crypt::PK::ECC         T_PTROBJ
-Crypt::PK::DH          T_PTROBJ
+Crypt::PK::RSA          T_PTROBJ
+Crypt::PK::DSA          T_PTROBJ
+Crypt::PK::ECC          T_PTROBJ
+Crypt::PK::DH           T_PTROBJ
 
 #pointer with automatic NULL<->undef conversion on input/output
-unsigned char *		T_PTR_OR_NULL
+unsigned char *         T_PTR_OR_NULL
+char *                  T_STR_OR_NULL
+const char *            T_STR_OR_NULL
 
 #perl 5.6.2 hack
 STRLEN                  T_UV
@@ -42,11 +44,18 @@ STRLEN                  T_UV
 INPUT
 
 T_PTR_OR_NULL
-	$var = (SvIOK($arg)) ? INT2PTR($type,SvIVX($arg)) : NULL;
+        $var = (SvIOK($arg)) ? INT2PTR($type,SvIVX($arg)) : NULL;
+
+T_STR_OR_NULL
+        $var = (SvOK($arg)) ? SvPV_nolen($arg) : NULL; 
 
 ###########################
 OUTPUT
 
 T_PTR_OR_NULL
-	if ($var==NULL) XSRETURN_UNDEF;
-	else sv_setiv($arg, PTR2IV($var));
+        if ($var==NULL) XSRETURN_UNDEF;
+        else sv_setiv($arg, PTR2IV($var));
+
+T_STR_OR_NULL
+        if ($var==NULL) XSRETURN_UNDEF;
+        else sv_setpv($arg, $var);

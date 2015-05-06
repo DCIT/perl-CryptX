@@ -12,7 +12,8 @@ use CryptX;
 use Crypt::PK;
 use Crypt::Digest 'digest_data';
 use Carp;
-use MIME::Base64 qw(encode_base64 decode_base64);
+use MIME::Base64 qw(encode_base64 decode_base64 encode_base64url decode_base64url);
+use JSON qw(encode_json decode_json);
 
 our %curve = (
         ### http://www.ecc-brainpool.org/download/Domain-parameters.pdf (v1.0 19.10.2005)
@@ -361,6 +362,68 @@ our %curve = (
         },
 );
 
+my %jwkcrv = (
+        'P-192'   => 'secp192r1',
+        'P-224'   => 'secp224r1',
+        'P-256'   => 'secp256r1',
+        'P-384'   => 'secp384r1',
+        'P-521'   => 'secp521r1',
+);
+
+sub _import_hex {
+  my ($self, $x, $y, $k, $crv) = @_;
+  my $p = $curve{$crv}{prime};
+  croak "FATAL: invalid or unknown curve" if !$p;
+  $p =~ s/^0+//;
+  my $hex_size = length($p) % 2 ? length($p) + 1 : length($p);
+  if ($k) {
+    $k =~ /^0+/;
+    croak "FATAL: too long private key (k)" if length($k) > $hex_size;
+    my $priv_hex = "0" x ($hex_size - length($k)) . $k;
+    return $self->import_key_raw(pack("H*", $priv_hex), $crv);
+  }
+  elsif ($x && $y) {
+    $x =~ /^0+/;
+    $y =~ /^0+/;
+    croak "FATAL: too long public key (x)" if length($x) > $hex_size;
+    croak "FATAL: too long public key (y)" if length($y) > $hex_size;
+    my $pub_hex = "04" . ("0" x ($hex_size - length($x))) . $x . ("0" x ($hex_size - length($y))) . $y;
+    return $self->import_key_raw(pack("H*", $pub_hex), $crv);
+  }
+}
+
+sub _curve_name_lookup {
+  my ($self, $key) = @_;
+
+  return $key->{curve_name} if $key->{curve_name} && exists $curve{$key->{curve_name}};
+
+  my $A        = $key->{curve_A}        or return;
+  my $B        = $key->{curve_B}        or return;
+  my $Gx       = $key->{curve_Gx}       or return;
+  my $Gy       = $key->{curve_Gy}       or return;
+  my $order    = $key->{curve_order}    or return;
+  my $prime    = $key->{curve_prime}    or return;
+  my $cofactor = $key->{curve_cofactor} or return;
+  $A     =~ s/^0+//;
+  $B     =~ s/^0+//;
+  $Gx    =~ s/^0+//;
+  $Gy    =~ s/^0+//;
+  $order =~ s/^0+//;
+  $prime =~ s/^0+//;
+
+  for my $k (sort keys %curve) {
+    (my $c_A       = $curve{$k}{A}       ) =~ s/^0+//;
+    (my $c_B       = $curve{$k}{B}       ) =~ s/^0+//;
+    (my $c_Gx      = $curve{$k}{Gx}      ) =~ s/^0+//;
+    (my $c_Gy      = $curve{$k}{Gy}      ) =~ s/^0+//;
+    (my $c_order   = $curve{$k}{order}   ) =~ s/^0+//;
+    (my $c_prime   = $curve{$k}{prime}   ) =~ s/^0+//;
+    my $c_cofactor = $curve{$k}{cofactor};
+    return $k if $A eq $c_A && $B eq $c_B && $Gx eq $c_Gx && $Gy eq $c_Gy &&
+                 $order eq $c_order && $prime eq $c_prime && $cofactor == $c_cofactor;
+  }
+}
+
 sub new {
   my ($class, $f, $p) = @_;
   my $self = _new();
@@ -372,13 +435,67 @@ sub export_key_pem {
   my ($self, $type, $password, $cipher) = @_;
   my $key = $self->export_key_der($type||'');
   return unless $key;
-  return Crypt::PK::_asn1_to_pem($key, "EC PRIVATE KEY", $password, $cipher) if $type eq 'private';  
+  return Crypt::PK::_asn1_to_pem($key, "EC PRIVATE KEY", $password, $cipher) if $type eq 'private';
   return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public' || $type eq 'public_compressed';
+}
+
+sub export_key_jwk {
+  my ($self, $type) = @_;
+  my $kh = $self->key2hash;
+  my $curve = $self->_curve_name_lookup($kh);
+  $curve = 'P-192' if $curve =~ /(secp192r1|nistp192|prime192v1)/;
+  $curve = 'P-224' if $curve =~ /(secp224r1|nistp224)/;
+  $curve = 'P-256' if $curve =~ /(secp256r1|nistp256|prime256v1)/;
+  $curve = 'P-384' if $curve =~ /(secp384r1|nistp384)/;
+  $curve = 'P-521' if $curve =~ /(secp521r1|nistp521)/;
+  if ($type eq 'private') {
+    return unless $kh->{pub_x} && $kh->{pub_y} && $kh->{k};
+    for (qw/pub_x pub_y k/) {
+      $kh->{$_} = "0$kh->{$_}" if length($kh->{$_}) % 2;
+    }
+    # NOTE: x + y are not necessary in privkey
+    # but they are used in https://tools.ietf.org/html/draft-ietf-jose-json-web-key-41#appendix-A.2
+    return sprintf '{"kty":"EC","crv":"%s","x":"%s","y":"%s","d":"%s"}',
+                        $curve,
+                        encode_base64url(pack("H*", $kh->{pub_x})),
+                        encode_base64url(pack("H*", $kh->{pub_y})),
+                        encode_base64url(pack("H*", $kh->{k}));
+  }
+  elsif ($type eq 'public') {
+    return unless $kh->{pub_x} && $kh->{pub_y};
+    for (qw/pub_x pub_y/) {
+      $kh->{$_} = "0$kh->{$_}" if length($kh->{$_}) % 2;
+    }
+    return sprintf '{"kty":"EC","crv":"%s","x":"%s","y":"%s"}',
+                        $curve,
+                        encode_base64url(pack("H*", $kh->{pub_x})),
+                        encode_base64url(pack("H*", $kh->{pub_y}));
+  }
 }
 
 sub import_key {
   my ($self, $key, $password) = @_;
   croak "FATAL: undefined key" unless $key;
+
+  # special case
+  if (ref($key) eq 'HASH') {
+    if (($key->{pub_x} && $key->{pub_y}) || $key->{k}) {
+      # hash exported via key2hash
+      my $curve = $self->_curve_name_lookup($key);
+      croak "FATAL: invalid or unknown curve" if !$curve;
+      return $self->_import_hex($key->{pub_x}, $key->{pub_y}, $key->{k}, $curve);
+    }
+    if ($key->{crv} && $key->{kty} && $key->{kty} eq "EC" && ($key->{d} || ($key->{x} && $key->{y}))) {
+      # hash with items corresponding to JSON Web Key (JWK)
+      for (qw/x y d/) {
+        $key->{$_} = eval { unpack("H*", decode_base64url($key->{$_})) } if exists $key->{$_};
+      }
+      if (my $curve = $jwkcrv{$key->{crv}}) {
+        return $self->_import_hex($key->{x}, $key->{y}, $key->{d}, $curve);
+      }
+    }
+  }
+
   my $data;
   if (ref($key) eq 'SCALAR') {
     $data = $$key;
@@ -389,11 +506,48 @@ sub import_key {
   else {
     croak "FATAL: non-existing file '$key'";
   }
-  if ($data && $data =~ /-----BEGIN (EC PRIVATE|EC PUBLIC|PRIVATE|PUBLIC) KEY-----(.*?)-----END/sg) {
-    $data = Crypt::PK::_pem_to_asn1($data, $password);
+  croak "FATAL: invalid key data" unless $data;
+
+  if ($data =~ /-----BEGIN (EC PRIVATE|EC PUBLIC|PUBLIC) KEY-----(.*?)-----END/sg) {
+    $data = Crypt::PK::_pem_to_binary($data, $password);
+    return $self->_import($data);
   }
-  croak "FATAL: invalid key format" unless $data;
-  return $self->_import($data);
+  elsif ($data =~ /-----BEGIN PRIVATE KEY-----(.*?)-----END/sg) {
+    $data = Crypt::PK::_pem_to_binary($data, $password);
+    return $self->_import_pkcs8($data);
+  }
+  elsif ($data =~ /-----BEGIN ENCRYPTED PRIVATE KEY-----(.*?)-----END/sg) {
+    # XXX-TODO: pkcs#8 encrypted private key
+    croak "FATAL: encrypted pkcs8 EC private keys are not supported";
+  }
+  elsif ($data =~ /^\s*(\{.*?\})\s*$/sg) {
+    # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
+    my $json =  $1;
+    my $h = eval { decode_json($json) };
+    if ($h && $h->{kty} eq "EC") {
+      for (qw/x y d/) {
+        $h->{$_} = eval { unpack("H*", decode_base64url($h->{$_})) } if exists $h->{$_};
+      }
+      if (my $curve = $jwkcrv{$h->{crv}}) {
+        return $self->_import_hex($h->{x}, $h->{y}, $h->{d}, $curve);
+      }
+    }
+  }
+  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
+    $data = Crypt::PK::_pem_to_binary($data);
+    my ($typ, $xxx, $pubkey) = Crypt::PK::_ssh_parse($data);
+    return $self->import_key_raw($pubkey, $2) if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
+  }
+  elsif ($data =~ /(ecdsa-\S+)\s+(\S+)/) {
+    $data = decode_base64($2);
+    my ($typ, $xxx, $pubkey) = Crypt::PK::_ssh_parse($data);
+    return $self->import_key_raw($pubkey, $2) if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
+  }
+  else {
+    my $rv = eval { $self->_import($data) } || eval { $self->_import_pkcs8($data) };
+    return $rv if $rv;
+  }
+  croak "FATAL: invalid or unsupported EC key format";
 }
 
 sub encrypt {
@@ -911,7 +1065,7 @@ Use keys by OpenSSL:
  openssl ec -in eckey.priv.pem -text
  openssl ec -in eckey-passwd.priv.pem -text -inform pem -passin pass:secret
  openssl ec -in eckey.pub.der -pubin -text -inform der
- openssl ec -in eckey.pub.pem -pubin -text 
+ openssl ec -in eckey.pub.pem -pubin -text
 
 =head2 Keys generated by OpenSSL
 

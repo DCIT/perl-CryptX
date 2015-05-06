@@ -99,7 +99,7 @@ int ecc_import_raw(const unsigned char *in, unsigned long inlen, ecc_key *key, l
       return CRYPT_MEM;
    }
 
-   if (inlen == (unsigned long)dp->size) {
+   if (inlen <= (unsigned long)dp->size) {
      /* read PRIVATE key */
      type = PK_PRIVATE;
      size = inlen;

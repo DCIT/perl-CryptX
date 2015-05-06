@@ -12,7 +12,8 @@ use CryptX;
 use Crypt::PK;
 use Crypt::Digest 'digest_data';
 use Carp;
-use MIME::Base64 qw(encode_base64 decode_base64);
+use MIME::Base64 qw(encode_base64 decode_base64 encode_base64url decode_base64url);
+use JSON qw(encode_json decode_json);
 
 sub new {
   my ($class, $f, $p) = @_;
@@ -26,20 +27,65 @@ sub export_key_pem {
   my $key = $self->export_key_der($type||'');
   return unless $key;
 
-  # PKCS#1 RSAPrivateKey** (PEM header: BEGIN RSA PRIVATE KEY)
-  # PKCS#8 PrivateKeyInfo* (PEM header: BEGIN PRIVATE KEY)
+  # PKCS#1 RSAPrivateKey**           (PEM header: BEGIN RSA PRIVATE KEY)
+  # PKCS#8 PrivateKeyInfo*           (PEM header: BEGIN PRIVATE KEY)
   # PKCS#8 EncryptedPrivateKeyInfo** (PEM header: BEGIN ENCRYPTED PRIVATE KEY)
   return Crypt::PK::_asn1_to_pem($key, "RSA PRIVATE KEY", $password, $cipher) if $type eq 'private';
 
   # PKCS#1 RSAPublicKey* (PEM header: BEGIN RSA PUBLIC KEY)
   return Crypt::PK::_asn1_to_pem($key, "RSA PUBLIC KEY") if $type eq 'public';
   # X.509 SubjectPublicKeyInfo** (PEM header: BEGIN PUBLIC KEY)
-  return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public_x509';  
+  return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public_x509';
+}
+
+sub export_key_jwk {
+  my ($self, $type) = @_;
+  my $kh = $self->key2hash;
+  if ($type eq 'private') {
+    return unless $kh->{N} && $kh->{e} && $kh->{d} && $kh->{p} && $kh->{q} && $kh->{dP} && $kh->{dQ} && $kh->{qP};
+    for (qw/N e d p q dP dQ qP/) {
+      $kh->{$_} = "0$kh->{$_}" if length($kh->{$_}) % 2;
+    }
+    return sprintf '{"kty":"RSA","n":"%s","e":"%s","d":"%s","p":"%s","q":"%s","dp":"%s","dq":"%s","qi":"%s"}',
+                        encode_base64url(pack("H*", $kh->{N})),
+                        encode_base64url(pack("H*", $kh->{e})),
+                        encode_base64url(pack("H*", $kh->{d})),
+                        encode_base64url(pack("H*", $kh->{p})),
+                        encode_base64url(pack("H*", $kh->{q})),
+                        encode_base64url(pack("H*", $kh->{dP})),
+                        encode_base64url(pack("H*", $kh->{dQ})),
+                        encode_base64url(pack("H*", $kh->{qP}));
+  }
+  elsif ($type eq 'public') {
+    return unless $kh->{N} && $kh->{e};
+    for (qw/N e/) {
+      $kh->{$_} = "0$kh->{$_}" if length($kh->{$_}) % 2;
+    }
+    return sprintf '{"kty":"RSA","n":"%s","e":"%s"}',
+                        encode_base64url(pack("H*", $kh->{N})),
+                        encode_base64url(pack("H*", $kh->{e}));
+  }
 }
 
 sub import_key {
   my ($self, $key, $password) = @_;
   croak "FATAL: undefined key" unless $key;
+
+  # special case
+  if (ref($key) eq 'HASH') {
+    if ($key->{N} && $key->{e}) {
+      # hash exported via key2hash
+      return $self->_import_hex($key->{N}, $key->{e}, $key->{d}, $key->{p}, $key->{q}, $key->{dP}, $key->{dQ}, $key->{qP});
+    }
+    if ($key->{n} && $key->{e} && $key->{kty} && $key->{kty} eq "RSA") {
+      # hash with items corresponding to JSON Web Key (JWK)
+      for (qw/n e d p q dp dq qi/) {
+        $key->{$_} = eval { unpack("H*", decode_base64url($key->{$_})) } if exists $key->{$_};
+      }
+      return $self->_import_hex($key->{n}, $key->{e}, $key->{d}, $key->{p}, $key->{q}, $key->{dp}, $key->{dq}, $key->{qi});
+    }
+  }
+
   my $data;
   if (ref($key) eq 'SCALAR') {
     $data = $$key;
@@ -50,11 +96,52 @@ sub import_key {
   else {
     croak "FATAL: non-existing file '$key'";
   }
-  if ($data && $data =~ /-----BEGIN (RSA PRIVATE|RSA PUBLIC|PRIVATE|PUBLIC|ENCRYPTED PRIVATE) KEY-----(.*?)-----END/sg) {
-    $data = Crypt::PK::_pem_to_asn1($data, $password);
+  croak "FATAL: invalid key data" unless $data;
+
+  if ($data =~ /-----BEGIN (RSA PRIVATE|RSA PUBLIC|PUBLIC) KEY-----(.*?)-----END/sg) {
+    # PKCS#1 RSAPublicKey        (PEM header: BEGIN RSA PUBLIC KEY)
+    # PKCS#1 RSAPrivateKey       (PEM header: BEGIN RSA PRIVATE KEY)
+    # X.509 SubjectPublicKeyInfo (PEM header: BEGIN PUBLIC KEY)
+    $data = Crypt::PK::_pem_to_binary($data, $password);
+    return $self->_import($data) if $data;
   }
-  croak "FATAL: invalid key format" unless $data;
-  return $self->_import($data);
+  elsif ($data =~ /-----BEGIN PRIVATE KEY-----(.*?)-----END/sg) {
+    # PKCS#8 PrivateKeyInfo      (PEM header: BEGIN PRIVATE KEY)
+    $data = Crypt::PK::_pem_to_binary($data, $password);
+    return $self->_import_pkcs8($data) if $data;
+  }
+  elsif ($data =~ /-----BEGIN ENCRYPTED PRIVATE KEY-----(.*?)-----END/sg) {
+    # XXX-TODO: PKCS#8 EncryptedPrivateKeyInfo (PEM header: BEGIN ENCRYPTED PRIVATE KEY)
+    croak "FATAL: encrypted pkcs8 RSA private keys are not supported";
+  }
+  elsif ($data =~ /^\s*(\{.*?\})\s*$/sg) {
+    # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
+    my $json =  $1;
+    my $h = eval { decode_json($json) };
+    if ($h && $h->{kty} eq "RSA") {
+      for (qw/n e d p q dp dq qi/) {
+        $h->{$_} = eval { unpack("H*", decode_base64url($h->{$_})) } if exists $h->{$_};
+      }
+      return $self->_import_hex($h->{n}, $h->{e}, $h->{d}, $h->{p}, $h->{q}, $h->{dp}, $h->{dp}, $h->{qi}) if $h->{n} && $h->{e};
+    }
+  }
+  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
+    $data = Crypt::PK::_pem_to_binary($data);
+    my ($typ, $N, $e) = Crypt::PK::_ssh_parse($data);
+    return $self->_import_hex(unpack("H*", $e), unpack("H*", $N)) if $typ && $e && $N && $typ eq 'ssh-rsa';
+  }
+  elsif ($data =~ /ssh-rsa\s+(\S+)/) {
+  $data = decode_base64($1);
+    my ($typ, $N, $e) = Crypt::PK::_ssh_parse($data);
+    return $self->_import_hex(unpack("H*", $e), unpack("H*", $N)) if $typ && $e && $N && $typ eq 'ssh-rsa';
+  }
+  else {
+    # DER format
+    my $rv = eval { $self->_import($data) } || eval { $self->_import_pkcs8($data) };
+    return $rv if $rv;
+  }
+
+  croak "FATAL: invalid or unsupported RSA key format";
 }
 
 sub encrypt {
@@ -604,7 +691,7 @@ Use keys by OpenSSL:
  openssl rsa -in rsakey.priv.pem -text
  openssl rsa -in rsakey-passwd.priv.pem -text -inform pem -passin pass:secret
  openssl rsa -in rsakey.pub.der -pubin -text -inform der
- openssl rsa -in rsakey.pub.pem -pubin -text 
+ openssl rsa -in rsakey.pub.pem -pubin -text
 
 =head2 Keys generated by OpenSSL
 

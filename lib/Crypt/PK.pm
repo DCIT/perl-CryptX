@@ -51,13 +51,21 @@ sub _password2key {
   return substr($key, 0, $klen);
 }
 
-sub _pem_to_asn1 {
+sub _pem_to_binary {
   my ($data, $password) = @_;
 
-  my ($begin, $object, $headers, $content, $end) = $data =~ m/(-----BEGIN ([^\r\n\-]+KEY)-----)\r?\n(.*?\r?\n\r?\n)?(.+)(-----END [^\r\n\-]*-----)/s;
+  my ($begin, $obj1, $content, $end, $obj2) = $data =~ m/(----[- ]BEGIN ([^\r\n\-]+KEY)[ -]----)(.*?)(----[- ]END ([^\r\n\-]+)[ -]----)/s;
+  return undef unless $content;
+  $content =~ s/^\s+//sg;
+  $content =~ s/\s+$//sg;
+  $content =~ s/\r\n/\n/sg;  # CR-LF >> LF
+  $content =~ s/\r/\n/sg;    # CR >> LF
+  $content =~ s/\\\n//sg;    # \ + LF
 
-  return $content unless $content;
-  $content = decode_base64($content);
+  my ($headers, undef, $b64) = $content =~ /^(([^:]+:.*?\n)*)(.*)$/s;
+  return undef unless $b64;
+  my $binary = decode_base64($b64);
+  return undef unless $binary;
 
   my ($ptype, $cipher_name, $iv_hex);
   for my $h (split /\n/, ($headers||'')) {
@@ -71,10 +79,10 @@ sub _pem_to_asn1 {
     my $iv = pack("H*", $iv_hex);
     my ($mode, $klen) = _name2mode($cipher_name);
     my $key = _password2key($password, $klen, $iv, 'MD5');
-    return $mode->decrypt($content, $key, $iv);
+    return $mode->decrypt($binary, $key, $iv);
   }
 
-  return $content;
+  return $binary;
 }
 
 sub _asn1_to_pem {
@@ -99,6 +107,21 @@ sub _asn1_to_pem {
   my @l = encode_base64($content, "") =~ /.{1,64}/g;
   $rv .= join("\n", @l) . "\n";
   $rv .= "-----END $header_name-----\n";
+}
+
+sub _ssh_parse {
+  my $raw = shift;
+  my $len = length($raw);
+  my @parts = ();
+  my $i = 0;
+  while (1) {
+    last unless $i + 4 <= $len;
+    my $part_len = unpack("N4", substr($raw, $i, 4));
+    last unless $i + 4 + $part_len <= $len;
+    push @parts, substr($raw, $i + 4, $part_len);
+    $i += $part_len + 4;
+  }
+  return @parts;
 }
 
 1;

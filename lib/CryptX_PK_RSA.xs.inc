@@ -46,6 +46,32 @@ _import(Crypt::PK::RSA self, SV * key_data)
         XPUSHs(ST(0)); /* return self */
     }
 
+void
+_import_pkcs8(Crypt::PK::RSA self, SV * key_data)
+    PPCODE:
+    {
+        int rv;
+        unsigned char *data=NULL;
+        STRLEN data_len=0;
+
+        data = (unsigned char *)SvPVbyte(key_data, data_len);
+        if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
+        rv = rsa_import_pkcs8(data, (unsigned long)data_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: rsa_import_pkcs8 failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
+    }
+
+void
+_import_hex(Crypt::PK::RSA self, char *N, char *e, char *d=NULL, char *p=NULL, char *q=NULL, char *dP=NULL, char *dQ=NULL, char *qP=NULL)
+    PPCODE:
+    {
+        int rv;
+        if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
+        rv = rsa_import_hex(N, e, d, p, q, dP, dQ, qP, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: rsa_import_hex failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
+    }
+
 int
 is_private(Crypt::PK::RSA self)
     CODE:

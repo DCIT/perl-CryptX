@@ -45,6 +45,17 @@ _import(Crypt::PK::DSA self, SV * key_data)
         XPUSHs(ST(0)); /* return self */
     }
 
+void
+_import_hex(Crypt::PK::DSA self, char *p, char *q, char *g, char *x, char *y)
+    PPCODE:
+    {
+        int rv;
+        if (self->key.type != -1) { dsa_free(&self->key); self->key.type = -1; }
+        rv = dsa_import_hex(p, q, g, x, y, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: dsa_import_hex failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
+    }
+
 int
 is_private(Crypt::PK::DSA self)
     CODE:
