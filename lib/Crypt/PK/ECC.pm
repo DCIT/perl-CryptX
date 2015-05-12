@@ -536,12 +536,12 @@ sub import_key {
   elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
     $data = Crypt::PK::_pem_to_binary($data);
     my ($typ, $xxx, $pubkey) = Crypt::PK::_ssh_parse($data);
-    return $self->import_key_raw($pubkey, $2) if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
+    return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
   }
   elsif ($data =~ /(ecdsa-\S+)\s+(\S+)/) {
     $data = decode_base64($2);
     my ($typ, $xxx, $pubkey) = Crypt::PK::_ssh_parse($data);
-    return $self->import_key_raw($pubkey, $2) if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
+    return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
   }
   else {
     my $rv = eval { $self->_import($data) } || eval { $self->_import_pkcs8($data) };
