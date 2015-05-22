@@ -56,12 +56,12 @@ int ecc_import_pkcs8(unsigned char *in, unsigned long inlen, ecc_key *key, ltc_e
   if (err != CRYPT_OK) { return err; }
 
   /* try to decode encrypted priv key */
-  LTC_SET_ASN1(key_seq_e, 0, LTC_ASN1_OCTET_STRING, buf1, 9000UL);
+  LTC_SET_ASN1(key_seq_e, 0, LTC_ASN1_OCTET_STRING, buf1, buf1len);
   LTC_SET_ASN1(key_seq_e, 1, LTC_ASN1_INTEGER, iter, 1UL);
   LTC_SET_ASN1(alg_seq_e, 0, LTC_ASN1_OBJECT_IDENTIFIER, oid, 16UL);
   LTC_SET_ASN1(alg_seq_e, 1, LTC_ASN1_SEQUENCE, key_seq_e, 2UL);
   LTC_SET_ASN1(top_seq_e, 0, LTC_ASN1_SEQUENCE, alg_seq_e, 2UL);
-  LTC_SET_ASN1(top_seq_e, 1, LTC_ASN1_OCTET_STRING, buf2, 9000UL);
+  LTC_SET_ASN1(top_seq_e, 1, LTC_ASN1_OCTET_STRING, buf2, buf2len);
   err=der_decode_sequence(in, inlen, top_seq_e, 2UL);
   if (err == CRYPT_OK) {
     /* unsigned long icount = mp_get_int(iter); */

@@ -535,12 +535,12 @@ sub import_key {
   }
   elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
     $data = Crypt::PK::_pem_to_binary($data);
-    my ($typ, $xxx, $pubkey) = Crypt::PK::_ssh_parse($data);
+    my ($typ, $skip, $pubkey) = Crypt::PK::_ssh_parse($data);
     return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
   }
   elsif ($data =~ /(ecdsa-\S+)\s+(\S+)/) {
     $data = decode_base64($2);
-    my ($typ, $xxx, $pubkey) = Crypt::PK::_ssh_parse($data);
+    my ($typ, $skip, $pubkey) = Crypt::PK::_ssh_parse($data);
     return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
   }
   else {
@@ -707,17 +707,17 @@ Supports elliptic curves C<y^2 = x^3 + a*x + b> over prime fields C<Fp = Z/pZ> (
 
 =head2 new
 
-  my $pk = Crypt::PK::ECC->new();
-  #or
-  my $pk = Crypt::PK::ECC->new($priv_or_pub_key_filename);
-  #or
-  my $pk = Crypt::PK::ECC->new(\$buffer_containing_priv_or_pub_key);
+ my $pk = Crypt::PK::ECC->new();
+ #or
+ my $pk = Crypt::PK::ECC->new($priv_or_pub_key_filename);
+ #or
+ my $pk = Crypt::PK::ECC->new(\$buffer_containing_priv_or_pub_key);
 
 Support for password protected PEM keys
 
-  my $pk = Crypt::PK::ECC->new($priv_pem_key_filename, $password);
-  #or
-  my $pk = Crypt::PK::ECC->new(\$buffer_containing_priv_pem_key, $password);
+ my $pk = Crypt::PK::ECC->new($priv_pem_key_filename, $password);
+ #or
+ my $pk = Crypt::PK::ECC->new(\$buffer_containing_priv_pem_key, $password);
 
 =head2 generate_key
 
@@ -785,15 +785,178 @@ See L<http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf>, L<http://www.s
 
 Loads private or public key in DER or PEM format.
 
-  $pk->import_key($filename);
-  #or
-  $pk->import_key(\$buffer_containing_key);
+ $pk->import_key($filename);
+ #or
+ $pk->import_key(\$buffer_containing_key);
 
-Support for password protected PEM keys
+Support for password protected PEM keys:
 
-  $pk->import_key($pem_filename, $password);
-  #or
-  $pk->import_key(\$buffer_containing_pem_key, $password);
+ $pk->import_key($filename, $password);
+ #or
+ $pk->import_key(\$buffer_containing_key, $password);
+
+Loading private or public keys form perl hash:
+
+ $pk->import_key($hashref);
+
+ # the $hashref is either a key exported via key2hash
+ $pk->import_key({
+      curve_A        => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFC",
+      curve_B        => "1C97BEFC54BD7A8B65ACF89F81D4D4ADC565FA45",
+      curve_bits     => 160,
+      curve_bytes    => 20,
+      curve_cofactor => 1,
+      curve_Gx       => "4A96B5688EF573284664698968C38BB913CBFC82",
+      curve_Gy       => "23A628553168947D59DCC912042351377AC5FB32",
+      curve_order    => "0100000000000000000001F4C8F927AED3CA752257",
+      curve_prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF",
+      k              => "B0EE84A749FE95DF997E33B8F333E12101E824C3",
+      pub_x          => "5AE1ACE3ED0AEA9707CE5C0BCE014F6A2F15023A",
+      pub_y          => "895D57E992D0A15F88D6680B27B701F615FCDC0F",
+ });
+
+ # or with the curve defined just by name
+ $pk->import_key({
+      curve_name => "secp160r1",
+      k          => "B0EE84A749FE95DF997E33B8F333E12101E824C3",
+      pub_x      => "5AE1ACE3ED0AEA9707CE5C0BCE014F6A2F15023A",
+      pub_y      => "895D57E992D0A15F88D6680B27B701F615FCDC0F",
+ });
+
+ # or a hash with items corresponding to JWK (JSON Web Key)
+ $pk->import_key({
+       kty => "EC",
+       crv => "P-256",
+       x   => "MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
+       y   => "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
+       d   => "870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE",
+ });
+
+Supported key formats:
+
+=over
+
+=item * EC private keys with with all curve parameters
+
+ -----BEGIN EC PRIVATE KEY-----
+ MIIB+gIBAQQwCKEAcA6cIt6CGfyLKm57LyXWv2PgTjydrHSbvhDJTOl+7bzUW8DS
+ rgSdtSPONPq1oIIBWzCCAVcCAQEwPAYHKoZIzj0BAQIxAP//////////////////
+ ///////////////////////+/////wAAAAAAAAAA/////zB7BDD/////////////
+ /////////////////////////////v////8AAAAAAAAAAP////wEMLMxL6fiPufk
+ mI4Fa+P4LRkYHZxu/oFBEgMUCI9QE4daxlY5jYou0Z0qhcjt0+wq7wMVAKM1kmqj
+ GaJ6HQCJamdzpIJ6zaxzBGEEqofKIr6LBTeOscce8yCtdG4dO2KLp5uYWfdB4IJU
+ KjhVAvJdv1UpbDpUXjhydgq3NhfeSpYmLG9dnpi/kpLcKfj0Hb0omhR86doxE7Xw
+ uMAKYLHOHX6BnXpDHXyQ6g5fAjEA////////////////////////////////x2NN
+ gfQ3Ld9YGg2ySLCneuzsGWrMxSlzAgEBoWQDYgAEeGyHPLmHcszPQ9MIIYnznpzi
+ QbvuJtYSjCqtIGxDfzgcLcc3nCc5tBxo+qX6OJEzcWdDAC0bwplY+9Z9jHR3ylNy
+ ovlHoK4ItdWkVO8NH89SLSRyVuOF8N5t3CHIo93B
+ -----END EC PRIVATE KEY-----
+
+=item * EC private keys with curve defined by OID (short form)
+
+ -----BEGIN EC PRIVATE KEY-----
+ MHcCAQEEIBG1c3z52T8XwMsahGVdOZWgKCQJfv+l7djuJjgetdbDoAoGCCqGSM49
+ AwEHoUQDQgAEoBUyo8CQAFPeYPvv78ylh5MwFZjTCLQeb042TjiMJxG+9DLFmRSM
+ lBQ9T/RsLLc+PmpB1+7yPAR+oR5gZn3kJQ==
+ -----END EC PRIVATE KEY-----
+
+=item * EC private keys in password protected PEM format
+
+ -----BEGIN EC PRIVATE KEY-----
+ Proc-Type: 4,ENCRYPTED
+ DEK-Info: AES-128-CBC,98245C830C9282F7937E13D1D5BA11EC
+
+ 0Y85oZ2+BKXYwrkBjsZdj6gnhOAfS5yDVmEsxFCDug+R3+Kw3QvyIfO4MVo9iWoA
+ D7wtoRfbt2OlBaLVl553+6QrUoa2DyKf8kLHQs1x1/J7tJOMM4SCXjlrOaToQ0dT
+ o7fOnjQjHne16pjgBVqGilY/I79Ab85AnE4uw7vgEucBEiU0d3nrhwuS2Opnhzyx
+ 009q9VLDPwY2+q7tXjTqnk9mCmQgsiaDJqY09wlauSukYPgVuOJFmi1VdkRSDKYZ
+ rUUsQvz6Q6Q+QirSlfHna+NhUgQ2eyhGszwcP6NU8iqIxI+NCwfFVuAzw539yYwS
+ 8SICczoC/YRlaclayXuomQ==
+ -----END EC PRIVATE KEY-----
+
+=item * EC public keys with all curve parameters
+
+ -----BEGIN PUBLIC KEY-----
+ MIH1MIGuBgcqhkjOPQIBMIGiAgEBMCwGByqGSM49AQECIQD/////////////////
+ ///////////////////+///8LzAGBAEABAEHBEEEeb5mfvncu6xVoGKVzocLBwKb
+ /NstzijZWfKBWxb4F5hIOtp3JqPEZV2k+/wOEQio/Re0SKaFVBmcR9CP+xDUuAIh
+ AP////////////////////66rtzmr0igO7/SXozQNkFBAgEBA0IABITjF/nKK3jg
+ pjmBRXKWAv7ekR1Ko/Nb5FFPHXjH0sDrpS7qRxFALwJHv7ylGnekgfKU3vzcewNs
+ lvjpBYt0Yg4=
+ -----END PUBLIC KEY-----
+
+=item * EC public keys with curve defined by OID (short form)
+
+ -----BEGIN PUBLIC KEY-----
+ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEoBUyo8CQAFPeYPvv78ylh5MwFZjT
+ CLQeb042TjiMJxG+9DLFmRSMlBQ9T/RsLLc+PmpB1+7yPAR+oR5gZn3kJQ==
+ -----END PUBLIC KEY-----
+
+=item * PKCS#8 private keys with all curve parameters
+
+ -----BEGIN PRIVATE KEY-----
+ MIIBMAIBADCB0wYHKoZIzj0CATCBxwIBATAkBgcqhkjOPQEBAhkA////////////
+ /////////v//////////MEsEGP////////////////////7//////////AQYIhI9
+ wjlaBcqnQj2uzMlHYKfUYiVr1WkWAxUAxGloRDXes3jEtlypWR4qV2MFmi4EMQR9
+ KXeBAMZaHaF4NxZYjc4ri0rujiKPGJY4qQ8iY3M3M0tJ3LZqbcj5l4rKdkipQ7AC
+ GQD///////////////96YtAxyD9ClPZA7BMCAQEEVTBTAgEBBBiKolTGIsTgOCtl
+ 6dpdos0LvuaExCDFyT6hNAMyAAREwaCX0VY1LZxLW3G75tmft4p9uhc0J7/+NGaP
+ DN3Tr7SXkT9+co2a+8KPJhQy10k=
+ -----END PRIVATE KEY-----
+
+=item * PKCS#8 private keys with curve defined by OID (short form)
+
+ -----BEGIN PRIVATE KEY-----
+ MG8CAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQMEVTBTAgEBBBjFP/caeQV4WO3fnWWS
+ f917PGzwtypd/t+hNAMyAATSg6pBT7RO6l/p+aKcrFsGuthUdfwJWS5V3NGcVt1b
+ lEHQYjWya2YnHaPq/iMFa7A=
+ -----END PRIVATE KEY-----
+
+=item * PKCS#8 encrypted private keys ARE NOT SUPPORTED YET!
+
+ -----BEGIN ENCRYPTED PRIVATE KEY-----
+ MIGYMBwGCiqGSIb3DQEMAQMwDgQINApjTa6oFl0CAggABHi+59l4d4e6KtG9yci2
+ BSC65LEsQSnrnFAExfKptNU1zMFsDLCRvDeDQDbxc6HlfoxyqFL4SmH1g3RvC/Vv
+ NfckdL5O2L8MRnM+ljkFtV2Te4fszWcJFdd7KiNOkPpn+7sWLfzQdvhHChLKUzmz
+ 4INKZyMv/G7VpZ0=
+ -----END ENCRYPTED PRIVATE KEY-----
+
+=item * SSH public EC keys
+
+ ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT...T3xYfJIs=
+
+=item * SSH public EC keys (RFC-4716 format)
+
+ ---- BEGIN SSH2 PUBLIC KEY ----
+ Comment: "521-bit ECDSA, converted from OpenSSH"
+ AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAFk35srteP9twCwYK
+ vU9ovMBi77Dd6lEBPrFaMEb0CZdZ5MC3nSqflGHRWkSbUpjdPdO7cYQNpK9YXHbNSO5hbU
+ 1gFZgyiGFxwJYYz8NAjedBXMgyH4JWplK5FQm5P5cvaglItC9qkKioUXhCc67YMYBtivXl
+ Ue0PgIq6kbHTqbX6+5Nw==
+ ---- END SSH2 PUBLIC KEY ----
+
+=item * EC private keys in JSON Web Key (JWK) format
+
+See L<http://tools.ietf.org/html/draft-ietf-jose-json-web-key>
+
+ {
+  "kty":"EC",
+  "crv":"P-256",
+  "x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
+  "y":"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
+  "d":"870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE",
+ }
+
+=item * EC public keys in JSON Web Key (JWK) format
+
+ {
+  "kty":"EC",
+  "crv":"P-256",
+  "x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
+  "y":"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
+ }
+
+=back
 
 =head2 import_key_raw
 
@@ -830,6 +993,14 @@ Support for password protected PEM keys
  #                    'AES-128-CBC'
  #                    'AES-192-CBC'
  #                    'AES-256-CBC' (DEFAULT)
+
+=head2 export_key_jwk
+
+Exports public/private keys as a JSON Web Key.
+
+ my $private_json_text = $pk->export_key_jwk('private');
+ #or
+ my $public_json_text = $pk->export_key_jwk('public');
 
 =head2 export_key_raw
 

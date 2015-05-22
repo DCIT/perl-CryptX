@@ -335,6 +335,166 @@ Support for password protected PEM keys
   #or
   $pk->import_key(\$buffer_containing_pem_key, $password);
 
+Loading private or public keys form perl hash:
+
+ $pk->import_key($hashref);
+
+ # the $hashref is either a key exported via key2hash
+ $pk->import_key({
+   e  => "10001", #public exponent
+   d  => "9ED5C3D3F866E06957CA0E9478A273C39BBDA4EEAC5B...", #private exponent
+   N  => "D0A5CCCAE03DF9C2F5C4C8C0CE840D62CDE279990DC6...", #modulus
+   p  => "D3EF0028FFAB508E2773C659E428A80FB0E9211346B4...", #p factor of N
+   q  => "FC07E46B163CAB6A83B8E467D169534B2077DCDEECAE...", #q factor of N
+   qP => "88C6D406F833DF73C8B734548E0385261AD51F4187CF...", #1/q mod p CRT param
+   dP => "486F142FEF0A1F53269AC43D2EE4D263E2841B60DA36...", #d mod (p - 1) CRT param
+   dQ => "4597284B2968B72C4212DB7E8F24360B987B80514DA9...", #d mod (q - 1) CRT param
+ });
+
+ # or a hash with items corresponding to JWK (JSON Web Key)
+ $pk->import_key({
+ {
+   kty => "RSA",
+   n   => "0vx7agoebGcQSuuPiLJXZpt...eZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw",
+   e   => "AQAB",
+   d   => "X4cTteJY_gn4FYPsXB8rdXi...FLN5EEaG6RoVH-HLKD9Mdx5ooGURknhnrRwUkC7h5fJLMWbFAKLWY2v7B6NqSzUvx0_YSf",
+   p   => "83i-7IvMGXoMXCskv73TKr8...Z27zvoj6pbUQyLPBQxtPnwD20-60eTmD2ujMt5PoMrm8RmNhVWtjjMmMjOpSicFHjXOuVI",
+   q   => "3dfOR9cuYq-0S-mkFLzgItg...q3hWeMuG0ouqnb3obLyuqjVZQ1dIrdgTnCdYzBcOW5r37AFXjift_NGiovonzhKpoVVS78",
+   dp  => "G4sPXkc6Ya9y8oJW9_ILj4...zi_H7TkS8x5SdX3oE0oiYwxIiemTAu0UOa5pgFGyJ4c8t2VF40XRugKTP8akhFo5tA77Qe",
+   dq  => "s9lAH9fggBsoFR8Oac2R_E...T2kGOhvIllTE1efA6huUvMfBcpn8lqW6vzzYY5SSF7pMd_agI3G8IbpBUb0JiraRNUfLhc",
+   qi  => "GyM_p6JrXySiz1toFgKbWV...4ypu9bMWx3QJBfm0FoYzUIZEVEcOqwmRN81oDAaaBk0KWGDjJHDdDmFW3AN7I-pux_mHZG",
+ });
+
+Supported key formats:
+
+=over
+
+=item * RSA public keys
+
+ -----BEGIN PUBLIC KEY-----
+ MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHlYKg9DeHB3/dY1D9WCyJTnl5
+ vEzAXpUOL9tDtdPUl96brIbbdMLooO1hKjsq98kLs1q4vOn/pxvzk0BRwhiu7Vvb
+ VUjAn/2HHDDL0U1utqqlMJhaffeLI3HEq5o/lSMFY7sSkZU/E4YX1yqAN0SE7xfK
+ B2uzcNq60sMIfp6siQIDAQAB
+ -----END PUBLIC KEY-----
+
+=item * RSA private keys
+
+ -----BEGIN RSA PRIVATE KEY-----
+ MIICXQIBAAKBgQDHlYKg9DeHB3/dY1D9WCyJTnl5vEzAXpUOL9tDtdPUl96brIbb
+ dMLooO1hKjsq98kLs1q4vOn/pxvzk0BRwhiu7VvbVUjAn/2HHDDL0U1utqqlMJha
+ ffeLI3HEq5o/lSMFY7sSkZU/E4YX1yqAN0SE7xfKB2uzcNq60sMIfp6siQIDAQAB
+ AoGBAI5+GgNcGQDYw9uF+t7FwxZM5sGZRJrbbEPyuvL+sDxKKW6voKCyHi4EJzaF
+ 9jRZMDqgVJcsmUwjPPuMGBHHJ+MI5Zb3L0jbZkyx8u+U5gf88oy9eZmfGOjmHcMB
+ oCgzyoLmJETuyADg2onLanuY3jggFb3tq/jimKjO8xM2R6zhAkEA7uXWWyJI9cCN
+ zrVt5R5v6oosjZ4r5VILGMqBRLrzfTvH+WDMK6Rl/2MHE+YDeLajzunaM8qY2456
+ GTYEXQsIdQJBANXfMEtXocSdPtoVj3ME8Do/0r+ApgTdcDPCwXOzkmkEJW/UFMSn
+ b8CYF5G6sZQN9L5z3s2nvi55PaFV8Q0LMUUCQBh9GvIQm6YFbQPpeTBpZFOIgnSp
+ 6BoDxPtvlryy5U7LF/6qO4OlwIbjYdBaXbS8FCKbujBg7jZjboSzEtNu1BkCQDGT
+ w0Yz0jQZn3A+fzpScr2N/fSWheWqz0+wXdfMUKw3YdZCe236wlUK7KvDc1a2xX1A
+ ru1NbTCoujikC3TSm2ECQQDKQshchJlZJmFv9vCFQlGCA/EX+4406xvOOiixbPYC
+ pIB4Ee2cmvEdAqSaOjrvgs5zvaCCFBO0MecPStCAxUX6
+ -----END RSA PRIVATE KEY-----
+
+=item * RSA private keys in password protected PEM format
+
+ -----BEGIN RSA PRIVATE KEY-----
+ Proc-Type: 4,ENCRYPTED
+ DEK-Info: DES-EDE3-CBC,4D697440FF5AEF18
+
+ C09H49Gn99o8b8O2r4+Hqao4r3udvC+QSSfsk20sXatyuZSEmbhyqKAB+13NRj+3
+ KIsRTqnL9VkeibIGgLHuekOFKAqeSVZ0PmR4bGWEFxUPAYUvg9N9pIa6hGtNZG+y
+ TEpOAfFITb1pbHQhp3j8y7qmKc5kY5LrZSFE8WwA24NTG773E07wJgRxKDkXNGOl
+ kki6oYArNEps0DdtHFxzgdRg0+yaotXuFJRuC5V4YzKGG/oSRcgYyXKTwCndb3xt
+ aHgI2WprQAPg+qOpLABzoi7bEjCqbHWrwkvnAngylbim2Uyvw1e1xKnzlgIHU7pv
+ e/J+s00pTItfqW1IpY2mh4C9nkfkfVKBKaAv7jO0s6aPySATqsdlrzv2kpF6Ub4J
+ kgaZDOfZ4K3qkyAYVLWcQeDqg4glv9Ah2J05bTm4qrIMmthYnThyQlGvcjUfCMXs
+ 0t+mEQbsRY7xKt0o6HzzvQlJ+JsFlLORoslAubJX9iLqpEdnlrj1lD9bo6uIClZ5
+ 5+aoLcAyz1D4OsauuP5i8VFu+Is+QG4SN/vHVuArjkqi3VpLwSAjNDY+KWbq042l
+ CqlM2mwm6FIGUZQFxiLHJD7WDmk1xmae++m+XG9CEDTfrUQ5v+l0O6BTrl80XUfU
+ w3gzAWbSjz3UK0FpKeABVFPE9fjNP9fTcS6qL5YJWBPflwxCAbVgsBOW4bOMpDGK
+ BJDQTeShWn4BlYCe/vgThI9ERdgZhRz4NcFeDgVA/CqQzVqptvz4PSqH46fqUN2n
+ 4PtJgKE5cASYUBuAjlD71FecSVVM/OTzL1uxYzXBilzvVn2vSHgo9g==
+ -----END RSA PRIVATE KEY-----
+
+=item * PKCS#8 encoded private keys
+
+ -----BEGIN PRIVATE KEY-----
+ MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBANPN17xW4EkH5PXG
+ 1i/i3rE1EXFcCHyxmz95VRBDs1p3MuYf9mxntbfYAmuzS3KrRWh3IyX/Eh80N/v9
+ OXPlwZbVqSTX+L3pCEJtRtsWn0zmswGThjMZiwle0oWuap63L35F1QN8EDaSPSBC
+ yGELNRr6rwVYq0w5b+LOcaCZ+/H1AgMBAAECgYEApfu3aGpww+rC3HUhX0+ckyTy
+ cXLdV9LbxidwqRlVEb0+DyfXNucjelp2sy5EHy3na9GJovo8mmWSxhCRGKliRkQ6
+ XgrEMZdCSaWI2AazuHAGlUJRFEVkvdla3AuBAn6y0YdDp/3kbg0yahmKyD8Gq74z
+ nUYbDL3R5JtR2Ad/KlUCQQDvSEICTHbO/BF7hVmlKRYZSNHKEPrv8X/OlppS14Kv
+ QRwc+CZ5+l6T1Y+l5cHJQUXrXZoWS1K741TXdUhjjUd7AkEA4pod804Ex8sttdWi
+ pHMfeyj+IbPAk5XnBc91jT7AYIeL8ccjtfl99xhMsGFaxrh3wA/4SGEvwzWkbxcq
+ H8G5TwJAKNG+0P2SVwURRm0dOdukdXPCtiHnbP9Zujhe4zr4hEUrMpXymmRntfh8
+ pORpBpgoAVraams3Fe5WDttnGfSD+QJAOOC6V9HjfUrQhG3FT0XeRwm5EDiQQ/tC
+ a8DxHqz7mL8tL1ju68ReC+G7jiJBqNOwqzLW/UP3uyYByiikWChGHQJAHUau7jIM
+ 45ErO096n94Vh95p76ANxOroWszOt39TyvJOykIfoPwFagLrBWV9Jjos2/D54KE+
+ fyoy4t3yHT+/nw==
+ -----END PRIVATE KEY-----
+
+=item * PKCS#8 encrypted private keys ARE NOT SUPPORTED YET!
+
+ -----BEGIN ENCRYPTED PRIVATE KEY-----
+ MIICojAcBgoqhkiG9w0BDAEDMA4ECCQk+Rr1yzzcAgIIAASCAoD/mgpUFjxxM/Ty
+ Yt+NeT0Fo4echgoGksqs6+rYhO16oshG664emZfkuNoFGGzJ38X6GVuqIXhlPnYQ
+ biKvL37dN/KnoGytFHq9Wnk8dDwjGHPtwajhW5WuIV3NuhW/AO1PF/cRZKFjWrPt
+ NWY5CrpfH6t6zojoe+5uyXpH29lQy4OqvSRdPIt/12UcB+tzV7XzSWEuXh8HAi8a
+ sYUu6tuCFnq4GrD2ffM4KWFmL5GqBAwN6m0KkyrNni9XT+RaA6zEhv/lVcwg2esa
+ 4/EzRs0ixzzZDKaml8oCMl9RHtFAbQmdlfV7Ip4rGK9BwY6UFiDMIVru6HynOVQK
+ vvZ+j//bgO+3ubrv7psX+vC9Fy/MoH2Tc7MIwDN/QVTciPZlzjWBnBNxMfeFKtEn
+ d7NFiapgfLuRQIiDTMrW/clcqvO54NphxhrcgUEoxos4twKZARntqPZHtf8nEM2x
+ 2sEF5kI65aEF/5Yy16qvP0vZAA2B1kcIdXZ8XLZCp4c3olhkIrmgUpo1gyFXdCoC
+ 7dT5Cz7/YLkq5hkcFrtp4V9BZMR24fSttc4p24N5xuZ+JneGnGkLX6B+nJAtm9vw
+ bZA6P+23GI0qeMzL3HJXwCOTSsWfm/H9W5+2Zmw851aAmE+pZLni/pk3e3iNSWgs
+ 946x/doA5O0uCFsU7oxme+WAIp2SjhxGoe808Lf1CCFMPboFi1O/E0NsX8SIEX+i
+ U+UHi4kxZqVkr3Q5SB/9kiSv8K1bE787yueQOT/dsTYYaMsjAbkEZo0o/47F32T6
+ A2ioXHOV/pr5zNHqE5tL+qKEcLYbAUF1O+WvmdqYz+vHQjRQBatAqTmncvLDYr/j
+ 1HPwZX2d
+ -----END ENCRYPTED PRIVATE KEY-----
+
+=item * SSH public RSA keys
+
+ ssh-rsa AAAAB3NzaC1yc2EAAAADAQA...6mdYs5iJNGu/ltUdc=
+
+=item * SSH public RSA keys (RFC-4716 format)
+
+ ---- BEGIN SSH2 PUBLIC KEY ----
+ Comment: "768-bit RSA, converted from OpenSSH"
+ AAAAB3NzaC1yc2EAAAADAQABAAAAYQDYebeGQFCnlQiNRE7r9UEbjr+DQMTdw1ZHGB2w6x
+ D/DzKem8761GdCpqsLrGaw2D7aSIoP1B5Sz870YoVWHn6Ao7Hvm17V3Kxfn4B01GNQTM5+
+ L26mdYs5iJNGu/ltUdc=
+ ---- END SSH2 PUBLIC KEY ----
+
+=item * RSA private keys in JSON Web Key (JWK) format
+
+See L<http://tools.ietf.org/html/draft-ietf-jose-json-web-key>
+
+ {
+   "kty":"RSA",
+   "n":"0vx7agoebGcQSuuPiLJXZpt...eZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw",
+   "e":"AQAB",
+   "d":"X4cTteJY_gn4FYPsXB8rdXi...FLN5EEaG6RoVH-HLKD9Mdx5ooGURknhnrRwUkC7h5fJLMWbFAKLWY2v7B6NqSzUvx0_YSf",
+   "p":"83i-7IvMGXoMXCskv73TKr8...Z27zvoj6pbUQyLPBQxtPnwD20-60eTmD2ujMt5PoMrm8RmNhVWtjjMmMjOpSicFHjXOuVI",
+   "q":"3dfOR9cuYq-0S-mkFLzgItg...q3hWeMuG0ouqnb3obLyuqjVZQ1dIrdgTnCdYzBcOW5r37AFXjift_NGiovonzhKpoVVS78",
+   "dp":"G4sPXkc6Ya9y8oJW9_ILj4...zi_H7TkS8x5SdX3oE0oiYwxIiemTAu0UOa5pgFGyJ4c8t2VF40XRugKTP8akhFo5tA77Qe",
+   "dq":"s9lAH9fggBsoFR8Oac2R_E...T2kGOhvIllTE1efA6huUvMfBcpn8lqW6vzzYY5SSF7pMd_agI3G8IbpBUb0JiraRNUfLhc",
+   "qi":"GyM_p6JrXySiz1toFgKbWV...4ypu9bMWx3QJBfm0FoYzUIZEVEcOqwmRN81oDAaaBk0KWGDjJHDdDmFW3AN7I-pux_mHZG",
+ }
+
+=item * RSA public keys in JSON Web Key (JWK) format
+
+ {
+   "kty":"RSA",
+   "n": "0vx7agoebGcQSuuPiLJXZp...tN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECP",
+   "e":"AQAB",
+ }
+
+=back
+
 =head2 export_key_der
 
  my $private_der = $pk->export_key_der('private');
@@ -374,6 +534,14 @@ Support for password protected PEM keys
  #                    'AES-128-CBC'
  #                    'AES-192-CBC'
  #                    'AES-256-CBC' (DEFAULT)
+
+=head2 export_key_jwk
+
+Exports public/private keys as a JSON Web Key.
+
+ my $private_json_text = $pk->export_key_jwk('private');
+ #or
+ my $public_json_text = $pk->export_key_jwk('public');
 
 =head2 encrypt
 

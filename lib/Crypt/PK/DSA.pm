@@ -265,6 +265,92 @@ Support for password protected PEM keys
   #or
   $pk->import_key(\$buffer_containing_pem_key, $password);
 
+Loading private or public keys form perl hash:
+
+ $pk->import_key($hashref);
+
+ # where $hashref is a key exported via key2hash
+ $pk->import_key({
+   p => "AAF839A764E04D80824B79FA1F0496C093...", #prime modulus
+   q => "D05C4CB45F29D353442F1FEC43A6BE2BE8...", #prime divisor
+   g => "847E8896D12C9BF18FE283AE7AD58ED7F3...", #generator of a subgroup of order q in GF(p)
+   x => "6C801901AC74E2DC714D75A9F6969483CF...", #private key, random  0 < x < q
+   y => "8F7604D77FA62C7539562458A63C7611B7...", #public key, where y = g^x mod p
+ });
+
+Supported key formats:
+
+=over
+
+=item * DSA public keys
+
+ -----BEGIN PUBLIC KEY-----
+ MIIBtjCCASsGByqGSM44BAEwggEeAoGBAJKyu+puNMGLpGIhbD1IatnwlI79ePr4
+ YHe2KBhRkheKxWUZRpN1Vd/+usS2IHSJ9op5cSWETiP05d7PMtJaitklw7jhudq3
+ GxNvV/GRdCQm3H6d76FHP88dms4vcDYc6ry6wKERGfNEtZ+4BAKrMZK+gDYsF4Aw
+ U6WVR969kYZhAhUA6w25FgSRmJ8W4XkvC60n8Wv3DpMCgYA4ZFE+3tLOM24PZj9Z
+ rxuqUzZZdR+kIzrsIYpWN9ustbmdKLKwsqIaUIxc5zxHEhbAjAIf8toPD+VEQIpY
+ 7vgJgDhXuPq45BgN19iLTzOJwIhAFXPZvnAdIo9D/AnMw688gT6g6U8QCZwX2XYg
+ ICiVcriYVNcjVKHSFY/X0Oi7CgOBhAACgYB4ZTn4OYT/pjUd6tNhGPtOS3CE1oaj
+ 5ScbetXg4ZDpceEyQi8VG+/ZTbs8var8X77JdEdeQA686cAxpOaVgW8V4odvcmfA
+ BfueiGnPXjqGfppiHAyL1Ngyd+EsXKmKVXZYAVFVI0WuJKiZBSVURU7+ByxOfpGa
+ fZhibr0SggWixQ==
+ -----END PUBLIC KEY-----
+
+=item * DSA private keys
+
+ -----BEGIN DSA PRIVATE KEY-----
+ MIIBuwIBAAKBgQCSsrvqbjTBi6RiIWw9SGrZ8JSO/Xj6+GB3tigYUZIXisVlGUaT
+ dVXf/rrEtiB0ifaKeXElhE4j9OXezzLSWorZJcO44bnatxsTb1fxkXQkJtx+ne+h
+ Rz/PHZrOL3A2HOq8usChERnzRLWfuAQCqzGSvoA2LBeAMFOllUfevZGGYQIVAOsN
+ uRYEkZifFuF5LwutJ/Fr9w6TAoGAOGRRPt7SzjNuD2Y/Wa8bqlM2WXUfpCM67CGK
+ VjfbrLW5nSiysLKiGlCMXOc8RxIWwIwCH/LaDw/lRECKWO74CYA4V7j6uOQYDdfY
+ i08zicCIQBVz2b5wHSKPQ/wJzMOvPIE+oOlPEAmcF9l2ICAolXK4mFTXI1Sh0hWP
+ 19DouwoCgYB4ZTn4OYT/pjUd6tNhGPtOS3CE1oaj5ScbetXg4ZDpceEyQi8VG+/Z
+ Tbs8var8X77JdEdeQA686cAxpOaVgW8V4odvcmfABfueiGnPXjqGfppiHAyL1Ngy
+ d+EsXKmKVXZYAVFVI0WuJKiZBSVURU7+ByxOfpGafZhibr0SggWixQIVAL7Sia03
+ 8bvANjjL9Sitk8slrM6P
+ -----END DSA PRIVATE KEY-----
+
+=item * DSA private keys in password protected PEM format:
+
+ -----BEGIN DSA PRIVATE KEY-----
+ Proc-Type: 4,ENCRYPTED
+ DEK-Info: DES-CBC,227ADC3AA0299491
+
+ UISxBYAxPQMl2eK9LMAeHsssF6IxO+4G2ta2Jn8VE+boJrrH3iSTKeMXGjGaXl0z
+ DwcLGV+KMR70y+cxtTb34rFy+uSpBy10dOQJhxALDbe1XfCDQIUfaXRfMNA3um2I
+ JdZixUD/zcxBOUzao+MCr0V9XlJDgqBhJ5EEr53XHH07Eo5fhiBfbbR9NzdUPFrQ
+ p2ASyZtFh7RXoIBUCQgg21oeLddcNWV7gd/Y46kghO9s0JbJ8C+IsuWEPRSq502h
+ tSoDN6B0sxbVvOUICLLbQaxt7yduTAhRxVIJZ1PWATTVD7CZBVz9uIDZ7LOv+er2
+ 1q3vkwb8E9spPsA240+BnfD571XEop4jrawxC0VKQZ+3cPVLc6jhIsxvzzFQUt67
+ g66v8GUgt7KF3KhVV7qEtntybQWDWb+K/uTIH9Ra8nP820d3Rnl61pPXDPlluteT
+ WSLOvEMN2zRmkaxQNv/tLdT0SYpQtdjw74G3A6T7+KnvinKrjtp1a/AXkCF9hNEx
+ DGbxOYo1UOmk8qdxWCrab34nO+Q8oQc9wjXHG+ZtRYIMoGMKREK8DeL4H1RPNkMf
+ rwXWk8scd8QFmJAb8De1VQ==
+ -----END DSA PRIVATE KEY-----
+
+=item * SSH public DSA keys
+
+ ssh-dss AAAAB3NzaC1kc3MAAACBAKU8/avmk...4XOwuEssAVhmwA==
+
+=item * SSH public DSA keys (RFC-4716 format)
+
+ ---- BEGIN SSH2 PUBLIC KEY ----
+ Comment: "1024-bit DSA, converted from OpenSSH"
+ AAAAB3NzaC1kc3MAAACBAKU8/avmkFeGnSqwYG7dZnQlG+01QNaxu3F5v0NcL/SRUW7Idp
+ Uq8t14siK0mA6yjphLhOf5t8gugTEVBllP86ANSbFigH7WN3v6ydJWqm60pNhNHN//50cn
+ NtIsXbxeq3VtsI64pkH1OJqeZDHLmu73k4T0EKOzsylSfF/wtVBJAAAAFQChpubLHViwPB
+ +jSvUb8e4THS7PBQAAAIAJD1PMCiTCQa1xyD/NCWOajCufTOIzKAhm6l+nlBVPiKI+262X
+ pYt127Ke4mPL8XJBizoTjSQN08uHMg/8L6W/cdO2aZ+mhkBnS1xAm83DAwqLrDraR1w/4Q
+ RFxr5Vbyy8qnejrPjTJobBN1BGsv84wHkjmoCn6pFIfkGYeATlJgAAAIAHYPU1zMVBTDWr
+ u7SNC4G2UyWGWYYLjLytBVHfQmBa51CmqrSs2kCfGLGA1ynfYENsxcJq9nsXrb4i17H5BH
+ JFkH0g7BUDpeBeLr8gsK3WgfqWwtZsDkltObw9chUD/siK6q/dk/fSIB2Ho0inev7k68Z5
+ ZkNI4XOwuEssAVhmwA==
+ ---- END SSH2 PUBLIC KEY ----
+
+=back
+
 =head2 export_key_der
 
  my $private_der = $pk->export_key_der('private');

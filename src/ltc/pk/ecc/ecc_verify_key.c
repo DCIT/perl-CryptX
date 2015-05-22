@@ -33,7 +33,6 @@ int ecc_verify_key(ecc_key *key)
   ecc_point *test_output = NULL;
   test_output = malloc(sizeof(ecc_point));
 
-  /* XXX test_output->infinity = 0; */
   if (mp_init_multi(&(test_output->x), &(test_output->y), &(test_output->z), &order, &prime, NULL) != CRYPT_OK) {
     return CRYPT_MEM;
   }
@@ -62,13 +61,6 @@ int ecc_verify_key(ecc_key *key)
   if((err = ltc_ecc_mulmod(order, &(key->pubkey), test_output, a, prime, 1)) != CRYPT_OK) {
     goto error;
   }
-
-  /* XXX
-  if(!test_output->infinity){
-    err = CRYPT_INVALID_PACKET;
-    goto error;
-  }
-  */
 
   err = CRYPT_OK;
 error:

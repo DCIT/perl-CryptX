@@ -3,7 +3,7 @@ package CryptX;
 use strict;
 use warnings ;
 
-our $VERSION = '0.021_7';
+our $VERSION = '0.022';
 
 require XSLoader;
 XSLoader::load('CryptX', $VERSION);
@@ -68,4 +68,4 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013 DCIT, a.s. L<http://www.dcit.cz> / Karel Miko
+Copyright (c) 2013-2015 DCIT, a.s. L<http://www.dcit.cz> / Karel Miko
