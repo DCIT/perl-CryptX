@@ -6,4 +6,9 @@ perl:
   - "5.14"
   - "5.16"
   - "5.18"
-  - "5.19"
+  - "5.20"
+  - "5.22"
+  - "dev"
+sudo: false
+before_install:
+  - eval $(curl https://travis-perl.github.io/init) --auto
