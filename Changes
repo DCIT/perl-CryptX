@@ -1,6 +1,9 @@
 Changes for CryptX
 
 TODO:
+        - strange failures of 0.22:
+          http://www.cpantesters.org/cpan/report/4d7fc1d0-01f4-11e5-a85a-e28fcaadd3a7
+          http://www.cpantesters.org/cpan/report/8809d2b2-05e8-11e5-a85a-e28fcaadd3a7
         - add support for PKCS#8 encrypted RSA+ECC private keys  "-----BEGIN ENCRYPTED PRIVATE KEY-----"
         - gcc v3 is now unsupported
         - add CCM interface for new-add-add-done mode
@@ -11,6 +14,10 @@ TODO:
         - DH: generate_key($base, $prime), generate_key(\$dh_params_der), generate_key($dh_params_file)
         - DH: key2hash should dump $base and $prime as well (perhasp add base, prime to dh_key struct)
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
+
+0.023   2015/06/10
+        - support for older compilers (gcc3, vc6)
+        - typo in documentation (by tomhukins)
 
 0.022   2015/05/22
         - new: Crypt::PK::ECC+RSA export_key_jwk() - exporting JWK format

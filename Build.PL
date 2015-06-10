@@ -7,7 +7,7 @@ use Config;
 my $flags = '-Isrc/ltc/headers -Isrc/ltm -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC';
 #$flags .= ' -Wall';
 #$flags .= ' -DLTC_NO_ASM' if $ENV{CRYPTX_NO_ASM} || $Config{archname} !~ /(MSWin32-(x86|x64)|(i.86|x86_64)-linux|(i.86|amd64)-(freebsd|openbsd)|cygwin|darwin)/;
-#$flags .= ' -DLTC_NO_ASM' if $^O eq 'cygwin' && $Config{cc} =~ /gcc/ && $Config{gccversion} =~ /^3\./;
+#$flags .= ' -DLTC_NO_FAST' if $^O eq 'cygwin' && $Config{cc} =~ /gcc/ && $Config{gccversion} =~ /^3\./;
 
 my $class = Module::Build->subclass(
     class => 'My::Builder',
