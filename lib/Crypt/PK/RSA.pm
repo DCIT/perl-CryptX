@@ -122,7 +122,7 @@ sub import_key {
       for (qw/n e d p q dp dq qi/) {
         $h->{$_} = eval { unpack("H*", decode_base64url($h->{$_})) } if exists $h->{$_};
       }
-      return $self->_import_hex($h->{n}, $h->{e}, $h->{d}, $h->{p}, $h->{q}, $h->{dp}, $h->{dp}, $h->{qi}) if $h->{n} && $h->{e};
+      return $self->_import_hex($h->{n}, $h->{e}, $h->{d}, $h->{p}, $h->{q}, $h->{dp}, $h->{dq}, $h->{qi}) if $h->{n} && $h->{e};
     }
   }
   elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {

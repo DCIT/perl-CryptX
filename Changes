@@ -15,6 +15,15 @@ TODO:
         - DH: key2hash should dump $base and $prime as well (perhasp add base, prime to dh_key struct)
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
 
+0.024   2015/06/26
+        - new: Crypt::KeyWrap - key wrapping algorithms defined in https://tools.ietf.org/html/rfc7518
+               aes_key_wrap()    aes_key_unwrap() 
+               gcm_key_wrap()    gcm_key_unwrap()
+               pbes2_key_wrap()  pbes2_key_unwrap()
+               pbes2_key_wrap()  pbes2_key_unwrap()
+               rsa_key_wrap()    rsa_key_unwrap()
+        - fix: Crypt::PK::RSA - bug in loading private key in JWK format
+
 0.023   2015/06/10
         - support for older compilers (gcc3, vc6)
         - typo in documentation (by tomhukins)
