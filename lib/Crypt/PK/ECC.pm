@@ -448,7 +448,7 @@ sub export_key_jwk {
   $curve = 'P-256' if $curve =~ /(secp256r1|nistp256|prime256v1)/;
   $curve = 'P-384' if $curve =~ /(secp384r1|nistp384)/;
   $curve = 'P-521' if $curve =~ /(secp521r1|nistp521)/;
-  if ($type eq 'private') {
+  if ($type && $type eq 'private') {
     return unless $kh->{pub_x} && $kh->{pub_y} && $kh->{k};
     for (qw/pub_x pub_y k/) {
       $kh->{$_} = "0$kh->{$_}" if length($kh->{$_}) % 2;
@@ -461,7 +461,7 @@ sub export_key_jwk {
                         encode_base64url(pack("H*", $kh->{pub_y})),
                         encode_base64url(pack("H*", $kh->{k}));
   }
-  elsif ($type eq 'public') {
+  elsif ($type && $type eq 'public') {
     return unless $kh->{pub_x} && $kh->{pub_y};
     for (qw/pub_x pub_y/) {
       $kh->{$_} = "0$kh->{$_}" if length($kh->{$_}) % 2;
@@ -487,6 +487,7 @@ sub import_key {
     }
     if ($key->{crv} && $key->{kty} && $key->{kty} eq "EC" && ($key->{d} || ($key->{x} && $key->{y}))) {
       # hash with items corresponding to JSON Web Key (JWK)
+      $key = {%$key}; # make a copy as we will modify it
       for (qw/x y d/) {
         $key->{$_} = eval { unpack("H*", decode_base64url($key->{$_})) } if exists $key->{$_};
       }
@@ -494,6 +495,7 @@ sub import_key {
         return $self->_import_hex($key->{x}, $key->{y}, $key->{d}, $curve);
       }
     }
+    croak "FATAL: unexpected key hash";
   }
 
   my $data;
@@ -568,11 +570,25 @@ sub sign_message {
   return $self->_sign($data_hash);
 }
 
+sub sign_message_rfc7518 {
+  my ($self, $data, $hash_name) = @_;
+  $hash_name ||= 'SHA1';
+  my $data_hash = digest_data($hash_name, $data);
+  return $self->_sign_rfc7518($data_hash);
+}
+
 sub verify_message {
   my ($self, $sig, $data, $hash_name) = @_;
   $hash_name ||= 'SHA1';
   my $data_hash = digest_data($hash_name, $data);
   return $self->_verify($sig, $data_hash);
+}
+
+sub verify_message_rfc7518 {
+  my ($self, $sig, $data, $hash_name) = @_;
+  $hash_name ||= 'SHA1';
+  my $data_hash = digest_data($hash_name, $data);
+  return $self->_verify_rfc7518($sig, $data_hash);
 }
 
 sub sign_hash {
@@ -583,6 +599,20 @@ sub sign_hash {
 sub verify_hash {
   my ($self, $sig, $data_hash) = @_;
   return $self->_verify($sig, $data_hash);
+}
+
+sub curve2hash {
+  my $self = shift;
+  my $kh = $self->key2hash;
+  return {
+     prime    => $kh->{curve_prime},
+     A        => $kh->{curve_A},
+     B        => $kh->{curve_B},
+     Gx       => $kh->{curve_Gx},
+     Gy       => $kh->{curve_Gy},
+     cofactor => $kh->{curve_cofactor},
+     order    => $kh->{curve_order}
+  };
 }
 
 ### FUNCTIONS
@@ -1036,6 +1066,11 @@ private key is exported as raw bytes (padded with leading zeros to have the same
 
  #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
+=head2 sign_message_rfc7518
+
+Same as L<sign_message|/sign_message> only the signature format is as defined by L<https://tools.ietf.org/html/rfc7518>
+(JWA - JSON Web Algorithms).
+
 =head2 verify_message
 
  my $pk = Crypt::PK::ECC->new($pub_key_filename);
@@ -1044,6 +1079,11 @@ private key is exported as raw bytes (padded with leading zeros to have the same
  my $valid = $pub->verify_message($signature, $message, $hash_name);
 
  #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+
+=head2 verify_message_rfc7518
+
+Same as L<verify_message|/verify_message> only the signature format is as defined by L<https://tools.ietf.org/html/rfc7518>
+(JWA - JSON Web Algorithms).
 
 =head2 sign_hash
 
@@ -1103,6 +1143,21 @@ private key is exported as raw bytes (padded with leading zeros to have the same
    #public key point coordinates
    pub_x          => "5AE1ACE3ED0AEA9707CE5C0BCE014F6A2F15023A",
    pub_y          => "895D57E992D0A15F88D6680B27B701F615FCDC0F",
+ }
+
+=head2 curve2hash
+
+ my $crv = $pk->curve2hash;
+
+ # returns a hash that can be passed to: $pk->generate_key($crv)
+ {
+   A        => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFC",
+   B        => "1C97BEFC54BD7A8B65ACF89F81D4D4ADC565FA45",
+   cofactor => 1,
+   Gx       => "4A96B5688EF573284664698968C38BB913CBFC82",
+   Gy       => "23A628553168947D59DCC912042351377AC5FB32",
+   order    => "0100000000000000000001F4C8F927AED3CA752257",
+   prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF",
  }
 
 =head1 FUNCTIONS

@@ -12,6 +12,7 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   ok($k->is_private, 'is_private cryptx_priv_ecc1.der');
   is($k->size, 32, 'size');
   is(uc($k->key2hash->{pub_x}), 'C068B754877A4AB328A569BAC6D464A81B17E527D2D652572ABB11BDA3572D50', 'key2hash');
+  is(uc($k->curve2hash->{prime}), 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F', 'curve2hash');
 
   $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc2.der');
   ok($k, 'load cryptx_priv_ecc2.der');
@@ -72,6 +73,10 @@ use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_messag
   ok(length $sig > 60, 'sign_message ' . length($sig));
   ok($pu1->verify_message($sig, "message"), 'verify_message');
 
+  my $sig_rfc7518 = $pr1->sign_message_rfc7518("message");
+  ok(length $sig_rfc7518 > 60, 'sign_message_rfc7518 ' . length($sig_rfc7518));
+  ok($pu1->verify_message_rfc7518($sig_rfc7518, "message"), 'verify_message_rfc7518');
+
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
   $sig = $pr1->sign_hash($hash, 'SHA1');
   ok(length $sig > 60, 'sign_hash ' . length($sig));
@@ -122,6 +127,7 @@ for my $priv (qw/openssl_ec-short.pem openssl_ec-short.der/) {
   ok($k->is_private, "is_private $priv");
   is($k->size, 32, "size $priv");
   is(uc($k->key2hash->{pub_x}), 'A01532A3C0900053DE60FBEFEFCCA58793301598D308B41E6F4E364E388C2711', "key2hash $priv");
+  is(uc($k->curve2hash->{prime}), 'FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF', "curve2hash $priv");
 }
 
 for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {

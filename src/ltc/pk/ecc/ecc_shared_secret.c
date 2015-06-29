@@ -51,10 +51,11 @@ int ecc_shared_secret(ecc_key *private_key, ecc_key *public_key,
       return CRYPT_INVALID_ARG;
    }
 
+/* XXX FIXME names can be different in some situations
    if (XSTRCMP(private_key->dp->name, public_key->dp->name) != 0) {
       return CRYPT_PK_TYPE_MISMATCH;
    }
-
+*/
    /* make new point */
    result = ltc_ecc_new_point();
    if (result == NULL) {

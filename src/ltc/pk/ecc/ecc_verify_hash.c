@@ -31,19 +31,9 @@
  * accept if v == r
  */
 
-/**
-   Verify an ECC signature
-   @param sig         The signature to verify
-   @param siglen      The length of the signature (octets)
-   @param hash        The hash (message digest) that was signed
-   @param hashlen     The length of the hash (octets)
-   @param stat        Result of signature, 1==valid, 0==invalid
-   @param key         The corresponding public ECC key
-   @return CRYPT_OK if successful (even if the signature is not valid)
-*/
-int ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
-                    const unsigned char *hash, unsigned long hashlen, 
-                    int *stat, ecc_key *key)
+int ecc_verify_hash_ex(const unsigned char *sig,  unsigned long siglen,
+                       const unsigned char *hash, unsigned long hashlen, 
+                       int *stat, ecc_key *key, int sigformat)
 {
    ecc_point    *mG, *mQ;
    void          *r, *s, *v, *w, *u1, *u2, *e, *p, *m, *a;
@@ -79,12 +69,24 @@ int ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
       goto error;
    }
 
-   /* parse header */
-   if ((err = der_decode_sequence_multi(sig, siglen,
-                                  LTC_ASN1_INTEGER, 1UL, r,
-                                  LTC_ASN1_INTEGER, 1UL, s,
-                                  LTC_ASN1_EOL, 0UL, NULL)) != CRYPT_OK) {
-      goto error;
+   if (sigformat == 1) {
+     /* RFC7518 format */
+     if ((siglen % 2) == 1) {
+       err = CRYPT_INVALID_PACKET;
+       goto error;
+     }
+     i = siglen / 2;
+     if ((err = mp_read_unsigned_bin(r, (unsigned char *)sig,   i)) != CRYPT_OK)  goto error;
+     if ((err = mp_read_unsigned_bin(s, (unsigned char *)sig+i, i)) != CRYPT_OK)  goto error;
+   }
+   else {
+     /* ASN.1 format */
+     if ((err = der_decode_sequence_multi(sig, siglen,
+                                    LTC_ASN1_INTEGER, 1UL, r,
+                                    LTC_ASN1_INTEGER, 1UL, s,
+                                    LTC_ASN1_EOL, 0UL, NULL)) != CRYPT_OK) {
+        goto error;
+     }
    }
 
    /* get the order */
@@ -175,6 +177,40 @@ error:
       mp_montgomery_free(mp);
    }
    return err;
+}
+
+/**
+   Verify an ECC signature
+   @param sig         The signature to verify
+   @param siglen      The length of the signature (octets)
+   @param hash        The hash (message digest) that was signed
+   @param hashlen     The length of the hash (octets)
+   @param stat        Result of signature, 1==valid, 0==invalid
+   @param key         The corresponding public ECC key
+   @return CRYPT_OK if successful (even if the signature is not valid)
+*/
+int ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
+                    const unsigned char *hash, unsigned long hashlen, 
+                    int *stat, ecc_key *key)
+{
+  return ecc_verify_hash_ex(sig, siglen, hash, hashlen, stat, key, 0);
+}
+
+/**
+   Verify an ECC signature in RFC7518 format
+   @param sig         The signature to verify
+   @param siglen      The length of the signature (octets)
+   @param hash        The hash (message digest) that was signed
+   @param hashlen     The length of the hash (octets)
+   @param stat        Result of signature, 1==valid, 0==invalid
+   @param key         The corresponding public ECC key
+   @return CRYPT_OK if successful (even if the signature is not valid)
+*/
+int ecc_verify_hash_rfc7518(const unsigned char *sig,  unsigned long siglen,
+                    const unsigned char *hash, unsigned long hashlen, 
+                    int *stat, ecc_key *key)
+{
+  return ecc_verify_hash_ex(sig, siglen, hash, hashlen, stat, key, 1);
 }
 
 #endif

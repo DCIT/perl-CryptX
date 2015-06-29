@@ -272,6 +272,8 @@ _decrypt(Crypt::PK::ECC self, SV * data)
 
 SV *
 _sign(Crypt::PK::ECC self, SV * data)
+    ALIAS:
+        _sign_rfc7518 = 1
     CODE:
     {
         int rv;
@@ -282,9 +284,16 @@ _sign(Crypt::PK::ECC self, SV * data)
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
-        rv = ecc_sign_hash(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
-                           &self->yarrow_prng_state, self->yarrow_prng_index,
-                           &self->key);
+        if (ix == 1) {
+          rv = ecc_sign_hash_rfc7518(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
+                             &self->yarrow_prng_state, self->yarrow_prng_index,
+                             &self->key);
+        }
+        else {
+          rv = ecc_sign_hash(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
+                             &self->yarrow_prng_state, self->yarrow_prng_index,
+                             &self->key);
+        }
         if (rv != CRYPT_OK) croak("FATAL: ecc_sign_hash_ex failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
     }
@@ -293,6 +302,8 @@ _sign(Crypt::PK::ECC self, SV * data)
 
 int
 _verify(Crypt::PK::ECC self, SV * sig, SV * data)
+    ALIAS:
+        _verify_rfc7518 = 1
     CODE:
     {
         int rv, stat;
@@ -305,7 +316,12 @@ _verify(Crypt::PK::ECC self, SV * sig, SV * data)
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
 
         RETVAL = 1;
-        rv = ecc_verify_hash(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
+        if (ix == 1) {
+          rv = ecc_verify_hash_rfc7518(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
+        }
+        else {
+          rv = ecc_verify_hash(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
+        }
         if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
     }
     OUTPUT:

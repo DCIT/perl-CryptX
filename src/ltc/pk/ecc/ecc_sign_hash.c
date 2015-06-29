@@ -21,20 +21,9 @@
 
 #ifdef LTC_MECC
 
-/**
-  Sign a message digest
-  @param in        The message digest to sign
-  @param inlen     The length of the digest
-  @param out       [out] The destination for the signature
-  @param outlen    [in/out] The max size and resulting size of the signature
-  @param prng      An active PRNG state
-  @param wprng     The index of the PRNG you wish to use
-  @param key       A private ECC key
-  @return CRYPT_OK if successful
-*/
-int ecc_sign_hash(const unsigned char *in,  unsigned long inlen, 
-                        unsigned char *out, unsigned long *outlen, 
-                        prng_state *prng, int wprng, ecc_key *key)
+int ecc_sign_hash_ex(const unsigned char *in,  unsigned long inlen, 
+                           unsigned char *out, unsigned long *outlen, 
+                           prng_state *prng, int wprng, ecc_key *key, int sigformat)
 {
    ecc_key       pubkey;
    void          *r, *s, *e, *p;
@@ -111,17 +100,66 @@ int ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
       }
    }
 
-   /* store as SEQUENCE { r, s -- integer } */
-   err = der_encode_sequence_multi(out, outlen,
-                             LTC_ASN1_INTEGER, 1UL, r,
-                             LTC_ASN1_INTEGER, 1UL, s,
-                             LTC_ASN1_EOL, 0UL, NULL);
+   if (sigformat == 1) {
+     /* RFC7518 format */
+     if (*outlen < 2*pbytes) { err = CRYPT_MEM; goto errnokey; }
+     zeromem(out, 2*pbytes); 
+     i = mp_unsigned_bin_size(r);
+     if ((err = mp_to_unsigned_bin(r, out + (pbytes - i)))   != CRYPT_OK) goto errnokey;
+     i = mp_unsigned_bin_size(s);
+     if ((err = mp_to_unsigned_bin(s, out + (2*pbytes - i))) != CRYPT_OK) goto errnokey;
+     *outlen = 2*pbytes;
+     err = CRYPT_OK;
+   }
+   else {
+     /* store as ASN.1 SEQUENCE { r, s -- integer } */
+     err = der_encode_sequence_multi(out, outlen,
+                               LTC_ASN1_INTEGER, 1UL, r,
+                               LTC_ASN1_INTEGER, 1UL, s,
+                               LTC_ASN1_EOL, 0UL, NULL);
+   }
    goto errnokey;
 error:
    ecc_free(&pubkey);
 errnokey:
    mp_clear_multi(r, s, p, e, NULL);
    return err;   
+}
+
+/**
+  Sign a message digest
+  @param in        The message digest to sign
+  @param inlen     The length of the digest
+  @param out       [out] The destination for the signature
+  @param outlen    [in/out] The max size and resulting size of the signature
+  @param prng      An active PRNG state
+  @param wprng     The index of the PRNG you wish to use
+  @param key       A private ECC key
+  @return CRYPT_OK if successful
+*/
+int ecc_sign_hash(const unsigned char *in,  unsigned long inlen, 
+                        unsigned char *out, unsigned long *outlen, 
+                        prng_state *prng, int wprng, ecc_key *key)
+{
+  return ecc_sign_hash_ex(in, inlen, out, outlen, prng, wprng, key, 0);
+}
+
+/**
+  Sign a message digest in RFC7518 format
+  @param in        The message digest to sign
+  @param inlen     The length of the digest
+  @param out       [out] The destination for the signature
+  @param outlen    [in/out] The max size and resulting size of the signature
+  @param prng      An active PRNG state
+  @param wprng     The index of the PRNG you wish to use
+  @param key       A private ECC key
+  @return CRYPT_OK if successful
+*/
+int ecc_sign_hash_rfc7518(const unsigned char *in,  unsigned long inlen, 
+                                unsigned char *out, unsigned long *outlen, 
+                                prng_state *prng, int wprng, ecc_key *key)
+{
+  return ecc_sign_hash_ex(in, inlen, out, outlen, prng, wprng, key, 1);
 }
 
 #endif
