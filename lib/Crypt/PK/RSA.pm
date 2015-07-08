@@ -39,31 +39,37 @@ sub export_key_pem {
 }
 
 sub export_key_jwk {
-  my ($self, $type) = @_;
+  my ($self, $type, $wanthash) = @_;
   my $kh = $self->key2hash;
   if ($type eq 'private') {
     return unless $kh->{N} && $kh->{e} && $kh->{d} && $kh->{p} && $kh->{q} && $kh->{dP} && $kh->{dQ} && $kh->{qP};
     for (qw/N e d p q dP dQ qP/) {
       $kh->{$_} = "0$kh->{$_}" if length($kh->{$_}) % 2;
     }
-    return sprintf '{"kty":"RSA","n":"%s","e":"%s","d":"%s","p":"%s","q":"%s","dp":"%s","dq":"%s","qi":"%s"}',
-                        encode_base64url(pack("H*", $kh->{N})),
-                        encode_base64url(pack("H*", $kh->{e})),
-                        encode_base64url(pack("H*", $kh->{d})),
-                        encode_base64url(pack("H*", $kh->{p})),
-                        encode_base64url(pack("H*", $kh->{q})),
-                        encode_base64url(pack("H*", $kh->{dP})),
-                        encode_base64url(pack("H*", $kh->{dQ})),
-                        encode_base64url(pack("H*", $kh->{qP}));
+    my $hash = {
+      kty => "RSA",
+      n   => encode_base64url(pack("H*", $kh->{N})),
+      e   => encode_base64url(pack("H*", $kh->{e})),
+      d   => encode_base64url(pack("H*", $kh->{d})),
+      p   => encode_base64url(pack("H*", $kh->{p})),
+      q   => encode_base64url(pack("H*", $kh->{q})),
+      dp  => encode_base64url(pack("H*", $kh->{dP})),
+      dq  => encode_base64url(pack("H*", $kh->{dQ})),
+      qi  => encode_base64url(pack("H*", $kh->{qP})),
+    };
+    return $wanthash ? $hash : encode_json($hash);
   }
   elsif ($type eq 'public') {
     return unless $kh->{N} && $kh->{e};
     for (qw/N e/) {
       $kh->{$_} = "0$kh->{$_}" if length($kh->{$_}) % 2;
     }
-    return sprintf '{"kty":"RSA","n":"%s","e":"%s"}',
-                        encode_base64url(pack("H*", $kh->{N})),
-                        encode_base64url(pack("H*", $kh->{e}));
+    my $hash = {
+      kty => "RSA",
+      n   => encode_base64url(pack("H*", $kh->{N})),
+      e   => encode_base64url(pack("H*", $kh->{e})),
+    };
+    return $wanthash ? $hash : encode_json($hash);
   }
 }
 
@@ -84,6 +90,7 @@ sub import_key {
       }
       return $self->_import_hex($key->{n}, $key->{e}, $key->{d}, $key->{p}, $key->{q}, $key->{dp}, $key->{dq}, $key->{qi});
     }
+    croak "FATAL: unexpected RSA key hash";
   }
 
   my $data;
@@ -367,6 +374,12 @@ Loading private or public keys form perl hash:
 
 Supported key formats:
 
+ # all formats can be loaded from a file
+ my $pk = Crypt::PK::RSA->new($filename);
+
+ # or from a buffer containing the key
+ my $pk = Crypt::PK::RSA->new(\$buffer_with_key);
+
 =over
 
 =item * RSA public keys
@@ -537,11 +550,17 @@ Support for password protected PEM keys
 
 =head2 export_key_jwk
 
-Exports public/private keys as a JSON Web Key.
+Exports public/private keys as a JSON Web Key (JWK).
 
  my $private_json_text = $pk->export_key_jwk('private');
  #or
  my $public_json_text = $pk->export_key_jwk('public');
+
+Also exports public/private keys as a perl HASH with JWK structure.
+
+ my $jwk_hash = $pk->export_key_jwk('private', 1);
+ #or
+ my $jwk_hash = $pk->export_key_jwk('public', 1);
 
 =head2 encrypt
 

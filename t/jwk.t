@@ -59,6 +59,16 @@ my $RSA2 = {
   ok($rsa->is_private, "RSA private test HASH1");
   my $jwk = $rsa->export_key_jwk('private');
   my $jwkp = $rsa->export_key_jwk('public');
+  my $jwkh = $rsa->export_key_jwk('private', 1);
+  my $jwkhp = $rsa->export_key_jwk('public', 1);
+  is($jwkh->{kty}, "RSA",  "RSA kty test export_key_jwk as hash");
+  is($jwkhp->{kty}, "RSA", "RSA(pub) kty test export_key_jwk as hash");
+  ok(exists $jwkhp->{n},  "RSA(pub) n test export_key_jwk as hash");
+  ok(exists $jwkhp->{e},  "RSA(pub) e test export_key_jwk as hash");
+  ok(!exists $jwkhp->{p}, "RSA(pub) p test export_key_jwk as hash");
+  ok(exists $jwkh->{n}, "RSA n test export_key_jwk as hash");
+  ok(exists $jwkh->{e}, "RSA e test export_key_jwk as hash");
+  ok(exists $jwkh->{p}, "RSA p test export_key_jwk as hash");
   ### jwk re-import private key
   $rsa->import_key(\$jwk);
   $kh = $rsa->key2hash;
@@ -154,6 +164,16 @@ my $EC2 = {
   ok($ec->is_private, "EC private test HASH1");
   my $jwk = $ec->export_key_jwk('private');
   my $jwkp = $ec->export_key_jwk('public');
+  my $jwkh = $ec->export_key_jwk('private', 1);
+  my $jwkhp = $ec->export_key_jwk('public', 1);
+  is($jwkh->{kty}, "EC",  "ECC kty test export_key_jwk as hash");
+  is($jwkhp->{kty}, "EC", "ECC(pub) kty test export_key_jwk as hash");
+  ok(exists $jwkhp->{x},  "ECC(pub) x test export_key_jwk as hash");
+  ok(exists $jwkhp->{y},  "ECC(pub) y test export_key_jwk as hash");
+  ok(!exists $jwkhp->{d}, "ECC(pub) d test export_key_jwk as hash");
+  ok(exists $jwkh->{x}, "ECC x test export_key_jwk as hash");
+  ok(exists $jwkh->{y}, "ECC y test export_key_jwk as hash");
+  ok(exists $jwkh->{d}, "ECC d test export_key_jwk as hash");
   ### jwk re-import private key
   $ec->import_key(\$jwk);
   $kh = $ec->key2hash;

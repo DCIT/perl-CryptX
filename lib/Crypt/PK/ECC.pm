@@ -440,7 +440,7 @@ sub export_key_pem {
 }
 
 sub export_key_jwk {
-  my ($self, $type) = @_;
+  my ($self, $type, $wanthash) = @_;
   my $kh = $self->key2hash;
   my $curve = $self->_curve_name_lookup($kh);
   $curve = 'P-192' if $curve =~ /(secp192r1|nistp192|prime192v1)/;
@@ -454,22 +454,26 @@ sub export_key_jwk {
       $kh->{$_} = "0$kh->{$_}" if length($kh->{$_}) % 2;
     }
     # NOTE: x + y are not necessary in privkey
-    # but they are used in https://tools.ietf.org/html/draft-ietf-jose-json-web-key-41#appendix-A.2
-    return sprintf '{"kty":"EC","crv":"%s","x":"%s","y":"%s","d":"%s"}',
-                        $curve,
-                        encode_base64url(pack("H*", $kh->{pub_x})),
-                        encode_base64url(pack("H*", $kh->{pub_y})),
-                        encode_base64url(pack("H*", $kh->{k}));
+    # but they are used in https://tools.ietf.org/html/rfc7517#appendix-A.2
+    my $hash = {
+      kty => "EC", crv=>$curve,
+      x => encode_base64url(pack("H*", $kh->{pub_x})),
+      y => encode_base64url(pack("H*", $kh->{pub_y})),
+      d => encode_base64url(pack("H*", $kh->{k})),
+    };
+    return $wanthash ? $hash : encode_json($hash);
   }
   elsif ($type && $type eq 'public') {
     return unless $kh->{pub_x} && $kh->{pub_y};
     for (qw/pub_x pub_y/) {
       $kh->{$_} = "0$kh->{$_}" if length($kh->{$_}) % 2;
     }
-    return sprintf '{"kty":"EC","crv":"%s","x":"%s","y":"%s"}',
-                        $curve,
-                        encode_base64url(pack("H*", $kh->{pub_x})),
-                        encode_base64url(pack("H*", $kh->{pub_y}));
+    my $hash = {
+      kty => "EC", crv=>$curve,
+      x => encode_base64url(pack("H*", $kh->{pub_x})),
+      y => encode_base64url(pack("H*", $kh->{pub_y})),
+    };
+    return $wanthash ? $hash : encode_json($hash);
   }
 }
 
@@ -495,7 +499,7 @@ sub import_key {
         return $self->_import_hex($key->{x}, $key->{y}, $key->{d}, $curve);
       }
     }
-    croak "FATAL: unexpected key hash";
+    croak "FATAL: unexpected ECC key hash";
   }
 
   my $data;
@@ -864,6 +868,12 @@ Loading private or public keys form perl hash:
 
 Supported key formats:
 
+ # all formats can be loaded from a file
+ my $pk = Crypt::PK::ECC->new($filename);
+
+ # or from a buffer containing the key
+ my $pk = Crypt::PK::ECC->new(\$buffer_with_key);
+
 =over
 
 =item * EC private keys with with all curve parameters
@@ -1026,11 +1036,17 @@ Support for password protected PEM keys
 
 =head2 export_key_jwk
 
-Exports public/private keys as a JSON Web Key.
+Exports public/private keys as a JSON Web Key (JWK).
 
  my $private_json_text = $pk->export_key_jwk('private');
  #or
  my $public_json_text = $pk->export_key_jwk('public');
+
+Also exports public/private keys as a perl HASH with JWK structure.
+
+ my $jwk_hash = $pk->export_key_jwk('private', 1);
+ #or
+ my $jwk_hash = $pk->export_key_jwk('public', 1);
 
 =head2 export_key_raw
 
