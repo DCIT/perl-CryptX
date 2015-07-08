@@ -14,6 +14,9 @@ TODO:
         - DH: key2hash should dump $base and $prime as well (perhasp add base, prime to dh_key struct)
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
 
+0.025   2015/07/07
+        - Crypt::PK::ECC+RSA export_key_jwk() allows to export a perl HASH with JWK structure
+
 0.024   2015/06/29
         - new Crypt::PK::ECC methods
             verify_message_rfc7518()
