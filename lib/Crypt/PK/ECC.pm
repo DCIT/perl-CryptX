@@ -13,7 +13,7 @@ use Crypt::PK;
 use Crypt::Digest 'digest_data';
 use Carp;
 use MIME::Base64 qw(encode_base64 decode_base64 encode_base64url decode_base64url);
-use JSON qw(encode_json decode_json);
+use JSON::MaybeXS qw(encode_json decode_json);
 
 our %curve = (
         ### http://www.ecc-brainpool.org/download/Domain-parameters.pdf (v1.0 19.10.2005)
