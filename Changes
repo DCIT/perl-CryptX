@@ -1,6 +1,7 @@
 Changes for CryptX
 
 TODO:
+        - VS2012: http://www.cpantesters.org/cpan/report/432294d4-6bfa-1014-a12f-1900f08ac328
         - strange failures of 0.22:
           http://www.cpantesters.org/cpan/report/4d7fc1d0-01f4-11e5-a85a-e28fcaadd3a7
           http://www.cpantesters.org/cpan/report/8809d2b2-05e8-11e5-a85a-e28fcaadd3a7
@@ -13,6 +14,9 @@ TODO:
         - DH: generate_key($base, $prime), generate_key(\$dh_params_der), generate_key($dh_params_file)
         - DH: key2hash should dump $base and $prime as well (perhasp add base, prime to dh_key struct)
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
+
+0.025_01 2015/10/22
+        - switch to JSON::MaybeXS
 
 0.025   2015/07/07
         - Crypt::PK::ECC+RSA export_key_jwk() allows to export a perl HASH with JWK structure
