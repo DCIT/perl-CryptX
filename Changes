@@ -1,22 +1,22 @@
 Changes for CryptX
 
 TODO:
-        - VS2012: http://www.cpantesters.org/cpan/report/432294d4-6bfa-1014-a12f-1900f08ac328
-        - strange failures of 0.22:
-          http://www.cpantesters.org/cpan/report/4d7fc1d0-01f4-11e5-a85a-e28fcaadd3a7
-          http://www.cpantesters.org/cpan/report/8809d2b2-05e8-11e5-a85a-e28fcaadd3a7
         - add support for PKCS#8 encrypted RSA+ECC private keys  "-----BEGIN ENCRYPTED PRIVATE KEY-----"
-        - add CCM interface for new-add-add-done mode
-        - switch yarrow > fortuna for Crypt::PK::*
         - RSA|DSA|ECC: verify_key($level) (basic check + extented primality test)
         - better primality testing: http://questhub.io/realm/perl/quest/519032ee1088c76505000035 (idea: mp_prime_lucas)
         - DSA: generate_key($p, $q, $g), generate_key(\$dsa_params_der), generate_key($dsa_params_file)
         - DH: generate_key($base, $prime), generate_key(\$dh_params_der), generate_key($dh_params_file)
         - DH: key2hash should dump $base and $prime as well (perhasp add base, prime to dh_key struct)
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
+        - maybe: add CCM interface for new-add-add-done mode
+        - maybe: switch yarrow > fortuna for Crypt::PK::*
+        - maybe: add enc_b64/dec_b64 + enc_b64u/dec_b64u + enc_b32/dec_b32
+        - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
-0.025_01 2015/10/22
+0.026   2015/11/28
         - switch to JSON::MaybeXS
+        - Crypt::PRNG - rand/irand related cosmetics
+        - consistently using UNIX newlines
 
 0.025   2015/07/07
         - Crypt::PK::ECC+RSA export_key_jwk() allows to export a perl HASH with JWK structure
