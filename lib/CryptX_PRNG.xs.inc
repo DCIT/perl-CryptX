@@ -121,6 +121,7 @@ _double(Crypt::PRNG self, IV curpid, ...)
         unsigned long a, b;     /* 32bit is enough */
         unsigned char rdata[7]; /* for double we need 53 bits */
         unsigned char entropy_buf[32];
+        NV limit;
 
         if (self->last_pid != curpid) {
           rng_get_bytes(entropy_buf, 32, NULL);
@@ -134,7 +135,10 @@ _double(Crypt::PRNG self, IV curpid, ...)
         a = (((unsigned long)(rdata[0])<<16) + ((unsigned long)(rdata[1])<<8) + ((unsigned long)(rdata[2]))) & 0x1FFFFF;                      /* 21 bits */
         b = ((unsigned long)(rdata[3])<<24) + ((unsigned long)(rdata[4])<<16) + ((unsigned long)(rdata[5])<<8) + ((unsigned long)(rdata[6])); /* 32 bits */
         RETVAL = ( (NV)a * 4294967296.0 + (NV)b ) / 9007199254740992.0;                           /* (a * 2^32 + b) / 2^53 */
-        if (items>2 && SvOK(ST(2))) RETVAL = RETVAL * SvNV(ST(2));
+        if (items>2 && SvOK(ST(2))) {
+          limit = SvNV(ST(2));
+          if (limit > 0 || limit < 0) RETVAL = RETVAL * limit;
+        }
     }
     OUTPUT:
         RETVAL

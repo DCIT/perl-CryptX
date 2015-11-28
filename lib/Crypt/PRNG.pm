@@ -87,14 +87,14 @@ sub CLONE_SKIP { 1 } # prevent cloning
     $RNG_object = Crypt::PRNG->new unless defined $RNG_object && ref($RNG_object) ne 'SCALAR';
     return $RNG_object;
   };
-  sub rand               { return $fetch_RNG->()->double(@_) }
-  sub irand              { return $fetch_RNG->()->int32() }
-  sub random_bytes       { return $fetch_RNG->()->bytes(@_) }
-  sub random_bytes_hex   { return $fetch_RNG->()->bytes_hex(@_) }
-  sub random_bytes_b64   { return $fetch_RNG->()->bytes_b64(@_) }
-  sub random_bytes_b64u  { return $fetch_RNG->()->bytes_b64u(@_) }
-  sub random_string_from { return $fetch_RNG->()->string_from(@_) }
-  sub random_string      { return $fetch_RNG->()->string(@_) }
+  sub rand(;$)               { return $fetch_RNG->()->double(@_) }
+  sub irand()                { return $fetch_RNG->()->int32() }
+  sub random_bytes($)        { return $fetch_RNG->()->bytes(@_) }
+  sub random_bytes_hex($)    { return $fetch_RNG->()->bytes_hex(@_) }
+  sub random_bytes_b64($)    { return $fetch_RNG->()->bytes_b64(@_) }
+  sub random_bytes_b64u($)   { return $fetch_RNG->()->bytes_b64u(@_) }
+  sub random_string_from($$) { return $fetch_RNG->()->string_from(@_) }
+  sub random_string(;$)      { return $fetch_RNG->()->string(@_) }
 }
 
 # Base64 URL Safe hack as encode_base64url requires MIME::Base64 3.11+
