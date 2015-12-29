@@ -14,23 +14,24 @@
   @file crypt.c
   Build strings, Tom St Denis
 */
+#define NAME_VALUE(s) #s"="NAME(s)
+#define NAME(s) #s
 
 const char *crypt_build_settings =
    "LibTomCrypt " SCRYPT " (Tom St Denis, tomstdenis@gmail.com)\n"
    "LibTomCrypt is public domain software.\n"
-   "Built on " __DATE__ " at " __TIME__ "\n\n\n"
-   "Endianness: "
+#if defined(INCLUDE_BUILD_DATE)
+   "Built on " __DATE__ " at " __TIME__ "\n"
+#endif
+   "\n\nEndianness: "
 #if defined(ENDIAN_NEUTRAL)
    "neutral\n"
-#elif defined(ENDIAN_LITTLE)
+#else
+#if defined(ENDIAN_LITTLE)
    "little"
-   #if defined(ENDIAN_32BITWORD)
-   " (32-bit words)\n"
-   #else
-   " (64-bit words)\n"
-   #endif
 #elif defined(ENDIAN_BIG)
    "big"
+#endif
    #if defined(ENDIAN_32BITWORD)
    " (32-bit words)\n"
    #else
@@ -252,7 +253,7 @@ const char *crypt_build_settings =
 
     "\nPRNG:\n"
 #if defined(LTC_YARROW)
-    "   Yarrow\n"
+    "   Yarrow ("NAME_VALUE(LTC_YARROW_AES)")\n"
 #endif
 #if defined(LTC_SPRNG)
     "   SPRNG\n"
@@ -261,7 +262,7 @@ const char *crypt_build_settings =
     "   RC4\n"
 #endif
 #if defined(LTC_FORTUNA)
-    "   Fortuna\n"
+    "   Fortuna (" NAME_VALUE(LTC_FORTUNA_POOLS) ", " NAME_VALUE(LTC_FORTUNA_WD) ")\n"
 #endif
 #if defined(LTC_SOBER128)
     "   SOBER128\n"
@@ -270,8 +271,12 @@ const char *crypt_build_settings =
     "\nPK Algs:\n"
 #if defined(LTC_MRSA)
     "   RSA"
-#if defined(LTC_RSA_BLINDING)
+#if defined(LTC_RSA_BLINDING) && defined(LTC_RSA_CRT_HARDENING)
+    " (with blinding and CRT hardening)"
+#elif defined(LTC_RSA_BLINDING)
     " (with blinding)"
+#elif defined(LTC_RSA_CRT_HARDENING)
+    " (with CRT hardening)"
 #endif
     "\n"
 #endif
@@ -323,14 +328,23 @@ const char *crypt_build_settings =
 #endif
 
     "\nVarious others: "
+#if defined(LTC_ADLER32)
+    " ADLER32 "
+#endif
 #if defined(LTC_BASE64)
     " BASE64 "
 #endif
 #if defined(LTC_BASE64_URL)
     " BASE64-URL-SAFE "
 #endif
+#if defined(LTC_CRC32)
+    " CRC32 "
+#endif
 #if defined(LTC_DER)
     " DER "
+#endif
+#if defined(LTC_DER_MAX_PUBKEY_SIZE)
+    " " NAME_VALUE(LTC_DER_MAX_PUBKEY_SIZE) " "
 #endif
 #if defined(LTC_PKCS_1)
     " PKCS#1 "
@@ -344,11 +358,29 @@ const char *crypt_build_settings =
 #if defined(MPI)
     " MPI "
 #endif
+#if defined(LTC_DEVRANDOM)
+    " LTC_DEVRANDOM "
+#endif
 #if defined(LTC_TRY_URANDOM_FIRST)
     " LTC_TRY_URANDOM_FIRST "
 #endif
+#if defined(LTC_RNG_GET_BYTES)
+    " LTC_RNG_GET_BYTES "
+#endif
+#if defined(LTC_RNG_MAKE_PRNG)
+    " LTC_RNG_MAKE_PRNG "
+#endif
+#if defined(LTC_HASH_HELPERS)
+    " LTC_HASH_HELPERS "
+#endif
+#if defined(LTC_VALGRIND)
+    " LTC_VALGRIND "
+#endif
 #if defined(LTC_TEST)
     " LTC_TEST "
+#endif
+#if defined(LTC_TEST_EXT)
+    " LTC_TEST_EXT "
 #endif
 #if defined(LTC_SMALL_CODE)
     " LTC_SMALL_CODE "

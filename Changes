@@ -13,6 +13,11 @@ TODO:
         - maybe: add enc_b64/dec_b64 + enc_b64u/dec_b64u + enc_b32/dec_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.026_01..03   2015/12/29
+        - sync with https://github.com/libtom/libtomcrypt (branch develop)
+        - 0.026_02 = with -Wall
+        - 0.026_03 = with -DLTC_NO_FAST
+
 0.026   2015/11/28
         - switch to JSON::MaybeXS
         - Crypt::PRNG - rand/irand related cosmetics

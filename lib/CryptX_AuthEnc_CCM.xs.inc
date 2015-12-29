@@ -77,15 +77,11 @@ _memory_decrypt(char *cipher_name, SV *key, SV *nonce, SV *header, SV *ciphertex
         SvCUR_set(pt, ct_len);
 
         xtag_len = (unsigned long)t_len;
+        Copy(t, xtag, t_len, unsigned char);
 
         rv = ccm_memory(id, k, (unsigned long)k_len, NULL, n, (unsigned long)n_len, h, (unsigned long)h_len,
                         (unsigned char *)SvPV_nolen(pt), (unsigned long)ct_len, ct, xtag, &xtag_len, CCM_DECRYPT);
-        if (rv != CRYPT_OK) croak("FATAL: ccm_memory failed: %s", error_to_string(rv));
-
-        if (t_len!=xtag_len) {
-          XPUSHs(sv_2mortal(newSVpvn(NULL,0))); /* undef */
-        }
-        else if (memNE(t, xtag, xtag_len)) {
+        if (rv != CRYPT_OK) {
           XPUSHs(sv_2mortal(newSVpvn(NULL,0))); /* undef */
         }
         else {

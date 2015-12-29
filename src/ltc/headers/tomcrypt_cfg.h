@@ -100,6 +100,22 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
    typedef unsigned long ulong32;
 #endif
 
+#ifdef LTC_NO_FAST
+   #undef LTC_FAST
+#endif
+
+#ifdef LTC_FAST
+#if __GNUC__ < 4 /* if the compiler does not support gnu extensions, i.e. its neither clang nor gcc nor icc */
+#error the LTC_FAST hack is only available on compilers that support __attribute__((may_alias)) - disable it for your compiler, and dont worry, it won`t buy you much anyway
+#else
+#ifdef ENDIAN_64BITWORD
+typedef ulong64 __attribute__((__may_alias__)) LTC_FAST_TYPE;
+#else
+typedef ulong32 __attribute__((__may_alias__)) LTC_FAST_TYPE;
+#endif
+#endif
+#endif /* LTC_FAST */
+
 /* detect sparc and sparc64 */
 #if defined(__sparc__)
   #define ENDIAN_BIG
@@ -114,18 +130,6 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 typedef ulong64 ltc_mp_digit;
 #else
 typedef ulong32 ltc_mp_digit;
-#endif
-
-#ifdef LTC_NO_FAST
-   #ifdef LTC_FAST
-      #undef LTC_FAST
-   #endif
-#endif
-
-/* if the compiler does not support __attribute__((__may_alias__))  */
-/* MSVC: http://stackoverflow.com/questions/70013/how-to-detect-if-im-compiling-code-with-visual-studio-2008 */
-#if (defined(__GNUC__) && __GNUC__ < 4) || (defined(_MSC_VER) && _MSC_VER < 1300)
-  #undef LTC_FAST
 #endif
 
 /* No asm is a quick way to disable anything "not portable" */
@@ -157,14 +161,6 @@ typedef ulong32 ltc_mp_digit;
 #if (defined(ENDIAN_32BITWORD) && defined(ENDIAN_64BITWORD))
     #error Can not be 32 and 64 bit words...
 #endif
-
-#ifdef LTC_FAST
-#ifdef ENDIAN_64BITWORD
-typedef ulong64 __attribute__((__may_alias__)) LTC_FAST_TYPE;
-#else
-typedef ulong32 __attribute__((__may_alias__)) LTC_FAST_TYPE;
-#endif
-#endif /* LTC_FAST */
 
 /* gcc 4.3 and up has a bswap builtin; detect it by gcc version.
  * clang also supports the bswap builtin, and although clang pretends

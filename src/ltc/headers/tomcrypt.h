@@ -12,11 +12,6 @@
 /* use configuration data */
 #include <tomcrypt_custom.h>
 
-/* Define inline for MSVC<2015 */ 
-# if defined(_MSC_VER) && _MSC_VER < 1900 
-#  define inline __inline 
-# endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif

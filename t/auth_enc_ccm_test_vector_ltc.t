@@ -20,7 +20,7 @@ sub do_test {
   is(unpack('H*', $tag3), $a{tag}, "enc: tag");
   my $pt3 = ccm_decrypt_verify('AES', $key, $nonce, $header, $ciphertext, $tag);
   is(unpack('H*', $pt3), $a{plaintext}, "dec: plaintext");
-  
+  ok(!defined ccm_decrypt_verify('AES', $key, $nonce, $header, $ciphertext, "BAD__TAG"));
 }
 
 do_test(%$_) for (

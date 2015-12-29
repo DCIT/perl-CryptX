@@ -69,6 +69,34 @@ void init_GMP(void);
 #endif
 */
 
+#ifdef LTC_ADLER32
+typedef struct adler32_state_s
+{
+   unsigned short s[2];
+} adler32_state;
+
+void adler32_init(adler32_state *ctx);
+void adler32_update(adler32_state *ctx, const unsigned char *input, unsigned long length);
+void adler32_finish(adler32_state *ctx, void *hash, unsigned long size);
+int adler32_test(void);
+#endif
+
+#ifdef LTC_CRC32
+typedef struct crc32_state_s
+{
+   ulong32 crc;
+} crc32_state;
+
+void crc32_init(crc32_state *ctx);
+void crc32_update(crc32_state *ctx, const unsigned char *input, unsigned long length);
+void crc32_finish(crc32_state *ctx, void *hash, unsigned long size);
+int crc32_test(void);
+#endif
+
+/* yeah it's not exactly in misc in the library, but in testprof/x86_prof.c */
+#if defined(LTC_TEST) && defined(LTC_TEST_DBG)
+void print_hex(const char* what, const unsigned char* p, const unsigned long l);
+#endif
 
 /* $Source$ */
 /* $Revision$ */
