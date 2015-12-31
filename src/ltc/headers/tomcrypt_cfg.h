@@ -82,6 +82,16 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
    #define LTC_FAST
 #endif
 
+/* detect HP-UX */
+#if defined(__hpux) || defined(__hpux__)
+  #define ENDIAN_BIG
+  #if defined(__ia64) || defined(__ia64__) || defined(__LP64__)
+    #define ENDIAN_64BITWORD
+  #else
+    #define ENDIAN_32BITWORD
+  #endif
+#endif
+
 /* fix for MSVC ...evil! */
 #ifdef _MSC_VER
    #define CONST64(n) n ## ui64
@@ -94,27 +104,23 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 /* this is the "32-bit at least" data type
  * Re-define it to suit your platform but it must be at least 32-bits
  */
-#if defined(__x86_64__) || (defined(__sparc__) && defined(__arch64__))
+#if defined(__x86_64__) || (defined(__sparc__) && defined(__arch64__)) || defined(__LP64__)
    typedef unsigned ulong32;
 #else
    typedef unsigned long ulong32;
 #endif
 
-#ifdef LTC_NO_FAST
+#if defined(LTC_NO_FAST) || (__GNUC__ < 4)
    #undef LTC_FAST
 #endif
 
 #ifdef LTC_FAST
-#if __GNUC__ < 4 /* if the compiler does not support gnu extensions, i.e. its neither clang nor gcc nor icc */
-#error the LTC_FAST hack is only available on compilers that support __attribute__((may_alias)) - disable it for your compiler, and dont worry, it won`t buy you much anyway
-#else
 #ifdef ENDIAN_64BITWORD
 typedef ulong64 __attribute__((__may_alias__)) LTC_FAST_TYPE;
 #else
 typedef ulong32 __attribute__((__may_alias__)) LTC_FAST_TYPE;
 #endif
 #endif
-#endif /* LTC_FAST */
 
 /* detect sparc and sparc64 */
 #if defined(__sparc__)

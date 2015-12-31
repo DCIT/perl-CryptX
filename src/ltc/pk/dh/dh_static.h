@@ -69,7 +69,11 @@
      y += x;                                                     \
 }
 
+#ifdef __HP_cc
+static void packet_store_header (unsigned char *dst, int section, int subsection)
+#else
 static inline void packet_store_header (unsigned char *dst, int section, int subsection)
+#endif
 {
    LTC_ARGCHKVD(dst != NULL);
 
@@ -83,7 +87,11 @@ static inline void packet_store_header (unsigned char *dst, int section, int sub
 
 }
 
+#ifdef __HP_cc
+static int packet_valid_header (unsigned char *src, int section, int subsection)
+#else
 static inline int packet_valid_header (unsigned char *src, int section, int subsection)
+#endif
 {
    unsigned long ver;
 
