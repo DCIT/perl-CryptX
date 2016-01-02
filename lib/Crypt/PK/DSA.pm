@@ -63,7 +63,7 @@ sub import_key {
     return $self->_import_hex($p, $q, $g, undef, $y) if $typ && $p && $q && $g && $y && $typ eq 'ssh-dss';
   }
   elsif ($data =~ /ssh-dss\s+(\S+)/) {
-    $data = _decode_base64($1);
+    $data = _decode_base64("$1");
     my ($typ, $p, $q, $g, $y) = Crypt::PK::_ssh_parse($data);
     return $self->_import_hex($p, $q, $g, undef, $y) if $typ && $p && $q && $g && $y && $typ eq 'ssh-dss';
   }
