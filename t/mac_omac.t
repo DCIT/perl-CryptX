@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 72;
 
 use Crypt::Mac::OMAC qw( omac omac_hex omac_b64 omac_b64u );
 
@@ -79,5 +79,3 @@ is( unpack('H*', omac('Blowfish','12345678901234561234567890123456',"test\0test\
 is( omac_hex('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), '40e6d018b49ada77', 'OMAC/func+hex/12');
 is( omac_b64('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), 'QObQGLSa2nc=', 'OMAC/func+b64/12');
 is( omac_b64u('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), 'QObQGLSa2nc', 'OMAC/func+b64u/12');
-
-done_testing();

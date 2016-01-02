@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 72;
 
 use Crypt::Mac::F9 qw( f9 f9_hex f9_b64 f9_b64u );
 
@@ -79,5 +79,3 @@ is( unpack('H*', f9('Blowfish','12345678901234561234567890123456',"test\0test\0t
 is( f9_hex('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), 'fa83d84023c43a81', 'F9/func+hex/12');
 is( f9_b64('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), '+oPYQCPEOoE=', 'F9/func+b64/12');
 is( f9_b64u('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), '-oPYQCPEOoE', 'F9/func+b64u/12');
-
-done_testing();

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 72;
 
 use Crypt::Mac::XCBC qw( xcbc xcbc_hex xcbc_b64 xcbc_b64u );
 
@@ -79,5 +79,3 @@ is( unpack('H*', xcbc('Blowfish','12345678901234561234567890123456',"test\0test\
 is( xcbc_hex('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), '98276a4a6aafd86b', 'XCBC/func+hex/12');
 is( xcbc_b64('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), 'mCdqSmqv2Gs=', 'XCBC/func+b64/12');
 is( xcbc_b64u('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), 'mCdqSmqv2Gs', 'XCBC/func+b64u/12');
-
-done_testing();

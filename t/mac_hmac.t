@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 72;
 
 use Crypt::Mac::HMAC qw( hmac hmac_hex hmac_b64 hmac_b64u );
 
@@ -79,5 +79,3 @@ is( unpack('H*', hmac('Whirlpool','secretkey',"test\0test\0test\n")), 'dab6a22e0
 is( hmac_hex('Whirlpool','secretkey',"test\0test\0test\n"), 'dab6a22e05b46ce641e022e6ea2b42646a25b994ed15fed09145e3906d159efba37b899c344f589b3ad5868cd631a8eb304d21dedf47e364c791ccfa665681f7', 'HMAC/func+hex/12');
 is( hmac_b64('Whirlpool','secretkey',"test\0test\0test\n"), '2raiLgW0bOZB4CLm6itCZGoluZTtFf7QkUXjkG0Vnvuje4mcNE9YmzrVhozWMajrME0h3t9H42THkcz6ZlaB9w==', 'HMAC/func+b64/12');
 is( hmac_b64u('Whirlpool','secretkey',"test\0test\0test\n"), '2raiLgW0bOZB4CLm6itCZGoluZTtFf7QkUXjkG0Vnvuje4mcNE9YmzrVhozWMajrME0h3t9H42THkcz6ZlaB9w', 'HMAC/func+b64u/12');
-
-done_testing();

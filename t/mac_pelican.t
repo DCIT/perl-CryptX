@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 72;
 
 use Crypt::Mac::Pelican qw( pelican pelican_hex pelican_b64 pelican_b64u );
 
@@ -79,5 +79,3 @@ is( unpack('H*', pelican('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',"test\0test\0test\n"
 is( pelican_hex('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',"test\0test\0test\n"), '8a798fcb2181d9f9ed81fcd2a7f6cd4e', 'Pelican/func+hex/12');
 is( pelican_b64('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',"test\0test\0test\n"), 'inmPyyGB2fntgfzSp/bNTg==', 'Pelican/func+b64/12');
 is( pelican_b64u('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',"test\0test\0test\n"), 'inmPyyGB2fntgfzSp_bNTg', 'Pelican/func+b64u/12');
-
-done_testing();
