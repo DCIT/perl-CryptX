@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 266;
 use Crypt::Mode::ECB;
 
 my @tests;
@@ -83,5 +83,3 @@ for (@tests) {
     }    
   }
 }
-
-done_testing;

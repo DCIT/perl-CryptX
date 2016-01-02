@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 44;
 
 use Crypt::PK::DSA qw(dsa_encrypt dsa_decrypt dsa_sign_message dsa_verify_message dsa_sign_hash dsa_verify_hash);
 
@@ -112,5 +112,3 @@ use Crypt::PK::DSA qw(dsa_encrypt dsa_decrypt dsa_sign_message dsa_verify_messag
   ok($sig, 'dsa_sign_hash');
   ok(dsa_verify_hash('t/data/cryptx_pub_dsa1.der', $sig, $hash, 'SHA1'), 'dsa_verify_hash');
 }
-
-done_testing;

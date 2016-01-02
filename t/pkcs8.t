@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 8;
 
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
@@ -52,5 +52,3 @@ for my $f (qw/pkcs8.ec-short-priv-nopass.der pkcs8.ec-short-priv-nopass.pem pkcs
 ###   $ec->import_key("t/data/$f");
 ###   ok($ec->is_private, "ECC is_private $f");
 ### }
-
-done_testing;

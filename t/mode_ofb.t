@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 12;
 use Crypt::Mode::OFB;
 
 my @tests = (
@@ -26,5 +26,3 @@ for (@tests) {
   is(unpack("H*",$ct), $_->{ct}, 'cipher text match');
   is(unpack("H*",$pt), $_->{pt}, 'plain text match');
 }
-
-done_testing;

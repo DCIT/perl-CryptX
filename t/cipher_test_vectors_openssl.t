@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 356;
 
 use Crypt::Mode::CBC;
 use Crypt::Mode::ECB;
@@ -64,8 +64,6 @@ while (my $l = <DATA>) {
   }
   #warn "[$cipher|$mode, ".length($key).", ".length($iv).", ".length($pt).", ".length($ct).", ".length($flag)."]\n";
 } 
-
-done_testing();
 
 __DATA__
 #cipher:key:iv:plaintext:ciphertext:0/1(decrypt/encrypt)

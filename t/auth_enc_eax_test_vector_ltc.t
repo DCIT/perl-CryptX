@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 56;
 
 use Crypt::AuthEnc::EAX qw( eax_encrypt_authenticate eax_decrypt_verify );
 
@@ -123,5 +123,3 @@ do_test(%$_) for (
      tag => '3a59f238a23e39199dc9266626c40f80',
   },
 );   
-
-done_testing;

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 86;
 
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
@@ -201,5 +201,3 @@ my $EC2 = {
   is($kh->{curve_name}, "secp256r1", "EC curve test HASH2");
   ok(!$ec->is_private, "EC private test HASH2");
 }
-
-done_testing;

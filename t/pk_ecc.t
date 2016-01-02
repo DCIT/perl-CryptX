@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 91;
 
 use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret);
 
@@ -137,5 +137,3 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   is($k->size, 32, "$pub size");
   is(uc($k->key2hash->{pub_x}), 'A01532A3C0900053DE60FBEFEFCCA58793301598D308B41E6F4E364E388C2711', "key2hash $pub");
 }
-
-done_testing;

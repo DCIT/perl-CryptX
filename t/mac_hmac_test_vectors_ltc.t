@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 1739;
 use Crypt::Mac::HMAC;
 use Crypt::Digest;
 
@@ -52,8 +52,6 @@ for my $n (sort keys %$tv) {
     $key = substr($result x 100, 0, Crypt::Digest->hashsize($N));
   }
 }
-
-done_testing();
 
 __DATA__
 HMAC Tests.  In these tests messages of N bytes long (00,01,02,...,NN-1) are HMACed.  The initial key is

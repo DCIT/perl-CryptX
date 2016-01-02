@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 2000;
 use Crypt::Cipher;
 
 my $trans = {
@@ -63,8 +63,6 @@ for my $n (sort keys %$tv) {
     }
   }
 }
-
-done_testing();
 
 __DATA__
 Cipher Test Vectors

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 660;
 use Crypt::PK::ECC;
 
 my $data = [
@@ -88,5 +88,3 @@ for my $h (@$data) {
   ok( $ec_pub->verify_message(pack("H*", $h->{ECDSA_SHA1}), 'test-data', 'SHA1'), "$h->{PRI_FILE}/ECDSA_SHA1");
   ok( $ec_pub->verify_message(pack("H*", $h->{ECDSA_SHA256}), 'test-data', 'SHA256'), "$h->{PRI_FILE}/ECDSA_SHA256");
 }
-
-done_testing();

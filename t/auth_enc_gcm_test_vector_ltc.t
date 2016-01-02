@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 42;
 
 use Crypt::AuthEnc::GCM qw( gcm_encrypt_authenticate gcm_decrypt_verify );
 
@@ -116,5 +116,3 @@ do_test(%$_) for (
      tag => '8d2d2a9372626f6bee8580276a6366bf',
   }
 );   
-
-done_testing;

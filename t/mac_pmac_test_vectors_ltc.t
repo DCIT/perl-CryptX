@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 452;
 use Crypt::Mac::PMAC;
 use Crypt::Cipher;
 
@@ -63,8 +63,6 @@ for my $n (sort keys %$tv) {
     }
   }
 }
-
-done_testing();
 
 __DATA__
 PMAC Tests.  In these tests messages of N bytes long (00,01,02,...,NN-1) are PMAC'ed.  The initial key is

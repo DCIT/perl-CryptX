@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 19;
 
 use Crypt::PRNG::RC4 qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand);
 
@@ -64,5 +64,3 @@ ok($r, 'new');
   like(random_bytes_b64(60),  qr/^[A-Za-z0-9+\/=]{80}$/, "bytes_b64");
   like(random_bytes_b64u(60), qr/^[A-Za-z0-9_-]{80}$/,   "bytes_b64u");
 }
-
-done_testing;

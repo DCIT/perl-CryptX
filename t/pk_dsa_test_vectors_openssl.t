@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 90;
 use Crypt::PK::DSA;
 
 my $data = [
@@ -40,5 +40,3 @@ for my $h (@$data) {
   ok( $dsa_pub->verify_message(pack("H*", $h->{DSA_SHA1}), 'test-data', 'SHA1'), "$h->{PRI_FILE}/DSA_SHA1");
   ok( $dsa_pub->verify_message(pack("H*", $h->{DSA_SHA256}), 'test-data', 'SHA256'), "$h->{PRI_FILE}/DSA_SHA256");
 }
-
-done_testing();

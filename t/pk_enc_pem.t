@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 27;
 
 use Crypt::PK::RSA;
 use Crypt::PK::DSA;
@@ -20,5 +20,3 @@ for my $f (qw/ec-aes128.pem ec-aes192.pem ec-aes256.pem ec-camellia128.pem ec-ca
   my $pk = Crypt::PK::ECC->new("t/data/$f", 'secret');
   is($pk->is_private, 1, $f);
 }
-
-done_testing;

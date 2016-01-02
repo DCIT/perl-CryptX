@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 57;
 
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
@@ -59,5 +59,3 @@ for my $f (qw/ssh_ecdsa_256 ssh_ecdsa_384 ssh_ecdsa_521/) {
   $dsa->import_key($kh_pub);
   ok(!$dsa->is_private, "DSA !is_private HASH");
 }
-
-done_testing;

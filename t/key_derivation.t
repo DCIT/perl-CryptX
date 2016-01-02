@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 27;
 
 use Crypt::KeyDerivation qw(pbkdf1 pbkdf2 hkdf hkdf_expand hkdf_extract);
 
@@ -136,5 +136,3 @@ use Crypt::KeyDerivation qw(pbkdf1 pbkdf2 hkdf hkdf_expand hkdf_extract);
   is(unpack('H*', pbkdf2("passwordPASSWORDpassword", "saltSALTsaltSALTsaltSALTsaltSALTsalt", 4096, 'SHA1', 25)),  '3d2eec4fe41c849b80c8d83662c0e44a8b291a964cf2f07038', 'test pbkdf2 E');
   is(unpack('H*', pbkdf2("pass\0word", "sa\0lt", 4096, 'SHA1', 16)),                                              '56fa6aa75548099dcc37d7f03425e0c3', 'test pbkdf2 F');
 }
-
-done_testing;

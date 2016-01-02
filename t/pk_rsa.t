@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 45;
 
 use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_message rsa_sign_hash rsa_verify_hash);
 
@@ -104,5 +104,3 @@ use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_messag
   ok($sig, 'rsa_sign_hash');
   ok(rsa_verify_hash('t/data/cryptx_pub_rsa1.der', $sig, $hash, 'SHA1'), 'rsa_verify_hash');
 }
-
-done_testing;

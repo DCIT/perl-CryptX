@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 8;
 
 use Crypt::Mode::CTR;
 
@@ -47,5 +47,3 @@ do_test(%$_) for (
    mode => 3, width => 0,
  },
 );
-
-done_testing;

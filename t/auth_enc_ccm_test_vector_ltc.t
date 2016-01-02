@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 16;
 
 use Crypt::AuthEnc::CCM qw( ccm_encrypt_authenticate ccm_decrypt_verify );
 
@@ -63,5 +63,3 @@ do_test(%$_) for (
      tag=>'7845ce0b16f97623',
   },
 );   
-
-done_testing;

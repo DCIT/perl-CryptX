@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 28;
 
 use Crypt::PK::DH qw(dh_encrypt dh_decrypt dh_sign_message dh_verify_message dh_sign_hash dh_verify_hash dh_shared_secret);
 
@@ -82,5 +82,3 @@ use Crypt::PK::DH qw(dh_encrypt dh_decrypt dh_sign_message dh_verify_message dh_
   my $ss2 = dh_shared_secret('t/data/cryptx_priv_dh2.bin', 't/data/cryptx_pub_dh1.bin');
   is(unpack("H*",$ss1), unpack("H*",$ss2), 'shared_secret');
 }
-
-done_testing;
