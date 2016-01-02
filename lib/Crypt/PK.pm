@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 use Carp;
+use CryptX qw( _encode_base64 _decode_base64 );
 use Crypt::Digest qw(digest_data);
-use MIME::Base64 qw(decode_base64 encode_base64);
 use Crypt::Mode::CBC;
 use Crypt::Mode::CFB;
 use Crypt::Mode::ECB;
@@ -64,7 +64,7 @@ sub _pem_to_binary {
 
   my ($headers, undef, $b64) = $content =~ /^(([^:]+:.*?\n)*)(.*)$/s;
   return undef unless $b64;
-  my $binary = decode_base64($b64);
+  my $binary = _decode_base64($b64);
   return undef unless $binary;
 
   my ($ptype, $cipher_name, $iv_hex);
@@ -104,13 +104,14 @@ sub _asn1_to_pem {
     $rv .= "$_\n" for @headers;
     $rv .= "\n";
   }
-  my @l = encode_base64($content, "") =~ /.{1,64}/g;
+  my @l = _encode_base64($content) =~ /.{1,64}/g;
   $rv .= join("\n", @l) . "\n";
   $rv .= "-----END $header_name-----\n";
 }
 
 sub _ssh_parse {
   my $raw = shift;
+  return unless defined $raw;
   my $len = length($raw);
   my @parts = ();
   my $i = 0;

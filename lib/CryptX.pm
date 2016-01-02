@@ -3,10 +3,35 @@ package CryptX;
 use strict;
 use warnings ;
 
-our $VERSION = '0.026_04';
+our $VERSION = '0.026_05';
+
+use Exporter 'import';
+our @EXPORT_OK = qw( _encode_base64url _decode_base64url _encode_base64 _decode_base64 _decode_json _encode_json);
 
 require XSLoader;
 XSLoader::load('CryptX', $VERSION);
+
+BEGIN {
+  our $JSON_Class = '';
+  if (eval { require Cpanel::JSON::XS }) {
+    $JSON_Class = 'Cpanel::JSON::XS';
+  }
+  elsif (eval { require JSON::XS }) {
+    $JSON_Class = 'JSON::XS';
+  }
+  elsif (eval { require JSON::PP }) {
+    $JSON_Class = 'JSON::PP';
+  }
+  $JSON_Class->import(qw(encode_json decode_json)) if $JSON_Class;
+}
+
+sub _decode_json {
+  decode_json(shift);
+}
+
+sub _encode_json {
+  encode_json(shift);
+}
 
 1;
 __END__

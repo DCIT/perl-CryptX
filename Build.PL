@@ -59,18 +59,18 @@ my $builder = $class->new(
   c_source             => 'src',
   requires             => {
     'perl'          => '5.006',
-    'MIME::Base64'  => '3.11',      # (en|de)code_base64url
-    'JSON::MaybeXS' => '1.003005',  # (en|de)code_json
+    'JSON::PP'      => '2.27102',   # encode_json + decode_json
     'Exporter'      => '5.59',      # we need: use Exporter 'import';
   },
   build_requires       => {
+    'perl'          => '5.006',
+    'JSON::PP'      => '2.27102',   # encode_json + decode_json
+    'Exporter'      => '5.59',      # we need: use Exporter 'import';
     'Module::Build' => 0,
-    'MIME::Base64'  => '3.11',      # (en|de)code_base64url
-    'JSON::MaybeXS' => '1.003005',  # (en|de)code_json
-    'Test::More'    => '0.88',      # we need: done_testing
-    'File::Find'    => 0,
+    'Test::More'    => 0,
   },
   configure_requires   => {
+    'perl'          => '5.006',
     'Module::Build' => 0,
   },
   meta_merge => {

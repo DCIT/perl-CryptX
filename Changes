@@ -16,6 +16,8 @@ TODO:
 0.026_04 2015/12/31
         - sync with https://github.com/libtom/libtomcrypt (branch develop)
         - HP-UX related fixes
+        - switch from JSON::MaybeXS to JSON::PP - https://rt.cpan.org/Public/Bug/Display.html?id=110807
+        - does not require MIME::Base64
 
 0.026   2015/11/28
         - switch to JSON::MaybeXS

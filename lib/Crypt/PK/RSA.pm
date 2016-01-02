@@ -8,12 +8,10 @@ our %EXPORT_TAGS = ( all => [qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_ver
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use CryptX;
+use CryptX qw( _encode_base64url _decode_base64url _encode_base64 _decode_base64 _encode_json _decode_json);
 use Crypt::PK;
 use Crypt::Digest 'digest_data';
 use Carp;
-use MIME::Base64 qw(encode_base64 decode_base64 encode_base64url decode_base64url);
-use JSON::MaybeXS qw(encode_json decode_json);
 
 sub new {
   my ($class, $f, $p) = @_;
@@ -48,16 +46,16 @@ sub export_key_jwk {
     }
     my $hash = {
       kty => "RSA",
-      n   => encode_base64url(pack("H*", $kh->{N})),
-      e   => encode_base64url(pack("H*", $kh->{e})),
-      d   => encode_base64url(pack("H*", $kh->{d})),
-      p   => encode_base64url(pack("H*", $kh->{p})),
-      q   => encode_base64url(pack("H*", $kh->{q})),
-      dp  => encode_base64url(pack("H*", $kh->{dP})),
-      dq  => encode_base64url(pack("H*", $kh->{dQ})),
-      qi  => encode_base64url(pack("H*", $kh->{qP})),
+      n   => _encode_base64url(pack("H*", $kh->{N})),
+      e   => _encode_base64url(pack("H*", $kh->{e})),
+      d   => _encode_base64url(pack("H*", $kh->{d})),
+      p   => _encode_base64url(pack("H*", $kh->{p})),
+      q   => _encode_base64url(pack("H*", $kh->{q})),
+      dp  => _encode_base64url(pack("H*", $kh->{dP})),
+      dq  => _encode_base64url(pack("H*", $kh->{dQ})),
+      qi  => _encode_base64url(pack("H*", $kh->{qP})),
     };
-    return $wanthash ? $hash : encode_json($hash);
+    return $wanthash ? $hash : _encode_json($hash);
   }
   elsif ($type eq 'public') {
     return unless $kh->{N} && $kh->{e};
@@ -66,10 +64,10 @@ sub export_key_jwk {
     }
     my $hash = {
       kty => "RSA",
-      n   => encode_base64url(pack("H*", $kh->{N})),
-      e   => encode_base64url(pack("H*", $kh->{e})),
+      n   => _encode_base64url(pack("H*", $kh->{N})),
+      e   => _encode_base64url(pack("H*", $kh->{e})),
     };
-    return $wanthash ? $hash : encode_json($hash);
+    return $wanthash ? $hash : _encode_json($hash);
   }
 }
 
@@ -86,7 +84,7 @@ sub import_key {
     if ($key->{n} && $key->{e} && $key->{kty} && $key->{kty} eq "RSA") {
       # hash with items corresponding to JSON Web Key (JWK)
       for (qw/n e d p q dp dq qi/) {
-        $key->{$_} = eval { unpack("H*", decode_base64url($key->{$_})) } if exists $key->{$_};
+        $key->{$_} = eval { unpack("H*", _decode_base64url($key->{$_})) } if exists $key->{$_};
       }
       return $self->_import_hex($key->{n}, $key->{e}, $key->{d}, $key->{p}, $key->{q}, $key->{dp}, $key->{dq}, $key->{qi});
     }
@@ -121,13 +119,13 @@ sub import_key {
     # XXX-TODO: PKCS#8 EncryptedPrivateKeyInfo (PEM header: BEGIN ENCRYPTED PRIVATE KEY)
     croak "FATAL: encrypted pkcs8 RSA private keys are not supported";
   }
-  elsif ($data =~ /^\s*(\{.*?\})\s*$/sg) {
+  elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
     # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
-    my $json =  $1;
-    my $h = eval { decode_json($json) };
+    my $json = "$1";
+    my $h = eval { _decode_json($json) };
     if ($h && $h->{kty} eq "RSA") {
       for (qw/n e d p q dp dq qi/) {
-        $h->{$_} = eval { unpack("H*", decode_base64url($h->{$_})) } if exists $h->{$_};
+        $h->{$_} = eval { unpack("H*", _decode_base64url($h->{$_})) } if exists $h->{$_};
       }
       return $self->_import_hex($h->{n}, $h->{e}, $h->{d}, $h->{p}, $h->{q}, $h->{dp}, $h->{dq}, $h->{qi}) if $h->{n} && $h->{e};
     }
@@ -138,7 +136,7 @@ sub import_key {
     return $self->_import_hex(unpack("H*", $e), unpack("H*", $N)) if $typ && $e && $N && $typ eq 'ssh-rsa';
   }
   elsif ($data =~ /ssh-rsa\s+(\S+)/) {
-  $data = decode_base64($1);
+  $data = _decode_base64("$1");
     my ($typ, $N, $e) = Crypt::PK::_ssh_parse($data);
     return $self->_import_hex(unpack("H*", $e), unpack("H*", $N)) if $typ && $e && $N && $typ eq 'ssh-rsa';
   }

@@ -8,11 +8,10 @@ our %EXPORT_TAGS = ( all => [qw( dsa_encrypt dsa_decrypt dsa_sign_message dsa_ve
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use CryptX;
+use CryptX qw( _encode_base64 _decode_base64 );
 use Crypt::PK;
 use Crypt::Digest 'digest_data';
 use Carp;
-use MIME::Base64 qw(encode_base64 decode_base64);
 
 sub new {
   my ($class, $f, $p) = @_;
@@ -64,7 +63,7 @@ sub import_key {
     return $self->_import_hex($p, $q, $g, undef, $y) if $typ && $p && $q && $g && $y && $typ eq 'ssh-dss';
   }
   elsif ($data =~ /ssh-dss\s+(\S+)/) {
-    $data = decode_base64($1);
+    $data = _decode_base64($1);
     my ($typ, $p, $q, $g, $y) = Crypt::PK::_ssh_parse($data);
     return $self->_import_hex($p, $q, $g, undef, $y) if $typ && $p && $q && $g && $y && $typ eq 'ssh-dss';
   }

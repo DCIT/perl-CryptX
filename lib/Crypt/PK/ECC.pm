@@ -8,12 +8,10 @@ our %EXPORT_TAGS = ( all => [qw( ecc_encrypt ecc_decrypt ecc_sign_message ecc_ve
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use CryptX;
+use CryptX qw( _encode_base64url _decode_base64url _encode_base64 _decode_base64 _decode_json _encode_json );
 use Crypt::PK;
 use Crypt::Digest 'digest_data';
 use Carp;
-use MIME::Base64 qw(encode_base64 decode_base64 encode_base64url decode_base64url);
-use JSON::MaybeXS qw(encode_json decode_json);
 
 our %curve = (
         ### http://www.ecc-brainpool.org/download/Domain-parameters.pdf (v1.0 19.10.2005)
@@ -457,11 +455,11 @@ sub export_key_jwk {
     # but they are used in https://tools.ietf.org/html/rfc7517#appendix-A.2
     my $hash = {
       kty => "EC", crv=>$curve,
-      x => encode_base64url(pack("H*", $kh->{pub_x})),
-      y => encode_base64url(pack("H*", $kh->{pub_y})),
-      d => encode_base64url(pack("H*", $kh->{k})),
+      x => _encode_base64url(pack("H*", $kh->{pub_x})),
+      y => _encode_base64url(pack("H*", $kh->{pub_y})),
+      d => _encode_base64url(pack("H*", $kh->{k})),
     };
-    return $wanthash ? $hash : encode_json($hash);
+    return $wanthash ? $hash : _encode_json($hash);
   }
   elsif ($type && $type eq 'public') {
     return unless $kh->{pub_x} && $kh->{pub_y};
@@ -470,10 +468,10 @@ sub export_key_jwk {
     }
     my $hash = {
       kty => "EC", crv=>$curve,
-      x => encode_base64url(pack("H*", $kh->{pub_x})),
-      y => encode_base64url(pack("H*", $kh->{pub_y})),
+      x => _encode_base64url(pack("H*", $kh->{pub_x})),
+      y => _encode_base64url(pack("H*", $kh->{pub_y})),
     };
-    return $wanthash ? $hash : encode_json($hash);
+    return $wanthash ? $hash : _encode_json($hash);
   }
 }
 
@@ -493,7 +491,7 @@ sub import_key {
       # hash with items corresponding to JSON Web Key (JWK)
       $key = {%$key}; # make a copy as we will modify it
       for (qw/x y d/) {
-        $key->{$_} = eval { unpack("H*", decode_base64url($key->{$_})) } if exists $key->{$_};
+        $key->{$_} = eval { unpack("H*", _decode_base64url($key->{$_})) } if exists $key->{$_};
       }
       if (my $curve = $jwkcrv{$key->{crv}}) {
         return $self->_import_hex($key->{x}, $key->{y}, $key->{d}, $curve);
@@ -526,13 +524,13 @@ sub import_key {
     # XXX-TODO: pkcs#8 encrypted private key
     croak "FATAL: encrypted pkcs8 EC private keys are not supported";
   }
-  elsif ($data =~ /^\s*(\{.*?\})\s*$/sg) {
+  elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
     # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
-    my $json =  $1;
-    my $h = eval { decode_json($json) };
+    my $json = "$1";
+    my $h = eval { _decode_json($json) };
     if ($h && $h->{kty} eq "EC") {
       for (qw/x y d/) {
-        $h->{$_} = eval { unpack("H*", decode_base64url($h->{$_})) } if exists $h->{$_};
+        $h->{$_} = eval { unpack("H*", _decode_base64url($h->{$_})) } if exists $h->{$_};
       }
       if (my $curve = $jwkcrv{$h->{crv}}) {
         return $self->_import_hex($h->{x}, $h->{y}, $h->{d}, $curve);
@@ -545,7 +543,7 @@ sub import_key {
     return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
   }
   elsif ($data =~ /(ecdsa-\S+)\s+(\S+)/) {
-    $data = decode_base64($2);
+    $data = _decode_base64("$2");
     my ($typ, $skip, $pubkey) = Crypt::PK::_ssh_parse($data);
     return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
   }

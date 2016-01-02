@@ -12,7 +12,6 @@ use CryptX;
 use Crypt::PK;
 use Crypt::Digest 'digest_data';
 use Carp;
-use MIME::Base64 qw(encode_base64 decode_base64);
 
 sub new {
   my ($class, $f) = @_;
