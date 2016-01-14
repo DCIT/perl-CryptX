@@ -1,4 +1,4 @@
-#include <tommath.h>
+#include <tommath_private.h>
 #ifdef BN_MP_IMPORT_C
 /* LibTomMath, multiple-precision integer library -- Tom St Denis
  *
@@ -12,7 +12,7 @@
  * The library is free for all purposes without any express
  * guarantee it works.
  *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
+ * Tom St Denis, tstdenis82@gmail.com, http://libtom.org
  */
 
 /* based on gmp's mpz_import.
@@ -30,9 +30,10 @@ int mp_import(mp_int* rop, size_t count, int order, size_t size,
 		union {
 			unsigned int i;
 			char c[4];
-		} lint = {0x01020304};
+		} lint;
+		lint.i = 0x01020304;
 
-		endian = (lint.c[0] == 4 ? -1 : 1);
+		endian = (lint.c[0] == 4) ? -1 : 1;
 	}
 
 	odd_nails = (nails % 8);
@@ -43,19 +44,19 @@ int mp_import(mp_int* rop, size_t count, int order, size_t size,
 	nail_bytes = nails / 8;
 
 	for (i = 0; i < count; ++i) {
-		for (j = 0; j < size - nail_bytes; ++j) {
+		for (j = 0; j < (size - nail_bytes); ++j) {
 			unsigned char byte = *(
 					(unsigned char*)op + 
-					(order == 1 ? i : count - 1 - i) * size + 
-					(endian == 1 ? j + nail_bytes : size - 1 - j - nail_bytes)
+					(((order == 1) ? i : ((count - 1) - i)) * size) +
+					((endian == 1) ? (j + nail_bytes) : (((size - 1) - j) - nail_bytes))
 				);
 
 			if (
-				(result = mp_mul_2d(rop, (j == 0 ? 8 - odd_nails : 8), rop)) != MP_OKAY) {
+				(result = mp_mul_2d(rop, ((j == 0) ? (8 - odd_nails) : 8), rop)) != MP_OKAY) {
 				return result;
 			}
 
-			rop->dp[0] |= (j == 0 ? (byte & odd_nail_mask) : byte);
+			rop->dp[0] |= (j == 0) ? (byte & odd_nail_mask) : byte;
 			rop->used  += 1;
 		}
 	}

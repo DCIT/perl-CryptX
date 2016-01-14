@@ -1,4 +1,4 @@
-#include <tommath.h>
+#include <tommath_private.h>
 #ifdef BN_MP_N_ROOT_EX_C
 /* LibTomMath, multiple-precision integer library -- Tom St Denis
  *
@@ -12,7 +12,7 @@
  * The library is free for all purposes without any express
  * guarantee it works.
  *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
+ * Tom St Denis, tstdenis82@gmail.com, http://libtom.org
  */
 
 /* find the n'th root of an integer
@@ -31,7 +31,7 @@ int mp_n_root_ex (mp_int * a, mp_digit b, mp_int * c, int fast)
   int     res, neg;
 
   /* input must be positive if b is even */
-  if ((b & 1) == 0 && a->sign == MP_NEG) {
+  if (((b & 1) == 0) && (a->sign == MP_NEG)) {
     return MP_VAL;
   }
 

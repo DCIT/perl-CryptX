@@ -1,4 +1,4 @@
-#include <tommath.h>
+#include <tommath_private.h>
 #ifdef BN_MP_GET_LONG_LONG_C
 /* LibTomMath, multiple-precision integer library -- Tom St Denis
  *
@@ -12,21 +12,21 @@
  * The library is free for all purposes without any express
  * guarantee it works.
  *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
+ * Tom St Denis, tstdenis82@gmail.com, http://libtom.org
  */
 
 /* get the lower unsigned long long of an mp_int, platform dependent */
-ulong64 mp_get_long_long (mp_int * a)
+unsigned long long mp_get_long_long (mp_int * a)
 {
   int i;
-  ulong64 res;
+  unsigned long long res;
 
   if (a->used == 0) {
      return 0;
   }
 
   /* get number of digits of the lsb we have to read */
-  i = MIN(a->used,(int)((sizeof(ulong64)*CHAR_BIT+DIGIT_BIT-1)/DIGIT_BIT))-1;
+  i = MIN(a->used,(int)(((sizeof(unsigned long long) * CHAR_BIT) + DIGIT_BIT - 1) / DIGIT_BIT)) - 1;
 
   /* get most significant digit of result */
   res = DIGIT(a,i);

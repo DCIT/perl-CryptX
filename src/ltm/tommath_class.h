@@ -424,7 +424,6 @@
 #endif
 
 #if defined(BN_MP_GET_LONG_LONG_C)
-   #define BN_MP_GET_LONG_C
 #endif
 
 #if defined(BN_MP_GROW_C)
@@ -868,15 +867,22 @@
 #endif
 
 #if defined(BN_MP_SQRTMOD_PRIME_C)
-   #define BN_MP_JACOBI_C
+   #define BN_MP_CMP_D_C
    #define BN_MP_ZERO_C
-   #define BN_MP_SET_INT_C
-   #define BN_MP_COPY_C
-   #define BN_MP_SUB_C
-   #define BN_MP_SUB_D_C
-   #define BN_MP_DIV_2_C
+   #define BN_MP_JACOBI_C
+   #define BN_MP_INIT_MULTI_C
+   #define BN_MP_MOD_D_C
    #define BN_MP_ADD_D_C
+   #define BN_MP_DIV_2_C
    #define BN_MP_EXPTMOD_C
+   #define BN_MP_COPY_C
+   #define BN_MP_SUB_D_C
+   #define BN_MP_ISEVEN_C
+   #define BN_MP_SET_INT_C
+   #define BN_MP_SQRMOD_C
+   #define BN_MP_MULMOD_C
+   #define BN_MP_SET_C
+   #define BN_MP_CLEAR_MULTI_C
 #endif
 
 #if defined(BN_MP_SUB_C)
