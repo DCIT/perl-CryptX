@@ -15,8 +15,8 @@
  * Tom St Denis, tstdenis82@gmail.com, http://libtom.org
  */
 
-/* set a platform dependent unsigned long long int */
-MP_SET_XLONG(mp_set_long_long, unsigned long long)
+/* set a platform dependent mp_uint64 int */
+MP_SET_XLONG(mp_set_long_long, mp_uint64)
 #endif
 
 /* $Source$ */

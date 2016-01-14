@@ -17,7 +17,24 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
+#ifdef LTM_NO_STDINT_H
+   typedef unsigned char      mp_uint8;
+   typedef unsigned short     mp_uint16;
+   typedef unsigned int       mp_uint32;
+   typedef unsigned int       mp_uint_least32;
+   #ifdef _MSC_VER
+   typedef unsigned __int64   mp_uint64;
+   #else
+   typedef unsigned long long mp_uint64;
+   #endif
+#else
+   #include <stdint.h>
+   typedef uint8_t        mp_uint8;
+   typedef uint16_t       mp_uint16;
+   typedef uint32_t       mp_uint32;
+   typedef uint_least32_t mp_uint_least32;
+   typedef uint64_t       mp_uint64;
+#endif
 #include <limits.h>
 
 #include <tommath_class.h>
@@ -42,27 +59,22 @@ extern "C" {
  * [any size beyond that is ok provided it doesn't overflow the data type]
  */
 #ifdef MP_8BIT
-   typedef uint8_t              mp_digit;
-   typedef uint16_t             mp_word;
+   typedef mp_uint8              mp_digit;
+   typedef mp_uint16             mp_word;
 #define MP_SIZEOF_MP_DIGIT      1
 #ifdef DIGIT_BIT
 #error You must not define DIGIT_BIT when using MP_8BIT
 #endif
 #elif defined(MP_16BIT)
-   typedef uint16_t             mp_digit;
-   typedef uint32_t             mp_word;
+   typedef mp_uint16             mp_digit;
+   typedef mp_uint32             mp_word;
 #define MP_SIZEOF_MP_DIGIT      2
 #ifdef DIGIT_BIT
 #error You must not define DIGIT_BIT when using MP_16BIT
 #endif
 #elif defined(MP_64BIT)
    /* for GCC only on supported platforms */
-#ifndef CRYPT
-   typedef unsigned long long   ulong64;
-   typedef signed long long     long64;
-#endif
-
-   typedef uint64_t mp_digit;
+   typedef mp_uint64 mp_digit;
 #if defined(_WIN32)
    typedef unsigned __int128    mp_word;
 #elif defined(__GNUC__)
@@ -76,15 +88,8 @@ extern "C" {
    #define DIGIT_BIT            60
 #else
    /* this is the default case, 28-bit digits */
-
-   /* this is to make porting into LibTomCrypt easier :-) */
-#ifndef CRYPT
-   typedef unsigned long long   ulong64;
-   typedef signed long long     long64;
-#endif
-
-   typedef uint32_t             mp_digit;
-   typedef uint64_t             mp_word;
+   typedef mp_uint32             mp_digit;
+   typedef mp_uint64             mp_word;
 
 #ifdef MP_31BIT
    /* this is an extension that uses 31-bit digits */
@@ -99,7 +104,7 @@ extern "C" {
 /* otherwise the bits per digit is calculated automatically from the size of a mp_digit */
 #ifndef DIGIT_BIT
    #define DIGIT_BIT     (((CHAR_BIT * MP_SIZEOF_MP_DIGIT) - 1))  /* bits per digit */
-   typedef uint_least32_t mp_min_u32;
+   typedef mp_uint_least32 mp_min_u32;
 #else
    typedef mp_digit mp_min_u32;
 #endif
@@ -224,8 +229,8 @@ int mp_set_int(mp_int *a, unsigned long b);
 /* set a platform dependent unsigned long value */
 int mp_set_long(mp_int *a, unsigned long b);
 
-/* set a platform dependent unsigned long long value */
-int mp_set_long_long(mp_int *a, unsigned long long b);
+/* set a platform dependent mp_uint64 value */
+int mp_set_long_long(mp_int *a, mp_uint64 b);
 
 /* get a 32-bit value */
 unsigned long mp_get_int(mp_int * a);
@@ -233,8 +238,8 @@ unsigned long mp_get_int(mp_int * a);
 /* get a platform dependent unsigned long value */
 unsigned long mp_get_long(mp_int * a);
 
-/* get a platform dependent unsigned long long value */
-unsigned long long mp_get_long_long(mp_int * a);
+/* get a platform dependent mp_uint64 value */
+mp_uint64 mp_get_long_long(mp_int * a);
 
 /* initialize and set a digit */
 int mp_init_set (mp_int * a, mp_digit b);

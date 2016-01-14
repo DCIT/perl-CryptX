@@ -4,7 +4,7 @@ use warnings;
 use Module::Build;
 use Config;
 
-my $flags = '-Isrc/ltc/headers -Isrc/ltm -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC';
+my $flags = '-Isrc/ltc/headers -Isrc/ltm -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC -DLTM_NO_STDINT_H';
 #$flags .= ' -Wall';
 #$flags .= ' -DLTC_NO_FAST';
 #$flags .= ' -DLTC_NO_ASM';
