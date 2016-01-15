@@ -15,18 +15,18 @@
  * Tom St Denis, tstdenis82@gmail.com, http://libtom.org
  */
 
-/* get the lower mp_uint64 of an mp_int, platform dependent */
-mp_uint64 mp_get_long_long (mp_int * a)
+/* get the lower unsigned long long of an mp_int, platform dependent */
+unsigned long long mp_get_long_long (mp_int * a)
 {
   int i;
-  mp_uint64 res;
+  unsigned long long res;
 
   if (a->used == 0) {
      return 0;
   }
 
   /* get number of digits of the lsb we have to read */
-  i = MIN(a->used,(int)(((sizeof(mp_uint64) * CHAR_BIT) + DIGIT_BIT - 1) / DIGIT_BIT)) - 1;
+  i = MIN(a->used,(int)(((sizeof(unsigned long long) * CHAR_BIT) + DIGIT_BIT - 1) / DIGIT_BIT)) - 1;
 
   /* get most significant digit of result */
   res = DIGIT(a,i);

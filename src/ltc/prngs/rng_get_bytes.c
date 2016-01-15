@@ -65,7 +65,7 @@ static unsigned long rng_ansic(unsigned char *buf, unsigned long len,
    clock_t t1;
    int l, acc, bits, a, b;
 
-   if (XCLOCKS_PER_SEC < 100 || XCLOCKS_PER_SEC > 10000) {
+   if (XCLOCKS_PER_SEC < 100 || XCLOCKS_PER_SEC > 1000000) {
       return 0;
    }
 

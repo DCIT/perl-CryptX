@@ -83,7 +83,8 @@ static const unsigned char poly[] = { 0x00, 0xE1 };
 void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *c)
 {
    unsigned char Z[16], V[16];
-   unsigned char x, y, z;
+   unsigned x, y;
+   unsigned char z;
 
    zeromem(Z, 16);
    XMEMCPY(V, a, 16);

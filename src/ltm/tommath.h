@@ -17,24 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef LTM_NO_STDINT_H
-   typedef unsigned char      mp_uint8;
-   typedef unsigned short     mp_uint16;
-   typedef unsigned int       mp_uint32;
-   typedef unsigned int       mp_uint_least32;
-   #ifdef _MSC_VER
-   typedef unsigned __int64   mp_uint64;
-   #else
-   typedef unsigned long long mp_uint64;
-   #endif
-#else
-   #include <stdint.h>
-   typedef uint8_t        mp_uint8;
-   typedef uint16_t       mp_uint16;
-   typedef uint32_t       mp_uint32;
-   typedef uint_least32_t mp_uint_least32;
-   typedef uint64_t       mp_uint64;
-#endif
 #include <limits.h>
 
 #include <tommath_class.h>
@@ -43,10 +25,26 @@
 extern "C" {
 #endif
 
+/* unsigned int types */
+typedef unsigned char      mp_uint8;
+typedef unsigned short     mp_uint16;
+typedef unsigned int       mp_uint32;
+#ifdef _MSC_VER
+typedef unsigned __int64   mp_uint64;
+#else
+typedef unsigned long long mp_uint64;
+#endif
+
 /* detect 64-bit mode if possible */
-#if defined(__x86_64__)
-   #if !(defined(MP_32BIT) || defined(MP_16BIT) || defined(MP_8BIT))
-      #define MP_64BIT
+#if !(defined(MP_32BIT) || defined(MP_16BIT) || defined(MP_8BIT))
+   #if defined(__x86_64__)
+      #if defined(__GNUC__)
+         typedef unsigned long        mp_uint128 __attribute__ ((mode(TI)));
+         #define MP_64BIT
+      #elif defined(_MSC_VER)
+         typedef unsigned __int128    mp_uint128;
+         #define MP_64BIT
+      #endif
    #endif
 #endif
 
@@ -59,54 +57,26 @@ extern "C" {
  * [any size beyond that is ok provided it doesn't overflow the data type]
  */
 #ifdef MP_8BIT
-   typedef mp_uint8              mp_digit;
-   typedef mp_uint16             mp_word;
-#define MP_SIZEOF_MP_DIGIT      1
-#ifdef DIGIT_BIT
-#error You must not define DIGIT_BIT when using MP_8BIT
-#endif
+   typedef mp_uint8     mp_digit;
+   typedef mp_uint16    mp_word;
+   #define DIGIT_BIT    7
 #elif defined(MP_16BIT)
-   typedef mp_uint16             mp_digit;
-   typedef mp_uint32             mp_word;
-#define MP_SIZEOF_MP_DIGIT      2
-#ifdef DIGIT_BIT
-#error You must not define DIGIT_BIT when using MP_16BIT
-#endif
+   typedef mp_uint16    mp_digit;
+   typedef mp_uint32    mp_word;
+   #define DIGIT_BIT    15
 #elif defined(MP_64BIT)
-   /* for GCC only on supported platforms */
-   typedef mp_uint64 mp_digit;
-#if defined(_WIN32)
-   typedef unsigned __int128    mp_word;
-#elif defined(__GNUC__)
-   typedef unsigned long        mp_word __attribute__ ((mode(TI)));
+   typedef mp_uint64    mp_digit;
+   typedef mp_uint128   mp_word;
+   #define DIGIT_BIT    60
+#elif defined(MP_32BIT)
+   typedef mp_uint32    mp_digit;
+   typedef mp_uint64    mp_word;
+   #define DIGIT_BIT    31
 #else
-   /* it seems you have a problem
-    * but we assume you can somewhere define your own uint128_t */
-   typedef uint128_t            mp_word;
-#endif
-
-   #define DIGIT_BIT            60
-#else
-   /* this is the default case, 28-bit digits */
-   typedef mp_uint32             mp_digit;
-   typedef mp_uint64             mp_word;
-
-#ifdef MP_31BIT
-   /* this is an extension that uses 31-bit digits */
-   #define DIGIT_BIT            31
-#else
-   /* default case is 28-bit digits, defines MP_28BIT as a handy macro to test */
-   #define DIGIT_BIT            28
+   typedef mp_uint32    mp_digit;
+   typedef mp_uint64    mp_word;
+   #define DIGIT_BIT    28
    #define MP_28BIT
-#endif
-#endif
-
-/* otherwise the bits per digit is calculated automatically from the size of a mp_digit */
-#ifndef DIGIT_BIT
-   #define DIGIT_BIT     (((CHAR_BIT * MP_SIZEOF_MP_DIGIT) - 1))  /* bits per digit */
-   typedef mp_uint_least32 mp_min_u32;
-#else
-   typedef mp_digit mp_min_u32;
 #endif
 
 /* platforms that can use a better rand function */
@@ -229,8 +199,8 @@ int mp_set_int(mp_int *a, unsigned long b);
 /* set a platform dependent unsigned long value */
 int mp_set_long(mp_int *a, unsigned long b);
 
-/* set a platform dependent mp_uint64 value */
-int mp_set_long_long(mp_int *a, mp_uint64 b);
+/* set a platform dependent unsigned long long value */
+int mp_set_long_long(mp_int *a, unsigned long long b);
 
 /* get a 32-bit value */
 unsigned long mp_get_int(mp_int * a);
@@ -238,8 +208,8 @@ unsigned long mp_get_int(mp_int * a);
 /* get a platform dependent unsigned long value */
 unsigned long mp_get_long(mp_int * a);
 
-/* get a platform dependent mp_uint64 value */
-mp_uint64 mp_get_long_long(mp_int * a);
+/* get a platform dependent unsigned long long value */
+unsigned long long mp_get_long_long(mp_int * a);
 
 /* initialize and set a digit */
 int mp_init_set (mp_int * a, mp_digit b);
