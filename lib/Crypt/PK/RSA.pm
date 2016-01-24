@@ -122,7 +122,7 @@ sub import_key {
   elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
     # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
     my $json = "$1";
-    my $h = eval { _decode_json($json) };
+    my $h = _decode_json($json);
     if ($h && $h->{kty} eq "RSA") {
       for (qw/n e d p q dp dq qi/) {
         $h->{$_} = eval { unpack("H*", _decode_base64url($h->{$_})) } if exists $h->{$_};
@@ -496,6 +496,8 @@ See L<http://tools.ietf.org/html/draft-ietf-jose-json-web-key>
    "qi":"GyM_p6JrXySiz1toFgKbWV...4ypu9bMWx3QJBfm0FoYzUIZEVEcOqwmRN81oDAaaBk0KWGDjJHDdDmFW3AN7I-pux_mHZG",
  }
 
+B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
+
 =item * RSA public keys in JSON Web Key (JWK) format
 
  {
@@ -503,6 +505,8 @@ See L<http://tools.ietf.org/html/draft-ietf-jose-json-web-key>
    "n": "0vx7agoebGcQSuuPiLJXZp...tN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECP",
    "e":"AQAB",
  }
+
+B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
 
 =back
 
@@ -559,6 +563,8 @@ Also exports public/private keys as a perl HASH with JWK structure.
  my $jwk_hash = $pk->export_key_jwk('private', 1);
  #or
  my $jwk_hash = $pk->export_key_jwk('public', 1);
+
+B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
 
 =head2 encrypt
 

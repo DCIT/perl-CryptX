@@ -11,23 +11,34 @@ our @EXPORT_OK = qw( _encode_base64url _decode_base64url _encode_base64 _decode_
 require XSLoader;
 XSLoader::load('CryptX', $VERSION);
 
+use Carp;
+my $has_json;
+
 BEGIN {
   if (eval { require Cpanel::JSON::XS }) {
     Cpanel::JSON::XS->import(qw(encode_json decode_json));
+    $has_json = 1;
   }
   elsif (eval { require JSON::XS }) {
     JSON::XS->import(qw(encode_json decode_json));
+    $has_json = 2;
   }
   elsif (eval { require JSON::PP }) {
     JSON::PP->import(qw(encode_json decode_json));
+    $has_json = 3;
+  }
+  else {
+    $has_json = 0;
   }
 }
 
 sub _decode_json {
+  croak "FATAL: cannot find JSON::PP or JSON::XS or Cpanel::JSON::XS" if !$has_json;
   decode_json(shift);
 }
 
 sub _encode_json {
+  croak "FATAL: cannot find JSON::PP or JSON::XS or Cpanel::JSON::XS" if !$has_json;
   encode_json(shift);
 }
 

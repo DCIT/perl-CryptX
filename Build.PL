@@ -59,13 +59,11 @@ my $builder = $class->new(
   c_source             => 'src',
   requires             => {
     'perl'          => '5.006',
-    'JSON::PP'      => '2.27102',   # encode_json + decode_json
-    'Exporter'      => '5.58',      # we need: use Exporter 'import';
+    'Exporter'      => '5.57',      # we need: use Exporter 'import';
   },
   build_requires       => {
     'perl'          => '5.006',
-    'JSON::PP'      => '2.27102',   # encode_json + decode_json
-    'Exporter'      => '5.58',      # we need: use Exporter 'import';
+    'Exporter'      => '5.57',      # we need: use Exporter 'import';
     'Module::Build' => 0,
     'Test::More'    => 0,
   },

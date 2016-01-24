@@ -527,7 +527,7 @@ sub import_key {
   elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
     # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
     my $json = "$1";
-    my $h = eval { _decode_json($json) };
+    my $h = _decode_json($json);
     if ($h && $h->{kty} eq "EC") {
       for (qw/x y d/) {
         $h->{$_} = eval { unpack("H*", _decode_base64url($h->{$_})) } if exists $h->{$_};
@@ -985,6 +985,8 @@ See L<http://tools.ietf.org/html/draft-ietf-jose-json-web-key>
   "d":"870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE",
  }
 
+B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
+
 =item * EC public keys in JSON Web Key (JWK) format
 
  {
@@ -993,6 +995,8 @@ See L<http://tools.ietf.org/html/draft-ietf-jose-json-web-key>
   "x":"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4",
   "y":"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
  }
+
+B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
 
 =back
 
@@ -1045,6 +1049,8 @@ Also exports public/private keys as a perl HASH with JWK structure.
  my $jwk_hash = $pk->export_key_jwk('private', 1);
  #or
  my $jwk_hash = $pk->export_key_jwk('public', 1);
+
+B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
 
 =head2 export_key_raw
 
