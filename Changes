@@ -13,14 +13,13 @@ TODO:
         - maybe: add enc_b64/dec_b64 + enc_b64u/dec_b64u + enc_b32/dec_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
-0.026_39 2016/01/22
+0.026_41 2016/01/22
         - sync with https://github.com/libtom/libtomcrypt (branch develop)
         - sync with https://github.com/libtom/libtommath (branch develop)
         - HP-UX related fixes
-        - switch from JSON::MaybeXS to JSON::PP - https://rt.cpan.org/Public/Bug/Display.html?id=110807
+        - JSON dependency is now optional (we check JSON::PP, JSON::XS, Cpanel::JSON::XS)
         - skip jwk.t if no JSON::* module available
-        - Exporter required version lowered to '5.58'
-        - does not require MIME::Base64 (we use the one from libtomcrypt)
+        - does not require MIME::Base64 (we use base64 routines from libtomcrypt)
 
 0.026   2015/11/28
         - switch to JSON::MaybeXS
