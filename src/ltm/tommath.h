@@ -30,6 +30,8 @@ typedef unsigned char      mp_uint8;
 typedef unsigned short     mp_uint16;
 typedef unsigned int       mp_uint32;
 #ifdef _MSC_VER
+#undef BN_MP_SET_LONG_LONG_C
+#undef BN_MP_GET_LONG_LONG_C
 typedef unsigned __int64   mp_uint64;
 #else
 typedef unsigned long long mp_uint64;
@@ -199,8 +201,10 @@ int mp_set_int(mp_int *a, unsigned long b);
 /* set a platform dependent unsigned long value */
 int mp_set_long(mp_int *a, unsigned long b);
 
+#ifdef BN_MP_SET_LONG_LONG_C
 /* set a platform dependent unsigned long long value */
 int mp_set_long_long(mp_int *a, unsigned long long b);
+#endif
 
 /* get a 32-bit value */
 unsigned long mp_get_int(mp_int * a);
@@ -208,8 +212,10 @@ unsigned long mp_get_int(mp_int * a);
 /* get a platform dependent unsigned long value */
 unsigned long mp_get_long(mp_int * a);
 
+#ifdef BN_MP_GET_LONG_LONG_C
 /* get a platform dependent unsigned long long value */
 unsigned long long mp_get_long_long(mp_int * a);
+#endif
 
 /* initialize and set a digit */
 int mp_init_set (mp_int * a, mp_digit b);
