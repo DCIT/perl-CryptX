@@ -4,7 +4,7 @@ use warnings;
 use Module::Build;
 use Config;
 
-my $flags = '-Isrc/ltc/headers -Isrc/ltm -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC';
+my $flags = '-I. -Isrc/ltc/headers -Isrc/ltm -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC';
 #$flags .= ' -Wall';
 #$flags .= ' -DLTC_NO_FAST';
 #$flags .= ' -DLTC_NO_ASM';
@@ -49,26 +49,27 @@ CODE
 );
 
 my $builder = $class->new(
-  module_name          => 'CryptX',
-  dist_abstract        => 'Crypto toolkit',
-  dist_author          => 'Karel Miko',
-  dist_version_from    => 'lib/CryptX.pm',
-  license              => 'perl',
-  create_readme        => 1,
-  extra_compiler_flags => $flags,
-  c_source             => 'src',
-  requires             => {
+  module_name          => 'CryptX',                     #0.03
+  dist_abstract        => 'Crypto toolkit',             #0.20
+  dist_author          => 'Karel Miko',                 #0.20
+  dist_version_from    => 'lib/CryptX.pm',              #0.11
+  license              => 'perl',                       #0.07
+  create_readme        => 1,                            #0.22
+  extra_compiler_flags => $flags,                       #0.25
+  c_source             => 'src',                        #0.04
+  xs_files             => {'CryptX.xs'=>'CryptX.xs'},   #0.25
+  requires             => {                             #0.21
     'perl'          => '5.006',
   },
-  build_requires       => {
-    'perl'          => '5.006',
-    'Module::Build' => 0,
-  },
-  configure_requires   => {
+  build_requires       => {                             #0.21
     'perl'          => '5.006',
     'Module::Build' => 0,
   },
-  meta_merge => {
+  configure_requires   => {                             #0.30
+    'perl'          => '5.006',
+    'Module::Build' => 0,
+  },
+  meta_merge => {                                       #0.28
     resources  => {
       repository => 'https://github.com/DCIT/perl-CryptX',
     }
