@@ -57,7 +57,7 @@ my $builder = $class->new(
   create_readme        => 1,                            #0.22
   extra_compiler_flags => $flags,                       #0.25
   c_source             => 'src',                        #0.04
-  xs_files             => {'CryptX.xs'=>'CryptX.xs'},   #0.25
+  xs_files             => {'CryptX.xs'=>'lib/CryptX.xs'}, #0.25
   requires             => {                             #0.21
     'perl'          => '5.006',
   },
