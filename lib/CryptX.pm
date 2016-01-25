@@ -3,7 +3,7 @@ package CryptX;
 use strict;
 use warnings ;
 
-our $VERSION = '0.027';
+our $VERSION = '0.027_01';
 
 use Exporter 'import';
 our @EXPORT_OK = qw( _encode_base64url _decode_base64url _encode_base64 _decode_base64 _decode_json _encode_json);
