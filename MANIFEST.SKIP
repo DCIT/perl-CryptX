@@ -9,9 +9,12 @@
 pm_to_blib*
 ^deps
 pod2htm*.tmp
-lib/CryptX.c$
+CryptX.c$
 ^CryptX-
 \.o$
+\.a$
+\.lib$
+\.bs$
 \.obj$
 \.pdb$
 \.ccs$
@@ -27,6 +30,7 @@ lib/CryptX.c$
 ^MYMETA\.json$
 ^MYMETA\.yml$
 ^Build$
+^Makefile$
 ^Build\.bat$
 ^MANIFEST\.SKIP$
 tmp.*
@@ -34,3 +38,4 @@ tmp.*
 \.stackdump$
 ^.travis*
 t/openssl/.*$
+^src/liballinone*

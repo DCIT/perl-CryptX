@@ -1,4 +1,5 @@
 *.a
+*.lib
 *.o
 *.obj
 *.pdb
