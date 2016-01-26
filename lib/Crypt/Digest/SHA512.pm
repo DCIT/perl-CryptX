@@ -5,7 +5,7 @@ package Crypt::Digest::SHA512;
 use strict;
 use warnings;
 
-use Exporter 'import';
+use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( sha512 sha512_hex sha512_b64 sha512_b64u sha512_file sha512_file_hex sha512_file_b64 sha512_file_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
@@ -13,7 +13,6 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-use base 'Crypt::Digest';
 
 sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 

@@ -3,14 +3,13 @@ package Crypt::AuthEnc::OCB;
 use strict;
 use warnings;
 
-use Exporter 'import';
+use base qw(Crypt::AuthEnc Exporter);
 our %EXPORT_TAGS = ( all => [qw( ocb_encrypt_authenticate ocb_decrypt_verify )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
 use Crypt::Cipher;
-use base 'Crypt::AuthEnc';
 
 sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
 

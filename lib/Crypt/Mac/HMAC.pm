@@ -5,14 +5,12 @@ package Crypt::Mac::HMAC;
 use strict;
 use warnings;
 
-use Exporter 'import';
+use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( hmac hmac_hex hmac_b64 hmac_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use base 'Crypt::Mac';
-
 use Crypt::Digest;
 
 sub new { my $class = shift; _new(Crypt::Digest::_trans_digest_name(shift), @_) }

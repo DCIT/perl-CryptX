@@ -5,7 +5,7 @@ package Crypt::Digest::Whirlpool;
 use strict;
 use warnings;
 
-use Exporter 'import';
+use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( whirlpool whirlpool_hex whirlpool_b64 whirlpool_b64u whirlpool_file whirlpool_file_hex whirlpool_file_b64 whirlpool_file_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
@@ -13,7 +13,6 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-use base 'Crypt::Digest';
 
 sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 

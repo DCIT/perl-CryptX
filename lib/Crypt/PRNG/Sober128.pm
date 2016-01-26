@@ -3,7 +3,7 @@ package Crypt::PRNG::Sober128;
 use strict;
 use warnings;
 
-use Exporter 'import';
+use base qw(Crypt::PRNG Exporter);
 our %EXPORT_TAGS = ( all => [qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand)] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();

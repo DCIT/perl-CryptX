@@ -5,7 +5,7 @@ package Crypt::Digest::RIPEMD256;
 use strict;
 use warnings;
 
-use Exporter 'import';
+use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( ripemd256 ripemd256_hex ripemd256_b64 ripemd256_b64u ripemd256_file ripemd256_file_hex ripemd256_file_b64 ripemd256_file_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
@@ -13,7 +13,6 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-use base 'Crypt::Digest';
 
 sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
 

@@ -5,14 +5,12 @@ package Crypt::Mac::Pelican;
 use strict;
 use warnings;
 
-use Exporter 'import';
+use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( pelican pelican_hex pelican_b64 pelican_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use base 'Crypt::Mac';
-
 sub new { my $class = shift; _new(@_) }
 sub pelican { Crypt::Mac::Pelican->new(shift)->add(@_)->mac }
 sub pelican_hex  { Crypt::Mac::Pelican->new(shift)->add(@_)->hexmac }

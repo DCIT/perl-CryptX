@@ -3,7 +3,7 @@ package Crypt::Mac;
 use strict;
 use warnings;
 
-use Exporter 'import';
+require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( mac mac_hex )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();

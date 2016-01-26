@@ -3,7 +3,7 @@ package Crypt::PK::DH;
 use strict;
 use warnings;
 
-use Exporter 'import';
+require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( dh_encrypt dh_decrypt dh_sign_message dh_verify_message dh_sign_hash dh_verify_hash dh_shared_secret )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();

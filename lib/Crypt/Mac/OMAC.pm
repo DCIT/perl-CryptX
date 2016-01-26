@@ -5,14 +5,12 @@ package Crypt::Mac::OMAC;
 use strict;
 use warnings;
 
-use Exporter 'import';
+use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( omac omac_hex omac_b64 omac_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use base 'Crypt::Mac';
-
 use Crypt::Cipher;
 
 sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
