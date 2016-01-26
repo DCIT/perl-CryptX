@@ -117,26 +117,23 @@ ltm/bn_mp_toom_mul.o ltm/bn_mp_toom_sqr.o ltm/bn_mp_toradix.o ltm/bn_mp_toradix_
 ltm/bn_mp_xor.o ltm/bn_mp_zero.o ltm/bn_prime_tab.o ltm/bn_reverse.o ltm/bn_s_mp_add.o ltm/bn_s_mp_exptmod.o \
 ltm/bn_s_mp_mul_digs.o ltm/bn_s_mp_mul_high_digs.o ltm/bn_s_mp_sqr.o ltm/bn_s_mp_sub.o ltm/bncore.o
 
-LIB_EXT  =.aa
+LIB_EXT    =.a
+OBJ_EXT    =.o
+PERL       =perl
 RANLIB     =ranlib
 AR         =ar
-ARFLAGS    =csr
-RM_F       =perl -MExtUtils::Command -e rm_f --
+ARFLAGS    =cr
+RM_F       =$(PERL) -MExtUtils::Command -e rm_f --
 
 liballinone$(LIB_EXT): $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
 clean:
-	$(RM_F) $(OBJS) $(STATIC_LIB)
+	$(RM_F) $(OBJS) liballinone$(LIB_EXT)
 
 #this is necessary fo compatibility with BSD make (namely on OpenBSD)
 .SUFFIXES: .o .c
 
-.c.o:
-	$(CC) -Iltm -Iltc/headers $(CCFLAGS) -c $< -o $@
-
-all: liballinone.a
-	echo "XXXXX"
-	echo $(MYCCFLAGS)
-	echo "YYYYY"
+.c$(OBJ_EXT):
+	$(CC) $(CFLAGS) -c $< -o $@

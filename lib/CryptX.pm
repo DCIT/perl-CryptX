@@ -3,9 +3,9 @@ package CryptX;
 use strict;
 use warnings ;
 
-our $VERSION = '0.027_01';
+our $VERSION = '0.027_05';
 
-use Exporter 'import';
+use base qw(Exporter);
 our @EXPORT_OK = qw( _encode_base64url _decode_base64url _encode_base64 _decode_base64 _decode_json _encode_json);
 
 require XSLoader;
