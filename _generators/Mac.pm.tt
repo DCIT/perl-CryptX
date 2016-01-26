@@ -5,14 +5,12 @@ package Crypt::Mac::[%orig_name%];
 use strict;
 use warnings;
 
-use Exporter 'import';
+use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_b64 [%lc_name%]_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use base 'Crypt::Mac';
-
 [%-IF lc_name == 'hmac' %]
 use Crypt::Digest;
 
