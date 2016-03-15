@@ -37,6 +37,7 @@ int dsa_import_hex(char *p, char *q, char *g, char *x, char *y, dsa_key *key)
    if ((err = mp_read_radix(key->y , y , 16)) != CRYPT_OK) { goto LBL_ERR; }
    if (x && strlen(x) > 0) {
      key->type = PK_PRIVATE;
+     if ((err = mp_read_radix(key->x , x , 16)) != CRYPT_OK) { goto LBL_ERR; }
    }
    else {
      key->type = PK_PUBLIC;
