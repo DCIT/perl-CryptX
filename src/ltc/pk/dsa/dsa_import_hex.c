@@ -34,12 +34,20 @@ int dsa_import_hex(char *p, char *q, char *g, char *x, char *y, dsa_key *key)
    if ((err = mp_read_radix(key->p , p , 16)) != CRYPT_OK) { goto LBL_ERR; }
    if ((err = mp_read_radix(key->q , q , 16)) != CRYPT_OK) { goto LBL_ERR; }
    if ((err = mp_read_radix(key->g , g , 16)) != CRYPT_OK) { goto LBL_ERR; }
-   if ((err = mp_read_radix(key->g , y , 16)) != CRYPT_OK) { goto LBL_ERR; }
+   if ((err = mp_read_radix(key->y , y , 16)) != CRYPT_OK) { goto LBL_ERR; }
    if (x && strlen(x) > 0) {
      key->type = PK_PRIVATE;
    }
    else {
      key->type = PK_PUBLIC;
+   }
+
+   key->qord = mp_unsigned_bin_size(key->q);
+
+   if (key->qord >= LTC_MDSA_MAX_GROUP || key->qord <= 15 ||
+      (unsigned long)key->qord >= mp_unsigned_bin_size(key->p) || (mp_unsigned_bin_size(key->p) - key->qord) >= LTC_MDSA_DELTA) {
+      err = CRYPT_INVALID_PACKET;
+      goto LBL_ERR;
    }
    return CRYPT_OK;
 
