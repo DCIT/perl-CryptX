@@ -109,6 +109,8 @@ int rsa_sign_saltlen_get_max_ex(int padding, int hash_idx, rsa_key *key);
 /* PKCS #1 import/export */
 int rsa_export(unsigned char *out, unsigned long *outlen, int type, rsa_key *key);
 int rsa_import(const unsigned char *in, unsigned long inlen, rsa_key *key);
+int rsa_import_pkcs8(unsigned char *in, unsigned long inlen, rsa_key *key);
+int rsa_import_hex(char *N, char *e, char *d, char *p, char *q, char *dP, char *dQ, char *qP, rsa_key *key);
 
 #endif
 
@@ -303,6 +305,7 @@ void ecc_free(ecc_key *key);
 int  ecc_export(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
 int  ecc_import(const unsigned char *in, unsigned long inlen, ecc_key *key);
 int  ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_set_type *dp);
+int  ecc_import_pkcs8(unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
 
 int ecc_ansi_x963_export(ecc_key *key, unsigned char *out, unsigned long *outlen);
 int ecc_ansi_x963_import(const unsigned char *in, unsigned long inlen, ecc_key *key);
@@ -332,9 +335,17 @@ int  ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
                          unsigned char *out, unsigned long *outlen,
                          prng_state *prng, int wprng, ecc_key *key);
 
+int ecc_sign_hash_rfc7518(const unsigned char *in,  unsigned long inlen,
+                                unsigned char *out, unsigned long *outlen,
+                                prng_state *prng, int wprng, ecc_key *key);
+
 int  ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
                      const unsigned char *hash, unsigned long hashlen,
                      int *stat, ecc_key *key);
+
+int ecc_verify_hash_rfc7518(const unsigned char *sig,  unsigned long siglen,
+                    const unsigned char *hash, unsigned long hashlen,
+                    int *stat, ecc_key *key);
 
 int ecc_verify_key(ecc_key *key);
 
@@ -456,6 +467,7 @@ int dsa_decrypt_key(const unsigned char *in,  unsigned long  inlen,
                           dsa_key *key);
 
 int dsa_import(const unsigned char *in, unsigned long inlen, dsa_key *key);
+int dsa_import_hex(char *p, char *q, char *g, char *x, char *y, dsa_key *key);
 int dsa_export(unsigned char *out, unsigned long *outlen, int type, dsa_key *key);
 int dsa_verify_key(dsa_key *key, int *stat);
 

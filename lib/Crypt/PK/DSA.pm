@@ -60,12 +60,12 @@ sub import_key {
   elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
     $data = Crypt::PK::_pem_to_binary($data);
     my ($typ, $p, $q, $g, $y) = Crypt::PK::_ssh_parse($data);
-    return $self->_import_hex($p, $q, $g, undef, $y) if $typ && $p && $q && $g && $y && $typ eq 'ssh-dss';
+    return $self->_import_hex(unpack('H*',$p), unpack('H*',$q), unpack('H*',$g), undef, unpack('H*',$y)) if $typ && $p && $q && $g && $y && $typ eq 'ssh-dss';
   }
   elsif ($data =~ /ssh-dss\s+(\S+)/) {
     $data = _decode_base64("$1");
     my ($typ, $p, $q, $g, $y) = Crypt::PK::_ssh_parse($data);
-    return $self->_import_hex($p, $q, $g, undef, $y) if $typ && $p && $q && $g && $y && $typ eq 'ssh-dss';
+    return $self->_import_hex(unpack('H*',$p), unpack('H*',$q), unpack('H*',$g), undef, unpack('H*',$y)) if $typ && $p && $q && $g && $y && $typ eq 'ssh-dss';
   }
   else {
     return $self->_import($data);
