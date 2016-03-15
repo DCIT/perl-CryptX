@@ -381,35 +381,35 @@ CryptX__decode_base64(SV * in)
 
 ###############################################################################
 
-INCLUDE: CryptX_Digest.xs.inc
-INCLUDE: CryptX_Cipher.xs.inc
+INCLUDE: lib/CryptX_Digest.xs.inc
+INCLUDE: lib/CryptX_Cipher.xs.inc
 
-INCLUDE: CryptX_AuthEnc_EAX.xs.inc
-INCLUDE: CryptX_AuthEnc_GCM.xs.inc
-INCLUDE: CryptX_AuthEnc_OCB.xs.inc
-INCLUDE: CryptX_AuthEnc_CCM.xs.inc
+INCLUDE: lib/CryptX_AuthEnc_EAX.xs.inc
+INCLUDE: lib/CryptX_AuthEnc_GCM.xs.inc
+INCLUDE: lib/CryptX_AuthEnc_OCB.xs.inc
+INCLUDE: lib/CryptX_AuthEnc_CCM.xs.inc
 
-INCLUDE: CryptX_Mac_F9.xs.inc
-INCLUDE: CryptX_Mac_HMAC.xs.inc
-INCLUDE: CryptX_Mac_OMAC.xs.inc
-INCLUDE: CryptX_Mac_Pelican.xs.inc
-INCLUDE: CryptX_Mac_PMAC.xs.inc
-INCLUDE: CryptX_Mac_XCBC.xs.inc
+INCLUDE: lib/CryptX_Mac_F9.xs.inc
+INCLUDE: lib/CryptX_Mac_HMAC.xs.inc
+INCLUDE: lib/CryptX_Mac_OMAC.xs.inc
+INCLUDE: lib/CryptX_Mac_Pelican.xs.inc
+INCLUDE: lib/CryptX_Mac_PMAC.xs.inc
+INCLUDE: lib/CryptX_Mac_XCBC.xs.inc
 
-INCLUDE: CryptX_Mode_CBC.xs.inc
-INCLUDE: CryptX_Mode_ECB.xs.inc
-INCLUDE: CryptX_Mode_CFB.xs.inc
-INCLUDE: CryptX_Mode_OFB.xs.inc
-INCLUDE: CryptX_Mode_CTR.xs.inc
-#INCLUDE: CryptX_Mode_F8.xs.inc
-#INCLUDE: CryptX_Mode_LRW.xs.inc
-#INCLUDE: CryptX_Mode_XTS.xs.inc
+INCLUDE: lib/CryptX_Mode_CBC.xs.inc
+INCLUDE: lib/CryptX_Mode_ECB.xs.inc
+INCLUDE: lib/CryptX_Mode_CFB.xs.inc
+INCLUDE: lib/CryptX_Mode_OFB.xs.inc
+INCLUDE: lib/CryptX_Mode_CTR.xs.inc
+#INCLUDE: lib/CryptX_Mode_F8.xs.inc
+#INCLUDE: lib/CryptX_Mode_LRW.xs.inc
+#INCLUDE: lib/CryptX_Mode_XTS.xs.inc
 
-INCLUDE: CryptX_PRNG.xs.inc
+INCLUDE: lib/CryptX_PRNG.xs.inc
 
-INCLUDE: CryptX_PK_RSA.xs.inc
-INCLUDE: CryptX_PK_DSA.xs.inc
-INCLUDE: CryptX_PK_DH.xs.inc
-INCLUDE: CryptX_PK_ECC.xs.inc
+INCLUDE: lib/CryptX_PK_RSA.xs.inc
+INCLUDE: lib/CryptX_PK_DSA.xs.inc
+INCLUDE: lib/CryptX_PK_DH.xs.inc
+INCLUDE: lib/CryptX_PK_ECC.xs.inc
 
-INCLUDE: CryptX_KeyDerivation.xs.inc
+INCLUDE: lib/CryptX_KeyDerivation.xs.inc

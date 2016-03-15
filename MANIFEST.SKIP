@@ -30,6 +30,7 @@ CryptX.c$
 ^MYMETA\.json$
 ^MYMETA\.yml$
 ^Build$
+^Build.PL$
 ^Makefile$
 ^Build\.bat$
 ^MANIFEST\.SKIP$
