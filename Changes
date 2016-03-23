@@ -13,7 +13,7 @@ TODO:
         - maybe: add enc_b64/dec_b64 + enc_b64u/dec_b64u + enc_b32/dec_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
-0.027_06 2016/03/15
+0.028   2016/03/23
         - IMPORTANT: switch from Module::Build to ExtUtils::MakeMaker
         - fix for broken DSA key (ssh format) loading
 
