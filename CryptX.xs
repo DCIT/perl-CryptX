@@ -171,6 +171,14 @@ typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
   int id;
 } *Crypt__PK__ECC;
 
+/* Math::BigInt::LTM related */
+typedef mp_int * Math__BigInt__LTM;
+STATIC SV * sv_from_mpi(mp_int *mpi) {
+  SV *obj = newSV(0);
+  sv_setref_pv(obj, "Math::BigInt::LTM", (void*)mpi);
+  return obj;
+}
+
 ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
 {
   HV *h;
@@ -413,3 +421,5 @@ INCLUDE: lib/CryptX_PK_DH.xs.inc
 INCLUDE: lib/CryptX_PK_ECC.xs.inc
 
 INCLUDE: lib/CryptX_KeyDerivation.xs.inc
+
+INCLUDE: lib/CryptX_BigInt_LTM.xs.inc

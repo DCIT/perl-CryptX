@@ -1,3 +1,5 @@
+### see http://perldoc.perl.org/perlxstypemap.html
+
 ###########################
 TYPEMAP
 
@@ -31,6 +33,8 @@ Crypt::PK::RSA          T_PTROBJ
 Crypt::PK::DSA          T_PTROBJ
 Crypt::PK::ECC          T_PTROBJ
 Crypt::PK::DH           T_PTROBJ
+
+Math::BigInt::LTM       T_PTROBJ
 
 #pointer with automatic NULL<->undef conversion on input/output
 unsigned char *         T_PTR_OR_NULL
