@@ -9,3 +9,5 @@ BEGIN {
     use_ok('Math::BigInt::LTM');
     use_ok('Math::BigInt');         # Math::BigInt is required for the tests
 };
+
+diag "Math::BigInt VERSION=$Math::BigInt::VERSION\n";

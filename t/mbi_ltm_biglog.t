@@ -12,7 +12,12 @@
 # versions up to v1.63, and for bsqrt($x) when $x << 1 for instance).
 
 use strict;
-use Test::More tests => 71;
+use Test::More;
+
+BEGIN {
+  plan skip_all => "requires Math::BigInt 1.9997+" unless eval { require Math::BigInt && $Math::BigInt::VERSION >= 1.9997 };
+  plan tests => 71;
+}
 
 use Math::BigFloat only => 'LTM';
 use Math::BigInt;

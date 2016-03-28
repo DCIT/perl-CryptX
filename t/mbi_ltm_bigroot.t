@@ -9,7 +9,12 @@
 # it at all.
 
 use strict;
-use Test::More tests => 1 + 4 * 2;
+use Test::More;
+
+BEGIN {
+  plan skip_all => "requires Math::BigInt 1.997+" unless eval { require Math::BigInt && $Math::BigInt::VERSION >= 1.997 };
+  plan tests => 1 + 4 * 2;
+}
 
 use Math::BigFloat only => 'LTM';
 use Math::BigInt;

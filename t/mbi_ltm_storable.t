@@ -1,6 +1,11 @@
 use strict;
 use warnings;
-use Test::More tests => 1;
+use Test::More;
+
+BEGIN {
+  plan skip_all => "requires Storable 2.0+" unless eval { require Storable && $Storable::VERSION >= 2.0 };
+  plan tests => 1;
+}
 
 use Math::BigInt::LTM;
 

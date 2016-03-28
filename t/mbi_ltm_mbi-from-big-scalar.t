@@ -7,18 +7,21 @@ use warnings;
 
 use Test::More;
 
-use Math::BigInt lib => "LTM";
+my $use64;
 
-# Don't run these tests unless we have proper 64-bit support.
-
-my $use64    = ~0 > 4294967295;
-my $broken64 = (18446744073709550592 == ~0);
-if ($broken64) {
-    plan(skip_all =>
-         "Your 64-bit system is broken.  Upgrade from 5.6 for this test.");
+BEGIN {
+  plan skip_all => "requires Math::BigInt 1.999712+" unless eval { require Math::BigInt && $Math::BigInt::VERSION >= 1.999712 };
+  # Don't run these tests unless we have proper 64-bit support.
+  $use64    = ~0 > 4294967295;
+  my $broken64 = (18446744073709550592 == ~0);
+  if ($broken64) {
+      plan(skip_all =>
+           "Your 64-bit system is broken.  Upgrade from 5.6 for this test.");
+  }
+  plan tests => 4*2 + 2*1 + 1 + $use64;
 }
 
-plan tests => 4*2 + 2*1 + 1 + $use64;
+use Math::BigInt lib => "LTM";
 
 my $maxs = ~0 >> 1;
 for my $n ($maxs - 2, $maxs - 1, $maxs, $maxs + 1) {

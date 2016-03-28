@@ -3,8 +3,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3724            # tests in require'd file
-                         + 6;           # tests in this file
+use Test::More;
+
+BEGIN {
+  plan skip_all => "requires Math::BigInt 1.999712+" unless eval { require Math::BigInt && $Math::BigInt::VERSION >= 1.999712 };
+  plan tests => 3724            # tests in require'd file
+                 + 6;           # tests in this file
+}
 
 use Math::BigInt lib => 'LTM';
 
