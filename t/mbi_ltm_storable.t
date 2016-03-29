@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 BEGIN {
-  plan skip_all => "requires Storable 2.0+" unless eval { require Storable && $Storable::VERSION >= 2.0 };
+  plan skip_all => "requires Storable 2.0+" unless eval { require Storable && eval($Storable::VERSION) >= 2.0 };
   plan tests => 1;
 }
 

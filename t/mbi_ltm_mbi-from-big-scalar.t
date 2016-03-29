@@ -6,11 +6,12 @@ use strict;
 use warnings;
 
 use Test::More;
+use Config;
 
 my $use64;
 
 BEGIN {
-  plan skip_all => "requires Math::BigInt 1.999712+" unless eval { require Math::BigInt && $Math::BigInt::VERSION >= 1.999712 };
+  plan skip_all => "requires Math::BigInt 1.999712+" unless eval { require Math::BigInt && eval($Math::BigInt::VERSION) >= 1.999712 };
   # Don't run these tests unless we have proper 64-bit support.
   $use64    = ~0 > 4294967295;
   my $broken64 = (18446744073709550592 == ~0);
@@ -20,6 +21,8 @@ BEGIN {
   }
   plan tests => 4*2 + 2*1 + 1 + $use64;
 }
+
+diag "use64=".($use64?1:0)." ivsize=".$Config{ivsize}." ivtype=".$Config{ivtype}." use64bitint=".$Config{use64bitint}."\n";
 
 use Math::BigInt lib => "LTM";
 

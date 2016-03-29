@@ -6,9 +6,9 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    plan skip_all => 'Devel only tests' unless $ENV{DEVEL_ONLY_TESTS};
-    plan tests => tests => 2409            # tests in require'd file
-                           + 5;            # tests in this file
+    plan skip_all => 'set TEST_MBI_LTM_BIGFLTPM to enable this test' unless $ENV{TEST_MBI_LTM_BIGFLTPM};
+    plan tests => 2409            # tests in require'd file
+                  + 5;            # tests in this file
 }
 
 use Math::BigInt lib => 'LTM';

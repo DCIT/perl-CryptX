@@ -15,7 +15,7 @@ use strict;
 use Test::More;
 
 BEGIN {
-  plan skip_all => "requires Math::BigInt 1.9997+" unless eval { require Math::BigInt && $Math::BigInt::VERSION >= 1.9997 };
+  plan skip_all => "requires Math::BigInt 1.9997+" unless eval { require Math::BigInt && eval($Math::BigInt::VERSION) >= 1.9997 };
   plan tests => 71;
 }
 
