@@ -8,10 +8,11 @@ our %EXPORT_TAGS = ( all => [qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_ver
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use CryptX qw( _encode_base64url _decode_base64url _encode_base64 _decode_base64 _encode_json _decode_json);
-use Crypt::PK;
-use Crypt::Digest 'digest_data';
 use Carp;
+use CryptX qw(_encode_json _decode_json);
+use Crypt::Digest 'digest_data';
+use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pem_to_der der_to_pem);
+use Crypt::PK;
 
 sub new {
   my ($class, $f, $p) = @_;
@@ -28,12 +29,12 @@ sub export_key_pem {
   # PKCS#1 RSAPrivateKey**           (PEM header: BEGIN RSA PRIVATE KEY)
   # PKCS#8 PrivateKeyInfo*           (PEM header: BEGIN PRIVATE KEY)
   # PKCS#8 EncryptedPrivateKeyInfo** (PEM header: BEGIN ENCRYPTED PRIVATE KEY)
-  return Crypt::PK::_asn1_to_pem($key, "RSA PRIVATE KEY", $password, $cipher) if $type eq 'private';
+  return der_to_pem($key, "RSA PRIVATE KEY", $password, $cipher) if $type eq 'private';
 
   # PKCS#1 RSAPublicKey* (PEM header: BEGIN RSA PUBLIC KEY)
-  return Crypt::PK::_asn1_to_pem($key, "RSA PUBLIC KEY") if $type eq 'public';
+  return der_to_pem($key, "RSA PUBLIC KEY") if $type eq 'public';
   # X.509 SubjectPublicKeyInfo** (PEM header: BEGIN PUBLIC KEY)
-  return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public_x509';
+  return der_to_pem($key, "PUBLIC KEY") if $type eq 'public_x509';
 }
 
 sub export_key_jwk {
@@ -46,14 +47,14 @@ sub export_key_jwk {
     }
     my $hash = {
       kty => "RSA",
-      n   => _encode_base64url(pack("H*", $kh->{N})),
-      e   => _encode_base64url(pack("H*", $kh->{e})),
-      d   => _encode_base64url(pack("H*", $kh->{d})),
-      p   => _encode_base64url(pack("H*", $kh->{p})),
-      q   => _encode_base64url(pack("H*", $kh->{q})),
-      dp  => _encode_base64url(pack("H*", $kh->{dP})),
-      dq  => _encode_base64url(pack("H*", $kh->{dQ})),
-      qi  => _encode_base64url(pack("H*", $kh->{qP})),
+      n   => encode_b64u(pack("H*", $kh->{N})),
+      e   => encode_b64u(pack("H*", $kh->{e})),
+      d   => encode_b64u(pack("H*", $kh->{d})),
+      p   => encode_b64u(pack("H*", $kh->{p})),
+      q   => encode_b64u(pack("H*", $kh->{q})),
+      dp  => encode_b64u(pack("H*", $kh->{dP})),
+      dq  => encode_b64u(pack("H*", $kh->{dQ})),
+      qi  => encode_b64u(pack("H*", $kh->{qP})),
     };
     return $wanthash ? $hash : _encode_json($hash);
   }
@@ -64,8 +65,8 @@ sub export_key_jwk {
     }
     my $hash = {
       kty => "RSA",
-      n   => _encode_base64url(pack("H*", $kh->{N})),
-      e   => _encode_base64url(pack("H*", $kh->{e})),
+      n   => encode_b64u(pack("H*", $kh->{N})),
+      e   => encode_b64u(pack("H*", $kh->{e})),
     };
     return $wanthash ? $hash : _encode_json($hash);
   }
@@ -84,7 +85,7 @@ sub import_key {
     if ($key->{n} && $key->{e} && $key->{kty} && $key->{kty} eq "RSA") {
       # hash with items corresponding to JSON Web Key (JWK)
       for (qw/n e d p q dp dq qi/) {
-        $key->{$_} = eval { unpack("H*", _decode_base64url($key->{$_})) } if exists $key->{$_};
+        $key->{$_} = eval { unpack("H*", decode_b64u($key->{$_})) } if exists $key->{$_};
       }
       return $self->_import_hex($key->{n}, $key->{e}, $key->{d}, $key->{p}, $key->{q}, $key->{dp}, $key->{dq}, $key->{qi});
     }
@@ -96,7 +97,7 @@ sub import_key {
     $data = $$key;
   }
   elsif (-f $key) {
-    $data = Crypt::PK::_slurp_file($key);
+    $data = read_rawfile($key);
   }
   else {
     croak "FATAL: non-existing file '$key'";
@@ -107,12 +108,12 @@ sub import_key {
     # PKCS#1 RSAPublicKey        (PEM header: BEGIN RSA PUBLIC KEY)
     # PKCS#1 RSAPrivateKey       (PEM header: BEGIN RSA PRIVATE KEY)
     # X.509 SubjectPublicKeyInfo (PEM header: BEGIN PUBLIC KEY)
-    $data = Crypt::PK::_pem_to_binary($data, $password);
+    $data = pem_to_der($data, $password);
     return $self->_import($data) if $data;
   }
   elsif ($data =~ /-----BEGIN PRIVATE KEY-----(.*?)-----END/sg) {
     # PKCS#8 PrivateKeyInfo      (PEM header: BEGIN PRIVATE KEY)
-    $data = Crypt::PK::_pem_to_binary($data, $password);
+    $data = pem_to_der($data, $password);
     return $self->_import_pkcs8($data) if $data;
   }
   elsif ($data =~ /-----BEGIN ENCRYPTED PRIVATE KEY-----(.*?)-----END/sg) {
@@ -125,18 +126,18 @@ sub import_key {
     my $h = _decode_json($json);
     if ($h && $h->{kty} eq "RSA") {
       for (qw/n e d p q dp dq qi/) {
-        $h->{$_} = eval { unpack("H*", _decode_base64url($h->{$_})) } if exists $h->{$_};
+        $h->{$_} = eval { unpack("H*", decode_b64u($h->{$_})) } if exists $h->{$_};
       }
       return $self->_import_hex($h->{n}, $h->{e}, $h->{d}, $h->{p}, $h->{q}, $h->{dp}, $h->{dq}, $h->{qi}) if $h->{n} && $h->{e};
     }
   }
   elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
-    $data = Crypt::PK::_pem_to_binary($data);
+    $data = pem_to_der($data);
     my ($typ, $N, $e) = Crypt::PK::_ssh_parse($data);
     return $self->_import_hex(unpack("H*", $e), unpack("H*", $N)) if $typ && $e && $N && $typ eq 'ssh-rsa';
   }
   elsif ($data =~ /ssh-rsa\s+(\S+)/) {
-  $data = _decode_base64("$1");
+  $data = decode_b64("$1");
     my ($typ, $N, $e) = Crypt::PK::_ssh_parse($data);
     return $self->_import_hex(unpack("H*", $e), unpack("H*", $N)) if $typ && $e && $N && $typ eq 'ssh-rsa';
   }

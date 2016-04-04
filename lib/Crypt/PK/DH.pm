@@ -8,10 +8,10 @@ our %EXPORT_TAGS = ( all => [qw( dh_encrypt dh_decrypt dh_sign_message dh_verify
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use CryptX;
-use Crypt::PK;
-use Crypt::Digest 'digest_data';
 use Carp;
+use CryptX;
+use Crypt::Digest 'digest_data';
+use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64);
 
 sub new {
   my ($class, $f) = @_;
@@ -28,7 +28,7 @@ sub import_key {
     $data = $$key;
   }
   elsif (-f $key) {
-    $data = Crypt::PK::_slurp_file($key);
+    $data = read_rawfile($key);
   }
   else {
     croak "FATAL: non-existing file '$key'";

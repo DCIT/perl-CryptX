@@ -14,8 +14,11 @@ TODO:
         - maybe: add enc_b64/dec_b64 + enc_b64u/dec_b64u + enc_b32/dec_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
-0.028_03 2016/03/29
+0.028_04 2016/04/04
         - NEW module: Math::BigInt::LTM
+        - NEW module: Crypt::Misc
+        - TODO: pod for Crypt::Misc
+        - TODO: fix - Please specify prototyping behavior for CryptX.xs (see perlxs manual)
 
 0.028   2016/03/23
         - IMPORTANT: switch from Module::Build to ExtUtils::MakeMaker

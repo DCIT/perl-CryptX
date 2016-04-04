@@ -8,10 +8,11 @@ our %EXPORT_TAGS = ( all => [qw( ecc_encrypt ecc_decrypt ecc_sign_message ecc_ve
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use CryptX qw( _encode_base64url _decode_base64url _encode_base64 _decode_base64 _decode_json _encode_json );
-use Crypt::PK;
-use Crypt::Digest 'digest_data';
 use Carp;
+use CryptX qw(_encode_json _decode_json);
+use Crypt::Digest 'digest_data';
+use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pem_to_der der_to_pem);
+use Crypt::PK;
 
 our %curve = (
         ### http://www.ecc-brainpool.org/download/Domain-parameters.pdf (v1.0 19.10.2005)
@@ -433,8 +434,8 @@ sub export_key_pem {
   my ($self, $type, $password, $cipher) = @_;
   my $key = $self->export_key_der($type||'');
   return unless $key;
-  return Crypt::PK::_asn1_to_pem($key, "EC PRIVATE KEY", $password, $cipher) if $type eq 'private';
-  return Crypt::PK::_asn1_to_pem($key, "PUBLIC KEY") if $type eq 'public' || $type eq 'public_compressed';
+  return der_to_pem($key, "EC PRIVATE KEY", $password, $cipher) if $type eq 'private';
+  return der_to_pem($key, "PUBLIC KEY") if $type eq 'public' || $type eq 'public_compressed';
 }
 
 sub export_key_jwk {
@@ -455,9 +456,9 @@ sub export_key_jwk {
     # but they are used in https://tools.ietf.org/html/rfc7517#appendix-A.2
     my $hash = {
       kty => "EC", crv=>$curve,
-      x => _encode_base64url(pack("H*", $kh->{pub_x})),
-      y => _encode_base64url(pack("H*", $kh->{pub_y})),
-      d => _encode_base64url(pack("H*", $kh->{k})),
+      x => encode_b64u(pack("H*", $kh->{pub_x})),
+      y => encode_b64u(pack("H*", $kh->{pub_y})),
+      d => encode_b64u(pack("H*", $kh->{k})),
     };
     return $wanthash ? $hash : _encode_json($hash);
   }
@@ -468,8 +469,8 @@ sub export_key_jwk {
     }
     my $hash = {
       kty => "EC", crv=>$curve,
-      x => _encode_base64url(pack("H*", $kh->{pub_x})),
-      y => _encode_base64url(pack("H*", $kh->{pub_y})),
+      x => encode_b64u(pack("H*", $kh->{pub_x})),
+      y => encode_b64u(pack("H*", $kh->{pub_y})),
     };
     return $wanthash ? $hash : _encode_json($hash);
   }
@@ -491,7 +492,7 @@ sub import_key {
       # hash with items corresponding to JSON Web Key (JWK)
       $key = {%$key}; # make a copy as we will modify it
       for (qw/x y d/) {
-        $key->{$_} = eval { unpack("H*", _decode_base64url($key->{$_})) } if exists $key->{$_};
+        $key->{$_} = eval { unpack("H*", decode_b64u($key->{$_})) } if exists $key->{$_};
       }
       if (my $curve = $jwkcrv{$key->{crv}}) {
         return $self->_import_hex($key->{x}, $key->{y}, $key->{d}, $curve);
@@ -505,7 +506,7 @@ sub import_key {
     $data = $$key;
   }
   elsif (-f $key) {
-    $data = Crypt::PK::_slurp_file($key);
+    $data = read_rawfile($key);
   }
   else {
     croak "FATAL: non-existing file '$key'";
@@ -513,11 +514,11 @@ sub import_key {
   croak "FATAL: invalid key data" unless $data;
 
   if ($data =~ /-----BEGIN (EC PRIVATE|EC PUBLIC|PUBLIC) KEY-----(.*?)-----END/sg) {
-    $data = Crypt::PK::_pem_to_binary($data, $password);
+    $data = pem_to_der($data, $password);
     return $self->_import($data);
   }
   elsif ($data =~ /-----BEGIN PRIVATE KEY-----(.*?)-----END/sg) {
-    $data = Crypt::PK::_pem_to_binary($data, $password);
+    $data = pem_to_der($data, $password);
     return $self->_import_pkcs8($data);
   }
   elsif ($data =~ /-----BEGIN ENCRYPTED PRIVATE KEY-----(.*?)-----END/sg) {
@@ -530,7 +531,7 @@ sub import_key {
     my $h = _decode_json($json);
     if ($h && $h->{kty} eq "EC") {
       for (qw/x y d/) {
-        $h->{$_} = eval { unpack("H*", _decode_base64url($h->{$_})) } if exists $h->{$_};
+        $h->{$_} = eval { unpack("H*", decode_b64u($h->{$_})) } if exists $h->{$_};
       }
       if (my $curve = $jwkcrv{$h->{crv}}) {
         return $self->_import_hex($h->{x}, $h->{y}, $h->{d}, $curve);
@@ -538,12 +539,12 @@ sub import_key {
     }
   }
   elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
-    $data = Crypt::PK::_pem_to_binary($data);
+    $data = pem_to_der($data);
     my ($typ, $skip, $pubkey) = Crypt::PK::_ssh_parse($data);
     return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
   }
   elsif ($data =~ /(ecdsa-\S+)\s+(\S+)/) {
-    $data = _decode_base64("$2");
+    $data = decode_b64("$2");
     my ($typ, $skip, $pubkey) = Crypt::PK::_ssh_parse($data);
     return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
   }
