@@ -1039,6 +1039,8 @@ Support for password protected PEM keys
 
 =head2 export_key_jwk
 
+I<Since: CryptX-0.022>
+
 Exports public/private keys as a JSON Web Key (JWK).
 
  my $private_json_text = $pk->export_key_jwk('private');
@@ -1089,6 +1091,8 @@ private key is exported as raw bytes (padded with leading zeros to have the same
 
 =head2 sign_message_rfc7518
 
+I<Since: CryptX-0.024>
+
 Same as L<sign_message|/sign_message> only the signature format is as defined by L<https://tools.ietf.org/html/rfc7518>
 (JWA - JSON Web Algorithms).
 
@@ -1102,6 +1106,8 @@ Same as L<sign_message|/sign_message> only the signature format is as defined by
  #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 verify_message_rfc7518
+
+I<Since: CryptX-0.024>
 
 Same as L<verify_message|/verify_message> only the signature format is as defined by L<https://tools.ietf.org/html/rfc7518>
 (JWA - JSON Web Algorithms).
@@ -1167,6 +1173,8 @@ Same as L<verify_message|/verify_message> only the signature format is as define
  }
 
 =head2 curve2hash
+
+I<Since: CryptX-0.024>
 
  my $crv = $pk->curve2hash;
 

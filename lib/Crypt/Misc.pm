@@ -7,7 +7,7 @@ require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 use Carp 'croak';
 our %EXPORT_TAGS = ( all => [qw(encode_b64 decode_b64 encode_b64u decode_b64u pem_to_der der_to_pem read_rawfile write_rawfile slow_eq)] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-our @EXPORT = qw(); 
+our @EXPORT = qw();
 
 use Carp 'carp';
 use CryptX;
@@ -161,50 +161,122 @@ Crypt::Misc - miscellaneous functions related to (or used by) CryptX
 
 =head1 SYNOPSIS
 
- use Crypt::Misc ':all';
+This module contains a collection of mostly unsorted functions loosely-related to CryptX distribution but not implementing cryptography.
 
+Most of them are also available in other perl modules but once you utilize CryptX you might avoid dependencies on other modules by using
+functions from Crypt::Misc.
 
 =head1 DESCRIPTION
 
-xxx
+ use Crypt::Misc ':all';
 
-=head1 METHODS
+ # Base64 and Base64/URL-safe functions
+ $base64    = encode_b64($rawbytes);
+ $rawbytes  = decode_b64($base64);
+ $base64url = encode_b64u($encode_b64u);
+ $rawbytes  = decode_b64u($base64url);
+
+ # read/write file
+ $rawdata = read_rawfile($filename);
+ write_rawfile($filename, $rawdata);
+
+ # convert PEM/DER
+ $der_data = pem_to_der($pem_data);
+ $pem_data = der_to_pem($der_data);
+
+  # others
+  die "mismatch" unless slow_eq($str1, $str2);
+
+=head1 FUNCTIONS
+
+By default, Crypt::Misc doesn't import any function. You can import individual functions like this:
+
+ use Crypt::Misc qw(read_rawfile);
+
+Or import all available functions:
+
+ use Crypt::Misc ':all';
 
 =head2 encode_b64
 
-xxx
+I<Since: CryptX-0.029>
+
+ $base64string = encode_b64($rawdata);
+
+Encode $rawbytes into Base64 string, no line-endings in the output string.
 
 =head2 decode_b64
 
-xxx
+I<Since: CryptX-0.029>
 
-=head2  read_rawfile
+ $rawdata = encode_b64($base64string);
 
-xxx
-
-=head2  write_rawfile
-
-xxx
-
-=head2  slow_eq
-
-xxx
+Decode a Base64 string.
 
 =head2  encode_b64u
 
-xxx
+I<Since: CryptX-0.029>
+
+ $base64url_string = encode_b64($rawdata);
+
+Encode $rawbytes into Base64/URL-Safe string, no line-endings in the output string.
 
 =head2  decode_b64u
 
-xxx
+I<Since: CryptX-0.029>
+
+ $rawdata = encode_b64($base64url_string);
+
+Decode a Base64/URL-Safe string.
+
+=head2  read_rawfile
+
+I<Since: CryptX-0.029>
+
+ $rawdata = read_rawfile($filename);
+
+Read file C<$filename> into a scalar as a binary data (without decoding/transformation).
+
+=head2  write_rawfile
+
+I<Since: CryptX-0.029>
+
+ write_rawfile($filename, $rawdata);
+
+Write C<$rawdata> to file <$filename> as binary data.
+
+=head2  slow_eq
+
+I<Since: CryptX-0.029>
+
+ if (slow_eq($data1, $data2)) { ... }
+
+Constant time compare (to avoid timing side-channel).
 
 =head2  pem_to_der
 
-xxx
+I<Since: CryptX-0.029>
+
+  $der_data = pem_to_der($pem_data);
+  #or
+  $der_data = pem_to_der($pem_data, $password);
+
+Convert PEM to DER representation. Supports also password protected PEM data.
 
 =head2  der_to_pem
 
-xxx
+I<Since: CryptX-0.029>
+
+  $pem_data = der_to_pem($pem_data, $header_name);
+  #or
+  $pem_data = der_to_pem($pem_data, $header_name, $password);
+  #or
+  $pem_data = der_to_pem($pem_data, $header_name, $passord, $cipher_name);
+
+  # $header_name e.g. "PUBLIC KEY", "RSA PRIVATE KEY" ...
+  # $cipher_name e.g. "DES-EDE3-CBC", "AES-256-CBC" (DEFAULT) ...
+
+Convert DER to PEM representation. Supports also password protected PEM data.
 
 =head1 SEE ALSO
 
@@ -215,5 +287,3 @@ xxx
 =back
 
 =cut
-
-__END__

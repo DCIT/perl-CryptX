@@ -553,6 +553,8 @@ Support for password protected PEM keys
 
 =head2 export_key_jwk
 
+I<Since: CryptX-0.022>
+
 Exports public/private keys as a JSON Web Key (JWK).
 
  my $private_json_text = $pk->export_key_jwk('private');
