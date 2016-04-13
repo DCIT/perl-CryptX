@@ -389,37 +389,37 @@ CryptX__decode_base64(SV * in)
 
 ###############################################################################
 
-INCLUDE: lib/CryptX_Digest.xs.inc
-INCLUDE: lib/CryptX_Cipher.xs.inc
+INCLUDE: inc/CryptX_Digest.xs.inc
+INCLUDE: inc/CryptX_Cipher.xs.inc
 
-INCLUDE: lib/CryptX_AuthEnc_EAX.xs.inc
-INCLUDE: lib/CryptX_AuthEnc_GCM.xs.inc
-INCLUDE: lib/CryptX_AuthEnc_OCB.xs.inc
-INCLUDE: lib/CryptX_AuthEnc_CCM.xs.inc
+INCLUDE: inc/CryptX_AuthEnc_EAX.xs.inc
+INCLUDE: inc/CryptX_AuthEnc_GCM.xs.inc
+INCLUDE: inc/CryptX_AuthEnc_OCB.xs.inc
+INCLUDE: inc/CryptX_AuthEnc_CCM.xs.inc
 
-INCLUDE: lib/CryptX_Mac_F9.xs.inc
-INCLUDE: lib/CryptX_Mac_HMAC.xs.inc
-INCLUDE: lib/CryptX_Mac_OMAC.xs.inc
-INCLUDE: lib/CryptX_Mac_Pelican.xs.inc
-INCLUDE: lib/CryptX_Mac_PMAC.xs.inc
-INCLUDE: lib/CryptX_Mac_XCBC.xs.inc
+INCLUDE: inc/CryptX_Mac_F9.xs.inc
+INCLUDE: inc/CryptX_Mac_HMAC.xs.inc
+INCLUDE: inc/CryptX_Mac_OMAC.xs.inc
+INCLUDE: inc/CryptX_Mac_Pelican.xs.inc
+INCLUDE: inc/CryptX_Mac_PMAC.xs.inc
+INCLUDE: inc/CryptX_Mac_XCBC.xs.inc
 
-INCLUDE: lib/CryptX_Mode_CBC.xs.inc
-INCLUDE: lib/CryptX_Mode_ECB.xs.inc
-INCLUDE: lib/CryptX_Mode_CFB.xs.inc
-INCLUDE: lib/CryptX_Mode_OFB.xs.inc
-INCLUDE: lib/CryptX_Mode_CTR.xs.inc
-#INCLUDE: lib/CryptX_Mode_F8.xs.inc
-#INCLUDE: lib/CryptX_Mode_LRW.xs.inc
-#INCLUDE: lib/CryptX_Mode_XTS.xs.inc
+INCLUDE: inc/CryptX_Mode_CBC.xs.inc
+INCLUDE: inc/CryptX_Mode_ECB.xs.inc
+INCLUDE: inc/CryptX_Mode_CFB.xs.inc
+INCLUDE: inc/CryptX_Mode_OFB.xs.inc
+INCLUDE: inc/CryptX_Mode_CTR.xs.inc
+#INCLUDE: inc/CryptX_Mode_F8.xs.inc
+#INCLUDE: inc/CryptX_Mode_LRW.xs.inc
+#INCLUDE: inc/CryptX_Mode_XTS.xs.inc
 
-INCLUDE: lib/CryptX_PRNG.xs.inc
+INCLUDE: inc/CryptX_PRNG.xs.inc
 
-INCLUDE: lib/CryptX_PK_RSA.xs.inc
-INCLUDE: lib/CryptX_PK_DSA.xs.inc
-INCLUDE: lib/CryptX_PK_DH.xs.inc
-INCLUDE: lib/CryptX_PK_ECC.xs.inc
+INCLUDE: inc/CryptX_PK_RSA.xs.inc
+INCLUDE: inc/CryptX_PK_DSA.xs.inc
+INCLUDE: inc/CryptX_PK_DH.xs.inc
+INCLUDE: inc/CryptX_PK_ECC.xs.inc
 
-INCLUDE: lib/CryptX_KeyDerivation.xs.inc
+INCLUDE: inc/CryptX_KeyDerivation.xs.inc
 
-INCLUDE: lib/CryptX_BigInt_LTM.xs.inc
+INCLUDE: inc/CryptX_BigInt_LTM.xs.inc
