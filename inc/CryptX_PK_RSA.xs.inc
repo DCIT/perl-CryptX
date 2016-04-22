@@ -219,7 +219,7 @@ export_key_der(Crypt::PK::RSA self, char * type)
         }
         else if (strnEQ(type, "public", 6)) {
           rv = rsa_export(out, &out_len, PK_PUBLIC, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: rsa_export(PK_PUBLIC) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) croak("FATAL: rsa_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else {
