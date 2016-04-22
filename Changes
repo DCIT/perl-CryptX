@@ -15,6 +15,10 @@ TODO:
         - maybe: add enc_b64/dec_b64 + enc_b64u/dec_b64u + enc_b32/dec_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.031   2016/04/XX
+        - RSA+DSA public key export now produces PEM/DER compatible with openssl
+                  public keys exported be previous version can still be imported
+
 0.030   2016/04/13
         - fix: 0.029 + 0.028 by mistake installed *.inc files to perl/(lib|site|vendor)
 
