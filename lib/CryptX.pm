@@ -39,7 +39,12 @@ sub _decode_json {
 
 sub _encode_json {
   croak "FATAL: cannot find JSON::PP or JSON::XS or Cpanel::JSON::XS" if !$has_json;
-  encode_json(shift);
+  my $data = shift;
+  my $rv = encode_json($data); # non-canonical fallback
+  return(eval { Cpanel::JSON::XS->new->canonical->encode($data) } || $rv) if $has_json == 1;
+  return(eval { JSON::XS->new->canonical->encode($data)         } || $rv) if $has_json == 2;
+  return(eval { JSON::PP->new->canonical->encode($data)         } || $rv) if $has_json == 3;
+  return($rv);
 }
 
 1;
