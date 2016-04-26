@@ -19,6 +19,7 @@ TODO:
         - RSA+DSA public key export now produces PEM/DER compatible with openssl
                   public keys exported be previous version can still be imported
         - RSA+DSA+ECC export_key_jwk produces canonical JSON
+        - ECC import_key now accepts non-standard JWK curve names e.g. "secp112r1", "secp521r1"
 
 0.030   2016/04/13
         - fix: 0.029 + 0.028 by mistake installed *.inc files to perl/(lib|site|vendor)
