@@ -10,7 +10,7 @@ our @EXPORT = qw();
 
 use Carp;
 use CryptX qw(_encode_json _decode_json);
-use Crypt::Digest 'digest_data';
+use Crypt::Digest qw(digest_data digest_data_b64u);
 use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pem_to_der der_to_pem);
 use Crypt::PK;
 
@@ -474,6 +474,13 @@ sub export_key_jwk {
     };
     return $wanthash ? $hash : _encode_json($hash);
   }
+}
+
+sub export_key_jwk_thumbprint {
+  my $self = shift;
+  my $h = $self->export_key_jwk('public', 1);
+  my $json = _encode_json({crv=>$h->{crv}, kty=>$h->{kty}, x=>$h->{x}, y=>$h->{y}});
+  return digest_data_b64u('SHA256', $json);
 }
 
 sub import_key {
