@@ -497,6 +497,8 @@ sub import_key {
       if (my $curve = $jwkcrv{$key->{crv}}) {
         return $self->_import_hex($key->{x}, $key->{y}, $key->{d}, $curve);
       }
+      # curve is not JWK compliant e.g. P-192 P-224 P-256 P-384 P-521 (we'll try to import anyway)
+      return $self->_import_hex($key->{x}, $key->{y}, $key->{d}, lc($key->{crv}));
     }
     croak "FATAL: unexpected ECC key hash";
   }
@@ -536,6 +538,8 @@ sub import_key {
       if (my $curve = $jwkcrv{$h->{crv}}) {
         return $self->_import_hex($h->{x}, $h->{y}, $h->{d}, $curve);
       }
+      # curve is not JWK compliant e.g. P-192 P-224 P-256 P-384 P-521 (we'll try to import anyway)
+      return $self->_import_hex($h->{x}, $h->{y}, $h->{d}, lc($h->{crv}));
     }
   }
   elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
