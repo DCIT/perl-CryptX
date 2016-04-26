@@ -477,10 +477,11 @@ sub export_key_jwk {
 }
 
 sub export_key_jwk_thumbprint {
-  my $self = shift;
+  my ($self, $hash_name) = @_;
+  $hash_name ||= 'SHA256';
   my $h = $self->export_key_jwk('public', 1);
   my $json = _encode_json({crv=>$h->{crv}, kty=>$h->{kty}, x=>$h->{x}, y=>$h->{y}});
-  return digest_data_b64u('SHA256', $json);
+  return digest_data_b64u($hash_name, $json);
 }
 
 sub import_key {
