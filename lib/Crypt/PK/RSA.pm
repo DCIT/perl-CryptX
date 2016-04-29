@@ -577,6 +577,14 @@ Also exports public/private keys as a perl HASH with JWK structure.
 
 B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
 
+=head2 export_key_jwk_thumbprint
+
+Exports the key’s JSON Web Key Thumbprint as a string.
+
+If you don’t know what this is, see RFC 7638 (C<https://tools.ietf.org/html/rfc7638>).
+
+ my $thumbprint = $pk->export_key_jwk_thumbprint('SHA256');
+
 =head2 encrypt
 
  my $pk = Crypt::PK::RSA->new($pub_key_filename);

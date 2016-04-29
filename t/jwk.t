@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 plan skip_all => "No JSON::* module installed" unless eval { require JSON::PP } || eval { require JSON::XS } || eval { require Cpanel::JSON::XS };
-plan tests => 90;
+plan tests => 92;
 
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
@@ -39,6 +39,8 @@ my $RSA1 = {
   size => 256,
   type => 1,
 };
+
+my $RSA1_jwk_thumbprint_sha256 = 'NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs';
 
 my $RSA2 = {
   d => "",
@@ -77,6 +79,8 @@ my $RSA2 = {
   ok(exists $jwkh->{n}, "RSA n test export_key_jwk as hash");
   ok(exists $jwkh->{e}, "RSA e test export_key_jwk as hash");
   ok(exists $jwkh->{p}, "RSA p test export_key_jwk as hash");
+  my $jwk_tp = $rsa->export_key_jwk_thumbprint('SHA256');
+  is($jwk_tp, $RSA1_jwk_thumbprint_sha256, 'export_key_jwk_thumbprint(SHA256)');
   ### jwk re-import private key
   $rsa->import_key(\$jwk);
   $kh = $rsa->key2hash;
@@ -89,6 +93,8 @@ my $RSA2 = {
   is($kh->{dP}, $RSA1->{dP}, "RSA private dP test JWK1");
   is($kh->{dQ}, $RSA1->{dQ}, "RSA private dQ test JWK1");
   is($kh->{qP}, $RSA1->{qP}, "RSA private qP test JWK1");
+  $jwk_tp = $rsa->export_key_jwk_thumbprint('SHA256');
+  is($jwk_tp, $RSA1_jwk_thumbprint_sha256, 'export_key_jwk_thumbprint(SHA256)');
   ### jwk re-import public key
   $rsa->import_key(\$jwkp);
   $kh = $rsa->key2hash;
@@ -101,6 +107,8 @@ my $RSA2 = {
   is($kh->{dP}, "", "RSA private dP test JWK2");
   is($kh->{dQ}, "", "RSA private dQ test JWK2");
   is($kh->{qP}, "", "RSA private qP test JWK2");
+  $jwk_tp = $rsa->export_key_jwk_thumbprint('SHA256');
+  is($jwk_tp, $RSA1_jwk_thumbprint_sha256, 'export_key_jwk_thumbprint(SHA256)');
 }
 
 {
@@ -149,6 +157,8 @@ my $EC1 = {
   type           => 1,
 };
 
+my $ec1_jwk_thumbprint_sha256 = 'cn-I_WNMClehiVp51i_0VpOENW1upEerA8sEam5hn-s';
+
 my $EC2 = {
   curve_A        => "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC",
   curve_B        => "5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B",
@@ -187,6 +197,8 @@ my $EC2 = {
   ok(exists $jwkh->{x}, "ECC x test export_key_jwk as hash");
   ok(exists $jwkh->{y}, "ECC y test export_key_jwk as hash");
   ok(exists $jwkh->{d}, "ECC d test export_key_jwk as hash");
+  my $jwk_tp = $ec->export_key_jwk_thumbprint('SHA256');
+  is($jwk_tp, $ec1_jwk_thumbprint_sha256, 'export_key_jwk_thumbprint(SHA256)');
   ### jwk re-import private key
   $ec->import_key(\$jwk);
   $kh = $ec->key2hash;
@@ -195,6 +207,8 @@ my $EC2 = {
   is($kh->{k},     $EC1->{k},     "EC k test JWK1");
   is($kh->{curve_name}, "secp256r1", "EC curve test JWK1");
   ok($ec->is_private, "EC private test JWK1");
+  $jwk_tp = $ec->export_key_jwk_thumbprint('SHA256');
+  is($jwk_tp, $ec1_jwk_thumbprint_sha256, 'export_key_jwk_thumbprint(SHA256)');
   ### jwk re-import public key
   $ec->import_key(\$jwkp);
   $kh = $ec->key2hash;
@@ -203,6 +217,8 @@ my $EC2 = {
   is($kh->{k}, "", "EC k test JWK2");
   is($kh->{curve_name}, "secp256r1", "EC curve test JWK2");
   ok(!$ec->is_private, "EC !private test JWK2");
+  $jwk_tp = $ec->export_key_jwk_thumbprint('SHA256');
+  is($jwk_tp, $ec1_jwk_thumbprint_sha256, 'export_key_jwk_thumbprint(SHA256)');
 }
 
 {
