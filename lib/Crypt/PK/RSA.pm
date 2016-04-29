@@ -10,7 +10,7 @@ our @EXPORT = qw();
 
 use Carp;
 use CryptX qw(_encode_json _decode_json);
-use Crypt::Digest 'digest_data';
+use Crypt::Digest qw(digest_data digest_data_b64u);
 use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pem_to_der der_to_pem);
 use Crypt::PK;
 
@@ -70,6 +70,14 @@ sub export_key_jwk {
     };
     return $wanthash ? $hash : _encode_json($hash);
   }
+}
+
+sub export_key_jwk_thumbprint {
+  my ($self, $hash_name) = @_;
+  $hash_name ||= 'SHA256';
+  my $h = $self->export_key_jwk('public', 1);
+  my $json = _encode_json({kty=>$h->{kty}, n=>$h->{n}, e=>$h->{e}});
+  return digest_data_b64u($hash_name, $json);
 }
 
 sub import_key {
@@ -568,6 +576,14 @@ Also exports public/private keys as a perl HASH with JWK structure.
  my $jwk_hash = $pk->export_key_jwk('public', 1);
 
 B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
+
+=head2 export_key_jwk_thumbprint
+
+Exports the key’s JSON Web Key Thumbprint as a string.
+
+If you don’t know what this is, see RFC 7638 (C<https://tools.ietf.org/html/rfc7638>).
+
+ my $thumbprint = $pk->export_key_jwk_thumbprint('SHA256');
 
 =head2 encrypt
 
