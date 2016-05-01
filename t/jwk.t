@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 plan skip_all => "No JSON::* module installed" unless eval { require JSON::PP } || eval { require JSON::XS } || eval { require Cpanel::JSON::XS };
-plan tests => 92;
+plan tests => 96;
 
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
