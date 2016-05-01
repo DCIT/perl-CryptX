@@ -17,6 +17,7 @@ TODO:
 
 0.031   2016/05/XX
         - new: RSA+ECC method export_key_jwk_thumbprint()
+        - new: Crypt::Misc functions random_v4uuid + is_v4uuid
         - fix: RSA+ECC export_key_jwk produces canonical JSON
         - fix: RSA+DSA public key export now produces PEM/DER compatible with openssl
                   public keys exported be previous version can still be imported

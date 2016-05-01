@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 17;
 
-use Crypt::Misc qw(encode_b64 decode_b64 encode_b64u decode_b64u pem_to_der der_to_pem read_rawfile write_rawfile slow_eq);
+use Crypt::Misc qw(encode_b64 decode_b64 encode_b64u decode_b64u pem_to_der der_to_pem read_rawfile write_rawfile slow_eq is_v4uuid random_v4uuid);
 
 is(encode_b64(pack("H*","702fad4215a04a657f011d3ea5711879c696788c91d2")), "cC+tQhWgSmV/AR0+pXEYecaWeIyR0g==", "encode_b64");
 is(unpack("H*", decode_b64("cC+tQhWgSmV/AR0+pXEYecaWeIyR0g==")), "702fad4215a04a657f011d3ea5711879c696788c91d2", "decode_b64");
@@ -23,3 +23,8 @@ is(unpack("H*", decode_b64u("cC-tQh\tWgSmV_A\tR0-pXEYec\taWeIyR0g")), "702fad421
 write_rawfile("tmp.$$.file", "a\nb\r\nc\rd\te");
 ok(slow_eq(read_rawfile("tmp.$$.file"), "a\nb\r\nc\rd\te"), "slow_eq + read_rawfile + write_rawfile");
 unlink "tmp.$$.file";
+
+my $uuid = random_v4uuid;
+ok($uuid, 'random_v4uuid');
+ok(is_v4uuid($uuid), 'is_v4uuid');
+

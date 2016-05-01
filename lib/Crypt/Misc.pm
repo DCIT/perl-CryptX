@@ -5,7 +5,7 @@ use warnings;
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 use Carp 'croak';
-our %EXPORT_TAGS = ( all => [qw(encode_b64 decode_b64 encode_b64u decode_b64u pem_to_der der_to_pem read_rawfile write_rawfile slow_eq)] );
+our %EXPORT_TAGS = ( all => [qw(encode_b64 decode_b64 encode_b64u decode_b64u pem_to_der der_to_pem read_rawfile write_rawfile slow_eq is_v4uuid random_v4uuid)] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -120,6 +120,28 @@ sub slow_eq {
     $diff |= ord(substr $a, $i) ^ ord(substr $b, $i);
   }
   return $diff == 0;
+}
+
+sub random_v4uuid() {
+  # Version 4 - random - UUID: xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx
+  # where x is any hexadecimal digit and Y is one of 8, 9, A, B (1000, 1001, 1010, 1011)
+  # e.g. f47ac10b-58cc-4372-a567-0e02b2c3d479
+  my $raw = random_bytes(16);
+  #                   xxxxxxxxxxxx4xxxYxxxxxxxxxxxxxxx
+  $raw &= pack("H*", "FFFFFFFFFFFF0FFFFFFFFFFFFFFFFFFF");
+  $raw |= pack("H*", "00000000000040000000000000000000");
+  $raw &= pack("H*", "FFFFFFFFFFFFFFFF3FFFFFFFFFFFFFFF"); # 0x3 == 0011b
+  $raw |= pack("H*", "00000000000000008000000000000000"); # 0x8 == 1000b
+  my $hex = unpack("H*", $raw);
+  $hex =~ s/^(.{8})(.{4})(.{4})(.{4})(.{12}).*$/$1-$2-$3-$4-$5/;
+  return $hex;
+}
+
+sub is_v4uuid($) {
+  my $uuid = shift;
+  return 0 if !$uuid;
+  return 1 if $uuid =~ /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return 0;
 }
 
 ###  private functions
@@ -277,6 +299,26 @@ I<Since: CryptX-0.029>
   # $cipher_name e.g. "DES-EDE3-CBC", "AES-256-CBC" (DEFAULT) ...
 
 Convert DER to PEM representation. Supports also password protected PEM data.
+
+=head2  random_v4uuid
+
+I<Since: CryptX-0.031>
+
+ my $uuid = random_v4uuid();
+
+Returns cryptographically strong Version 4 random UUID: C<xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx>
+where C<x> is any hexadecimal digit and C<Y> is one of 8, 9, A, B (1000, 1001, 1010, 1011)
+e.g. C<f47ac10b-58cc-4372-a567-0e02b2c3d479>.
+
+=head2  is_v4uuid
+
+I<Since: CryptX-0.031>
+
+  if (is_v4uuid($uuid)) {
+    ...
+  }
+
+Checks the given C<$uuid> string whether it matches V4 UUID format and returns C<0> (mismatch) or C<1> (match).
 
 =head1 SEE ALSO
 
