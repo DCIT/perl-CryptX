@@ -1069,6 +1069,8 @@ B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel
 
 =head2 export_key_jwk_thumbprint
 
+I<Since: CryptX-0.031>
+
 Exports the key's JSON Web Key Thumbprint as a string.
 
 If you don't know what this is, see RFC 7638 (C<https://tools.ietf.org/html/rfc7638>).
