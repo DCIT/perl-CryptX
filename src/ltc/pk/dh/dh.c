@@ -298,11 +298,11 @@ int dh_export(unsigned char *out, unsigned long *outlen, int type, dh_key *key)
    if (type == PK_PRIVATE) {
       /* export x */
       OUTPUT_BIGNUM(key->x, out, y, z);
-      /* export g and p */
-      if (key->idx == SUPPLIED_PRIME) {
-         OUTPUT_BIGNUM(key->base, out, y, z);
-         OUTPUT_BIGNUM(key->prime, out, y, z);
-      }
+   }
+   /* export g and p */
+   if (key->idx == SUPPLIED_PRIME) {
+      OUTPUT_BIGNUM(key->base, out, y, z);
+      OUTPUT_BIGNUM(key->prime, out, y, z);
    }
 
    /* store header */
@@ -385,10 +385,10 @@ int dh_import(const unsigned char *in, unsigned long inlen, dh_key *key)
    if (key->type == PK_PRIVATE) {
       INPUT_BIGNUM(key->x, in, x, y, inlen);
       /* if idx = SUPPLIED_PRIME then prime is not from static table */
-      if (key->idx == SUPPLIED_PRIME) {
-         INPUT_BIGNUM(key->base, in, x, y, inlen);
-         INPUT_BIGNUM(key->prime, in, x, y, inlen);
-      }
+   }
+   if (key->idx == SUPPLIED_PRIME) {
+      INPUT_BIGNUM(key->base, in, x, y, inlen);
+      INPUT_BIGNUM(key->prime, in, x, y, inlen);
    }
 
    /* eliminate private key if public */
