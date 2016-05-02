@@ -105,7 +105,7 @@ key2hash(Crypt::PK::DH self)
         else{
           not_used = hv_store(rv_hash, "x", 1, newSVpv("", 0), 0);
         }
-       /* =====> y */
+        /* =====> y */
         siz = (self->key.y) ? mp_unsigned_bin_size(self->key.y) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'y' too big number");
