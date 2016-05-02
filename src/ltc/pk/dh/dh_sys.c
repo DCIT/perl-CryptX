@@ -78,7 +78,13 @@ int dh_encrypt_key(const unsigned char *in,   unsigned long inlen,
     }
 
     /* make a random key and export the public copy */
-    if ((err = dh_make_key(prng, wprng, dh_get_size(key), &pubkey)) != CRYPT_OK) {
+    pubkey.idx = key->idx;
+    if ((err = mp_init_multi(&pubkey.base, &pubkey.prime, NULL)) != CRYPT_OK) {
+       goto LBL_ERR;
+    }
+    if ((err = mp_copy(key->base, pubkey.base)) != CRYPT_OK)   { goto LBL_ERR; }
+    if ((err = mp_copy(key->prime, pubkey.prime)) != CRYPT_OK) { goto LBL_ERR; }
+    if ((err = dh_make_key_ex_main(prng, wprng, &pubkey)) != CRYPT_OK) {
        goto LBL_ERR;
     }
 
@@ -307,7 +313,7 @@ int dh_sign_hash(const unsigned char *in,  unsigned long inlen,
                        unsigned char *out, unsigned long *outlen,
                        prng_state *prng, int wprng, dh_key *key)
 {
-   void         *a, *b, *k, *m, *g, *p, *p1, *tmp;
+   void         *a, *b, *k, *m, *p1, *tmp;
    unsigned char *buf;
    unsigned long  x, y;
    int            err;
@@ -338,32 +344,27 @@ int dh_sign_hash(const unsigned char *in,  unsigned long inlen,
     * since the order of the group is prime
     * we need not check if gcd(k, r) is 1
     */
-   if (prng_descriptor[wprng].read(buf, sets[key->idx].size, prng) !=
-       (unsigned long)(sets[key->idx].size)) {
+   if (prng_descriptor[wprng].read(buf, dh_get_size(key), prng) !=
+       (unsigned long)(dh_get_size(key))) {
       err = CRYPT_ERROR_READPRNG;
       goto LBL_ERR_1;
    }
 
    /* init bignums */
-   if ((err = mp_init_multi(&a, &b, &k, &m, &p, &g, &p1, &tmp, NULL)) != CRYPT_OK) {
+   if ((err = mp_init_multi(&a, &b, &k, &m, &p1, &tmp, NULL)) != CRYPT_OK) {
       goto LBL_ERR;
    }
 
-   /* load k and m */
-   if ((err = mp_read_unsigned_bin(m, (unsigned char *)in, inlen)) != CRYPT_OK)        { goto LBL_ERR; }
-   if ((err = mp_read_unsigned_bin(k, buf, sets[key->idx].size)) != CRYPT_OK)          { goto LBL_ERR; }
-
-   /* load g, p and p1 */
-   if ((err = mp_read_radix(g, sets[key->idx].base, 64)) != CRYPT_OK)               { goto LBL_ERR; }
-   if ((err = mp_read_radix(p, sets[key->idx].prime, 64)) != CRYPT_OK)              { goto LBL_ERR; }
-   if ((err = mp_sub_d(p, 1, p1)) != CRYPT_OK)                                     { goto LBL_ERR; }
-   if ((err = mp_div_2(p1, p1)) != CRYPT_OK)                                       { goto LBL_ERR; } /* p1 = (p-1)/2 */
-
+   /* load k, m and p1 */
+   if ((err = mp_read_unsigned_bin(m, (unsigned char *)in, inlen)) != CRYPT_OK)  { goto LBL_ERR; }
+   if ((err = mp_read_unsigned_bin(k, buf, dh_get_size(key))) != CRYPT_OK)       { goto LBL_ERR; }
+   if ((err = mp_sub_d(key->prime, 1, p1)) != CRYPT_OK)                          { goto LBL_ERR; }
+   if ((err = mp_div_2(p1, p1)) != CRYPT_OK)                                     { goto LBL_ERR; } /* p1 = (p-1)/2 */
    /* now get a = g^k mod p */
-   if ((err = mp_exptmod(g, k, p, a)) != CRYPT_OK)                               { goto LBL_ERR; }
+   if ((err = mp_exptmod(key->base, k, key->prime, a)) != CRYPT_OK)              { goto LBL_ERR; }
 
    /* now find M = xa + kb mod p1 or just b = (M - xa)/k mod p1 */
-   if ((err = mp_invmod(k, p1, k)) != CRYPT_OK)                                   { goto LBL_ERR; } /* k = 1/k mod p1 */
+   if ((err = mp_invmod(k, p1, k)) != CRYPT_OK)                                  { goto LBL_ERR; } /* k = 1/k mod p1 */
    if ((err = mp_mulmod(a, key->x, p1, tmp)) != CRYPT_OK)                        { goto LBL_ERR; } /* tmp = xa */
    if ((err = mp_submod(m, tmp, p1, tmp)) != CRYPT_OK)                           { goto LBL_ERR; } /* tmp = M - xa */
    if ((err = mp_mulmod(k, tmp, p1, b)) != CRYPT_OK)                             { goto LBL_ERR; } /* b = (M - xa)/k */
@@ -400,7 +401,7 @@ int dh_sign_hash(const unsigned char *in,  unsigned long inlen,
 
    err = CRYPT_OK;
 LBL_ERR:
-   mp_clear_multi(tmp, p1, g, p, m, k, b, a, NULL);
+   mp_clear_multi(tmp, p1, m, k, b, a, NULL);
 LBL_ERR_1:
 
    XFREE(buf);
@@ -449,7 +450,7 @@ int dh_verify_hash(const unsigned char *sig, unsigned long siglen,
    y = PACKET_SIZE;
 
    /* init all bignums */
-   if ((err = mp_init_multi(&a, &p, &b, &g, &m, &tmp, NULL)) != CRYPT_OK) {
+   if ((err = mp_init_multi(&a, &b, &m, &tmp, NULL)) != CRYPT_OK) {
       return err;
    }
 
@@ -457,20 +458,16 @@ int dh_verify_hash(const unsigned char *sig, unsigned long siglen,
    INPUT_BIGNUM(a, sig, x, y, siglen);
    INPUT_BIGNUM(b, sig, x, y, siglen);
 
-   /* load p and g */
-   if ((err = mp_read_radix(p, sets[key->idx].prime, 64)) != CRYPT_OK)              { goto error1; }
-   if ((err = mp_read_radix(g, sets[key->idx].base, 64)) != CRYPT_OK)               { goto error1; }
-
    /* load m */
    if ((err = mp_read_unsigned_bin(m, (unsigned char *)hash, hashlen)) != CRYPT_OK) { goto error1; }
 
    /* find g^m mod p */
-   if ((err = mp_exptmod(g, m, p, m)) != CRYPT_OK)                { goto error1; } /* m = g^m mod p */
+   if ((err = mp_exptmod(key->base, m, key->prime, m)) != CRYPT_OK) { goto error1; } /* m = g^m mod p */
 
    /* find y^a * a^b */
-   if ((err = mp_exptmod(key->y, a, p, tmp)) != CRYPT_OK)         { goto error1; } /* tmp = y^a mod p */
-   if ((err = mp_exptmod(a, b, p, a)) != CRYPT_OK)                { goto error1; } /* a = a^b mod p */
-   if ((err = mp_mulmod(a, tmp, p, a)) != CRYPT_OK)               { goto error1; } /* a = y^a * a^b mod p */
+   if ((err = mp_exptmod(key->y, a, key->prime, tmp)) != CRYPT_OK)  { goto error1; } /* tmp = y^a mod p */
+   if ((err = mp_exptmod(a, b, key->prime, a)) != CRYPT_OK)         { goto error1; } /* a = a^b mod p */
+   if ((err = mp_mulmod(a, tmp, key->prime, a)) != CRYPT_OK)        { goto error1; } /* a = y^a * a^b mod p */
 
    /* y^a * a^b == g^m ??? */
    if (mp_cmp(a, m) == 0) {
@@ -483,7 +480,7 @@ int dh_verify_hash(const unsigned char *sig, unsigned long siglen,
 error1:
 error:
 done:
-   mp_clear_multi(tmp, m, g, p, b, a, NULL);
+   mp_clear_multi(tmp, m, b, a, NULL);
    return err;
 }
 

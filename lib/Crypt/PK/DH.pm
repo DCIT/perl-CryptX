@@ -72,6 +72,48 @@ sub verify_hash {
   return $self->_verify($sig, $data_hash);
 }
 
+sub generate_key {
+  my $key = shift;
+  if (@_ == 1) {
+    my $keylen = shift;
+    carp "FATAL: invalid key length" unless !ref $keylen && ($keylen >= 96 || $keylen <= 512);
+    return $key->_generate_key($keylen);
+  }
+  my ($g,$p);
+  if (@_ == 2) {
+    ($g,$p) = @_;
+  } elsif (@_ == 4) {
+    my %args = @_;
+    $g = $args{g} or carp "FATAL: 'g' param not specified";
+    $p = $args{p} or carp "FATAL: 'p' param not specified";
+  } else {
+     carp "FATAL: invalid params";
+  }
+  $g =~ s/^0x//;
+  $p =~ s/^0x//;
+  return $key->_generate_key_ex($g,$p);
+}
+
+sub shared_secret {
+  my $key = shift;
+  my $pub = shift or return;
+  if (ref $pub eq 'Crypt::PK::DH') {
+    return $key->_shared_secret($pub);
+  }
+  $pub =~ s/^0x//;
+  return $key->_shared_secret_ex($pub);
+}
+
+sub is_pubkey_valid {
+  my $key = shift;
+  my $pub = shift;
+  if (ref $pub eq 'Crypt::PK::DH') {
+    return $key->_is_pubkey_valid($pub);
+  }
+  $pub =~ s/^0x//;
+  return $key->_is_pubkey_valid_ex($pub)
+}
+
 ### FUNCTIONS
 
 sub dh_encrypt {
@@ -160,9 +202,21 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
  my $pub = Crypt::PK::DH->new('Bob_pub_dh1.key');
  my $shared_secret = $priv->shared_secret($pub);
 
+ or
+
+ my $priv = Crypt::PK::DH->new('Alice_priv_dh1.key');
+ my $shared_secret = $priv->shared_secret($pub_hex_str);
+
  #Key generation
  my $pk = Crypt::PK::DH->new();
  $pk->generate_key(128);
+ my $private = $pk->export_key('private');
+ my $public = $pk->export_key('public');
+
+ or
+
+ my $pk = Crypt::PK::DH->new();
+ $pk->generate_key($base_hex_str, $prime_hex_str);
  my $private = $pk->export_key('private');
  my $public = $pk->export_key('public');
 
@@ -207,6 +261,13 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  # 320  =>  DH-2560
  # 384  =>  DH-3072
  # 512  =>  DH-4096
+
+The following usage allows base (g) and prime (p) values to be specified in a
+hex string:
+
+ $pk->generate_key($g, $p);
+ or
+ $pk->generate_key(g => $g, p => $p);
 
 =head2 import_key
 
@@ -300,6 +361,23 @@ Loads private or public key (exported by L</export_key>).
    x => "FBC1062F73B9A17BB8473A2F5A074911FA7F20D28FB...", #private key
    y => "AB9AAA40774D3CD476B52F82E7EE2D8A8D40CD88BF4...", #public key
 }
+
+=head2 is_pubkey_valid
+
+Performs basic checks against the public key to determine if it is a valid
+public key.
+
+ my $is_valid = $pk->is_pubkey_valid($pub)
+ # 1 .. valid
+ # 0 .. not valid
+
+Where $pub is either a Crypt::PK::DH object or a hex string.
+
+=head2 public_key
+
+Returns a binary representation of the public key.
+
+ my $pub_key_bin = $pk->public_key;
 
 =head1 FUNCTIONS
 

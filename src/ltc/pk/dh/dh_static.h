@@ -69,6 +69,8 @@
      y += x;                                                     \
 }
 
+#define SUPPLIED_PRIME 255
+
 static void packet_store_header (unsigned char *dst, int section, int subsection)
 {
    LTC_ARGCHKVD(dst != NULL);
