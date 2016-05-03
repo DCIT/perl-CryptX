@@ -191,6 +191,8 @@ void dh_free(dh_key *key);
 
 int dh_export(unsigned char *out, unsigned long *outlen, int type, dh_key *key);
 int dh_import(const unsigned char *in, unsigned long inlen, dh_key *key);
+int dh_import_raw(unsigned char *in, unsigned long inlen, int type,
+                  const char *base, const char *prime, dh_key *key);
 
 int dh_shared_secret(dh_key        *private_key, dh_key        *public_key,
                      unsigned char *out,         unsigned long *outlen);

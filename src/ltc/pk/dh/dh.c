@@ -314,6 +314,52 @@ int dh_export(unsigned char *out, unsigned long *outlen, int type, dh_key *key)
 }
 
 /**
+  Import a DH key from a binary string
+  @param in     The string to read
+  @param inlen  The length of the input packet
+  @param type   The type of key.  PK_PRIVATE or PK_PUBLIC
+  @param base   The base (generator) in hex string
+  @param prime  The prime in hex string
+  @param key    [out] Where to import the key to
+  @return CRYPT_OK if successful, on error all allocated memory is freed automatically
+*/
+int dh_import_raw(unsigned char *in, unsigned long inlen, int type,
+                  const char *base, const char *prime, dh_key *key)
+{
+   int err;
+
+   LTC_ARGCHK(in    != NULL);
+   LTC_ARGCHK(base  != NULL);
+   LTC_ARGCHK(prime != NULL);
+   LTC_ARGCHK(key   != NULL);
+
+   if ((err = mp_init_multi(&key->x, &key->y, &key->base, &key->prime, NULL)) != CRYPT_OK) {
+      goto error;
+   }
+   if ((err = mp_read_radix(key->base, base, 16)) != CRYPT_OK)     { goto error; }
+   if ((err = mp_read_radix(key->prime, prime, 16)) != CRYPT_OK)   { goto error; }
+   key->idx = SUPPLIED_PRIME;
+
+   if (type == PK_PRIVATE) {
+      /* load the x value */
+      if ((err = mp_read_unsigned_bin(key->x, in, inlen)) != CRYPT_OK)            { goto error; }
+      if ((err = mp_exptmod(key->base, key->x, key->prime, key->y)) != CRYPT_OK)  { goto error; }
+      key->type = PK_PRIVATE;
+   } else {
+      /* load the y value */
+      if ((err = mp_read_unsigned_bin(key->y, in, inlen)) != CRYPT_OK)  { goto error; }
+      key->type = PK_PUBLIC;
+      mp_clear(key->x);
+      key->x = NULL;
+   }
+   key->idx = SUPPLIED_PRIME;
+   return CRYPT_OK;
+error:
+   mp_clear_multi(key->y, key->x, key->base, key->prime, NULL);
+   return err;
+}
+
+/**
   Import a DH key from a binary packet
   @param in     The packet to read
   @param inlen  The length of the input packet
