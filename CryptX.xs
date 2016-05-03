@@ -11,6 +11,9 @@
 #include "tomcrypt.h"
 #include "tommath.h"
 
+typedef adler32_state *Crypt__Checksum__Adler32;
+typedef crc32_state   *Crypt__Checksum__CRC32;
+
 typedef struct cipher_struct {          /* used by Crypt::Cipher */
   symmetric_key skey;
   int id;
@@ -391,6 +394,9 @@ CryptX__decode_base64(SV * in)
 
 INCLUDE: inc/CryptX_Digest.xs.inc
 INCLUDE: inc/CryptX_Cipher.xs.inc
+
+INCLUDE: inc/CryptX_Checksum_Adler32.xs.inc
+INCLUDE: inc/CryptX_Checksum_CRC32.xs.inc
 
 INCLUDE: inc/CryptX_AuthEnc_EAX.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_GCM.xs.inc

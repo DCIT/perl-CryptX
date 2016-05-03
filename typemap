@@ -6,6 +6,9 @@ TYPEMAP
 Crypt::Cipher           T_PTROBJ
 Crypt::Digest           T_PTROBJ
 
+Crypt::Checksum::Adler32 T_PTROBJ
+Crypt::Checksum::CRC32  T_PTROBJ
+
 Crypt::AuthEnc::CCM     T_PTROBJ
 Crypt::AuthEnc::EAX     T_PTROBJ
 Crypt::AuthEnc::GCM     T_PTROBJ

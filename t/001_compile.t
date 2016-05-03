@@ -64,6 +64,9 @@ use Crypt::PK::RSA;
 use Crypt::PK::DSA;
 use Crypt::PK::ECC;
 use Crypt::PK::DH;
+use Crypt::Checksum;
+use Crypt::Checksum::Adler32;
+use Crypt::Checksum::CRC32;
 
 ok 1, 'All modules loaded successfully';
 $ok = 1;

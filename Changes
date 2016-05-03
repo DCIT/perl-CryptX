@@ -15,6 +15,9 @@ TODO:
         - maybe: add enc_b64/dec_b64 + enc_b64u/dec_b64u + enc_b32/dec_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.032   2016/05/XX
+        - new: Crypt::Checksum, Crypt::Checksum::CRC32, Crypt::Checksum::Adler32
+
 0.031   2016/05/01
         - new: RSA+ECC method export_key_jwk_thumbprint()
         - new: Crypt::Misc functions random_v4uuid + is_v4uuid

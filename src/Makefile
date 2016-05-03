@@ -27,7 +27,7 @@ ltc/mac/pmac/pmac_init.o ltc/mac/pmac/pmac_memory.o ltc/mac/pmac/pmac_memory_mul
 ltc/mac/pmac/pmac_process.o ltc/mac/pmac/pmac_shift_xor.o ltc/mac/xcbc/xcbc_done.o ltc/mac/xcbc/xcbc_file.o \
 ltc/mac/xcbc/xcbc_init.o ltc/mac/xcbc/xcbc_memory.o ltc/mac/xcbc/xcbc_memory_multi.o ltc/mac/xcbc/xcbc_process.o \
 ltc/math/fp/ltc_ecc_fp_mulmod.o ltc/math/ltm_desc.o ltc/math/multi.o ltc/math/rand_bn.o ltc/math/rand_prime.o \
-ltc/math/tfm_desc.o ltc/misc/base64/base64_decode.o ltc/misc/base64/base64_encode.o ltc/misc/burn_stack.o \
+ltc/math/tfm_desc.o ltc/misc/crc32.o ltc/misc/adler32.o ltc/misc/base64/base64_decode.o ltc/misc/base64/base64_encode.o ltc/misc/burn_stack.o \
 ltc/misc/crypt/crypt.o ltc/misc/crypt/crypt_argchk.o ltc/misc/crypt/crypt_cipher_descriptor.o \
 ltc/misc/crypt/crypt_cipher_is_valid.o ltc/misc/crypt/crypt_find_cipher.o ltc/misc/crypt/crypt_find_cipher_any.o \
 ltc/misc/crypt/crypt_find_cipher_id.o ltc/misc/crypt/crypt_find_hash.o ltc/misc/crypt/crypt_find_hash_any.o \

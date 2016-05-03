@@ -27,7 +27,7 @@ ltc/mac/pmac/pmac_init.obj ltc/mac/pmac/pmac_memory.obj ltc/mac/pmac/pmac_memory
 ltc/mac/pmac/pmac_process.obj ltc/mac/pmac/pmac_shift_xor.obj ltc/mac/xcbc/xcbc_done.obj ltc/mac/xcbc/xcbc_file.obj \
 ltc/mac/xcbc/xcbc_init.obj ltc/mac/xcbc/xcbc_memory.obj ltc/mac/xcbc/xcbc_memory_multi.obj ltc/mac/xcbc/xcbc_process.obj \
 ltc/math/fp/ltc_ecc_fp_mulmod.obj ltc/math/ltm_desc.obj ltc/math/multi.obj ltc/math/rand_bn.obj ltc/math/rand_prime.obj \
-ltc/math/tfm_desc.obj ltc/misc/base64/base64_decode.obj ltc/misc/base64/base64_encode.obj ltc/misc/burn_stack.obj \
+ltc/math/tfm_desc.obj ltc/misc/crc32.obj ltc/misc/adler32.obj ltc/misc/base64/base64_decode.obj ltc/misc/base64/base64_encode.obj ltc/misc/burn_stack.obj \
 ltc/misc/crypt/crypt.obj ltc/misc/crypt/crypt_argchk.obj ltc/misc/crypt/crypt_cipher_descriptor.obj \
 ltc/misc/crypt/crypt_cipher_is_valid.obj ltc/misc/crypt/crypt_find_cipher.obj ltc/misc/crypt/crypt_find_cipher_any.obj \
 ltc/misc/crypt/crypt_find_cipher_id.obj ltc/misc/crypt/crypt_find_hash.obj ltc/misc/crypt/crypt_find_hash_any.obj \
