@@ -95,6 +95,9 @@ void dh_sizes(int *low, int *high)
 int dh_get_size(dh_key *key)
 {
     LTC_ARGCHK(key != NULL);
+    if (key->idx == SUPPLIED_PRIME) {
+        return mp_unsigned_bin_size(key->prime);
+    }
     if (dh_is_valid_idx(key->idx) == 1) {
         return sets[key->idx].size;
     } else {
@@ -112,17 +115,8 @@ int dh_get_size(dh_key *key)
 */
 int dh_make_key(prng_state *prng, int wprng, int keysize, dh_key *key)
 {
-   unsigned char *buf;
    unsigned long x;
-   void *p, *g;
    int err;
-
-   LTC_ARGCHK(key  != NULL);
-
-   /* good prng? */
-   if ((err = prng_is_valid(wprng)) != CRYPT_OK) {
-      return err;
-   }
 
    /* find key size */
    for (x = 0; (keysize > sets[x].size) && (sets[x].size != 0); x++);
@@ -136,6 +130,72 @@ int dh_make_key(prng_state *prng, int wprng, int keysize, dh_key *key)
    }
    key->idx = x;
 
+   if ((err = mp_init_multi(&key->base, &key->prime, NULL)) != CRYPT_OK) {
+      goto error;
+   }
+   if ((err = mp_read_radix(key->base, sets[key->idx].base, 64)) != CRYPT_OK)     { goto error; }
+   if ((err = mp_read_radix(key->prime, sets[key->idx].prime, 64)) != CRYPT_OK)    { goto error; }
+   return dh_make_key_ex_main(prng, wprng, key);
+error:
+   mp_clear_multi(key->base, key->prime, NULL);
+   return err;
+}
+
+/**
+  Make a DH key [private key pair] from provided base and prime
+  @param prng     An active PRNG state
+  @param wprng    The index for the PRNG you desire to use
+  @param keysize  The key size (octets) desired
+  @param base     The base (generator) to create the key from
+  @param prime    The prime to create the key from
+  @param key      [out] Where the newly created DH key will be stored
+  @return CRYPT_OK if successful, note: on error all allocated memory will be freed automatically.
+*/
+int dh_make_key_ex(prng_state *prng, int wprng, const char *base, const char *prime, dh_key *key)
+{
+   int err;
+
+   LTC_ARGCHK(base  != NULL);
+   LTC_ARGCHK(prime != NULL);
+   LTC_ARGCHK(key   != NULL);
+
+   /* good prng? */
+   if ((err = prng_is_valid(wprng)) != CRYPT_OK) {
+      return err;
+   }
+
+   if ((err = mp_init_multi(&key->base, &key->prime, NULL)) != CRYPT_OK) {
+      goto error;
+   }
+   if ((err = mp_read_radix(key->base, base, 16)) != CRYPT_OK)     { goto error; }
+   if ((err = mp_read_radix(key->prime, prime, 16)) != CRYPT_OK)   { goto error; }
+   key->idx = SUPPLIED_PRIME;
+   return dh_make_key_ex_main(prng, wprng, key);
+error:
+   mp_clear_multi(key->base, key->prime, NULL);
+   return err;
+}
+
+
+int dh_make_key_ex_main(prng_state *prng, int wprng, dh_key *key)
+{
+   unsigned char *buf;
+   int err, keysize;
+
+   LTC_ARGCHK(key != NULL);
+   LTC_ARGCHK(key->prime  != NULL);
+   LTC_ARGCHK(key->base != NULL);
+
+   /* init parameters */
+   if ((err = mp_init_multi(&key->x, &key->y, NULL)) != CRYPT_OK) {
+      goto error;
+   }
+
+   keysize = dh_get_size(key);
+   if (keysize < 96) {
+      return CRYPT_INVALID_KEYSIZE;
+   }
+
    /* allocate buffer */
    buf = XMALLOC(keysize);
    if (buf == NULL) {
@@ -143,8 +203,8 @@ int dh_make_key(prng_state *prng, int wprng, int keysize, dh_key *key)
    }
 
    /* make up random string */
-   if ( rng_make_prng( keysize, wprng, prng, NULL) != CRYPT_OK) {
-      err = CRYPT_ERROR_READPRNG;
+   if ( (err = rng_make_prng( keysize, wprng, prng, NULL)) != CRYPT_OK) {
+      /*err = CRYPT_ERROR_READPRNG;*/
       goto error2;
    }
 
@@ -153,26 +213,17 @@ int dh_make_key(prng_state *prng, int wprng, int keysize, dh_key *key)
       goto error2;
    }
 
-   /* init parameters */
-   if ((err = mp_init_multi(&g, &p, &key->x, &key->y, NULL)) != CRYPT_OK) {
-      goto error;
-   }
-
-   if ((err = mp_read_radix(g, sets[key->idx].base, 64)) != CRYPT_OK)      { goto error; }
-   if ((err = mp_read_radix(p, sets[key->idx].prime, 64)) != CRYPT_OK)     { goto error; }
-
    /* load the x value */
-   if ((err = mp_read_unsigned_bin(key->x, buf, keysize)) != CRYPT_OK)     { goto error; }
-   if ((err = mp_exptmod(g, key->x, p, key->y)) != CRYPT_OK)            { goto error; }
+   if ((err = mp_read_unsigned_bin(key->x, buf, keysize)) != CRYPT_OK)          { goto error; }
+   if ((err = mp_exptmod(key->base, key->x, key->prime, key->y)) != CRYPT_OK)   { goto error; }
    key->type = PK_PRIVATE;
 
    /* free up ram */
    err = CRYPT_OK;
    goto done;
 error:
-   mp_clear_multi(key->x, key->y, NULL);
+   mp_clear_multi(key->base, key->prime, key->x, key->y, NULL);
 done:
-   mp_clear_multi(p, g, NULL);
 error2:
 #ifdef LTC_CLEAN_STACK
    zeromem(buf, keysize);
@@ -188,13 +239,21 @@ error2:
 void dh_free(dh_key *key)
 {
    LTC_ARGCHKVD(key != NULL);
+   if ( key->base ) {
+      mp_clear( key->base );
+      key->base = NULL;
+   }
+   if ( key->prime ) {
+      mp_clear( key->prime );
+      key->prime = NULL;
+   }
    if ( key->x ) {
-		mp_clear( key->x );
-		key->x = NULL;
+      mp_clear( key->x );
+      key->x = NULL;
    }
    if ( key->y ) {
-        mp_clear( key->y );
-		key->y = NULL;
+      mp_clear( key->y );
+      key->y = NULL;
    }
 }
 
@@ -229,7 +288,9 @@ int dh_export(unsigned char *out, unsigned long *outlen, int type, dh_key *key)
 
    /* header */
    out[y++] = type;
-   out[y++] = (unsigned char)(sets[key->idx].size / 8);
+   out[y++] = key->idx == SUPPLIED_PRIME ?
+      SUPPLIED_PRIME :
+      (unsigned char)(sets[key->idx].size / 8);
 
    /* export y */
    OUTPUT_BIGNUM(key->y, out, y, z);
@@ -237,6 +298,11 @@ int dh_export(unsigned char *out, unsigned long *outlen, int type, dh_key *key)
    if (type == PK_PRIVATE) {
       /* export x */
       OUTPUT_BIGNUM(key->x, out, y, z);
+   }
+   /* export g and p */
+   if (key->idx == SUPPLIED_PRIME) {
+      OUTPUT_BIGNUM(key->base, out, y, z);
+      OUTPUT_BIGNUM(key->prime, out, y, z);
    }
 
    /* store header */
@@ -248,6 +314,52 @@ int dh_export(unsigned char *out, unsigned long *outlen, int type, dh_key *key)
 }
 
 /**
+  Import a DH key from a binary string
+  @param in     The string to read
+  @param inlen  The length of the input packet
+  @param type   The type of key.  PK_PRIVATE or PK_PUBLIC
+  @param base   The base (generator) in hex string
+  @param prime  The prime in hex string
+  @param key    [out] Where to import the key to
+  @return CRYPT_OK if successful, on error all allocated memory is freed automatically
+*/
+int dh_import_raw(unsigned char *in, unsigned long inlen, int type,
+                  const char *base, const char *prime, dh_key *key)
+{
+   int err;
+
+   LTC_ARGCHK(in    != NULL);
+   LTC_ARGCHK(base  != NULL);
+   LTC_ARGCHK(prime != NULL);
+   LTC_ARGCHK(key   != NULL);
+
+   if ((err = mp_init_multi(&key->x, &key->y, &key->base, &key->prime, NULL)) != CRYPT_OK) {
+      goto error;
+   }
+   if ((err = mp_read_radix(key->base, base, 16)) != CRYPT_OK)     { goto error; }
+   if ((err = mp_read_radix(key->prime, prime, 16)) != CRYPT_OK)   { goto error; }
+   key->idx = SUPPLIED_PRIME;
+
+   if (type == PK_PRIVATE) {
+      /* load the x value */
+      if ((err = mp_read_unsigned_bin(key->x, in, inlen)) != CRYPT_OK)            { goto error; }
+      if ((err = mp_exptmod(key->base, key->x, key->prime, key->y)) != CRYPT_OK)  { goto error; }
+      key->type = PK_PRIVATE;
+   } else {
+      /* load the y value */
+      if ((err = mp_read_unsigned_bin(key->y, in, inlen)) != CRYPT_OK)  { goto error; }
+      key->type = PK_PUBLIC;
+      mp_clear(key->x);
+      key->x = NULL;
+   }
+   key->idx = SUPPLIED_PRIME;
+   return CRYPT_OK;
+error:
+   mp_clear_multi(key->y, key->x, key->base, key->prime, NULL);
+   return err;
+}
+
+/**
   Import a DH key from a binary packet
   @param in     The packet to read
   @param inlen  The length of the input packet
@@ -256,7 +368,7 @@ int dh_export(unsigned char *out, unsigned long *outlen, int type, dh_key *key)
 */
 int dh_import(const unsigned char *in, unsigned long inlen, dh_key *key)
 {
-   unsigned long x, y, s;
+   long x, y, s;
    int err;
 
    LTC_ARGCHK(in  != NULL);
@@ -273,7 +385,7 @@ int dh_import(const unsigned char *in, unsigned long inlen, dh_key *key)
    }
 
    /* init */
-   if ((err = mp_init_multi(&key->x, &key->y, NULL)) != CRYPT_OK) {
+   if ((err = mp_init_multi(&key->x, &key->y, &key->base, &key->prime, NULL)) != CRYPT_OK) {
       return err;
    }
 
@@ -284,14 +396,22 @@ int dh_import(const unsigned char *in, unsigned long inlen, dh_key *key)
    key->type = (int)in[y++];
 
    /* key size in bytes */
-   s  = (unsigned long)in[y++] * 8;
+   s = (int)in[y++];
 
-   for (x = 0; (s > (unsigned long)sets[x].size) && (sets[x].size != 0); x++);
-   if (sets[x].size == 0) {
-      err = CRYPT_INVALID_KEYSIZE;
-      goto error;
+   if (s == SUPPLIED_PRIME) {
+      /* key from provided p,g values */
+      key->idx = SUPPLIED_PRIME;
+   } else {
+      s *= 8;
+      for (x = 0; (s > sets[x].size) && (sets[x].size != 0); x++);
+      if (sets[x].size == 0) {
+         err = CRYPT_INVALID_KEYSIZE;
+         goto error;
+      }
+      key->idx = (int)x;
+     if ((err = mp_read_radix(key->base, (char *)sets[x].base, 64)) != CRYPT_OK)    { goto error; }
+     if ((err = mp_read_radix(key->prime, (char *)sets[x].prime, 64)) != CRYPT_OK)  { goto error; }
    }
-   key->idx = (int)x;
 
    /* type check both values */
    if ((key->type != PK_PUBLIC) && (key->type != PK_PRIVATE))  {
@@ -310,6 +430,11 @@ int dh_import(const unsigned char *in, unsigned long inlen, dh_key *key)
 
    if (key->type == PK_PRIVATE) {
       INPUT_BIGNUM(key->x, in, x, y, inlen);
+      /* if idx = SUPPLIED_PRIME then prime is not from static table */
+   }
+   if (key->idx == SUPPLIED_PRIME) {
+      INPUT_BIGNUM(key->base, in, x, y, inlen);
+      INPUT_BIGNUM(key->prime, in, x, y, inlen);
    }
 
    /* eliminate private key if public */
@@ -320,7 +445,7 @@ int dh_import(const unsigned char *in, unsigned long inlen, dh_key *key)
 
    return CRYPT_OK;
 error:
-   mp_clear_multi(key->y, key->x, NULL);
+   mp_clear_multi(key->y, key->x, key->base, key->prime, NULL);
    return err;
 }
 
@@ -335,7 +460,7 @@ error:
 int dh_shared_secret(dh_key *private_key, dh_key *public_key,
                      unsigned char *out, unsigned long *outlen)
 {
-   void *tmp, *p;
+   void *tmp;
    unsigned long x;
    int err;
 
@@ -355,12 +480,11 @@ int dh_shared_secret(dh_key *private_key, dh_key *public_key,
    }
 
    /* compute y^x mod p */
-   if ((err = mp_init_multi(&tmp, &p, NULL)) != CRYPT_OK) {
+   if ((err = mp_init(&tmp)) != CRYPT_OK) {
       return err;
    }
 
-   if ((err = mp_read_radix(p, (char *)sets[private_key->idx].prime, 64)) != CRYPT_OK)     { goto error; }
-   if ((err = mp_exptmod(public_key->y, private_key->x, p, tmp)) != CRYPT_OK)           { goto error; }
+   if ((err = mp_exptmod(public_key->y, private_key->x, private_key->prime, tmp)) != CRYPT_OK)  { goto error; }
 
    /* enough space for output? */
    x = (unsigned long)mp_unsigned_bin_size(tmp);
@@ -374,7 +498,7 @@ int dh_shared_secret(dh_key *private_key, dh_key *public_key,
    goto done;
 error:
 done:
-   mp_clear_multi(p, tmp, NULL);
+   mp_clear(tmp);
    return err;
 }
 

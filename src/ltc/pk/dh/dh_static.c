@@ -152,6 +152,8 @@ int dh_is_valid_idx(int n)
 {
    int x;
 
+   if (n == SUPPLIED_PRIME)
+      return 1;
    for (x = 0; sets[x].size; x++);
    if ((n < 0) || (n >= x)) {
       return 0;
