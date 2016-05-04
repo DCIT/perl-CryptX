@@ -421,6 +421,8 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  # 384  =>  DH-3072
  # 512  =>  DH-4096
 
+The following variants are available since CryptX-0.032
+
  $pk->generate_key($name)
  ### $name corresponds to values defined in RFC7296 and RFC3526
  # ike768  =>  768-bit MODP (Group 1)
@@ -446,6 +448,8 @@ Loads private or public key (exported by L</export_key>).
 
 =head2 import_key_raw
 
+I<Since: CryptX-0.032>
+
   $pk->import_key_raw($raw_bytes, $type, $params)
   ### $raw_bytes is a binary string containing the key
   ### $type is either 'private' or 'public'
@@ -459,6 +463,8 @@ Loads private or public key (exported by L</export_key>).
  my $public = $pk->export_key('public');
 
 =head2 export_key_raw
+
+I<Since: CryptX-0.032>
 
  $raw_bytes = $dh->export_key_raw('public')
  #or
@@ -545,6 +551,8 @@ Loads private or public key (exported by L</export_key>).
 }
 
 =head2 params2hash
+
+I<Since: CryptX-0.032>
 
  my $params = $pk->params2hash;
 
