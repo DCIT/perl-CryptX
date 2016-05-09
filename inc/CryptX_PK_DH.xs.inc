@@ -224,7 +224,7 @@ export_key(Crypt::PK::DH self, char * type)
     {
         int rv;
         unsigned long int out_len = 4096;
-        unsigned char out[out_len];
+        unsigned char out[4096];
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(type, "private", 7)) {
@@ -252,7 +252,7 @@ _encrypt(Crypt::PK::DH self, SV * data, char * hash_name)
         unsigned char *data_ptr=NULL;
         STRLEN data_len=0;
         unsigned long buffer_len = 1024;
-        unsigned char buffer[buffer_len];
+        unsigned char buffer[1024];
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
@@ -275,7 +275,7 @@ _decrypt(Crypt::PK::DH self, SV * data)
         unsigned char *data_ptr=NULL;
         STRLEN data_len=0;
         unsigned long buffer_len = 1024;
-        unsigned char buffer[buffer_len];
+        unsigned char buffer[1024];
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
@@ -294,7 +294,7 @@ _sign(Crypt::PK::DH self, SV * data)
         unsigned char *data_ptr=NULL;
         STRLEN data_len=0;
         unsigned long buffer_len = 1024;
-        unsigned char buffer[buffer_len];
+        unsigned char buffer[1024];
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
@@ -333,7 +333,7 @@ shared_secret(Crypt::PK::DH self, Crypt::PK::DH pubkey)
     {
         int rv;
         unsigned long buffer_len = 1024;
-        unsigned char buffer[buffer_len];
+        unsigned char buffer[1024];
 
         rv = dh_shared_secret(&self->key, &pubkey->key, buffer, &buffer_len);
         if (rv != CRYPT_OK) croak("FATAL: dh_shared_secret failed: %s", error_to_string(rv));
@@ -346,9 +346,9 @@ SV *
 export_key_raw(Crypt::PK::DH self, char * type)
     CODE:
     {
-        int rv, len;
-        unsigned long buffer_len = 1024;
-        unsigned char buffer[buffer_len];
+        int rv;
+        unsigned long len, buffer_len = 1024;
+        unsigned char buffer[1024];
 	void *key;
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
