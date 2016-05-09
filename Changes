@@ -12,6 +12,9 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.033   2016/05/09
+        - MSVC6 related fixes (needed for older ActivePerl@MSWin32)
+
 0.032   2016/05/04
         - Crypt::PK::DH - accept base/prime values
         - new: DH methods export_key_raw, import_key_raw, params2hash
