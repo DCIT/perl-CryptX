@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 plan skip_all => "No JSON::* module installed" unless eval { require JSON::PP } || eval { require JSON::XS } || eval { require Cpanel::JSON::XS };
-plan tests => 96;
+plan tests => 97;
 
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
@@ -229,4 +229,21 @@ my $EC2 = {
   is($kh->{k}, "", "EC k test HASH2");
   is($kh->{curve_name}, "secp256r1", "EC curve test HASH2");
   ok(!$ec->is_private, "EC private test HASH2");
+}
+
+{
+    my $jwk = {
+        e => 'AQAB',
+        kty => 'RSA',
+        n => 'ln_cp6g_c65R6uYmwFx6AF1PyyZF7N1EaLhvUjDStK6Scmp_XCD-ynz5Q1iS0Q2t8gnh_s5dQtThiuvOGxCK1j69TA6Jpo0uUBL-gzf3J25PhqdNmTbGGRNkD0aT8qfeY9_bXTA1vmawh-46A6xrVFiT62NK7IdsyQNzrtR9QwzcSR79m9UqTVe5MdDB9tZZIotmqWQlZ5MVb26PPmgkuh6AthS-an2KeDdYRwAyQtfR1B6f-swzIPwq-AUy1pfmGVe-d6K5dCOU9RUMPPRiQ7atmodAxfcWywmnrCtSCfPk0fkTLN4RsuCWV85NXcGnpr41m4uacALT0Xs0IqBKbw',
+    };
+    my $before_json = {%$jwk};
+
+    Crypt::PK::RSA->new($jwk);
+
+    is_deeply(
+        $jwk,
+        $before_json,
+        'new($jwk) doesn’t change $jwk',
+    );
 }
