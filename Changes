@@ -12,6 +12,9 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.034   2016/05/11
+        - Prevent RSA import_key() from altering a JWK hash reference
+
 0.033   2016/05/09
         - MSVC6 related fixes (needed for older ActivePerl@MSWin32)
 
