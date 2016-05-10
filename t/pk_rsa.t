@@ -1,6 +1,8 @@
 use strict;
 use warnings;
-use Test::More tests => 45;
+use Test::More tests => 46;
+
+use JSON::XS;
 
 use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_message rsa_sign_hash rsa_verify_hash);
 
@@ -103,4 +105,23 @@ use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_messag
   $sig = rsa_sign_hash('t/data/cryptx_priv_rsa1.der', $hash, 'SHA1');
   ok($sig, 'rsa_sign_hash');
   ok(rsa_verify_hash('t/data/cryptx_pub_rsa1.der', $sig, $hash, 'SHA1'), 'rsa_verify_hash');
+}
+
+{
+    my $json = JSON::XS->new()->canonical(1);
+
+    my $jwk = {
+        e => 'AQAB',
+        kty => 'RSA',
+        n => 'ln_cp6g_c65R6uYmwFx6AF1PyyZF7N1EaLhvUjDStK6Scmp_XCD-ynz5Q1iS0Q2t8gnh_s5dQtThiuvOGxCK1j69TA6Jpo0uUBL-gzf3J25PhqdNmTbGGRNkD0aT8qfeY9_bXTA1vmawh-46A6xrVFiT62NK7IdsyQNzrtR9QwzcSR79m9UqTVe5MdDB9tZZIotmqWQlZ5MVb26PPmgkuh6AthS-an2KeDdYRwAyQtfR1B6f-swzIPwq-AUy1pfmGVe-d6K5dCOU9RUMPPRiQ7atmodAxfcWywmnrCtSCfPk0fkTLN4RsuCWV85NXcGnpr41m4uacALT0Xs0IqBKbw',
+    };
+    my $before_json = $json->encode($jwk);
+
+    Crypt::PK::RSA->new($jwk);
+
+    is(
+        $json->encode($jwk),
+        $before_json,
+        'new($jwk) doesn’t change $jwk',
+    );
 }

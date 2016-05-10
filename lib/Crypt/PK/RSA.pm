@@ -91,11 +91,14 @@ sub import_key {
       return $self->_import_hex($key->{N}, $key->{e}, $key->{d}, $key->{p}, $key->{q}, $key->{dP}, $key->{dQ}, $key->{qP});
     }
     if ($key->{n} && $key->{e} && $key->{kty} && $key->{kty} eq "RSA") {
+      my %copy;
+
       # hash with items corresponding to JSON Web Key (JWK)
-      for (qw/n e d p q dp dq qi/) {
-        $key->{$_} = eval { unpack("H*", decode_b64u($key->{$_})) } if exists $key->{$_};
+      my @jwk_parts = qw/n e d p q dp dq qi/;
+      for (@jwk_parts) {
+        $copy{$_} = eval { unpack("H*", decode_b64u($key->{$_})) } if exists $key->{$_};
       }
-      return $self->_import_hex($key->{n}, $key->{e}, $key->{d}, $key->{p}, $key->{q}, $key->{dp}, $key->{dq}, $key->{qi});
+      return $self->_import_hex( @copy{@jwk_parts} );
     }
     croak "FATAL: unexpected RSA key hash";
   }
