@@ -145,7 +145,6 @@ key2hash(Crypt::PK::ECC self)
         }
         /* =====> curve_... */
         if (self->key.dp) {
-          not_used = hv_store(rv_hash, "curve_name",  10, newSVpv(self->key.dp->name,  strlen(self->key.dp->name)), 0);
           not_used = hv_store(rv_hash, "curve_prime", 11, newSVpv(self->key.dp->prime, strlen(self->key.dp->prime)), 0);
           not_used = hv_store(rv_hash, "curve_A",      7, newSVpv(self->key.dp->A,     strlen(self->key.dp->A)), 0);
           not_used = hv_store(rv_hash, "curve_B",      7, newSVpv(self->key.dp->B,     strlen(self->key.dp->B)), 0);
@@ -160,6 +159,17 @@ key2hash(Crypt::PK::ECC self)
             not_used = hv_store(rv_hash, "curve_bytes", 11, newSViv(mp_unsigned_bin_size(&p_num)), 0);
             not_used = hv_store(rv_hash, "curve_bits",  10, newSViv(mp_count_bits(&p_num)), 0);
             mp_clear(&p_num);
+          }
+          {
+            int i;
+            SV *name;
+            unsigned char *name_ptr;
+            STRLEN name_len;
+
+            name = newSVpv(self->key.dp->name,  strlen(self->key.dp->name));
+            name_ptr = SvPV(name, name_len);
+            for (i=0; i<name_len && name_ptr[i]>0; i++) name_ptr[i] = toLOWER(name_ptr[i]);
+            not_used = hv_store(rv_hash, "curve_name",  10, name, 0);
           }
         }
         /* =====> size */

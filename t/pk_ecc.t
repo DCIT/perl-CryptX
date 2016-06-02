@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 91;
+use Test::More tests => 95;
 
 use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret);
 
@@ -128,6 +128,7 @@ for my $priv (qw/openssl_ec-short.pem openssl_ec-short.der/) {
   is($k->size, 32, "size $priv");
   is(uc($k->key2hash->{pub_x}), 'A01532A3C0900053DE60FBEFEFCCA58793301598D308B41E6F4E364E388C2711', "key2hash $priv");
   is(uc($k->curve2hash->{prime}), 'FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF', "curve2hash $priv");
+  is($k->key2hash->{curve_name}, "secp256r1", "EC curve_name is lowercase");
 }
 
 for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
@@ -136,4 +137,5 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   ok(!$k->is_private, "is_private $pub");
   is($k->size, 32, "$pub size");
   is(uc($k->key2hash->{pub_x}), 'A01532A3C0900053DE60FBEFEFCCA58793301598D308B41E6F4E364E388C2711', "key2hash $pub");
+  is($k->key2hash->{curve_name}, "secp256r1", "EC curve_name is lowercase");
 }
