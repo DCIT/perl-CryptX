@@ -12,6 +12,10 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.035   2016/06/XX
+        - fix issue #14 Ensure Crypt::PK::ECC->key2hash()->{curve_name} is lowercase
+        - fix issue #15 OpenSSL interoperability broken
+
 0.034   2016/05/11
         - Prevent RSA import_key() from altering a JWK hash reference
 

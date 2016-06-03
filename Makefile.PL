@@ -20,7 +20,7 @@ my %eumm_args = (
   ABSTRACT         => 'Crypto toolkit',
   MIN_PERL_VERSION => '5.006',
   LICENSE          => 'perl_5',
-  META_MERGE       => { resources  => { repository => 'https://github.com/DCIT/perl-CryptX' } },
+  META_MERGE       => { resources  => { repository => 'https://github.com/DCIT/perl-CryptX', bugtracker => 'https://github.com/DCIT/perl-CryptX/issues' } },
   DEFINE           => '-DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC',
   INC              => '-Isrc/ltc/headers -Isrc/ltm',
   LIBS             => [''],
