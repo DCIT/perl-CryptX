@@ -169,12 +169,12 @@ export_key_der(Crypt::PK::DSA self, char * type)
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(type, "private", 7)) {
-          rv = dsa_export(out, &out_len, PK_PRIVATE, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: dsa_export(PK_PRIVATE) failed: %s", error_to_string(rv));
+          rv = dsa_export(out, &out_len, PK_PRIVATE|PK_STD, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: dsa_export(PK_PRIVATE|PK_STD) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "public", 6)) {
-          rv = dsa_export(out, &out_len, PK_PUBLIC, &self->key);
+          rv = dsa_export(out, &out_len, PK_PUBLIC|PK_STD, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: dsa_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
