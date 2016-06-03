@@ -12,7 +12,7 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
-0.035   2016/06/XX
+0.035   2016/06/03
         - fix issue #14 Ensure Crypt::PK::ECC->key2hash()->{curve_name} is lowercase
         - fix issue #15 OpenSSL interoperability broken
 
