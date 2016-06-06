@@ -396,13 +396,13 @@ sub _curve_name_lookup {
 
   return $key->{curve_name} if $key->{curve_name} && exists $curve{$key->{curve_name}};
 
-  my $A        = $key->{curve_A}        or return;
-  my $B        = $key->{curve_B}        or return;
-  my $Gx       = $key->{curve_Gx}       or return;
-  my $Gy       = $key->{curve_Gy}       or return;
-  my $order    = $key->{curve_order}    or return;
-  my $prime    = $key->{curve_prime}    or return;
-  my $cofactor = $key->{curve_cofactor} or return;
+  defined(my $A        = $key->{curve_A})        or return;
+  defined(my $B        = $key->{curve_B})        or return;
+  defined(my $Gx       = $key->{curve_Gx})       or return;
+  defined(my $Gy       = $key->{curve_Gy})       or return;
+  defined(my $order    = $key->{curve_order})    or return;
+  defined(my $prime    = $key->{curve_prime})    or return;
+  defined(my $cofactor = $key->{curve_cofactor}) or return;
   $A     =~ s/^0+//;
   $B     =~ s/^0+//;
   $Gx    =~ s/^0+//;
