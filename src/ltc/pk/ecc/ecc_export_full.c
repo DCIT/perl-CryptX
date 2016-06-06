@@ -41,6 +41,7 @@ int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key
 
   if (key->type != PK_PRIVATE && type == PK_PRIVATE)                                   return CRYPT_PK_TYPE_MISMATCH;
   if (ltc_ecc_is_valid_idx(key->idx) == 0)                                             return CRYPT_INVALID_ARG;
+  if (key->dp == NULL)                                                                 return CRYPT_INVALID_ARG;
 
   if ((err = mp_init_multi(&prime, &order, &a, &b, &gx, &gy, NULL)) != CRYPT_OK)       return err;
 
