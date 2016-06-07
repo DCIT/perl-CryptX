@@ -55,9 +55,14 @@ int ecc_dp_set_bn(ltc_ecc_set_type *dp, void *a, void *b, void *prime, void *ord
   /* cofactor & size */
   dp->cofactor = cofactor;
   dp->size = mp_unsigned_bin_size(prime);
-  /* name */
-  if ((dp->name = XMALLOC(7)) == NULL)          goto cleanup7;
-  strcpy(dp->name, "custom");  /* XXX-TODO check this */
+  /* see if we can fill in the missing parameters from known curves */
+  if ((ecc_dp_fill_from_sets(dp)) != CRYPT_OK) {
+    /* custom name */
+    if ((dp->name = XMALLOC(7)) == NULL)        goto cleanup7;
+    strcpy(dp->name, "custom");  /* XXX-TODO check this */
+    /* no oid */
+    dp->oid.OIDlen = 0;
+  }
   /* done - success */
   return CRYPT_OK;
 

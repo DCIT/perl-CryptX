@@ -33,7 +33,7 @@ int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key
   unsigned long len_a, len_b, len_k, len_g, len_xy;
   unsigned long cofactor, one = 1;
   oid_st oid;
-  ltc_asn1_list seq_fieldid[2], seq_curve[2], seq_ecparams[6], seq_priv[4];
+  ltc_asn1_list seq_fieldid[2], seq_curve[2], seq_ecparams[6], seq_priv[4], asn_ecparams[1];
 
   LTC_ARGCHK(out    != NULL);
   LTC_ARGCHK(outlen != NULL);
@@ -78,21 +78,60 @@ int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key
   /* we support only prime-field EC */
   if ((err = pk_get_oid(EC_PRIME_FIELD, &oid)) != CRYPT_OK)                            goto error;
 
-  /* FieldID SEQUENCE */
-  LTC_SET_ASN1(seq_fieldid,  0, LTC_ASN1_OBJECT_IDENTIFIER, oid.OID,     oid.OIDlen);
-  LTC_SET_ASN1(seq_fieldid,  1, LTC_ASN1_INTEGER,           prime,       1UL);
+  if (type & PK_CURVEOID) {
+      /* from http://tools.ietf.org/html/rfc5912
 
-  /* Curve SEQUENCE */
-  LTC_SET_ASN1(seq_curve,    0, LTC_ASN1_OCTET_STRING,      bin_a,       len_a);
-  LTC_SET_ASN1(seq_curve,    1, LTC_ASN1_OCTET_STRING,      bin_b,       len_b);
+          ECParameters ::= CHOICE {
+               namedCurve      CURVE.&id({NamedCurve})                # OBJECT
+          }
+      */
 
-  /* ECParameters SEQUENCE */
-  LTC_SET_ASN1(seq_ecparams, 0, LTC_ASN1_SHORT_INTEGER,     &one,        1UL);
-  LTC_SET_ASN1(seq_ecparams, 1, LTC_ASN1_SEQUENCE,          seq_fieldid, 2UL);
-  LTC_SET_ASN1(seq_ecparams, 2, LTC_ASN1_SEQUENCE,          seq_curve,   2UL);
-  LTC_SET_ASN1(seq_ecparams, 3, LTC_ASN1_OCTET_STRING,      bin_g,       len_g);
-  LTC_SET_ASN1(seq_ecparams, 4, LTC_ASN1_INTEGER,           order,       1UL);
-  LTC_SET_ASN1(seq_ecparams, 5, LTC_ASN1_SHORT_INTEGER,     &cofactor,   1UL);
+      /* BEWARE: exporting PK_CURVEOID with custom OID means we're unable to read the curve again */
+      if (key->dp->oid.OIDlen == 0) { err = CRYPT_INVALID_ARG; goto error; }
+
+      /* ECParameters used by ECPrivateKey or SubjectPublicKeyInfo below */
+      LTC_SET_ASN1(asn_ecparams, 0, LTC_ASN1_OBJECT_IDENTIFIER, key->dp->oid.OID, key->dp->oid.OIDlen);
+      type &= ~PK_CURVEOID;
+  }
+  else {
+      /* from http://tools.ietf.org/html/rfc3279
+
+          ECParameters ::= SEQUENCE {                                   # SEQUENCE
+               version         INTEGER { ecpVer1(1) } (ecpVer1),        # INTEGER       :01
+               FieldID ::= SEQUENCE {                                   # SEQUENCE
+                   fieldType       FIELD-ID.&id({IOSet}),               # OBJECT        :prime-field
+                   parameters      FIELD-ID.&Type({IOSet}{@fieldType})  # INTEGER
+               }
+               Curve ::= SEQUENCE {                                     # SEQUENCE
+                   a               FieldElement ::= OCTET STRING        # OCTET STRING
+                   b               FieldElement ::= OCTET STRING        # OCTET STRING
+                   seed            BIT STRING      OPTIONAL
+               }
+               base            ECPoint ::= OCTET STRING                 # OCTET STRING
+               order           INTEGER,                                 # INTEGER
+               cofactor        INTEGER OPTIONAL                         # INTEGER
+          }
+      */
+
+      /* FieldID SEQUENCE */
+      LTC_SET_ASN1(seq_fieldid,  0, LTC_ASN1_OBJECT_IDENTIFIER, oid.OID,     oid.OIDlen);
+      LTC_SET_ASN1(seq_fieldid,  1, LTC_ASN1_INTEGER,           prime,       1UL);
+
+      /* Curve SEQUENCE */
+      LTC_SET_ASN1(seq_curve,    0, LTC_ASN1_OCTET_STRING,      bin_a,       len_a);
+      LTC_SET_ASN1(seq_curve,    1, LTC_ASN1_OCTET_STRING,      bin_b,       len_b);
+
+      /* ECParameters SEQUENCE */
+      LTC_SET_ASN1(seq_ecparams, 0, LTC_ASN1_SHORT_INTEGER,     &one,        1UL);
+      LTC_SET_ASN1(seq_ecparams, 1, LTC_ASN1_SEQUENCE,          seq_fieldid, 2UL);
+      LTC_SET_ASN1(seq_ecparams, 2, LTC_ASN1_SEQUENCE,          seq_curve,   2UL);
+      LTC_SET_ASN1(seq_ecparams, 3, LTC_ASN1_OCTET_STRING,      bin_g,       len_g);
+      LTC_SET_ASN1(seq_ecparams, 4, LTC_ASN1_INTEGER,           order,       1UL);
+      LTC_SET_ASN1(seq_ecparams, 5, LTC_ASN1_SHORT_INTEGER,     &cofactor,   1UL);
+
+      /* ECParameters used by ECPrivateKey or SubjectPublicKeyInfo below */
+      LTC_SET_ASN1(asn_ecparams, 0, LTC_ASN1_SEQUENCE, seq_ecparams, 6UL);
+  }
 
   if (type == PK_PRIVATE) {
       /* private key format: http://tools.ietf.org/html/rfc5915
@@ -100,22 +139,8 @@ int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key
           ECPrivateKey ::= SEQUENCE {                                    # SEQUENCE
            version        INTEGER { ecPrivkeyVer1(1) } (ecPrivkeyVer1),  # INTEGER       :01
            privateKey     OCTET STRING,                                  # OCTET STRING
-           [0] ECParameters ::= SEQUENCE {                               # SEQUENCE
-                version         INTEGER { ecpVer1(1) } (ecpVer1),        # INTEGER       :01
-                FieldID ::= SEQUENCE {                                   # SEQUENCE
-                    fieldType       FIELD-ID.&id({IOSet}),               # OBJECT        :prime-field
-                    parameters      FIELD-ID.&Type({IOSet}{@fieldType})  # INTEGER
-                }
-                Curve ::= SEQUENCE {                                     # SEQUENCE
-                    a               FieldElement ::= OCTET STRING        # OCTET STRING
-                    b               FieldElement ::= OCTET STRING        # OCTET STRING
-                    seed            BIT STRING      OPTIONAL
-                }
-                base            ECPoint ::= OCTET STRING                 # OCTET STRING
-                order           INTEGER,                                 # INTEGER
-                cofactor        INTEGER OPTIONAL                         # INTEGER
-            }
-            [1] publicKey                                                # BIT STRING
+           [0] ECParameters                                              # see above
+           [1] publicKey                                                 # BIT STRING
           }
       */
 
@@ -124,10 +149,10 @@ int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key
       if (len_k > sizeof(bin_k))                                                       { err = CRYPT_BUFFER_OVERFLOW; goto error; }
       if ((err = mp_to_unsigned_bin(key->k, bin_k)) != CRYPT_OK)                       goto error;
 
-      LTC_SET_ASN1(seq_priv, 0, LTC_ASN1_SHORT_INTEGER,   &one,         1UL);
-      LTC_SET_ASN1(seq_priv, 1, LTC_ASN1_OCTET_STRING,    bin_k,        len_k);
-      LTC_SET_ASN1(seq_priv, 2, LTC_ASN1_SEQUENCE,        seq_ecparams, 6UL);
-      LTC_SET_ASN1(seq_priv, 3, LTC_ASN1_RAW_BIT_STRING,  bin_xy,       8*len_xy);
+      LTC_SET_ASN1(seq_priv, 0, LTC_ASN1_SHORT_INTEGER,   &one,                 1UL);
+      LTC_SET_ASN1(seq_priv, 1, LTC_ASN1_OCTET_STRING,    bin_k,                len_k);
+      LTC_SET_ASN1(seq_priv, 2, asn_ecparams[0].type,     asn_ecparams[0].data, asn_ecparams[0].size);
+      LTC_SET_ASN1(seq_priv, 3, LTC_ASN1_RAW_BIT_STRING,  bin_xy,               8*len_xy);
       seq_priv[2].tag = 0xA0;
       seq_priv[3].tag = 0xA1;
 
@@ -139,29 +164,14 @@ int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key
           SubjectPublicKeyInfo ::= SEQUENCE  {                           # SEQUENCE
             AlgorithmIdentifier ::= SEQUENCE  {                          # SEQUENCE
               algorithm OBJECT IDENTIFIER                                # OBJECT        :id-ecPublicKey
-              ECParameters ::= SEQUENCE {                                # SEQUENCE
-                  version INTEGER { ecpVer1(1) } (ecpVer1),              # INTEGER       :01
-                  FieldID ::= SEQUENCE {                                 # SEQUENCE
-                      fieldType   FIELD-ID.&id({IOSet}),                 # OBJECT        :prime-field
-                      parameters  FIELD-ID.&Type({IOSet}{@fieldType})    # INTEGER
-                  }
-                  Curve ::= SEQUENCE {                                   # SEQUENCE
-                      a           FieldElement ::= OCTET STRING          # OCTET STRING
-                      b           FieldElement ::= OCTET STRING          # OCTET STRING
-                      seed        BIT STRING      OPTIONAL
-                  }
-                  base            ECPoint ::= OCTET STRING               # OCTET STRING
-                  order           INTEGER,                               # INTEGER
-                  cofactor        INTEGER OPTIONAL                       # INTEGER
-              }
+              ECParameters                                               # see above
             }
             subjectPublicKey  BIT STRING                                 # BIT STRING
           }
       */
-
       err = der_encode_subject_public_key_info( out, outlen,
                                                 PKA_EC, bin_xy, len_xy,
-                                                LTC_ASN1_SEQUENCE, seq_ecparams, 6 );
+                                                asn_ecparams[0].type, asn_ecparams[0].data, asn_ecparams[0].size );
   }
 
 error:

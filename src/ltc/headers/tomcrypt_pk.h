@@ -3,7 +3,8 @@
 enum {
    PK_PUBLIC=0,
    PK_PRIVATE=1,
-   PK_PUBLIC_COMPRESSED=2  /* used only when exporting public ECC key */
+   PK_PUBLIC_COMPRESSED=2, /* used only when exporting public ECC key */
+   PK_CURVEOID=4           /* used only when exporting public ECC key */
 };
 
 /* Indicates standard output formats that can be read e.g. by OpenSSL or GnuTLS */
@@ -298,11 +299,11 @@ void ecc_sizes(int *low, int *high);
 int  ecc_get_size(ecc_key *key);
 
 int ecc_dp_init(ltc_ecc_set_type *dp);
-int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, char *ch_order, char *ch_Gx, char *ch_Gy, unsigned long cofactor, char *ch_name);
+int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, char *ch_order, char *ch_Gx, char *ch_Gy, unsigned long cofactor, char *ch_name, char *oid);
 int ecc_dp_set_bn(ltc_ecc_set_type *dp, void *a, void *b, void *prime, void *order, void *gx, void *gy, unsigned long cofactor);
 int ecc_dp_set_by_oid(ltc_ecc_set_type *dp, unsigned long *oid, unsigned long oidsize);
+int ecc_dp_fill_from_sets(ltc_ecc_set_type *dp);
 int ecc_dp_clear(ltc_ecc_set_type *dp);
-
 
 int  ecc_make_key(prng_state *prng, int wprng, int keysize, ecc_key *key);
 int  ecc_make_key_ex(prng_state *prng, int wprng, ecc_key *key, const ltc_ecc_set_type *dp);

@@ -74,8 +74,9 @@ ltc/pk/dsa/dsa_decrypt_key.o ltc/pk/dsa/dsa_encrypt_key.o ltc/pk/dsa/dsa_export.
 ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_import_hex.o ltc/pk/dsa/dsa_make_key.o ltc/pk/dsa/dsa_shared_secret.o \
 ltc/pk/dsa/dsa_sign_hash.o ltc/pk/dsa/dsa_verify_hash.o ltc/pk/dsa/dsa_verify_key.o ltc/pk/ecc/ecc.o \
 ltc/pk/ecc/ecc_ansi_x963_export.o ltc/pk/ecc/ecc_ansi_x963_import.o ltc/pk/ecc/ecc_decrypt_key.o \
-ltc/pk/ecc/ecc_dp_clear.o ltc/pk/ecc/ecc_dp_from_oid.o ltc/pk/ecc/ecc_dp_from_params.o ltc/pk/ecc/ecc_dp_init.o \
-ltc/pk/ecc/ecc_dp_set.o ltc/pk/ecc/ecc_encrypt_key.o ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_full.o \
+ltc/pk/ecc/ecc_dp_clear.o ltc/pk/ecc/ecc_dp_fill_from_sets.o ltc/pk/ecc/ecc_dp_from_oid.o \
+ltc/pk/ecc/ecc_dp_from_params.o ltc/pk/ecc/ecc_dp_init.o ltc/pk/ecc/ecc_dp_set.o \
+ltc/pk/ecc/ecc_encrypt_key.o ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_full.o \
 ltc/pk/ecc/ecc_export_raw.o ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o \
 ltc/pk/ecc/ecc_import_full.o ltc/pk/ecc/ecc_import_pkcs8.o ltc/pk/ecc/ecc_import_raw.o \
 ltc/pk/ecc/ecc_make_key.o ltc/pk/ecc/ecc_shared_secret.o ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sizes.o \

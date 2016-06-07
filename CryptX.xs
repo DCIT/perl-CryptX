@@ -186,7 +186,7 @@ ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
 {
   HV *h;
   SV *param, **pref;
-  SV **sv_cofactor, **sv_prime, **sv_A, **sv_B, **sv_order, **sv_Gx, **sv_Gy;
+  SV **sv_cofactor, **sv_prime, **sv_A, **sv_B, **sv_order, **sv_Gx, **sv_Gy, **sv_oid;
   int err;
   char *ch_name;
   STRLEN l_name;
@@ -200,7 +200,6 @@ ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
   }
   else if (SvROK(curve)) {
     param = curve;
-    ch_name = "custom";
   }
   else {
     croak("FATAL: curve has to be a string or a hashref");
@@ -232,7 +231,9 @@ ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
                     SvPV_nolen(*sv_Gx),
                     SvPV_nolen(*sv_Gy),
                     (unsigned long)SvUV(*sv_cofactor),
-                    ch_name );
+                    NULL, /* we intentionally don't allow setting custom names */
+                    NULL  /* we intentionally don't allow setting custom OIDs */
+                  );
   return err == CRYPT_OK ? dp : NULL;
 }
 
