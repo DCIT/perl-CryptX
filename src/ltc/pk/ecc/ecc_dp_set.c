@@ -17,7 +17,7 @@
 
 #ifdef LTC_MECC
 
-int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, char *ch_order, char *ch_Gx, char *ch_Gy, unsigned long cofactor, char *ch_name)
+int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, char *ch_order, char *ch_Gx, char *ch_Gy, unsigned long cofactor, char *ch_name, char *oid)
 {
   unsigned long l_name, l_prime, l_A, l_B, l_order, l_Gx, l_Gy;
 
@@ -56,7 +56,7 @@ int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, cha
   dp->Gy    = XMALLOC(1+l_Gy);    strncpy(dp->Gy,    ch_Gy,    1+l_Gy);
 
   /* optional parameters */
-  if (ch_name == NULL) {
+  if (ch_name == NULL && oid == NULL) {
     (void)ecc_dp_fill_from_sets(dp);
   }
   else {
@@ -64,6 +64,26 @@ int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, cha
       l_name   = (unsigned long)strlen(ch_name);
       dp->name = XMALLOC(1+l_name);
       strncpy(dp->name, ch_name, 1+l_name);
+    }
+
+    if (oid != NULL) {
+      char *end_ptr;
+      unsigned int i = 0;
+      unsigned long val;
+
+      end_ptr = oid;
+      while (i < sizeof(dp->oid.OID)/sizeof(dp->oid.OID[0]) && *oid != '\0') {
+        errno = 0;
+        val = strtoul(oid, &end_ptr, 10);
+        if (errno != 0 || oid == end_ptr) break; // parsing failed
+        if (val > 0xFFFFFFFF) break;             // x64 check
+        dp->oid.OID[i++] = val;
+        oid = end_ptr;
+        if (*oid != '.') break;
+        oid++;
+      }
+      if (i == 0 || *end_ptr != '\0') return CRYPT_INVALID_ARG;
+      dp->oid.OIDlen = i;
     }
   }
 
