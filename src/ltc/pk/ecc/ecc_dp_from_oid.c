@@ -61,6 +61,9 @@ int ecc_dp_set_by_oid(ltc_ecc_set_type *dp, unsigned long *oid, unsigned long oi
   len = (unsigned long)strlen(ltc_ecc_sets[i].name);
   if ((dp->name = XMALLOC(1+len)) == NULL)      goto cleanup7;
   strncpy(dp->name, ltc_ecc_sets[i].name, 1+len);
+  /* oid */
+  dp->oid.OIDlen = ltc_ecc_sets[i].oid.OIDlen;
+  XMEMCPY(dp->oid.OID, ltc_ecc_sets[i].oid.OID, dp->oid.OIDlen * sizeof(dp->oid.OID[0]));
   /* done - success */
   return CRYPT_OK;
 

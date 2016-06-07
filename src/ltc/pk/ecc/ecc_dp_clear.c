@@ -27,7 +27,8 @@ int ecc_dp_clear(ltc_ecc_set_type *dp)
   if (dp->order != NULL) { XFREE(dp->order); dp->order = NULL; }
   if (dp->Gx    != NULL) { XFREE(dp->Gx   ); dp->Gx    = NULL; }
   if (dp->Gy    != NULL) { XFREE(dp->Gy   ); dp->Gy    = NULL; }
-  dp->cofactor = 0;
+  dp->cofactor   = 0;
+  dp->oid.OIDlen = 0;
 
   return CRYPT_OK;
 }
