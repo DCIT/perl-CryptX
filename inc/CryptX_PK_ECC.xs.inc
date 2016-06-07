@@ -169,7 +169,14 @@ key2hash(Crypt::PK::ECC self)
             name = newSVpv(self->key.dp->name,  strlen(self->key.dp->name));
             name_ptr = SvPV(name, name_len);
             for (i=0; i<name_len && name_ptr[i]>0; i++) name_ptr[i] = toLOWER(name_ptr[i]);
-            not_used = hv_store(rv_hash, "curve_name",  10, name, 0);
+            not_used = hv_store(rv_hash, "curve_name", 10, name, 0);
+          }
+          if (self->key.dp->oid.OIDlen > 0) {
+            int i;
+            SV *oid = newSVpv("", 0);
+            for(i = 0; i < self->key.dp->oid.OIDlen - 1; i++) sv_catpvf(oid, "%lu.", self->key.dp->oid.OID[i]);
+            sv_catpvf(oid, "%lu", self->key.dp->oid.OID[i]);
+            not_used = hv_store(rv_hash, "curve_oid", 9, oid, 0);
           }
         }
         /* =====> size */

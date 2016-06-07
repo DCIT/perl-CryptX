@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 119;
+use Test::More tests => 121;
 
 use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret);
 
@@ -194,11 +194,13 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   $k = Crypt::PK::ECC->new;
   ok($k->generate_key($params), "generate_key hash params");
   is($k->key2hash->{curve_name}, 'secp384r1',    "key2hash curve_name");
+  is($k->key2hash->{curve_oid},  $params->{oid}, "key2hash curve_oid");
   ok($k->export_key_der('private_short'), "export_key_der auto oid");
 
   $k = Crypt::PK::ECC->new;
   ok($k->generate_key({ %$params, A => '0' }), "generate_key invalid auto oid");
   is($k->key2hash->{curve_name}, 'custom', "key2hash custom curve_name");
+  ok(!exists($k->key2hash->{curve_oid}), "key2hash curve_oid doesn't exist");
   eval { $k->export_key_der('private_short'); };
   ok($@, "export_key_der invalid auto oid");
 }
