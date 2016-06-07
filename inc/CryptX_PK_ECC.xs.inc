@@ -190,9 +190,19 @@ export_key_der(Crypt::PK::ECC self, char * type)
         unsigned long int out_len = 4096;
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
-        if (strnEQ(type, "private", 7)) {
+        if (strnEQ(type, "private_short", 16)) {
+          rv = ecc_export_full(out, &out_len, PK_PRIVATE|PK_CURVEOID, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_export(PK_PRIVATE|PK_CURVEOID) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
+        }
+        else if (strnEQ(type, "private", 7)) {
           rv = ecc_export_full(out, &out_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_export(PK_PRIVATE) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
+        }
+        else if (strnEQ(type, "public_short", 15)) {
+          rv = ecc_export_full(out, &out_len, PK_PUBLIC|PK_CURVEOID, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_export(PK_PUBLIC|PK_CURVEOID) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "public", 6)) {
