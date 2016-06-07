@@ -62,6 +62,12 @@ write_file("input.data", "test-file-content");
  write_file("eckey.pub.pem",  $pkec->export_key_pem('public'));
  write_file("eckey.priv.pem", $pkec->export_key_pem('private'));
  write_file("eckey-passwd.priv.pem", $pkec->export_key_pem('private', 'secret'));
+ #short
+ write_file("eckey.pubs.der",  {binmode=>':raw'}, $pkec->export_key_der('public_short'));
+ write_file("eckey.privs.der", {binmode=>':raw'}, $pkec->export_key_der('private_short'));
+ write_file("eckey.pubs.pem",  $pkec->export_key_pem('public_short'));
+ write_file("eckey.privs.pem", $pkec->export_key_pem('private_short'));
+ write_file("eckey-passwd.privs.pem", $pkec->export_key_pem('private_short', 'secret'));
 }
 
 runcmds <<'MARKER';
@@ -70,6 +76,11 @@ runcmds <<'MARKER';
  openssl ec -in eckey-passwd.priv.pem -text -inform pem -passin pass:secret
  openssl ec -in eckey.pub.der -pubin -text -inform der
  openssl ec -in eckey.pub.pem -pubin -text 
+ openssl ec -in eckey.privs.der -text -inform der
+ openssl ec -in eckey.privs.pem -text
+ openssl ec -in eckey-passwd.privs.pem -text -inform pem -passin pass:secret
+ openssl ec -in eckey.pubs.der -pubin -text -inform der
+ openssl ec -in eckey.pubs.pem -pubin -text 
 MARKER
 
 doit();
