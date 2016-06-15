@@ -75,8 +75,8 @@ int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, cha
       while (i < sizeof(dp->oid.OID)/sizeof(dp->oid.OID[0]) && *oid != '\0') {
         errno = 0;
         val = strtoul(oid, &end_ptr, 10);
-        if (errno != 0 || oid == end_ptr) break; // parsing failed
-        if (val > 0xFFFFFFFF) break;             // x64 check
+        if (errno != 0 || oid == end_ptr) break; /* parsing failed */
+        if (val > 0xFFFFFFFF) break;             /* x64 check */
         dp->oid.OID[i++] = val;
         oid = end_ptr;
         if (*oid != '.') break;
