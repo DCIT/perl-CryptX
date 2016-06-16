@@ -82,6 +82,16 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
    #define LTC_FAST
 #endif
 
+/* detect AIX */
+#if defined(_AIX) && defined(_BIG_ENDIAN)
+  #define ENDIAN_BIG
+  #if defined(__LP64__) || defined(_ARCH_PPC64)
+    #define ENDIAN_64BITWORD
+  #else
+    #define ENDIAN_32BITWORD
+  #endif
+#endif
+
 /* detect HP-UX */
 #if defined(__hpux) || defined(__hpux__)
   #define ENDIAN_BIG
