@@ -12,6 +12,10 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.037   2016/06/16
+        - fix issue #18 Minor issue with comment syntax
+        - fix issue #19 t/checksum.t fails on AIX-5.3
+
 0.036   2016/06/07
         - fix issue #17 ability to export ecc keys in short/oid form
 
