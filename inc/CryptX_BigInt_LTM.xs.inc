@@ -155,7 +155,7 @@ _str(Class, Math::BigInt::LTM n)
       RETVAL = newSVpv("0", 0);
     }
     else {
-      len = mp_unsigned_bin_size(n) * 3 + 2; /* decimal size ~ 3 * bin size +1 for sign +1 for NUL-byte */
+      len = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
       mp_toradix_n(n, buf, 10, len);
       RETVAL = newSVpv(buf, 0);
@@ -177,7 +177,7 @@ _len(Class, Math::BigInt::LTM n)
       RETVAL = 1;
     }
     else {
-      len = mp_unsigned_bin_size(n) * 3 + 2; /* decimal size ~ 3 * bin size +1 for sign +1 for NUL-byte */
+      len = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
       mp_toradix_n(n, buf, 10, len);
       RETVAL = strlen(buf);
@@ -192,7 +192,7 @@ _len(Class, Math::BigInt::LTM n)
 int
 _alen(Class, Math::BigInt::LTM n)
   CODE:
-    RETVAL = mp_unsigned_bin_size(n) * 3 + 2; /* decimal size ~ 3 * bin size XXX-FIXME very bad estimate */
+    RETVAL = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
   OUTPUT:
     RETVAL
 
@@ -209,7 +209,7 @@ _zeros(Class, Math::BigInt::LTM n)
       RETVAL = 0; /* '0' has no trailing zeros! */
     }
     else {
-      len = mp_unsigned_bin_size(n) * 3 + 2; /* decimal size ~ 3 * bin size +1 for sign +1 for NUL-byte */
+      len = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
       mp_toradix_n(n, buf, 10, len);
       len = strlen(buf);
@@ -631,7 +631,7 @@ STORABLE_freeze(self, cloning = NULL)
       RETVAL = newSVpv("0", 0);
     }
     else {
-      len = mp_unsigned_bin_size(self) * 3 + 2; /* decimal size ~ 3 * bin size +1 for sign +1 for NUL-byte */
+      len = mp_count_bits(self) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
       mp_toradix_n(self, buf, 10, len);
       RETVAL = newSVpv(buf, 0);
