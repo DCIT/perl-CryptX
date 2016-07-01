@@ -32,8 +32,8 @@ for my $h (@$data) {
   my $dsa_pub  = Crypt::PK::DSA->new->import_key(\pack("H*",$h->{PUB_DER}));
   my $dsa_pri_h = $dsa_pri->key2hash;
   my $dsa_pub_h = $dsa_pub->key2hash;
-  $h->{PRI} =~ s/^0+//;
-  $h->{PUB} =~ s/^0+//;
+  $h->{PRI} =~ s/^(00)+//;
+  $h->{PUB} =~ s/^(00)+//;
   is($dsa_pri_h->{x}, uc $h->{PRI}, "$h->{PRI_FILE}/PRI");
   is($dsa_pri_h->{y}, uc $h->{PUB}, "$h->{PRI_FILE}/PUB");
   is($dsa_pub_h->{y}, uc $h->{PUB}, "$h->{PUB_FILE}/PUB");

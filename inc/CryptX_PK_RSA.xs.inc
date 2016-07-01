@@ -104,7 +104,7 @@ key2hash(Crypt::PK::RSA self)
           croak("FATAL: key2hash failed - 'e' too big number");
         }
         if (siz>0) {
-          mp_tohex(self->key.e, buf);
+          mp_tohex_with_leading_zero(self->key.e, buf, 20000);
           not_used = hv_store(rv_hash, "e", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -116,7 +116,7 @@ key2hash(Crypt::PK::RSA self)
           croak("FATAL: key2hash failed - 'd' too big number");
         }
         if (siz>0) {
-          mp_tohex(self->key.d, buf);
+          mp_tohex_with_leading_zero(self->key.d, buf, 20000);
           not_used = hv_store(rv_hash, "d", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -128,7 +128,7 @@ key2hash(Crypt::PK::RSA self)
           croak("FATAL: key2hash failed - 'N' too big number");
         }
         if (siz>0) {
-          mp_tohex(self->key.N, buf);
+          mp_tohex_with_leading_zero(self->key.N, buf, 20000);
           not_used = hv_store(rv_hash, "N", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -140,7 +140,7 @@ key2hash(Crypt::PK::RSA self)
           croak("FATAL: key2hash failed - 'q' too big number");
         }
         if (siz>0) {
-          mp_tohex(self->key.q, buf);
+          mp_tohex_with_leading_zero(self->key.q, buf, 20000);
           not_used = hv_store(rv_hash, "q", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -152,7 +152,7 @@ key2hash(Crypt::PK::RSA self)
           croak("FATAL: key2hash failed - 'p' too big number");
         }
         if (siz>0) {
-          mp_tohex(self->key.p, buf);
+          mp_tohex_with_leading_zero(self->key.p, buf, 20000);
           not_used = hv_store(rv_hash, "p", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -164,7 +164,7 @@ key2hash(Crypt::PK::RSA self)
           croak("FATAL: key2hash failed - 'qP' too big number");
         }
         if (siz>0) {
-          mp_tohex(self->key.qP, buf);
+          mp_tohex_with_leading_zero(self->key.qP, buf, 20000);
           not_used = hv_store(rv_hash, "qP", 2, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -176,7 +176,7 @@ key2hash(Crypt::PK::RSA self)
           croak("FATAL: key2hash failed - 'dP' too big number");
         }
         if (siz>0) {
-          mp_tohex(self->key.dP, buf);
+          mp_tohex_with_leading_zero(self->key.dP, buf, 20000);
           not_used = hv_store(rv_hash, "dP", 2, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -188,7 +188,7 @@ key2hash(Crypt::PK::RSA self)
           croak("FATAL: key2hash failed - 'dQ' too big number");
         }
         if (siz>0) {
-          mp_tohex(self->key.dQ, buf);
+          mp_tohex_with_leading_zero(self->key.dQ, buf, 20000);
           not_used = hv_store(rv_hash, "dQ", 2, newSVpv(buf, strlen(buf)), 0);
         }
         else{

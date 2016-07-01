@@ -113,7 +113,7 @@ key2hash(Crypt::PK::ECC self)
           croak("FATAL: key2hash failed - 'k' too big number");
         }
         if (siz>0) {
-          mp_tohex(self->key.k, buf);
+          mp_tohex_with_leading_zero(self->key.k, buf, 20000);
           not_used = hv_store(rv_hash, "k", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -125,7 +125,7 @@ key2hash(Crypt::PK::ECC self)
           croak("FATAL: key2hash failed - 'pub_x' too big number");
         }
         if (siz>0) {
-          mp_tohex(self->key.pubkey.x, buf);
+          mp_tohex_with_leading_zero(self->key.pubkey.x, buf, 20000);
           not_used = hv_store(rv_hash, "pub_x", 5, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -137,7 +137,7 @@ key2hash(Crypt::PK::ECC self)
           croak("FATAL: key2hash failed - 'pub_y' too big number");
         }
         if (siz>0) {
-          mp_tohex(self->key.pubkey.y, buf);
+          mp_tohex_with_leading_zero(self->key.pubkey.y, buf, 20000);
           not_used = hv_store(rv_hash, "pub_y", 5, newSVpv(buf, strlen(buf)), 0);
         }
         else{
