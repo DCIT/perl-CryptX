@@ -12,6 +12,10 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.038   2016/07/XXX
+        - fix issue #20 DSA/RSA/ECC/DH key2hash - hexadecimal numbers are missing leading zero
+        - Math::BigInt::LTM fixed mp_invmod(a,b,c) for b == 1
+
 0.037   2016/06/16
         - fix issue #18 Minor issue with comment syntax
         - fix issue #19 t/checksum.t fails on AIX-5.3
