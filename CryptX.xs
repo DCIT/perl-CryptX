@@ -174,23 +174,33 @@ typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
   int id;
 } *Crypt__PK__ECC;
 
-int mp_tohex_with_leading_zero(mp_int * a, char *str, int maxlen) {
+int str_add_leading_zero(char *str, int maxlen, int minlen) {
   int rv, len;
-  if (mp_isneg(a) == MP_YES) {
-    *str = '\0';
-    return MP_VAL;
-  }
-  rv = mp_toradix_n(a, str, 16, maxlen-1);
-  if (rv != MP_OKAY) {
-    *str = '\0';
-    return rv;
-  }
   len = strlen(str);
   if (len > 0 && len % 2 && len < maxlen-2) {
     memmove(str+1, str, len+1); /* incl. NUL byte */
     *str = '0';                 /* add leading zero */
   }
+  len = strlen(str);
+  if (len < minlen && minlen < maxlen-1) {
+    memmove(str+(minlen-len), str, len+1); /* incl. NUL byte */
+    memset(str, '0', minlen-len);          /* add leading zero */
+  }
   return MP_OKAY;
+}
+
+int mp_tohex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
+  int rv, len;
+  if (mp_isneg(a) == MP_YES) {
+    *str = '\0';
+    return MP_VAL;
+  }
+  rv = mp_toradix_n(a, str, 16, maxlen);
+  if (rv != MP_OKAY) {
+    *str = '\0';
+    return rv;
+  }
+  return str_add_leading_zero(str, maxlen, minlen);
 }
 
 /* Math::BigInt::LTM related */

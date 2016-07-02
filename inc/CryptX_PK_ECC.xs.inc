@@ -101,11 +101,12 @@ SV*
 key2hash(Crypt::PK::ECC self)
     PREINIT:
         HV *rv_hash;
-        long siz;
+        long siz, esize;
         char buf[20001];
         SV **not_used;
     CODE:
         if (self->key.type == -1) XSRETURN_UNDEF;
+        esize = ecc_get_size(&self->key);
         rv_hash = newHV();
         /* =====> k */
         siz = (self->key.k) ? mp_unsigned_bin_size(self->key.k) : 0;
@@ -113,7 +114,7 @@ key2hash(Crypt::PK::ECC self)
           croak("FATAL: key2hash failed - 'k' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.k, buf, 20000);
+          mp_tohex_with_leading_zero(self->key.k, buf, 20000, esize*2);
           not_used = hv_store(rv_hash, "k", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -125,7 +126,7 @@ key2hash(Crypt::PK::ECC self)
           croak("FATAL: key2hash failed - 'pub_x' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.pubkey.x, buf, 20000);
+          mp_tohex_with_leading_zero(self->key.pubkey.x, buf, 20000, esize*2);
           not_used = hv_store(rv_hash, "pub_x", 5, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -137,7 +138,7 @@ key2hash(Crypt::PK::ECC self)
           croak("FATAL: key2hash failed - 'pub_y' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.pubkey.y, buf, 20000);
+          mp_tohex_with_leading_zero(self->key.pubkey.y, buf, 20000, esize*2);
           not_used = hv_store(rv_hash, "pub_y", 5, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -145,13 +146,28 @@ key2hash(Crypt::PK::ECC self)
         }
         /* =====> curve_... */
         if (self->key.dp) {
-          not_used = hv_store(rv_hash, "curve_prime", 11, newSVpv(self->key.dp->prime, strlen(self->key.dp->prime)), 0);
-          not_used = hv_store(rv_hash, "curve_A",      7, newSVpv(self->key.dp->A,     strlen(self->key.dp->A)), 0);
-          not_used = hv_store(rv_hash, "curve_B",      7, newSVpv(self->key.dp->B,     strlen(self->key.dp->B)), 0);
-          not_used = hv_store(rv_hash, "curve_order", 11, newSVpv(self->key.dp->order, strlen(self->key.dp->order)), 0);
-          not_used = hv_store(rv_hash, "curve_Gx",     8, newSVpv(self->key.dp->Gx,    strlen(self->key.dp->Gx)), 0);
-          not_used = hv_store(rv_hash, "curve_Gy",     8, newSVpv(self->key.dp->Gy,    strlen(self->key.dp->Gy)), 0);
           not_used = hv_store(rv_hash, "curve_cofactor", 14, newSViv(self->key.dp->cofactor), 0);
+          /* prepend leading zero if we have odd number of hexadecimal digits */
+          strncpy(buf, self->key.dp->prime, 20000); str_add_leading_zero(buf, 20000, 0);
+          not_used = hv_store(rv_hash, "curve_prime", 11, newSVpv(buf, strlen(buf)), 0);
+          strncpy(buf, self->key.dp->A,     20000); str_add_leading_zero(buf, 20000, 0);
+          not_used = hv_store(rv_hash, "curve_A",      7, newSVpv(buf, strlen(buf)), 0);
+          strncpy(buf, self->key.dp->B,     20000); str_add_leading_zero(buf, 20000, 0);
+          not_used = hv_store(rv_hash, "curve_B",      7, newSVpv(buf, strlen(buf)), 0);
+          strncpy(buf, self->key.dp->order, 20000); str_add_leading_zero(buf, 20000, 0);
+          not_used = hv_store(rv_hash, "curve_order", 11, newSVpv(buf, strlen(buf)), 0);
+          strncpy(buf, self->key.dp->Gx,    20000); str_add_leading_zero(buf, 20000, 0);
+          not_used = hv_store(rv_hash, "curve_Gx",     8, newSVpv(buf, strlen(buf)), 0);
+          strncpy(buf, self->key.dp->Gy,    20000); str_add_leading_zero(buf, 20000, 0);
+          not_used = hv_store(rv_hash, "curve_Gy",     8, newSVpv(buf, strlen(buf)), 0);
+          /* OLD approach
+            not_used = hv_store(rv_hash, "curve_prime", 11, newSVpv(self->key.dp->prime, strlen(self->key.dp->prime)), 0);
+            not_used = hv_store(rv_hash, "curve_A",      7, newSVpv(self->key.dp->A,     strlen(self->key.dp->A)), 0);
+            not_used = hv_store(rv_hash, "curve_B",      7, newSVpv(self->key.dp->B,     strlen(self->key.dp->B)), 0);
+            not_used = hv_store(rv_hash, "curve_order", 11, newSVpv(self->key.dp->order, strlen(self->key.dp->order)), 0);
+            not_used = hv_store(rv_hash, "curve_Gx",     8, newSVpv(self->key.dp->Gx,    strlen(self->key.dp->Gx)), 0);
+            not_used = hv_store(rv_hash, "curve_Gy",     8, newSVpv(self->key.dp->Gy,    strlen(self->key.dp->Gy)), 0);
+          */
           {
             mp_int p_num;
             mp_init(&p_num);
@@ -180,7 +196,7 @@ key2hash(Crypt::PK::ECC self)
           }
         }
         /* =====> size */
-        not_used = hv_store(rv_hash, "size", 4, newSViv(ecc_get_size(&self->key)), 0);
+        not_used = hv_store(rv_hash, "size", 4, newSViv(esize), 0);
         /* =====> type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
         if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */
