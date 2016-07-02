@@ -280,6 +280,8 @@ void _ecc_free_key(ecc_key *key, ltc_ecc_set_type *dp)
 
 MODULE = CryptX       PACKAGE = CryptX      PREFIX = CryptX_
 
+PROTOTYPES: DISABLE
+
 BOOT:
     if(register_cipher(&blowfish_desc)==-1)    { croak("FATAL: cannot register_cipher blowfish"); }
     if(register_cipher(&rc5_desc)==-1)         { croak("FATAL: cannot register_cipher rc5"); }

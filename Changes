@@ -15,6 +15,7 @@ TODO:
 0.038   2016/07/XXX
         - fix issue #20 DSA/RSA/ECC/DH key2hash - hexadecimal numbers are missing leading zero
         - Math::BigInt::LTM fixed mp_invmod(a,b,c) for b == 1
+        - fix 'Please specify prototyping behavior for CryptX.xs'
 
 0.037   2016/06/16
         - fix issue #18 Minor issue with comment syntax
