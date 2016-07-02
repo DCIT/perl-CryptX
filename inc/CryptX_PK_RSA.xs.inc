@@ -92,11 +92,12 @@ SV*
 key2hash(Crypt::PK::RSA self)
     PREINIT:
         HV *rv_hash;
-        long siz;
+        long siz, nsize;
         char buf[20001];
         SV **not_used;
     CODE:
         if (self->key.type == -1 || self->key.N == NULL) XSRETURN_UNDEF;
+        nsize = mp_unsigned_bin_size(self->key.N);
         rv_hash = newHV();
         /* =====> e */
         siz = (self->key.e) ? mp_unsigned_bin_size(self->key.e) : 0;

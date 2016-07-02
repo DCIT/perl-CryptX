@@ -84,11 +84,13 @@ SV*
 key2hash(Crypt::PK::DSA self)
     PREINIT:
         HV *rv_hash;
-        long siz;
+        long siz, qsize, psize;
         char buf[20001];
         SV **not_used;
     CODE:
         if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
+        qsize = mp_unsigned_bin_size(self->key.q);
+        psize = mp_unsigned_bin_size(self->key.p);
         rv_hash = newHV();
         /* =====> g */
         siz = (self->key.g) ? mp_unsigned_bin_size(self->key.g) : 0;
@@ -132,7 +134,7 @@ key2hash(Crypt::PK::DSA self)
           croak("FATAL: key2hash failed - 'x' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.x, buf, 20000, 0);
+          mp_tohex_with_leading_zero(self->key.x, buf, 20000, qsize*2);
           not_used = hv_store(rv_hash, "x", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -144,14 +146,14 @@ key2hash(Crypt::PK::DSA self)
           croak("FATAL: key2hash failed - 'y' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.y, buf, 20000, 0);
+          mp_tohex_with_leading_zero(self->key.y, buf, 20000, psize*2);
           not_used = hv_store(rv_hash, "y", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
           not_used = hv_store(rv_hash, "y", 1, newSVpv("", 0), 0);
         }
         /* =====> size */
-        not_used = hv_store(rv_hash, "size", 4, newSViv(mp_unsigned_bin_size(self->key.q)), 0);
+        not_used = hv_store(rv_hash, "size", 4, newSViv(qsize), 0);
         /* =====> type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
         if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */
