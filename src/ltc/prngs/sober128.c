@@ -19,7 +19,7 @@
 #ifdef LTC_SOBER128
 
 #define __LTC_SOBER128TAB_C__
-#include "sober128tab.c.inc"
+#include "sober128tab.c"
 
 const struct ltc_prng_descriptor sober128_desc =
 {

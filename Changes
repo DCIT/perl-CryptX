@@ -17,6 +17,7 @@ TODO:
         - Math::BigInt::LTM fixed mp_invmod(a,b,c) for b == 1
         - Math::BigInt::LTM fixed _log_int()
         - fix 'Please specify prototyping behavior for CryptX.xs'
+        - libtomcrypt (renaming *tab.c > *tab.c.inc not needed anymore)
 
 0.037   2016/06/16
         - fix issue #18 Minor issue with comment syntax

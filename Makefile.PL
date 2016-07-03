@@ -3,7 +3,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 
-my @myobjs = map { s|.c$|$Config{obj_ext}|; $_ } (
+my @myobjs = map { s|.c$|$Config{obj_ext}|; $_ } grep { $_ !~ m|^src/ltc/\.*tab\.c$| } (
     glob('src/ltm/*.c'),
     glob('src/ltc/*/*.c'),
     glob('src/ltc/*/*/*.c'),

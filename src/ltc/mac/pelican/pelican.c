@@ -20,7 +20,7 @@
 #define __LTC_AES_TAB_C__
 #define ENCRYPT_ONLY
 #define PELI_TAB
-#include "../../ciphers/aes/aes_tab.c.inc"
+#include "../../ciphers/aes/aes_tab.c"
 
 /**
    Initialize a Pelican state

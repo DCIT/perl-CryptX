@@ -33,7 +33,7 @@
 #ifdef LTC_SAFER
 
 #define __LTC_SAFER_TAB_C__
-#include "safer_tab.c.inc"
+#include "safer_tab.c"
 
 const struct ltc_cipher_descriptor
    safer_k64_desc = {
