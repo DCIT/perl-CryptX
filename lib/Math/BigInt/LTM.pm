@@ -118,73 +118,75 @@ sub _nok {
 # based on _log_int() in Math::BigInt::GMP
 
 sub _log_int {
-  my ($c,$x,$base) = @_;
+  my ($c, $x, $base) = @_;
 
   # X == 0 => NaN
-  return if _is_zero($c,$x);
+  return if _is_zero($c, $x);
 
-  $base = _new($c,2) unless defined $base;
-  $base = _new($c,$base) unless ref $base;
+  $base = _new($c, 2)     unless defined $base;
+  $base = _new($c, $base) unless ref $base;
 
   # BASE 0 or 1 => NaN
-  return if (_is_zero($c, $base) ||
-             _is_one($c, $base));
+  return if _is_zero($c, $base) || _is_one($c, $base);
 
-  my $cmp = _acmp($c,$x,$base);         # X == BASE => 1
+  # X == 1 => 0 (is exact)
+  if (_is_one($c, $x)) {
+      _set($c, $x, 0);
+      return $x, 1;
+  }
+
+  my $cmp = _acmp($c, $x, $base);
+
+  # X == BASE => 1 (is exact)
   if ($cmp == 0) {
-    # return one
-    return (_one($c), 1);
+      _set($c, $x, 1);
+      return $x, 1;
   }
-  # X < BASE
+
+  # 1 < X < BASE => 0 (is truncated)
   if ($cmp < 0) {
-    return (_zero($c),undef);
+      _set($c, $x, 0);
+      return $x, 0;
   }
+
+  my $x_org = _copy($c, $x);
+
+  # Alternative 1:
 
   # Compute a guess for the result based on:
-  # $guess = int ( length_in_base_10(X) / ( log(base) / log(10) ) )
-  my $len = _len($c,$x);
-  my $log = log( _str($c,$base) ) / log(10);
+  # $guess = int( length_in_base_10(X) / ( log(base) / log(10) ) )
 
-  # calculate now a guess based on the values obtained above:
-  my $x_org = _copy($c,$x);
+  my $len = _alen($c, $x);
+  my $log = log(_num($c, $base)) / log(10);
 
-  # keep the reference to $x, modifying it in place
   _set($c, $x, int($len / $log) - 1);
 
-  my $trial = _pow ($c, _copy($c, $base), $x);
-  my $a = _acmp($c,$trial,$x_org);
+  my $trial = _pow($c, _copy($c, $base), $x);
+  my $acmp  = _acmp($c, $trial, $x_org);
 
-  if ($a == 0) {
-    return ($x,1);
-  }
-  elsif ($a > 0) {
-    # too big, shouldn't happen
-    _div($c,$trial,$base); _dec($c, $x);
-  }
+  # Exact result?
 
-  # find the real result by going forward:
-  my $base_mul = _mul($c, _copy($c,$base), $base);
-  my $two = _two($c);
+  return $x, 1 if $acmp == 0;
 
-  while (($a = _acmp($c, $trial, $x_org)) < 0) {
-    _mul($c,$trial,$base_mul); _add($c, $x, $two);
+  # Too small?
+
+  while ($acmp < 0) {
+      _mul($c, $trial, $base);
+      _inc($c, $x);
+      $acmp = _acmp($c, $trial, $x_org);
   }
 
-  my $exact = 1;
-  if ($a > 0) {
-    # overstepped the result
-    _dec($c, $x);
-    _div($c,$trial,$base);
-    $a = _acmp($c,$trial,$x_org);
-    if ($a > 0) {
+  # Too big?
+
+  while ($acmp > 0) {
+      _div($c, $trial, $base);
       _dec($c, $x);
-    }
-    $exact = 0 if $a != 0;
+      $acmp = _acmp($c, $trial, $x_org);
   }
 
-  return ($x, $exact);
+  return $x, 1 if $acmp == 0;         # result is exact
+  return $x, 0;                       # result is too small
 }
-
 1;
 
 __END__
