@@ -135,7 +135,7 @@ sub _check_len {
     } else {
         # equal or at most one bigger
         print STDERR "# $len $y". $C->$m($x). "\n" unless
-          ok($len - $C->$m($x) <= 1, 1);
+          ok($len >= $C->$m($x), 1);
     }
 }
 

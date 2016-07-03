@@ -16,6 +16,7 @@ TODO:
         - fix issue #20 DSA/RSA/ECC/DH key2hash - hexadecimal numbers are missing leading zero
         - Math::BigInt::LTM fixed mp_invmod(a,b,c) for b == 1
         - Math::BigInt::LTM fixed _log_int()
+        - Math::BigInt::LTM fixed _alen()
         - fix 'Please specify prototyping behavior for CryptX.xs'
         - libtomcrypt (renaming *tab.c > *tab.c.inc not needed anymore)
 

@@ -188,11 +188,14 @@ _len(Class, Math::BigInt::LTM n)
 
 ##############################################################################
 # _alen() - return the approx. length of the number in base 10 (fast)
-
+# _alen() might underestimate, but never overestimate the true value
 int
 _alen(Class, Math::BigInt::LTM n)
+  PREINIT:
+    int bits;
   CODE:
-    RETVAL = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
+    bits = mp_count_bits(n);
+    RETVAL = (bits < 5) ? 1 : bits / 4;
   OUTPUT:
     RETVAL
 

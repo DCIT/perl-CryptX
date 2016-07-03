@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    plan skip_all => 'set TEST_MBI_LTM_BIGFLTPM to enable this test' unless $ENV{TEST_MBI_LTM_BIGFLTPM};
+    plan skip_all => "requires Math::BigFloat 1.999715+" unless eval { require Math::BigFloat && eval($Math::BigFloat::VERSION) >= 1.999715 };
     plan tests => 2409            # tests in require'd file
                   + 5;            # tests in this file
 }
