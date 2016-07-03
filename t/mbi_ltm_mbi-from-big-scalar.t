@@ -13,6 +13,7 @@ my $use64;
 BEGIN {
   plan skip_all => "requires Math::BigInt 1.999712+" unless eval { require Math::BigInt && eval($Math::BigInt::VERSION) >= 1.999712 };
   # Don't run these tests unless we have proper 64-bit support.
+  plan skip_all => "missing 64bit int support" if $Config{ivsize} < 8;
   $use64    = ~0 > 4294967295;
   my $broken64 = (18446744073709550592 == ~0);
   if ($broken64) {
