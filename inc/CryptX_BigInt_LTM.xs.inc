@@ -195,7 +195,12 @@ _alen(Class, Math::BigInt::LTM n)
     int bits;
   CODE:
     bits = mp_count_bits(n);
-    RETVAL = (bits < 5) ? 1 : bits / 4;
+    /* alen = round(bits * log(2) / log(10)) */
+    RETVAL = (bits < 5) ? 1 : (int)(bits * 0.301029995663 + 0.499999999999);
+    /* less accurate approximation, but without floating-point calculations
+       RETVAL = (bits < 5) ? 1 : bits / 4 + bits / 32 + bits / 64 + bits / 256;
+       RETVAL = (bits < 5) ? 1 : bits / 4;
+    */
   OUTPUT:
     RETVAL
 
