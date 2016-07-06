@@ -159,7 +159,7 @@ You can export selected functions:
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Mode::CCM|Crypt::Mode::CCM>, L<Crypt::Mode::GCM|Crypt::Mode::GCM>, L<Crypt::Mode::EAX|Crypt::Mode::EAX>
+=item * L<CryptX|CryptX>, L<Crypt::AuthEnc::CCM|Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::GCM|Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::EAX|Crypt::AuthEnc::EAX>
 
 =item * L<https://en.wikipedia.org/wiki/OCB_mode|https://en.wikipedia.org/wiki/OCB_mode>
 
