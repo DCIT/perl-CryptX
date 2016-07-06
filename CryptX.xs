@@ -27,6 +27,7 @@ typedef struct digest_struct {          /* used by Crypt::Digest */
 } *Crypt__Digest;
 
 typedef struct ccm_struct {             /* used by Crypt::AuthEnc::CCM */
+  ccm_state state;
   int id;
 } *Crypt__AuthEnc__CCM;
 
