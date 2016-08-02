@@ -102,6 +102,20 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
   #endif
 #endif
 
+/* detect Apple OS X */
+#if defined(__APPLE__) && defined(__MACH__)
+  #if defined(__LITTLE_ENDIAN__) || defined(__x86_64__)
+    #define ENDIAN_LITTLE
+  #else
+    #define ENDIAN_BIG
+  #endif
+  #if defined(__LP64__) || defined(__x86_64__)
+    #define ENDIAN_64BITWORD
+  #else
+    #define ENDIAN_32BITWORD
+  #endif
+#endif
+
 /* fix for MSVC ...evil! */
 #ifdef _MSC_VER
    #define CONST64(n) n ## ui64
