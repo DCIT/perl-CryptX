@@ -11,6 +11,9 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.039   2016/08/02
+        - fix build troubles for MacOS / PPC
+
 0.038   2016/07/06
         - fix issue #20 DSA/RSA/ECC/DH key2hash - hexadecimal numbers are missing leading zero
         - Math::BigInt::LTM fixed mp_invmod(a,b,c) for b == 1
