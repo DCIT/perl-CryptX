@@ -179,7 +179,7 @@ key2hash(Crypt::PK::ECC self)
           {
             int i;
             SV *name;
-            unsigned char *name_ptr;
+            char *name_ptr;
             STRLEN name_len;
 
             name = newSVpv(self->key.dp->name,  strlen(self->key.dp->name));

@@ -179,7 +179,7 @@ error:
 
 int dh_make_key_ex_main(prng_state *prng, int wprng, dh_key *key)
 {
-   unsigned char *buf;
+   unsigned char *buf = NULL;
    int err, keysize;
 
    LTC_ARGCHK(key != NULL);

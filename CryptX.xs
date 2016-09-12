@@ -176,7 +176,7 @@ typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
 } *Crypt__PK__ECC;
 
 int str_add_leading_zero(char *str, int maxlen, int minlen) {
-  int rv, len;
+  int len;
   len = strlen(str);
   if (len > 0 && len % 2 && len < maxlen-2) {
     memmove(str+1, str, len+1); /* incl. NUL byte */
@@ -191,7 +191,7 @@ int str_add_leading_zero(char *str, int maxlen, int minlen) {
 }
 
 int mp_tohex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
-  int rv, len;
+  int rv;
   if (mp_isneg(a) == MP_YES) {
     *str = '\0';
     return MP_VAL;
@@ -216,7 +216,7 @@ ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
 {
   HV *h;
   SV *param, **pref;
-  SV **sv_cofactor, **sv_prime, **sv_A, **sv_B, **sv_order, **sv_Gx, **sv_Gy, **sv_oid;
+  SV **sv_cofactor, **sv_prime, **sv_A, **sv_B, **sv_order, **sv_Gx, **sv_Gy;
   int err;
   char *ch_name;
   STRLEN l_name;

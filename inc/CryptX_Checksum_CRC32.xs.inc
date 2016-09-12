@@ -1,7 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Checksum::CRC32
 
 Crypt::Checksum::CRC32
-new(SV *class)
+new(Class)
     CODE:
         Newz(0, RETVAL, 1, crc32_state);
         if (!RETVAL) croak("FATAL: Newz failed");

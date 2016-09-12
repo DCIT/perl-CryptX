@@ -3,44 +3,44 @@
 
 /* macros for various libc functions you can change for embedded targets */
 #ifndef XMALLOC
-   #ifdef malloc
+   #if !defined(LTC_NO_PROTOTYPES) && defined(malloc)
    #define LTC_NO_PROTOTYPES
    #endif
 #define XMALLOC  malloc
 #endif
 #ifndef XREALLOC
-   #ifdef realloc
+   #if !defined(LTC_NO_PROTOTYPES) && defined(realloc)
    #define LTC_NO_PROTOTYPES
    #endif
 #define XREALLOC realloc
 #endif
 #ifndef XCALLOC
-   #ifdef calloc
+   #if !defined(LTC_NO_PROTOTYPES) && defined(calloc)
    #define LTC_NO_PROTOTYPES
    #endif
 #define XCALLOC  calloc
 #endif
 #ifndef XFREE
-   #ifdef free
+   #if !defined(LTC_NO_PROTOTYPES) && defined(free)
    #define LTC_NO_PROTOTYPES
    #endif
 #define XFREE    free
 #endif
 
 #ifndef XMEMSET
-   #ifdef memset
+   #if !defined(LTC_NO_PROTOTYPES) && defined(memset)
    #define LTC_NO_PROTOTYPES
    #endif
 #define XMEMSET  memset
 #endif
 #ifndef XMEMCPY
-   #ifdef memcpy
+   #if !defined(LTC_NO_PROTOTYPES) && defined(memcpy)
    #define LTC_NO_PROTOTYPES
    #endif
 #define XMEMCPY  memcpy
 #endif
 #ifndef XMEMCMP
-   #ifdef memcmp
+   #if !defined(LTC_NO_PROTOTYPES) && defined(memcmp)
    #define LTC_NO_PROTOTYPES
    #endif
 #define XMEMCMP  memcmp
@@ -49,7 +49,7 @@
 #define XMEM_NEQ  mem_neq
 #endif
 #ifndef XSTRCMP
-   #ifdef strcmp
+   #if !defined(LTC_NO_PROTOTYPES) && defined(strcmp)
    #define LTC_NO_PROTOTYPES
    #endif
 #define XSTRCMP strcmp
@@ -63,7 +63,7 @@
 #endif
 
 #ifndef XQSORT
-   #ifdef qsort
+   #if !defined(LTC_NO_PROTOTYPES) && defined(qsort)
    #define LTC_NO_PROTOTYPES
    #endif
 #define XQSORT qsort

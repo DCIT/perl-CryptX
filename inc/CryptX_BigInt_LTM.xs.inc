@@ -313,7 +313,7 @@ _modpow(Class, Math::BigInt::LTM n, Math::BigInt::LTM exp, Math::BigInt::LTM mod
 void
 _modinv(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
   PREINIT:
-    int rc, sign;
+    int rc;
     SV* s;
     mp_int* RETVAL;
   PPCODE:
@@ -610,10 +610,10 @@ STORABLE_thaw(blank_obj, cloning, serialized, ...)
     SV *cloning = NO_INIT
     SV *serialized
   PREINIT:
-    SV *target, *tmp;
+    SV *target;
     mp_int *mpi;
-    mp_int *mpitmp;
   PPCODE:
+    PERL_UNUSED_VAR(cloning);
     if (SvROK(blank_obj) && sv_isa(blank_obj, "Math::BigInt::LTM")) {
         Newz(0, mpi, 1, mp_int);
         mp_init(mpi);
@@ -635,6 +635,7 @@ STORABLE_freeze(self, cloning = NULL)
     unsigned long len;
     char *buf;
   CODE:
+    PERL_UNUSED_VAR(cloning);
     if (mp_iszero(self) == MP_YES) {
       RETVAL = newSVpv("0", 0);
     }

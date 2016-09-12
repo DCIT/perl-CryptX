@@ -424,7 +424,7 @@ int dh_verify_hash(const unsigned char *sig, unsigned long siglen,
                    const unsigned char *hash, unsigned long hashlen,
                          int *stat, dh_key *key)
 {
-   void        *a, *b, *p, *g, *m, *tmp;
+   void        *a, *b, *m, *tmp;
    unsigned long x, y;
    int           err;
 

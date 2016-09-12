@@ -124,7 +124,7 @@ key2hash(Crypt::PK::RSA self)
           not_used = hv_store(rv_hash, "d", 1, newSVpv("", 0), 0);
         }
         /* =====> N */
-        siz = (self->key.N) ? mp_unsigned_bin_size(self->key.N) : 0;
+        siz = (self->key.N) ? nsize : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'N' too big number");
         }
@@ -196,7 +196,7 @@ key2hash(Crypt::PK::RSA self)
           not_used = hv_store(rv_hash, "dQ", 2, newSVpv("", 0), 0);
         }
         /* =====> size */
-        not_used = hv_store(rv_hash, "size", 4, newSViv(mp_unsigned_bin_size(self->key.N)), 0);
+        not_used = hv_store(rv_hash, "size", 4, newSViv(nsize), 0);
         /* =====> type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
         if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */

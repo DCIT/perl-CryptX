@@ -1,7 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Checksum::Adler32
 
 Crypt::Checksum::Adler32
-new(SV *class)
+new(Class)
     CODE:
         Newz(0, RETVAL, 1, adler32_state);
         if (!RETVAL) croak("FATAL: Newz failed");
