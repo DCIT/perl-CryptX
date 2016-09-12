@@ -11,6 +11,10 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.040   2016/09/12
+        - fix file permissions
+        - fix compiler warnings
+
 0.039   2016/08/02
         - fix build troubles for MacOS / PPC
 
