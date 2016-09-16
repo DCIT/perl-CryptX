@@ -53,7 +53,10 @@ int dsa_verify_hash_raw(         void   *r,          void   *s,
       err = CRYPT_INVALID_PACKET;
       goto error;
    }
-   
+
+   /* FIPS 186-4 4.7: use leftmost min(bitlen(q), bitlen(hash)) bits of 'hash' */
+   if (hashlen > key->qord) hashlen = key->qord;
+
    /* w = 1/s mod q */
    if ((err = mp_invmod(s, key->q, w)) != CRYPT_OK)                                       { goto error; }
 
