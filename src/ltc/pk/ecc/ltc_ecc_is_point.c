@@ -68,7 +68,7 @@ int ltc_ecc_is_point(const ltc_ecc_set_type *dp, void *x, void *y)
   }
 
 cleanup:
-  mp_clear_multi(prime, b, t1, t2, NULL);
+  mp_clear_multi(prime, a, b, t1, t2, NULL);
   return err;
 }
 

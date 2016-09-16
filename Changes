@@ -11,6 +11,9 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.041   2016/XX/XX
+        - ltc_ecc_is_point memory leak
+
 0.040   2016/09/12
         - fix file permissions
         - fix compiler warnings
