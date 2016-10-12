@@ -11,7 +11,7 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
-0.041   2016/XX/XX
+0.041   2016/10/12
         - ECC: ltc_ecc_is_point memory leak
         - DSA: properly handle FIPS 186-4 (4.6 + 4.7)
         - GCM: counter incrementation isn't stopped at 2^32 blocks, which breaks GCM
