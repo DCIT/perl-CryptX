@@ -39,16 +39,37 @@ WriteMakefile(%eumm_args);
 # ARFLAGS=\$(AR_STATIC_ARGS) RANLIB=\$(RANLIB) AR=\$(AR)
 
 sub MY::postamble {
-return qq{
-\$(MYEXTLIB): src/Makefile
-	cd src && \$(MAKE) -f Makefile.nmake CFLAGS="$mycflags"
-} if $^O eq 'MSWin32' && $Config{make} =~ /nmake/ && $Config{cc} =~ /cl/;
-return qq{
-\$(MYEXTLIB): src/Makefile
-	cd src && \$(MAKE) CC="$Config{cc}" CFLAGS="$mycflags"
-} if $^O eq 'MSWin32' && $Config{cc} =~ /gcc/;
-return qq{
+  my $myextlib = qq{
 \$(MYEXTLIB): src/Makefile
 	cd src && \$(MAKE) ARFLAGS="\$(AR_STATIC_ARGS)" RANLIB="\$(RANLIB)" AR="\$(AR)" CC="\$(CC)" LIB_EXT=\$(LIB_EXT) OBJ_EXT=\$(OBJ_EXT) CFLAGS="$mycflags"
 };
+
+  $myextlib = qq{
+\$(MYEXTLIB): src/Makefile
+	cd src && \$(MAKE) -f Makefile.nmake CFLAGS="$mycflags"
+} if $^O eq 'MSWin32' && $Config{make} =~ /nmake/ && $Config{cc} =~ /cl/;
+
+  $myextlib = qq{
+\$(MYEXTLIB): src/Makefile
+	cd src && \$(MAKE) CC="$Config{cc}" CFLAGS="$mycflags"
+} if $^O eq 'MSWin32' && $Config{cc} =~ /gcc/;
+
+  my $version_patch = q{
+versionsync:
+	$(NOECHO) perl _generators/version_patch.pl sync
+
+versioninc:
+	$(NOECHO) perl _generators/version_patch.pl inc
+
+versionincdev:
+	$(NOECHO) perl _generators/version_patch.pl incdev
+
+versiondec:
+	$(NOECHO) perl _generators/version_patch.pl dec
+
+versiondecdev:
+	$(NOECHO) perl _generators/version_patch.pl decdev
+};
+
+  return "$myextlib\n$version_patch";
 }

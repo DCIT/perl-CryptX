@@ -4,6 +4,7 @@ package Crypt::Digest::[%orig_name%];
 
 use strict;
 use warnings;
+our $VERSION = '0.001';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_b64 [%lc_name%]_b64u [%lc_name%]_file [%lc_name%]_file_hex [%lc_name%]_file_b64 [%lc_name%]_file_b64u )] );

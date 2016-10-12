@@ -4,6 +4,7 @@ package Crypt::Cipher::[%orig_name%];
 
 use strict;
 use warnings;
+our $VERSION = '0.001';
 
 use CryptX;
 use base 'Crypt::Cipher';

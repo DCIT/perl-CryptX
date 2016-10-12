@@ -12,7 +12,9 @@ TODO:
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
 0.041   2016/XX/XX
-        - ltc_ecc_is_point memory leak
+        - ECC: ltc_ecc_is_point memory leak
+        - DSA: properly handle FIPS 186-4 (4.6 + 4.7)
+        - fix issue #24 Crypt::PK::ECC needs $VERSION (all *.pm have $VERSION)
 
 0.040   2016/09/12
         - fix file permissions

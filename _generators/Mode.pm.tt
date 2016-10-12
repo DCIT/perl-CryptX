@@ -4,6 +4,7 @@ package Crypt::Mode::[%orig_name%];
 
 use strict;
 use warnings;
+our $VERSION = '0.001';
 
 use Crypt::Cipher;
 use base 'Crypt::Mode';
