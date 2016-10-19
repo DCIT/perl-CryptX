@@ -321,7 +321,7 @@ _decrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
         RETVAL
 
 SV *
-_sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name, unsigned long saltlen=12)
+_sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name=NULL, unsigned long saltlen=12)
     CODE:
     {
         int rv, hash_id;
@@ -333,9 +333,9 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name, unsigned
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
-        hash_id = find_hash(hash_name);
-        if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
         if (strnEQ(padding, "pss", 3)) {
+          hash_id = find_hash(hash_name);
+          if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_PSS,
                                 &self->yarrow_prng_state, self->yarrow_prng_index,
                                 hash_id, saltlen, &self->key);
@@ -343,10 +343,18 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name, unsigned
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
+          hash_id = find_hash(hash_name);
+          if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_V1_5,
                                 &self->yarrow_prng_state, self->yarrow_prng_index,
                                 hash_id, 0, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_sign_hash_ex failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)buffer, buffer_len);
+        }
+        else if (strnEQ(padding, "none", 4)) {
+          /* raw RSA */
+          rv = ltc_mp.rsa_me(data_ptr, (unsigned long)data_len, buffer, &buffer_len, PK_PRIVATE, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: rsa_me failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else {
@@ -357,30 +365,47 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name, unsigned
         RETVAL
 
 int
-_verify(Crypt::PK::RSA self, SV * sig, SV * data, char * padding, char * hash_name, unsigned long saltlen=12)
+_verify(Crypt::PK::RSA self, SV * sig, SV * data, char * padding, char * hash_name=NULL, unsigned long saltlen=12)
     CODE:
     {
-        int rv, hash_id, stat;
+        int rv, hash_id, stat, i;
         unsigned char *data_ptr=NULL;
         STRLEN data_len=0;
         unsigned char *sig_ptr=NULL;
         STRLEN sig_len=0;
+        unsigned char buffer[1024];
+        unsigned long buffer_len = 1024;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
 
         RETVAL = 1;
-        hash_id = find_hash(hash_name);
-        if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
         if (strnEQ(padding, "pss", 3)) {
+          hash_id = find_hash(hash_name);
+          if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_PKCS_1_PSS,
                                 hash_id, saltlen, &stat, &self->key);
           if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
         }
         else if (strnEQ(padding, "v1.5", 4)) {
+          hash_id = find_hash(hash_name);
+          if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_PKCS_1_V1_5,
                                 hash_id, 0, &stat, &self->key);
           if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
+        }
+        else if (strnEQ(padding, "none", 4)) {
+          /* raw RSA */
+          Zero(buffer, buffer_len, unsigned char);
+          rv = ltc_mp.rsa_me(sig_ptr, (unsigned long)sig_len, buffer, &buffer_len, PK_PUBLIC, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: rsa_me failed: %s", error_to_string(rv));
+          if (data_len <= buffer_len && buffer_len > 0 && data_len > 0) {
+            for (i = 0; i < buffer_len - data_len; i++) if (buffer[i] != 0) RETVAL = 0;
+            if (memNE(data_ptr, buffer + buffer_len - data_len, data_len)) RETVAL = 0;
+          }
+          else {
+            RETVAL = 0;
+          }
         }
         else {
           croak("FATAL: rsa_verify invalid padding '%s'", padding);

@@ -599,7 +599,7 @@ If you don't know what this is, see RFC 7638 (C<https://tools.ietf.org/html/rfc7
  #or
  my $ct = $pk->encrypt($message, 'oaep', $hash_name, $lparam);
 
- # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none'
+ # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none' (INSECURE)
  # $hash_name (only for oaep) .. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
  # $lparam (only for oaep) ..... DEFAULT is empty string
 
@@ -612,7 +612,7 @@ If you don't know what this is, see RFC 7638 (C<https://tools.ietf.org/html/rfc7
  #or
  my $pt = $pk->decrypt($ciphertext, 'oaep', $hash_name, $lparam);
 
- # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none'
+ # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none' (INSECURE)
  # $hash_name (only for oaep) .. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
  # $lparam (only for oaep) ..... DEFAULT is empty string
 
@@ -628,7 +628,7 @@ If you don't know what this is, see RFC 7638 (C<https://tools.ietf.org/html/rfc7
  my $signature = $priv->sign_message($message, $hash_name, 'pss', $saltlen);
 
  # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
  # $saltlen (only for pss) .. DEFAULT is 12
 
 =head2 verify_message
@@ -643,7 +643,7 @@ If you don't know what this is, see RFC 7638 (C<https://tools.ietf.org/html/rfc7
  my $valid = $pub->verify_message($signature, $message, $hash_name, 'pss', $saltlen);
 
  # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
  # $saltlen (only for pss) .. DEFAULT is 12
 
 =head2 sign_hash
@@ -658,7 +658,7 @@ If you don't know what this is, see RFC 7638 (C<https://tools.ietf.org/html/rfc7
  my $signature = $priv->sign_hash($message_hash, $hash_name, 'pss', $saltlen);
 
  # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
  # $saltlen (only for pss) .. DEFAULT is 12
 
 =head2 verify_hash
@@ -673,7 +673,7 @@ If you don't know what this is, see RFC 7638 (C<https://tools.ietf.org/html/rfc7
  my $valid = $pub->verify_hash($signature, $message_hash, $hash_name, 'pss', $saltlen);
 
  # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
  # $saltlen (only for pss) .. DEFAULT is 12
 
 =head2 is_private
@@ -721,7 +721,7 @@ RSA based encryption. See method L</encrypt> below.
  #or
  my $ct = rsa_encrypt($pub_key, $message, 'oaep', $hash_name, $lparam);
 
- # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none'
+ # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none' (INSECURE)
  # $hash_name (only for oaep) .. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
  # $lparam (only for oaep) ..... DEFAULT is empty string
 
@@ -737,7 +737,7 @@ RSA based decryption. See method L</decrypt> below.
  #or
  my $pt = rsa_decrypt($priv_key, $ciphertext, 'oaep', $hash_name, $lparam);
 
- # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none'
+ # $padding .................... 'oaep' (DEFAULT), 'v1.5' or 'none' (INSECURE)
  # $hash_name (only for oaep) .. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
  # $lparam (only for oaep) ..... DEFAULT is empty string
 
@@ -756,7 +756,7 @@ Generate RSA signature. See method L</sign_message> below.
  my $sig = rsa_sign_message($priv_key, $message, $hash_name, 'pss', $saltlen);
 
  # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
  # $saltlen (only for pss) .. DEFAULT is 12
 
 =head2 rsa_verify_message
@@ -774,7 +774,7 @@ Verify RSA signature. See method L</verify_message> below.
  rsa_verify_message($pub_key, $signature, $message, $hash_name, 'pss', $saltlen) or die "ERROR";
 
  # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
  # $saltlen (only for pss) .. DEFAULT is 12
 
 =head2 rsa_sign_hash
@@ -792,7 +792,7 @@ Generate RSA signature. See method L</sign_hash> below.
  my $sig = rsa_sign_hash($priv_key, $message_hash, $hash_name, 'pss', $saltlen);
 
  # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
  # $saltlen (only for pss) .. DEFAULT is 12
 
 =head2 rsa_verify_hash
@@ -810,7 +810,7 @@ Verify RSA signature. See method L</verify_hash> below.
  rsa_verify_hash($pub_key, $signature, $message_hash, $hash_name, 'pss', $saltlen) or die "ERROR";
 
  # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5'
+ # $padding ................. 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
  # $saltlen (only for pss) .. DEFAULT is 12
 
 =head1 OpenSSL interoperability
