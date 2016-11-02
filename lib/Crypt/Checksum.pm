@@ -2,7 +2,7 @@ package Crypt::Checksum;
 
 use strict;
 use warnings;
-our $VERSION = '0.041_001';
+our $VERSION = '0.041_002';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw/
