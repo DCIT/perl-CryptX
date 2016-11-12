@@ -11,7 +11,7 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
-0.041_003 2016/11/02
+0.042   2016/11/12
         - RSA: sign/verify functions now support 'none' padding (INSECURE!)
         - RC2: min keylen 40bit, used to be 64bit (INSECURE!)
 
