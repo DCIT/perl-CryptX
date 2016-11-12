@@ -4,7 +4,7 @@ package Crypt::Mode::ECB;
 
 use strict;
 use warnings;
-our $VERSION = '0.041_003';
+our $VERSION = '0.042';
 
 use Crypt::Cipher;
 use base 'Crypt::Mode';
