@@ -602,6 +602,14 @@ _root(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
+# _lcm() - least common multiple
+void
+_lcm(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
+  PPCODE:
+    mp_lcm(x, y, x) ;
+    XPUSHs(ST(1)); /* x */
+
+##############################################################################
 # Storable hooks
 
 void

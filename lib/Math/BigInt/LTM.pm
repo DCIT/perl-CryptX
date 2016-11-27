@@ -10,65 +10,308 @@ sub api_version() { 2 }
 
 sub CLONE_SKIP { 1 } # prevent cloning
 
-##############################################################################
-# routine to test internal state
+### same as overloading in Math::BigInt::Lib
+use overload
+  # overload key: with_assign
 
+  '+'    => sub {
+                my $class = ref $_[0];
+                my $x = $class -> _copy($_[0]);
+                my $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                return $class -> _add($x, $y);
+            },
+
+  '-'    => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _sub($x, $y);
+            },
+
+  '*'    => sub {
+                my $class = ref $_[0];
+                my $x = $class -> _copy($_[0]);
+                my $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                return $class -> _mul($x, $y);
+            },
+
+  '/'    => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _div($x, $y);
+            },
+
+  '%'    => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _mod($x, $y);
+            },
+
+  '**'   => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _pow($x, $y);
+            },
+
+  '<<'   => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $class -> _num($_[0]);
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $_[0];
+                    $y = ref($_[1]) ? $class -> _num($_[1]) : $_[1];
+                }
+                return $class -> _blsft($x, $y);
+            },
+
+  '>>'   => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _brsft($x, $y);
+            },
+
+  # overload key: num_comparison
+
+  '<'    => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _acmp($x, $y) < 0;
+            },
+
+  '<='   => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _acmp($x, $y) <= 0;
+            },
+
+  '>'    => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _acmp($x, $y) > 0;
+            },
+
+  '>='   => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _acmp($x, $y) >= 0;
+          },
+
+  '=='   => sub {
+                my $class = ref $_[0];
+                my $x = $class -> _copy($_[0]);
+                my $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                return $class -> _acmp($x, $y) == 0;
+            },
+
+  '!='   => sub {
+                my $class = ref $_[0];
+                my $x = $class -> _copy($_[0]);
+                my $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                return $class -> _acmp($x, $y) != 0;
+            },
+
+  # overload key: 3way_comparison
+
+  '<=>'  => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _acmp($x, $y);
+            },
+
+  # overload key: binary
+
+  '&'    => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _and($x, $y);
+            },
+
+  '|'    => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _or($x, $y);
+            },
+
+  '^'    => sub {
+                my $class = ref $_[0];
+                my ($x, $y);
+                if ($_[2]) {            # if swapped
+                    $y = $_[0];
+                    $x = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                } else {
+                    $x = $class -> _copy($_[0]);
+                    $y = ref($_[1]) ? $_[1] : $class -> _new($_[1]);
+                }
+                return $class -> _xor($x, $y);
+            },
+
+  # overload key: func
+
+  'abs'  => sub { $_[0] },
+
+  'sqrt' => sub {
+                my $class = ref $_[0];
+                return $class -> _sqrt($class -> _copy($_[0]));
+            },
+
+  'int'  => sub { $_[0] -> copy() -> bint(); },
+
+  # overload key: conversion
+
+  'bool' => sub { ref($_[0]) -> _is_zero($_[0]) ? '' : 1; },
+
+  '""'   => sub { ref($_[0]) -> _str($_[0]); },
+
+  '0+'   => sub { ref($_[0]) -> _num($_[0]); },
+
+  '='    => sub { ref($_[0]) -> _copy($_[0]); },
+
+  ;
+
+### same as import() in Math::BigInt::Lib
+sub import { }
+
+### same as _check() in Math::BigInt::Lib
 sub _check {
-  my ($c, $x) = @_;
-  return 0 if ref $x eq 'Math::BigInt::LTM';
-  return "$x is not a reference to Math::BigInt::LTM";
+  # used by the test suite
+  my ($class, $x) = @_;
+  return "Input is undefined" unless defined $x;
+  return "$x is not a reference" unless ref($x);
+  return 0;
 }
 
-##############################################################################
-# Return the nth digit, negative values count backward.
-
+### same as _digit() in Math::BigInt::Lib
 sub _digit {
-  my ($c, $x, $n) = @_;
-  substr(_str($c, $x), -($n+1), 1);
+  my ($class, $x, $n) = @_;
+  substr($class ->_str($x), -($n+1), 1);
 }
 
-##############################################################################
-# Return a Perl numerical scalar.
-
+### same as _num() in Math::BigInt::Lib
 sub _num {
-  my ($c, $x) = @_;
-  return 0 + _str($c, $x);
+  my ($class, $x) = @_;
+  0 + $class -> _str($x);
 }
 
-##############################################################################
-# _fac() - n! (factorial)
-
+### same as _fac() in Math::BigInt::Lib
 sub _fac {
-  my ($c, $x) = @_;
-  if (_is_zero($c, $x) || _is_one($c, $x)) {
-    _set($c, $x, 1);
+  # factorial
+  my ($class, $x) = @_;
+
+  my $two = $class -> _two();
+
+  if ($class -> _acmp($x, $two) < 0) {
+      return $class -> _one();
   }
-  else {
-    my $copy = _copy($c, $x);
-    my $one = _new($c, 1);
-    while(_acmp($c, $copy, $one) > 0) {
-      $copy = _dec($c, $copy);
-      $x  = _mul($c, $x, $copy);
-    }
+
+  my $i = $class -> _copy($x);
+  while ($class -> _acmp($i, $two) > 0) {
+      $i = $class -> _dec($i);
+      $x = $class -> _mul($x, $i);
   }
+
   return $x;
 }
 
-##############################################################################
-# Return binomial coefficient (n over k).
-# based on _nok() in Math::BigInt::GMP
-
+### same as _nok() in Math::BigInt::Lib
 sub _nok {
+  # Return binomial coefficient (n over k).
+  # Given refs to arrays, return ref to array.
   # First input argument is modified.
-  my ($c, $n, $k) = @_;
+
+  my ($class, $n, $k) = @_;
 
   # If k > n/2, or, equivalently, 2*k > n, compute nok(n, k) as
   # nok(n, n-k), to minimize the number if iterations in the loop.
 
   {
-      my $twok = _mul($c, _two($c), _copy($c, $k));   # 2 * k
-      if (_acmp($c, $twok, $n) > 0) {                 # if 2*k > n
-          $k = _sub($c, _copy($c, $n), $k);           # k = n - k
+      my $twok = $class -> _mul($class -> _two(), $class -> _copy($k));
+      if ($class -> _acmp($twok, $n) > 0) {
+          $k = $class -> _sub($class -> _copy($n), $k);
       }
   }
 
@@ -78,116 +321,118 @@ sub _nok {
   # |   | = --------- =  --------------- = --------- = 5 * - * -
   # \ 3 /   (7-3)! 3!    1*2*3*4 * 1*2*3   1 * 2 * 3       2   3
 
-  if (_is_zero($c, $k)) {
-      $n = _one($c);
-      return $n;
+  if ($class -> _is_zero($k)) {
+      return $class -> _one();
   }
 
   # Make a copy of the original n, since we'll be modifying n in-place.
 
-  my $n_orig = _copy($c, $n);
+  my $n_orig = $class -> _copy($n);
 
   # n = 5, f = 6, d = 2 (cf. example above)
 
-  _sub($c, $n, $k);
-  _inc($c, $n);
+  $n = $class -> _sub($n, $k);
+  $n = $class -> _inc($n);
 
-  my $f = _copy($c, $n);
-  _inc($c, $f);
+  my $f = $class -> _copy($n);
+  $class -> _inc($f);
 
-  my $d = _two($c);
+  my $d = $class -> _two();
 
   # while f <= n (the original n, that is) ...
 
-  while (_acmp($c, $f, $n_orig) <= 0) {
+  while ($class -> _acmp($f, $n_orig) <= 0) {
 
       # n = (n * f / d) == 5 * 6 / 2 (cf. example above)
 
-      _mul($c, $n, $f);
-      _div($c, $n, $d);
+      $n = $class -> _mul($n, $f);
+      $n = $class -> _div($n, $d);
 
       # f = 7, d = 3 (cf. example above)
 
-      _inc($c, $f);
-      _inc($c, $d);
+      $f = $class -> _inc($f);
+      $d = $class -> _inc($d);
   }
 
   return $n;
 }
 
-##############################################################################
-# based on _log_int() in Math::BigInt::GMP
-
+### same as _log_int() in Math::BigInt::Lib
 sub _log_int {
-  my ($c, $x, $base) = @_;
+  # calculate integer log of $x to base $base
+  # ref to array, ref to array - return ref to array
+  my ($class, $x, $base) = @_;
 
   # X == 0 => NaN
-  return if _is_zero($c, $x);
+  return if $class -> _is_zero($x);
 
-  $base = _new($c, 2)     unless defined $base;
-  $base = _new($c, $base) unless ref $base;
+  $base = $class -> _new(2)     unless defined($base);
+  $base = $class -> _new($base) unless ref($base);
 
   # BASE 0 or 1 => NaN
-  return if _is_zero($c, $base) || _is_one($c, $base);
+  return if $class -> _is_zero($base) || $class -> _is_one($base);
 
   # X == 1 => 0 (is exact)
-  if (_is_one($c, $x)) {
-      _set($c, $x, 0);
-      return $x, 1;
+  if ($class -> _is_one($x)) {
+      return $class -> _zero(), 1;
   }
 
-  my $cmp = _acmp($c, $x, $base);
+  my $cmp = $class -> _acmp($x, $base);
 
   # X == BASE => 1 (is exact)
   if ($cmp == 0) {
-      _set($c, $x, 1);
-      return $x, 1;
+      return $class -> _one(), 1;
   }
 
   # 1 < X < BASE => 0 (is truncated)
   if ($cmp < 0) {
-      _set($c, $x, 0);
-      return $x, 0;
+      return $class -> _zero(), 0;
   }
 
-  my $x_org = _copy($c, $x);
+  my $y;
 
-  # Alternative 1:
+  # log(x) / log(b) = log(xm * 10^xe) / log(bm * 10^be)
+  #                 = (log(xm) + xe*(log(10))) / (log(bm) + be*log(10))
 
-  # Compute a guess for the result based on:
-  # $guess = int( length_in_base_10(X) / ( log(base) / log(10) ) )
+  {
+      my $x_str = $class -> _str($x);
+      my $b_str = $class -> _str($base);
+      my $xm    = "." . $x_str;
+      my $bm    = "." . $b_str;
+      my $xe    = length($x_str);
+      my $be    = length($b_str);
+      my $log10 = log(10);
+      my $guess = int((log($xm) + $xe * $log10) / (log($bm) + $be * $log10));
+      $y = $class -> _new($guess);
+  }
 
-  my $len = _alen($c, $x);
-  my $log = log(_num($c, $base)) / log(10);
+  my $trial = $class -> _pow($class -> _copy($base), $y);
+  my $acmp  = $class -> _acmp($trial, $x);
 
-  _set($c, $x, int($len / $log) - 1);
+  # Did we get the exact result?
 
-  my $trial = _pow($c, _copy($c, $base), $x);
-  my $acmp  = _acmp($c, $trial, $x_org);
-
-  # Exact result?
-
-  return $x, 1 if $acmp == 0;
+  return $y, 1 if $acmp == 0;
 
   # Too small?
 
   while ($acmp < 0) {
-      _mul($c, $trial, $base);
-      _inc($c, $x);
-      $acmp = _acmp($c, $trial, $x_org);
+      $trial = $class -> _mul($trial, $base);
+      $y     = $class -> _inc($y);
+      $acmp  = $class -> _acmp($trial, $x);
   }
 
   # Too big?
 
   while ($acmp > 0) {
-      _div($c, $trial, $base);
-      _dec($c, $x);
-      $acmp = _acmp($c, $trial, $x_org);
+      $trial = $class -> _div($trial, $base);
+      $y     = $class -> _dec($y);
+      $acmp  = $class -> _acmp($trial, $x);
   }
 
-  return $x, 1 if $acmp == 0;         # result is exact
-  return $x, 0;                       # result is too small
+  return $y, 1 if $acmp == 0;         # result is exact
+  return $y, 0;                       # result is too small
 }
+
 1;
 
 __END__

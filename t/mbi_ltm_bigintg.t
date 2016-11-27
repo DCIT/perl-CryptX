@@ -479,14 +479,14 @@ $x = $C->_new("81");
 
 my ($r, $exact) = $C->_log_int($x, $C->_new("3"));
 ok($C->_str($r), '4');
-ok($C->_str($x), '4');
+ok($C->_str($x) eq '81' || $C->_str($x) eq '4');
 ok($exact, 1);
 
 $x = $C->_new("81");
 
 ($r, $exact) = $C->_log_int($x, 3);
 ok($C->_str($r), '4');
-ok($C->_str($x), '4');
+ok($C->_str($x) eq '81' || $C->_str($x) eq '4');
 ok($exact, 1);
 
 ###############################################################################
@@ -558,7 +558,7 @@ ok($C->_str($C->_1ex(16)), "10000000000000000");
 
 $x = $C->_new("123456789");
 ok($C->_check($x), 0);
-ok($C->_check(123), '123 is not a reference to Math::BigInt::LTM');
+ok($C->_check(123), '123 is not a reference');
 
 # done
 
