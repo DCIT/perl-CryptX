@@ -11,6 +11,9 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.044   2016/11/28
+        - fix #27 Math::BigInt::LTM compatibility with older Math::BigInt
+
 0.043   2016/11/27
         - fix #26 Math::BigInt::LTM compatibility with Math::BigInt 1.999801+
 
