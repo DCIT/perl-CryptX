@@ -277,7 +277,7 @@ sub _num {
   0 + $class -> _str($x);
 }
 
-### same as _fac() in Math::BigInt::Lib
+### BEWARE!!! NOT THE SAME as _fac() in Math::BigInt::Lib
 sub _fac {
   # factorial
   my ($class, $x) = @_;
@@ -285,7 +285,8 @@ sub _fac {
   my $two = $class -> _two();
 
   if ($class -> _acmp($x, $two) < 0) {
-      return $class -> _one();
+      $class->_set($x, 1);
+      return $x;
   }
 
   my $i = $class -> _copy($x);
