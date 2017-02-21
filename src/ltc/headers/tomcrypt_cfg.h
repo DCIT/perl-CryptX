@@ -125,10 +125,17 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
    typedef unsigned long long ulong64;
 #endif
 
+/* SolarisStudio does not have __arch64__ */
+#ifndef __arch64__
+   #if defined(__sparc) && defined(__sparcv9)
+      #define __arch64__   
+   #endif
+#endif
+
 /* this is the "32-bit at least" data type
  * Re-define it to suit your platform but it must be at least 32-bits
  */
-#if defined(__x86_64__) || (defined(__sparc__) && defined(__arch64__)) || defined(__ia64) || defined(__ia64__) || defined(__LP64__)
+#if defined(__x86_64__) || ((defined(__sparc__) || defined(__sparc)) && defined(__arch64__)) || defined(__ia64) || defined(__ia64__) || defined(__LP64__)
    typedef unsigned ulong32;
 #else
    typedef unsigned long ulong32;
@@ -147,7 +154,7 @@ typedef ulong32 __attribute__((__may_alias__)) LTC_FAST_TYPE;
 #endif
 
 /* detect sparc and sparc64 */
-#if defined(__sparc__)
+#if defined(__sparc__) || defined(__sparc)
   #define ENDIAN_BIG
   #if defined(__arch64__)
     #define ENDIAN_64BITWORD
