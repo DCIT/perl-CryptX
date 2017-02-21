@@ -71,7 +71,7 @@ ltc/pk/asn1/der/utctime/der_encode_utctime.o ltc/pk/asn1/der/utctime/der_length_
 ltc/pk/asn1/der/utf8/der_decode_utf8_string.o ltc/pk/asn1/der/utf8/der_encode_utf8_string.o \
 ltc/pk/asn1/der/utf8/der_length_utf8_string.o ltc/pk/dh/dh.o ltc/pk/dh/dh_static.o ltc/pk/dh/dh_sys.o \
 ltc/pk/dsa/dsa_decrypt_key.o ltc/pk/dsa/dsa_encrypt_key.o ltc/pk/dsa/dsa_export.o ltc/pk/dsa/dsa_free.o \
-ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_import_hex.o ltc/pk/dsa/dsa_make_key.o ltc/pk/dsa/dsa_shared_secret.o \
+ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_import_radix.o ltc/pk/dsa/dsa_make_key.o ltc/pk/dsa/dsa_shared_secret.o \
 ltc/pk/dsa/dsa_sign_hash.o ltc/pk/dsa/dsa_verify_hash.o ltc/pk/dsa/dsa_verify_key.o ltc/pk/ecc/ecc.o \
 ltc/pk/ecc/ecc_ansi_x963_export.o ltc/pk/ecc/ecc_ansi_x963_import.o ltc/pk/ecc/ecc_decrypt_key.o \
 ltc/pk/ecc/ecc_dp_clear.o ltc/pk/ecc/ecc_dp_fill_from_sets.o ltc/pk/ecc/ecc_dp_from_oid.o \
@@ -88,7 +88,7 @@ ltc/pk/pkcs1/pkcs_1_oaep_decode.o ltc/pk/pkcs1/pkcs_1_oaep_encode.o ltc/pk/pkcs1
 ltc/pk/pkcs1/pkcs_1_pss_decode.o ltc/pk/pkcs1/pkcs_1_pss_encode.o ltc/pk/pkcs1/pkcs_1_v1_5_decode.o \
 ltc/pk/pkcs1/pkcs_1_v1_5_encode.o ltc/pk/rsa/rsa_decrypt_key.o ltc/pk/rsa/rsa_encrypt_key.o ltc/pk/rsa/rsa_export.o \
 ltc/pk/rsa/rsa_exptmod.o ltc/pk/rsa/rsa_free.o ltc/pk/rsa/rsa_get_size.o ltc/pk/rsa/rsa_import.o \
-ltc/pk/rsa/rsa_import_hex.o ltc/pk/rsa/rsa_import_pkcs8.o ltc/pk/rsa/rsa_make_key.o ltc/pk/rsa/rsa_sign_hash.o \
+ltc/pk/rsa/rsa_import_radix.o ltc/pk/rsa/rsa_import_pkcs8.o ltc/pk/rsa/rsa_make_key.o ltc/pk/rsa/rsa_sign_hash.o \
 ltc/pk/rsa/rsa_sign_saltlen_get.o ltc/pk/rsa/rsa_verify_hash.o ltc/prngs/fortuna.o ltc/prngs/rc4.o \
 ltc/prngs/rng_get_bytes.o ltc/prngs/rng_make_prng.o ltc/prngs/sober128.o ltc/prngs/sprng.o ltc/prngs/yarrow.o \
 ltm/bn_error.o ltm/bn_fast_mp_invmod.o ltm/bn_fast_mp_montgomery_reduce.o ltm/bn_fast_s_mp_mul_digs.o \

@@ -111,7 +111,7 @@ int rsa_sign_saltlen_get_max_ex(int padding, int hash_idx, rsa_key *key);
 int rsa_export(unsigned char *out, unsigned long *outlen, int type, rsa_key *key);
 int rsa_import(const unsigned char *in, unsigned long inlen, rsa_key *key);
 int rsa_import_pkcs8(unsigned char *in, unsigned long inlen, rsa_key *key);
-int rsa_import_hex(char *N, char *e, char *d, char *p, char *q, char *dP, char *dQ, char *qP, rsa_key *key);
+int rsa_import_radix(int radix, char *N, char *e, char *d, char *p, char *q, char *dP, char *dQ, char *qP, rsa_key *key);
 
 #endif
 
@@ -474,7 +474,7 @@ int dsa_decrypt_key(const unsigned char *in,  unsigned long  inlen,
                           dsa_key *key);
 
 int dsa_import(const unsigned char *in, unsigned long inlen, dsa_key *key);
-int dsa_import_hex(char *p, char *q, char *g, char *x, char *y, dsa_key *key);
+int dsa_import_radix(int radix, char *p, char *q, char *g, char *x, char *y, dsa_key *key);
 int dsa_export(unsigned char *out, unsigned long *outlen, int type, dsa_key *key);
 int dsa_verify_key(dsa_key *key, int *stat);
 

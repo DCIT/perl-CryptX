@@ -67,8 +67,8 @@ _import_hex(Crypt::PK::RSA self, char *N, char *e, char *d=NULL, char *p=NULL, c
     {
         int rv;
         if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
-        rv = rsa_import_hex(N, e, d, p, q, dP, dQ, qP, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: rsa_import_hex failed: %s", error_to_string(rv));
+        rv = rsa_import_radix(16, N, e, d, p, q, dP, dQ, qP, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: rsa_import_radix failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
 

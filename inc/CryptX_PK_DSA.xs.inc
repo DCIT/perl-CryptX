@@ -51,8 +51,8 @@ _import_hex(Crypt::PK::DSA self, char *p, char *q, char *g, char *x, char *y)
     {
         int rv;
         if (self->key.type != -1) { dsa_free(&self->key); self->key.type = -1; }
-        rv = dsa_import_hex(p, q, g, x, y, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: dsa_import_hex failed: %s", error_to_string(rv));
+        rv = dsa_import_radix(16, p, q, g, x, y, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: dsa_import_radix failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
 

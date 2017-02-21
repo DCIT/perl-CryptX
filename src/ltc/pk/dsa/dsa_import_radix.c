@@ -11,15 +11,22 @@
 #include "tomcrypt.h"
 
 /**
-   @file dsa_import_hex.c
-   DSA implementation, import a DSA key
+  Import DSA public or private key from raw numbers
+  @param radix   the radix the numbers are represented in (2-64, 16 = hexadecimal)
+  @param p       DSA's p  in radix representation
+  @param q       DSA's q  in radix representation
+  @param g       DSA's g  in radix representation
+  @param x       DSA's x  in radix representation (only private key, NULL for public key)
+  @param y       DSA's y  in radix representation
+  @param key     [out] the destination for the imported key
+  @return CRYPT_OK if successful, upon error allocated memory is freed
 */
 
 #ifdef LTC_MDSA
 
-int dsa_import_hex(char *p, char *q, char *g, char *x, char *y, dsa_key *key)
+int dsa_import_radix(int radix, char *p, char *q, char *g, char *x, char *y, dsa_key *key)
 {
-   int           err;
+   int err;
 
    LTC_ARGCHK(p != NULL);
    LTC_ARGCHK(q != NULL);
@@ -31,16 +38,16 @@ int dsa_import_hex(char *p, char *q, char *g, char *x, char *y, dsa_key *key)
    err = mp_init_multi(&key->p, &key->g, &key->q, &key->x, &key->y, NULL);
    if (err != CRYPT_OK) return err;
    
-   if ((err = mp_read_radix(key->p , p , 16)) != CRYPT_OK) { goto LBL_ERR; }
-   if ((err = mp_read_radix(key->q , q , 16)) != CRYPT_OK) { goto LBL_ERR; }
-   if ((err = mp_read_radix(key->g , g , 16)) != CRYPT_OK) { goto LBL_ERR; }
-   if ((err = mp_read_radix(key->y , y , 16)) != CRYPT_OK) { goto LBL_ERR; }
+   if ((err = mp_read_radix(key->p , p , radix)) != CRYPT_OK) { goto LBL_ERR; }
+   if ((err = mp_read_radix(key->q , q , radix)) != CRYPT_OK) { goto LBL_ERR; }
+   if ((err = mp_read_radix(key->g , g , radix)) != CRYPT_OK) { goto LBL_ERR; }
+   if ((err = mp_read_radix(key->y , y , radix)) != CRYPT_OK) { goto LBL_ERR; }
    if (x && strlen(x) > 0) {
-     key->type = PK_PRIVATE;
-     if ((err = mp_read_radix(key->x , x , 16)) != CRYPT_OK) { goto LBL_ERR; }
+      key->type = PK_PRIVATE;
+      if ((err = mp_read_radix(key->x , x , radix)) != CRYPT_OK) { goto LBL_ERR; }
    }
    else {
-     key->type = PK_PUBLIC;
+      key->type = PK_PUBLIC;
    }
 
    key->qord = mp_unsigned_bin_size(key->q);
