@@ -119,7 +119,7 @@ static int _base64_decode_internal(const unsigned char *in,  unsigned long inlen
 
    if (y != 0) {
       if (y == 1) return CRYPT_INVALID_PACKET;
-      if ((y + g) != 4 && is_strict) return CRYPT_INVALID_PACKET;
+      if ((y + g) != 4 && is_strict && map != map_base64url) return CRYPT_INVALID_PACKET;
       t = t << (6 * (4 - y));
       if (z + y - 1 > *outlen) return CRYPT_BUFFER_OVERFLOW;
       if (y >= 2) out[z++] = (unsigned char) ((t >> 16) & 255);
