@@ -4,7 +4,7 @@ package Crypt::Digest::MD2;
 
 use strict;
 use warnings;
-our $VERSION = '0.044';
+our $VERSION = '0.044_001';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( md2 md2_hex md2_b64 md2_b64u md2_file md2_file_hex md2_file_b64 md2_file_b64u )] );
