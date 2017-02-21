@@ -8,39 +8,30 @@
 #define TOMCRYPT_CFG_H
 
 #if defined(_WIN32) || defined(_MSC_VER)
-#define LTC_CALL __cdecl
-#else
-#ifndef LTC_CALL
+   #define LTC_CALL __cdecl
+#elif !defined(LTC_CALL)
    #define LTC_CALL
-#endif
 #endif
 
 #ifndef LTC_EXPORT
-#define LTC_EXPORT
+   #define LTC_EXPORT
 #endif
 
 /* certain platforms use macros for these, making the prototypes broken */
 #ifndef LTC_NO_PROTOTYPES
-
-/* you can change how memory allocation works ... */
-LTC_EXPORT void * LTC_CALL XMALLOC(size_t n);
-LTC_EXPORT void * LTC_CALL XREALLOC(void *p, size_t n);
-LTC_EXPORT void * LTC_CALL XCALLOC(size_t n, size_t s);
-LTC_EXPORT void LTC_CALL XFREE(void *p);
-
-LTC_EXPORT void LTC_CALL XQSORT(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *));
-
-
-/* change the clock function too */
-LTC_EXPORT clock_t LTC_CALL XCLOCK(void);
-
-/* various other functions */
-LTC_EXPORT void * LTC_CALL XMEMCPY(void *dest, const void *src, size_t n);
-LTC_EXPORT int   LTC_CALL XMEMCMP(const void *s1, const void *s2, size_t n);
-LTC_EXPORT void * LTC_CALL XMEMSET(void *s, int c, size_t n);
-
-LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
-
+  /* you can change how memory allocation works ... */
+  LTC_EXPORT void *  LTC_CALL XMALLOC(size_t n);
+  LTC_EXPORT void *  LTC_CALL XREALLOC(void *p, size_t n);
+  LTC_EXPORT void *  LTC_CALL XCALLOC(size_t n, size_t s);
+  LTC_EXPORT void    LTC_CALL XFREE(void *p);
+  LTC_EXPORT void    LTC_CALL XQSORT(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *));
+  /* change the clock function too */
+  LTC_EXPORT clock_t LTC_CALL XCLOCK(void);
+  /* various other functions */
+  LTC_EXPORT void *  LTC_CALL XMEMCPY(void *dest, const void *src, size_t n);
+  LTC_EXPORT int     LTC_CALL XMEMCMP(const void *s1, const void *s2, size_t n);
+  LTC_EXPORT void *  LTC_CALL XMEMSET(void *s, int c, size_t n);
+  LTC_EXPORT int     LTC_CALL XSTRCMP(const char *s1, const char *s2);
 #endif
 
 /* type of argument checking, 0=default, 1=fatal and 2=error+continue, 3=nothing */
@@ -55,9 +46,23 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
  * use the portable [slower] macros.
  */
 
-/* detect x86-32 machines somewhat */
-#if !defined(__STRICT_ANSI__) && !defined(__x86_64__) && !defined(_WIN64) && ((defined(_MSC_VER) && defined(WIN32)) || (defined(__GNUC__) && (defined(__DJGPP__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__i386__))))
+/* detect x86/i386 32bit */
+#if defined(__i386__) || defined(__i386) || defined(_M_IX86)
    #define ENDIAN_LITTLE
+   #define ENDIAN_32BITWORD
+   #define LTC_FAST
+#endif
+
+/* detect amd64/x64 */
+#if defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64)
+   #define ENDIAN_LITTLE
+   #define ENDIAN_64BITWORD
+   #define LTC_FAST
+#endif
+
+/* detect PPC32 */
+#if defined(LTC_PPC32)
+   #define ENDIAN_BIG
    #define ENDIAN_32BITWORD
    #define LTC_FAST
 #endif
@@ -66,20 +71,6 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 #if (defined(__R5900) || defined(R5900) || defined(__R5900__)) && (defined(_mips) || defined(__mips__) || defined(mips))
    #define ENDIAN_LITTLE
    #define ENDIAN_64BITWORD
-#endif
-
-/* detect amd64 */
-#if !defined(__STRICT_ANSI__) && defined(__x86_64__)
-   #define ENDIAN_LITTLE
-   #define ENDIAN_64BITWORD
-   #define LTC_FAST
-#endif
-
-/* detect PPC32 */
-#if !defined(__STRICT_ANSI__) && defined(LTC_PPC32)
-   #define ENDIAN_BIG
-   #define ENDIAN_32BITWORD
-   #define LTC_FAST
 #endif
 
 /* detect AIX */
@@ -116,7 +107,32 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
   #endif
 #endif
 
-/* fix for MSVC ...evil! */
+/* detect SPARC and SPARC64 */
+#if defined(__sparc__) || defined(__sparc)
+  #define ENDIAN_BIG
+  #if defined(__arch64__) || defined(__sparcv9) || defined(__sparc_v9__)
+    #define ENDIAN_64BITWORD
+  #else
+    #define ENDIAN_32BITWORD
+  #endif
+#endif
+
+/* endianess fallback */
+#if !defined(ENDIAN_BIG) && !defined(ENDIAN_LITTLE)
+  #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || \
+      defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ || \
+      defined(__BIG_ENDIAN__)
+    #define ENDIAN_BIG
+  #elif defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN || \
+      defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ || \
+      defined(__LITTLE_ENDIAN__)
+    #define ENDIAN_LITTLE
+  #else
+    #error Cannot detect endianess
+  #endif
+#endif
+
+/* ulong64: 64-bit data type */
 #ifdef _MSC_VER
    #define CONST64(n) n ## ui64
    typedef unsigned __int64 ulong64;
@@ -125,41 +141,27 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
    typedef unsigned long long ulong64;
 #endif
 
-/* this is the "32-bit at least" data type
- * Re-define it to suit your platform but it must be at least 32-bits
- */
-#if defined(__x86_64__) || (defined(__sparc__) && defined(__arch64__)) || defined(__ia64) || defined(__ia64__) || defined(__LP64__)
+/* ulong32: "32-bit at least" data type */
+#if defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64) || \
+    defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || \
+    defined(__arch64__) || \
+    defined(__sparcv9) || defined(__sparc_v9__) || defined(__sparc64__) || \
+    defined(__ia64) || defined(__ia64__) || defined(__itanium__) || defined(_M_IA64) || \
+    defined(__LP64__) || defined(_LP64) || defined(__64BIT__)
    typedef unsigned ulong32;
+   #if !defined(ENDIAN_64BITWORD) && !defined(ENDIAN_32BITWORD)
+     #define ENDIAN_64BITWORD
+   #endif
 #else
    typedef unsigned long ulong32;
+   #if !defined(ENDIAN_64BITWORD) && !defined(ENDIAN_32BITWORD)
+     #define ENDIAN_32BITWORD
+   #endif
 #endif
 
-#if defined(LTC_NO_FAST) || (__GNUC__ < 4)
+/* No LTC_FAST if explicitly disabled, old gcc, gcc with -ansi or -std=c99 */
+#if defined(LTC_NO_FAST) || (__GNUC__ < 4) || defined(__STRICT_ANSI__)
    #undef LTC_FAST
-#endif
-
-#ifdef LTC_FAST
-#ifdef ENDIAN_64BITWORD
-typedef ulong64 __attribute__((__may_alias__)) LTC_FAST_TYPE;
-#else
-typedef ulong32 __attribute__((__may_alias__)) LTC_FAST_TYPE;
-#endif
-#endif
-
-/* detect sparc and sparc64 */
-#if defined(__sparc__)
-  #define ENDIAN_BIG
-  #if defined(__arch64__)
-    #define ENDIAN_64BITWORD
-  #else
-    #define ENDIAN_32BITWORD
-  #endif
-#endif
-
-#ifdef ENDIAN_64BITWORD
-typedef ulong64 ltc_mp_digit;
-#else
-typedef ulong32 ltc_mp_digit;
 #endif
 
 /* No asm is a quick way to disable anything "not portable" */
@@ -174,14 +176,18 @@ typedef ulong32 ltc_mp_digit;
    #define LTC_NO_BSWAP
 #endif
 
-/* #define ENDIAN_LITTLE */
-/* #define ENDIAN_BIG */
+#ifdef LTC_FAST
+   #ifdef ENDIAN_64BITWORD
+   typedef ulong64 __attribute__((__may_alias__)) LTC_FAST_TYPE;
+   #else
+   typedef ulong32 __attribute__((__may_alias__)) LTC_FAST_TYPE;
+   #endif
+#endif
 
-/* #define ENDIAN_32BITWORD */
-/* #define ENDIAN_64BITWORD */
-
-#if (defined(ENDIAN_BIG) || defined(ENDIAN_LITTLE)) && !(defined(ENDIAN_32BITWORD) || defined(ENDIAN_64BITWORD))
-    #error You must specify a word size as well as endianess in tomcrypt_cfg.h
+#ifdef ENDIAN_64BITWORD
+typedef ulong64 ltc_mp_digit;
+#else
+typedef ulong32 ltc_mp_digit;
 #endif
 
 #if !(defined(ENDIAN_BIG) || defined(ENDIAN_LITTLE))
@@ -189,7 +195,7 @@ typedef ulong32 ltc_mp_digit;
 #endif
 
 #if (defined(ENDIAN_32BITWORD) && defined(ENDIAN_64BITWORD))
-    #error Can not be 32 and 64 bit words...
+    #error Cannot be 32 and 64 bit words...
 #endif
 
 /* gcc 4.3 and up has a bswap builtin; detect it by gcc version.
@@ -209,7 +215,6 @@ typedef ulong32 ltc_mp_digit;
 #endif
 
 #endif
-
 
 /* $Source$ */
 /* $Revision$ */
