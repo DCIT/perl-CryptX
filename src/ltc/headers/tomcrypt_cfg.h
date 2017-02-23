@@ -242,8 +242,6 @@ typedef ulong32 ltc_mp_digit;
    #define LTC_HAVE_BSWAP_BUILTIN
 #endif
 
-#endif
-
 
 /* $Source$ */
 /* $Revision$ */
