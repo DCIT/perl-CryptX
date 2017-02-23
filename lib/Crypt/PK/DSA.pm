@@ -2,7 +2,7 @@ package Crypt::PK::DSA;
 
 use strict;
 use warnings;
-our $VERSION = '0.044_004';
+our $VERSION = '0.044_005';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( dsa_encrypt dsa_decrypt dsa_sign_message dsa_verify_message dsa_sign_hash dsa_verify_hash )] );
