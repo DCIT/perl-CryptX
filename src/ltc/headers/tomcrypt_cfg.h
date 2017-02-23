@@ -75,8 +75,12 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 
 /* detects MIPS R5900 processors (PS2) */
 #if (defined(__R5900) || defined(R5900) || defined(__R5900__)) && (defined(_mips) || defined(__mips__) || defined(mips))
-   #define ENDIAN_LITTLE
    #define ENDIAN_64BITWORD
+   #if defined(_MIPSEB) || defined(__MIPSEB) || defined(__MIPSEB__)
+     #define ENDIAN_BIG
+   #endif
+     #define ENDIAN_LITTLE
+   #endif
 #endif
 
 /* detect AIX */
@@ -137,11 +141,15 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 #if !defined(ENDIAN_BIG) && !defined(ENDIAN_LITTLE)
   #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || \
       defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ || \
-      defined(__BIG_ENDIAN__)
+      defined(__BIG_ENDIAN__) || defined(_BIG_ENDIAN) || \
+      defined(__ARMEB__) || defined(__THUMBEB__) || defined(__AARCH64EB__) || \
+      defined(_MIPSEB) || defined(__MIPSEB) || defined(__MIPSEB__)
     #define ENDIAN_BIG
   #elif defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN || \
       defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ || \
-      defined(__LITTLE_ENDIAN__)
+      defined(__LITTLE_ENDIAN__) || defined(_LITTLE_ENDIAN) || \
+      defined(__ARMEL__) || defined(__THUMBEL__) || defined(__AARCH64EL__) || \
+      defined(_MIPSEL) || defined(__MIPSEL) || defined(__MIPSEL__)
     #define ENDIAN_LITTLE
   #else
     #error Cannot detect endianness
@@ -160,7 +168,7 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 /* ulong32: "32-bit at least" data type */
 #if defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64) || \
     defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || \
-    defined(__s390x__) || defined(__arch64__) || \
+    defined(__s390x__) || defined(__arch64__) || defined(__aarch64__) || \
     defined(__sparcv9) || defined(__sparc_v9__) || defined(__sparc64__) || \
     defined(__ia64) || defined(__ia64__) || defined(__itanium__) || defined(_M_IA64) || \
     defined(__LP64__) || defined(_LP64) || defined(__64BIT__)
