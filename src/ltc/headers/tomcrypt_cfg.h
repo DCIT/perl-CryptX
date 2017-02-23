@@ -19,19 +19,26 @@
 
 /* certain platforms use macros for these, making the prototypes broken */
 #ifndef LTC_NO_PROTOTYPES
-  /* you can change how memory allocation works ... */
-  LTC_EXPORT void *  LTC_CALL XMALLOC(size_t n);
-  LTC_EXPORT void *  LTC_CALL XREALLOC(void *p, size_t n);
-  LTC_EXPORT void *  LTC_CALL XCALLOC(size_t n, size_t s);
-  LTC_EXPORT void    LTC_CALL XFREE(void *p);
-  LTC_EXPORT void    LTC_CALL XQSORT(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *));
-  /* change the clock function too */
-  LTC_EXPORT clock_t LTC_CALL XCLOCK(void);
-  /* various other functions */
-  LTC_EXPORT void *  LTC_CALL XMEMCPY(void *dest, const void *src, size_t n);
-  LTC_EXPORT int     LTC_CALL XMEMCMP(const void *s1, const void *s2, size_t n);
-  LTC_EXPORT void *  LTC_CALL XMEMSET(void *s, int c, size_t n);
-  LTC_EXPORT int     LTC_CALL XSTRCMP(const char *s1, const char *s2);
+
+/* you can change how memory allocation works ... */
+LTC_EXPORT void * LTC_CALL XMALLOC(size_t n);
+LTC_EXPORT void * LTC_CALL XREALLOC(void *p, size_t n);
+LTC_EXPORT void * LTC_CALL XCALLOC(size_t n, size_t s);
+LTC_EXPORT void LTC_CALL XFREE(void *p);
+
+LTC_EXPORT void LTC_CALL XQSORT(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *));
+
+
+/* change the clock function too */
+LTC_EXPORT clock_t LTC_CALL XCLOCK(void);
+
+/* various other functions */
+LTC_EXPORT void * LTC_CALL XMEMCPY(void *dest, const void *src, size_t n);
+LTC_EXPORT int   LTC_CALL XMEMCMP(const void *s1, const void *s2, size_t n);
+LTC_EXPORT void * LTC_CALL XMEMSET(void *s, int c, size_t n);
+
+LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
+
 #endif
 
 /* type of argument checking, 0=default, 1=fatal and 2=error+continue, 3=nothing */
@@ -45,7 +52,6 @@
  * The x86 platforms allow this but some others [ARM for instance] do not.  On those platforms you **MUST**
  * use the portable [slower] macros.
  */
-
 /* detect x86/i386 32bit */
 #if defined(__i386__) || defined(__i386) || defined(_M_IX86)
    #define ENDIAN_LITTLE
@@ -117,7 +123,17 @@
   #endif
 #endif
 
-/* endianess fallback */
+/* detect IBM S390(x) */
+#if defined(__s390x__) || defined(__s390__)
+  #define ENDIAN_BIG
+  #if defined(__s390x__)
+    #define ENDIAN_64BITWORD
+  #else
+    #define ENDIAN_32BITWORD
+  #endif
+#endif
+
+/* endianness fallback */
 #if !defined(ENDIAN_BIG) && !defined(ENDIAN_LITTLE)
   #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || \
       defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ || \
@@ -128,7 +144,7 @@
       defined(__LITTLE_ENDIAN__)
     #define ENDIAN_LITTLE
   #else
-    #error Cannot detect endianess
+    #error Cannot detect endianness
   #endif
 #endif
 
@@ -144,7 +160,7 @@
 /* ulong32: "32-bit at least" data type */
 #if defined(__x86_64__) || defined(_M_X64) || defined(_M_AMD64) || \
     defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || \
-    defined(__arch64__) || \
+    defined(__s390x__) || defined(__arch64__) || \
     defined(__sparcv9) || defined(__sparc_v9__) || defined(__sparc64__) || \
     defined(__ia64) || defined(__ia64__) || defined(__itanium__) || defined(_M_IA64) || \
     defined(__LP64__) || defined(_LP64) || defined(__64BIT__)
@@ -190,6 +206,10 @@ typedef ulong64 ltc_mp_digit;
 typedef ulong32 ltc_mp_digit;
 #endif
 
+#if (defined(ENDIAN_BIG) || defined(ENDIAN_LITTLE)) && !(defined(ENDIAN_32BITWORD) || defined(ENDIAN_64BITWORD))
+    #error You must specify a word size as well as endianess in tomcrypt_cfg.h
+#endif
+
 #if !(defined(ENDIAN_BIG) || defined(ENDIAN_LITTLE))
    #define ENDIAN_NEUTRAL
 #endif
@@ -215,6 +235,7 @@ typedef ulong32 ltc_mp_digit;
 #endif
 
 #endif
+
 
 /* $Source$ */
 /* $Revision$ */
