@@ -52,7 +52,7 @@ int mp_import(mp_int* rop, size_t count, int order, size_t size,
 				);
 
 			if (
-				(result = mp_mul_2d(rop, ((j == 0) ? (8 - odd_nails) : 8), rop)) != MP_OKAY) {
+				(result = mp_mul_2d(rop, (int)((j == 0) ? (8 - odd_nails) : 8), rop)) != MP_OKAY) {
 				return result;
 			}
 
