@@ -95,24 +95,26 @@ int dsa_import(const unsigned char *in, unsigned long inlen, dsa_key *key)
 
       tmpbuf = XCALLOC(1, tmpbuf_len);
       if (tmpbuf == NULL) {
-          err = CRYPT_MEM;
-          goto LBL_ERR;
+         err = CRYPT_MEM;
+         goto LBL_ERR;
       }
 
-      err = der_decode_subject_public_key_info(in, inlen,
-        PKA_DSA, tmpbuf, &tmpbuf_len,
-        LTC_ASN1_SEQUENCE, params, 3);
+      err = der_decode_subject_public_key_info(in, inlen, PKA_DSA,
+                                               tmpbuf, &tmpbuf_len,
+                                               LTC_ASN1_SEQUENCE, params, 3);
       if (err != CRYPT_OK) {
+         XFREE(tmpbuf);
          goto LBL_ERR;
       }
 
       if ((err=der_decode_integer(tmpbuf, tmpbuf_len, key->y)) != CRYPT_OK) {
+         XFREE(tmpbuf);
          goto LBL_ERR;
       }
 
       XFREE(tmpbuf);
       key->type = PK_PUBLIC;
-  }
+   }
 
 LBL_OK:
   key->qord = mp_unsigned_bin_size(key->q);
@@ -125,7 +127,6 @@ LBL_OK:
 
   return CRYPT_OK;
 LBL_ERR:
-   XFREE(tmpbuf);
    mp_clear_multi(key->p, key->g, key->q, key->x, key->y, NULL);
    return err;
 }

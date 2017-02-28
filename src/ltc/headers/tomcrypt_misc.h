@@ -2,6 +2,7 @@
 #ifdef LTC_BASE64
 int base64_encode(const unsigned char *in,  unsigned long len,
                         unsigned char *out, unsigned long *outlen);
+
 int base64_decode(const unsigned char *in,  unsigned long len,
                         unsigned char *out, unsigned long *outlen);
 int base64_strict_decode(const unsigned char *in,  unsigned long len,
@@ -11,6 +12,9 @@ int base64_strict_decode(const unsigned char *in,  unsigned long len,
 #ifdef LTC_BASE64_URL
 int base64url_encode(const unsigned char *in,  unsigned long len,
                         unsigned char *out, unsigned long *outlen);
+int base64url_strict_encode(const unsigned char *in,  unsigned long inlen,
+                        unsigned char *out, unsigned long *outlen);
+
 int base64url_decode(const unsigned char *in,  unsigned long len,
                         unsigned char *out, unsigned long *outlen);
 int base64url_strict_decode(const unsigned char *in,  unsigned long len,
@@ -97,7 +101,7 @@ int crc32_test(void);
 
 /* yeah it's not exactly in misc in the library, but in testprof/x86_prof.c */
 #if defined(LTC_TEST) && defined(LTC_TEST_DBG)
-void print_hex(const char* what, const unsigned char* p, const unsigned long l);
+void print_hex(const char* what, const void* p, const unsigned long l);
 #endif
 
 /* $Source$ */
