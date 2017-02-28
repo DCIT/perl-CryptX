@@ -368,13 +368,13 @@ int
 _verify(Crypt::PK::RSA self, SV * sig, SV * data, char * padding, char * hash_name=NULL, unsigned long saltlen=12)
     CODE:
     {
-        int rv, hash_id, stat, i;
+        int rv, hash_id, stat;
         unsigned char *data_ptr=NULL;
         STRLEN data_len=0;
         unsigned char *sig_ptr=NULL;
         STRLEN sig_len=0;
         unsigned char buffer[1024];
-        unsigned long buffer_len = 1024;
+        unsigned long i, buffer_len = 1024;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
