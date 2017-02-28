@@ -68,7 +68,7 @@ _from_oct(Class, SV *x)
 void
 _set(Class, Math::BigInt::LTM n, SV *x)
   CODE:
-    mp_set_int(n, SvIV(x));
+    mp_set_int(n, (unsigned long)SvIV(x));
 
 ##############################################################################
 # _zero()
@@ -180,7 +180,7 @@ _len(Class, Math::BigInt::LTM n)
       len = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
       mp_toradix_n(n, buf, 10, len);
-      RETVAL = strlen(buf);
+      RETVAL = (int)strlen(buf);
       Safefree(buf);
     }
   OUTPUT:
@@ -220,7 +220,7 @@ _zeros(Class, Math::BigInt::LTM n)
       len = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
       mp_toradix_n(n, buf, 10, len);
-      len = strlen(buf);
+      len = (int)strlen(buf);
       RETVAL = 0;
       while (len > 0) {
         if (buf[len-1] != '0') break;

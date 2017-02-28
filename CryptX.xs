@@ -177,12 +177,12 @@ typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
 
 int str_add_leading_zero(char *str, int maxlen, int minlen) {
   int len;
-  len = strlen(str);
+  len = (int)strlen(str);
   if (len > 0 && len % 2 && len < maxlen-2) {
     memmove(str+1, str, len+1); /* incl. NUL byte */
     *str = '0';                 /* add leading zero */
   }
-  len = strlen(str);
+  len = (int)strlen(str);
   if (len < minlen && minlen < maxlen-1) {
     memmove(str+(minlen-len), str, len+1); /* incl. NUL byte */
     memset(str, '0', minlen-len);          /* add leading zero */
@@ -224,7 +224,7 @@ ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
   if (SvPOK(curve)) {
     ch_name = SvPV(curve, l_name);
     if ((h = get_hv("Crypt::PK::ECC::curve", 0)) == NULL) croak("FATAL: generate_key_ex: no curve register");
-    if ((pref = hv_fetch(h, ch_name, l_name, 0)) == NULL)  croak("FATAL: generate_key_ex: unknown curve/1 '%s'", ch_name);
+    if ((pref = hv_fetch(h, ch_name, (U32)l_name, 0)) == NULL)  croak("FATAL: generate_key_ex: unknown curve/1 '%s'", ch_name);
     if (!SvOK(*pref)) croak("FATAL: generate_key_ex: unknown curve/2 '%s'", ch_name);
     param = *pref;
   }
@@ -350,7 +350,7 @@ CryptX__encode_base64url(SV * in)
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, in_len);
-        out_len = 4 * ((in_len + 2) / 3) + 1;
+        out_len = (unsigned long)(4 * ((in_len + 2) / 3) + 1);
         Newz(0, out_data, out_len, unsigned char);
         if (!out_data) croak("FATAL: Newz failed [%ld]", out_len);
         rv = base64url_encode(in_data, (unsigned long)in_len, out_data, &out_len);
@@ -371,7 +371,7 @@ CryptX__decode_base64url(SV * in)
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, in_len);
-        out_len = in_len;
+        out_len = (unsigned long)in_len;
         Newz(0, out_data, out_len, unsigned char);
         if (!out_data) croak("FATAL: Newz failed [%ld]", out_len);
         rv = base64url_decode(in_data, (unsigned long)in_len, out_data, &out_len);
@@ -392,7 +392,7 @@ CryptX__encode_base64(SV * in)
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, in_len);
-        out_len = 4 * ((in_len + 2) / 3) + 1;
+        out_len = (unsigned long)(4 * ((in_len + 2) / 3) + 1);
         Newz(0, out_data, out_len, unsigned char);
         if (!out_data) croak("FATAL: Newz failed [%ld]", out_len);
         rv = base64_encode(in_data, (unsigned long)in_len, out_data, &out_len);
@@ -413,7 +413,7 @@ CryptX__decode_base64(SV * in)
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, in_len);
-        out_len = in_len;
+        out_len = (unsigned long)in_len;
         Newz(0, out_data, out_len, unsigned char);
         if (!out_data) croak("FATAL: Newz failed [%ld]", out_len);
         rv = base64_decode(in_data, (unsigned long)in_len, out_data, &out_len);
