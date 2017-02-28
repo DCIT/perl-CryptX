@@ -46,9 +46,8 @@ do { x = (((ulong64)((y)[0] & 255))<<56)|(((ulong64)((y)[1] & 255))<<48) | \
          (((ulong64)((y)[4] & 255))<<24)|(((ulong64)((y)[5] & 255))<<16) | \
          (((ulong64)((y)[6] & 255))<<8)|(((ulong64)((y)[7] & 255))); } while(0)
 
-#endif /* ENDIAN_NEUTRAL */
 
-#ifdef ENDIAN_LITTLE
+#elif defined(ENDIAN_LITTLE)
 
 #ifdef LTC_HAVE_BSWAP_BUILTIN
 
@@ -167,9 +166,8 @@ do { x = (((ulong64)((y)[0] & 255))<<56)|(((ulong64)((y)[1] & 255))<<48) | \
 
 #endif /* ENDIAN_64BITWORD */
 
-#endif /* ENDIAN_LITTLE */
+#elif defined(ENDIAN_BIG)
 
-#ifdef ENDIAN_BIG
 #define STORE32L(x, y)                                                                     \
   do { (y)[3] = (unsigned char)(((x)>>24)&255); (y)[2] = (unsigned char)(((x)>>16)&255);   \
        (y)[1] = (unsigned char)(((x)>>8)&255); (y)[0] = (unsigned char)((x)&255); } while(0)
@@ -267,7 +265,7 @@ static inline ulong32 ROR(ulong32 word, int i)
 #ifndef LTC_NO_ROLC
 
 #define ROLc(word,i) ({ \
-   ulong32 __ROLc_tmp = word; \
+   ulong32 __ROLc_tmp = (word); \
    __asm__ ("roll %2, %0" : \
             "=r" (__ROLc_tmp) : \
             "0" (__ROLc_tmp), \
@@ -275,7 +273,7 @@ static inline ulong32 ROR(ulong32 word, int i)
             __ROLc_tmp; \
    })
 #define RORc(word,i) ({ \
-   ulong32 __RORc_tmp = word; \
+   ulong32 __RORc_tmp = (word); \
    __asm__ ("rorl %2, %0" : \
             "=r" (__RORc_tmp) : \
             "0" (__RORc_tmp), \

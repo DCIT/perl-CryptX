@@ -41,6 +41,15 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 
 #endif
 
+/* some compilers do not like "inline" */
+#if defined(__HP_cc)
+   #define LTC_INLINE
+#elif defined(_MSC_VER)
+   #define LTC_INLINE __inline
+#else
+   #define LTC_INLINE inline
+#endif
+
 /* type of argument checking, 0=default, 1=fatal and 2=error+continue, 3=nothing */
 #ifndef ARGTYPE
    #define ARGTYPE  0
@@ -137,6 +146,17 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
   #endif
 #endif
 
+/* detect PPC64 */
+#if defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__)
+   #define ENDIAN_64BITWORD
+   #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+      #define ENDIAN_BIG
+   #elif  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+      #define ENDIAN_LITTLE
+   #endif
+   #define LTC_FAST
+#endif
+
 /* endianness fallback */
 #if !defined(ENDIAN_BIG) && !defined(ENDIAN_LITTLE)
   #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || \
@@ -188,19 +208,8 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
    #undef LTC_FAST
 #endif
 
-/* No asm is a quick way to disable anything "not portable" */
-#ifdef LTC_NO_ASM
-   #undef ENDIAN_LITTLE
-   #undef ENDIAN_BIG
-   #undef ENDIAN_32BITWORD
-   #undef ENDIAN_64BITWORD
-   #undef LTC_FAST
-   #undef LTC_FAST_TYPE
-   #define LTC_NO_ROLC
-   #define LTC_NO_BSWAP
-#endif
-
 #ifdef LTC_FAST
+   #define LTC_FAST_TYPE_PTR_CAST(x) ((LTC_FAST_TYPE*)(void*)(x))
    #ifdef ENDIAN_64BITWORD
    typedef ulong64 __attribute__((__may_alias__)) LTC_FAST_TYPE;
    #else
@@ -214,7 +223,18 @@ typedef ulong64 ltc_mp_digit;
 typedef ulong32 ltc_mp_digit;
 #endif
 
-#if (defined(ENDIAN_BIG) || defined(ENDIAN_LITTLE)) && !(defined(ENDIAN_32BITWORD) || defined(ENDIAN_64BITWORD))
+/* No asm is a quick way to disable anything "not portable" */
+#ifdef LTC_NO_ASM
+   #define ENDIAN_NEUTRAL
+   #undef ENDIAN_32BITWORD
+   #undef ENDIAN_64BITWORD
+   #undef LTC_FAST
+   #undef LTC_FAST_TYPE
+   #define LTC_NO_ROLC
+   #define LTC_NO_BSWAP
+#endif
+
+#if !defined(ENDIAN_NEUTRAL) && (defined(ENDIAN_BIG) || defined(ENDIAN_LITTLE)) && !(defined(ENDIAN_32BITWORD) || defined(ENDIAN_64BITWORD))
     #error You must specify a word size as well as endianess in tomcrypt_cfg.h
 #endif
 
