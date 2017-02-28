@@ -2,7 +2,7 @@ package Crypt::Mode;
 
 use strict;
 use warnings;
-our $VERSION = '0.044_005';
+our $VERSION = '0.044_006';
 
 ### METHODS
 
