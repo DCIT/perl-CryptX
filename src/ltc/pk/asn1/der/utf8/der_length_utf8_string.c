@@ -27,11 +27,17 @@ unsigned long der_utf8_charsize(const wchar_t c)
       return 1;
    } else if (c <= 0x7FF) {
       return 2;
+#if __WCHAR_MAX__ == 0xFFFF
+   } else {
+      return 3;
+   }
+#else
    } else if (c <= 0xFFFF) {
       return 3;
    } else {
       return 4;
    }
+#endif
 }
 
 /**
@@ -50,9 +56,12 @@ int der_length_utf8_string(const wchar_t *in, unsigned long noctets, unsigned lo
 
    len = 0;
    for (x = 0; x < noctets; x++) {
-      if (in[x] < 0 || in[x] > 0x10FFFF) {
-         return CRYPT_INVALID_ARG;
-      }
+#if !defined(__WCHAR_MAX__) || __WCHAR_MAX__ > 0xFFFF
+      if (in[x] > 0x10FFFF) return CRYPT_INVALID_ARG;
+#endif
+#if !defined(__WCHAR_MAX__) || __WCHAR_MAX__ != 0xFFFF && __WCHAR_MAX__ != 0xFFFFFFFF
+      if (in[x] < 0) return CRYPT_INVALID_ARG;
+#endif
       len += der_utf8_charsize(in[x]);
    }
 
