@@ -93,16 +93,16 @@ void adler32_finish(adler32_state *ctx, void *hash, unsigned long size)
    switch (size) {
       default:
          h[3] = ctx->s[0] & 0x0ff;
-         /* no break */
+         /* FALLTHROUGH */
       case 3:
          h[2] = (ctx->s[0] >> 8) & 0x0ff;
-         /* no break */
+         /* FALLTHROUGH */
       case 2:
          h[1] = ctx->s[1] & 0x0ff;
-         /* no break */
+         /* FALLTHROUGH */
       case 1:
          h[0] = (ctx->s[1] >> 8) & 0x0ff;
-         /* no break */
+         /* FALLTHROUGH */
       case 0:
          ;
    }
@@ -119,7 +119,7 @@ int adler32_test(void)
    adler32_state ctx;
    adler32_init(&ctx);
    adler32_update(&ctx, in, strlen(in));
-   adler32_finish(&ctx, &out, 4);
+   adler32_finish(&ctx, out, 4);
    if (XMEMCMP(adler32, out, 4)) {
 #ifdef LTC_TEST_DBG
       ulong32 _out, _adler32;
