@@ -84,8 +84,8 @@ retry:
 
    if (mp_iszero(r) == LTC_MP_YES)                                                     { goto retry; }
 
-   /* FIPS 186-4 4.6: use leftmost min(bitlen(q), bitlen(hash)) */
-   if (inlen > (unsigned long)key->qord) inlen = (unsigned long)key->qord;
+   /* FIPS 186-4 4.6: use leftmost min(bitlen(q), bitlen(hash)) bits of 'hash'*/
+   inlen = MIN(inlen, (unsigned long)(key->qord));
 
    /* now find s = (in + xr)/k mod q */
    if ((err = mp_read_unsigned_bin(tmp, (unsigned char *)in, inlen)) != CRYPT_OK)      { goto error; }
@@ -96,7 +96,7 @@ retry:
    if (mp_iszero(s) == LTC_MP_YES)                                                     { goto retry; }
 
    err = CRYPT_OK;
-error: 
+error:
    mp_clear_multi(k, kinv, tmp, NULL);
 ERRBUF:
 #ifdef LTC_CLEAN_STACK
@@ -137,9 +137,9 @@ int dsa_sign_hash(const unsigned char *in,  unsigned long inlen,
       goto error;
    }
 
-   err = der_encode_sequence_multi(out, outlen, 
-                             LTC_ASN1_INTEGER, 1UL, r, 
-                             LTC_ASN1_INTEGER, 1UL, s, 
+   err = der_encode_sequence_multi(out, outlen,
+                             LTC_ASN1_INTEGER, 1UL, r,
+                             LTC_ASN1_INTEGER, 1UL, s,
                              LTC_ASN1_EOL,     0UL, NULL);
 
 error:
