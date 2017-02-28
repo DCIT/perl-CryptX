@@ -85,7 +85,7 @@ retry:
    if (mp_iszero(r) == LTC_MP_YES)                                                     { goto retry; }
 
    /* FIPS 186-4 4.6: use leftmost min(bitlen(q), bitlen(hash)) */
-   if (inlen > key->qord) inlen = key->qord;
+   if (inlen > (unsigned long)key->qord) inlen = (unsigned long)key->qord;
 
    /* now find s = (in + xr)/k mod q */
    if ((err = mp_read_unsigned_bin(tmp, (unsigned char *)in, inlen)) != CRYPT_OK)      { goto error; }
