@@ -368,8 +368,8 @@ error:
 */
 int dh_import(const unsigned char *in, unsigned long inlen, dh_key *key)
 {
-   long x, y, s;
-   int err;
+   unsigned long x, y;
+   int s, err;
 
    LTC_ARGCHK(in  != NULL);
    LTC_ARGCHK(key != NULL);
