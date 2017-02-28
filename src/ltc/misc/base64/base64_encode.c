@@ -20,12 +20,12 @@
 #if defined(LTC_BASE64) || defined (LTC_BASE64_URL)
 
 #if defined(LTC_BASE64)
-static const char *codes_base64 =
+static const char * const codes_base64 =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 #endif /* LTC_BASE64 */
 
 #if defined(LTC_BASE64_URL)
-static const char *codes_base64url =
+static const char * const codes_base64url =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 #endif /* LTC_BASE64_URL */
 
@@ -75,7 +75,7 @@ static int _base64_encode_internal(const unsigned char *in,  unsigned long inlen
    *p = '\0';
 
    /* return ok */
-   *outlen = p - out;
+   *outlen = (unsigned long)(p - out);
    return CRYPT_OK;
 }
 
@@ -109,6 +109,12 @@ int base64url_encode(const unsigned char *in,  unsigned long inlen,
                            unsigned char *out, unsigned long *outlen)
 {
     return _base64_encode_internal(in, inlen, out, outlen, codes_base64url, 0);
+}
+
+int base64url_strict_encode(const unsigned char *in,  unsigned long inlen,
+                           unsigned char *out, unsigned long *outlen)
+{
+    return _base64_encode_internal(in, inlen, out, outlen, codes_base64url, 1);
 }
 #endif /* LTC_BASE64_URL */
 

@@ -111,7 +111,7 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
       }
 
       /* grab the next msb from the ltiplicand */
-      i = (buf >> (MP_DIGIT_BIT - 1)) & 1;
+      i = (int)((buf >> (MP_DIGIT_BIT - 1)) & 1);
       buf <<= 1;
 
       if (mode == 0 && i == 0) {
