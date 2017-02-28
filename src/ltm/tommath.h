@@ -38,8 +38,8 @@ typedef unsigned long long mp_uint64;
 #endif
 
 /* detect 64-bit mode if possible */
-#if !(defined(MP_32BIT) || defined(MP_16BIT) || defined(MP_8BIT))
-   #if defined(__x86_64__)
+#if defined(__x86_64__)
+   #if !(defined(MP_32BIT) || defined(MP_16BIT) || defined(MP_8BIT))
       #if defined(__GNUC__)
          typedef unsigned long        mp_uint128 __attribute__ ((mode(TI)));
          #define MP_64BIT
@@ -59,26 +59,46 @@ typedef unsigned long long mp_uint64;
  * [any size beyond that is ok provided it doesn't overflow the data type]
  */
 #ifdef MP_8BIT
-   typedef mp_uint8     mp_digit;
-   typedef mp_uint16    mp_word;
-   #define DIGIT_BIT    7
+   typedef mp_uint8             mp_digit;
+   typedef mp_uint16            mp_word;
+#define MP_SIZEOF_MP_DIGIT      1
+#ifdef DIGIT_BIT
+#error You must not define DIGIT_BIT when using MP_8BIT
+#endif
 #elif defined(MP_16BIT)
-   typedef mp_uint16    mp_digit;
-   typedef mp_uint32    mp_word;
-   #define DIGIT_BIT    15
+   typedef mp_uint16            mp_digit;
+   typedef mp_uint32            mp_word;
+#define MP_SIZEOF_MP_DIGIT      2
+#ifdef DIGIT_BIT
+#error You must not define DIGIT_BIT when using MP_16BIT
+#endif
 #elif defined(MP_64BIT)
-   typedef mp_uint64    mp_digit;
-   typedef mp_uint128   mp_word;
-   #define DIGIT_BIT    60
-#elif defined(MP_32BIT)
-   typedef mp_uint32    mp_digit;
-   typedef mp_uint64    mp_word;
-   #define DIGIT_BIT    31
+   typedef mp_uint64            mp_digit;
+   typedef mp_uint128           mp_word;
+   #define DIGIT_BIT            60
 #else
-   typedef mp_uint32    mp_digit;
-   typedef mp_uint64    mp_word;
-   #define DIGIT_BIT    28
+   /* this is the default case, 28-bit digits */
+
+   /* this is to make porting into LibTomCrypt easier :-) */
+   typedef mp_uint32            mp_digit;
+   typedef mp_uint64            mp_word;
+
+#ifdef MP_31BIT
+   /* this is an extension that uses 31-bit digits */
+   #define DIGIT_BIT            31
+#else
+   /* default case is 28-bit digits, defines MP_28BIT as a handy macro to test */
+   #define DIGIT_BIT            28
    #define MP_28BIT
+#endif
+#endif
+
+/* otherwise the bits per digit is calculated automatically from the size of a mp_digit */
+#ifndef DIGIT_BIT
+   #define DIGIT_BIT     (((CHAR_BIT * MP_SIZEOF_MP_DIGIT) - 1))  /* bits per digit */
+   typedef mp_uint32 mp_min_u32;
+#else
+   typedef mp_digit mp_min_u32;
 #endif
 
 /* platforms that can use a better rand function */
