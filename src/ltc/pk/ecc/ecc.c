@@ -412,7 +412,9 @@ const ltc_ecc_set_type ltc_ecc_sets[] = {
 #endif
 {
    0,
-   NULL, NULL, NULL, NULL, NULL, NULL
+   NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+   0,
+   { { 0 }, 0 }
 }
 };
 
