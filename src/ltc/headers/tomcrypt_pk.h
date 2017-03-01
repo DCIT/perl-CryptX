@@ -14,7 +14,7 @@ int rand_prime(void *N, long len, prng_state *prng, int wprng);
 int rand_bn_bits(void *N, int bits, prng_state *prng, int wprng);
 int rand_bn_range(void *N, void *limit, prng_state *prng, int wprng);
 
-enum {
+enum public_key_algorithms {
    PKA_RSA,
    PKA_DSA,
    PKA_EC,
@@ -298,12 +298,12 @@ int  ecc_test(void);
 void ecc_sizes(int *low, int *high);
 int  ecc_get_size(ecc_key *key);
 
-int ecc_dp_init(ltc_ecc_set_type *dp);
-int ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, char *ch_order, char *ch_Gx, char *ch_Gy, unsigned long cofactor, char *ch_name, char *oid);
-int ecc_dp_set_bn(ltc_ecc_set_type *dp, void *a, void *b, void *prime, void *order, void *gx, void *gy, unsigned long cofactor);
-int ecc_dp_set_by_oid(ltc_ecc_set_type *dp, unsigned long *oid, unsigned long oidsize);
-int ecc_dp_fill_from_sets(ltc_ecc_set_type *dp);
-int ecc_dp_clear(ltc_ecc_set_type *dp);
+int  ecc_dp_init(ltc_ecc_set_type *dp);
+int  ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, char *ch_order, char *ch_Gx, char *ch_Gy, unsigned long cofactor, char *ch_name, char *oid);
+int  ecc_dp_set_bn(ltc_ecc_set_type *dp, void *a, void *b, void *prime, void *order, void *gx, void *gy, unsigned long cofactor);
+int  ecc_dp_set_by_oid(ltc_ecc_set_type *dp, unsigned long *oid, unsigned long oidsize);
+int  ecc_dp_fill_from_sets(ltc_ecc_set_type *dp);
+int  ecc_dp_clear(ltc_ecc_set_type *dp);
 
 int  ecc_make_key(prng_state *prng, int wprng, int keysize, ecc_key *key);
 int  ecc_make_key_ex(prng_state *prng, int wprng, ecc_key *key, const ltc_ecc_set_type *dp);
@@ -313,18 +313,16 @@ int  ecc_export(unsigned char *out, unsigned long *outlen, int type, ecc_key *ke
 int  ecc_import(const unsigned char *in, unsigned long inlen, ecc_key *key);
 int  ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_set_type *dp);
 int  ecc_import_pkcs8(unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
+int  ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
+int  ecc_import_full(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
+int  ecc_export_point(unsigned char *out, unsigned long *outlen, void *x, void *y, unsigned long size, int compressed);
+int  ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y);
+int  ecc_export_raw(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
+int  ecc_import_raw(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
 
 int ecc_ansi_x963_export(ecc_key *key, unsigned char *out, unsigned long *outlen);
 int ecc_ansi_x963_import(const unsigned char *in, unsigned long inlen, ecc_key *key);
 int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
-
-int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
-int ecc_import_full(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
-
-int ecc_export_point(unsigned char *out, unsigned long *outlen, void *x, void *y, unsigned long size, int compressed);
-int ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y);
-int ecc_export_raw(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
-int ecc_import_raw(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
 
 int  ecc_shared_secret(ecc_key *private_key, ecc_key *public_key,
                        unsigned char *out, unsigned long *outlen);
@@ -342,19 +340,19 @@ int  ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
                          unsigned char *out, unsigned long *outlen,
                          prng_state *prng, int wprng, ecc_key *key);
 
-int ecc_sign_hash_rfc7518(const unsigned char *in,  unsigned long inlen,
-                                unsigned char *out, unsigned long *outlen,
-                                prng_state *prng, int wprng, ecc_key *key);
-
 int  ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
                      const unsigned char *hash, unsigned long hashlen,
                      int *stat, ecc_key *key);
 
-int ecc_verify_hash_rfc7518(const unsigned char *sig,  unsigned long siglen,
-                    const unsigned char *hash, unsigned long hashlen,
-                    int *stat, ecc_key *key);
+int  ecc_sign_hash_rfc7518(const unsigned char *in,  unsigned long inlen,
+                                 unsigned char *out, unsigned long *outlen,
+                                 prng_state *prng, int wprng, ecc_key *key);
 
-int ecc_verify_key(ecc_key *key);
+int  ecc_verify_hash_rfc7518(const unsigned char *sig,  unsigned long siglen,
+                             const unsigned char *hash, unsigned long hashlen,
+                             int *stat, ecc_key *key);
+
+int  ecc_verify_key(ecc_key *key);
 
 /* low level functions */
 ecc_point *ltc_ecc_new_point(void);
