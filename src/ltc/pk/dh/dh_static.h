@@ -71,7 +71,7 @@
 
 #define SUPPLIED_PRIME 255
 
-static void packet_store_header (unsigned char *dst, int section, int subsection)
+static LTC_INLINE void packet_store_header (unsigned char *dst, int section, int subsection)
 {
    LTC_ARGCHKVD(dst != NULL);
 
@@ -85,7 +85,7 @@ static void packet_store_header (unsigned char *dst, int section, int subsection
 
 }
 
-static int packet_valid_header (unsigned char *src, int section, int subsection)
+static LTC_INLINE int packet_valid_header (unsigned char *src, int section, int subsection)
 {
    unsigned long ver;
 

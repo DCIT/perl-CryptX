@@ -17,7 +17,7 @@
 /**
   @file ecc_ansi_x963_export.c
   ECC Crypto, Tom St Denis
-*/  
+*/
 
 #ifdef LTC_MECC
 

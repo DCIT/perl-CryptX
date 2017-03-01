@@ -17,12 +17,12 @@
 /**
   @file ecc_sign_hash.c
   ECC Crypto, Tom St Denis
-*/  
+*/
 
 #ifdef LTC_MECC
 
-int ecc_sign_hash_ex(const unsigned char *in,  unsigned long inlen, 
-                           unsigned char *out, unsigned long *outlen, 
+int ecc_sign_hash_ex(const unsigned char *in,  unsigned long inlen,
+                           unsigned char *out, unsigned long *outlen,
                            prng_state *prng, int wprng, ecc_key *key, int sigformat)
 {
    ecc_key       pubkey;
@@ -40,18 +40,18 @@ int ecc_sign_hash_ex(const unsigned char *in,  unsigned long inlen,
    if (key->type != PK_PRIVATE) {
       return CRYPT_PK_NOT_PRIVATE;
    }
-   
+
    /* is the IDX valid ?  */
    if (ltc_ecc_is_valid_idx(key->idx) != 1) {
       return CRYPT_PK_INVALID_TYPE;
    }
-   
+
    if ((err = prng_is_valid(wprng)) != CRYPT_OK) {
       return err;
    }
 
    /* init the bignums */
-   if ((err = mp_init_multi(&r, &s, &p, &e, NULL)) != CRYPT_OK) { 
+   if ((err = mp_init_multi(&r, &s, &p, &e, NULL)) != CRYPT_OK) {
       return err;
    }
    if ((err = mp_read_radix(p, (char *)key->dp->order, 16)) != CRYPT_OK)                      { goto errnokey; }
@@ -86,7 +86,7 @@ int ecc_sign_hash_ex(const unsigned char *in,  unsigned long inlen,
 
       if (mp_iszero(r) == LTC_MP_YES) {
          ecc_free(&pubkey);
-      } else { 
+      } else {
         /* find s = (e + xr)/k */
         if ((err = mp_invmod(pubkey.k, p, pubkey.k)) != CRYPT_OK)            { goto error; } /* k = 1/k */
         if ((err = mp_mulmod(key->k, r, p, s)) != CRYPT_OK)                  { goto error; } /* s = xr */
@@ -103,7 +103,7 @@ int ecc_sign_hash_ex(const unsigned char *in,  unsigned long inlen,
    if (sigformat == 1) {
      /* RFC7518 format */
      if (*outlen < 2*pbytes) { err = CRYPT_MEM; goto errnokey; }
-     zeromem(out, 2*pbytes); 
+     zeromem(out, 2*pbytes);
      i = mp_unsigned_bin_size(r);
      if ((err = mp_to_unsigned_bin(r, out + (pbytes - i)))   != CRYPT_OK) goto errnokey;
      i = mp_unsigned_bin_size(s);
@@ -123,7 +123,7 @@ error:
    ecc_free(&pubkey);
 errnokey:
    mp_clear_multi(r, s, p, e, NULL);
-   return err;   
+   return err;
 }
 
 /**
@@ -137,8 +137,8 @@ errnokey:
   @param key       A private ECC key
   @return CRYPT_OK if successful
 */
-int ecc_sign_hash(const unsigned char *in,  unsigned long inlen, 
-                        unsigned char *out, unsigned long *outlen, 
+int ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
+                        unsigned char *out, unsigned long *outlen,
                         prng_state *prng, int wprng, ecc_key *key)
 {
   return ecc_sign_hash_ex(in, inlen, out, outlen, prng, wprng, key, 0);
@@ -155,8 +155,8 @@ int ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
   @param key       A private ECC key
   @return CRYPT_OK if successful
 */
-int ecc_sign_hash_rfc7518(const unsigned char *in,  unsigned long inlen, 
-                                unsigned char *out, unsigned long *outlen, 
+int ecc_sign_hash_rfc7518(const unsigned char *in,  unsigned long inlen,
+                                unsigned char *out, unsigned long *outlen,
                                 prng_state *prng, int wprng, ecc_key *key)
 {
   return ecc_sign_hash_ex(in, inlen, out, outlen, prng, wprng, key, 1);

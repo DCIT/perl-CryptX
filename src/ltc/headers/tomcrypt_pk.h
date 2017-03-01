@@ -281,8 +281,8 @@ typedef struct {
     /** Index into the ltc_ecc_sets[] for the parameters of this curve; if -1, then this key is using user supplied curve in dp */
     int idx;
 
-	/** pointer to domain parameters; either points to NIST curves (identified by idx >= 0) or user supplied curve */
-	const ltc_ecc_set_type *dp;
+    /** pointer to domain parameters; either points to NIST curves (identified by idx >= 0) or user supplied curve */
+    const ltc_ecc_set_type *dp;
 
     /** The public key */
     ecc_point pubkey;
@@ -446,6 +446,11 @@ typedef struct {
 } dsa_key;
 
 int dsa_make_key(prng_state *prng, int wprng, int group_size, int modulus_size, dsa_key *key);
+
+int dsa_make_key_ex(prng_state *prng, int wprng, int group_size, int modulus_size, dsa_key *key, char* p_hex, char* q_hex, char* g_hex);
+
+int dsa_make_params(prng_state *prng, int wprng, int group_size, int modulus_size, void *p, void *q, void *g);
+
 void dsa_free(dsa_key *key);
 
 int dsa_sign_hash_raw(const unsigned char *in,  unsigned long inlen,
@@ -473,8 +478,8 @@ int dsa_decrypt_key(const unsigned char *in,  unsigned long  inlen,
                           unsigned char *out, unsigned long *outlen,
                           dsa_key *key);
 
-int dsa_import(const unsigned char *in, unsigned long inlen, dsa_key *key);
 int dsa_import_radix(int radix, char *p, char *q, char *g, char *x, char *y, dsa_key *key);
+int dsa_import(const unsigned char *in, unsigned long inlen, dsa_key *key);
 int dsa_export(unsigned char *out, unsigned long *outlen, int type, dsa_key *key);
 int dsa_verify_key(dsa_key *key, int *stat);
 

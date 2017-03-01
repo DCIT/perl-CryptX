@@ -17,7 +17,7 @@
 /**
   @file ecc_import.c
   ECC Crypto, Tom St Denis
-*/  
+*/
 
 #ifdef LTC_MECC
 
@@ -57,7 +57,7 @@ int ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, co
    }
 
    /* find out what type of key it is */
-   if ((err = der_decode_sequence_multi(in, inlen, 
+   if ((err = der_decode_sequence_multi(in, inlen,
                                   LTC_ASN1_BIT_STRING, 1UL, &flags,
                                   LTC_ASN1_EOL,        0UL, NULL)) != CRYPT_OK) {
       goto done;
@@ -107,7 +107,7 @@ int ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, co
    }
    /* set z */
    if ((err = mp_set(key->pubkey.z, 1)) != CRYPT_OK) { goto done; }
-   
+
    /* is it a point on the curve?  */
    if ((err = ltc_ecc_is_point(key->dp, key->pubkey.x, key->pubkey.y)) != CRYPT_OK) {
       goto done;

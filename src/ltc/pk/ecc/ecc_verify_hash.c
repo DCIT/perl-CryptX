@@ -17,14 +17,14 @@
 /**
   @file ecc_verify_hash.c
   ECC Crypto, Tom St Denis
-*/  
+*/
 
 #ifdef LTC_MECC
 
-/* verify 
+/* verify
  *
  * w  = s^-1 mod n
- * u1 = xw 
+ * u1 = xw
  * u2 = rw
  * X = u1*G + u2*Q
  * v = X_x1 mod n
@@ -32,7 +32,7 @@
  */
 
 int ecc_verify_hash_ex(const unsigned char *sig,  unsigned long siglen,
-                       const unsigned char *hash, unsigned long hashlen, 
+                       const unsigned char *hash, unsigned long hashlen,
                        int *stat, ecc_key *key, int sigformat)
 {
    ecc_point    *mG, *mQ;
@@ -190,7 +190,7 @@ error:
    @return CRYPT_OK if successful (even if the signature is not valid)
 */
 int ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
-                    const unsigned char *hash, unsigned long hashlen, 
+                    const unsigned char *hash, unsigned long hashlen,
                     int *stat, ecc_key *key)
 {
   return ecc_verify_hash_ex(sig, siglen, hash, hashlen, stat, key, 0);
@@ -207,7 +207,7 @@ int ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
    @return CRYPT_OK if successful (even if the signature is not valid)
 */
 int ecc_verify_hash_rfc7518(const unsigned char *sig,  unsigned long siglen,
-                    const unsigned char *hash, unsigned long hashlen, 
+                    const unsigned char *hash, unsigned long hashlen,
                     int *stat, ecc_key *key)
 {
   return ecc_verify_hash_ex(sig, siglen, hash, hashlen, stat, key, 1);
