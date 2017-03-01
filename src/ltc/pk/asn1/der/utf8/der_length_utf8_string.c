@@ -41,6 +41,23 @@ unsigned long der_utf8_charsize(const wchar_t c)
 }
 
 /**
+  Test whether the given code point is valid character
+  @param c   The UTF-8 character to test
+  @return    1 - valid, 0 - invalid
+*/
+int der_utf8_valid_char(const wchar_t c)
+{
+   LTC_UNUSED_PARAM(c);
+#if !defined(__WCHAR_MAX__) || __WCHAR_MAX__ > 0xFFFF
+   if (c > 0x10FFFF) return 0;
+#endif
+#if !defined(__WCHAR_MAX__) || __WCHAR_MAX__ != 0xFFFF && __WCHAR_MAX__ != 0xFFFFFFFF
+   if (c < 0) return 0;
+#endif
+   return 1;
+}
+
+/**
   Gets length of DER encoding of UTF8 STRING
   @param in       The characters to measure the length of
   @param noctets  The number of octets in the string to encode
@@ -56,12 +73,7 @@ int der_length_utf8_string(const wchar_t *in, unsigned long noctets, unsigned lo
 
    len = 0;
    for (x = 0; x < noctets; x++) {
-#if !defined(__WCHAR_MAX__) || __WCHAR_MAX__ > 0xFFFF
-      if (in[x] > 0x10FFFF) return CRYPT_INVALID_ARG;
-#endif
-#if !defined(__WCHAR_MAX__) || __WCHAR_MAX__ != 0xFFFF && __WCHAR_MAX__ != 0xFFFFFFFF
-      if (in[x] < 0) return CRYPT_INVALID_ARG;
-#endif
+      if (!der_utf8_valid_char(in[x])) return CRYPT_INVALID_ARG;
       len += der_utf8_charsize(in[x]);
    }
 

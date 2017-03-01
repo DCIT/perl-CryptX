@@ -37,12 +37,7 @@ int der_encode_utf8_string(const wchar_t *in,  unsigned long inlen,
 
    /* get the size */
    for (x = len = 0; x < inlen; x++) {
-#if !defined(__WCHAR_MAX__) || __WCHAR_MAX__ > 0xFFFF
-       if (in[x] > 0x10FFFF) return CRYPT_INVALID_ARG;
-#endif
-#if !defined(__WCHAR_MAX__) || __WCHAR_MAX__ != 0xFFFF && __WCHAR_MAX__ != 0xFFFFFFFF
-       if (in[x] < 0) return CRYPT_INVALID_ARG;
-#endif
+       if (!der_utf8_valid_char(in[x])) return CRYPT_INVALID_ARG;
        len += der_utf8_charsize(in[x]);
    }
 
