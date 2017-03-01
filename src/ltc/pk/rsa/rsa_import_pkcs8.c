@@ -31,7 +31,7 @@
  * - PrivateKeyAlgorithmIdentifier ::= AlgorithmIdentifier
  * - PrivateKey ::= OCTET STRING
  * - Attributes ::= SET OF Attribute
- * 
+ *
  * EncryptedPrivateKeyInfo ::= SEQUENCE {
  *        encryptionAlgorithm  EncryptionAlgorithmIdentifier,
  *        encryptedData        EncryptedData }
@@ -63,12 +63,12 @@ int rsa_import_pkcs8(unsigned char *in, unsigned long inlen, rsa_key *key)
    unsigned char  *buf1=NULL, *buf2=NULL;
    unsigned long  buf1len, buf2len;
    unsigned long  oid[16];
-   oid_st         rsaoid; 
+   oid_st         rsaoid;
    ltc_asn1_list  alg_seq[2], top_seq[3];
    ltc_asn1_list  alg_seq_e[2], key_seq_e[2], top_seq_e[2];
    unsigned char  *decrypted=NULL;
    unsigned long  decryptedlen;
- 
+
    LTC_ARGCHK(in          != NULL);
    LTC_ARGCHK(key         != NULL);
    LTC_ARGCHK(ltc_mp.name != NULL);
@@ -76,12 +76,12 @@ int rsa_import_pkcs8(unsigned char *in, unsigned long inlen, rsa_key *key)
    /* get RSA alg oid */
    err = pk_get_oid(PKA_RSA, &rsaoid);
    if (err != CRYPT_OK) { return err; }
-   
+
    /* alloc buffers */
-   buf1len = 10000; /* XXX-TODO LTC_DER_MAX_PUBKEY_SIZE*8 nebo inlen*/
+   buf1len = inlen; /* approx. */
    buf1 = XCALLOC(1, buf1len);
    if (buf1 == NULL) { err = CRYPT_MEM; goto LBL_FREE; }
-   buf2len = 10000; /* XXX-TODO LTC_DER_MAX_PUBKEY_SIZE*8 nebo inlen */
+   buf2len = inlen; /* approx. */
    buf2 = XCALLOC(1, buf2len);
    if (buf2 == NULL) { err = CRYPT_MEM; goto LBL_FREE; }
 
@@ -95,12 +95,11 @@ int rsa_import_pkcs8(unsigned char *in, unsigned long inlen, rsa_key *key)
    LTC_SET_ASN1(alg_seq_e, 0, LTC_ASN1_OBJECT_IDENTIFIER, oid, 16UL);
    LTC_SET_ASN1(alg_seq_e, 1, LTC_ASN1_SEQUENCE, key_seq_e, 2UL);
    LTC_SET_ASN1(top_seq_e, 0, LTC_ASN1_SEQUENCE, alg_seq_e, 2UL);
-   LTC_SET_ASN1(top_seq_e, 1, LTC_ASN1_OCTET_STRING, buf2, buf2len);  
+   LTC_SET_ASN1(top_seq_e, 1, LTC_ASN1_OCTET_STRING, buf2, buf2len);
    err=der_decode_sequence(in, inlen, top_seq_e, 2UL);
    if (err == CRYPT_OK) {
-     /* unsigned long icount = mp_get_int(iter); */
-     /* XXX: TODO */
-     /* fprintf(stderr, "XXX-DEBUG: gonna decrypt: iter=%ld salt.len=%ld encdata.len=%ld\n", icount, key_seq_e[0].size, top_seq_e[1].size); */
+     /* XXX: TODO encrypted pkcs8 not supported */
+     /* fprintf(stderr, "decrypt: iter=%ld salt.len=%ld encdata.len=%ld\n", mp_get_int(iter), key_seq_e[0].size, top_seq_e[1].size); */
      err = CRYPT_PK_INVALID_TYPE;
      goto LBL_ERR;
    }
@@ -114,16 +113,16 @@ int rsa_import_pkcs8(unsigned char *in, unsigned long inlen, rsa_key *key)
    LTC_SET_ASN1(alg_seq, 1, LTC_ASN1_NULL, NULL, 0UL);
    LTC_SET_ASN1(top_seq, 0, LTC_ASN1_INTEGER, zero, 1UL);
    LTC_SET_ASN1(top_seq, 1, LTC_ASN1_SEQUENCE, alg_seq, 2UL);
-   LTC_SET_ASN1(top_seq, 2, LTC_ASN1_OCTET_STRING, buf1, buf1len);  
+   LTC_SET_ASN1(top_seq, 2, LTC_ASN1_OCTET_STRING, buf1, buf1len);
    err=der_decode_sequence(decrypted, decryptedlen, top_seq, 3UL);
    if (err != CRYPT_OK) { goto LBL_ERR; }
-   
+
    /* check alg oid */
    if ((alg_seq[0].size != rsaoid.OIDlen) ||
         XMEMCMP(rsaoid.OID, alg_seq[0].data, rsaoid.OIDlen * sizeof(rsaoid.OID[0]))) {
         err = CRYPT_PK_INVALID_TYPE;
         goto LBL_ERR;
-   } 
+   }
 
    err = der_decode_sequence_multi(buf1, top_seq[2].size,
                                    LTC_ASN1_INTEGER, 1UL, zero,
