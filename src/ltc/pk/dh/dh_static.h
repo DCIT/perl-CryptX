@@ -71,7 +71,8 @@
 
 #define SUPPLIED_PRIME 255
 
-static LTC_INLINE void packet_store_header (unsigned char *dst, int section, int subsection)
+/* XXX: HP C compiler + IBM C compiler do not like "static inline" */
+static void packet_store_header (unsigned char *dst, int section, int subsection)
 {
    LTC_ARGCHKVD(dst != NULL);
 
@@ -85,7 +86,8 @@ static LTC_INLINE void packet_store_header (unsigned char *dst, int section, int
 
 }
 
-static LTC_INLINE int packet_valid_header (unsigned char *src, int section, int subsection)
+/* XXX: HP C compiler + IBM C compiler do not like "static inline" */
+static int packet_valid_header (unsigned char *src, int section, int subsection)
 {
    unsigned long ver;
 
