@@ -40,34 +40,25 @@
  * - EncryptedData ::= OCTET STRING
  */
 
-/*
- * This PKCS12 key derivation code comes from BouncyCastle.
- *
- * @param idByte         1 == key, 2 == iv
- * @param n              keysize or ivsize
- * @param salt           8 byte salt
- * @param password       password
- * @param iterationCount iteration-count
- * @param md             The message digest to use
- * @return byte[] the derived key
- */
-
-/*
-pkcs12(int idByte, int n, byte[] salt, byte[] password, int iterationCount, MessageDigest md)
+/**
+  Import an RSAPublicKey or RSAPrivateKey in PKCS#8 format
+  @param in      The packet to import from
+  @param inlen   It's length (octets)
+  @param key     [out] Destination for newly imported key
+  @return CRYPT_OK if successful, upon error allocated memory is freed
 */
-
-int rsa_import_pkcs8(unsigned char *in, unsigned long inlen, rsa_key *key)
+int rsa_import_pkcs8(const unsigned char *in, unsigned long inlen, rsa_key *key)
 {
-   int            err;
-   void           *zero, *iter;
-   unsigned char  *buf1=NULL, *buf2=NULL;
-   unsigned long  buf1len, buf2len;
-   unsigned long  oid[16];
-   oid_st         rsaoid;
-   ltc_asn1_list  alg_seq[2], top_seq[3];
-   ltc_asn1_list  alg_seq_e[2], key_seq_e[2], top_seq_e[2];
-   unsigned char  *decrypted=NULL;
-   unsigned long  decryptedlen;
+   int           err;
+   void          *zero, *iter;
+   unsigned char *buf1 = NULL, *buf2 = NULL;
+   unsigned long buf1len, buf2len;
+   unsigned long oid[16];
+   oid_st        rsaoid;
+   ltc_asn1_list alg_seq[2], top_seq[3];
+   ltc_asn1_list alg_seq_e[2], key_seq_e[2], top_seq_e[2];
+   unsigned char *decrypted = NULL;
+   unsigned long decryptedlen;
 
    LTC_ARGCHK(in          != NULL);
    LTC_ARGCHK(key         != NULL);
@@ -75,19 +66,19 @@ int rsa_import_pkcs8(unsigned char *in, unsigned long inlen, rsa_key *key)
 
    /* get RSA alg oid */
    err = pk_get_oid(PKA_RSA, &rsaoid);
-   if (err != CRYPT_OK) { return err; }
+   if (err != CRYPT_OK) { goto LBL_NOFREE; }
 
    /* alloc buffers */
    buf1len = inlen; /* approx. */
-   buf1 = XCALLOC(1, buf1len);
-   if (buf1 == NULL) { err = CRYPT_MEM; goto LBL_FREE; }
+   buf1 = XMALLOC(buf1len);
+   if (buf1 == NULL) { err = CRYPT_MEM; goto LBL_NOCLEAR; }
    buf2len = inlen; /* approx. */
-   buf2 = XCALLOC(1, buf2len);
+   buf2 = XMALLOC(buf2len);
    if (buf2 == NULL) { err = CRYPT_MEM; goto LBL_FREE; }
 
    /* init key */
    err = mp_init_multi(&key->e, &key->d, &key->N, &key->dQ, &key->dP, &key->qP, &key->p, &key->q, &zero, &iter, NULL);
-   if (err != CRYPT_OK) { return err; }
+   if (err != CRYPT_OK) { goto LBL_NOCLEAR; }
 
    /* try to decode encrypted priv key */
    LTC_SET_ASN1(key_seq_e, 0, LTC_ASN1_OCTET_STRING, buf1, buf1len);
@@ -98,14 +89,14 @@ int rsa_import_pkcs8(unsigned char *in, unsigned long inlen, rsa_key *key)
    LTC_SET_ASN1(top_seq_e, 1, LTC_ASN1_OCTET_STRING, buf2, buf2len);
    err=der_decode_sequence(in, inlen, top_seq_e, 2UL);
    if (err == CRYPT_OK) {
-     /* XXX: TODO encrypted pkcs8 not supported */
-     /* fprintf(stderr, "decrypt: iter=%ld salt.len=%ld encdata.len=%ld\n", mp_get_int(iter), key_seq_e[0].size, top_seq_e[1].size); */
-     err = CRYPT_PK_INVALID_TYPE;
-     goto LBL_ERR;
+      /* XXX: TODO encrypted pkcs8 not supported */
+      /* fprintf(stderr, "decrypt: iter=%ld salt.len=%ld encdata.len=%ld\n", mp_get_int(iter), key_seq_e[0].size, top_seq_e[1].size); */
+      err = CRYPT_PK_INVALID_TYPE;
+      goto LBL_ERR;
    }
    else {
-     decrypted    = in;
-     decryptedlen = inlen;
+      decrypted    = (unsigned char *)in;
+      decryptedlen = inlen;
    }
 
    /* try to decode unencrypted priv key */
@@ -119,9 +110,9 @@ int rsa_import_pkcs8(unsigned char *in, unsigned long inlen, rsa_key *key)
 
    /* check alg oid */
    if ((alg_seq[0].size != rsaoid.OIDlen) ||
-        XMEMCMP(rsaoid.OID, alg_seq[0].data, rsaoid.OIDlen * sizeof(rsaoid.OID[0]))) {
-        err = CRYPT_PK_INVALID_TYPE;
-        goto LBL_ERR;
+      XMEMCMP(rsaoid.OID, alg_seq[0].data, rsaoid.OIDlen * sizeof(rsaoid.OID[0]))) {
+      err = CRYPT_PK_INVALID_TYPE;
+      goto LBL_ERR;
    }
 
    err = der_decode_sequence_multi(buf1, top_seq[2].size,
@@ -143,11 +134,11 @@ int rsa_import_pkcs8(unsigned char *in, unsigned long inlen, rsa_key *key)
 
 LBL_ERR:
    mp_clear_multi(key->d, key->e, key->N, key->dQ, key->dP, key->qP, key->p, key->q, zero, iter, NULL);
-
+LBL_NOCLEAR:
+   XFREE(buf2);
 LBL_FREE:
-   if (buf2 != NULL) XFREE(buf2);
-   if (buf1 != NULL) XFREE(buf1);
-
+   XFREE(buf1);
+LBL_NOFREE:
    return err;
 }
 

@@ -11,7 +11,7 @@
 #include "tomcrypt.h"
 
 /**
-   @file crc.c
+   @file crc32.c
    CRC-32 checksum algorithm
    Written and placed in the public domain by Wei Dai
    Adapted for libtomcrypt by Steffen Jaeckel
@@ -172,6 +172,7 @@ void crc32_finish(crc32_state *ctx, void *hash, unsigned long size)
    h = hash;
    crc = ctx->crc;
    crc ^= _CRC32_NEGL;
+
    if (size > 4) size = 4;
    for (i = 0; i < size; i++) {
       h[i] = ((unsigned char*)&(crc))[size-i-1];
@@ -184,7 +185,7 @@ int crc32_test(void)
    return CRYPT_NOP;
 #else
    const void* in = "libtomcrypt";
-   const unsigned char crc32[] = { 0xef, 0x76, 0x73, 0xb3 };
+   const unsigned char crc32[] = { 0xb3, 0x73, 0x76, 0xef };
    unsigned char out[4];
    crc32_state ctx;
    crc32_init(&ctx);

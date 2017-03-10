@@ -203,7 +203,7 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
    #endif
 #endif
 
-/* No LTC_FAST if explicitly disabled, old gcc, gcc with -ansi or -std=c99 */
+/* No LTC_FAST if: explicitly disabled OR non-gcc/non-clang compiler OR old gcc OR using -ansi -std=c99 */
 #if defined(LTC_NO_FAST) || (__GNUC__ < 4) || defined(__STRICT_ANSI__)
    #undef LTC_FAST
 #endif

@@ -110,8 +110,7 @@ int rsa_sign_saltlen_get_max_ex(int padding, int hash_idx, rsa_key *key);
 /* PKCS #1 import/export */
 int rsa_export(unsigned char *out, unsigned long *outlen, int type, rsa_key *key);
 int rsa_import(const unsigned char *in, unsigned long inlen, rsa_key *key);
-int rsa_import_pkcs8(unsigned char *in, unsigned long inlen, rsa_key *key);
-
+int rsa_import_pkcs8(const unsigned char *in, unsigned long inlen, rsa_key *key);
 int rsa_import_radix(int radix, char *N, char *e, char *d, char *p, char *q, char *dP, char *dQ, char *qP, rsa_key *key);
 #endif
 
@@ -665,10 +664,17 @@ int der_printable_char_encode(int c);
 int der_printable_value_decode(int v);
 
 /* UTF-8 */
-#if (defined(SIZE_MAX) || __STDC_VERSION__ >= 199901L || defined(WCHAR_MAX) || defined(_WCHAR_T) || defined(_WCHAR_T_DEFINED) || defined (__WCHAR_TYPE__)) && !defined(LTC_NO_WCHAR)
+#if (defined(SIZE_MAX) || __STDC_VERSION__ >= 199901L || defined(WCHAR_MAX) || defined(__WCHAR_MAX__) || defined(_WCHAR_T) || defined(_WCHAR_T_DEFINED) || defined (__WCHAR_TYPE__)) && !defined(LTC_NO_WCHAR)
 #include <wchar.h>
+#if defined(__WCHAR_MAX__)
+#define LTC_WCHAR_MAX __WCHAR_MAX__
+#elif defined(WCHAR_MAX)
+#define LTC_WCHAR_MAX WCHAR_MAX
+#endif
+/* please note that it might happen that LTC_WCHAR_MAX is undefined */
 #else
 typedef ulong32 wchar_t;
+#define LTC_WCHAR_MAX 0xFFFFFFFF
 #endif
 
 int der_encode_utf8_string(const wchar_t *in,  unsigned long inlen,
