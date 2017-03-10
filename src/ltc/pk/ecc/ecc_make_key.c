@@ -102,7 +102,7 @@ int ecc_make_key_ex(prng_state *prng, int wprng, ecc_key *key, const ltc_ecc_set
    if ((err = mp_read_unsigned_bin(key->k, (unsigned char *)buf, keysize)) != CRYPT_OK)         { goto errkey; }
 
    /* ECC key pair generation according to FIPS-186-4 (B.4.2 Key Pair Generation by Testing Candidates):
-    * the generated private key k should be the range [1, order–1]
+    * the generated private key k should be the range [1, order-1]
     *  a/ N = bitlen(order)
     *  b/ generate N random bits and convert them into big integer k
     *  c/ if k not in [1, order-1] go to b/
