@@ -13,9 +13,9 @@
  *
  */
 
-#ifdef LTC_MECC
-
 #include "tomcrypt.h"
+
+#ifdef LTC_MECC
 
 /**
   @file ecc_verify_hash.c

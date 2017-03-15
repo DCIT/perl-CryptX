@@ -12,9 +12,9 @@
  *
  */
 
-#ifdef LTC_MECC
-
 #include "tomcrypt.h"
+
+#ifdef LTC_MECC
 
 int ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y)
 {
