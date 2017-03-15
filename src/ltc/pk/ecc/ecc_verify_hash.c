@@ -12,6 +12,9 @@
 /* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
  *
  */
+
+#ifdef LTC_MECC
+
 #include "tomcrypt.h"
 
 /**
@@ -19,21 +22,9 @@
   ECC Crypto, Tom St Denis
 */
 
-#ifdef LTC_MECC
-
-/* verify
- *
- * w  = s^-1 mod n
- * u1 = xw
- * u2 = rw
- * X = u1*G + u2*Q
- * v = X_x1 mod n
- * accept if v == r
- */
-
-int ecc_verify_hash_ex(const unsigned char *sig,  unsigned long siglen,
-                       const unsigned char *hash, unsigned long hashlen,
-                       int *stat, ecc_key *key, int sigformat)
+static int ecc_verify_hash_ex(const unsigned char *sig,  unsigned long siglen,
+                              const unsigned char *hash, unsigned long hashlen,
+                              int *stat, ecc_key *key, int sigformat)
 {
    ecc_point    *mG, *mQ;
    void          *r, *s, *v, *w, *u1, *u2, *e, *p, *m, *a;
@@ -70,23 +61,21 @@ int ecc_verify_hash_ex(const unsigned char *sig,  unsigned long siglen,
    }
 
    if (sigformat == 1) {
-     /* RFC7518 format */
-     if ((siglen % 2) == 1) {
-       err = CRYPT_INVALID_PACKET;
-       goto error;
-     }
-     i = siglen / 2;
-     if ((err = mp_read_unsigned_bin(r, (unsigned char *)sig,   i)) != CRYPT_OK)  goto error;
-     if ((err = mp_read_unsigned_bin(s, (unsigned char *)sig+i, i)) != CRYPT_OK)  goto error;
+      /* RFC7518 format */
+      if ((siglen % 2) == 1) {
+         err = CRYPT_INVALID_PACKET;
+         goto error;
+      }
+      i = siglen / 2;
+      if ((err = mp_read_unsigned_bin(r, (unsigned char *)sig,   i)) != CRYPT_OK)                       { goto error; }
+      if ((err = mp_read_unsigned_bin(s, (unsigned char *)sig+i, i)) != CRYPT_OK)                       { goto error; }
    }
    else {
-     /* ASN.1 format */
-     if ((err = der_decode_sequence_multi(sig, siglen,
-                                    LTC_ASN1_INTEGER, 1UL, r,
-                                    LTC_ASN1_INTEGER, 1UL, s,
-                                    LTC_ASN1_EOL, 0UL, NULL)) != CRYPT_OK) {
-        goto error;
-     }
+      /* ASN.1 format */
+      if ((err = der_decode_sequence_multi(sig, siglen,
+                                     LTC_ASN1_INTEGER, 1UL, r,
+                                     LTC_ASN1_INTEGER, 1UL, s,
+                                     LTC_ASN1_EOL, 0UL, NULL)) != CRYPT_OK)                             { goto error; }
    }
 
    /* get the order */
@@ -108,19 +97,19 @@ int ecc_verify_hash_ex(const unsigned char *sig,  unsigned long siglen,
    pbits = mp_count_bits(p);
    pbytes = (pbits+7) >> 3;
    if (pbits > hashlen*8) {
-     if ((err = mp_read_unsigned_bin(e, (unsigned char *)hash, hashlen)) != CRYPT_OK)              { goto error; }
+      if ((err = mp_read_unsigned_bin(e, (unsigned char *)hash, hashlen)) != CRYPT_OK)                  { goto error; }
    }
    else if (pbits % 8 == 0) {
-     if ((err = mp_read_unsigned_bin(e, (unsigned char *)hash, pbytes)) != CRYPT_OK)                    { goto error; }
+      if ((err = mp_read_unsigned_bin(e, (unsigned char *)hash, pbytes)) != CRYPT_OK)                   { goto error; }
    }
    else {
-     shift_right = 8 - pbits % 8;
-     for (i=0, ch=0; i<pbytes; i++) {
-       buf[i] = ch;
-       ch = (hash[i] << (8-shift_right));
-       buf[i] = buf[i] ^ (hash[i] >> shift_right);
-     }
-     if ((err = mp_read_unsigned_bin(e, (unsigned char *)buf, pbytes)) != CRYPT_OK)                     { goto error; }
+      shift_right = 8 - pbits % 8;
+      for (i=0, ch=0; i<pbytes; i++) {
+        buf[i] = ch;
+        ch = (hash[i] << (8-shift_right));
+        buf[i] = buf[i] ^ (hash[i] >> shift_right);
+      }
+      if ((err = mp_read_unsigned_bin(e, (unsigned char *)buf, pbytes)) != CRYPT_OK)                    { goto error; }
    }
 
    /*  w  = s^-1 mod n */
@@ -193,7 +182,7 @@ int ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
                     const unsigned char *hash, unsigned long hashlen,
                     int *stat, ecc_key *key)
 {
-  return ecc_verify_hash_ex(sig, siglen, hash, hashlen, stat, key, 0);
+   return ecc_verify_hash_ex(sig, siglen, hash, hashlen, stat, key, 0);
 }
 
 /**
@@ -207,14 +196,10 @@ int ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
    @return CRYPT_OK if successful (even if the signature is not valid)
 */
 int ecc_verify_hash_rfc7518(const unsigned char *sig,  unsigned long siglen,
-                    const unsigned char *hash, unsigned long hashlen,
-                    int *stat, ecc_key *key)
+                            const unsigned char *hash, unsigned long hashlen,
+                            int *stat, ecc_key *key)
 {
-  return ecc_verify_hash_ex(sig, siglen, hash, hashlen, stat, key, 1);
+   return ecc_verify_hash_ex(sig, siglen, hash, hashlen, stat, key, 1);
 }
 
 #endif
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
-

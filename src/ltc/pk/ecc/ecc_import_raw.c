@@ -12,62 +12,56 @@
  *
  */
 
-#include "tomcrypt.h"
-
 #ifdef LTC_MECC
+
+#include "tomcrypt.h"
 
 int ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y)
 {
-  int err;
-  unsigned long size;
-  void *t1, *t2;
+   int err;
+   unsigned long size;
+   void *t1, *t2;
 
-  /* init key + temporary numbers */
-  if (mp_init_multi(&t1, &t2, NULL) != CRYPT_OK) {
-     return CRYPT_MEM;
-  }
+   /* init key + temporary numbers */
+   if (mp_init_multi(&t1, &t2, NULL) != CRYPT_OK) {
+      return CRYPT_MEM;
+   }
 
-  size = mp_unsigned_bin_size(prime);
+   size = mp_unsigned_bin_size(prime);
 
-  if (in[0] == 0x04 && (inlen&1) && ((inlen-1)>>1) == size) {
-    /* read uncompressed point */
-    /* load x */
-    if ((err = mp_read_unsigned_bin(x, (unsigned char *)in+1, size)) != CRYPT_OK) {
-       goto cleanup;
-    }
-    /* load y */
-    if ((err = mp_read_unsigned_bin(y, (unsigned char *)in+1+size, size)) != CRYPT_OK) {
-       goto cleanup;
-    }
-  }
-  else if ((in[0] == 0x02 || in[0] == 0x03) && (inlen-1) == size) {
-    /* read compressed point */
-    /* load x */
-    if ((err = mp_read_unsigned_bin(x, (unsigned char *)in+1, size)) != CRYPT_OK) {
-       goto cleanup;
-    }
-    /* compute x^3 */
-    if ((err = mp_sqr(x, t1)) != CRYPT_OK)                                      { goto cleanup; }
-    if ((err = mp_mulmod(t1, x, prime, t1)) != CRYPT_OK)                        { goto cleanup; }
-    /* compute x^3 + a*x */
-    if ((err = mp_mulmod(a, x, prime, t2)) != CRYPT_OK)                         { goto cleanup; }
-    if ((err = mp_add(t1, t2, t1)) != CRYPT_OK)                                 { goto cleanup; }
-    /* compute x^3 + a*x + b */
-    if ((err = mp_add(t1, b, t1)) != CRYPT_OK)                                  { goto cleanup; }
-    /* compute sqrt(x^3 + a*x + b) */
-    if ((err = mp_sqrtmod_prime(t1, prime, t2)) != CRYPT_OK)                    { goto cleanup; }
-    /* adjust y */
-    if ((mp_isodd(t2) && in[0] == 0x03) || (!mp_isodd(t2) && in[0] == 0x02)) {
-      if ((err = mp_mod(t2, prime, y)) != CRYPT_OK)                             { goto cleanup; }
-    }
-    else {
-      if ((err = mp_submod(prime, t2, prime, y)) != CRYPT_OK)                   { goto cleanup; }
-    }
-  }
-  else {
-    err = CRYPT_INVALID_PACKET;
-    goto cleanup;
-  }
+   if (in[0] == 0x04 && (inlen&1) && ((inlen-1)>>1) == size) {
+      /* read uncompressed point */
+      /* load x */
+      if ((err = mp_read_unsigned_bin(x, (unsigned char *)in+1, size)) != CRYPT_OK)      { goto cleanup; }
+      /* load y */
+      if ((err = mp_read_unsigned_bin(y, (unsigned char *)in+1+size, size)) != CRYPT_OK) { goto cleanup; }
+   }
+   else if ((in[0] == 0x02 || in[0] == 0x03) && (inlen-1) == size) {
+      /* read compressed point */
+      /* load x */
+      if ((err = mp_read_unsigned_bin(x, (unsigned char *)in+1, size)) != CRYPT_OK)      { goto cleanup; }
+      /* compute x^3 */
+      if ((err = mp_sqr(x, t1)) != CRYPT_OK)                                             { goto cleanup; }
+      if ((err = mp_mulmod(t1, x, prime, t1)) != CRYPT_OK)                               { goto cleanup; }
+      /* compute x^3 + a*x */
+      if ((err = mp_mulmod(a, x, prime, t2)) != CRYPT_OK)                                { goto cleanup; }
+      if ((err = mp_add(t1, t2, t1)) != CRYPT_OK)                                        { goto cleanup; }
+      /* compute x^3 + a*x + b */
+      if ((err = mp_add(t1, b, t1)) != CRYPT_OK)                                         { goto cleanup; }
+      /* compute sqrt(x^3 + a*x + b) */
+      if ((err = mp_sqrtmod_prime(t1, prime, t2)) != CRYPT_OK)                           { goto cleanup; }
+      /* adjust y */
+      if ((mp_isodd(t2) && in[0] == 0x03) || (!mp_isodd(t2) && in[0] == 0x02)) {
+         if ((err = mp_mod(t2, prime, y)) != CRYPT_OK)                                   { goto cleanup; }
+      }
+      else {
+         if ((err = mp_submod(prime, t2, prime, y)) != CRYPT_OK)                         { goto cleanup; }
+      }
+   }
+   else {
+      err = CRYPT_INVALID_PACKET;
+      goto cleanup;
+   }
 
    err = CRYPT_OK;
 cleanup:
@@ -100,50 +94,48 @@ int ecc_import_raw(const unsigned char *in, unsigned long inlen, ecc_key *key, l
    }
 
    if (inlen <= (unsigned long)dp->size) {
-     /* read PRIVATE key */
-     type = PK_PRIVATE;
-     size = inlen;
-     /* load private k */
-     if ((err = mp_read_unsigned_bin(key->k, (unsigned char *)in, size)) != CRYPT_OK) {
-        goto cleanup;
-     }
-     if (mp_iszero(key->k)) {
-        err = CRYPT_INVALID_PACKET;
-        goto cleanup;
-     }
-     /* init base point */
-     if ((base = ltc_ecc_new_point()) == NULL) {
-       err = CRYPT_MEM;
-       goto cleanup;
-     }
-     /* load prime + base point */
-     if ((err = mp_read_radix(prime, dp->prime, 16)) != CRYPT_OK)               { goto cleanup; }
-     if ((err = mp_read_radix(base->x, dp->Gx, 16)) != CRYPT_OK)                { goto cleanup; }
-     if ((err = mp_read_radix(base->y, dp->Gy, 16)) != CRYPT_OK)                { goto cleanup; }
-     if ((err = mp_set(base->z, 1)) != CRYPT_OK)                                { goto cleanup; }
-     /* make the public key */
-     if ((err = mp_read_radix(a, dp->A, 16)) != CRYPT_OK)                       { goto cleanup; }
-     if ((err = ltc_mp.ecc_ptmul(key->k, base, &key->pubkey, a, prime, 1)) != CRYPT_OK) {
-       goto cleanup;
-     }
-     /* cleanup */
-     ltc_ecc_del_point(base);
+      /* read PRIVATE key */
+      type = PK_PRIVATE;
+      size = inlen;
+      /* load private k */
+      if ((err = mp_read_unsigned_bin(key->k, (unsigned char *)in, size)) != CRYPT_OK) {
+         goto cleanup;
+      }
+      if (mp_iszero(key->k)) {
+         err = CRYPT_INVALID_PACKET;
+         goto cleanup;
+      }
+      /* init base point */
+      if ((base = ltc_ecc_new_point()) == NULL) {
+         err = CRYPT_MEM;
+         goto cleanup;
+      }
+      /* load prime + base point */
+      if ((err = mp_read_radix(prime, dp->prime, 16)) != CRYPT_OK)                       { goto cleanup; }
+      if ((err = mp_read_radix(base->x, dp->Gx, 16)) != CRYPT_OK)                        { goto cleanup; }
+      if ((err = mp_read_radix(base->y, dp->Gy, 16)) != CRYPT_OK)                        { goto cleanup; }
+      if ((err = mp_set(base->z, 1)) != CRYPT_OK)                                        { goto cleanup; }
+      /* make the public key */
+      if ((err = mp_read_radix(a, dp->A, 16)) != CRYPT_OK)                               { goto cleanup; }
+      if ((err = ltc_mp.ecc_ptmul(key->k, base, &key->pubkey, a, prime, 1)) != CRYPT_OK) { goto cleanup; }
+      /* cleanup */
+      ltc_ecc_del_point(base);
    }
    else {
-     /* read PUBLIC key */
-     type = PK_PUBLIC;
-     /* load prime + A + B */
-     if ((err = mp_read_radix(prime, dp->prime, 16)) != CRYPT_OK)               { goto cleanup; }
-     if ((err = mp_read_radix(b, dp->B, 16)) != CRYPT_OK)                       { goto cleanup; }
-     if ((err = mp_read_radix(a, dp->A, 16)) != CRYPT_OK)                       { goto cleanup; }
-     err = ecc_import_point(in, inlen, prime, a, b, key->pubkey.x, key->pubkey.y);
-     if (err != CRYPT_OK)                                                       { goto cleanup; }
-     if ((err = mp_set(key->pubkey.z, 1)) != CRYPT_OK)                          { goto cleanup; }
+      /* read PUBLIC key */
+      type = PK_PUBLIC;
+      /* load prime + A + B */
+      if ((err = mp_read_radix(prime, dp->prime, 16)) != CRYPT_OK)                       { goto cleanup; }
+      if ((err = mp_read_radix(b, dp->B, 16)) != CRYPT_OK)                               { goto cleanup; }
+      if ((err = mp_read_radix(a, dp->A, 16)) != CRYPT_OK)                               { goto cleanup; }
+      err = ecc_import_point(in, inlen, prime, a, b, key->pubkey.x, key->pubkey.y);
+      if (err != CRYPT_OK)                                                               { goto cleanup; }
+      if ((err = mp_set(key->pubkey.z, 1)) != CRYPT_OK)                                  { goto cleanup; }
    }
 
-   if ((err = ltc_ecc_is_point(dp, key->pubkey.x, key->pubkey.y)) != CRYPT_OK)      {
-     err = CRYPT_INVALID_PACKET;
-     goto cleanup;
+   if ((err = ltc_ecc_is_point(dp, key->pubkey.x, key->pubkey.y)) != CRYPT_OK) {
+      err = CRYPT_INVALID_PACKET;
+      goto cleanup;
    }
 
    key->type = type;
