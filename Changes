@@ -11,6 +11,11 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.045   2017/03/31
+        - sync with libtomcrypt/develop
+        - fix #30 fix on SPARC+SolarisStudio
+        - fix #31 Fails tests without '.' in @INC
+
 0.044   2016/11/28
         - fix #27 Math::BigInt::LTM compatibility with older Math::BigInt
 
