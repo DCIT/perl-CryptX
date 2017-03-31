@@ -15,6 +15,7 @@ TODO:
         - sync with libtomcrypt/develop
         - fix #30 fix on SPARC+SolarisStudio
         - fix #31 Fails tests without '.' in @INC
+        - polish compiler warnings
 
 0.044   2016/11/28
         - fix #27 Math::BigInt::LTM compatibility with older Math::BigInt
