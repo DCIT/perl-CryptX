@@ -49,4 +49,4 @@ is($x, "9903520314281112085086151826",
 #############################################################################
 # all the other tests
 
-require 't/mbi_ltm/bigintpm.inc';       # all tests here for sharing
+require './t/mbi_ltm/bigintpm.inc';       # all tests here for sharing
