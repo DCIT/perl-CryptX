@@ -4,7 +4,7 @@ package Crypt::Digest::Tiger192;
 
 use strict;
 use warnings;
-our $VERSION = '0.045';
+our $VERSION = '0.046';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( tiger192 tiger192_hex tiger192_b64 tiger192_b64u tiger192_file tiger192_file_hex tiger192_file_b64 tiger192_file_b64u )] );
