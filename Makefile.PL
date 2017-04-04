@@ -14,7 +14,7 @@ my $myextlib = "src/liballinone$Config{lib_ext}";
 my $mycflags = "$Config{cccdlflags} $Config{ccflags} $Config{optimize} -Iltm -Iltc/headers -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC";
 
 # gcc with -flto is a trouble maker see https://github.com/DCIT/perl-CryptX/issues/32
-my $myar = $mycflags =~ /-flto/ && $Config{gccversion} ? 'gcc-ar' : '$(AR)';
+$mycflags =~ s/-flto\b//g;
 
 my %eumm_args = (
   NAME             => 'CryptX',
@@ -44,7 +44,7 @@ WriteMakefile(%eumm_args);
 sub MY::postamble {
   my $myextlib = qq{
 \$(MYEXTLIB): src/Makefile
-	cd src && \$(MAKE) ARFLAGS="\$(AR_STATIC_ARGS)" RANLIB="\$(RANLIB)" AR="$myar" CC="\$(CC)" LIB_EXT=\$(LIB_EXT) OBJ_EXT=\$(OBJ_EXT) CFLAGS="$mycflags"
+	cd src && \$(MAKE) ARFLAGS="\$(AR_STATIC_ARGS)" RANLIB="\$(RANLIB)" AR="\$(AR)" CC="\$(CC)" LIB_EXT=\$(LIB_EXT) OBJ_EXT=\$(OBJ_EXT) CFLAGS="$mycflags"
 };
 
   $myextlib = qq{
