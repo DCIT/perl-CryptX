@@ -11,6 +11,9 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.046   2017/04/04
+        - fix #32 Compile "ar" step fails when Perl built with -flto
+
 0.045   2017/03/31
         - sync with libtomcrypt/develop
         - fix #30 fix on SPARC+SolarisStudio
