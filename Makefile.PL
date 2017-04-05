@@ -13,8 +13,17 @@ my @myobjs = map { s|.c$|$Config{obj_ext}|; $_ } grep { $_ !~ m|^src/ltc/\.*tab\
 my $myextlib = "src/liballinone$Config{lib_ext}";
 my $mycflags = "$Config{cccdlflags} $Config{ccflags} $Config{optimize} -Iltm -Iltc/headers -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC";
 
-# gcc with -flto is a trouble maker see https://github.com/DCIT/perl-CryptX/issues/32
+#FIX: gcc with -flto is a trouble maker see https://github.com/DCIT/perl-CryptX/issues/32
 $mycflags =~ s/-flto\b//g;
+
+#FIX: avoid "ar: fatal: Numeric group ID too large" see https://github.com/DCIT/perl-CryptX/issues/33
+my $myarflags = '$(AR_STATIC_ARGS)';
+if ($^O ne 'MSWin32' && $Config{ar}) {
+  # for ar's "deterministic mode" we need GNU binutils 2.20+ (2009-10-16)
+  my $arver = `$Config{ar} --version`;
+  my ($maj, $min) = $arver =~ /^GNU ar [^\d]*(\d)\.(\d+)\.\d+/s;
+  $myarflags = 'rcD' if $maj && $min && $maj >= 2 && $min >= 20;
+}
 
 my %eumm_args = (
   NAME             => 'CryptX',
@@ -44,7 +53,7 @@ WriteMakefile(%eumm_args);
 sub MY::postamble {
   my $myextlib = qq{
 \$(MYEXTLIB): src/Makefile
-	cd src && \$(MAKE) ARFLAGS="\$(AR_STATIC_ARGS)" RANLIB="\$(RANLIB)" AR="\$(AR)" CC="\$(CC)" LIB_EXT=\$(LIB_EXT) OBJ_EXT=\$(OBJ_EXT) CFLAGS="$mycflags"
+	cd src && \$(MAKE) ARFLAGS="$myarflags" RANLIB="\$(RANLIB)" AR="\$(AR)" CC="\$(CC)" LIB_EXT=\$(LIB_EXT) OBJ_EXT=\$(OBJ_EXT) CFLAGS="$mycflags"
 };
 
   $myextlib = qq{
