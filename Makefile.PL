@@ -22,7 +22,7 @@ if ($^O ne 'MSWin32' && $Config{ar}) {
   # for ar's "deterministic mode" we need GNU binutils 2.20+ (2009-10-16)
   my $arver = `$Config{ar} --version`;
   my ($maj, $min) = $arver =~ /^GNU ar [^\d]*(\d)\.(\d+)\.\d+/s;
-  $myarflags = 'rcD' if $maj && $min && $maj >= 2 && $min >= 20;
+  $myarflags = 'rcD' if ($maj && $min && $maj >= 2 && $min >= 20) || $arver=~ /^BSD ar /;
 }
 
 my %eumm_args = (
