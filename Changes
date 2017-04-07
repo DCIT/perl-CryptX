@@ -18,6 +18,7 @@ TODO:
         - NEW: Crypt::Digest::SHA3_512
         - NEW: Crypt::AuthEnc::ChaCha20Poly1305
         - NEW: Crypt::Mac::Poly1305
+        - NEW: Crypt::PRNG::ChaCha20
         - NEW: Crypt::Stream::ChaCha
         - NEW: Crypt::Stream::RC4
         - NEW: Crypt::Stream::Sober128

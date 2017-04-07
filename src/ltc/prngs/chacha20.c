@@ -17,7 +17,7 @@
 
 const struct ltc_prng_descriptor chacha20_prng_desc =
 {
-   "chacha",
+   "chacha20",
    sizeof(chacha_state),
    &chacha20_prng_start,
    &chacha20_prng_add_entropy,
