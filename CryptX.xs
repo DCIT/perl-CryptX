@@ -41,6 +41,11 @@ typedef struct gcm_struct {             /* used by Crypt::AuthEnc::GCM */
   int id;
 } *Crypt__AuthEnc__GCM;
 
+typedef struct chacha20poly1305_struct {/* used by Crypt::AuthEnc::ChaCha20Poly1305 */
+  chacha20poly1305_state state;
+  int id;
+} *Crypt__AuthEnc__ChaCha20Poly1305;
+
 typedef struct ocb_struct {             /* used by Crypt::AuthEnc::OCB */
   ocb3_state state;
   int id;
@@ -444,6 +449,7 @@ INCLUDE: inc/CryptX_AuthEnc_EAX.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_GCM.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_OCB.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_CCM.xs.inc
+INCLUDE: inc/CryptX_AuthEnc_ChaCha20Poly1305.xs.inc
 
 INCLUDE: inc/CryptX_Mac_F9.xs.inc
 INCLUDE: inc/CryptX_Mac_HMAC.xs.inc

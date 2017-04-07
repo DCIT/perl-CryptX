@@ -13,6 +13,7 @@ Crypt::AuthEnc::CCM     T_PTROBJ
 Crypt::AuthEnc::EAX     T_PTROBJ
 Crypt::AuthEnc::GCM     T_PTROBJ
 Crypt::AuthEnc::OCB     T_PTROBJ
+Crypt::AuthEnc::ChaCha20Poly1305 T_PTROBJ
 
 Crypt::Mac::F9          T_PTROBJ
 Crypt::Mac::HMAC        T_PTROBJ
