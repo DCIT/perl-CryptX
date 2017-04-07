@@ -20,6 +20,7 @@ Crypt::Mac::OMAC        T_PTROBJ
 Crypt::Mac::Pelican     T_PTROBJ
 Crypt::Mac::PMAC        T_PTROBJ
 Crypt::Mac::XCBC        T_PTROBJ
+Crypt::Mac::Poly1305    T_PTROBJ
 
 Crypt::Mode::CBC        T_PTROBJ
 Crypt::Mode::CFB        T_PTROBJ

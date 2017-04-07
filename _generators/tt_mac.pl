@@ -28,14 +28,19 @@ my %list = (
         Pelican => { info=>'Message authentication code Pelican (AES based MAC)', urls=>['http://eprint.iacr.org/2005/088.pdf'] },
         PMAC    => { info=>'Message authentication code PMAC', urls=>['https://en.wikipedia.org/wiki/PMAC_%28cryptography%29'] },
         XCBC    => { info=>'Message authentication code XCBC (RFC 3566)', urls=>['https://www.ietf.org/rfc/rfc3566.txt'] },
+        Poly1305=> { info=>'Message authentication code Poly1305 (RFC 7539)', urls=>['https://www.ietf.org/rfc/rfc7539.txt'] },
 );
 
 my @test_strings = ( '', '123', "test\0test\0test\n");
+
+my ($pmver) = grep { /^our\s+\$VERSION/ } read_file("$FindBin::Bin/../lib/Crypt/Mac.pm");
+$pmver =~ s/our\s+\$VERSION\s*=\s*'(.*?)'.*$/$1/s;
 
 for my $n (keys %list) {
   warn "Processing mac: '$n'\n";
   my $data = {
     comment   => "### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!",
+    pmver     => $pmver,
     orig_name => $n,
     uc_name   => uc($n),
     lc_name   => lc($n),
@@ -50,6 +55,7 @@ for my $n (keys %list) {
     require Crypt::Mac::Pelican;
     require Crypt::Mac::PMAC;
     require Crypt::Mac::XCBC;
+    require Crypt::Mac::Poly1305;
 
     for (@test_strings) {
       if ($n eq 'HMAC') {
@@ -63,6 +69,10 @@ for my $n (keys %list) {
         push @{$data->{t_strings}}, { mac=>unpack('H*', Crypt::Mac::Pelican->new('12345678901234561234567890123456')->add($_)->mac), data=>pp($_), args=>"'12345678901234561234567890123456'" };
         push @{$data->{t_strings}}, { mac=>unpack('H*', Crypt::Mac::Pelican->new('aaaaaaaaaaaaaaaa')->add($_)->mac), data=>pp($_), args=>"'aaaaaaaaaaaaaaaa'" };
         push @{$data->{t_strings}}, { mac=>unpack('H*', Crypt::Mac::Pelican->new('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')->add($_)->mac), data=>pp($_), args=>"'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'" };
+      }
+      elsif ($n eq 'Poly1305') {
+        push @{$data->{t_strings}}, { mac=>unpack('H*', Crypt::Mac::Poly1305->new('12345678901234561234567890123456')->add($_)->mac), data=>pp($_), args=>"'12345678901234561234567890123456'" };
+        push @{$data->{t_strings}}, { mac=>unpack('H*', Crypt::Mac::Poly1305->new('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')->add($_)->mac), data=>pp($_), args=>"'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'" };
       }
       else {
         push @{$data->{t_strings}}, { mac=>unpack('H*', "Crypt::Mac::$n"->new('AES', '1234567890123456')->add($_)->mac), data=>pp($_), args=>"'AES','1234567890123456'" };
@@ -89,7 +99,7 @@ for my $n (keys %list) {
     copy("$pm_out.$$", $pm_out) and warn("Writting '$pm_out'\n") unless equal_files("$pm_out.$$", $pm_out);
     unlink "$pm_out.$$";
 
-    my $xs_out = catfile($outdir_l, "CryptX_Mac_$n.xs.inc");
+    my $xs_out = catfile($outdir_l, "../inc/CryptX_Mac_$n.xs.inc");
     my $xs_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
     $xs_tt->process("$FindBin::Bin/Mac.xs.inc.tt", $data, "$xs_out.$$", {binmode=>1}) || die $xs_tt->error(), "\n";
     copy("$xs_out.$$", $xs_out) and warn("Writting '$xs_out'\n") unless equal_files("$xs_out.$$", $xs_out);

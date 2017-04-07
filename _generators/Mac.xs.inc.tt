@@ -5,7 +5,7 @@ MODULE = CryptX         PACKAGE = Crypt::Mac::[%orig_name%]
 Crypt::Mac::[%orig_name%]
 [%-IF lc_name == 'hmac' %]
 _new(char * hash_name, SV * key)
-[%-ELSIF lc_name == 'pelican' %]
+[%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
 _new(SV * key)
 [%-ELSE%]
 _new(char * cipher_name, SV * key)
@@ -20,7 +20,7 @@ _new(char * cipher_name, SV * key)
 
         id = find_hash(hash_name);
         if(id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
-[%-ELSIF lc_name == 'pelican' %]
+[%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
 [%-ELSE%]
         int id;
 
@@ -34,7 +34,7 @@ _new(char * cipher_name, SV * key)
         Newz(0, RETVAL, 1, struct [%lc_name%]_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-[%-IF lc_name == 'pelican' %]
+[%-IF lc_name == 'pelican' || lc_name == 'poly1305' %]
         rv = [%lc_name%]_init(&RETVAL->state, k, (unsigned long)k_len);
 [%-ELSE%]
         rv = [%lc_name%]_init(&RETVAL->state, id, k, (unsigned long)k_len);

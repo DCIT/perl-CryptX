@@ -76,6 +76,11 @@ typedef struct xcbc_struct {            /* used by Crypt::Mac::XCBC */
   int id;
 } *Crypt__Mac__XCBC;
 
+typedef struct poly1305_struct {            /* used by Crypt::Mac::Poly1305 */
+  poly1305_state state;
+  int id;
+} *Crypt__Mac__Poly1305;
+
 typedef struct cbc_struct {             /* used by Crypt::Mode::CBC */
   int cipher_id, cipher_rounds;
   symmetric_CBC state;
@@ -446,6 +451,7 @@ INCLUDE: inc/CryptX_Mac_OMAC.xs.inc
 INCLUDE: inc/CryptX_Mac_Pelican.xs.inc
 INCLUDE: inc/CryptX_Mac_PMAC.xs.inc
 INCLUDE: inc/CryptX_Mac_XCBC.xs.inc
+INCLUDE: inc/CryptX_Mac_Poly1305.xs.inc
 
 INCLUDE: inc/CryptX_Mode_CBC.xs.inc
 INCLUDE: inc/CryptX_Mode_ECB.xs.inc
