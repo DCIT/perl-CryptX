@@ -2,7 +2,7 @@ package Crypt::AuthEnc::CCM;
 
 use strict;
 use warnings;
-our $VERSION = '0.047';
+our $VERSION = '0.047_001';
 
 use base qw(Crypt::AuthEnc Exporter);
 our %EXPORT_TAGS = ( all => [qw( ccm_encrypt_authenticate ccm_decrypt_verify )] );

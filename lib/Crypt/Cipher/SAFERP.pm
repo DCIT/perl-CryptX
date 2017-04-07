@@ -4,7 +4,7 @@ package Crypt::Cipher::SAFERP;
 
 use strict;
 use warnings;
-our $VERSION = '0.047';
+our $VERSION = '0.047_001';
 
 use CryptX;
 use base 'Crypt::Cipher';
