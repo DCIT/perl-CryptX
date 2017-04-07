@@ -175,7 +175,8 @@ Please note that all functions take as its first argument the algoritm name, sup
 
  'CHAES', 'MD2', 'MD4', 'MD5', 'RIPEMD128', 'RIPEMD160',
  'RIPEMD256', 'RIPEMD320', 'SHA1', 'SHA224', 'SHA256',
- 'SHA384', 'SHA512', 'SHA512_224', 'SHA512_256', 'Tiger192', 'Whirlpool'
+ 'SHA384', 'SHA512', 'SHA512_224', 'SHA512_256', 'Tiger192', 'Whirlpool',
+ 'SHA3_224', 'SHA3_256', 'SHA3_384', 'SHA3_512'
 
  (simply any <FUNCNAME> for which there is Crypt::Digest::<FUNCNAME> module)
 
