@@ -23,7 +23,7 @@ ltc/hashes/chc/chc.obj ltc/hashes/helper/hash_file.obj ltc/hashes/helper/hash_fi
 ltc/hashes/helper/hash_memory_multi.obj ltc/hashes/md2.obj ltc/hashes/md4.obj ltc/hashes/md5.obj ltc/hashes/rmd128.obj \
 ltc/hashes/rmd160.obj ltc/hashes/rmd256.obj ltc/hashes/rmd320.obj ltc/hashes/sha1.obj ltc/hashes/sha2/sha224.obj \
 ltc/hashes/sha2/sha256.obj ltc/hashes/sha2/sha384.obj ltc/hashes/sha2/sha512.obj ltc/hashes/sha2/sha512_224.obj \
-ltc/hashes/sha2/sha512_256.obj ltc/hashes/tiger.obj ltc/hashes/whirl/whirl.obj ltc/hashes/sha3.obj \
+ltc/hashes/sha2/sha512_256.obj ltc/hashes/tiger.obj ltc/hashes/whirl/whirl.obj ltc/hashes/sha3.obj ltc/hashes/sha3_test.obj \
 ltc/mac/poly1305/poly1305.obj ltc/mac/poly1305/poly1305_file.obj ltc/mac/poly1305/poly1305_memory.obj ltc/mac/poly1305/poly1305_memory_multi.obj \
 ltc/mac/f9/f9_done.obj ltc/mac/f9/f9_file.obj ltc/mac/f9/f9_init.obj ltc/mac/f9/f9_memory.obj ltc/mac/f9/f9_memory_multi.obj ltc/mac/f9/f9_process.obj \
 ltc/mac/hmac/hmac_done.obj ltc/mac/hmac/hmac_file.obj ltc/mac/hmac/hmac_init.obj ltc/mac/hmac/hmac_memory.obj \

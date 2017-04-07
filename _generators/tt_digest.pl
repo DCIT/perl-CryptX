@@ -38,6 +38,10 @@ my %list = (
         SHA512     => { ltc=>'sha512',    info=>'Hash function SHA-512 [size: 512 bits]', urls=>['http://en.wikipedia.org/wiki/SHA-2'] },
         SHA512_224 => { ltc=>'sha512_224',info=>'Hash function SHA-512/224 [size: 224 bits]', urls=>['http://en.wikipedia.org/wiki/SHA-2'] },
         SHA512_256 => { ltc=>'sha512_256',info=>'Hash function SHA-512/256 [size: 256 bits]', urls=>['http://en.wikipedia.org/wiki/SHA-2'] },
+        SHA3_224   => { ltc=>'sha3_224',  info=>'Hash function SHA3-224 [size: 224 bits]', urls=>['http://en.wikipedia.org/wiki/SHA-3'] },
+        SHA3_256   => { ltc=>'sha3_256',  info=>'Hash function SHA3-256 [size: 256 bits]', urls=>['http://en.wikipedia.org/wiki/SHA-3'] },
+        SHA3_384   => { ltc=>'sha3_384',  info=>'Hash function SHA3-384 [size: 384 bits]', urls=>['http://en.wikipedia.org/wiki/SHA-3'] },
+        SHA3_512   => { ltc=>'sha3_512',  info=>'Hash function SHA3-512 [size: 512 bits]', urls=>['http://en.wikipedia.org/wiki/SHA-3'] },
         Tiger192   => { ltc=>'tiger',     info=>'Hash function Tiger-192 [size: 192 bits]', urls=>['http://en.wikipedia.org/wiki/Tiger_(cryptography)'] },
         Whirlpool  => { ltc=>'whirlpool', info=>'Hash function Whirlpool [size: 512 bits]', urls=>['http://en.wikipedia.org/wiki/Whirlpool_(cryptography)'] },
 );
@@ -46,11 +50,15 @@ my @test_strings = ( '', '123', "test\0test\0test\n");
 my @test_files = bsd_glob("$FindBin::Bin/../t/data/*.file");
 @test_files = map { abs2rel(canonpath($_), canonpath("$FindBin::Bin/../")) } @test_files;
 
-for my $n (keys %list) {
+my ($pmver) = grep { /^our\s+\$VERSION/ } read_file("$FindBin::Bin/../lib/Crypt/Digest.pm");
+$pmver =~ s/our\s+\$VERSION\s*=\s*'(.*?)'.*$/$1/s;
+
+for my $n (sort keys %list) {
   warn "Processing digest: '$n'\n";
 
   my $data = {
     comment   => "### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!",
+    pmver     => $pmver,
     orig_name => $n,
     uc_name   => uc($n),
     lc_name   => lc($n),
@@ -61,10 +69,13 @@ for my $n (keys %list) {
   };
 
   if ($outdir_t) {
-    require Crypt::Digest;
-    Crypt::Digest::import(':all');
+    eval "use Crypt::Digest ':all';"; die $@ if $@;
+    #require Crypt::Digest;
+    #Crypt::Digest::import(':all');
     for (@test_strings) {
-      push @{$data->{t_strings}}, { data=>pp($_),
+      my $d = pp($_);
+      $d = "\"$d\"" if $d =~ /^\d*$/; # 123 >>> "123"
+      push @{$data->{t_strings}}, { data=>$d,
                                     hex=>Crypt::Digest::digest_data_hex($n, $_),
                                     base64=>Crypt::Digest::digest_data_b64($n, $_),
                                     base64url=>Crypt::Digest::digest_data_b64u($n, $_),
