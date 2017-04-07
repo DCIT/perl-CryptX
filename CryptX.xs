@@ -26,6 +26,11 @@ typedef struct digest_struct {          /* used by Crypt::Digest */
   struct ltc_hash_descriptor *desc;
 } *Crypt__Digest;
 
+typedef struct digest_shake_struct {    /* used by Crypt::Digest::SHAKE */
+  hash_state state;
+  int num;
+} *Crypt__Digest__SHAKE;
+
 typedef struct ccm_struct {             /* used by Crypt::AuthEnc::CCM */
   ccm_state state;
   int id;
@@ -456,6 +461,7 @@ CryptX__decode_base64(SV * in)
 ###############################################################################
 
 INCLUDE: inc/CryptX_Digest.xs.inc
+INCLUDE: inc/CryptX_Digest_SHAKE.xs.inc 
 INCLUDE: inc/CryptX_Cipher.xs.inc
 
 INCLUDE: inc/CryptX_Checksum_Adler32.xs.inc

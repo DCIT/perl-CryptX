@@ -9,13 +9,13 @@ TODO:
         - maybe: add CCM interface for new-add-add-done mode
         - maybe: switch yarrow > fortuna for Crypt::PK::*
         - maybe: add encode_b32/decode_b32
-        - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
 0.047_001 2017/04/07
         - NEW: Crypt::Digest::SHA3_224
         - NEW: Crypt::Digest::SHA3_256
         - NEW: Crypt::Digest::SHA3_384
         - NEW: Crypt::Digest::SHA3_512
+        - NEW: Crypt::Digest::SHAKE
         - NEW: Crypt::AuthEnc::ChaCha20Poly1305
         - NEW: Crypt::Mac::Poly1305
         - NEW: Crypt::PRNG::ChaCha20
