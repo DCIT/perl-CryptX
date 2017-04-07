@@ -11,6 +11,17 @@ TODO:
         - maybe: add encode_b32/decode_b32
         - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
 
+0.048   2017/04/XX
+        - NEW: Crypt::Digest::SHA3_224
+        - NEW: Crypt::Digest::SHA3_256
+        - NEW: Crypt::Digest::SHA3_384
+        - NEW: Crypt::Digest::SHA3_512
+        - NEW: Crypt::AuthEnc::ChaCha20Poly1305
+        - NEW: Crypt::Mac::Poly1305
+        - NEW: Crypt::Stream::ChaCha
+        - NEW: Crypt::Stream::RC4
+        - NEW: Crypt::Stream::Sober128
+
 0.047   2017/04/05
         - fix #32 Compile "ar" step fails when Perl built with -flto (better version)
         - fix #33 build fails on freebsd 9.2 and 10.0 (ar: fatal: Numeric group ID too large)

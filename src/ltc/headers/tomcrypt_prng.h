@@ -10,8 +10,8 @@ struct yarrow_prng {
 
 #ifdef LTC_RC4
 struct rc4_prng {
-    int x, y;
-    unsigned char buf[256];
+    rc4_state s;
+    short ready;
 };
 #endif
 
@@ -44,15 +44,10 @@ struct fortuna_prng {
 
 #ifdef LTC_SOBER128
 struct sober128_prng {
-    ulong32      R[17],          /* Working storage for the shift register */
-                 initR[17],      /* saved register contents */
-                 konst,          /* key dependent constant */
-                 sbuf;           /* partial word encryption buffer */
-
-    int          nbuf,           /* number of part-word stream bits buffered */
-                 flag,           /* first add_entropy call or not? */
-                 set;            /* did we call add_entropy to set key? */
-
+    sober128_state s;      /* sober128 state */
+    unsigned char ent[40]; /* entropy buffer */
+    unsigned long idx;     /* entropy counter */
+    short ready;           /* ready flag 0-1 */
 };
 #endif
 
@@ -155,15 +150,15 @@ extern const struct ltc_prng_descriptor fortuna_desc;
 #endif
 
 #ifdef LTC_RC4
-int rc4_start(prng_state *prng);
-int rc4_add_entropy(const unsigned char *in, unsigned long inlen, prng_state *prng);
-int rc4_ready(prng_state *prng);
-unsigned long rc4_read(unsigned char *out, unsigned long outlen, prng_state *prng);
+int rc4_prng_start(prng_state *prng);
+int rc4_prng_add_entropy(const unsigned char *in, unsigned long inlen, prng_state *prng);
+int rc4_prng_ready(prng_state *prng);
+unsigned long rc4_prng_read(unsigned char *out, unsigned long outlen, prng_state *prng);
 int  rc4_prng_done(prng_state *prng);
-int  rc4_export(unsigned char *out, unsigned long *outlen, prng_state *prng);
-int  rc4_import(const unsigned char *in, unsigned long inlen, prng_state *prng);
+int  rc4_prng_export(unsigned char *out, unsigned long *outlen, prng_state *prng);
+int  rc4_prng_import(const unsigned char *in, unsigned long inlen, prng_state *prng);
 int  rc4_prng_test(void);
-extern const struct ltc_prng_descriptor rc4_desc;
+extern const struct ltc_prng_descriptor rc4_prng_desc;
 #endif
 
 #ifdef LTC_CHACHA20_PRNG
@@ -191,15 +186,15 @@ extern const struct ltc_prng_descriptor sprng_desc;
 #endif
 
 #ifdef LTC_SOBER128
-int sober128_start(prng_state *prng);
-int sober128_add_entropy(const unsigned char *in, unsigned long inlen, prng_state *prng);
-int sober128_ready(prng_state *prng);
-unsigned long sober128_read(unsigned char *out, unsigned long outlen, prng_state *prng);
+int sober128_prng_start(prng_state *prng);
+int sober128_prng_add_entropy(const unsigned char *in, unsigned long inlen, prng_state *prng);
+int sober128_prng_ready(prng_state *prng);
+unsigned long sober128_prng_read(unsigned char *out, unsigned long outlen, prng_state *prng);
 int sober128_prng_done(prng_state *prng);
-int  sober128_export(unsigned char *out, unsigned long *outlen, prng_state *prng);
-int  sober128_import(const unsigned char *in, unsigned long inlen, prng_state *prng);
+int  sober128_prng_export(unsigned char *out, unsigned long *outlen, prng_state *prng);
+int  sober128_prng_import(const unsigned char *in, unsigned long inlen, prng_state *prng);
 int  sober128_prng_test(void);
-extern const struct ltc_prng_descriptor sober128_desc;
+extern const struct ltc_prng_descriptor sober128_prng_desc;
 #endif
 
 int find_prng(const char *name);

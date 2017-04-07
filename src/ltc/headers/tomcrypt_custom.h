@@ -192,8 +192,11 @@
 #define LTC_KASUMI
 #define LTC_MULTI2
 #define LTC_CAMELLIA
-/* ChaCha is special (a stream cipher) */
+
+/* stream ciphers */
 #define LTC_CHACHA
+#define LTC_RC4
+#define LTC_SOBER128
 
 #endif /* LTC_NO_CIPHERS */
 
@@ -294,8 +297,8 @@
 /* a PRNG that simply reads from an available system source */
 #define LTC_SPRNG
 
-/* The LTC_RC4 stream cipher */
-#define LTC_RC4
+/* The LTC_RC4 stream cipher based PRNG */
+#define LTC_RC4_PRNG
 
 /* The ChaCha20 stream cipher based PRNG */
 #define LTC_CHACHA20_PRNG
@@ -303,8 +306,8 @@
 /* Fortuna PRNG */
 #define LTC_FORTUNA
 
-/* Greg's LTC_SOBER128 PRNG ;-0 */
-#define LTC_SOBER128
+/* Greg's SOBER128 stream cipher based PRNG */
+#define LTC_SOBER128_PRNG
 
 /* the *nix style /dev/random device */
 #define LTC_DEVRANDOM
@@ -548,6 +551,14 @@
 
 #if defined(LTC_CHACHA20_PRNG) && !defined(LTC_CHACHA)
    #error LTC_CHACHA20_PRNG requires LTC_CHACHA
+#endif
+
+#if defined(LTC_RC4_PRNG) && !defined(LTC_RC4)
+   #error LTC_RC4_PRNG requires LTC_RC4
+#endif
+
+#if defined(LTC_SOBER128_PRNG) && !defined(LTC_SOBER128)
+   #error LTC_SOBER128_PRNG requires LTC_SOBER128
 #endif
 
 /* THREAD management */

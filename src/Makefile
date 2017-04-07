@@ -4,6 +4,7 @@ ltc/ciphers/noekeon.o ltc/ciphers/rc2.o ltc/ciphers/rc5.o ltc/ciphers/rc6.o ltc/
 ltc/ciphers/safer/saferp.o ltc/ciphers/skipjack.o ltc/ciphers/twofish/twofish.o ltc/ciphers/xtea.o \
 ltc/stream/chacha/chacha_crypt.o ltc/stream/chacha/chacha_done.o ltc/stream/chacha/chacha_ivctr32.o \
 ltc/stream/chacha/chacha_ivctr64.o ltc/stream/chacha/chacha_keystream.o ltc/stream/chacha/chacha_setup.o \
+ltc/stream/rc4/rc4.o ltc/stream/sober128/sober128.o \
 ltc/encauth/chachapoly/chacha20poly1305_add_aad.o ltc/encauth/chachapoly/chacha20poly1305_decrypt.o \
 ltc/encauth/chachapoly/chacha20poly1305_done.o ltc/encauth/chachapoly/chacha20poly1305_encrypt.o \
 ltc/encauth/chachapoly/chacha20poly1305_init.o ltc/encauth/chachapoly/chacha20poly1305_memory.o \
