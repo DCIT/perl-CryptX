@@ -58,7 +58,7 @@ _import_pkcs8(Crypt::PK::ECC self, SV * key_data)
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         _ecc_free_key(&self->key, &self->dp);
-        rv = ecc_import_pkcs8(data, (unsigned long)data_len, &self->key, &self->dp);
+        rv = ecc_import_pkcs8(data, (unsigned long)data_len, NULL, 0, &self->key, &self->dp);
         if (rv != CRYPT_OK) croak("FATAL: ecc_import_pkcs8 failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }

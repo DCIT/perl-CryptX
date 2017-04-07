@@ -2,8 +2,14 @@ OBJS=ltc/ciphers/aes/aes.obj ltc/ciphers/anubis.obj ltc/ciphers/blowfish.obj ltc
 ltc/ciphers/des.obj ltc/ciphers/kasumi.obj ltc/ciphers/khazad.obj ltc/ciphers/kseed.obj ltc/ciphers/multi2.obj \
 ltc/ciphers/noekeon.obj ltc/ciphers/rc2.obj ltc/ciphers/rc5.obj ltc/ciphers/rc6.obj ltc/ciphers/safer/safer.obj \
 ltc/ciphers/safer/saferp.obj ltc/ciphers/skipjack.obj ltc/ciphers/twofish/twofish.obj ltc/ciphers/xtea.obj \
+ltc/stream/chacha/chacha_crypt.obj ltc/stream/chacha/chacha_done.obj ltc/stream/chacha/chacha_ivctr32.obj \
+ltc/stream/chacha/chacha_ivctr64.obj ltc/stream/chacha/chacha_keystream.obj ltc/stream/chacha/chacha_setup.obj \
+ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj ltc/encauth/chachapoly/chacha20poly1305_decrypt.obj \
+ltc/encauth/chachapoly/chacha20poly1305_done.obj ltc/encauth/chachapoly/chacha20poly1305_encrypt.obj \
+ltc/encauth/chachapoly/chacha20poly1305_init.obj ltc/encauth/chachapoly/chacha20poly1305_memory.obj \
+ltc/encauth/chachapoly/chacha20poly1305_setiv.obj ltc/encauth/chachapoly/chacha20poly1305_setiv_rfc7905.obj \
 ltc/encauth/ccm/ccm_add_aad.obj ltc/encauth/ccm/ccm_add_nonce.obj ltc/encauth/ccm/ccm_done.obj ltc/encauth/ccm/ccm_init.obj \
-ltc/encauth/ccm/ccm_memory.obj ltc/encauth/ccm/ccm_memory_ex.obj ltc/encauth/ccm/ccm_process.obj ltc/encauth/ccm/ccm_reset.obj \
+ltc/encauth/ccm/ccm_memory.obj ltc/encauth/ccm/ccm_process.obj ltc/encauth/ccm/ccm_reset.obj \
 ltc/encauth/eax/eax_addheader.obj ltc/encauth/eax/eax_decrypt.obj ltc/encauth/eax/eax_decrypt_verify_memory.obj \
 ltc/encauth/eax/eax_done.obj ltc/encauth/eax/eax_encrypt.obj ltc/encauth/eax/eax_encrypt_authenticate_memory.obj \
 ltc/encauth/eax/eax_init.obj ltc/encauth/gcm/gcm_add_aad.obj ltc/encauth/gcm/gcm_add_iv.obj ltc/encauth/gcm/gcm_done.obj \
@@ -17,8 +23,9 @@ ltc/hashes/chc/chc.obj ltc/hashes/helper/hash_file.obj ltc/hashes/helper/hash_fi
 ltc/hashes/helper/hash_memory_multi.obj ltc/hashes/md2.obj ltc/hashes/md4.obj ltc/hashes/md5.obj ltc/hashes/rmd128.obj \
 ltc/hashes/rmd160.obj ltc/hashes/rmd256.obj ltc/hashes/rmd320.obj ltc/hashes/sha1.obj ltc/hashes/sha2/sha224.obj \
 ltc/hashes/sha2/sha256.obj ltc/hashes/sha2/sha384.obj ltc/hashes/sha2/sha512.obj ltc/hashes/sha2/sha512_224.obj \
-ltc/hashes/sha2/sha512_256.obj ltc/hashes/tiger.obj ltc/hashes/whirl/whirl.obj ltc/mac/f9/f9_done.obj ltc/mac/f9/f9_file.obj \
-ltc/mac/f9/f9_init.obj ltc/mac/f9/f9_memory.obj ltc/mac/f9/f9_memory_multi.obj ltc/mac/f9/f9_process.obj \
+ltc/hashes/sha2/sha512_256.obj ltc/hashes/tiger.obj ltc/hashes/whirl/whirl.obj ltc/hashes/sha3.obj \
+ltc/mac/poly1305/poly1305.obj ltc/mac/poly1305/poly1305_file.obj ltc/mac/poly1305/poly1305_memory.obj ltc/mac/poly1305/poly1305_memory_multi.obj \
+ltc/mac/f9/f9_done.obj ltc/mac/f9/f9_file.obj ltc/mac/f9/f9_init.obj ltc/mac/f9/f9_memory.obj ltc/mac/f9/f9_memory_multi.obj ltc/mac/f9/f9_process.obj \
 ltc/mac/hmac/hmac_done.obj ltc/mac/hmac/hmac_file.obj ltc/mac/hmac/hmac_init.obj ltc/mac/hmac/hmac_memory.obj \
 ltc/mac/hmac/hmac_memory_multi.obj ltc/mac/hmac/hmac_process.obj ltc/mac/omac/omac_done.obj ltc/mac/omac/omac_file.obj \
 ltc/mac/omac/omac_init.obj ltc/mac/omac/omac_memory.obj ltc/mac/omac/omac_memory_multi.obj ltc/mac/omac/omac_process.obj \
@@ -50,6 +57,8 @@ ltc/pk/asn1/der/bit/der_encode_bit_string.obj ltc/pk/asn1/der/bit/der_encode_raw
 ltc/pk/asn1/der/bit/der_length_bit_string.obj ltc/pk/asn1/der/boolean/der_decode_boolean.obj \
 ltc/pk/asn1/der/boolean/der_encode_boolean.obj ltc/pk/asn1/der/boolean/der_length_boolean.obj \
 ltc/pk/asn1/der/choice/der_decode_choice.obj ltc/pk/asn1/der/ia5/der_decode_ia5_string.obj \
+ltc/pk/asn1/der/generalizedtime/der_decode_generalizedtime.obj ltc/pk/asn1/der/generalizedtime/der_encode_generalizedtime.obj \
+ltc/pk/asn1/der/generalizedtime/der_length_generalizedtime.obj \
 ltc/pk/asn1/der/ia5/der_encode_ia5_string.obj ltc/pk/asn1/der/ia5/der_length_ia5_string.obj \
 ltc/pk/asn1/der/integer/der_decode_integer.obj ltc/pk/asn1/der/integer/der_encode_integer.obj \
 ltc/pk/asn1/der/integer/der_length_integer.obj ltc/pk/asn1/der/object_identifier/der_decode_object_identifier.obj \
@@ -84,13 +93,14 @@ ltc/pk/ecc/ecc_verify_hash.obj ltc/pk/ecc/ecc_verify_key.obj ltc/pk/ecc/ltc_ecc_
 ltc/pk/ecc/ltc_ecc_is_valid_idx.obj ltc/pk/ecc/ltc_ecc_map.obj ltc/pk/ecc/ltc_ecc_mul2add.obj ltc/pk/ecc/ltc_ecc_mulmod.obj \
 ltc/pk/ecc/ltc_ecc_mulmod_timing.obj ltc/pk/ecc/ltc_ecc_points.obj ltc/pk/ecc/ltc_ecc_projective_add_point.obj \
 ltc/pk/ecc/ltc_ecc_projective_dbl_point.obj ltc/pk/pkcs1/pkcs_1_i2osp.obj ltc/pk/pkcs1/pkcs_1_mgf1.obj \
+ltc/pk/ecc/ltc_ecc_export_point.obj ltc/pk/ecc/ltc_ecc_import_point.obj ltc/pk/ecc/ltc_ecc_is_point_at_infinity.obj \
 ltc/pk/pkcs1/pkcs_1_oaep_decode.obj ltc/pk/pkcs1/pkcs_1_oaep_encode.obj ltc/pk/pkcs1/pkcs_1_os2ip.obj \
 ltc/pk/pkcs1/pkcs_1_pss_decode.obj ltc/pk/pkcs1/pkcs_1_pss_encode.obj ltc/pk/pkcs1/pkcs_1_v1_5_decode.obj \
 ltc/pk/pkcs1/pkcs_1_v1_5_encode.obj ltc/pk/rsa/rsa_decrypt_key.obj ltc/pk/rsa/rsa_encrypt_key.obj ltc/pk/rsa/rsa_export.obj \
 ltc/pk/rsa/rsa_exptmod.obj ltc/pk/rsa/rsa_free.obj ltc/pk/rsa/rsa_get_size.obj ltc/pk/rsa/rsa_import.obj \
-ltc/pk/rsa/rsa_import_radix.obj ltc/pk/rsa/rsa_import_pkcs8.obj ltc/pk/rsa/rsa_make_key.obj ltc/pk/rsa/rsa_sign_hash.obj \
+ltc/pk/rsa/rsa_import_radix.obj ltc/pk/rsa/rsa_import_pkcs8.obj ltc/pk/rsa/rsa_import_x509.obj ltc/pk/rsa/rsa_make_key.obj ltc/pk/rsa/rsa_sign_hash.obj \
 ltc/pk/rsa/rsa_sign_saltlen_get.obj ltc/pk/rsa/rsa_verify_hash.obj ltc/prngs/fortuna.obj ltc/prngs/rc4.obj \
-ltc/prngs/rng_get_bytes.obj ltc/prngs/rng_make_prng.obj ltc/prngs/sober128.obj ltc/prngs/sprng.obj ltc/prngs/yarrow.obj \
+ltc/prngs/rng_get_bytes.obj ltc/prngs/rng_make_prng.obj ltc/prngs/sober128.obj ltc/prngs/sprng.obj ltc/prngs/yarrow.obj ltc/prngs/chacha20.obj \
 ltm/bn_error.obj ltm/bn_fast_mp_invmod.obj ltm/bn_fast_mp_montgomery_reduce.obj ltm/bn_fast_s_mp_mul_digs.obj \
 ltm/bn_fast_s_mp_mul_high_digs.obj ltm/bn_fast_s_mp_sqr.obj ltm/bn_mp_2expt.obj ltm/bn_mp_abs.obj ltm/bn_mp_add.obj \
 ltm/bn_mp_add_d.obj ltm/bn_mp_addmod.obj ltm/bn_mp_and.obj ltm/bn_mp_clamp.obj ltm/bn_mp_clear.obj ltm/bn_mp_clear_multi.obj \

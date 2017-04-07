@@ -124,8 +124,14 @@ const char *crypt_build_settings =
 #if defined(LTC_CAMELLIA)
    "   Camellia\n"
 #endif
+#if defined(LTC_CHACHA)
+   "   ChaCha\n"
+#endif
 
     "\nHashes built-in:\n"
+#if defined(LTC_SHA3)
+   "   SHA3\n"
+#endif
 #if defined(LTC_SHA512)
    "   SHA-512\n"
 #endif
@@ -227,6 +233,9 @@ const char *crypt_build_settings =
 #if defined(LTC_F9_MODE)
     "   F9\n"
 #endif
+#if defined(LTC_POLY1305)
+    "   POLY1305\n"
+#endif
 
     "\nENC + AUTH modes:\n"
 #if defined(LTC_EAX_MODE)
@@ -251,6 +260,9 @@ const char *crypt_build_settings =
 #endif
    "\n"
 #endif
+#if defined(LTC_CHACHA20POLY1305_MODE)
+    "   CHACHA20POLY1305\n"
+#endif
 
     "\nPRNG:\n"
 #if defined(LTC_YARROW)
@@ -261,6 +273,9 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_RC4)
     "   RC4\n"
+#endif
+#if defined(LTC_CHACHA20_PRNG)
+    "   ChaCha20\n"
 #endif
 #if defined(LTC_FORTUNA)
     "   Fortuna (" NAME_VALUE(LTC_FORTUNA_POOLS) ", " NAME_VALUE(LTC_FORTUNA_WD) ")\n"
@@ -371,6 +386,9 @@ const char *crypt_build_settings =
 #if defined(LTC_RNG_MAKE_PRNG)
     " LTC_RNG_MAKE_PRNG "
 #endif
+#if defined(LTC_PRNG_ENABLE_LTC_RNG)
+    " LTC_PRNG_ENABLE_LTC_RNG "
+#endif
 #if defined(LTC_HASH_HELPERS)
     " LTC_HASH_HELPERS "
 #endif
@@ -388,6 +406,9 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_NO_FILE)
     " LTC_NO_FILE "
+#endif
+#if defined(LTC_FILE_READ_BUFSIZE)
+    " " NAME_VALUE(LTC_FILE_READ_BUFSIZE) " "
 #endif
 #if defined(LTC_FAST)
     " LTC_FAST "

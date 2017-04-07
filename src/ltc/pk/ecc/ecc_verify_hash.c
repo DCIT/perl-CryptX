@@ -27,7 +27,7 @@ static int ecc_verify_hash_ex(const unsigned char *sig,  unsigned long siglen,
                               int *stat, ecc_key *key, int sigformat)
 {
    ecc_point    *mG, *mQ;
-   void          *r, *s, *v, *w, *u1, *u2, *e, *p, *m, *a;
+   void          *r, *s, *v, *w, *u1, *u2, *e, *p, *m, *a, *mu, *ma;
    void          *mp;
    int           err;
    unsigned long pbits, pbytes, i, shift_right;
@@ -48,7 +48,7 @@ static int ecc_verify_hash_ex(const unsigned char *sig,  unsigned long siglen,
    }
 
    /* allocate ints */
-   if ((err = mp_init_multi(&r, &s, &v, &w, &u1, &u2, &p, &e, &m, &a, NULL)) != CRYPT_OK) {
+   if ((err = mp_init_multi(&r, &s, &v, &w, &u1, &u2, &p, &e, &m, &a, &mu, &ma, NULL)) != CRYPT_OK) {
       return CRYPT_MEM;
    }
 
@@ -137,9 +137,11 @@ static int ecc_verify_hash_ex(const unsigned char *sig,  unsigned long siglen,
 
       /* find the montgomery mp */
       if ((err = mp_montgomery_setup(m, &mp)) != CRYPT_OK)                                              { goto error; }
+      if ((err = mp_montgomery_normalization(mu, m)) != CRYPT_OK)                                       { goto error; }
+      if ((err = mp_mulmod(a, mu, m, ma)) != CRYPT_OK)                                                  { goto error; }
 
       /* add them */
-      if ((err = ltc_mp.ecc_ptadd(mQ, mG, mG, a, m, mp)) != CRYPT_OK)                                   { goto error; }
+      if ((err = ltc_mp.ecc_ptadd(mQ, mG, mG, ma, m, mp)) != CRYPT_OK)                                  { goto error; }
 
       /* reduce */
       if ((err = ltc_mp.ecc_map(mG, m, mp)) != CRYPT_OK)                                                { goto error; }
@@ -161,7 +163,7 @@ static int ecc_verify_hash_ex(const unsigned char *sig,  unsigned long siglen,
 error:
    ltc_ecc_del_point(mG);
    ltc_ecc_del_point(mQ);
-   mp_clear_multi(r, s, v, w, u1, u2, p, e, m, a, NULL);
+   mp_clear_multi(r, s, v, w, u1, u2, p, e, m, a, mu, ma, NULL);
    if (mp != NULL) {
       mp_montgomery_free(mp);
    }

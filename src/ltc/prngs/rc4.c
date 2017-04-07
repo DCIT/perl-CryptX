@@ -24,10 +24,10 @@ const struct ltc_prng_descriptor rc4_desc =
     &rc4_add_entropy,
     &rc4_ready,
     &rc4_read,
-    &rc4_done,
+    &rc4_prng_done,
     &rc4_export,
     &rc4_import,
-    &rc4_test
+    &rc4_prng_test
 };
 
 /**
@@ -155,7 +155,7 @@ unsigned long rc4_read(unsigned char *out, unsigned long outlen, prng_state *prn
   @param prng   The PRNG to terminate
   @return CRYPT_OK if successful
 */
-int rc4_done(prng_state *prng)
+int rc4_prng_done(prng_state *prng)
 {
    LTC_ARGCHK(prng != NULL);
    return CRYPT_OK;
@@ -214,7 +214,7 @@ int rc4_import(const unsigned char *in, unsigned long inlen, prng_state *prng)
   PRNG self-test
   @return CRYPT_OK if successful, CRYPT_NOP if self-testing has been disabled
 */
-int rc4_test(void)
+int rc4_prng_test(void)
 {
 #if !defined(LTC_TEST) || defined(LTC_VALGRIND)
    return CRYPT_NOP;
@@ -246,7 +246,7 @@ int rc4_test(void)
        if (rc4_read(dst, 8, &prng) != 8) {
           return CRYPT_ERROR_READPRNG;
        }
-       rc4_done(&prng);
+       rc4_prng_done(&prng);
        if (XMEMCMP(dst, tests[x].ct, 8)) {
 #if 0
           int y;

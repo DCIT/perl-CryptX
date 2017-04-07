@@ -110,7 +110,10 @@ int rsa_sign_saltlen_get_max_ex(int padding, int hash_idx, rsa_key *key);
 /* PKCS #1 import/export */
 int rsa_export(unsigned char *out, unsigned long *outlen, int type, rsa_key *key);
 int rsa_import(const unsigned char *in, unsigned long inlen, rsa_key *key);
-int rsa_import_pkcs8(const unsigned char *in, unsigned long inlen, rsa_key *key);
+
+int rsa_import_x509(const unsigned char *in, unsigned long inlen, rsa_key *key);
+int rsa_import_pkcs8(const unsigned char *in, unsigned long inlen,
+                     const void *passwd, unsigned long passwdlen, rsa_key *key);
 int rsa_import_radix(int radix, char *N, char *e, char *d, char *p, char *q, char *dP, char *dQ, char *qP, rsa_key *key);
 #endif
 
@@ -311,11 +314,9 @@ void ecc_free(ecc_key *key);
 int  ecc_export(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
 int  ecc_import(const unsigned char *in, unsigned long inlen, ecc_key *key);
 int  ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_set_type *dp);
-int  ecc_import_pkcs8(unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
+int  ecc_import_pkcs8(const unsigned char *in,  unsigned long inlen, const void *pwd, unsigned long pwdlen, ecc_key *key, ltc_ecc_set_type *dp);
 int  ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
 int  ecc_import_full(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
-int  ecc_export_point(unsigned char *out, unsigned long *outlen, void *x, void *y, unsigned long size, int compressed);
-int  ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y);
 int  ecc_export_raw(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
 int  ecc_import_raw(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
 
@@ -358,6 +359,9 @@ ecc_point *ltc_ecc_new_point(void);
 void       ltc_ecc_del_point(ecc_point *p);
 int        ltc_ecc_is_valid_idx(int n);
 int        ltc_ecc_is_point(const ltc_ecc_set_type *dp, void *x, void *y);
+int        ltc_ecc_is_point_at_infinity(ecc_point *p, void *modulus);
+int        ltc_ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y);
+int        ltc_ecc_export_point(unsigned char *out, unsigned long *outlen, void *x, void *y, unsigned long size, int compressed);
 
 /* point ops (mp == montgomery digit) */
 #if !defined(LTC_MECC_ACCEL) || defined(LTM_DESC) || defined(GMP_DESC)
@@ -513,6 +517,8 @@ typedef enum ltc_asn1_type_ {
  LTC_ASN1_TELETEX_STRING,
  LTC_ASN1_CONSTRUCTED,
  LTC_ASN1_CONTEXT_SPECIFIC,
+ /* 20 */
+ LTC_ASN1_GENERALIZEDTIME,
 } ltc_asn1_type;
 
 /** A LTC ASN.1 list type */
@@ -592,6 +598,7 @@ int der_decode_sequence_multi(const unsigned char *in, unsigned long inlen, ...)
 int  der_decode_sequence_flexi(const unsigned char *in, unsigned long *inlen, ltc_asn1_list **out);
 #define der_free_sequence_flexi         der_sequence_free
 void der_sequence_free(ltc_asn1_list *in);
+void der_sequence_shrink(ltc_asn1_list *in);
 
 /* BOOLEAN */
 int der_length_boolean(unsigned long *outlen);
@@ -711,6 +718,28 @@ int der_decode_utctime(const unsigned char *in, unsigned long *inlen,
                              ltc_utctime   *out);
 
 int der_length_utctime(ltc_utctime *utctime, unsigned long *outlen);
+
+/* GeneralizedTime */
+typedef struct {
+   unsigned YYYY, /* year */
+            MM, /* month */
+            DD, /* day */
+            hh, /* hour */
+            mm, /* minute */
+            ss, /* second */
+            fs, /* fractional seconds */
+            off_dir, /* timezone offset direction 0 == +, 1 == - */
+            off_hh, /* timezone offset hours */
+            off_mm; /* timezone offset minutes */
+} ltc_generalizedtime;
+
+int der_encode_generalizedtime(ltc_generalizedtime *gtime,
+                               unsigned char       *out, unsigned long *outlen);
+
+int der_decode_generalizedtime(const unsigned char *in, unsigned long *inlen,
+                               ltc_generalizedtime *out);
+
+int der_length_generalizedtime(ltc_generalizedtime *gtime, unsigned long *outlen);
 
 
 #endif

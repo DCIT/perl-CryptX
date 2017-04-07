@@ -28,10 +28,10 @@ const struct ltc_prng_descriptor sober128_desc =
     &sober128_add_entropy,
     &sober128_ready,
     &sober128_read,
-    &sober128_done,
+    &sober128_prng_done,
     &sober128_export,
     &sober128_import,
-    &sober128_test
+    &sober128_prng_test
 };
 
 /* don't change these... */
@@ -365,7 +365,7 @@ unsigned long sober128_read(unsigned char *out, unsigned long outlen, prng_state
   @param prng   The PRNG to terminate
   @return CRYPT_OK if successful
 */
-int sober128_done(prng_state *prng)
+int sober128_prng_done(prng_state *prng)
 {
    LTC_ARGCHK(prng != NULL);
    return CRYPT_OK;
@@ -427,7 +427,7 @@ int sober128_import(const unsigned char *in, unsigned long inlen, prng_state *pr
   PRNG self-test
   @return CRYPT_OK if successful, CRYPT_NOP if self-testing has been disabled
 */
-int sober128_test(void)
+int sober128_prng_test(void)
 {
 #ifndef LTC_TEST
    return CRYPT_NOP;
@@ -478,7 +478,7 @@ int sober128_test(void)
        if (sober128_read(dst, tests[x].len, &prng) != (unsigned long)tests[x].len) {
           return CRYPT_ERROR_READPRNG;
        }
-       sober128_done(&prng);
+       sober128_prng_done(&prng);
        if (XMEMCMP(dst, tests[x].out, tests[x].len)) {
 #if 0
           printf("\n\nLTC_SOBER128 failed, I got:\n");

@@ -17,7 +17,9 @@
 
 #ifdef LTC_MECC
 
-int ecc_import_pkcs8(unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp)
+int ecc_import_pkcs8(const unsigned char *in,  unsigned long inlen,
+                     const void *pwd, unsigned long pwdlen,
+                     ecc_key *key, ltc_ecc_set_type *dp)
 {
    int err;
    void           *zero, *one, *iter;
@@ -64,6 +66,8 @@ int ecc_import_pkcs8(unsigned char *in, unsigned long inlen, ecc_key *key, ltc_e
    LTC_SET_ASN1(top_seq_e, 1, LTC_ASN1_OCTET_STRING, buf2, buf2len);
    err=der_decode_sequence(in, inlen, top_seq_e, 2UL);
    if (err == CRYPT_OK) {
+      LTC_UNUSED_PARAM(pwd);
+      LTC_UNUSED_PARAM(pwdlen);
       /* unsigned long icount = mp_get_int(iter); */
       /* XXX: TODO decrypt buf1 with a key derived form password + salt + iter */
       /* fprintf(stderr, "XXX-DEBUG: gonna decrypt: iter=%ld salt.len=%ld encdata.len=%ld\n", icount, key_seq_e[0].size, top_seq_e[1].size); */
@@ -71,7 +75,7 @@ int ecc_import_pkcs8(unsigned char *in, unsigned long inlen, ecc_key *key, ltc_e
       goto LBL_ERR;
    }
    else {
-      decrypted = in;
+      decrypted = (unsigned char*)in;
       decryptedlen = inlen;
    }
 
@@ -119,7 +123,7 @@ int ecc_import_pkcs8(unsigned char *in, unsigned long inlen, ecc_key *key, ltc_e
       /* create bignums */
       if ((err = mp_read_unsigned_bin(a, bin_a, len_a)) != CRYPT_OK)                   { goto LBL_ERR; }
       if ((err = mp_read_unsigned_bin(b, bin_b, len_b)) != CRYPT_OK)                   { goto LBL_ERR; }
-      if ((err = ecc_import_point(bin_g, len_g, prime, a, b, gx, gy)) != CRYPT_OK)     { goto LBL_ERR; }
+      if ((err = ltc_ecc_import_point(bin_g, len_g, prime, a, b, gx, gy)) != CRYPT_OK) { goto LBL_ERR; }
       /* load curve parameters */
       if ((err = ecc_dp_set_bn(dp, a, b, prime, order, gx, gy, cofactor)) != CRYPT_OK) { goto LBL_ERR; }
    }

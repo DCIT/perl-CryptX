@@ -53,6 +53,25 @@ static unsigned long fetch_length(const unsigned char *in, unsigned long inlen, 
    return z+*data_offset;
 }
 
+static int new_element(ltc_asn1_list **l)
+{
+   /* alloc new link */
+   if (*l == NULL) {
+      *l = XCALLOC(1, sizeof(ltc_asn1_list));
+      if (*l == NULL) {
+         return CRYPT_MEM;
+      }
+   } else {
+      (*l)->next = XCALLOC(1, sizeof(ltc_asn1_list));
+      if ((*l)->next == NULL) {
+         return CRYPT_MEM;
+      }
+      (*l)->next->prev = *l;
+      *l = (*l)->next;
+   }
+   return CRYPT_OK;
+}
+
 /**
    ASN.1 DER Flexi(ble) decoder will decode arbitrary DER packets and create a linked list of the decoded elements.
    @param in      The input buffer
@@ -73,6 +92,13 @@ int der_decode_sequence_flexi(const unsigned char *in, unsigned long *inlen, ltc
    l = NULL;
    totlen = 0;
 
+   if (*inlen == 0) {
+      /* alloc new link */
+      if ((err = new_element(&l)) != CRYPT_OK) {
+         goto error;
+      }
+   }
+
    /* scan the input and and get lengths and what not */
    while (*inlen) {
       /* read the type byte */
@@ -86,20 +112,8 @@ int der_decode_sequence_flexi(const unsigned char *in, unsigned long *inlen, ltc
       }
 
       /* alloc new link */
-      if (l == NULL) {
-         l = XCALLOC(1, sizeof(*l));
-         if (l == NULL) {
-            err = CRYPT_MEM;
-            goto error;
-         }
-      } else {
-         l->next = XCALLOC(1, sizeof(*l));
-         if (l->next == NULL) {
-            err = CRYPT_MEM;
-            goto error;
-         }
-         l->next->prev = l;
-         l = l->next;
+      if ((err = new_element(&l)) != CRYPT_OK) {
+         goto error;
       }
 
       if ((type & 0x20) && (type != 0x30) && (type != 0x31)) {
@@ -333,6 +347,25 @@ int der_decode_sequence_flexi(const unsigned char *in, unsigned long *inlen, ltc
             }
             break;
 
+         case 0x18:
+            l->type = LTC_ASN1_GENERALIZEDTIME;
+            l->size = len;
+
+            if ((l->data = XCALLOC(1, sizeof(ltc_generalizedtime))) == NULL) {
+               err = CRYPT_MEM;
+               goto error;
+            }
+
+            if ((err = der_decode_generalizedtime(in, &len, l->data)) != CRYPT_OK) {
+               goto error;
+            }
+
+            if ((err = der_length_generalizedtime(l->data, &len)) != CRYPT_OK) {
+               goto error;
+            }
+
+            break;
+
          case 0x20: /* Any CONSTRUCTED element that is neither SEQUENCE nor SET */
          case 0x30: /* SEQUENCE */
          case 0x31: /* SET */
@@ -347,6 +380,15 @@ int der_decode_sequence_flexi(const unsigned char *in, unsigned long *inlen, ltc
              else {
                 l->type = LTC_ASN1_SET;
              }
+
+             if ((l->data = XMALLOC(len)) == NULL) {
+                err = CRYPT_MEM;
+                goto error;
+             }
+
+             XMEMCPY(l->data, in, len);
+             l->size = len;
+
 
              /* jump to the start of the data */
              in     += data_offset;

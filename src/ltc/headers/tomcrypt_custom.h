@@ -24,6 +24,9 @@
 #ifndef XMEMCMP
 #define XMEMCMP  memcmp
 #endif
+#ifndef XMEMMOVE
+#define XMEMMOVE memmove
+#endif
 #ifndef XMEM_NEQ
 #define XMEM_NEQ  mem_neq
 #endif
@@ -74,6 +77,7 @@
 
    #define LTC_NO_HASHES
    #define LTC_SHA1
+   #define LTC_SHA3
    #define LTC_SHA512
    #define LTC_SHA384
    #define LTC_SHA256
@@ -188,6 +192,8 @@
 #define LTC_KASUMI
 #define LTC_MULTI2
 #define LTC_CAMELLIA
+/* ChaCha is special (a stream cipher) */
+#define LTC_CHACHA
 
 #endif /* LTC_NO_CIPHERS */
 
@@ -223,6 +229,7 @@
 
 #define LTC_CHC_HASH
 #define LTC_WHIRLPOOL
+#define LTC_SHA3
 #define LTC_SHA512
 #define LTC_SHA512_256
 #define LTC_SHA512_224
@@ -253,6 +260,7 @@
 #define LTC_XCBC
 #define LTC_F9_MODE
 #define LTC_PELICAN
+#define LTC_POLY1305
 
 /* ---> Encrypt + Authenticate Modes <--- */
 
@@ -262,6 +270,7 @@
 #define LTC_OCB3_MODE
 #define LTC_CCM_MODE
 #define LTC_GCM_MODE
+#define LTC_CHACHA20POLY1305_MODE
 
 /* Use 64KiB tables */
 #ifndef LTC_NO_TABLES
@@ -288,6 +297,9 @@
 /* The LTC_RC4 stream cipher */
 #define LTC_RC4
 
+/* The ChaCha20 stream cipher based PRNG */
+#define LTC_CHACHA20_PRNG
+
 /* Fortuna PRNG */
 #define LTC_FORTUNA
 
@@ -303,6 +315,9 @@
 #define LTC_RNG_GET_BYTES
 /* rng_make_prng() */
 #define LTC_RNG_MAKE_PRNG
+
+/* enable the ltc_rng hook to integrate e.g. embedded hardware RNG's easily */
+/* #define LTC_PRNG_ENABLE_LTC_RNG */
 
 #endif /* LTC_NO_PRNGS */
 
@@ -340,7 +355,6 @@
 #define LTC_MRSA
 
 /* Include Diffie-Hellman support */
-#ifndef GMP_DESC
 /* is_prime fails for GMP */
 #define LTC_MDH
 /* Supported Key Sizes */
@@ -356,7 +370,6 @@
 #define LTC_DH2560
 #define LTC_DH3072
 #define LTC_DH4096
-#endif
 #endif
 
 /* Include Katja (a Rabin variant like RSA) */
@@ -529,6 +542,14 @@
    #error PK requires ASN.1 DER functionality, make sure LTC_DER is enabled
 #endif
 
+#if defined(LTC_CHACHA20POLY1305_MODE) && (!defined(LTC_CHACHA) || !defined(LTC_POLY1305))
+   #error LTC_CHACHA20POLY1305_MODE requires LTC_CHACHA + LTC_POLY1305
+#endif
+
+#if defined(LTC_CHACHA20_PRNG) && !defined(LTC_CHACHA)
+   #error LTC_CHACHA20_PRNG requires LTC_CHACHA
+#endif
+
 /* THREAD management */
 #ifdef LTC_PTHREAD
 
@@ -560,7 +581,12 @@
 
 #endif
 
-
+#ifndef LTC_NO_FILE
+   /* buffer size for reading from a file via fread(..) */
+   #ifndef LTC_FILE_READ_BUFSIZE
+   #define LTC_FILE_READ_BUFSIZE 8192
+   #endif
+#endif
 
 /* $Source$ */
 /* $Revision$ */

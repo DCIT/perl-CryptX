@@ -42,12 +42,16 @@
 
 /**
   Import an RSAPublicKey or RSAPrivateKey in PKCS#8 format
-  @param in      The packet to import from
-  @param inlen   It's length (octets)
-  @param key     [out] Destination for newly imported key
+  @param in        The packet to import from
+  @param inlen     It's length (octets)
+  @param passwd    The password for decrypting privkey (NOT SUPPORTED YET)
+  @param passwdlen Password's length (octets)
+  @param key       [out] Destination for newly imported key
   @return CRYPT_OK if successful, upon error allocated memory is freed
 */
-int rsa_import_pkcs8(const unsigned char *in, unsigned long inlen, rsa_key *key)
+int rsa_import_pkcs8(const unsigned char *in, unsigned long inlen,
+                     const void *passwd, unsigned long passwdlen,
+                     rsa_key *key)
 {
    int           err;
    void          *zero, *iter;
@@ -89,7 +93,9 @@ int rsa_import_pkcs8(const unsigned char *in, unsigned long inlen, rsa_key *key)
    LTC_SET_ASN1(top_seq_e, 1, LTC_ASN1_OCTET_STRING, buf2, buf2len);
    err=der_decode_sequence(in, inlen, top_seq_e, 2UL);
    if (err == CRYPT_OK) {
-      /* XXX: TODO encrypted pkcs8 not supported */
+      LTC_UNUSED_PARAM(passwd);
+      LTC_UNUSED_PARAM(passwdlen);
+      /* XXX: TODO encrypted pkcs8 not implemented yet */
       /* fprintf(stderr, "decrypt: iter=%ld salt.len=%ld encdata.len=%ld\n", mp_get_int(iter), key_seq_e[0].size, top_seq_e[1].size); */
       err = CRYPT_PK_INVALID_TYPE;
       goto LBL_ERR;

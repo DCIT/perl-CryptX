@@ -37,6 +37,13 @@ int ltc_ecc_map(ecc_point *P, void *modulus, void *mp)
    LTC_ARGCHK(modulus != NULL);
    LTC_ARGCHK(mp      != NULL);
 
+   if (mp_iszero(P->z)) {
+      if ((err = mp_set(P->x, 0)) != CRYPT_OK) { return err; }
+      if ((err = mp_set(P->y, 0)) != CRYPT_OK) { return err; }
+      if ((err = mp_set(P->z, 1)) != CRYPT_OK) { return err; }
+      return CRYPT_OK;
+   }
+
    if ((err = mp_init_multi(&t1, &t2, NULL)) != CRYPT_OK) {
       return CRYPT_MEM;
    }

@@ -67,13 +67,13 @@ int ecc_import_full(const unsigned char *in, unsigned long inlen, ecc_key *key, 
     len_b = seq_curve[1].size;
     len_g = seq_ecparams[3].size;
     /* create bignums */
-    if ((err = mp_read_unsigned_bin(a, bin_a, len_a)) != CRYPT_OK)                  { goto error; }
-    if ((err = mp_read_unsigned_bin(b, bin_b, len_b)) != CRYPT_OK)                  { goto error; }
-    if ((err = ecc_import_point(bin_g, len_g, prime, a, b, gx, gy)) != CRYPT_OK)    { goto error; }
+    if ((err = mp_read_unsigned_bin(a, bin_a, len_a)) != CRYPT_OK)                   { goto error; }
+    if ((err = mp_read_unsigned_bin(b, bin_b, len_b)) != CRYPT_OK)                   { goto error; }
+    if ((err = ltc_ecc_import_point(bin_g, len_g, prime, a, b, gx, gy)) != CRYPT_OK) { goto error; }
     /* load curve parameters */
     if ((err = ecc_dp_set_bn(dp, a, b, prime, order, gx, gy, cofactor)) != CRYPT_OK) { goto error; }
     /* load public key */
-    if ((err = ecc_import_raw(bin_xy, len_xy, key, dp)) != CRYPT_OK)                { goto error; }
+    if ((err = ecc_import_raw(bin_xy, len_xy, key, dp)) != CRYPT_OK)                 { goto error; }
     goto success;
   }
 
@@ -131,18 +131,18 @@ int ecc_import_full(const unsigned char *in, unsigned long inlen, ecc_key *key, 
     len_b  = seq_curve[1].size;
     len_g  = seq_ecparams[3].size;
     /* create bignums */
-    if ((err = mp_read_unsigned_bin(a, bin_a, len_a)) != CRYPT_OK)                  { goto error; }
-    if ((err = mp_read_unsigned_bin(b, bin_b, len_b)) != CRYPT_OK)                  { goto error; }
-    if ((err = ecc_import_point(bin_g, len_g, prime, a, b, gx, gy)) != CRYPT_OK)    { goto error; }
+    if ((err = mp_read_unsigned_bin(a, bin_a, len_a)) != CRYPT_OK)                   { goto error; }
+    if ((err = mp_read_unsigned_bin(b, bin_b, len_b)) != CRYPT_OK)                   { goto error; }
+    if ((err = ltc_ecc_import_point(bin_g, len_g, prime, a, b, gx, gy)) != CRYPT_OK) { goto error; }
     /* load curve parameters */
     if ((err = ecc_dp_set_bn(dp, a, b, prime, order, gx, gy, cofactor)) != CRYPT_OK) { goto error; }
     /* load private+public key */
-    if ((err = ecc_import_raw(bin_k, len_k, key, dp)) != CRYPT_OK)                  { goto error; }
+    if ((err = ecc_import_raw(bin_k, len_k, key, dp)) != CRYPT_OK)                   { goto error; }
     goto success;
   }
 
   /* ### 5. backward compatibility - try to load old-DER format */
-  if ((err = ecc_import(in, inlen, key)) != CRYPT_OK)                               { goto error; }
+  if ((err = ecc_import(in, inlen, key)) != CRYPT_OK)                                { goto error; }
 
 success:
   err = CRYPT_OK;

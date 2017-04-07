@@ -37,7 +37,7 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
 {
    ecc_point *tG, *M[3];
    int        i, j, err;
-   void       *mu, *mp;
+   void       *mu, *mp, *ma;
    ltc_mp_digit buf;
    int        bitcnt, mode, digidx;
 
@@ -46,17 +46,30 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
    LTC_ARGCHK(R       != NULL);
    LTC_ARGCHK(modulus != NULL);
 
+   if (ltc_ecc_is_point_at_infinity(G, modulus)) {
+      /* return the point at infinity */
+      if ((err = mp_set(R->x, 1)) != CRYPT_OK) { return err; }
+      if ((err = mp_set(R->y, 1)) != CRYPT_OK) { return err; }
+      if ((err = mp_set(R->z, 0)) != CRYPT_OK) { return err; }
+      return CRYPT_OK;
+   }
+
    /* init montgomery reduction */
    if ((err = mp_montgomery_setup(modulus, &mp)) != CRYPT_OK) {
       return err;
    }
-   if ((err = mp_init(&mu)) != CRYPT_OK) {
+   if ((err = mp_init_multi(&mu, &ma, NULL)) != CRYPT_OK) {
       mp_montgomery_free(mp);
       return err;
    }
    if ((err = mp_montgomery_normalization(mu, modulus)) != CRYPT_OK) {
       mp_clear(mu);
       mp_montgomery_free(mp);
+      return err;
+   }
+   if ((err = mp_mulmod(a, mu, modulus, ma)) != CRYPT_OK) {
+      mp_montgomery_free(mp);
+      mp_clear_multi(mu, ma, NULL);
       return err;
    }
 
@@ -90,7 +103,7 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
    if ((err = mp_copy(tG->y, M[0]->y)) != CRYPT_OK)                                  { goto done; }
    if ((err = mp_copy(tG->z, M[0]->z)) != CRYPT_OK)                                  { goto done; }
    /* M[1] == 2G */
-   if ((err = ltc_mp.ecc_ptdbl(tG, M[1], a, modulus, mp)) != CRYPT_OK)               { goto done; }
+   if ((err = ltc_mp.ecc_ptdbl(tG, M[1], ma, modulus, mp)) != CRYPT_OK)              { goto done; }
 
    /* setup sliding window */
    mode   = 0;
@@ -116,21 +129,21 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
 
       if (mode == 0 && i == 0) {
          /* dummy operations */
-         if ((err = ltc_mp.ecc_ptadd(M[0], M[1], M[2], a, modulus, mp)) != CRYPT_OK) { goto done; }
-         if ((err = ltc_mp.ecc_ptdbl(M[1], M[2], a, modulus, mp)) != CRYPT_OK)       { goto done; }
+         if ((err = ltc_mp.ecc_ptadd(M[0], M[1], M[2], ma, modulus, mp)) != CRYPT_OK) { goto done; }
+         if ((err = ltc_mp.ecc_ptdbl(M[1], M[2], ma, modulus, mp)) != CRYPT_OK)       { goto done; }
          continue;
       }
 
       if (mode == 0 && i == 1) {
          mode = 1;
          /* dummy operations */
-         if ((err = ltc_mp.ecc_ptadd(M[0], M[1], M[2], a, modulus, mp)) != CRYPT_OK) { goto done; }
-         if ((err = ltc_mp.ecc_ptdbl(M[1], M[2], a, modulus, mp)) != CRYPT_OK)       { goto done; }
+         if ((err = ltc_mp.ecc_ptadd(M[0], M[1], M[2], ma, modulus, mp)) != CRYPT_OK) { goto done; }
+         if ((err = ltc_mp.ecc_ptdbl(M[1], M[2], ma, modulus, mp)) != CRYPT_OK)       { goto done; }
          continue;
       }
 
-      if ((err = ltc_mp.ecc_ptadd(M[0], M[1], M[i^1], a, modulus, mp)) != CRYPT_OK)  { goto done; }
-      if ((err = ltc_mp.ecc_ptdbl(M[i], M[i], a, modulus, mp)) != CRYPT_OK)          { goto done; }
+      if ((err = ltc_mp.ecc_ptadd(M[0], M[1], M[i^1], ma, modulus, mp)) != CRYPT_OK)  { goto done; }
+      if ((err = ltc_mp.ecc_ptdbl(M[i], M[i], ma, modulus, mp)) != CRYPT_OK)          { goto done; }
    }
 
    /* copy result out */
@@ -148,6 +161,7 @@ done:
    if (mu != NULL) {
       mp_clear(mu);
    }
+   mp_clear(ma);
    mp_montgomery_free(mp);
    ltc_ecc_del_point(tG);
    for (i = 0; i < 3; i++) {

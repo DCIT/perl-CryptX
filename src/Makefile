@@ -2,8 +2,14 @@ OBJS=ltc/ciphers/aes/aes.o ltc/ciphers/anubis.o ltc/ciphers/blowfish.o ltc/ciphe
 ltc/ciphers/des.o ltc/ciphers/kasumi.o ltc/ciphers/khazad.o ltc/ciphers/kseed.o ltc/ciphers/multi2.o \
 ltc/ciphers/noekeon.o ltc/ciphers/rc2.o ltc/ciphers/rc5.o ltc/ciphers/rc6.o ltc/ciphers/safer/safer.o \
 ltc/ciphers/safer/saferp.o ltc/ciphers/skipjack.o ltc/ciphers/twofish/twofish.o ltc/ciphers/xtea.o \
+ltc/stream/chacha/chacha_crypt.o ltc/stream/chacha/chacha_done.o ltc/stream/chacha/chacha_ivctr32.o \
+ltc/stream/chacha/chacha_ivctr64.o ltc/stream/chacha/chacha_keystream.o ltc/stream/chacha/chacha_setup.o \
+ltc/encauth/chachapoly/chacha20poly1305_add_aad.o ltc/encauth/chachapoly/chacha20poly1305_decrypt.o \
+ltc/encauth/chachapoly/chacha20poly1305_done.o ltc/encauth/chachapoly/chacha20poly1305_encrypt.o \
+ltc/encauth/chachapoly/chacha20poly1305_init.o ltc/encauth/chachapoly/chacha20poly1305_memory.o \
+ltc/encauth/chachapoly/chacha20poly1305_setiv.o ltc/encauth/chachapoly/chacha20poly1305_setiv_rfc7905.o \
 ltc/encauth/ccm/ccm_add_aad.o ltc/encauth/ccm/ccm_add_nonce.o ltc/encauth/ccm/ccm_done.o ltc/encauth/ccm/ccm_init.o \
-ltc/encauth/ccm/ccm_memory.o ltc/encauth/ccm/ccm_memory_ex.o ltc/encauth/ccm/ccm_process.o ltc/encauth/ccm/ccm_reset.o \
+ltc/encauth/ccm/ccm_memory.o ltc/encauth/ccm/ccm_process.o ltc/encauth/ccm/ccm_reset.o \
 ltc/encauth/eax/eax_addheader.o ltc/encauth/eax/eax_decrypt.o ltc/encauth/eax/eax_decrypt_verify_memory.o \
 ltc/encauth/eax/eax_done.o ltc/encauth/eax/eax_encrypt.o ltc/encauth/eax/eax_encrypt_authenticate_memory.o \
 ltc/encauth/eax/eax_init.o ltc/encauth/gcm/gcm_add_aad.o ltc/encauth/gcm/gcm_add_iv.o ltc/encauth/gcm/gcm_done.o \
@@ -17,8 +23,9 @@ ltc/hashes/chc/chc.o ltc/hashes/helper/hash_file.o ltc/hashes/helper/hash_fileha
 ltc/hashes/helper/hash_memory_multi.o ltc/hashes/md2.o ltc/hashes/md4.o ltc/hashes/md5.o ltc/hashes/rmd128.o \
 ltc/hashes/rmd160.o ltc/hashes/rmd256.o ltc/hashes/rmd320.o ltc/hashes/sha1.o ltc/hashes/sha2/sha224.o \
 ltc/hashes/sha2/sha256.o ltc/hashes/sha2/sha384.o ltc/hashes/sha2/sha512.o ltc/hashes/sha2/sha512_224.o \
-ltc/hashes/sha2/sha512_256.o ltc/hashes/tiger.o ltc/hashes/whirl/whirl.o ltc/mac/f9/f9_done.o ltc/mac/f9/f9_file.o \
-ltc/mac/f9/f9_init.o ltc/mac/f9/f9_memory.o ltc/mac/f9/f9_memory_multi.o ltc/mac/f9/f9_process.o \
+ltc/hashes/sha2/sha512_256.o ltc/hashes/tiger.o ltc/hashes/whirl/whirl.o ltc/hashes/sha3.o \
+ltc/mac/poly1305/poly1305.o ltc/mac/poly1305/poly1305_file.o ltc/mac/poly1305/poly1305_memory.o ltc/mac/poly1305/poly1305_memory_multi.o \
+ltc/mac/f9/f9_done.o ltc/mac/f9/f9_file.o ltc/mac/f9/f9_init.o ltc/mac/f9/f9_memory.o ltc/mac/f9/f9_memory_multi.o ltc/mac/f9/f9_process.o \
 ltc/mac/hmac/hmac_done.o ltc/mac/hmac/hmac_file.o ltc/mac/hmac/hmac_init.o ltc/mac/hmac/hmac_memory.o \
 ltc/mac/hmac/hmac_memory_multi.o ltc/mac/hmac/hmac_process.o ltc/mac/omac/omac_done.o ltc/mac/omac/omac_file.o \
 ltc/mac/omac/omac_init.o ltc/mac/omac/omac_memory.o ltc/mac/omac/omac_memory_multi.o ltc/mac/omac/omac_process.o \
@@ -50,6 +57,8 @@ ltc/pk/asn1/der/bit/der_encode_bit_string.o ltc/pk/asn1/der/bit/der_encode_raw_b
 ltc/pk/asn1/der/bit/der_length_bit_string.o ltc/pk/asn1/der/boolean/der_decode_boolean.o \
 ltc/pk/asn1/der/boolean/der_encode_boolean.o ltc/pk/asn1/der/boolean/der_length_boolean.o \
 ltc/pk/asn1/der/choice/der_decode_choice.o ltc/pk/asn1/der/ia5/der_decode_ia5_string.o \
+ltc/pk/asn1/der/generalizedtime/der_decode_generalizedtime.o ltc/pk/asn1/der/generalizedtime/der_encode_generalizedtime.o \
+ltc/pk/asn1/der/generalizedtime/der_length_generalizedtime.o \
 ltc/pk/asn1/der/ia5/der_encode_ia5_string.o ltc/pk/asn1/der/ia5/der_length_ia5_string.o \
 ltc/pk/asn1/der/integer/der_decode_integer.o ltc/pk/asn1/der/integer/der_encode_integer.o \
 ltc/pk/asn1/der/integer/der_length_integer.o ltc/pk/asn1/der/object_identifier/der_decode_object_identifier.o \
@@ -84,13 +93,14 @@ ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ecc_verify_key.o ltc/pk/ecc/ltc_ecc_is_p
 ltc/pk/ecc/ltc_ecc_is_valid_idx.o ltc/pk/ecc/ltc_ecc_map.o ltc/pk/ecc/ltc_ecc_mul2add.o ltc/pk/ecc/ltc_ecc_mulmod.o \
 ltc/pk/ecc/ltc_ecc_mulmod_timing.o ltc/pk/ecc/ltc_ecc_points.o ltc/pk/ecc/ltc_ecc_projective_add_point.o \
 ltc/pk/ecc/ltc_ecc_projective_dbl_point.o ltc/pk/pkcs1/pkcs_1_i2osp.o ltc/pk/pkcs1/pkcs_1_mgf1.o \
+ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o \
 ltc/pk/pkcs1/pkcs_1_oaep_decode.o ltc/pk/pkcs1/pkcs_1_oaep_encode.o ltc/pk/pkcs1/pkcs_1_os2ip.o \
 ltc/pk/pkcs1/pkcs_1_pss_decode.o ltc/pk/pkcs1/pkcs_1_pss_encode.o ltc/pk/pkcs1/pkcs_1_v1_5_decode.o \
 ltc/pk/pkcs1/pkcs_1_v1_5_encode.o ltc/pk/rsa/rsa_decrypt_key.o ltc/pk/rsa/rsa_encrypt_key.o ltc/pk/rsa/rsa_export.o \
 ltc/pk/rsa/rsa_exptmod.o ltc/pk/rsa/rsa_free.o ltc/pk/rsa/rsa_get_size.o ltc/pk/rsa/rsa_import.o \
-ltc/pk/rsa/rsa_import_radix.o ltc/pk/rsa/rsa_import_pkcs8.o ltc/pk/rsa/rsa_make_key.o ltc/pk/rsa/rsa_sign_hash.o \
+ltc/pk/rsa/rsa_import_radix.o ltc/pk/rsa/rsa_import_pkcs8.o ltc/pk/rsa/rsa_import_x509.o ltc/pk/rsa/rsa_make_key.o ltc/pk/rsa/rsa_sign_hash.o \
 ltc/pk/rsa/rsa_sign_saltlen_get.o ltc/pk/rsa/rsa_verify_hash.o ltc/prngs/fortuna.o ltc/prngs/rc4.o \
-ltc/prngs/rng_get_bytes.o ltc/prngs/rng_make_prng.o ltc/prngs/sober128.o ltc/prngs/sprng.o ltc/prngs/yarrow.o \
+ltc/prngs/rng_get_bytes.o ltc/prngs/rng_make_prng.o ltc/prngs/sober128.o ltc/prngs/sprng.o ltc/prngs/yarrow.o ltc/prngs/chacha20.o \
 ltm/bn_error.o ltm/bn_fast_mp_invmod.o ltm/bn_fast_mp_montgomery_reduce.o ltm/bn_fast_s_mp_mul_digs.o \
 ltm/bn_fast_s_mp_mul_high_digs.o ltm/bn_fast_s_mp_sqr.o ltm/bn_mp_2expt.o ltm/bn_mp_abs.o ltm/bn_mp_add.o \
 ltm/bn_mp_add_d.o ltm/bn_mp_addmod.o ltm/bn_mp_and.o ltm/bn_mp_clamp.o ltm/bn_mp_clear.o ltm/bn_mp_clear_multi.o \

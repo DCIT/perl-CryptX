@@ -66,11 +66,11 @@ int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key
 
   /* base point - we export uncompressed form */
   len_g = sizeof(bin_g);
-  if ((err = ecc_export_point(bin_g, &len_g, gx, gy, key->dp->size, 0)) != CRYPT_OK)   goto error;
+  if ((err = ltc_ecc_export_point(bin_g, &len_g, gx, gy, key->dp->size, 0)) != CRYPT_OK) goto error;
 
   /* public key */
   len_xy = sizeof(bin_xy);
-  if ((err = ecc_export_point(bin_xy, &len_xy, key->pubkey.x, key->pubkey.y, key->dp->size, 0)) != CRYPT_OK)    goto error;
+  if ((err = ltc_ecc_export_point(bin_xy, &len_xy, key->pubkey.x, key->pubkey.y, key->dp->size, 0)) != CRYPT_OK) goto error;
 
   /* co-factor */
   cofactor = key->dp->cofactor;

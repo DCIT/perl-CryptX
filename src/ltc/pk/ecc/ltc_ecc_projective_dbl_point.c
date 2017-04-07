@@ -43,12 +43,12 @@
    Double an ECC point
    @param P   The point to double
    @param R   [out] The destination of the double
-   @param a   ECC curve parameter a (if NULL we assume a == -3)
+   @param ma  ECC curve parameter a in montgomery form (if NULL we assume a == -3)
    @param modulus  The modulus of the field the ECC curve is in
    @param mp       The "b" value from montgomery_setup()
    @return CRYPT_OK on success
 */
-int ltc_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, void *a, void *modulus, void *mp)
+int ltc_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, void *ma, void *modulus, void *mp)
 {
    void *t1, *t2;
    int   err;
@@ -68,6 +68,14 @@ int ltc_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, void *a, void *modu
       if ((err = mp_copy(P->z, R->z)) != CRYPT_OK)                                { goto done; }
    }
 
+   if (ltc_ecc_is_point_at_infinity(P, modulus)) {
+      /* if P is point at infinity >> Result = point at infinity */
+      if ((err = ltc_mp.set_int(R->x, 1)) != CRYPT_OK)                            { goto done; }
+      if ((err = ltc_mp.set_int(R->y, 1)) != CRYPT_OK)                            { goto done; }
+      if ((err = ltc_mp.set_int(R->z, 0)) != CRYPT_OK)                            { goto done; }
+      goto done; /* CRYPT_OK */
+   }
+
    /* t1 = Z * Z */
    if ((err = mp_sqr(R->z, t1)) != CRYPT_OK)                                      { goto done; }
    if ((err = mp_montgomery_reduce(t1, modulus, mp)) != CRYPT_OK)                 { goto done; }
@@ -80,7 +88,7 @@ int ltc_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, void *a, void *modu
       if ((err = mp_sub(R->z, modulus, R->z)) != CRYPT_OK)                        { goto done; }
    }
 
-   if (a == NULL) { /* special case for a == -3 (slightly faster than general case) */
+   if (ma == NULL) { /* special case for ma == -3 (slightly faster than general case) */
       /* T2 = X - T1 */
       if ((err = mp_sub(R->x, t1, t2)) != CRYPT_OK)                               { goto done; }
       if (mp_cmp_d(t2, 0) == LTC_MP_LT) {
@@ -110,7 +118,8 @@ int ltc_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, void *a, void *modu
       if ((err = mp_sqr(t1, t2)) != CRYPT_OK)                                     { goto done; }
       if ((err = mp_montgomery_reduce(t2, modulus, mp)) != CRYPT_OK)              { goto done; }
       /* T1 = T2 * a */
-      if ((err = mp_mulmod(t2, a, modulus, t1)) != CRYPT_OK)                      { goto done; }
+      if ((err = mp_mul(t2, ma, t1)) != CRYPT_OK)                                 { goto done; }
+      if ((err = mp_montgomery_reduce(t1, modulus, mp)) != CRYPT_OK)              { goto done; }
       /* T2 = X * X */
       if ((err = mp_sqr(R->x, t2)) != CRYPT_OK)                                   { goto done; }
       if ((err = mp_montgomery_reduce(t2, modulus, mp)) != CRYPT_OK)              { goto done; }
