@@ -5,10 +5,8 @@ _new(SV * key, SV * nonce)
     CODE:
     {
         int rv;
-        STRLEN iv_len;
-        unsigned char *iv;
-        STRLEN k_len=0;
-        unsigned char *k=NULL;
+        STRLEN iv_len=0, k_len=0;
+        unsigned char *iv=NULL, *k=NULL;
 
         if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
         if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");

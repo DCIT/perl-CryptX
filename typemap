@@ -15,6 +15,10 @@ Crypt::AuthEnc::GCM     T_PTROBJ
 Crypt::AuthEnc::OCB     T_PTROBJ
 Crypt::AuthEnc::ChaCha20Poly1305 T_PTROBJ
 
+Crypt::Stream::ChaCha   T_PTROBJ
+Crypt::Stream::RC4      T_PTROBJ
+Crypt::Stream::Sober128 T_PTROBJ
+
 Crypt::Mac::F9          T_PTROBJ
 Crypt::Mac::HMAC        T_PTROBJ
 Crypt::Mac::OMAC        T_PTROBJ

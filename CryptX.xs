@@ -51,6 +51,21 @@ typedef struct ocb_struct {             /* used by Crypt::AuthEnc::OCB */
   int id;
 } *Crypt__AuthEnc__OCB;
 
+typedef struct chacha_struct {          /* used by Crypt::Stream::ChaCha */
+  chacha_state state;
+  int id;
+} *Crypt__Stream__ChaCha;
+
+typedef struct rc4_struct {             /* used by Crypt::Stream::RC4 */
+  rc4_state state;
+  int id;
+} *Crypt__Stream__RC4;
+
+typedef struct sober128_struct {        /* used by Crypt::Stream::Sober128 */
+  sober128_state state;
+  int id;
+} *Crypt__Stream__Sober128;
+
 typedef struct f9_struct {              /* used by Crypt::Mac::F9 */
   f9_state state;
   int id;
@@ -451,6 +466,10 @@ INCLUDE: inc/CryptX_AuthEnc_GCM.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_OCB.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_CCM.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_ChaCha20Poly1305.xs.inc
+
+INCLUDE: inc/CryptX_Stream_ChaCha.xs.inc
+INCLUDE: inc/CryptX_Stream_RC4.xs.inc
+INCLUDE: inc/CryptX_Stream_Sober128.xs.inc
 
 INCLUDE: inc/CryptX_Mac_F9.xs.inc
 INCLUDE: inc/CryptX_Mac_HMAC.xs.inc
