@@ -12,7 +12,13 @@ our @EXPORT = qw();
 use CryptX;
 use Crypt::Cipher;
 
-sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
+sub new {
+  my ($class, $cipher, $key, $iv) = @_;
+  my $self = _new(Crypt::Cipher::_trans_cipher_name($cipher), $key);
+  # for backwards compatibility the $iv is optional
+  $self->iv_add($iv) if defined $iv;
+  return $self;
+}
 
 sub gcm_encrypt_authenticate {
   my $cipher_name = shift;
@@ -55,28 +61,29 @@ Crypt::AuthEnc::GCM - Authenticated encryption in GCM mode
 =head1 SYNOPSIS
 
  ### OO interface
+ use Crypt::AuthEnc::GCM;
 
  # encrypt and authenticate
- my $ae = Crypt::AuthEnc::GCM->new("AES", $key);
- $ae->iv_add('data_iv1');
- $ae->iv_add('data_iv2');
- $ae->aad_add('data_aad1');
- $ae->aad_add('data_aad2');
+ my $ae = Crypt::AuthEnc::GCM->new("AES", $key, $iv);
+ $ae->aad_add('additional_authenticated_data1');
+ $ae->aad_add('additional_authenticated_data2');
  $ct = $ae->encrypt_add('data1');
  $ct = $ae->encrypt_add('data2');
  $ct = $ae->encrypt_add('data3');
  $tag = $ae->encrypt_done();
 
  # decrypt and verify
- my $ae = Crypt::AuthEnc::GCM->new("AES", $key);
- $ae->iv_add('data_iv1');
- $ae->iv_add('data_iv2');
- $ae->aad_add('data_aad1');
- $ae->aad_add('data_aad2');
- $pt = $ae->decrypt_add($ciphertext1);
- $pt = $ae->decrypt_add($ciphertext2);
- $pt = $ae->decrypt_add($ciphertext3);
+ my $ae = Crypt::AuthEnc::GCM->new("AES", $key, $iv);
+ $ae->aad_add('additional_authenticated_data1');
+ $ae->aad_add('additional_authenticated_data2');
+ $pt = $ae->decrypt_add('ciphertext1');
+ $pt = $ae->decrypt_add('ciphertext2');
+ $pt = $ae->decrypt_add('ciphertext3');
  $tag = $ae->decrypt_done();
+ die "decrypt failed" unless $tag eq $expected_tag;
+
+ #or
+ my $result = $ae->decrypt_done($expected_tag) die "decrypt failed";
 
  ### functional interface
  use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate gcm_decrypt_verify);
@@ -104,8 +111,8 @@ You can export selected functions:
 
  # $cipher .. 'AES' or name of any other cipher with 16-byte block len
  # $key ..... AES key of proper length (128/192/256bits)
- # $iv ...... initial vector
- # $adata ... additional authentication data
+ # $iv ...... initialization vector
+ # $adata ... additional authenticated data
 
 =head2 gcm_decrypt_verify
 
@@ -118,9 +125,12 @@ You can export selected functions:
 =head2 new
 
  my $ae = Crypt::AuthEnc::GCM->new($cipher, $key);
+ #or
+ my $ae = Crypt::AuthEnc::GCM->new($cipher, $key, $iv);
 
  # $cipher .. 'AES' or name of any other cipher
  # $key ..... encryption key of proper length
+ # $iv ...... initialization vector (optional, you can set it later via iv_add method)
 
 =head2 iv_add
 

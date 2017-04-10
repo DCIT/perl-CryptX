@@ -54,8 +54,8 @@ Crypt::AuthEnc::ChaCha20Poly1305 - Authenticated encryption in ChaCha20Poly1305 
 
  # encrypt and authenticate
  my $ae = Crypt::AuthEnc::ChaCha20Poly1305->new($key, $iv);
- $ae->aad_add('data_aad1');
- $ae->aad_add('data_aad2');
+ $ae->aad_add('additional_authenticated_data1');
+ $ae->aad_add('additional_authenticated_data2');
  $ct = $ae->encrypt_add('data1');
  $ct = $ae->encrypt_add('data2');
  $ct = $ae->encrypt_add('data3');
@@ -63,12 +63,16 @@ Crypt::AuthEnc::ChaCha20Poly1305 - Authenticated encryption in ChaCha20Poly1305 
 
  # decrypt and verify
  my $ae = Crypt::AuthEnc::ChaCha20Poly1305->new($key, $iv);
- $ae->aad_add('data_aad1');
- $ae->aad_add('data_aad2');
- $pt = $ae->decrypt_add($ciphertext1);
- $pt = $ae->decrypt_add($ciphertext2);
- $pt = $ae->decrypt_add($ciphertext3);
+ $ae->aad_add('additional_authenticated_data1');
+ $ae->aad_add('additional_authenticated_data2');
+ $pt = $ae->decrypt_add('ciphertext1');
+ $pt = $ae->decrypt_add('ciphertext2');
+ $pt = $ae->decrypt_add('ciphertext3');
  $tag = $ae->decrypt_done();
+ die "decrypt failed" unless $tag eq $expected_tag;
+
+ #or
+ my $result = $ae->decrypt_done($expected_tag) die "decrypt failed";
 
  ### functional interface
  use Crypt::AuthEnc::ChaCha20Poly1305 qw(chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify);
@@ -96,7 +100,7 @@ You can export selected functions:
 
  # $key ..... key of proper length (128 or 256 bits / 16 or 32 bytes)
  # $iv ...... initialization vector (64 or 96 bits / 8 or 12 bytes)
- # $adata ... additional authentication data (optional)
+ # $adata ... additional authenticated data (optional)
 
 =head2 chacha20poly1305_decrypt_verify
 

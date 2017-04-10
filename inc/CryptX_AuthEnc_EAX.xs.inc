@@ -1,7 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::AuthEnc::EAX
 
 Crypt::AuthEnc::EAX
-_new(char * cipher_name, SV * key, SV * nonce, SV * header=&PL_sv_undef)
+_new(char * cipher_name, SV * key, SV * nonce, SV * adata=&PL_sv_undef)
     CODE:
     {
         STRLEN k_len=0;
@@ -16,9 +16,9 @@ _new(char * cipher_name, SV * key, SV * nonce, SV * header=&PL_sv_undef)
         k = (unsigned char *) SvPVbyte(key, k_len);
         if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
         n = (unsigned char *) SvPVbyte(nonce, n_len);
-        if(SvOK(header)) { /* header is optional param */
-          if(!SvPOK(header)) croak("FATAL: header must be string/buffer scalar");
-          h = (unsigned char *) SvPVbyte(header, h_len);
+        if(SvOK(adata)) { /* adata is optional param */
+          if(!SvPOK(adata)) croak("FATAL: adata must be string/buffer scalar");
+          h = (unsigned char *) SvPVbyte(adata, h_len);
         }
 
         id = find_cipher(cipher_name);
@@ -140,12 +140,12 @@ decrypt_done(Crypt::AuthEnc::EAX self, ...)
     }
 
 int
-header_add(Crypt::AuthEnc::EAX self, SV * header)
+aad_add(Crypt::AuthEnc::EAX self, SV * adata)
     CODE:
     {
         STRLEN h_len;
         unsigned char *h;
-        h = (unsigned char *)SvPVbyte(header, h_len);
+        h = (unsigned char *)SvPVbyte(adata, h_len);
         RETVAL = eax_addheader(&self->state, h, (unsigned long)h_len);
     }
     OUTPUT:
