@@ -22,7 +22,7 @@ sub _trans_prng_name {
 
 sub new {
   my $pkg = shift;
-  my $prng_name = $pkg eq __PACKAGE__ ? _trans_prng_name(shift||'Fortuna') : _trans_prng_name($pkg);
+  my $prng_name = $pkg eq __PACKAGE__ ? _trans_prng_name(shift||'ChaCha20') : _trans_prng_name($pkg);
   return _new($$, $prng_name, @_);
 }
 
@@ -143,7 +143,7 @@ Crypt::PRNG - Cryptographically secure random number generator
 
 =head1 DESCRIPTION
 
-Provides an interface to the Fortuna based pseudo random number generator (thread-safe and fork-safe).
+Provides an interface to the ChaCha20 based pseudo random number generator (thread-safe and fork-safe).
 
 =head1 FUNCTIONS
 
