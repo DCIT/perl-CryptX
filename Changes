@@ -10,7 +10,7 @@ TODO:
         - maybe: switch yarrow > fortuna for Crypt::PK::*
         - maybe: add encode_b32/decode_b32
 
-0.047_002 2017/04/07
+0.047_004 2017/04/24
         - NEW: Crypt::Digest::SHA3_224
         - NEW: Crypt::Digest::SHA3_256
         - NEW: Crypt::Digest::SHA3_384
