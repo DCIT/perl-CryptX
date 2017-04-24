@@ -82,7 +82,7 @@ Crypt::AuthEnc::ChaCha20Poly1305 - Authenticated encryption in ChaCha20Poly1305 
 
 =head1 DESCRIPTION
 
-Galois/Counter Mode (ChaCha20Poly1305) - provides encryption and authentication.
+Provides encryption and authentication based on ChaCha20 + Poly1305 as defined in RFC 7539 - L<https://tools.ietf.org/html/rfc7539>
 
 =head1 EXPORT
 
@@ -144,6 +144,10 @@ Can be called before the first C<encrypt_add> or C<decrypt_add>;
 =head2 clone
 
  my $ae_new = $ae->clone;
+
+=head2 increment_iv
+
+ $ae->increment_iv;
 
 =head1 SEE ALSO
 

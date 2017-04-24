@@ -9,6 +9,7 @@ ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj ltc/encauth/chachapoly/chach
 ltc/encauth/chachapoly/chacha20poly1305_done.obj ltc/encauth/chachapoly/chacha20poly1305_encrypt.obj \
 ltc/encauth/chachapoly/chacha20poly1305_init.obj ltc/encauth/chachapoly/chacha20poly1305_memory.obj \
 ltc/encauth/chachapoly/chacha20poly1305_setiv.obj ltc/encauth/chachapoly/chacha20poly1305_setiv_rfc7905.obj \
+ltc/encauth/chachapoly/chacha20poly1305_inciv.obj \
 ltc/encauth/ccm/ccm_add_aad.obj ltc/encauth/ccm/ccm_add_nonce.obj ltc/encauth/ccm/ccm_done.obj ltc/encauth/ccm/ccm_init.obj \
 ltc/encauth/ccm/ccm_memory.obj ltc/encauth/ccm/ccm_process.obj ltc/encauth/ccm/ccm_reset.obj \
 ltc/encauth/eax/eax_addheader.obj ltc/encauth/eax/eax_decrypt.obj ltc/encauth/eax/eax_decrypt_verify_memory.obj \

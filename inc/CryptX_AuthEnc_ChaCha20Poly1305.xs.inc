@@ -40,6 +40,18 @@ clone(Crypt::AuthEnc::ChaCha20Poly1305 self)
         RETVAL
 
 int
+increment_iv(Crypt::AuthEnc::ChaCha20Poly1305 self)
+    CODE:
+    {
+        int rv;
+        rv = chacha20poly1305_inciv(&self->state);
+        if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_inciv failed: %s", error_to_string(rv));
+        RETVAL = rv;
+    }
+    OUTPUT:
+        RETVAL
+
+int
 adata_add(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * data)
     CODE:
     {
