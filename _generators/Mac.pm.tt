@@ -20,6 +20,12 @@ sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->mac }
 sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->hexmac }
 sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64mac }
 sub [%lc_name%]_b64u { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64umac }
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+sub new { my $class = shift; _new(@_) }
+sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->mac }
+sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->hexmac }
+sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64mac }
+sub [%lc_name%]_b64u { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64umac }
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
 sub new { my $class = shift; _new(@_) }
 sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->mac }
@@ -55,6 +61,11 @@ Crypt::Mac::[%orig_name%] - [%info%]
    $[%lc_name%]_hex  = [%lc_name%]_hex('SHA256', $key, 'data buffer');
    $[%lc_name%]_b64  = [%lc_name%]_b64('SHA256', $key, 'data buffer');
    $[%lc_name%]_b64u = [%lc_name%]_b64u('SHA256', $key, 'data buffer');
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+   $[%lc_name%]_raw  = [%lc_name%]($size, $key, 'data buffer');
+   $[%lc_name%]_hex  = [%lc_name%]_hex($size, $key, 'data buffer');
+   $[%lc_name%]_b64  = [%lc_name%]_b64($size, $key, 'data buffer');
+   $[%lc_name%]_b64u = [%lc_name%]_b64u($size, $key, 'data buffer');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
    $[%lc_name%]_raw  = [%lc_name%]($key, 'data buffer');
    $[%lc_name%]_hex  = [%lc_name%]_hex($key, 'data buffer');
@@ -72,6 +83,8 @@ Crypt::Mac::[%orig_name%] - [%info%]
 
 [%-IF lc_name == 'hmac' %]
    $d = Crypt::Mac::[%orig_name%]->new('SHA256', $key);
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+   $d = Crypt::Mac::[%orig_name%]->new($size, $key);
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
    $d = Crypt::Mac::[%orig_name%]->new($key);
 [%-ELSE%]
@@ -111,6 +124,10 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
  $[%lc_name%]_raw = [%lc_name%]($hash_name, $key, 'data buffer');
  #or
  $[%lc_name%]_raw = [%lc_name%]($hash_name, $key, 'any data', 'more data', 'even more data');
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+ $[%lc_name%]_raw = [%lc_name%]($size, $key, 'data buffer');
+ #or
+ $[%lc_name%]_raw = [%lc_name%]($size, $key, 'any data', 'more data', 'even more data');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
  $[%lc_name%]_raw = [%lc_name%]($key, 'data buffer');
  #or
@@ -129,6 +146,10 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
  $[%lc_name%]_hex = [%lc_name%]_hex($hash_name, $key, 'data buffer');
  #or
  $[%lc_name%]_hex = [%lc_name%]_hex($hash_name, $key, 'any data', 'more data', 'even more data');
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+ $[%lc_name%]_hex = [%lc_name%]_hex($size, $key, 'data buffer');
+ #or
+ $[%lc_name%]_hex = [%lc_name%]_hex($size, $key, 'any data', 'more data', 'even more data');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
  $[%lc_name%]_hex = [%lc_name%]_hex($key, 'data buffer');
  #or
@@ -147,6 +168,10 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
  $[%lc_name%]_b64 = [%lc_name%]_b64($hash_name, $key, 'data buffer');
  #or
  $[%lc_name%]_b64 = [%lc_name%]_b64($hash_name, $key, 'any data', 'more data', 'even more data');
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+ $[%lc_name%]_b64 = [%lc_name%]_b64($size, $key, 'data buffer');
+ #or
+ $[%lc_name%]_b64 = [%lc_name%]_b64($size, $key, 'any data', 'more data', 'even more data');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
  $[%lc_name%]_b64 = [%lc_name%]_b64($key, 'data buffer');
  #or
@@ -165,6 +190,10 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
  $[%lc_name%]_b64url = [%lc_name%]_b64u($hash_name, $key, 'data buffer');
  #or
  $[%lc_name%]_b64url = [%lc_name%]_b64u($hash_name, $key, 'any data', 'more data', 'even more data');
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+ $[%lc_name%]_b64url = [%lc_name%]_b64u($size, $key, 'data buffer');
+ #or
+ $[%lc_name%]_b64url = [%lc_name%]_b64u($size, $key, 'any data', 'more data', 'even more data');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
  $[%lc_name%]_b64url = [%lc_name%]_b64u($key, 'data buffer');
  #or
@@ -181,6 +210,8 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 [%-IF lc_name == 'hmac' %]
  $d = Crypt::Mac::[%orig_name%]->new($hash_name, $key);
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+ $d = Crypt::Mac::[%orig_name%]->new($size, $key);
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
  $d = Crypt::Mac::[%orig_name%]->new($key);
 [%-ELSE%]

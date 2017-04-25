@@ -28,14 +28,26 @@ use CryptX;
 sub _trans_digest_name {
   my $name = shift;
   my %trans = (
-    CHAES     => 'chc_hash',
-    RIPEMD128 => 'rmd128',
-    RIPEMD160 => 'rmd160',
-    RIPEMD256 => 'rmd256',
-    RIPEMD320 => 'rmd320',
-    TIGER192  => 'tiger',
-    SHA512_224=> 'sha512-224',
-    SHA512_256=> 'sha512-256',
+    CHAES       => 'chc_hash',
+    RIPEMD128   => 'rmd128',
+    RIPEMD160   => 'rmd160',
+    RIPEMD256   => 'rmd256',
+    RIPEMD320   => 'rmd320',
+    TIGER192    => 'tiger',
+    SHA512_224  => 'sha512-224',
+    SHA512_256  => 'sha512-256',
+    SHA3_224    => 'sha3-224',
+    SHA3_256    => 'sha3-256',
+    SHA3_384    => 'sha3-384',
+    SHA3_512    => 'sha3-512',
+    BLAKE2B_160 => 'blake2b-160',
+    BLAKE2B_256 => 'blake2b-256',
+    BLAKE2B_384 => 'blake2b-384',
+    BLAKE2B_512 => 'blake2b-512',
+    BLAKE2S_128 => 'blake2s-128',
+    BLAKE2S_160 => 'blake2s-160',
+    BLAKE2S_224 => 'blake2s-224',
+    BLAKE2S_256 => 'blake2s-256',
   );
   $name =~ s/^Crypt::Digest:://i;
   return $trans{uc($name)} if defined $trans{uc($name)};

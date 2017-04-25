@@ -40,3 +40,4 @@ tmp.*
 ^.travis*
 t/openssl/.*$
 ^src/liballinone*
+^src/update-makefiles.pl$

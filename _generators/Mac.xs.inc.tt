@@ -5,6 +5,8 @@ MODULE = CryptX         PACKAGE = Crypt::Mac::[%orig_name%]
 Crypt::Mac::[%orig_name%]
 [%-IF lc_name == 'hmac' %]
 _new(char * hash_name, SV * key)
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+_new(int size, SV * key)
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
 _new(SV * key)
 [%-ELSE%]
@@ -20,6 +22,7 @@ _new(char * cipher_name, SV * key)
 
         id = find_hash(hash_name);
         if(id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
 [%-ELSE%]
         int id;
@@ -36,6 +39,8 @@ _new(char * cipher_name, SV * key)
 
 [%-IF lc_name == 'pelican' || lc_name == 'poly1305' %]
         rv = [%lc_name%]_init(&RETVAL->state, k, (unsigned long)k_len);
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+        rv = [%lc_name%]mac_init(&RETVAL->state, size, k, (unsigned long)k_len);
 [%-ELSE%]
         rv = [%lc_name%]_init(&RETVAL->state, id, k, (unsigned long)k_len);
 [%-END%]
@@ -68,7 +73,11 @@ _add_single(Crypt::Mac::[%orig_name%] self, SV * data)
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
         if (in_data_len>0) {
+[%-IF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+          rv = [%lc_name%]mac_process(&self->state, in_data, (unsigned long)in_data_len);
+[%-ELSE%]
           rv = [%lc_name%]_process(&self->state, in_data, (unsigned long)in_data_len);
+[%-END%]
           if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_process failed: %s", error_to_string(rv));
         }
     }
@@ -85,6 +94,10 @@ mac(Crypt::Mac::[%orig_name%] self)
         mac_len = 16;
         rv = [%lc_name%]_done(&self->state, (unsigned char*)mac);
         if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_done failed: %s", error_to_string(rv));
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+        mac_len = sizeof(mac);
+        rv = [%lc_name%]mac_done(&self->state, (unsigned char*)mac, &mac_len);
+        if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]mac_done failed: %s", error_to_string(rv));
 [%-ELSE%]
         mac_len = sizeof(mac);
         rv = [%lc_name%]_done(&self->state, (unsigned char*)mac, &mac_len);
@@ -109,6 +122,10 @@ b64mac(Crypt::Mac::[%orig_name%] self)
         mac_len = 16;
         rv = [%lc_name%]_done(&self->state, mac);
         if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_done failed: %s", error_to_string(rv));
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+        mac_len = sizeof(mac);
+        rv = [%lc_name%]mac_done(&self->state, mac, &mac_len);
+        if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]mac_done failed: %s", error_to_string(rv));
 [%-ELSE%]
         mac_len = sizeof(mac);
         rv = [%lc_name%]_done(&self->state, mac, &mac_len);
@@ -136,6 +153,10 @@ b64umac(Crypt::Mac::[%orig_name%] self)
         mac_len = 16;
         rv = [%lc_name%]_done(&self->state, mac);
         if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_done failed: %s", error_to_string(rv));
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+        mac_len = sizeof(mac);
+        rv = [%lc_name%]mac_done(&self->state, mac, &mac_len);
+        if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]mac_done failed: %s", error_to_string(rv));
 [%-ELSE%]
         mac_len = sizeof(mac);
         rv = [%lc_name%]_done(&self->state, mac, &mac_len);
@@ -162,6 +183,10 @@ hexmac(Crypt::Mac::[%orig_name%] self)
         mac_len = 16;
         rv = [%lc_name%]_done(&self->state, mac);
         if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_done failed: %s", error_to_string(rv));
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+        mac_len = sizeof(mac);
+        rv = [%lc_name%]mac_done(&self->state, mac, &mac_len);
+        if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]mac_done failed: %s", error_to_string(rv));
 [%-ELSE%]
         mac_len = sizeof(mac);
         rv = [%lc_name%]_done(&self->state, mac, &mac_len);

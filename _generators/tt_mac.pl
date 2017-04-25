@@ -29,6 +29,8 @@ my %list = (
         PMAC    => { info=>'Message authentication code PMAC', urls=>['https://en.wikipedia.org/wiki/PMAC_%28cryptography%29'] },
         XCBC    => { info=>'Message authentication code XCBC (RFC 3566)', urls=>['https://www.ietf.org/rfc/rfc3566.txt'] },
         Poly1305=> { info=>'Message authentication code Poly1305 (RFC 7539)', urls=>['https://www.ietf.org/rfc/rfc7539.txt'] },
+        BLAKE2s => { info=>'Message authentication code BLAKE2s MAC (RFC 7693)', urls=>['https://tools.ietf.org/html/rfc7693'] },
+        BLAKE2b => { info=>'Message authentication code BLAKE2b MAC (RFC 7693)', urls=>['https://tools.ietf.org/html/rfc7693'] },
 );
 
 my @test_strings = ( '', '123', "test\0test\0test\n");
@@ -56,6 +58,8 @@ for my $n (keys %list) {
     require Crypt::Mac::PMAC;
     require Crypt::Mac::XCBC;
     require Crypt::Mac::Poly1305;
+    require Crypt::Mac::BLAKE2s;
+    require Crypt::Mac::BLAKE2b;
 
     for (@test_strings) {
       if ($n eq 'HMAC') {
@@ -73,6 +77,10 @@ for my $n (keys %list) {
       elsif ($n eq 'Poly1305') {
         push @{$data->{t_strings}}, { mac=>unpack('H*', Crypt::Mac::Poly1305->new('12345678901234561234567890123456')->add($_)->mac), data=>pp($_), args=>"'12345678901234561234567890123456'" };
         push @{$data->{t_strings}}, { mac=>unpack('H*', Crypt::Mac::Poly1305->new('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')->add($_)->mac), data=>pp($_), args=>"'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'" };
+      }
+      elsif ($n =~ /BLAKE2(s|b)/) {
+        push @{$data->{t_strings}}, { mac=>unpack('H*', "Crypt::Mac::$n"->new(32, '12345678901234561234567890123456')->add($_)->mac), data=>pp($_), args=>"32,'12345678901234561234567890123456'" };
+        push @{$data->{t_strings}}, { mac=>unpack('H*', "Crypt::Mac::$n"->new(32, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')->add($_)->mac), data=>pp($_), args=>"32,'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'" };
       }
       else {
         push @{$data->{t_strings}}, { mac=>unpack('H*', "Crypt::Mac::$n"->new('AES', '1234567890123456')->add($_)->mac), data=>pp($_), args=>"'AES','1234567890123456'" };

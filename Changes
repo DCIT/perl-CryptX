@@ -10,14 +10,24 @@ TODO:
         - maybe: switch yarrow > fortuna for Crypt::PK::*
         - maybe: add encode_b32/decode_b32
 
-0.047_004 2017/04/24
+0.047_005 2017/04/25
         - NEW: Crypt::Digest::SHA3_224
         - NEW: Crypt::Digest::SHA3_256
         - NEW: Crypt::Digest::SHA3_384
         - NEW: Crypt::Digest::SHA3_512
         - NEW: Crypt::Digest::SHAKE
+        - NEW: Crypt::Digest::BLAKE2b_160
+        - NEW: Crypt::Digest::BLAKE2b_256
+        - NEW: Crypt::Digest::BLAKE2b_384
+        - NEW: Crypt::Digest::BLAKE2b_512
+        - NEW: Crypt::Digest::BLAKE2s_128
+        - NEW: Crypt::Digest::BLAKE2s_160
+        - NEW: Crypt::Digest::BLAKE2s_224
+        - NEW: Crypt::Digest::BLAKE2s_256
         - NEW: Crypt::AuthEnc::ChaCha20Poly1305
         - NEW: Crypt::Mac::Poly1305
+        - NEW: Crypt::Mac::BLAKE2s
+        - NEW: Crypt::Mac::BLAKE2b
         - NEW: Crypt::PRNG::ChaCha20
         - NEW: Crypt::Stream::ChaCha
         - NEW: Crypt::Stream::RC4

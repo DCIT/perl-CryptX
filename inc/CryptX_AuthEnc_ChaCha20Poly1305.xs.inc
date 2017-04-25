@@ -52,6 +52,40 @@ increment_iv(Crypt::AuthEnc::ChaCha20Poly1305 self)
         RETVAL
 
 int
+set_iv(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * nonce)
+    CODE:
+    {
+        int rv;
+        STRLEN iv_len=0;
+        unsigned char *iv=NULL;
+
+        if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+        iv = (unsigned char *) SvPVbyte(nonce, iv_len);
+        rv = chacha20poly1305_setiv(&self->state, iv, (unsigned long)iv_len);
+        if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_setiv failed: %s", error_to_string(rv));
+        RETVAL = rv;
+    }
+    OUTPUT:
+        RETVAL
+
+int
+set_iv_rfc7905(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * nonce, UV seqnum)
+    CODE:
+    {
+        int rv;
+        STRLEN iv_len=0;
+        unsigned char *iv=NULL;
+
+        if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+        iv = (unsigned char *) SvPVbyte(nonce, iv_len);
+        rv = chacha20poly1305_setiv_rfc7905(&self->state, iv, (unsigned long)iv_len, (ulong64)seqnum);
+        if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_setiv_rfc7905 failed: %s", error_to_string(rv));
+        RETVAL = rv;
+    }
+    OUTPUT:
+        RETVAL
+
+int
 adata_add(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * data)
     CODE:
     {

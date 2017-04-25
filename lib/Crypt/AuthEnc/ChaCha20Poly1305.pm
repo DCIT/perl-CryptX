@@ -147,7 +147,15 @@ Can be called before the first C<encrypt_add> or C<decrypt_add>;
 
 =head2 increment_iv
 
- $ae->increment_iv;
+ $ae->increment_iv();
+
+=head2 set_iv
+
+ $ae->set_iv($iv);
+
+=head2 set_iv_rfc7905
+
+ $ae->set_iv_rfc7905($iv, $seqnum);
 
 =head1 SEE ALSO
 

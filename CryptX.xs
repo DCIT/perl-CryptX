@@ -101,10 +101,20 @@ typedef struct xcbc_struct {            /* used by Crypt::Mac::XCBC */
   int id;
 } *Crypt__Mac__XCBC;
 
-typedef struct poly1305_struct {            /* used by Crypt::Mac::Poly1305 */
+typedef struct poly1305_struct {        /* used by Crypt::Mac::Poly1305 */
   poly1305_state state;
   int id;
 } *Crypt__Mac__Poly1305;
+
+typedef struct blake2s_struct {         /* used by Crypt::Mac::BLAKE2s */
+  blake2smac_state state;
+  int id;
+} *Crypt__Mac__BLAKE2s;
+
+typedef struct blake2b_struct {         /* used by Crypt::Mac::BLAKE2b */
+  blake2bmac_state state;
+  int id;
+} *Crypt__Mac__BLAKE2b;
 
 typedef struct cbc_struct {             /* used by Crypt::Mode::CBC */
   int cipher_id, cipher_rounds;
@@ -359,6 +369,14 @@ BOOT:
     if(register_hash(&sha3_512_desc)==-1)      { croak("FATAL: cannot register_hash sha3_512"); }
     if(register_hash(&tiger_desc)==-1)         { croak("FATAL: cannot register_hash tiger"); }
     if(register_hash(&whirlpool_desc)==-1)     { croak("FATAL: cannot register_hash whirlpool"); }
+    if(register_hash(&blake2b_160_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_160"); }
+    if(register_hash(&blake2b_256_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_256"); }
+    if(register_hash(&blake2b_384_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_384"); }
+    if(register_hash(&blake2b_512_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_512"); }
+    if(register_hash(&blake2s_128_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_128"); }
+    if(register_hash(&blake2s_160_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_160"); }
+    if(register_hash(&blake2s_224_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_224"); }
+    if(register_hash(&blake2s_256_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_256"); }
     /* --- */
     if(chc_register(find_cipher("aes"))==-1)   { croak("FATAL: chc_register failed"); }
     /* --- */
@@ -484,6 +502,8 @@ INCLUDE: inc/CryptX_Mac_Pelican.xs.inc
 INCLUDE: inc/CryptX_Mac_PMAC.xs.inc
 INCLUDE: inc/CryptX_Mac_XCBC.xs.inc
 INCLUDE: inc/CryptX_Mac_Poly1305.xs.inc
+INCLUDE: inc/CryptX_Mac_BLAKE2s.xs.inc
+INCLUDE: inc/CryptX_Mac_BLAKE2b.xs.inc
 
 INCLUDE: inc/CryptX_Mode_CBC.xs.inc
 INCLUDE: inc/CryptX_Mode_ECB.xs.inc

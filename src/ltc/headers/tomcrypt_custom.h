@@ -248,6 +248,8 @@
 #define LTC_RIPEMD160
 #define LTC_RIPEMD256
 #define LTC_RIPEMD320
+#define LTC_BLAKE2S
+#define LTC_BLAKE2B
 
 #define LTC_HASH_HELPERS
 
@@ -264,6 +266,8 @@
 #define LTC_F9_MODE
 #define LTC_PELICAN
 #define LTC_POLY1305
+#define LTC_BLAKE2SMAC
+#define LTC_BLAKE2BMAC
 
 /* ---> Encrypt + Authenticate Modes <--- */
 
@@ -297,7 +301,7 @@
 /* a PRNG that simply reads from an available system source */
 #define LTC_SPRNG
 
-/* The LTC_RC4 stream cipher based PRNG */
+/* The RC4 stream cipher based PRNG */
 #define LTC_RC4_PRNG
 
 /* The ChaCha20 stream cipher based PRNG */
@@ -561,6 +565,14 @@
    #error LTC_SOBER128_PRNG requires LTC_SOBER128
 #endif
 
+#if defined(LTC_BLAKE2SMAC) && !defined(LTC_BLAKE2S)
+   #error LTC_BLAKE2SMAC requires LTC_BLAKE2S
+#endif
+
+#if defined(LTC_BLAKE2BMAC) && !defined(LTC_BLAKE2B)
+   #error LTC_BLAKE2BMAC requires LTC_BLAKE2B
+#endif
+
 /* THREAD management */
 #ifdef LTC_PTHREAD
 
@@ -587,7 +599,7 @@
 
 /* Debuggers */
 
-/* define this if you use Valgrind, note: it CHANGES the way SOBER-128 and LTC_RC4 work (see the code) */
+/* define this if you use Valgrind, note: it CHANGES the way SOBER-128 and RC4 work (see the code) */
 /* #define LTC_VALGRIND */
 
 #endif
