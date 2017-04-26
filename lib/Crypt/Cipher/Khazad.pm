@@ -4,7 +4,7 @@ package Crypt::Cipher::Khazad;
 
 use strict;
 use warnings;
-our $VERSION = '0.047_004';
+our $VERSION = '0.047_005';
 
 use CryptX;
 use base 'Crypt::Cipher';
