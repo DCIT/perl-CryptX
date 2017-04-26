@@ -476,6 +476,60 @@ CryptX__decode_base64(SV * in)
     OUTPUT:
         RETVAL
 
+SV *
+CryptX__increment_octets_le(SV * in)
+    CODE:
+    {
+        STRLEN len, i = 0;
+        unsigned char *out_data, *in_data;
+        int rv;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *) SvPVbyte(in, len);
+        if (len == 0) XSRETURN_UNDEF;
+
+        RETVAL = NEWSV(0, len);
+        SvPOK_only(RETVAL);
+        SvCUR_set(RETVAL, len);
+        out_data = (unsigned char *)SvPV_nolen(RETVAL);
+        Copy(in_data, out_data, len, unsigned char);
+        while (i < len) {
+          out_data[i]++;
+          if (0 != out_data[i]) break;
+          i++;
+        }
+        if (i == len) croak("FATAL: increment_octets_le overflow");
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+CryptX__increment_octets_be(SV * in)
+    CODE:
+    {
+        STRLEN len, i = 0;
+        unsigned char *out_data, *in_data;
+        int rv;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *) SvPVbyte(in, len);
+        if (len == 0) XSRETURN_UNDEF;
+
+        RETVAL = NEWSV(0, len);
+        SvPOK_only(RETVAL);
+        SvCUR_set(RETVAL, len);
+        out_data = (unsigned char *)SvPV_nolen(RETVAL);
+        Copy(in_data, out_data, len, unsigned char);
+        while (i < len) {
+          out_data[len - 1 - i]++;
+          if (0 != out_data[len - 1 - i]) break;
+          i++;
+        }
+        if (i == len) croak("FATAL: increment_octets_le overflow");
+    }
+    OUTPUT:
+        RETVAL
+
 ###############################################################################
 
 INCLUDE: inc/CryptX_Digest.xs.inc

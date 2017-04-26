@@ -145,10 +145,6 @@ Can be called before the first C<encrypt_add> or C<decrypt_add>;
 
  my $ae_new = $ae->clone;
 
-=head2 increment_iv
-
- $ae->increment_iv();
-
 =head2 set_iv
 
  $ae->set_iv($iv);

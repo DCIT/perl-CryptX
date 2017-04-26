@@ -32,6 +32,7 @@ TODO:
         - NEW: Crypt::Stream::ChaCha
         - NEW: Crypt::Stream::RC4
         - NEW: Crypt::Stream::Sober128
+        - NEW: functions in Crypt::Misc - increment_octets_be, increment_octets_le
 
 0.047   2017/04/05
         - fix #32 Compile "ar" step fails when Perl built with -flto (better version)

@@ -1,25 +1,32 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::GCM
 
 Crypt::AuthEnc::GCM
-_new(char * cipher_name, SV * key)
+_new(char * cipher_name, SV * key, SV * nonce = NULL)
     CODE:
     {
-        STRLEN k_len=0;
-        unsigned char *k=NULL;
-        int id;
+        STRLEN k_len = 0, iv_len = 0;
+        unsigned char *k = NULL, *iv = NULL;
+        int id, rv;
 
-        if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
+        if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
-
+        if (nonce) {
+          if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+          iv = (unsigned char *)SvPVbyte(nonce, iv_len);
+        }
 
         id = find_cipher(cipher_name);
-        if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         Newz(0, RETVAL, 1, struct gcm_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        if (gcm_init(&RETVAL->state, id, k, (unsigned long)k_len) != CRYPT_OK) {
-          croak("FATAL: gcm setup failed");
+        rv = gcm_init(&RETVAL->state, id, k, (unsigned long)k_len);
+        if (rv != CRYPT_OK) croak("FATAL: gcm_init failed: %s", error_to_string(rv));
+
+        if (iv && iv_len > 0) {
+          rv = gcm_add_iv(&RETVAL->state, iv, (unsigned long)iv_len);
+          if (rv != CRYPT_OK) croak("FATAL: gcm_add_iv failed: %s", error_to_string(rv));
         }
     }
     OUTPUT:

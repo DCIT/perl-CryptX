@@ -7,11 +7,11 @@ ltc/encauth/ccm/ccm_add_aad.obj ltc/encauth/ccm/ccm_add_nonce.obj ltc/encauth/cc
 ltc/encauth/ccm/ccm_init.obj ltc/encauth/ccm/ccm_memory.obj ltc/encauth/ccm/ccm_process.obj \
 ltc/encauth/ccm/ccm_reset.obj ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj \
 ltc/encauth/chachapoly/chacha20poly1305_decrypt.obj ltc/encauth/chachapoly/chacha20poly1305_done.obj \
-ltc/encauth/chachapoly/chacha20poly1305_encrypt.obj ltc/encauth/chachapoly/chacha20poly1305_inciv.obj \
-ltc/encauth/chachapoly/chacha20poly1305_init.obj ltc/encauth/chachapoly/chacha20poly1305_memory.obj \
-ltc/encauth/chachapoly/chacha20poly1305_setiv.obj ltc/encauth/chachapoly/chacha20poly1305_setiv_rfc7905.obj \
-ltc/encauth/eax/eax_addheader.obj ltc/encauth/eax/eax_decrypt.obj ltc/encauth/eax/eax_decrypt_verify_memory.obj \
-ltc/encauth/eax/eax_done.obj ltc/encauth/eax/eax_encrypt.obj ltc/encauth/eax/eax_encrypt_authenticate_memory.obj \
+ltc/encauth/chachapoly/chacha20poly1305_encrypt.obj ltc/encauth/chachapoly/chacha20poly1305_init.obj \
+ltc/encauth/chachapoly/chacha20poly1305_memory.obj ltc/encauth/chachapoly/chacha20poly1305_setiv.obj \
+ltc/encauth/chachapoly/chacha20poly1305_setiv_rfc7905.obj ltc/encauth/eax/eax_addheader.obj \
+ltc/encauth/eax/eax_decrypt.obj ltc/encauth/eax/eax_decrypt_verify_memory.obj ltc/encauth/eax/eax_done.obj \
+ltc/encauth/eax/eax_encrypt.obj ltc/encauth/eax/eax_encrypt_authenticate_memory.obj \
 ltc/encauth/eax/eax_init.obj ltc/encauth/gcm/gcm_add_aad.obj ltc/encauth/gcm/gcm_add_iv.obj \
 ltc/encauth/gcm/gcm_done.obj ltc/encauth/gcm/gcm_gf_mult.obj ltc/encauth/gcm/gcm_init.obj \
 ltc/encauth/gcm/gcm_memory.obj ltc/encauth/gcm/gcm_mult_h.obj ltc/encauth/gcm/gcm_process.obj \

@@ -1,7 +1,7 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::ChaCha20Poly1305
 
 Crypt::AuthEnc::ChaCha20Poly1305
-_new(SV * key, SV * nonce)
+_new(SV * key, SV * nonce = NULL)
     CODE:
     {
         int rv;
@@ -9,9 +9,11 @@ _new(SV * key, SV * nonce)
         unsigned char *iv=NULL, *k=NULL;
 
         if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
-        if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
         k  = (unsigned char *) SvPVbyte(key, k_len);
-        iv = (unsigned char *) SvPVbyte(nonce, iv_len);
+        if (nonce) {
+          if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+          iv = (unsigned char *) SvPVbyte(nonce, iv_len);
+        }
 
         Newz(0, RETVAL, 1, struct chacha20poly1305_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
@@ -19,8 +21,10 @@ _new(SV * key, SV * nonce)
         rv = chacha20poly1305_init(&RETVAL->state, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_init failed: %s", error_to_string(rv));
 
-        rv = chacha20poly1305_setiv(&RETVAL->state, iv, (unsigned long)iv_len);
-        if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_setiv failed: %s", error_to_string(rv));
+        if (iv && iv_len > 0) {
+          rv = chacha20poly1305_setiv(&RETVAL->state, iv, (unsigned long)iv_len);
+          if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_setiv failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL
@@ -36,18 +40,6 @@ clone(Crypt::AuthEnc::ChaCha20Poly1305 self)
         Newz(0, RETVAL, 1, struct chacha20poly1305_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         Copy(&self->state, &RETVAL->state, 1, struct chacha20poly1305_struct);
-    OUTPUT:
-        RETVAL
-
-int
-increment_iv(Crypt::AuthEnc::ChaCha20Poly1305 self)
-    CODE:
-    {
-        int rv;
-        rv = chacha20poly1305_inciv(&self->state);
-        if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_inciv failed: %s", error_to_string(rv));
-        RETVAL = rv;
-    }
     OUTPUT:
         RETVAL
 
