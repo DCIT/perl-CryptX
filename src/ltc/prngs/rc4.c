@@ -5,30 +5,28 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 #include "tomcrypt.h"
 
 /**
   @file rc4.c
-  LTC_RC4 PRNG, Tom St Denis
+  RC4 PRNG, Tom St Denis
 */
 
 #ifdef LTC_RC4
 
-const struct ltc_prng_descriptor rc4_prng_desc =
+const struct ltc_prng_descriptor rc4_desc =
 {
    "rc4",
-   sizeof(rc4_state),
-   &rc4_prng_start,
-   &rc4_prng_add_entropy,
-   &rc4_prng_ready,
-   &rc4_prng_read,
-   &rc4_prng_done,
-   &rc4_prng_export,
-   &rc4_prng_import,
-   &rc4_prng_test
+   32,
+   &rc4_start,
+   &rc4_add_entropy,
+   &rc4_ready,
+   &rc4_read,
+   &rc4_done,
+   &rc4_export,
+   &rc4_import,
+   &rc4_test
 };
 
 /**
@@ -36,16 +34,15 @@ const struct ltc_prng_descriptor rc4_prng_desc =
   @param prng     [out] The PRNG state to initialize
   @return CRYPT_OK if successful
 */
-int rc4_prng_start(prng_state *prng)
+int rc4_start(prng_state *prng)
 {
    LTC_ARGCHK(prng != NULL);
-   prng->rc4.ready = 0;
-
+   prng->ready = 0;
    /* set entropy (key) size to zero */
    prng->rc4.s.x = 0;
    /* clear entropy (key) buffer */
-   XMEMSET(&prng->rc4.s.buf, 0, 256);
-
+   XMEMSET(&prng->rc4.s.buf, 0, sizeof(prng->rc4.s.buf));
+   LTC_MUTEX_INIT(&prng->lock)
    return CRYPT_OK;
 }
 
@@ -56,7 +53,7 @@ int rc4_prng_start(prng_state *prng)
   @param prng     PRNG state to update
   @return CRYPT_OK if successful
 */
-int rc4_prng_add_entropy(const unsigned char *in, unsigned long inlen, prng_state *prng)
+int rc4_add_entropy(const unsigned char *in, unsigned long inlen, prng_state *prng)
 {
    unsigned char buf[256];
    unsigned long i;
@@ -66,21 +63,24 @@ int rc4_prng_add_entropy(const unsigned char *in, unsigned long inlen, prng_stat
    LTC_ARGCHK(in != NULL);
    LTC_ARGCHK(inlen > 0);
 
-   if (prng->rc4.ready) {
-      /* rc4_prng_ready() was already called, do "rekey" operation */
-      if ((err = rc4_keystream(&prng->rc4.s, buf, 256)) != CRYPT_OK)  return err;
-      for(i = 0; i < inlen; i++) buf[i % 256] ^= in[i];
+   LTC_MUTEX_LOCK(&prng->lock);
+   if (prng->ready) {
+      /* rc4_ready() was already called, do "rekey" operation */
+      if ((err = rc4_stream_keystream(&prng->rc4.s, buf, sizeof(buf))) != CRYPT_OK) goto LBL_UNLOCK;
+      for(i = 0; i < inlen; i++) buf[i % sizeof(buf)] ^= in[i];
       /* initialize RC4 */
-      if ((err = rc4_setup(&prng->rc4.s, buf, 256)) != CRYPT_OK)      return err;
+      if ((err = rc4_stream_setup(&prng->rc4.s, buf, sizeof(buf))) != CRYPT_OK) goto LBL_UNLOCK;
       /* drop first 3072 bytes - https://en.wikipedia.org/wiki/RC4#Fluhrer.2C_Mantin_and_Shamir_attack */
-      for (i = 0; i < 12; i++) rc4_keystream(&prng->rc4.s, buf, 256);
+      for (i = 0; i < 12; i++) rc4_stream_keystream(&prng->rc4.s, buf, sizeof(buf));
    }
    else {
-      /* rc4_prng_ready() was not called yet, add entropy to the buffer */
-      while (inlen--) prng->rc4.s.buf[prng->rc4.s.x++ % 256] ^= *in++;
+      /* rc4_ready() was not called yet, add entropy to the buffer */
+      while (inlen--) prng->rc4.s.buf[prng->rc4.s.x++ % sizeof(prng->rc4.s.buf)] ^= *in++;
    }
-
-   return CRYPT_OK;
+   err = CRYPT_OK;
+LBL_UNLOCK:
+   LTC_MUTEX_UNLOCK(&prng->lock);
+   return err;
 }
 
 /**
@@ -88,25 +88,26 @@ int rc4_prng_add_entropy(const unsigned char *in, unsigned long inlen, prng_stat
   @param prng   The PRNG to make active
   @return CRYPT_OK if successful
 */
-int rc4_prng_ready(prng_state *prng)
+int rc4_ready(prng_state *prng)
 {
-   unsigned char buf[256];
+   unsigned char buf[256] = { 0 };
    unsigned long len;
    int err, i;
 
    LTC_ARGCHK(prng != NULL);
-   if (prng->rc4.ready) return CRYPT_OK;
 
-   len = MIN(prng->rc4.s.x, 256);
-   if (len < 5) return CRYPT_ERROR;
-
-   XMEMCPY(buf, prng->rc4.s.buf, len);
+   LTC_MUTEX_LOCK(&prng->lock);
+   if (prng->ready) { err = CRYPT_OK; goto LBL_UNLOCK; }
+   XMEMCPY(buf, prng->rc4.s.buf, sizeof(buf));
    /* initialize RC4 */
-   if ((err = rc4_setup(&prng->rc4.s, buf, len)) != CRYPT_OK) return err;
+   len = MIN(prng->rc4.s.x, 256); /* TODO: we can perhaps always use all 256 bytes */
+   if ((err = rc4_stream_setup(&prng->rc4.s, buf, len)) != CRYPT_OK) goto LBL_UNLOCK;
    /* drop first 3072 bytes - https://en.wikipedia.org/wiki/RC4#Fluhrer.2C_Mantin_and_Shamir_attack */
-   for (i = 0; i < 12; i++) rc4_keystream(&prng->rc4.s, buf, 256);
-   prng->rc4.ready = 1;
-   return CRYPT_OK;
+   for (i = 0; i < 12; i++) rc4_stream_keystream(&prng->rc4.s, buf, sizeof(buf));
+   prng->ready = 1;
+LBL_UNLOCK:
+   LTC_MUTEX_UNLOCK(&prng->lock);
+   return err;
 }
 
 /**
@@ -116,11 +117,14 @@ int rc4_prng_ready(prng_state *prng)
   @param prng     The active PRNG to read from
   @return Number of octets read
 */
-unsigned long rc4_prng_read(unsigned char *out, unsigned long outlen, prng_state *prng)
+unsigned long rc4_read(unsigned char *out, unsigned long outlen, prng_state *prng)
 {
-   LTC_ARGCHK(prng != NULL);
-   if (!prng->rc4.ready) return 0;
-   if (rc4_keystream(&prng->rc4.s, out, outlen) != CRYPT_OK) return 0;
+   if (outlen == 0 || prng == NULL || out == NULL) return 0;
+   LTC_MUTEX_LOCK(&prng->lock);
+   if (!prng->ready) { outlen = 0; goto LBL_UNLOCK; }
+   if (rc4_stream_keystream(&prng->rc4.s, out, outlen) != CRYPT_OK) outlen = 0;
+LBL_UNLOCK:
+   LTC_MUTEX_UNLOCK(&prng->lock);
    return outlen;
 }
 
@@ -129,14 +133,15 @@ unsigned long rc4_prng_read(unsigned char *out, unsigned long outlen, prng_state
   @param prng   The PRNG to terminate
   @return CRYPT_OK if successful
 */
-int rc4_prng_done(prng_state *prng)
+int rc4_done(prng_state *prng)
 {
    int err;
-
    LTC_ARGCHK(prng != NULL);
-   if ((err = rc4_done(&prng->rc4.s)) != CRYPT_OK) return err;
-   prng->rc4.ready = 0;
-   return CRYPT_OK;
+   LTC_MUTEX_LOCK(&prng->lock);
+   prng->ready = 0;
+   err = rc4_stream_done(&prng->rc4.s);
+   LTC_MUTEX_UNLOCK(&prng->lock);
+   return err;
 }
 
 /**
@@ -146,21 +151,23 @@ int rc4_prng_done(prng_state *prng)
   @param prng      The PRNG to export
   @return CRYPT_OK if successful
 */
-int rc4_prng_export(unsigned char *out, unsigned long *outlen, prng_state *prng)
+int rc4_export(unsigned char *out, unsigned long *outlen, prng_state *prng)
 {
-   unsigned long len = sizeof(rc4_state);
+   unsigned long len = rc4_desc.export_size;
 
-   LTC_ARGCHK(outlen != NULL);
-   LTC_ARGCHK(out    != NULL);
    LTC_ARGCHK(prng   != NULL);
-
-   if (!prng->rc4.ready) return CRYPT_ERROR;
+   LTC_ARGCHK(out    != NULL);
+   LTC_ARGCHK(outlen != NULL);
 
    if (*outlen < len) {
       *outlen = len;
       return CRYPT_BUFFER_OVERFLOW;
    }
-   XMEMCPY(out, &prng->rc4.s, len);
+
+   if (rc4_read(out, len, prng) != len) {
+      return CRYPT_ERROR_READPRNG;
+   }
+
    *outlen = len;
    return CRYPT_OK;
 }
@@ -172,15 +179,16 @@ int rc4_prng_export(unsigned char *out, unsigned long *outlen, prng_state *prng)
   @param prng     The PRNG to import
   @return CRYPT_OK if successful
 */
-int rc4_prng_import(const unsigned char *in, unsigned long inlen, prng_state *prng)
+int rc4_import(const unsigned char *in, unsigned long inlen, prng_state *prng)
 {
-   LTC_ARGCHK(in   != NULL);
+   int err;
+
    LTC_ARGCHK(prng != NULL);
+   LTC_ARGCHK(in   != NULL);
+   if (inlen < (unsigned long)rc4_desc.export_size) return CRYPT_INVALID_ARG;
 
-   if (inlen != sizeof(rc4_state)) return CRYPT_INVALID_ARG;
-
-   XMEMCPY(&prng->rc4.s, in, inlen);
-   prng->rc4.ready = 1;
+   if ((err = rc4_start(prng)) != CRYPT_OK)                  return err;
+   if ((err = rc4_add_entropy(in, inlen, prng)) != CRYPT_OK) return err;
    return CRYPT_OK;
 }
 
@@ -188,7 +196,7 @@ int rc4_prng_import(const unsigned char *in, unsigned long inlen, prng_state *pr
   PRNG self-test
   @return CRYPT_OK if successful, CRYPT_NOP if self-testing has been disabled
 */
-int rc4_prng_test(void)
+int rc4_test(void)
 {
 #ifndef LTC_TEST
    return CRYPT_NOP;
@@ -203,26 +211,31 @@ int rc4_prng_test(void)
    unsigned long dmplen = sizeof(dmp);
    unsigned char out[1000];
    unsigned char t1[] = { 0xE0, 0x4D, 0x9A, 0xF6, 0xA8, 0x9D, 0x77, 0x53, 0xAE, 0x09 };
-   unsigned char t2[] = { 0xEC, 0x66, 0x32, 0xAF, 0xD8, 0xBD, 0x4C, 0x42, 0x1F, 0xCB };
+   unsigned char t2[] = { 0xEF, 0x80, 0xA2, 0xE6, 0x50, 0x91, 0xF3, 0x17, 0x4A, 0x8A };
+   unsigned char t3[] = { 0x4B, 0xD6, 0x5C, 0x67, 0x99, 0x03, 0x56, 0x12, 0x80, 0x48 };
+   int err;
 
-   rc4_prng_start(&st);
-   rc4_prng_add_entropy(en, sizeof(en), &st);
-   rc4_prng_ready(&st);
-   rc4_prng_read(out, 10, &st);  /* 10 bytes for testing */
-   if (compare_testvector(out, 10, t1, sizeof(t1), "RC4-PRNG", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
-   rc4_prng_read(out, 500, &st);
-   rc4_prng_export(dmp, &dmplen, &st);
-   rc4_prng_read(out, 500, &st); /* skip 500 bytes */
-   rc4_prng_read(out, 10, &st);  /* 10 bytes for testing */
-   if (compare_testvector(out, 10, t2, sizeof(t2), "RC4-PRNG", 2) != 0) return CRYPT_FAIL_TESTVECTOR;
-   rc4_prng_done(&st);
-
-   XMEMSET(&st, 0xFF, sizeof(st)); /* just to be sure */
-   rc4_prng_import(dmp, dmplen, &st);
-   rc4_prng_read(out, 500, &st); /* skip 500 bytes */
-   rc4_prng_read(out, 10, &st);  /* 10 bytes for testing */
-   if (compare_testvector(out, 10, t2, sizeof(t2), "RC4-PRNG", 3) != 0) return CRYPT_FAIL_TESTVECTOR;
-   rc4_prng_done(&st);
+   if ((err = rc4_start(&st)) != CRYPT_OK)                         return err;
+   /* add entropy to uninitialized prng */
+   if ((err = rc4_add_entropy(en, sizeof(en), &st)) != CRYPT_OK)   return err;
+   if ((err = rc4_ready(&st)) != CRYPT_OK)                         return err;
+   if (rc4_read(out, 10, &st) != 10)                               return CRYPT_ERROR_READPRNG; /* 10 bytes for testing */
+   if (compare_testvector(out, 10, t1, sizeof(t1), "RC4-PRNG", 1)) return CRYPT_FAIL_TESTVECTOR;
+   if (rc4_read(out, 500, &st) != 500)                             return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
+   /* add entropy to already initialized prng */
+   if ((err = rc4_add_entropy(en, sizeof(en), &st)) != CRYPT_OK)   return err;
+   if (rc4_read(out, 500, &st) != 500)                             return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
+   if ((err = rc4_export(dmp, &dmplen, &st)) != CRYPT_OK)          return err;
+   if (rc4_read(out, 500, &st) != 500)                             return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
+   if (rc4_read(out, 10, &st) != 10)                               return CRYPT_ERROR_READPRNG; /* 10 bytes for testing */
+   if (compare_testvector(out, 10, t2, sizeof(t2), "RC4-PRNG", 2)) return CRYPT_FAIL_TESTVECTOR;
+   if ((err = rc4_done(&st)) != CRYPT_OK)                          return err;
+   if ((err = rc4_import(dmp, dmplen, &st)) != CRYPT_OK)           return err;
+   if ((err = rc4_ready(&st)) != CRYPT_OK)                         return err;
+   if (rc4_read(out, 500, &st) != 500)                             return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
+   if (rc4_read(out, 10, &st) != 10)                               return CRYPT_ERROR_READPRNG; /* 10 bytes for testing */
+   if (compare_testvector(out, 10, t3, sizeof(t3), "RC4-PRNG", 3)) return CRYPT_FAIL_TESTVECTOR;
+   if ((err = rc4_done(&st)) != CRYPT_OK)                          return err;
 
    return CRYPT_OK;
 #endif

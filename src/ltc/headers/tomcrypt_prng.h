@@ -4,14 +4,12 @@ struct yarrow_prng {
     int                   cipher, hash;
     unsigned char         pool[MAXBLOCKSIZE];
     symmetric_CTR         ctr;
-    LTC_MUTEX_TYPE(prng_lock)
 };
 #endif
 
 #ifdef LTC_RC4
 struct rc4_prng {
     rc4_state s;
-    short ready;
 };
 #endif
 
@@ -20,7 +18,6 @@ struct chacha20_prng {
     chacha_state s;        /* chacha state */
     unsigned char ent[40]; /* entropy buffer */
     unsigned long idx;     /* entropy counter */
-    short ready;           /* ready flag 0-1 */
 };
 #endif
 
@@ -38,7 +35,6 @@ struct fortuna_prng {
                   wd;
 
     ulong64       reset_cnt;  /* number of times we have reset */
-    LTC_MUTEX_TYPE(prng_lock)
 };
 #endif
 
@@ -47,27 +43,30 @@ struct sober128_prng {
     sober128_state s;      /* sober128 state */
     unsigned char ent[40]; /* entropy buffer */
     unsigned long idx;     /* entropy counter */
-    short ready;           /* ready flag 0-1 */
 };
 #endif
 
-typedef union Prng_state {
-    char dummy[1];
+typedef struct {
+   union {
+      char dummy[1];
 #ifdef LTC_YARROW
-    struct yarrow_prng    yarrow;
+      struct yarrow_prng    yarrow;
 #endif
 #ifdef LTC_RC4
-    struct rc4_prng       rc4;
+      struct rc4_prng       rc4;
 #endif
 #ifdef LTC_CHACHA20_PRNG
-    struct chacha20_prng  chacha;
+      struct chacha20_prng  chacha;
 #endif
 #ifdef LTC_FORTUNA
-    struct fortuna_prng   fortuna;
+      struct fortuna_prng   fortuna;
 #endif
 #ifdef LTC_SOBER128
-    struct sober128_prng  sober128;
+      struct sober128_prng  sober128;
 #endif
+   };
+   short ready;            /* ready flag 0-1 */
+   LTC_MUTEX_TYPE(lock);   /* lock */
 } prng_state;
 
 /** PRNG descriptor */
@@ -150,15 +149,15 @@ extern const struct ltc_prng_descriptor fortuna_desc;
 #endif
 
 #ifdef LTC_RC4
-int rc4_prng_start(prng_state *prng);
-int rc4_prng_add_entropy(const unsigned char *in, unsigned long inlen, prng_state *prng);
-int rc4_prng_ready(prng_state *prng);
-unsigned long rc4_prng_read(unsigned char *out, unsigned long outlen, prng_state *prng);
-int  rc4_prng_done(prng_state *prng);
-int  rc4_prng_export(unsigned char *out, unsigned long *outlen, prng_state *prng);
-int  rc4_prng_import(const unsigned char *in, unsigned long inlen, prng_state *prng);
-int  rc4_prng_test(void);
-extern const struct ltc_prng_descriptor rc4_prng_desc;
+int rc4_start(prng_state *prng);
+int rc4_add_entropy(const unsigned char *in, unsigned long inlen, prng_state *prng);
+int rc4_ready(prng_state *prng);
+unsigned long rc4_read(unsigned char *out, unsigned long outlen, prng_state *prng);
+int  rc4_done(prng_state *prng);
+int  rc4_export(unsigned char *out, unsigned long *outlen, prng_state *prng);
+int  rc4_import(const unsigned char *in, unsigned long inlen, prng_state *prng);
+int  rc4_test(void);
+extern const struct ltc_prng_descriptor rc4_desc;
 #endif
 
 #ifdef LTC_CHACHA20_PRNG
@@ -186,15 +185,15 @@ extern const struct ltc_prng_descriptor sprng_desc;
 #endif
 
 #ifdef LTC_SOBER128
-int sober128_prng_start(prng_state *prng);
-int sober128_prng_add_entropy(const unsigned char *in, unsigned long inlen, prng_state *prng);
-int sober128_prng_ready(prng_state *prng);
-unsigned long sober128_prng_read(unsigned char *out, unsigned long outlen, prng_state *prng);
-int sober128_prng_done(prng_state *prng);
-int  sober128_prng_export(unsigned char *out, unsigned long *outlen, prng_state *prng);
-int  sober128_prng_import(const unsigned char *in, unsigned long inlen, prng_state *prng);
-int  sober128_prng_test(void);
-extern const struct ltc_prng_descriptor sober128_prng_desc;
+int sober128_start(prng_state *prng);
+int sober128_add_entropy(const unsigned char *in, unsigned long inlen, prng_state *prng);
+int sober128_ready(prng_state *prng);
+unsigned long sober128_read(unsigned char *out, unsigned long outlen, prng_state *prng);
+int sober128_done(prng_state *prng);
+int  sober128_export(unsigned char *out, unsigned long *outlen, prng_state *prng);
+int  sober128_import(const unsigned char *in, unsigned long inlen, prng_state *prng);
+int  sober128_test(void);
+extern const struct ltc_prng_descriptor sober128_desc;
 #endif
 
 int find_prng(const char *name);

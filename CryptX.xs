@@ -382,8 +382,8 @@ BOOT:
     /* --- */
     if(register_prng(&fortuna_desc)==-1)       { croak("FATAL: cannot register_prng fortuna"); }
     if(register_prng(&yarrow_desc)==-1)        { croak("FATAL: cannot register_prng yarrow"); }
-    if(register_prng(&rc4_prng_desc)==-1)      { croak("FATAL: cannot register_prng rc4"); }
-    if(register_prng(&sober128_prng_desc)==-1) { croak("FATAL: cannot register_prng sober128"); }
+    if(register_prng(&rc4_desc)==-1)           { croak("FATAL: cannot register_prng rc4"); }
+    if(register_prng(&sober128_desc)==-1)      { croak("FATAL: cannot register_prng sober128"); }
     if(register_prng(&chacha20_prng_desc)==-1) { croak("FATAL: cannot register_prng chacha20"); }
     /* --- */
 #ifdef TFM_DESC

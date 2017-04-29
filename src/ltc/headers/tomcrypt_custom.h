@@ -195,8 +195,8 @@
 
 /* stream ciphers */
 #define LTC_CHACHA
-#define LTC_RC4
-#define LTC_SOBER128
+#define LTC_RC4_STREAM
+#define LTC_SOBER128_STREAM
 
 #endif /* LTC_NO_CIPHERS */
 
@@ -302,7 +302,7 @@
 #define LTC_SPRNG
 
 /* The RC4 stream cipher based PRNG */
-#define LTC_RC4_PRNG
+#define LTC_RC4
 
 /* The ChaCha20 stream cipher based PRNG */
 #define LTC_CHACHA20_PRNG
@@ -311,7 +311,7 @@
 #define LTC_FORTUNA
 
 /* Greg's SOBER128 stream cipher based PRNG */
-#define LTC_SOBER128_PRNG
+#define LTC_SOBER128
 
 /* the *nix style /dev/random device */
 #define LTC_DEVRANDOM
@@ -557,12 +557,12 @@
    #error LTC_CHACHA20_PRNG requires LTC_CHACHA
 #endif
 
-#if defined(LTC_RC4_PRNG) && !defined(LTC_RC4)
-   #error LTC_RC4_PRNG requires LTC_RC4
+#if defined(LTC_RC4) && !defined(LTC_RC4_STREAM)
+   #error LTC_RC4 requires LTC_RC4_STREAM
 #endif
 
-#if defined(LTC_SOBER128_PRNG) && !defined(LTC_SOBER128)
-   #error LTC_SOBER128_PRNG requires LTC_SOBER128
+#if defined(LTC_SOBER128) && !defined(LTC_SOBER128_STREAM)
+   #error LTC_SOBER128 requires LTC_SOBER128_STREAM
 #endif
 
 #if defined(LTC_BLAKE2SMAC) && !defined(LTC_BLAKE2S)

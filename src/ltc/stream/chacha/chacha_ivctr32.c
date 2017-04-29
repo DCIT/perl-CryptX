@@ -38,6 +38,6 @@ int chacha_ivctr32(chacha_state *st, const unsigned char *iv, unsigned long ivle
    st->ksleft = 0;
    st->ivlen = ivlen;
    return CRYPT_OK;
-};
+}
 
 #endif

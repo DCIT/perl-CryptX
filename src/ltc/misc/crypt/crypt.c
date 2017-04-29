@@ -124,8 +124,15 @@ const char *crypt_build_settings =
 #if defined(LTC_CAMELLIA)
    "   Camellia\n"
 #endif
+   "Stream ciphers built-in:\n"
 #if defined(LTC_CHACHA)
    "   ChaCha\n"
+#endif
+#if defined(LTC_RC4_STREAM)
+   "   RC4\n"
+#endif
+#if defined(LTC_SOBER128_STREAM)
+   "   SOBER128\n"
 #endif
 
     "\nHashes built-in:\n"
@@ -179,6 +186,12 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_WHIRLPOOL)
    "   WHIRLPOOL\n"
+#endif
+#if defined(LTC_BLAKE2S)
+   "   BLAKE2S\n"
+#endif
+#if defined(LTC_BLAKE2B)
+   "   BLAKE2B\n"
 #endif
 #if defined(LTC_CHC_HASH)
    "   CHC_HASH\n"
@@ -235,6 +248,12 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_POLY1305)
     "   POLY1305\n"
+#endif
+#if defined(LTC_BLAKE2SMAC)
+    "   BLAKE2S MAC\n"
+#endif
+#if defined(LTC_BLAKE2BMAC)
+    "   BLAKE2B MAC\n"
 #endif
 
     "\nENC + AUTH modes:\n"

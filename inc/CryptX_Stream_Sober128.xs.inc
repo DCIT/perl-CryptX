@@ -16,11 +16,11 @@ _new(SV * key, SV * nonce)
         Newz(0, RETVAL, 1, struct sober128_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = sober128_setup(&RETVAL->state, k, (unsigned long)k_len);
-        if (rv != CRYPT_OK) croak("FATAL: sober128_setup failed: %s", error_to_string(rv));
+        rv = sober128_stream_setup(&RETVAL->state, k, (unsigned long)k_len);
+        if (rv != CRYPT_OK) croak("FATAL: sober128_stream_setup failed: %s", error_to_string(rv));
 
-        rv = sober128_setiv(&RETVAL->state, iv, (unsigned long)iv_len);
-        if (rv != CRYPT_OK) croak("FATAL: sober128_setiv failed: %s", error_to_string(rv));
+        rv = sober128_stream_setiv(&RETVAL->state, iv, (unsigned long)iv_len);
+        if (rv != CRYPT_OK) croak("FATAL: sober128_stream_setiv failed: %s", error_to_string(rv));
     }
     OUTPUT:
         RETVAL
@@ -28,7 +28,7 @@ _new(SV * key, SV * nonce)
 void
 DESTROY(Crypt::Stream::Sober128 self)
     CODE:
-        sober128_done(&self->state);
+        sober128_stream_done(&self->state);
         Safefree(self);
 
 Crypt::Stream::Sober128
@@ -51,8 +51,8 @@ keystream(Crypt::Stream::Sober128 self, STRLEN out_len)
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, out_len);
         out_data = (unsigned char *)SvPV_nolen(RETVAL);
-        rv = sober128_keystream(&self->state, out_data, out_len);
-        if (rv != CRYPT_OK) croak("FATAL: sober128_keystream failed: %s", error_to_string(rv));
+        rv = sober128_stream_keystream(&self->state, out_data, out_len);
+        if (rv != CRYPT_OK) croak("FATAL: sober128_stream_keystream failed: %s", error_to_string(rv));
     }
     OUTPUT:
         RETVAL
@@ -74,8 +74,8 @@ crypt(Crypt::Stream::Sober128 self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPV_nolen(RETVAL);
-          rv = sober128_crypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
-          if (rv != CRYPT_OK) croak("FATAL: sober128_crypt failed: %s", error_to_string(rv));
+          rv = sober128_stream_crypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
+          if (rv != CRYPT_OK) croak("FATAL: sober128_stream_crypt failed: %s", error_to_string(rv));
         }
     }
     OUTPUT:
