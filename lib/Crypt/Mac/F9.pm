@@ -4,7 +4,7 @@ package Crypt::Mac::F9;
 
 use strict;
 use warnings;
-our $VERSION = '0.047_005';
+our $VERSION = '0.047_006';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( f9 f9_hex f9_b64 f9_b64u )] );
