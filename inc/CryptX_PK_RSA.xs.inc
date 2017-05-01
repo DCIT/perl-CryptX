@@ -8,9 +8,9 @@ _new()
         Newz(0, RETVAL, 1, struct rsa_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->key.type = -1;
-        RETVAL->yarrow_prng_index = find_prng("yarrow");
-        if(RETVAL->yarrow_prng_index==-1) croak("FATAL: find_prng('yarrow') failed");
-        rv = rng_make_prng(256, RETVAL->yarrow_prng_index, &RETVAL->yarrow_prng_state, NULL);
+        RETVAL->pindex = find_prng("chacha20");
+        if(RETVAL->pindex==-1) croak("FATAL: find_prng('chacha20') failed");
+        rv = rng_make_prng(320, RETVAL->pindex, &RETVAL->pstate, NULL); /* 320bits = 40bytes */
         if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
     }
     OUTPUT:
@@ -22,11 +22,8 @@ generate_key(Crypt::PK::RSA self, int key_size=256, long key_e=65537)
     {
         /* key_size is in octets */
         int rv;
-        /* add a small random entropy before generating key - not necessary as we have initialized prng with 256bit entropy in _new() */
-        rv = rng_make_prng(64, self->yarrow_prng_index, &self->yarrow_prng_state, NULL);
-        if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
         /* gen the key */
-        rv = rsa_make_key(&self->yarrow_prng_state, self->yarrow_prng_index, key_size, key_e, &self->key);
+        rv = rsa_make_key(&self->pstate, self->pindex, key_size, key_e, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: rsa_make_key failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
@@ -250,14 +247,14 @@ _encrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
           if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
           lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_encrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
-                                  &self->yarrow_prng_state, self->yarrow_prng_index,
+                                  &self->pstate, self->pindex,
                                   hash_id, LTC_PKCS_1_OAEP, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_encrypt_key_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
           rv = rsa_encrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, NULL, 0,
-                                  &self->yarrow_prng_state, self->yarrow_prng_index,
+                                  &self->pstate, self->pindex,
                                   0, LTC_PKCS_1_V1_5, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_encrypt_key_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
@@ -337,7 +334,7 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name=NULL, uns
           hash_id = find_hash(hash_name);
           if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_PSS,
-                                &self->yarrow_prng_state, self->yarrow_prng_index,
+                                &self->pstate, self->pindex,
                                 hash_id, saltlen, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_sign_hash_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
@@ -346,7 +343,7 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name=NULL, uns
           hash_id = find_hash(hash_name);
           if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_V1_5,
-                                &self->yarrow_prng_state, self->yarrow_prng_index,
+                                &self->pstate, self->pindex,
                                 hash_id, 0, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_sign_hash_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);

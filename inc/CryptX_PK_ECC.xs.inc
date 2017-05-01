@@ -7,11 +7,11 @@ _new()
         int rv;
         Newz(0, RETVAL, 1, struct ecc_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
-        RETVAL->yarrow_prng_index = find_prng("yarrow");
+        RETVAL->pindex = find_prng("chacha20");
         RETVAL->key.type = -1;
         ecc_dp_init(&RETVAL->dp);
-        if(RETVAL->yarrow_prng_index==-1) croak("FATAL: find_prng('yarrow') failed");
-        rv = rng_make_prng(256, RETVAL->yarrow_prng_index, &RETVAL->yarrow_prng_state, NULL);
+        if(RETVAL->pindex==-1) croak("FATAL: find_prng('chacha20') failed");
+        rv = rng_make_prng(320, RETVAL->pindex, &RETVAL->pstate, NULL); /* 320bits = 40bytes */
         if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
     }
     OUTPUT:
@@ -22,13 +22,10 @@ generate_key(Crypt::PK::ECC self, SV *curve)
     PPCODE:
     {
         int rv;
-        /* add a small random entropy before generating key - not necessary as we have initialized prng with 256bit entropy in _new() */
-        rv = rng_make_prng(64, self->yarrow_prng_index, &self->yarrow_prng_state, NULL);
-        if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
         /* setup dp structure */
         _ecc_set_dp_from_SV(&self->dp, curve); /* croaks on error */
         /* gen the key */
-        rv = ecc_make_key_ex(&self->yarrow_prng_state, self->yarrow_prng_index, &self->key, &self->dp);
+        rv = ecc_make_key_ex(&self->pstate, self->pindex, &self->key, &self->dp);
         if (rv != CRYPT_OK) croak("FATAL: ecc_make_key_ex failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
@@ -286,7 +283,7 @@ _encrypt(Crypt::PK::ECC self, SV * data, char * hash_name)
         hash_id = find_hash(hash_name);
         if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
         rv = ecc_encrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
-                             &self->yarrow_prng_state, self->yarrow_prng_index,
+                             &self->pstate, self->pindex,
                              hash_id, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_encrypt_key failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
@@ -329,12 +326,12 @@ _sign(Crypt::PK::ECC self, SV * data)
 
         if (ix == 1) {
           rv = ecc_sign_hash_rfc7518(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
-                             &self->yarrow_prng_state, self->yarrow_prng_index,
+                             &self->pstate, self->pindex,
                              &self->key);
         }
         else {
           rv = ecc_sign_hash(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
-                             &self->yarrow_prng_state, self->yarrow_prng_index,
+                             &self->pstate, self->pindex,
                              &self->key);
         }
         if (rv != CRYPT_OK) croak("FATAL: ecc_sign_hash_ex failed: %s", error_to_string(rv));

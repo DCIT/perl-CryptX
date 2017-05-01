@@ -187,29 +187,29 @@ typedef struct prng_struct {            /* used by Crypt::PRNG */
 } *Crypt__PRNG;
 
 typedef struct rsa_struct {             /* used by Crypt::PK::RSA */
-  prng_state yarrow_prng_state;
-  int yarrow_prng_index;
+  prng_state pstate;
+  int pindex;
   rsa_key key;
   int id;
 } *Crypt__PK__RSA;
 
 typedef struct dsa_struct {             /* used by Crypt::PK::DSA */
-  prng_state yarrow_prng_state;
-  int yarrow_prng_index;
+  prng_state pstate;
+  int pindex;
   dsa_key key;
   int id;
 } *Crypt__PK__DSA;
 
 typedef struct dh_struct {              /* used by Crypt::PK::DH */
-  prng_state yarrow_prng_state;
-  int yarrow_prng_index;
+  prng_state pstate;
+  int pindex;
   dh_key key;
   int id;
 } *Crypt__PK__DH;
 
 typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
-  prng_state yarrow_prng_state;
-  int yarrow_prng_index;
+  prng_state pstate;
+  int pindex;
   ecc_key key;
   ltc_ecc_set_type dp;
   int id;
