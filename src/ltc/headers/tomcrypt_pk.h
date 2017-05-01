@@ -187,15 +187,15 @@ int dh_compat_test(void);
 void dh_sizes(int *low, int *high);
 int dh_get_size(dh_key *key);
 
+int dh_make_key_internal(prng_state *prng, int wprng, dh_key *key); /* for internal use only */
+int dh_make_key_ex(prng_state *prng, int wprng, const char *base_hex, const char *prime_hex, dh_key *key);
 int dh_make_key(prng_state *prng, int wprng, int keysize, dh_key *key);
-int dh_make_key_ex(prng_state *prng, int wprng, const char *g, const char *p, dh_key *key);
-int dh_make_key_ex_main(prng_state *prng, int wprng, dh_key *key);
 void dh_free(dh_key *key);
 
 int dh_export(unsigned char *out, unsigned long *outlen, int type, dh_key *key);
 int dh_import(const unsigned char *in, unsigned long inlen, dh_key *key);
 int dh_import_raw(unsigned char *in, unsigned long inlen, int type,
-                  const char *base, const char *prime, dh_key *key);
+                  const char *base_hex, const char *prime_hex, dh_key *key);
 
 int dh_shared_secret(dh_key        *private_key, dh_key        *public_key,
                      unsigned char *out,         unsigned long *outlen);

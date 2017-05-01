@@ -84,7 +84,7 @@ int dh_encrypt_key(const unsigned char *in,   unsigned long inlen,
     }
     if ((err = mp_copy(key->base, pubkey.base)) != CRYPT_OK)   { goto LBL_ERR; }
     if ((err = mp_copy(key->prime, pubkey.prime)) != CRYPT_OK) { goto LBL_ERR; }
-    if ((err = dh_make_key_ex_main(prng, wprng, &pubkey)) != CRYPT_OK) {
+    if ((err = dh_make_key_internal(prng, wprng, &pubkey)) != CRYPT_OK) {
        goto LBL_ERR;
     }
 

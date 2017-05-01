@@ -135,7 +135,7 @@ int dh_make_key(prng_state *prng, int wprng, int keysize, dh_key *key)
    }
    if ((err = mp_read_radix(key->base, sets[key->idx].base, 64)) != CRYPT_OK)     { goto error; }
    if ((err = mp_read_radix(key->prime, sets[key->idx].prime, 64)) != CRYPT_OK)    { goto error; }
-   return dh_make_key_ex_main(prng, wprng, key);
+   return dh_make_key_internal(prng, wprng, key);
 error:
    mp_clear_multi(key->base, key->prime, NULL);
    return err;
@@ -151,12 +151,12 @@ error:
   @param key      [out] Where the newly created DH key will be stored
   @return CRYPT_OK if successful, note: on error all allocated memory will be freed automatically.
 */
-int dh_make_key_ex(prng_state *prng, int wprng, const char *base, const char *prime, dh_key *key)
+int dh_make_key_ex(prng_state *prng, int wprng, const char *base_hex, const char *prime_hex, dh_key *key)
 {
    int err;
 
-   LTC_ARGCHK(base  != NULL);
-   LTC_ARGCHK(prime != NULL);
+   LTC_ARGCHK(base_hex  != NULL);
+   LTC_ARGCHK(prime_hex != NULL);
    LTC_ARGCHK(key   != NULL);
 
    /* good prng? */
@@ -167,17 +167,17 @@ int dh_make_key_ex(prng_state *prng, int wprng, const char *base, const char *pr
    if ((err = mp_init_multi(&key->base, &key->prime, NULL)) != CRYPT_OK) {
       goto error;
    }
-   if ((err = mp_read_radix(key->base, base, 16)) != CRYPT_OK)     { goto error; }
-   if ((err = mp_read_radix(key->prime, prime, 16)) != CRYPT_OK)   { goto error; }
+   if ((err = mp_read_radix(key->base, base_hex, 16)) != CRYPT_OK)   { goto error; }
+   if ((err = mp_read_radix(key->prime, prime_hex, 16)) != CRYPT_OK) { goto error; }
    key->idx = SUPPLIED_PRIME;
-   return dh_make_key_ex_main(prng, wprng, key);
+   return dh_make_key_internal(prng, wprng, key);
 error:
    mp_clear_multi(key->base, key->prime, NULL);
    return err;
 }
 
 
-int dh_make_key_ex_main(prng_state *prng, int wprng, dh_key *key)
+int dh_make_key_internal(prng_state *prng, int wprng, dh_key *key)
 {
    unsigned char *buf = NULL;
    int err, keysize;
@@ -324,20 +324,20 @@ int dh_export(unsigned char *out, unsigned long *outlen, int type, dh_key *key)
   @return CRYPT_OK if successful, on error all allocated memory is freed automatically
 */
 int dh_import_raw(unsigned char *in, unsigned long inlen, int type,
-                  const char *base, const char *prime, dh_key *key)
+                  const char *base_hex, const char *prime_hex, dh_key *key)
 {
    int err;
 
-   LTC_ARGCHK(in    != NULL);
-   LTC_ARGCHK(base  != NULL);
-   LTC_ARGCHK(prime != NULL);
-   LTC_ARGCHK(key   != NULL);
+   LTC_ARGCHK(in        != NULL);
+   LTC_ARGCHK(base_hex  != NULL);
+   LTC_ARGCHK(prime_hex != NULL);
+   LTC_ARGCHK(key       != NULL);
 
    if ((err = mp_init_multi(&key->x, &key->y, &key->base, &key->prime, NULL)) != CRYPT_OK) {
       goto error;
    }
-   if ((err = mp_read_radix(key->base, base, 16)) != CRYPT_OK)     { goto error; }
-   if ((err = mp_read_radix(key->prime, prime, 16)) != CRYPT_OK)   { goto error; }
+   if ((err = mp_read_radix(key->base, base_hex, 16)) != CRYPT_OK)   { goto error; }
+   if ((err = mp_read_radix(key->prime, prime_hex, 16)) != CRYPT_OK) { goto error; }
    key->idx = SUPPLIED_PRIME;
 
    if (type == PK_PRIVATE) {
