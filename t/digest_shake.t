@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 16;
 
 use Crypt::Digest::SHAKE;
 
@@ -33,4 +33,21 @@ is(unpack("H*", Crypt::Digest::SHAKE->new(128)->add("The quick brown fox jumps o
   $res .= $sh128->done(8);
   $res .= $sh128->done(12);
   is(unpack("H*", $res), "853f4538be0db9621a6cea659a06c1107b1f83f02b13d18297bd39d7411cf10c");
+}
+
+is(unpack("H*", Crypt::Digest::SHAKE->new(256)->add("A" x 307)->done(9)),  "dbf9928a270d58ed5a");
+is(unpack("H*", Crypt::Digest::SHAKE->new(256)->add("A" x 307)->done(19)), "dbf9928a270d58ed5a6c00f2f849cac54aef8c");
+is(unpack("H*", Crypt::Digest::SHAKE->new(256)->add("A" x 307)->done(29)), "dbf9928a270d58ed5a6c00f2f849cac54aef8c917698bcc971fe6b973e");
+is(unpack("H*", Crypt::Digest::SHAKE->new(256)->add("A" x 307)->done(39)), "dbf9928a270d58ed5a6c00f2f849cac54aef8c917698bcc971fe6b973ec8aac9666a6f6829c58a");
+is(unpack("H*", Crypt::Digest::SHAKE->new(256)->add("A" x 307)->done(49)), "dbf9928a270d58ed5a6c00f2f849cac54aef8c917698bcc971fe6b973ec8aac9666a6f6829c58aba66ebbb34dbd7acab94");
+is(unpack("H*", Crypt::Digest::SHAKE->new(256)->add("A" x 307)->done(59)), "dbf9928a270d58ed5a6c00f2f849cac54aef8c917698bcc971fe6b973ec8aac9666a6f6829c58aba66ebbb34dbd7acab94cd20c6de1916fc29a890");
+is(unpack("H*", Crypt::Digest::SHAKE->new(256)->add("A" x 307)->done(69)), "dbf9928a270d58ed5a6c00f2f849cac54aef8c917698bcc971fe6b973ec8aac9666a6f6829c58aba66ebbb34dbd7acab94cd20c6de1916fc29a890ad14e4f95af8c3c20147");
+
+{
+  my $hex = substr(unpack("H*", Crypt::Digest::SHAKE->new(256)->add("A" x 307)->done(999)), -100);
+  is($hex, "e8e5fc62297c4ce6f915d79148470b87f539f2806160e3114ae210a3c4707e73adcdb33410606aad260c4f5dbb1575fa3d1e");
+}
+{
+  my $hex = substr(unpack("H*", Crypt::Digest::SHAKE->new(128)->add("A" x 307)->done(999)), -100);
+  is($hex, "868064bc8e37bd63713aa58ee7dae1c8d022aab26f079b13dfbc6c986a2d0200b046a99ed716380f691b7d15689236a0a8e6");
 }
