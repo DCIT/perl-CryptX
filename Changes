@@ -7,10 +7,9 @@ TODO:
         - DSA: generate_key($p, $q, $g), generate_key(\$dsa_params_der), generate_key($dsa_params_file)
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - maybe: add CCM interface for new-add-add-done mode
-        - maybe: switch yarrow > fortuna for Crypt::PK::*
         - maybe: add encode_b32/decode_b32
 
-0.047_005 2017/04/25
+0.048   2017/05/31
         - NEW: Crypt::Digest::SHA3_224
         - NEW: Crypt::Digest::SHA3_256
         - NEW: Crypt::Digest::SHA3_384

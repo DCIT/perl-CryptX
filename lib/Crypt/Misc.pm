@@ -338,11 +338,19 @@ Checks the given C<$uuid> string whether it matches V4 UUID format and returns C
 
 =head2 increment_octets_le
 
+I<Since: CryptX-0.048>
+
  $octects = increment_octets_le($octets);
+
+Take input C<$octets> as a little-endian big number and return an increment.
 
 =head2 increment_octets_be
 
+I<Since: CryptX-0.048>
+
  $octects = increment_octets_be($octets);
+
+Take input C<$octets> as a big-endian big number and return an increment.
 
 =head1 SEE ALSO
 
