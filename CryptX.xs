@@ -482,7 +482,6 @@ CryptX__increment_octets_le(SV * in)
     {
         STRLEN len, i = 0;
         unsigned char *out_data, *in_data;
-        int rv;
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, len);
@@ -509,7 +508,6 @@ CryptX__increment_octets_be(SV * in)
     {
         STRLEN len, i = 0;
         unsigned char *out_data, *in_data;
-        int rv;
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, len);
