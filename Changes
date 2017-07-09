@@ -9,6 +9,10 @@ TODO:
         - maybe: add CCM interface for new-add-add-done mode
         - maybe: add encode_b32/decode_b32
 
+0.048_* 2017/07/09
+        - fix #36 aad_add is obsolete for all EncAuth algs (correct is adata_add)
+        - fix #37 GCM - Encryption of the empty string
+
 0.048   2017/05/31
         - NEW: Crypt::Digest::SHA3_224
         - NEW: Crypt::Digest::SHA3_256
