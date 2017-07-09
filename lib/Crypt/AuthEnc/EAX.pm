@@ -20,7 +20,7 @@ use Crypt::Cipher;
 # - encrypt_done
 # - decrypt_add
 # - decrypt_done
-# - aad_add
+# - adata_add
 
 sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
 
@@ -32,7 +32,7 @@ sub eax_encrypt_authenticate {
   my $plaintext = shift;
 
   my $m = Crypt::AuthEnc::EAX->new($cipher_name, $key, $iv);
-  $m->aad_add($adata) if defined $adata;
+  $m->adata_add($adata) if defined $adata;
   my $ct = $m->encrypt_add($plaintext);
   my $tag = $m->encrypt_done;
   return ($ct, $tag);
@@ -47,15 +47,14 @@ sub eax_decrypt_verify {
   my $tag = shift;
 
   my $m = Crypt::AuthEnc::EAX->new($cipher_name, $key, $iv);
-  $m->aad_add($adata) if defined $adata;
+  $m->adata_add($adata) if defined $adata;
   my $ct = $m->decrypt_add($ciphertext);
   return $m->decrypt_done($tag) ? $ct : undef;
 }
 
-sub header_add {
-  # obsolete, only for backwards compatibility
-  shift->aad_add(@_);
-}
+# obsolete, only for backwards compatibility
+sub header_add { goto &adata_add }
+sub aad_add    { goto &adata_add }
 
 1;
 
@@ -72,8 +71,8 @@ Crypt::AuthEnc::EAX - Authenticated encryption in EAX mode
 
  # encrypt and authenticate
  my $ae = Crypt::AuthEnc::EAX->new("AES", $key, $iv);
- $ae->aad_add('additional_authenticated_data1');
- $ae->aad_add('additional_authenticated_data2');
+ $ae->adata_add('additional_authenticated_data1');
+ $ae->adata_add('additional_authenticated_data2');
  $ct = $ae->encrypt_add('data1');
  $ct = $ae->encrypt_add('data2');
  $ct = $ae->encrypt_add('data3');
@@ -81,8 +80,8 @@ Crypt::AuthEnc::EAX - Authenticated encryption in EAX mode
 
  # decrypt and verify
  my $ae = Crypt::AuthEnc::EAX->new("AES", $key, $iv);
- $ae->aad_add('additional_authenticated_data1');
- $ae->aad_add('additional_authenticated_data2');
+ $ae->adata_add('additional_authenticated_data1');
+ $ae->adata_add('additional_authenticated_data2');
  $pt = $ae->decrypt_add('ciphertext1');
  $pt = $ae->decrypt_add('ciphertext2');
  $pt = $ae->decrypt_add('ciphertext3');
@@ -142,9 +141,9 @@ You can export selected functions:
  # $iv ...... unique initialization vector (no need to keep it secret)
  # $adata ... additional authenticated data (optional)
 
-=head2 aad_add
+=head2 adata_add
 
- $ae->aad_add($adata);                          #can be called multiple times
+ $ae->adata_add($adata);                          #can be called multiple times
 
 =head2 encrypt_add
 

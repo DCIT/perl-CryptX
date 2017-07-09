@@ -140,7 +140,7 @@ decrypt_done(Crypt::AuthEnc::EAX self, ...)
     }
 
 int
-aad_add(Crypt::AuthEnc::EAX self, SV * adata)
+adata_add(Crypt::AuthEnc::EAX self, SV * adata)
     CODE:
     {
         STRLEN h_len;

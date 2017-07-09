@@ -65,8 +65,8 @@ Crypt::AuthEnc::GCM - Authenticated encryption in GCM mode
 
  # encrypt and authenticate
  my $ae = Crypt::AuthEnc::GCM->new("AES", $key, $iv);
- $ae->aad_add('additional_authenticated_data1');
- $ae->aad_add('additional_authenticated_data2');
+ $ae->adata_add('additional_authenticated_data1');
+ $ae->adata_add('additional_authenticated_data2');
  $ct = $ae->encrypt_add('data1');
  $ct = $ae->encrypt_add('data2');
  $ct = $ae->encrypt_add('data3');
@@ -74,8 +74,8 @@ Crypt::AuthEnc::GCM - Authenticated encryption in GCM mode
 
  # decrypt and verify
  my $ae = Crypt::AuthEnc::GCM->new("AES", $key, $iv);
- $ae->aad_add('additional_authenticated_data1');
- $ae->aad_add('additional_authenticated_data2');
+ $ae->adata_add('additional_authenticated_data1');
+ $ae->adata_add('additional_authenticated_data2');
  $pt = $ae->decrypt_add('ciphertext1');
  $pt = $ae->decrypt_add('ciphertext2');
  $pt = $ae->decrypt_add('ciphertext3');
@@ -134,13 +134,16 @@ You can export selected functions:
 
 =head2 iv_add
 
- $ae->iv_add($iv_data);                 #can be called multiple times
+Set initialization vector (IV).
 
-=head2 aad_add
+ $ae->iv_add($iv_data);                        #can be called multiple times
 
-Can be called B<after> all C<iv_add> calls but before the first C<encrypt_add> or C<decrypt_add>;
+=head2 adata_add
 
- $ae->aad_add($aad_data);               #can be called multiple times
+Add B<additional authenticated data>.
+Can be called B<after> all C<iv_add> calls but before the first C<encrypt_add> or C<decrypt_add>.
+
+ $ae->adata_add($aad_data);                    #can be called multiple times
 
 =head2 encrypt_add
 

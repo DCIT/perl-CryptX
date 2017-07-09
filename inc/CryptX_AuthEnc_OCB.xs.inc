@@ -43,7 +43,7 @@ clone(Crypt::AuthEnc::OCB self)
         RETVAL
 
 void
-aad_add(Crypt::AuthEnc::OCB self, SV * data)
+adata_add(Crypt::AuthEnc::OCB self, SV * data)
     CODE:
     {
         int rv;
