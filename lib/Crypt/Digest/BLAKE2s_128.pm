@@ -4,7 +4,7 @@ package Crypt::Digest::BLAKE2s_128;
 
 use strict;
 use warnings;
-our $VERSION = '0.048';
+our $VERSION = '0.048_001';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( blake2s_128 blake2s_128_hex blake2s_128_b64 blake2s_128_b64u blake2s_128_file blake2s_128_file_hex blake2s_128_file_b64 blake2s_128_file_b64u )] );
