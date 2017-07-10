@@ -29,6 +29,8 @@ Currently available modules:
 
 - Hash Functions - see [Crypt::Digest](https://metacpan.org/pod/Crypt::Digest) and related modules
 
+    [Crypt::Digest::BLAKE2b\_160](https://metacpan.org/pod/Crypt::Digest::BLAKE2b_160), [Crypt::Digest::BLAKE2b\_256](https://metacpan.org/pod/Crypt::Digest::BLAKE2b_256), [Crypt::Digest::BLAKE2b\_384](https://metacpan.org/pod/Crypt::Digest::BLAKE2b_384), [Crypt::Digest::BLAKE2b\_512](https://metacpan.org/pod/Crypt::Digest::BLAKE2b_512),
+    [Crypt::Digest::BLAKE2s\_128](https://metacpan.org/pod/Crypt::Digest::BLAKE2s_128), [Crypt::Digest::BLAKE2s\_160](https://metacpan.org/pod/Crypt::Digest::BLAKE2s_160), [Crypt::Digest::BLAKE2s\_224](https://metacpan.org/pod/Crypt::Digest::BLAKE2s_224), [Crypt::Digest::BLAKE2s\_256](https://metacpan.org/pod/Crypt::Digest::BLAKE2s_256),
     [Crypt::Digest::CHAES](https://metacpan.org/pod/Crypt::Digest::CHAES), [Crypt::Digest::MD2](https://metacpan.org/pod/Crypt::Digest::MD2), [Crypt::Digest::MD4](https://metacpan.org/pod/Crypt::Digest::MD4), [Crypt::Digest::MD5](https://metacpan.org/pod/Crypt::Digest::MD5), [Crypt::Digest::RIPEMD128](https://metacpan.org/pod/Crypt::Digest::RIPEMD128), [Crypt::Digest::RIPEMD160](https://metacpan.org/pod/Crypt::Digest::RIPEMD160),
     [Crypt::Digest::RIPEMD256](https://metacpan.org/pod/Crypt::Digest::RIPEMD256), [Crypt::Digest::RIPEMD320](https://metacpan.org/pod/Crypt::Digest::RIPEMD320), [Crypt::Digest::SHA1](https://metacpan.org/pod/Crypt::Digest::SHA1), [Crypt::Digest::SHA224](https://metacpan.org/pod/Crypt::Digest::SHA224), [Crypt::Digest::SHA256](https://metacpan.org/pod/Crypt::Digest::SHA256), [Crypt::Digest::SHA384](https://metacpan.org/pod/Crypt::Digest::SHA384),
     [Crypt::Digest::SHA512](https://metacpan.org/pod/Crypt::Digest::SHA512), [Crypt::Digest::SHA512\_224](https://metacpan.org/pod/Crypt::Digest::SHA512_224), [Crypt::Digest::SHA512\_256](https://metacpan.org/pod/Crypt::Digest::SHA512_256), [Crypt::Digest::Tiger192](https://metacpan.org/pod/Crypt::Digest::Tiger192), [Crypt::Digest::Whirlpool](https://metacpan.org/pod/Crypt::Digest::Whirlpool),
@@ -49,6 +51,10 @@ Currently available modules:
 - Key derivation functions - PBKDF1, PBKFD2 and HKDF
 
     [Crypt::KeyDerivation](https://metacpan.org/pod/Crypt::KeyDerivation)
+
+- Other handy functions related to cryptography
+
+    [Crypt::Misc](https://metacpan.org/pod/Crypt::Misc)
 
 # LICENSE
 
