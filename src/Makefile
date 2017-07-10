@@ -39,22 +39,22 @@ ltc/mac/pmac/pmac_ntz.o ltc/mac/pmac/pmac_process.o ltc/mac/pmac/pmac_shift_xor.
 ltc/mac/poly1305/poly1305.o ltc/mac/poly1305/poly1305_file.o ltc/mac/poly1305/poly1305_memory.o \
 ltc/mac/poly1305/poly1305_memory_multi.o ltc/mac/xcbc/xcbc_done.o ltc/mac/xcbc/xcbc_file.o \
 ltc/mac/xcbc/xcbc_init.o ltc/mac/xcbc/xcbc_memory.o ltc/mac/xcbc/xcbc_memory_multi.o \
-ltc/mac/xcbc/xcbc_process.o ltc/math/ltm_desc.o ltc/math/multi.o ltc/math/rand_bn.o \
-ltc/math/rand_prime.o ltc/math/tfm_desc.o ltc/math/fp/ltc_ecc_fp_mulmod.o ltc/misc/adler32.o \
-ltc/misc/burn_stack.o ltc/misc/compare_testvector.o ltc/misc/crc32.o ltc/misc/error_to_string.o \
-ltc/misc/mem_neq.o ltc/misc/pk_get_oid.o ltc/misc/zeromem.o ltc/misc/base64/base64_decode.o \
-ltc/misc/base64/base64_encode.o ltc/misc/crypt/crypt.o ltc/misc/crypt/crypt_argchk.o \
-ltc/misc/crypt/crypt_cipher_descriptor.o ltc/misc/crypt/crypt_cipher_is_valid.o ltc/misc/crypt/crypt_find_cipher.o \
-ltc/misc/crypt/crypt_find_cipher_any.o ltc/misc/crypt/crypt_find_cipher_id.o ltc/misc/crypt/crypt_find_hash.o \
-ltc/misc/crypt/crypt_find_hash_any.o ltc/misc/crypt/crypt_find_hash_id.o ltc/misc/crypt/crypt_find_hash_oid.o \
-ltc/misc/crypt/crypt_find_prng.o ltc/misc/crypt/crypt_fsa.o ltc/misc/crypt/crypt_hash_descriptor.o \
-ltc/misc/crypt/crypt_hash_is_valid.o ltc/misc/crypt/crypt_inits.o ltc/misc/crypt/crypt_ltc_mp_descriptor.o \
-ltc/misc/crypt/crypt_prng_descriptor.o ltc/misc/crypt/crypt_prng_is_valid.o ltc/misc/crypt/crypt_register_cipher.o \
-ltc/misc/crypt/crypt_register_hash.o ltc/misc/crypt/crypt_register_prng.o ltc/misc/crypt/crypt_unregister_cipher.o \
-ltc/misc/crypt/crypt_unregister_hash.o ltc/misc/crypt/crypt_unregister_prng.o ltc/misc/hkdf/hkdf.o \
-ltc/misc/pkcs5/pkcs_5_1.o ltc/misc/pkcs5/pkcs_5_2.o ltc/modes/cbc/cbc_decrypt.o ltc/modes/cbc/cbc_done.o \
-ltc/modes/cbc/cbc_encrypt.o ltc/modes/cbc/cbc_getiv.o ltc/modes/cbc/cbc_setiv.o ltc/modes/cbc/cbc_start.o \
-ltc/modes/cfb/cfb_decrypt.o ltc/modes/cfb/cfb_done.o ltc/modes/cfb/cfb_encrypt.o \
+ltc/mac/xcbc/xcbc_process.o ltc/math/ltm_desc.o ltc/math/multi.o ltc/math/radix_to_bin.o \
+ltc/math/rand_bn.o ltc/math/rand_prime.o ltc/math/tfm_desc.o ltc/math/fp/ltc_ecc_fp_mulmod.o \
+ltc/misc/adler32.o ltc/misc/burn_stack.o ltc/misc/compare_testvector.o ltc/misc/crc32.o \
+ltc/misc/error_to_string.o ltc/misc/mem_neq.o ltc/misc/pk_get_oid.o ltc/misc/zeromem.o \
+ltc/misc/base64/base64_decode.o ltc/misc/base64/base64_encode.o ltc/misc/crypt/crypt.o \
+ltc/misc/crypt/crypt_argchk.o ltc/misc/crypt/crypt_cipher_descriptor.o ltc/misc/crypt/crypt_cipher_is_valid.o \
+ltc/misc/crypt/crypt_find_cipher.o ltc/misc/crypt/crypt_find_cipher_any.o ltc/misc/crypt/crypt_find_cipher_id.o \
+ltc/misc/crypt/crypt_find_hash.o ltc/misc/crypt/crypt_find_hash_any.o ltc/misc/crypt/crypt_find_hash_id.o \
+ltc/misc/crypt/crypt_find_hash_oid.o ltc/misc/crypt/crypt_find_prng.o ltc/misc/crypt/crypt_fsa.o \
+ltc/misc/crypt/crypt_hash_descriptor.o ltc/misc/crypt/crypt_hash_is_valid.o ltc/misc/crypt/crypt_inits.o \
+ltc/misc/crypt/crypt_ltc_mp_descriptor.o ltc/misc/crypt/crypt_prng_descriptor.o ltc/misc/crypt/crypt_prng_is_valid.o \
+ltc/misc/crypt/crypt_register_cipher.o ltc/misc/crypt/crypt_register_hash.o ltc/misc/crypt/crypt_register_prng.o \
+ltc/misc/crypt/crypt_unregister_cipher.o ltc/misc/crypt/crypt_unregister_hash.o ltc/misc/crypt/crypt_unregister_prng.o \
+ltc/misc/hkdf/hkdf.o ltc/misc/pkcs5/pkcs_5_1.o ltc/misc/pkcs5/pkcs_5_2.o ltc/modes/cbc/cbc_decrypt.o \
+ltc/modes/cbc/cbc_done.o ltc/modes/cbc/cbc_encrypt.o ltc/modes/cbc/cbc_getiv.o ltc/modes/cbc/cbc_setiv.o \
+ltc/modes/cbc/cbc_start.o ltc/modes/cfb/cfb_decrypt.o ltc/modes/cfb/cfb_done.o ltc/modes/cfb/cfb_encrypt.o \
 ltc/modes/cfb/cfb_getiv.o ltc/modes/cfb/cfb_setiv.o ltc/modes/cfb/cfb_start.o ltc/modes/ctr/ctr_decrypt.o \
 ltc/modes/ctr/ctr_done.o ltc/modes/ctr/ctr_encrypt.o ltc/modes/ctr/ctr_getiv.o ltc/modes/ctr/ctr_setiv.o \
 ltc/modes/ctr/ctr_start.o ltc/modes/ecb/ecb_decrypt.o ltc/modes/ecb/ecb_done.o ltc/modes/ecb/ecb_encrypt.o \
@@ -105,8 +105,8 @@ ltc/pk/pkcs1/pkcs_1_oaep_encode.o ltc/pk/pkcs1/pkcs_1_os2ip.o ltc/pk/pkcs1/pkcs_
 ltc/pk/pkcs1/pkcs_1_pss_encode.o ltc/pk/pkcs1/pkcs_1_v1_5_decode.o ltc/pk/pkcs1/pkcs_1_v1_5_encode.o \
 ltc/pk/rsa/rsa_decrypt_key.o ltc/pk/rsa/rsa_encrypt_key.o ltc/pk/rsa/rsa_export.o \
 ltc/pk/rsa/rsa_exptmod.o ltc/pk/rsa/rsa_free.o ltc/pk/rsa/rsa_get_size.o ltc/pk/rsa/rsa_import.o \
-ltc/pk/rsa/rsa_import_pkcs8.o ltc/pk/rsa/rsa_import_radix.o ltc/pk/rsa/rsa_import_x509.o \
-ltc/pk/rsa/rsa_make_key.o ltc/pk/rsa/rsa_sign_hash.o ltc/pk/rsa/rsa_sign_saltlen_get.o \
+ltc/pk/rsa/rsa_import_pkcs8.o ltc/pk/rsa/rsa_import_x509.o ltc/pk/rsa/rsa_make_key.o \
+ltc/pk/rsa/rsa_set.o ltc/pk/rsa/rsa_sign_hash.o ltc/pk/rsa/rsa_sign_saltlen_get.o \
 ltc/pk/rsa/rsa_verify_hash.o ltc/prngs/chacha20.o ltc/prngs/fortuna.o ltc/prngs/rc4.o \
 ltc/prngs/rng_get_bytes.o ltc/prngs/rng_make_prng.o ltc/prngs/sober128.o ltc/prngs/sprng.o \
 ltc/prngs/yarrow.o ltc/stream/chacha/chacha_crypt.o ltc/stream/chacha/chacha_done.o \
