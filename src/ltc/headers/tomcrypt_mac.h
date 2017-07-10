@@ -1,3 +1,12 @@
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis
+ *
+ * LibTomCrypt is a library that provides various cryptographic
+ * algorithms in a highly modular and flexible manner.
+ *
+ * The library is free for all purposes without any express
+ * guarantee it works.
+ */
+
 #ifdef LTC_HMAC
 typedef struct Hmac_state {
      hash_state     md;
@@ -290,11 +299,13 @@ int ocb3_decrypt_verify_memory(int cipher,
 
 int ocb3_test(void);
 
+#ifdef LTC_SOURCE
 /* internal helper functions */
 int ocb3_int_aad_add_block(ocb3_state *ocb, const unsigned char *aad_block);
 void ocb3_int_calc_offset_zero(ocb3_state *ocb, const unsigned char *nonce, unsigned long noncelen);
 int ocb3_int_ntz(unsigned long x);
 void ocb3_int_xor_blocks(unsigned char *out, const unsigned char *block_a, const unsigned char *block_b, unsigned long block_len);
+#endif /* LTC_SOURCE */
 
 #endif /* LTC_OCB3_MODE */
 
@@ -552,6 +563,6 @@ int chacha20poly1305_test(void);
 
 #endif /* LTC_CHACHA20POLY1305_MODE */
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

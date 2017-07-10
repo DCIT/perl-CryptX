@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 #include "tomcrypt.h"
 
@@ -351,7 +349,7 @@ int  md5_test(void)
       md5_init(&md);
       md5_process(&md, (unsigned char *)tests[i].msg, (unsigned long)strlen(tests[i].msg));
       md5_done(&md, tmp);
-      if (XMEMCMP(tmp, tests[i].hash, 16) != 0) {
+      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "MD5", i)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
   }
@@ -363,6 +361,6 @@ int  md5_test(void)
 
 
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

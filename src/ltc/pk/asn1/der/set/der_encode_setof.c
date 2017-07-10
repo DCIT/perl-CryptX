@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 #include "tomcrypt.h"
 
@@ -22,7 +20,7 @@ struct edge {
    unsigned long  size;
 };
 
-static int qsort_helper(const void *a, const void *b)
+static int _qsort_helper(const void *a, const void *b)
 {
    struct edge   *A = (struct edge *)a, *B = (struct edge *)b;
    int            r;
@@ -134,7 +132,7 @@ int der_encode_setof(ltc_asn1_list *list, unsigned long inlen,
    }
 
    /* sort based on contents (using edges) */
-   XQSORT(edges, inlen, sizeof(*edges), &qsort_helper);
+   XQSORT(edges, inlen, sizeof(*edges), &_qsort_helper);
 
    /* copy static header */
    XMEMCPY(out, buf, hdrlen);
@@ -158,6 +156,6 @@ int der_encode_setof(ltc_asn1_list *list, unsigned long inlen,
 
 #endif
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

@@ -1,3 +1,12 @@
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis
+ *
+ * LibTomCrypt is a library that provides various cryptographic
+ * algorithms in a highly modular and flexible manner.
+ *
+ * The library is free for all purposes without any express
+ * guarantee it works.
+ */
+
 /* ---- HASH FUNCTIONS ---- */
 #ifdef LTC_SHA3
 struct sha3_state {
@@ -461,6 +470,7 @@ int find_hash_oid(const unsigned long *ID, unsigned long IDlen);
 int find_hash_any(const char *name, int digestlen);
 int register_hash(const struct ltc_hash_descriptor *hash);
 int unregister_hash(const struct ltc_hash_descriptor *hash);
+int register_all_hashes(void);
 int hash_is_valid(int idx);
 
 LTC_MUTEX_PROTO(ltc_hash_mutex)
@@ -516,6 +526,6 @@ int func_name (hash_state * md, const unsigned char *in, unsigned long inlen)   
     return CRYPT_OK;                                                                        \
 }
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

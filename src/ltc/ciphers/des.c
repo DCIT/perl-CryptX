@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 #include "tomcrypt.h"
 
@@ -1979,7 +1977,7 @@ int des_test(void)
            des_ecb_decrypt(cases[i].txt, tmp, &des);
         }
 
-        if (XMEMCMP(cases[i].out, tmp, sizeof(tmp)) != 0) {
+        if (compare_testvector(cases[i].out, sizeof(tmp), tmp, sizeof(tmp), "DES", i) != 0) {
            return CRYPT_FAIL_TESTVECTOR;
         }
 
@@ -2022,7 +2020,7 @@ int des3_test(void)
    des3_ecb_encrypt(pt, ct, &skey);
    des3_ecb_decrypt(ct, tmp, &skey);
 
-   if (XMEMCMP(pt, tmp, 8) != 0) {
+   if (compare_testvector(pt, 8, tmp, 8, "3DES", 0) != 0) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -2080,6 +2078,6 @@ int des3_keysize(int *keysize)
 #endif
 
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

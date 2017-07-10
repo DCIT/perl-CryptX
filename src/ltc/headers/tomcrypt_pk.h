@@ -1,3 +1,12 @@
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis
+ *
+ * LibTomCrypt is a library that provides various cryptographic
+ * algorithms in a highly modular and flexible manner.
+ *
+ * The library is free for all purposes without any express
+ * guarantee it works.
+ */
+
 /* ---- NUMBER THEORY ---- */
 
 enum {
@@ -10,9 +19,13 @@ enum {
 /* Indicates standard output formats that can be read e.g. by OpenSSL or GnuTLS */
 #define PK_STD          0x1000
 
+/* iterations limit for retry-loops */
+#define PK_MAX_RETRIES  20
+
 int rand_prime(void *N, long len, prng_state *prng, int wprng);
+
 int rand_bn_bits(void *N, int bits, prng_state *prng, int wprng);
-int rand_bn_range(void *N, void *limit, prng_state *prng, int wprng);
+int rand_bn_upto(void *N, void *limit, prng_state *prng, int wprng);
 
 enum public_key_algorithms {
    PKA_RSA,
@@ -218,7 +231,7 @@ int dh_verify_hash(const unsigned char *sig,  unsigned long siglen,
                    int *stat, dh_key *key);
 
 
-#endif
+#endif /* LTC_MDH */
 
 
 /* ---- ECC Routines ---- */
@@ -336,21 +349,21 @@ int  ecc_decrypt_key(const unsigned char *in,  unsigned long  inlen,
                            unsigned char *out, unsigned long *outlen,
                            ecc_key *key);
 
+int ecc_sign_hash_rfc7518(const unsigned char *in,  unsigned long inlen,
+                                unsigned char *out, unsigned long *outlen,
+                                prng_state *prng, int wprng, ecc_key *key);
+
 int  ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
                          unsigned char *out, unsigned long *outlen,
                          prng_state *prng, int wprng, ecc_key *key);
 
+int ecc_verify_hash_rfc7518(const unsigned char *sig,  unsigned long siglen,
+                            const unsigned char *hash, unsigned long hashlen,
+                            int *stat, ecc_key *key);
+
 int  ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
                      const unsigned char *hash, unsigned long hashlen,
                      int *stat, ecc_key *key);
-
-int  ecc_sign_hash_rfc7518(const unsigned char *in,  unsigned long inlen,
-                                 unsigned char *out, unsigned long *outlen,
-                                 prng_state *prng, int wprng, ecc_key *key);
-
-int  ecc_verify_hash_rfc7518(const unsigned char *sig,  unsigned long siglen,
-                             const unsigned char *hash, unsigned long hashlen,
-                             int *stat, ecc_key *key);
 
 int  ecc_verify_key(ecc_key *key);
 
@@ -564,6 +577,10 @@ int der_decode_sequence_ex(const unsigned char *in, unsigned long  inlen,
 
 int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
                         unsigned long *outlen);
+
+
+#ifdef LTC_SOURCE
+/* internal helper functions */
 int der_length_sequence_ex(ltc_asn1_list *list, unsigned long inlen,
                            unsigned long *outlen, unsigned long *payloadlen);
 
@@ -580,6 +597,7 @@ int der_decode_subject_public_key_info_ex(const unsigned char *in, unsigned long
         unsigned int algorithm, void* public_key, unsigned long* public_key_len,
         unsigned long parameters_type, void* parameters, unsigned long parameters_len,
         unsigned long *parameters_outsize);
+#endif /* LTC_SOURCE */
 
 /* SET */
 #define der_decode_set(in, inlen, list, outlen) der_decode_sequence_ex(in, inlen, list, outlen, 0)
@@ -657,8 +675,12 @@ int der_decode_teletex_string(const unsigned char *in, unsigned long inlen,
                                 unsigned char *out, unsigned long *outlen);
 int der_length_teletex_string(const unsigned char *octets, unsigned long noctets, unsigned long *outlen);
 
+#ifdef LTC_SOURCE
+/* internal helper functions */
 int der_teletex_char_encode(int c);
 int der_teletex_value_decode(int v);
+#endif /* LTC_SOURCE */
+
 
 /* PRINTABLE STRING */
 int der_encode_printable_string(const unsigned char *in, unsigned long inlen,
@@ -690,7 +712,10 @@ int der_encode_utf8_string(const wchar_t *in,  unsigned long inlen,
 int der_decode_utf8_string(const unsigned char *in,  unsigned long inlen,
                                        wchar_t *out, unsigned long *outlen);
 unsigned long der_utf8_charsize(const wchar_t c);
+#ifdef LTC_SOURCE
+/* internal helper functions */
 int der_utf8_valid_char(const wchar_t c);
+#endif /* LTC_SOURCE */
 int der_length_utf8_string(const wchar_t *in, unsigned long noctets, unsigned long *outlen);
 
 
@@ -744,6 +769,6 @@ int der_length_generalizedtime(ltc_generalizedtime *gtime, unsigned long *outlen
 
 #endif
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

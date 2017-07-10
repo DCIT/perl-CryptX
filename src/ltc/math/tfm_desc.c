@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
 #define DESC_DEF_ONLY
@@ -84,7 +82,7 @@ static int init_copy(void **a, void *b)
 }
 
 /* ---- trivial ---- */
-static int set_int(void *a, unsigned long b)
+static int set_int(void *a, ltc_mp_digit b)
 {
    LTC_ARGCHK(a != NULL);
    fp_set(a, b);
@@ -129,7 +127,7 @@ static int compare(void *a, void *b)
    return 0;
 }
 
-static int compare_d(void *a, unsigned long b)
+static int compare_d(void *a, ltc_mp_digit b)
 {
    int ret;
    LTC_ARGCHK(a != NULL);
@@ -214,7 +212,7 @@ static int add(void *a, void *b, void *c)
    return CRYPT_OK;
 }
 
-static int addi(void *a, unsigned long b, void *c)
+static int addi(void *a, ltc_mp_digit b, void *c)
 {
    LTC_ARGCHK(a != NULL);
    LTC_ARGCHK(c != NULL);
@@ -232,7 +230,7 @@ static int sub(void *a, void *b, void *c)
    return CRYPT_OK;
 }
 
-static int subi(void *a, unsigned long b, void *c)
+static int subi(void *a, ltc_mp_digit b, void *c)
 {
    LTC_ARGCHK(a != NULL);
    LTC_ARGCHK(c != NULL);
@@ -250,7 +248,7 @@ static int mul(void *a, void *b, void *c)
    return CRYPT_OK;
 }
 
-static int muli(void *a, unsigned long b, void *c)
+static int muli(void *a, ltc_mp_digit b, void *c)
 {
    LTC_ARGCHK(a != NULL);
    LTC_ARGCHK(c != NULL);
@@ -265,16 +263,6 @@ static int sqr(void *a, void *b)
    LTC_ARGCHK(b != NULL);
    fp_sqr(a, b);
    return CRYPT_OK;
-}
-
-/* sqrtmod_prime */
-static int sqrtmod_prime(void *a, void *b, void *c)
-{
-   LTC_ARGCHK(a != NULL);
-   LTC_ARGCHK(b != NULL);
-   LTC_ARGCHK(c != NULL);
-   fprintf(stderr, "TFM does not support sqrtmod_prime\n"); /* XXX-FIXME */
-   return CRYPT_ERROR;
 }
 
 /* div */
@@ -294,7 +282,7 @@ static int div_2(void *a, void *b)
 }
 
 /* modi */
-static int modi(void *a, unsigned long b, unsigned long *c)
+static int modi(void *a, ltc_mp_digit b, ltc_mp_digit *c)
 {
    fp_digit tmp;
    int      err;
@@ -427,8 +415,10 @@ static int isprime(void *a, int b, int *c)
 {
    LTC_ARGCHK(a != NULL);
    LTC_ARGCHK(c != NULL);
-   (void)b;
-   *c = (fp_isprime(a) == FP_YES) ? LTC_MP_YES : LTC_MP_NO;
+   if (b == 0) {
+       b = LTC_MILLER_RABIN_REPS;
+   } /* if */
+   *c = (fp_isprime_ex(a, b) == FP_YES) ? LTC_MP_YES : LTC_MP_NO;
    return CRYPT_OK;
 }
 
@@ -709,6 +699,13 @@ static int tfm_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R
 
 #endif
 
+static int set_rand(void *a, int size)
+{
+   LTC_ARGCHK(a != NULL);
+   fp_rand(a, size);
+   return CRYPT_OK;
+}
+
 const ltc_math_descriptor tfm_desc = {
 
    "TomsFastMath",
@@ -744,7 +741,6 @@ const ltc_math_descriptor tfm_desc = {
    &mul,
    &muli,
    &sqr,
-   &sqrtmod_prime,
    &divide,
    &div_2,
    &modi,
@@ -799,13 +795,13 @@ const ltc_math_descriptor tfm_desc = {
    &addmod,
    &submod,
 
-   NULL,
+   set_rand,
 
 };
 
 
 #endif
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
 /**
@@ -89,7 +87,7 @@ int ocb3_decrypt_verify_memory(int cipher,
    }
 
    /* compare tags */
-   if (buflen >= taglen && XMEMCMP(buf, tag, taglen) == 0) {
+   if (buflen >= taglen && XMEM_NEQ(buf, tag, taglen) == 0) {
       *stat = 1;
    }
 
@@ -107,6 +105,6 @@ LBL_ERR:
 
 #endif
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

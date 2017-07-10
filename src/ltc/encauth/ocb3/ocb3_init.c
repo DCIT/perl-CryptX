@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
 /**
@@ -19,17 +17,13 @@
 
 static const struct {
     int           len;
-    unsigned char poly_div[MAXBLOCKSIZE],
-                  poly_mul[MAXBLOCKSIZE];
+    unsigned char poly_mul[MAXBLOCKSIZE];
 } polys[] = {
 {
     8,
-    { 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0D },
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1B }
 }, {
     16,
-    { 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x43 },
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x87 }
 }
@@ -133,6 +127,6 @@ int ocb3_init(ocb3_state *ocb, int cipher,
 
 #endif
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

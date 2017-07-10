@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 #include "tomcrypt.h"
 
@@ -263,7 +261,7 @@ int sober128_stream_crypt(sober128_state *c, const unsigned char *in, unsigned l
 
    /* handle any previously buffered bytes */
    while (c->nbuf != 0 && inlen != 0) {
-      *out++ = *in++ ^ (c->sbuf & 0xFF);
+      *out++ = *in++ ^ (unsigned char)(c->sbuf & 0xFF);
       c->sbuf >>= 8;
       c->nbuf -= 8;
       --inlen;
@@ -311,7 +309,7 @@ int sober128_stream_crypt(sober128_state *c, const unsigned char *in, unsigned l
       c->sbuf = nltap(c);
       c->nbuf = 32;
       while (c->nbuf != 0 && inlen != 0) {
-          *out++ = *in++ ^ (c->sbuf & 0xFF);
+          *out++ = *in++ ^ (unsigned char)(c->sbuf & 0xFF);
           c->sbuf >>= 8;
           c->nbuf -= 8;
           --inlen;
@@ -342,3 +340,7 @@ int sober128_stream_done(sober128_state *c)
 }
 
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

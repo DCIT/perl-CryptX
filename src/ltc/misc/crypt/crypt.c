@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 #include "tomcrypt.h"
 
@@ -18,7 +16,7 @@
 #define NAME(s) #s
 
 const char *crypt_build_settings =
-   "LibTomCrypt " SCRYPT " (Tom St Denis, tomstdenis@gmail.com)\n"
+   "LibTomCrypt " SCRYPT " (www.libtom.net)\n"
    "LibTomCrypt is public domain software.\n"
 #if defined(INCLUDE_BUILD_DATE)
    "Built on " __DATE__ " at " __TIME__ "\n"
@@ -332,6 +330,23 @@ const char *crypt_build_settings =
     "   Katja\n"
 #endif
 
+    "\nMPI (Math):\n"
+#if defined(LTC_MPI)
+    "   LTC_MPI\n"
+#endif
+#if defined(LTM_DESC)
+    "   LTM_DESC\n"
+#endif
+#if defined(TFM_DESC)
+    "   TFM_DESC\n"
+#endif
+#if defined(GMP_DESC)
+    "   GMP_DESC\n"
+#endif
+#if defined(LTC_MILLER_RABIN_REPS)
+    "   "NAME_VALUE(LTC_MILLER_RABIN_REPS)"\n"
+#endif
+
     "\nCompiler:\n"
 #if defined(_WIN64)
     "   WIN64 platform detected.\n"
@@ -389,9 +404,6 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_HKDF)
     " HKDF "
-#endif
-#if defined(MPI)
-    " MPI "
 #endif
 #if defined(LTC_DEVRANDOM)
     " LTC_DEVRANDOM "
@@ -456,15 +468,6 @@ const char *crypt_build_settings =
 #if defined(LTC_PTHREAD)
     " LTC_PTHREAD "
 #endif
-#if defined(LTM_DESC)
-    " LTM_DESC "
-#endif
-#if defined(TFM_DESC)
-    " TFM_DESC "
-#endif
-#if defined(GMP_DESC)
-    " GMP_DESC "
-#endif
 #if defined(LTC_EASY)
     " LTC_EASY "
 #endif
@@ -481,6 +484,6 @@ const char *crypt_build_settings =
     ;
 
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

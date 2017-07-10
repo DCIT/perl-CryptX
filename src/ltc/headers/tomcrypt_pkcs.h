@@ -1,3 +1,12 @@
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis
+ *
+ * LibTomCrypt is a library that provides various cryptographic
+ * algorithms in a highly modular and flexible manner.
+ *
+ * The library is free for all purposes without any express
+ * guarantee it works.
+ */
+
 /* PKCS Header Info */
 
 /* ===> PKCS #1 -- RSA Cryptography <=== */
@@ -13,7 +22,8 @@ enum ltc_pkcs_1_paddings
 {
   LTC_PKCS_1_V1_5     = 1,        /* PKCS #1 v1.5 padding (\sa ltc_pkcs_1_v1_5_blocks) */
   LTC_PKCS_1_OAEP     = 2,        /* PKCS #1 v2.0 encryption padding */
-  LTC_PKCS_1_PSS      = 3         /* PKCS #1 v2.1 signature padding */
+  LTC_PKCS_1_PSS      = 3,        /* PKCS #1 v2.1 signature padding */
+  LTC_PKCS_1_V1_5_NA1 = 4         /* PKCS #1 v1.5 padding - No ASN.1 (\sa ltc_pkcs_1_v1_5_blocks) */
 };
 
 int pkcs_1_mgf1(      int            hash_idx,
@@ -93,6 +103,6 @@ int pkcs_5_alg2(const unsigned char *password, unsigned long password_len,
 int pkcs_5_test (void);
 #endif  /* LTC_PKCS_5 */
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

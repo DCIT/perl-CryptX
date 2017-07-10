@@ -73,7 +73,7 @@ int sober128_add_entropy(const unsigned char *in, unsigned long inlen, prng_stat
       /* iv 8 bytes */
       if ((err = sober128_stream_setiv(&prng->sober128.s, buf + 32, 8)) != CRYPT_OK) goto LBL_UNLOCK;
       /* clear KEY + IV */
-      XMEMSET(buf, 0, sizeof(buf));
+      zeromem(buf, sizeof(buf));
    }
    else {
       /* sober128_ready() was not called yet, add entropy to ent buffer */
@@ -242,3 +242,7 @@ int sober128_test(void)
 }
 
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

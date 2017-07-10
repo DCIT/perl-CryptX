@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 /**
    @param sha224.c
@@ -115,7 +113,7 @@ int  sha224_test(void)
       sha224_init(&md);
       sha224_process(&md, (unsigned char*)tests[i].msg, (unsigned long)strlen(tests[i].msg));
       sha224_done(&md, tmp);
-      if (XMEMCMP(tmp, tests[i].hash, 28) != 0) {
+      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "SHA224", i)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
   }
@@ -126,6 +124,6 @@ int  sha224_test(void)
 #endif /* defined(LTC_SHA224) && defined(LTC_SHA256) */
 
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

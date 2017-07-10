@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 #include "tomcrypt.h"
 
@@ -271,7 +269,7 @@ int  sha1_test(void)
       sha1_init(&md);
       sha1_process(&md, (unsigned char*)tests[i].msg, (unsigned long)strlen(tests[i].msg));
       sha1_done(&md, tmp);
-      if (XMEMCMP(tmp, tests[i].hash, 20) != 0) {
+      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "SHA1", i)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
   }
@@ -283,6 +281,6 @@ int  sha1_test(void)
 
 
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

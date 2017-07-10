@@ -330,7 +330,7 @@ int blake2s_process(hash_state *md, const unsigned char *in, unsigned long inlen
       unsigned long fill = BLAKE2S_BLOCKBYTES - left;
       if (inlen > fill) {
          md->blake2s.curlen = 0;
-         XMEMCPY(md->blake2s.buf + left, in, fill); /* Fill buffer */
+         XMEMCPY(md->blake2s.buf + (left % sizeof(md->blake2s.buf)), in, fill); /* Fill buffer */
          blake2s_increment_counter(md, BLAKE2S_BLOCKBYTES);
          blake2s_compress(md, md->blake2s.buf); /* Compress */
          in += fill;
@@ -422,8 +422,9 @@ int blake2s_256_test(void)
       blake2s_256_init(&md);
       blake2s_process(&md, (unsigned char *)tests[i].msg, (unsigned long)strlen(tests[i].msg));
       blake2s_done(&md, tmp);
-      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "BLAKE2S_256", i))
+      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "BLAKE2S_256", i)) {
          return CRYPT_FAIL_TESTVECTOR;
+      }
 
    }
    return CRYPT_OK;
@@ -465,8 +466,9 @@ int blake2s_224_test(void)
       blake2s_224_init(&md);
       blake2s_process(&md, (unsigned char *)tests[i].msg, (unsigned long)strlen(tests[i].msg));
       blake2s_done(&md, tmp);
-      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "BLAKE2S_224", i))
+      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "BLAKE2S_224", i)) {
          return CRYPT_FAIL_TESTVECTOR;
+      }
 
    }
    return CRYPT_OK;
@@ -506,8 +508,9 @@ int blake2s_160_test(void)
       blake2s_160_init(&md);
       blake2s_process(&md, (unsigned char *)tests[i].msg, (unsigned long)strlen(tests[i].msg));
       blake2s_done(&md, tmp);
-      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "BLAKE2S_160", i))
+      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "BLAKE2S_160", i)) {
          return CRYPT_FAIL_TESTVECTOR;
+      }
 
    }
    return CRYPT_OK;
@@ -545,11 +548,16 @@ int blake2s_128_test(void)
       blake2s_128_init(&md);
       blake2s_process(&md, (unsigned char *)tests[i].msg, (unsigned long)strlen(tests[i].msg));
       blake2s_done(&md, tmp);
-      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "BLAKE2S_128", i))
+      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "BLAKE2S_128", i)) {
          return CRYPT_FAIL_TESTVECTOR;
+      }
    }
    return CRYPT_OK;
 #endif
 }
 
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

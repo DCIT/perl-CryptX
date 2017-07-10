@@ -1,3 +1,12 @@
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis
+ *
+ * LibTomCrypt is a library that provides various cryptographic
+ * algorithms in a highly modular and flexible manner.
+ *
+ * The library is free for all purposes without any express
+ * guarantee it works.
+ */
+
 /* ---- SYMMETRIC KEY STUFF -----
  *
  * We put each of the ciphers scheduled keys in their own structs then we put all of
@@ -933,6 +942,7 @@ int find_cipher_any(const char *name, int blocklen, int keylen);
 int find_cipher_id(unsigned char ID);
 int register_cipher(const struct ltc_cipher_descriptor *cipher);
 int unregister_cipher(const struct ltc_cipher_descriptor *cipher);
+int register_all_ciphers(void);
 int cipher_is_valid(int idx);
 
 LTC_MUTEX_PROTO(ltc_cipher_mutex)
@@ -993,6 +1003,6 @@ int sober128_stream_test(void);
 
 #endif /* LTC_SOBER128_STREAM */
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

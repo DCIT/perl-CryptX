@@ -1,3 +1,12 @@
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis
+ *
+ * LibTomCrypt is a library that provides various cryptographic
+ * algorithms in a highly modular and flexible manner.
+ *
+ * The library is free for all purposes without any express
+ * guarantee it works.
+ */
+
 /* ---- LTC_BASE64 Routines ---- */
 #ifdef LTC_BASE64
 int base64_encode(const unsigned char *in,  unsigned long len,
@@ -99,15 +108,8 @@ void crc32_finish(crc32_state *ctx, void *hash, unsigned long size);
 int crc32_test(void);
 #endif
 
-/* yeah it's not exactly in misc in the library, but in testprof/x86_prof.c */
-#if defined(LTC_TEST) && defined(LTC_TEST_DBG)
-void print_hex(const char* what, const void* v, const unsigned long l);
 int compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
-#else
-#define compare_testvector(is, is_len, should, should_len, what, which) \
-   ((((is_len) != (should_len)) || (XMEMCMP((is), (should), (is_len)) != 0)) ? 1 : 0)
-#endif
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

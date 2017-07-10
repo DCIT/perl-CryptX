@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
 /* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
@@ -135,7 +133,7 @@ ERR_BUF:
 }
 
 #endif
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */
 
