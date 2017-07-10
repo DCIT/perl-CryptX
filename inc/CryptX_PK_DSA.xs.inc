@@ -47,9 +47,37 @@ _import_hex(Crypt::PK::DSA self, char *p, char *q, char *g, char *x, char *y)
     PPCODE:
     {
         int rv;
+        unsigned char pbin[512], qbin[512], gbin[512], xbin[512], ybin[512];
+        unsigned long plen=sizeof(pbin), qlen=sizeof(qbin), glen=sizeof(gbin), xlen=sizeof(xbin), ylen=sizeof(ybin);
+
         if (self->key.type != -1) { dsa_free(&self->key); self->key.type = -1; }
-        rv = dsa_import_radix(16, p, q, g, x, y, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: dsa_import_radix failed: %s", error_to_string(rv));
+
+        if (p && strlen(p) > 0 && q && strlen(q) > 0 && g && strlen(g) > 0 && y && strlen(y) > 0) {
+          rv = radix_to_bin(p, 16, pbin, &plen);
+          if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(p) failed: %s", error_to_string(rv));
+          rv = radix_to_bin(q, 16, qbin, &qlen);
+          if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(q) failed: %s", error_to_string(rv));
+          rv = radix_to_bin(g, 16, gbin, &glen);
+          if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(g) failed: %s", error_to_string(rv));
+          rv = dsa_set_pqg(pbin, plen, qbin, qlen, gbin, glen, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: dsa_set_pqg failed: %s", error_to_string(rv));
+
+          rv = radix_to_bin(y, 16, ybin, &ylen);
+          if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(y) failed: %s", error_to_string(rv));
+          if (x && strlen(x) > 0) {
+            /* private */
+            rv = radix_to_bin(x, 16, xbin, &xlen);
+            if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(x) failed: %s", error_to_string(rv));
+            rv = dsa_set_key(ybin, ylen, xbin, xlen, &self->key);
+            if (rv != CRYPT_OK) croak("FATAL: dsa_set_key failed: %s", error_to_string(rv));
+          }
+          else {
+            /* public */
+            rv = dsa_set_key(ybin, ylen, NULL, 0, &self->key);
+            if (rv != CRYPT_OK) croak("FATAL: dsa_set_key failed: %s", error_to_string(rv));
+          }
+        }
+
         XPUSHs(ST(0)); /* return self */
     }
 

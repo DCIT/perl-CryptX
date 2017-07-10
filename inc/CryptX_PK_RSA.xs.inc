@@ -62,7 +62,7 @@ void
 _import_hex(Crypt::PK::RSA self, char *N, char *e, char *d=NULL, char *p=NULL, char *q=NULL, char *dP=NULL, char *dQ=NULL, char *qP=NULL)
     PPCODE:
     {
-        int i, rv;
+        int rv;
         unsigned char Nbin[1024], ebin[128], dbin[1024], pbin[512], qbin[512], dPbin[512], dQbin[512], qPbin[512];
         unsigned long Nlen=sizeof(Nbin), elen=sizeof(ebin), dlen=sizeof(dbin), plen=sizeof(pbin),
                       qlen=sizeof(qbin), dPlen=sizeof(dPbin), dQlen=sizeof(dQbin), qPlen=sizeof(qPbin);
