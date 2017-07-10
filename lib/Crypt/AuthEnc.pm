@@ -2,7 +2,7 @@ package Crypt::AuthEnc;
 
 use strict;
 use warnings;
-our $VERSION = '0.048_001';
+our $VERSION = '0.048_002';
 
 sub CLONE_SKIP { 1 } # prevent cloning
 
