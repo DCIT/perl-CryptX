@@ -38,6 +38,7 @@ my %eumm_args = (
   LIBS             => [''],
   MYEXTLIB         => $myextlib,
   clean            => { 'FILES' => join(' ', @myobjs, $myextlib) },
+  dist             => { 'PREOP' => 'perldoc -u lib/CryptX.pm | pod2markdown > README.md' },
 );
 
 my $eumm_ver  = eval $ExtUtils::MakeMaker::VERSION;
