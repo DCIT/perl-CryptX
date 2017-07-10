@@ -84,7 +84,9 @@ ltc/pk/asn1/der/teletex_string/der_decode_teletex_string.o ltc/pk/asn1/der/telet
 ltc/pk/asn1/der/utctime/der_decode_utctime.o ltc/pk/asn1/der/utctime/der_encode_utctime.o \
 ltc/pk/asn1/der/utctime/der_length_utctime.o ltc/pk/asn1/der/utf8/der_decode_utf8_string.o \
 ltc/pk/asn1/der/utf8/der_encode_utf8_string.o ltc/pk/asn1/der/utf8/der_length_utf8_string.o \
-ltc/pk/dh/dh.o ltc/pk/dh/dh_static.o ltc/pk/dh/dh_sys.o ltc/pk/dsa/dsa_decrypt_key.o \
+ltc/pk/dh/dh.o ltc/pk/dh/dh_check_pubkey.o ltc/pk/dh/dh_export.o ltc/pk/dh/dh_export_key.o \
+ltc/pk/dh/dh_free.o ltc/pk/dh/dh_generate_key.o ltc/pk/dh/dh_import.o ltc/pk/dh/dh_set.o \
+ltc/pk/dh/dh_set_pg_dhparam.o ltc/pk/dh/dh_shared_secret.o ltc/pk/dsa/dsa_decrypt_key.o \
 ltc/pk/dsa/dsa_encrypt_key.o ltc/pk/dsa/dsa_export.o ltc/pk/dsa/dsa_free.o ltc/pk/dsa/dsa_generate_key.o \
 ltc/pk/dsa/dsa_generate_pqg.o ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_make_key.o ltc/pk/dsa/dsa_set.o \
 ltc/pk/dsa/dsa_set_pqg_dsaparam.o ltc/pk/dsa/dsa_shared_secret.o ltc/pk/dsa/dsa_sign_hash.o \

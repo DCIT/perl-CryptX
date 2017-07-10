@@ -90,7 +90,9 @@ ltc/pk/asn1/der/teletex_string/der_decode_teletex_string.obj ltc/pk/asn1/der/tel
 ltc/pk/asn1/der/utctime/der_decode_utctime.obj ltc/pk/asn1/der/utctime/der_encode_utctime.obj \
 ltc/pk/asn1/der/utctime/der_length_utctime.obj ltc/pk/asn1/der/utf8/der_decode_utf8_string.obj \
 ltc/pk/asn1/der/utf8/der_encode_utf8_string.obj ltc/pk/asn1/der/utf8/der_length_utf8_string.obj \
-ltc/pk/dh/dh.obj ltc/pk/dh/dh_static.obj ltc/pk/dh/dh_sys.obj ltc/pk/dsa/dsa_decrypt_key.obj \
+ltc/pk/dh/dh.obj ltc/pk/dh/dh_check_pubkey.obj ltc/pk/dh/dh_export.obj ltc/pk/dh/dh_export_key.obj \
+ltc/pk/dh/dh_free.obj ltc/pk/dh/dh_generate_key.obj ltc/pk/dh/dh_import.obj ltc/pk/dh/dh_set.obj \
+ltc/pk/dh/dh_set_pg_dhparam.obj ltc/pk/dh/dh_shared_secret.obj ltc/pk/dsa/dsa_decrypt_key.obj \
 ltc/pk/dsa/dsa_encrypt_key.obj ltc/pk/dsa/dsa_export.obj ltc/pk/dsa/dsa_free.obj \
 ltc/pk/dsa/dsa_generate_key.obj ltc/pk/dsa/dsa_generate_pqg.obj ltc/pk/dsa/dsa_import.obj \
 ltc/pk/dsa/dsa_make_key.obj ltc/pk/dsa/dsa_set.obj ltc/pk/dsa/dsa_set_pqg_dsaparam.obj \

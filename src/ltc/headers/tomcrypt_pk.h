@@ -199,48 +199,49 @@ int katja_import(const unsigned char *in, unsigned long inlen, katja_key *key);
 /* ---- DH Routines ---- */
 #ifdef LTC_MDH
 
-typedef struct Dh_key {
-    int idx, type;
+typedef struct {
+  int size;
+  char *name, *base, *prime;
+} ltc_dh_set_type;
+
+extern const ltc_dh_set_type ltc_dh_sets[];
+
+typedef struct {
+    int type;
     void *x;
     void *y;
     void *base;
     void *prime;
 } dh_key;
 
-int dh_compat_test(void);
-void dh_sizes(int *low, int *high);
-int dh_get_size(dh_key *key);
-
-int dh_make_key_internal(prng_state *prng, int wprng, dh_key *key); /* for internal use only */
-int dh_make_key_ex(prng_state *prng, int wprng, const char *base_hex, const char *prime_hex, dh_key *key);
-int dh_make_key(prng_state *prng, int wprng, int keysize, dh_key *key);
-void dh_free(dh_key *key);
+int dh_get_groupsize(dh_key *key);
 
 int dh_export(unsigned char *out, unsigned long *outlen, int type, dh_key *key);
 int dh_import(const unsigned char *in, unsigned long inlen, dh_key *key);
-int dh_import_raw(unsigned char *in, unsigned long inlen, int type,
-                  const char *base_hex, const char *prime_hex, dh_key *key);
+
+int dh_set_pg(const unsigned char *p, unsigned long plen,
+              const unsigned char *g, unsigned long glen,
+              dh_key *key);
+int dh_set_pg_dhparam(const unsigned char *dhparam, unsigned long dhparamlen, dh_key *key);
+int dh_set_pg_groupsize(int groupsize, dh_key *key);
+
+int dh_set_key(const unsigned char *pub, unsigned long publen,
+               const unsigned char *priv, unsigned long privlen,
+               dh_key *key);
+int dh_generate_key(prng_state *prng, int wprng, dh_key *key);
 
 int dh_shared_secret(dh_key        *private_key, dh_key        *public_key,
                      unsigned char *out,         unsigned long *outlen);
 
-int dh_encrypt_key(const unsigned char *in,    unsigned long  keylen,
-                         unsigned char *out,   unsigned long *outlen,
-                         prng_state    *prng,  int wprng, int hash,
-                         dh_key        *key);
+void dh_free(dh_key *key);
 
-int dh_decrypt_key(const unsigned char *in,  unsigned long  inlen,
-                         unsigned char *out, unsigned long *outlen,
-                         dh_key *key);
+int dh_export_key(void *out, unsigned long *outlen,
+                  int type, dh_key *key);
 
-int dh_sign_hash(const unsigned char *in,   unsigned long inlen,
-                       unsigned char *out,  unsigned long *outlen,
-                       prng_state    *prng, int wprng, dh_key *key);
-
-int dh_verify_hash(const unsigned char *sig,  unsigned long siglen,
-                   const unsigned char *hash, unsigned long hashlen,
-                   int *stat, dh_key *key);
-
+#ifdef LTC_SOURCE
+/* internal helper functions */
+int dh_check_pubkey(dh_key *key);
+#endif
 
 #endif /* LTC_MDH */
 
