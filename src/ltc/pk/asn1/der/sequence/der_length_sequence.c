@@ -25,7 +25,7 @@
 int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
                         unsigned long *outlen)
 {
-  return der_length_sequence_ex(list, inlen, outlen, NULL);
+   return der_length_sequence_ex(list, inlen, outlen, NULL);
 }
 
 int der_length_sequence_ex(ltc_asn1_list *list, unsigned long inlen,
