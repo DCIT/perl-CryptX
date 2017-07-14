@@ -12,7 +12,8 @@ our @EXPORT = qw();
 use Carp;
 use CryptX;
 use Crypt::Digest 'digest_data';
-use Crypt::Misc qw(read_rawfile);
+use Crypt::Misc qw(read_rawfile pem_to_der);
+use Scalar::Util 'looks_like_number';
 
 my %DH_PARAMS = (
   ike768  => { g => 2, p => 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'.
@@ -215,26 +216,31 @@ sub import_key_raw {
     croak "FATAL: invalid key type '$type'";
   }
   my $rv = $self->_import_raw($raw_bytes, $type, $g, $p);
-  croak "FATAL: invalid public key" unless $self->_is_pubkey_valid;
   return $rv;
 }
 
 sub generate_key {
-  my ($key,$param) = @_;
+  my ($self, $param) = @_;
 
   if (!ref $param) {
-    if (my $dhparam = $DH_PARAMS{$param}) {
-      $param = $dhparam;
-    } else {
-      croak "FATAL: invalid key length" unless ($param >= 96 || $param <= 512);
-      return $key->_generate_key($param);
-    }
+    # group name
+    return $self->_generate_key_gp($DH_PARAMS{$param}{g}, $DH_PARAMS{$param}{p}) if $DH_PARAMS{$param};
+    # size
+    return $self->_generate_key_size($param) if looks_like_number($param);
   }
-  my $g = $param->{g} or croak "FATAL: 'g' param not specified";
-  my $p = $param->{p} or croak "FATAL: 'p' param not specified";
-  $g =~ s/^0x//;
-  $p =~ s/^0x//;
-  return $key->_generate_key_ex($g, $p);
+  elsif (ref $param eq 'SCALAR') {
+    my $data = $$param;
+    $data = pem_to_der($data) if $data =~ /-----BEGIN DH PARAMETERS-----\s*(.+)\s*-----END DH PARAMETERS-----/s;
+    return $self->_generate_key_dhparam($data);
+  }
+  elsif (ref $param eq 'HASH') {
+    my $g = $param->{g} or croak "FATAL: 'g' param not specified";
+    my $p = $param->{p} or croak "FATAL: 'p' param not specified";
+    $g =~ s/^0x//;
+    $p =~ s/^0x//;
+    return $self->_generate_key_gp($g, $p);
+  }
+  croak "FATAL: DH generate_key - invalid args";
 }
 
 ### FUNCTIONS
@@ -335,20 +341,24 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 The following variants are available since CryptX-0.032
 
- $pk->generate_key($name)
- ### $name corresponds to values defined in RFC7296 and RFC3526
- # ike768  =>  768-bit MODP (Group 1)
- # ike1024 => 1024-bit MODP (Group 2)
- # ike1536 => 1536-bit MODP (Group 5)
- # ike2048 => 2048-bit MODP (Group 14)
- # ike3072 => 3072-bit MODP (Group 15)
- # ike4096 => 4096-bit MODP (Group 16)
- # ike6144 => 6144-bit MODP (Group 17)
- # ike8192 => 8192-bit MODP (Group 18)
+ $pk->generate_key($groupname)
+ ### $groupname corresponds to values defined in RFC7296 and RFC3526
+ # 'ike768'  =>  768-bit MODP (Group 1)
+ # 'ike1024' => 1024-bit MODP (Group 2)
+ # 'ike1536' => 1536-bit MODP (Group 5)
+ # 'ike2048' => 2048-bit MODP (Group 14)
+ # 'ike3072' => 3072-bit MODP (Group 15)
+ # 'ike4096' => 4096-bit MODP (Group 16)
+ # 'ike6144' => 6144-bit MODP (Group 17)
+ # 'ike8192' => 8192-bit MODP (Group 18)
 
  $pk->generate_key($param_hash)
- ## $param_hash is { g => $g, p => $p }
- ## where $g is the generator (base) in a hex string and $p is the prime in a hex string
+ # $param_hash is { g => $g, p => $p }
+ # where $g is the generator (base) in a hex string and $p is the prime in a hex string
+ 
+ $pk->generate_key(\$dh_param)
+ # $dh_param is the content of DER or PEM file with DH params
+ # e.g. openssl dhparam 2048
 
 =head2 import_key
 

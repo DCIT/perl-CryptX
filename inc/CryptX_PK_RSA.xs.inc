@@ -44,7 +44,25 @@ _import(Crypt::PK::RSA self, SV * key_data)
     }
 
 void
-_import_pkcs8(Crypt::PK::RSA self, SV * key_data)
+_import_pkcs8(Crypt::PK::RSA self, SV * key_data, SV * passwd)
+    PPCODE:
+    {
+        int rv;
+        unsigned char *data=NULL, *pwd=NULL;
+        STRLEN data_len=0, pwd_len=0;
+
+        data = (unsigned char *)SvPVbyte(key_data, data_len);
+        if (SvOK(passwd)) {
+          pwd = (unsigned char *)SvPVbyte(passwd, pwd_len);
+        }
+        if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
+        rv = rsa_import_pkcs8(data, (unsigned long)data_len, pwd, pwd_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: rsa_import_pkcs8 failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
+    }
+
+void
+_import_x509(Crypt::PK::RSA self, SV * key_data)
     PPCODE:
     {
         int rv;
@@ -53,8 +71,8 @@ _import_pkcs8(Crypt::PK::RSA self, SV * key_data)
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
-        rv = rsa_import_pkcs8(data, (unsigned long)data_len, NULL, 0, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: rsa_import_pkcs8 failed: %s", error_to_string(rv));
+        rv = rsa_import_x509(data, (unsigned long)data_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: rsa_import_x509 failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -248,7 +266,7 @@ export_key_der(Crypt::PK::RSA self, char * type)
     {
         int rv;
         unsigned char out[4096];
-        unsigned long int out_len = 4096;
+        unsigned long out_len = 4096;
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(type, "private", 7)) {
@@ -457,4 +475,3 @@ DESTROY(Crypt::PK::RSA self)
     CODE:
         if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
         Safefree(self);
-

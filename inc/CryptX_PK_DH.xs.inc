@@ -17,7 +17,7 @@ _new()
         RETVAL
 
 void
-_generate_key(Crypt::PK::DH self, int groupsize=256)
+_generate_key_size(Crypt::PK::DH self, int groupsize=256)
     PPCODE:
     {
         int rv;
@@ -29,7 +29,7 @@ _generate_key(Crypt::PK::DH self, int groupsize=256)
     }
 
 void
-_generate_key_ex(Crypt::PK::DH self, char *g, char *p)
+_generate_key_gp(Crypt::PK::DH self, char *g, char *p)
     PPCODE:
     {
         int rv;
@@ -41,13 +41,30 @@ _generate_key_ex(Crypt::PK::DH self, char *g, char *p)
           if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(p) failed: %s", error_to_string(rv));
           rv = radix_to_bin(g, 16, gbin, &glen);
           if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(g) failed: %s", error_to_string(rv));
-          
+
           rv = dh_set_pg(pbin, plen, gbin, glen, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: dh_set_pg failed: %s", error_to_string(rv));
           rv = dh_generate_key(&self->pstate, self->pindex, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: dh_generate_key failed: %s", error_to_string(rv));
         }
 
+        XPUSHs(ST(0)); /* return self */
+    }
+
+void
+_generate_key_dhparam(Crypt::PK::DH self, SV * dhparam)
+    PPCODE:
+    {
+        int rv;
+        unsigned char *data=NULL;
+        STRLEN data_len=0;
+        data = (unsigned char *)SvPVbyte(dhparam, data_len);
+        /* load d p q */
+        rv = dh_set_pg_dhparam(data, data_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: dh_set_pg_dhparam failed: %s", error_to_string(rv));
+        /* gen the key */
+        rv = dh_generate_key(&self->pstate, self->pindex, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: dh_generate_key failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -73,30 +90,29 @@ _import_raw(Crypt::PK::DH self, SV * raw_key, int type, char * g, char * p)
         int rv;
         unsigned char *data=NULL;
         STRLEN data_len=0;
+        unsigned char pbin[1024], gbin[512];
+        unsigned long plen=sizeof(pbin), glen=sizeof(gbin);
 
         data = (unsigned char *)SvPVbyte(raw_key, data_len);
         if (self->key.type != -1) { dh_free(&self->key); self->key.type = -1; }
-
-        unsigned char pbin[1024], gbin[512];
-        unsigned long plen=sizeof(pbin), glen=sizeof(gbin);
 
         if (p && strlen(p) > 0 && g && strlen(g) > 0) {
           rv = radix_to_bin(p, 16, pbin, &plen);
           if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(p) failed: %s", error_to_string(rv));
           rv = radix_to_bin(g, 16, gbin, &glen);
           if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(g) failed: %s", error_to_string(rv));
-          
+
           rv = dh_set_pg(pbin, plen, gbin, glen, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: dh_set_pg failed: %s", error_to_string(rv));
 
           if (type == 0) {
             /* public */
-            rv = dh_set_key(data, (unsigned long)data_len, NULL, 0, &self->key);
+            rv = dh_set_key(data, (unsigned long)data_len, PK_PUBLIC, &self->key);
             if (rv != CRYPT_OK) croak("FATAL: dh_set_key failed: %s", error_to_string(rv));
           }
           else if (type == 1) {
             /* private */
-            rv = dh_set_key(NULL, 0, data, (unsigned long)data_len, &self->key);
+            rv = dh_set_key(data, (unsigned long)data_len, PK_PRIVATE, &self->key);
             if (rv != CRYPT_OK) croak("FATAL: dh_set_key failed: %s", error_to_string(rv));
           }
           else {
@@ -258,97 +274,6 @@ export_key(Crypt::PK::DH self, char * type)
         RETVAL
 
 SV *
-_encrypt(Crypt::PK::DH self, SV * data, char * hash_name)
-    CODE:
-    {
-        /* XXXXXXXXXXXXXXXXXXXXX
-        int rv, hash_id;
-        unsigned char *data_ptr=NULL;
-        STRLEN data_len=0;
-        unsigned long buffer_len = 1024;
-        unsigned char buffer[1024];
-
-        data_ptr = (unsigned char *)SvPVbyte(data, data_len);
-
-        hash_id = find_hash(hash_name);
-        if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
-        rv = dh_encrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
-                             &self->pstate, self->pindex,
-                             hash_id, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: dh_encrypt_key failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn((char*)buffer, buffer_len);
-        */
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-_decrypt(Crypt::PK::DH self, SV * data)
-    CODE:
-    {
-        /* XXXXXXXXXXXXXXXXXXXXX
-        int rv;
-        unsigned char *data_ptr=NULL;
-        STRLEN data_len=0;
-        unsigned long buffer_len = 1024;
-        unsigned char buffer[1024];
-
-        data_ptr = (unsigned char *)SvPVbyte(data, data_len);
-
-        rv = dh_decrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: dh_decrypt_key failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn((char*)buffer, buffer_len);
-        */
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-_sign(Crypt::PK::DH self, SV * data)
-    CODE:
-    {
-        /* XXXXXXXXXXXXXXXXXXXXX
-        int rv;
-        unsigned char *data_ptr=NULL;
-        STRLEN data_len=0;
-        unsigned long buffer_len = 1024;
-        unsigned char buffer[1024];
-
-        data_ptr = (unsigned char *)SvPVbyte(data, data_len);
-
-        rv = dh_sign_hash(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
-                           &self->pstate, self->pindex,
-                           &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: dh_sign_hash failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn((char*)buffer, buffer_len);
-        */
-    }
-    OUTPUT:
-        RETVAL
-
-int
-_verify(Crypt::PK::DH self, SV * sig, SV * data)
-    CODE:
-    {
-        /* XXXXXXXXXXXXXXXXXXXXX
-        int rv, stat;
-        unsigned char *data_ptr=NULL;
-        STRLEN data_len=0;
-        unsigned char *sig_ptr=NULL;
-        STRLEN sig_len=0;
-
-        data_ptr = (unsigned char *)SvPVbyte(data, data_len);
-        sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
-
-        RETVAL = 1;
-        rv = dh_verify_hash(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
-        if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
-        */
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
 shared_secret(Crypt::PK::DH self, Crypt::PK::DH pubkey)
     CODE:
     {
@@ -368,79 +293,23 @@ export_key_raw(Crypt::PK::DH self, char * type)
     CODE:
     {
         int rv;
-        unsigned long len, buffer_len = 1024;
-        unsigned char buffer[1024];
-	void *key;
+        unsigned char out[1024];
+        unsigned long out_len = 1024;
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(type, "private", 7)) {
-		key = self->key.x;
+          rv = dh_export_key(out, &out_len, PK_PRIVATE, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: dh_export_key(PK_PRIVATE) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "public", 6)) {
-		key = self->key.y;
+          rv = dh_export_key(out, &out_len, PK_PUBLIC, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: dh_export_key(PK_PUBLIC) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
         }
         else {
           croak("FATAL: export_key_raw: invalid type '%s'", type);
         }
-
-        len = (unsigned long)mp_unsigned_bin_size(key);
-        if (buffer_len < len) {
-            croak("FATAL: %s", error_to_string(CRYPT_BUFFER_OVERFLOW));
-        }
-        rv = mp_to_unsigned_bin(key, buffer);
-        if (rv != CRYPT_OK) croak("FATAL: %s", error_to_string(rv));
-        RETVAL = newSVpvn((char*)buffer, len);
-    }
-    OUTPUT:
-        RETVAL
-
-int
-_is_pubkey_valid(Crypt::PK::DH self);
-    CODE:
-    {
-        int rv, i, bits_set = 0;
-        mp_int one, two, p1, *y;
-        mp_digit digit;
-
-        if ((rv = mp_init_multi(&one, &two, &p1, NULL)) != MP_OKAY) {
-            croak("FATAL: %s", error_to_string(rv));
-        }
-
-        y = self->key.y;
-        mp_set(&one, 1);
-        mp_set(&two, 2);
-
-	/* p1 = p-1 */
-        if ((rv = mp_sub(self->key.prime, &one, &p1)) != MP_OKAY) {
-            croak("FATAL: %s", error_to_string(rv));
-        }
-	/* valid public key cannot be negative */
-        if (y->sign == MP_NEG) {
-            RETVAL = 0;
-        }
-	/* valid public key != 1 */
-        else if (mp_cmp(y, &one) == MP_EQ) {
-            RETVAL = 0;
-        }
-	/* public key cannot be > p-1 */
-        else if (mp_cmp(y, &p1) == MP_GT) {
-            RETVAL = 0;
-        }
-	/* if base == 2, public must have more than one bit set */
-        else if (mp_cmp(self->key.base, &two) == MP_EQ) {
-            for (i = 0; i < y->used; i++) {
-                digit = y->dp[i];
-                while (digit > ((mp_digit) 0)) {
-                    if (digit & ((mp_digit) 1))
-                        bits_set++;
-                    digit >>= ((mp_digit) 1);
-                }
-            }
-            if (bits_set > 1)
-                RETVAL = 1;
-            else RETVAL = 0;
-        }
-        else RETVAL = 1;
     }
     OUTPUT:
         RETVAL
@@ -450,4 +319,3 @@ DESTROY(Crypt::PK::DH self)
     CODE:
         if (self->key.type != -1) { dh_free(&self->key); self->key.type = -1; }
         Safefree(self);
-

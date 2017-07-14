@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 45;
+use Test::More tests => 49;
 
 use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_message rsa_sign_hash rsa_verify_hash);
 
@@ -56,6 +56,14 @@ use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_messag
   $k = Crypt::PK::RSA->new('t/data/openssl_rsa2.pem');
   ok($k, 'load openssl_rsa2.pem');
   ok($k->is_private, 'is_private openssl_rsa2.pem');
+
+  # X509  
+  $k = Crypt::PK::RSA->new('t/data/openssl_rsa-x509.pem');
+  ok($k, 'openssl_rsa-x509.pem');
+  ok(!$k->is_private, 'not private openssl_rsa-x509.pem');
+  $k = Crypt::PK::RSA->new('t/data/openssl_rsa-x509.der');
+  ok($k, 'openssl_rsa-x509.der');
+  ok(!$k->is_private, 'not private openssl_rsa-x509.der');
 }
 
 {

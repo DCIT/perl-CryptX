@@ -17,13 +17,49 @@ _new()
         RETVAL
 
 void
-generate_key(Crypt::PK::DSA self, int group_size=30, int modulus_size=256)
+_generate_key_size(Crypt::PK::DSA self, int group_size=30, int modulus_size=256)
     PPCODE:
     {
         int rv;
         /* gen the key */
         rv = dsa_make_key(&self->pstate, self->pindex, group_size, modulus_size, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dsa_make_key failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
+    }
+
+void
+_generate_key_dsaparam(Crypt::PK::DSA self, SV * dsaparam)
+    PPCODE:
+    {
+        int rv;
+        unsigned char *data=NULL;
+        STRLEN data_len=0;
+        data = (unsigned char *)SvPVbyte(dsaparam, data_len);
+        /* load d p q */
+        rv = dsa_set_pqg_dsaparam(data, data_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: dsa_set_pqg_dsaparam failed: %s", error_to_string(rv));
+        /* gen the key */
+        rv = dsa_generate_key(&self->pstate, self->pindex, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: dsa_generate_key failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
+    }
+
+void
+_generate_key_pqg(Crypt::PK::DSA self, SV * psv, SV * qsv, SV * gsv)
+    PPCODE:
+    {
+        int rv;
+        unsigned char *p=NULL, *q=NULL, *g=NULL;
+        STRLEN plen=0, qlen=0, glen=0;
+        p = (unsigned char *)SvPVbyte(psv, plen);
+        q = (unsigned char *)SvPVbyte(qsv, qlen);
+        g = (unsigned char *)SvPVbyte(gsv, glen);
+        /* set p q g */
+        rv = dsa_set_pqg(p, plen, q, qlen, g, glen, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: dsa_set_pqg failed: %s", error_to_string(rv));
+        /* gen the key */
+        rv = dsa_generate_key(&self->pstate, self->pindex, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: dsa_generate_key failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -68,12 +104,12 @@ _import_hex(Crypt::PK::DSA self, char *p, char *q, char *g, char *x, char *y)
             /* private */
             rv = radix_to_bin(x, 16, xbin, &xlen);
             if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(x) failed: %s", error_to_string(rv));
-            rv = dsa_set_key(ybin, ylen, xbin, xlen, &self->key);
+            rv = dsa_set_key(xbin, xlen, PK_PRIVATE, &self->key);
             if (rv != CRYPT_OK) croak("FATAL: dsa_set_key failed: %s", error_to_string(rv));
           }
           else {
             /* public */
-            rv = dsa_set_key(ybin, ylen, NULL, 0, &self->key);
+            rv = dsa_set_key(ybin, ylen, PK_PUBLIC, &self->key);
             if (rv != CRYPT_OK) croak("FATAL: dsa_set_key failed: %s", error_to_string(rv));
           }
         }

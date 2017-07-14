@@ -125,7 +125,7 @@ sub import_key {
   elsif ($data =~ /-----BEGIN PRIVATE KEY-----(.*?)-----END/sg) {
     # PKCS#8 PrivateKeyInfo      (PEM header: BEGIN PRIVATE KEY)
     $data = pem_to_der($data, $password);
-    return $self->_import_pkcs8($data) if $data;
+    return $self->_import_pkcs8($data, $password) if $data;
   }
   elsif ($data =~ /-----BEGIN ENCRYPTED PRIVATE KEY-----(.*?)-----END/sg) {
     # XXX-TODO: PKCS#8 EncryptedPrivateKeyInfo (PEM header: BEGIN ENCRYPTED PRIVATE KEY)
@@ -142,6 +142,10 @@ sub import_key {
       return $self->_import_hex($h->{n}, $h->{e}, $h->{d}, $h->{p}, $h->{q}, $h->{dp}, $h->{dq}, $h->{qi}) if $h->{n} && $h->{e};
     }
   }
+  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.*?)-----END CERTIFICATE-----/sg) {
+    $data = pem_to_der($data);
+    return $self->_import_x509($data);
+  }
   elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
     $data = pem_to_der($data);
     my ($typ, $N, $e) = Crypt::PK::_ssh_parse($data);
@@ -154,7 +158,7 @@ sub import_key {
   }
   else {
     # DER format
-    my $rv = eval { $self->_import($data) } || eval { $self->_import_pkcs8($data) };
+    my $rv = eval { $self->_import($data) } || eval { $self->_import_pkcs8($data, $password) } || eval { $self->_import_x509($data) };
     return $rv if $rv;
   }
 
@@ -478,6 +482,27 @@ Supported key formats:
  A2ioXHOV/pr5zNHqE5tL+qKEcLYbAUF1O+WvmdqYz+vHQjRQBatAqTmncvLDYr/j
  1HPwZX2d
  -----END ENCRYPTED PRIVATE KEY-----
+
+=item * RSA public key from X509 certificate
+
+-----BEGIN CERTIFICATE-----
+MIIC8zCCAdugAwIBAgIJAPi+LvMU3uGWMA0GCSqGSIb3DQEBCwUAMBAxDjAMBgNV
+BAMMBXBva3VzMB4XDTE3MDcxNDE0MTAyMFoXDTIwMDQwOTE0MTAyMFowEDEOMAwG
+A1UEAwwFcG9rdXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDCQima
+SUIMIdz5uVevzcScbcj06xs1OLaFKUoPJ8v+xP6Ut61BQhAvc8GYuw2uRx223hZC
+r3HYLfSdWIfmOIAtlL8cPYPVoSivJtpSGE6fBG1tlBjVgXWRmJGR/oxx6Y5QDwcB
+Q4GZKga8TtHQoY5idZuatYOFZGfMIcIUC0Uoda+YSypnw7A90F/JvlpcTUh3Fnem
+VinqEA6XOegU9dCZk/29sXqauBjbdGihh8DvpklOhY16eQoiR3909AywQ0KUmI+R
+Sa9E8oIsmUDetFuXEvana+sD3y42tU+cd2nhBPRETbSXPcum0B3uF4yKgweuJy5D
+cvtVQIFVkkh4+AWNAgMBAAGjUDBOMB0GA1UdDgQWBBSS6V5PVGyN92NoB0AVLcOb
+pzR3SzAfBgNVHSMEGDAWgBSS6V5PVGyN92NoB0AVLcObpzR3SzAMBgNVHRMEBTAD
+AQH/MA0GCSqGSIb3DQEBCwUAA4IBAQBIszrBjoJ39axsS6Btbvwvo8vAmgiSWsav
+7AmjXOAwknHPaCcDmrdOys5POD0DNRwNeRsnxFiZ/UL8Vmj2JGDLgAw+/v32MwfX
+Ig7m+oIbO8KqDzlYvS5kd3suJ5C21hHy1/JUtfofZLovZH7ZRzhTAoRvCYaodW90
+2o8ZqmyCdcXPzjFmoJ2xYzs/Sf8/E1cHfb+4HjOpeRnKxDvG0gwWzcsXpUrw2pNO
+Oztj6Rd0THNrf/anIeYVtAHX4aqZA8Kbv2TyJd+9g78usFw1cn+8vfmilm6Pn0DQ
+a+I5GyGd7BJI8wYuWqIStzvrJHbQQaNrSk7hgjWYiYlcsPh6w2QP
+-----END CERTIFICATE-----
 
 =item * SSH public RSA keys
 

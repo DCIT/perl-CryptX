@@ -530,7 +530,7 @@ sub import_key {
   }
   elsif ($data =~ /-----BEGIN PRIVATE KEY-----(.*?)-----END/sg) {
     $data = pem_to_der($data, $password);
-    return $self->_import_pkcs8($data);
+    return $self->_import_pkcs8($data, $password);
   }
   elsif ($data =~ /-----BEGIN ENCRYPTED PRIVATE KEY-----(.*?)-----END/sg) {
     # XXX-TODO: pkcs#8 encrypted private key
@@ -562,7 +562,7 @@ sub import_key {
     return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
   }
   else {
-    my $rv = eval { $self->_import($data) } || eval { $self->_import_pkcs8($data) };
+    my $rv = eval { $self->_import($data) } || eval { $self->_import_pkcs8($data, $password) };
     return $rv if $rv;
   }
   croak "FATAL: invalid or unsupported EC key format";
