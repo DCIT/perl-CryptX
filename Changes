@@ -1,15 +1,16 @@
 Changes for CryptX
 
 TODO:
-        - add support for PKCS#8 encrypted RSA+ECC private keys  "-----BEGIN ENCRYPTED PRIVATE KEY-----"
-        - RSA|DSA|ECC: verify_key($level) (basic check + extented primality test)
-        - better primality testing: http://questhub.io/realm/perl/quest/519032ee1088c76505000035 (idea: mp_prime_lucas)
-        - DSA: generate_key($p, $q, $g), generate_key(\$dsa_params_der), generate_key($dsa_params_file)
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
-        - maybe: add CCM interface for new-add-add-done mode
-        - maybe: add encode_b32/decode_b32
+        - CCM interface - new-add-add-done mode
 
-0.048_* 2017/07/09
+0.048_* 2017/07/14
+        - libtomcrypt updated to 1.18 (+ some extra patches)
+        - REMOVED: Crypt::PK::DH encrypt decrypt sign_message verify_message sign_hash verify_hash
+        - NEW: Crypt::Misc - encode_b32*, decode_b32*, encode_b58*, decode_b58*
+        - Crypt::PK::RSA: import public key from X509 certificate
+        - Crypt::PK::DSA: improved generate_key()
+        - Crypt::PK::DH: improved generate_key()
         - fix #36 aad_add is obsolete for all EncAuth algs (correct is adata_add)
         - fix #37 GCM - Encryption of the empty string
 
