@@ -528,10 +528,231 @@ CryptX__increment_octets_be(SV * in)
     OUTPUT:
         RETVAL
 
+SV *
+CryptX__radix_to_bin(char *in, int radix)
+    CODE:
+    {
+        STRLEN len;
+        unsigned char *out_data;
+        mp_int mpi;
+
+        if (in == NULL || strlen(in) == 0)      XSRETURN_UNDEF;
+
+        if (mp_init(&mpi) != CRYPT_OK)          XSRETURN_UNDEF;
+
+        if (mp_read_radix(&mpi, in, radix) == CRYPT_OK) {
+          len = mp_unsigned_bin_size(&mpi);
+          RETVAL = NEWSV(0, len);
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, len);
+          out_data = (unsigned char *)SvPV_nolen(RETVAL);
+          mp_to_unsigned_bin(&mpi, out_data);
+          mp_clear(&mpi);
+        }
+        else {
+          XSRETURN_UNDEF;
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+CryptX__bin_to_radix(SV *in, int radix)
+    CODE:
+    {
+        STRLEN len;
+        unsigned char *out_data, *in_data;
+        mp_int mpi, tmp;
+        mp_digit d;
+        int digits = 0;
+
+        if (!SvPOK(in) || radix < 2 || radix > 64) XSRETURN_UNDEF;
+        in_data = (unsigned char *) SvPVbyte(in, len);
+        if (len == 0) XSRETURN_UNDEF;
+
+        mp_init(&mpi);
+        if (mp_read_unsigned_bin(&mpi, in_data, len) == CRYPT_OK) {
+          mp_init_copy(&tmp, &mpi);
+          while (mp_iszero(&tmp) == MP_NO) {
+            mp_div_d(&tmp, (mp_digit)radix, &tmp, &d);
+            digits++;
+          }
+          mp_clear(&tmp);
+
+          RETVAL = NEWSV(0, digits + 1);
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPV_nolen(RETVAL);
+          mp_toradix(&mpi, out_data, radix);
+          SvCUR_set(RETVAL, digits);
+          mp_clear(&mpi);
+        }
+        else {
+          XSRETURN_UNDEF;
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+CryptX__encode_b32(SV *bytes, unsigned idx)
+    CODE:
+    {
+        STRLEN inlen, outlen, i, leven;
+        unsigned char *out, *in, *codes;
+        char *alphabet[] = {
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",     /* rfc4648 */
+                "0123456789ABCDEFGHIJKLMNOPQRSTUV",     /* base32hex */
+                "ybndrfg8ejkmcpqxot1uwisza345h769",     /* zbase32 */
+                "0123456789ABCDEFGHJKMNPQRSTVWXYZ"      /* crockford */
+        };
+
+        if (!SvOK(bytes)) {
+          /* for undefined input return "" (empty string) */
+          RETVAL = newSVpv("", 0);
+        }
+        else {
+          if (!SvPOK(bytes) || idx > 3) XSRETURN_UNDEF;         /* error */
+          in = (unsigned char *) SvPVbyte(bytes, inlen);
+          if (in == NULL) XSRETURN_UNDEF;                       /* error */
+          if (inlen == 0) {
+            RETVAL = newSVpv("", 0);
+          }
+          else {
+            codes = (unsigned char*)alphabet[idx];
+            outlen = (8 * inlen + 4) / 5;
+            RETVAL = NEWSV(0, outlen);
+            SvPOK_only(RETVAL);
+            SvCUR_set(RETVAL, outlen);
+            out = (unsigned char *)SvPV_nolen(RETVAL);
+
+            leven = 5 * (inlen / 5);
+            for (i = 0; i < leven; i += 5) {
+              *out++ = codes[(in[0] >> 3) & 0x1F];
+              *out++ = codes[(((in[0] & 0x7) << 2) + (in[1] >> 6)) & 0x1F];
+              *out++ = codes[(in[1] >> 1) & 0x1F];
+              *out++ = codes[(((in[1] & 0x1) << 4) + (in[2] >> 4)) & 0x1F];
+              *out++ = codes[(((in[2] & 0xF) << 1) + (in[3] >> 7)) & 0x1F];
+              *out++ = codes[(in[3] >> 2) & 0x1F];
+              *out++ = codes[(((in[3] & 0x3) << 3) + (in[4] >> 5)) & 0x1F];
+              *out++ = codes[in[4] & 0x1F];
+              in += 5;
+            }
+            if (i < inlen) {
+              unsigned a = in[0];
+              unsigned b = (i+1 < inlen) ? in[1] : 0;
+              unsigned c = (i+2 < inlen) ? in[2] : 0;
+              unsigned d = (i+3 < inlen) ? in[3] : 0;
+              *out++ = codes[(a >> 3) & 0x1F];
+              *out++ = codes[(((a & 0x7) << 2) + (b >> 6)) & 0x1F];
+              if (i+1 < inlen) {
+                *out++ = codes[(b >> 1) & 0x1F];
+                *out++ = codes[(((b & 0x1) << 4) + (c >> 4)) & 0x1F];
+              }
+              if (i+2 < inlen) {
+                *out++ = codes[(((c & 0xF) << 1) + (d >> 7)) & 0x1F];
+                *out++ = codes[(d >> 2) & 0x1F];
+              }
+              if (i+3 < inlen) {
+                *out++ = codes[((d & 0x3) << 3) & 0x1F];
+              }
+            }
+          }
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+CryptX__decode_b32(SV *base32, unsigned idx)
+    CODE:
+    {
+        STRLEN x, inlen, outlen;
+        int y = 0, err = 0;
+        ulong64 t = 0;
+        unsigned char c, *in, *out, *map;
+        unsigned char tables[4][43] = {
+          {  /* rfc4648 ABCDEFGHIJKLMNOPQRSTUVWXYZ234567 */
+             99/*0*/,99/*1*/,26/*2*/,27/*3*/,28/*4*/,29/*5*/,30/*6*/,31/*7*/,99/*8*/,99/*9*/,
+             99/*:*/,99/*;*/,99/*<*/,99/*=*/,99/*>*/,99/*?*/,99/*@*/,
+              0/*A*/, 1/*B*/, 2/*C*/, 3/*D*/, 4/*E*/, 5/*F*/, 6/*G*/, 7/*H*/, 8/*I*/, 9/*J*/,10/*K*/,11/*L*/,12/*M*/,
+             13/*N*/,14/*O*/,15/*P*/,16/*Q*/,17/*R*/,18/*S*/,19/*T*/,20/*U*/,21/*V*/,22/*W*/,23/*X*/,24/*Y*/,25/*Z*/
+          },
+          {  /* base32hex 0123456789ABCDEFGHIJKLMNOPQRSTUV */
+              0/*0*/, 1/*1*/, 2/*2*/, 3/*3*/, 4/*4*/, 5/*5*/, 6/*6*/, 7/*7*/, 8/*8*/, 9/*9*/,
+              99/*:*/,99/*;*/,99/*<*/,99/*=*/,99/*>*/,99/*?*/,99/*@*/,
+              10/*A*/,11/*B*/,12/*C*/,13/*D*/,14/*E*/,15/*F*/,16/*G*/,17/*H*/,18/*I*/,19/*J*/,20/*K*/,21/*L*/,22/*M*/,
+              23/*N*/,24/*O*/,25/*P*/,26/*Q*/,27/*R*/,28/*S*/,29/*T*/,30/*U*/,31/*V*/,99/*W*/,99/*X*/,99/*Y*/,99/*Z*/
+          },
+          {  /* zbase32 YBNDRFG8EJKMCPQXOT1UWISZA345H769 */
+             99/*0*/,18/*1*/,99/*2*/,25/*3*/,26/*4*/,27/*5*/,30/*6*/,29/*7*/, 7/*8*/,31/*9*/,
+             99/*:*/,99/*;*/,99/*<*/,99/*=*/,99/*>*/,99/*?*/,99/*@*/,
+             24/*A*/, 1/*B*/,12/*C*/, 3/*D*/, 8/*E*/, 5/*F*/, 6/*G*/,28/*H*/,21/*I*/, 9/*J*/,10/*K*/,99/*L*/,11/*M*/,
+              2/*N*/,16/*O*/,13/*P*/,14/*Q*/, 4/*R*/,22/*S*/,17/*T*/,19/*U*/,99/*V*/,20/*W*/,15/*X*/, 0/*Y*/,23/*Z*/
+          },
+          {  /* crockford 0123456789ABCDEFGHJKMNPQRSTVWXYZ + O=>0 + IL=>1 */
+              0/*0*/, 1/*1*/, 2/*2*/, 3/*3*/, 4/*4*/, 5/*5*/, 6/*6*/, 7/*7*/, 8/*8*/, 9/*9*/,
+             99/*:*/,99/*;*/,99/*<*/,99/*=*/,99/*>*/,99/*?*/,99/*@*/,
+             10/*A*/,11/*B*/,12/*C*/,13/*D*/,14/*E*/,15/*F*/,16/*G*/,17/*H*/, 1/*I*/,18/*J*/,19/*K*/, 1/*L*/,20/*M*/,
+             21/*N*/, 0/*O*/,22/*P*/,23/*Q*/,24/*R*/,25/*S*/,26/*T*/,99/*U*/,27/*V*/,28/*W*/,29/*X*/,30/*Y*/,31/*Z*/
+          }
+        };
+
+        if (!SvOK(base32)) {
+          /* for undefined input return "" (empty string) */
+          RETVAL = newSVpv("", 0);
+        }
+        else {
+          if (!SvPOK(base32) || idx > 3) XSRETURN_UNDEF;                /* error */
+          in = (unsigned char *) SvPVbyte(base32, inlen);
+          if (in == NULL) XSRETURN_UNDEF;                               /* error */
+
+          while (inlen>0 && in[inlen-1] == '=') inlen--;
+          if (inlen == 0) {
+            RETVAL = newSVpv("", 0);
+          }
+          else {
+            x = inlen % 8;
+            if (x == 1 || x == 3 || x == 6) XSRETURN_UNDEF;             /* error */
+            outlen = (inlen * 5) / 8;
+            RETVAL = NEWSV(0, outlen);
+            SvPOK_only(RETVAL);
+            SvCUR_set(RETVAL, outlen);
+            out = (unsigned char *)SvPV_nolen(RETVAL);
+            map = tables[idx];
+            for (x = 0; x < inlen; x++) {
+              c = in[x];
+              /* convert to upper case */
+              if ((c >= 'a') && (c <= 'z')) c -= 32;
+              /* '0' = 48 .. 'Z' = 90 */
+              if (c < 48 || c > 90 || map[c-48] > 31) XSRETURN_UNDEF;   /* error */
+              t = (t<<5)|map[c-48];
+              if (++y == 8) {
+                *out++ = (unsigned char)((t>>32) & 255);
+                *out++ = (unsigned char)((t>>24) & 255);
+                *out++ = (unsigned char)((t>>16) & 255);
+                *out++ = (unsigned char)((t>> 8) & 255);
+                *out++ = (unsigned char)( t      & 255);
+                y = 0;
+                t = 0;
+              }
+            }
+            if (y > 0) {
+              t = t << (5 * (8 - y));
+              if (y >= 2) *out++ = (unsigned char)((t>>32) & 255);
+              if (y >= 4) *out++ = (unsigned char)((t>>24) & 255);
+              if (y >= 5) *out++ = (unsigned char)((t>>16) & 255);
+              if (y >= 7) *out++ = (unsigned char)((t>> 8) & 255);
+            }
+          }
+        }
+    }
+    OUTPUT:
+        RETVAL
+
 ###############################################################################
 
 INCLUDE: inc/CryptX_Digest.xs.inc
-INCLUDE: inc/CryptX_Digest_SHAKE.xs.inc 
+INCLUDE: inc/CryptX_Digest_SHAKE.xs.inc
 INCLUDE: inc/CryptX_Cipher.xs.inc
 
 INCLUDE: inc/CryptX_Checksum_Adler32.xs.inc
