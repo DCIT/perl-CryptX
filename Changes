@@ -2,10 +2,10 @@ Changes for CryptX
 
 TODO:
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
-        - CCM interface - new-add-add-done mode
+        - CCM interface new-add-add-done
 
-0.048_* 2017/07/14
-        - libtomcrypt updated to 1.18 (+ some extra patches)
+0.049   2017/07/18
+        - libtomcrypt updated to 1.18-rc2 (+ some extra patches)
         - REMOVED: Crypt::PK::DH encrypt decrypt sign_message verify_message sign_hash verify_hash
         - NEW: Crypt::Misc - encode_b32*, decode_b32*, encode_b58*, decode_b58*
         - Crypt::PK::RSA: import public key from X509 certificate
