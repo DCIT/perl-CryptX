@@ -11,10 +11,19 @@ my @myobjs = map { s|.c$|$Config{obj_ext}|; $_ } grep { $_ !~ m|^src/ltc/\.*tab\
     glob('src/ltc/*/*/*/*/*.c'),
 );
 my $myextlib = "src/liballinone$Config{lib_ext}";
-my $mycflags = "$Config{cccdlflags} $Config{ccflags} $Config{optimize} -Iltm -Iltc/headers -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC";
+my $mycflags = "$Config{ccflags}";
+#my $mycflags = "$Config{cccdlflags} $Config{ccflags} $Config{optimize}";
 
 #FIX: gcc with -flto is a trouble maker see https://github.com/DCIT/perl-CryptX/issues/32
 $mycflags =~ s/-flto\b//g;
+
+#FIX: avoid -Wwrite-strings -Wcast-qual -pedantic -pedantic-errors -ansi -std=c89
+$mycflags =~ s/-pedantic\b//g;
+$mycflags =~ s/-pedantic-errors\b//g;
+$mycflags =~ s/-std=c89\b//g;
+$mycflags =~ s/-ansi\b//g;
+$mycflags =~ s/-Wwrite-strings\b//g;
+$mycflags =~ s/-Wcast-qual\b//g;
 
 #FIX: avoid "ar: fatal: Numeric group ID too large" see https://github.com/DCIT/perl-CryptX/issues/33
 my $myarflags = '$(AR_STATIC_ARGS)';
