@@ -11,8 +11,7 @@ my @myobjs = map { s|.c$|$Config{obj_ext}|; $_ } grep { $_ !~ m|^src/ltc/\.*tab\
     glob('src/ltc/*/*/*/*/*.c'),
 );
 my $myextlib = "src/liballinone$Config{lib_ext}";
-my $mycflags = "$Config{ccflags}";
-#my $mycflags = "$Config{cccdlflags} $Config{ccflags} $Config{optimize}";
+my $mycflags = "$Config{ccflags} $Config{cccdlflags} $Config{optimize}";
 
 #FIX: gcc with -flto is a trouble maker see https://github.com/DCIT/perl-CryptX/issues/32
 $mycflags =~ s/-flto\b//g;

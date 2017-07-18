@@ -167,5 +167,5 @@ clean:
 	$(RM_F) $(OBJS) liballinone.lib
 
 .c.obj:
-        cl $(CFLAGS) /Iltm /Iltc/headers /DLTC_SOURCE /DLTC_NO_TEST /DLTC_NO_PROTOTYPES /DLTM_DESC /c $< /Fo$@
+        cl /Iltm /Iltc/headers /DLTC_SOURCE /DLTC_NO_TEST /DLTC_NO_PROTOTYPES /DLTM_DESC $(CFLAGS) /c $< /Fo$@
  
