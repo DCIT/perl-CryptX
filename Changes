@@ -4,6 +4,9 @@ TODO:
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - CCM interface new-add-add-done
 
+0.050   2017/07/18
+        - fix cpantesters failures/warnings
+
 0.049   2017/07/18
         - libtomcrypt updated to 1.18-rc2 (+ some extra patches)
         - REMOVED: Crypt::PK::DH encrypt decrypt sign_message verify_message sign_hash verify_hash
