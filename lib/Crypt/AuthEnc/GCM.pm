@@ -2,7 +2,7 @@ package Crypt::AuthEnc::GCM;
 
 use strict;
 use warnings;
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 
 use base qw(Crypt::AuthEnc Exporter);
 our %EXPORT_TAGS = ( all => [qw( gcm_encrypt_authenticate gcm_decrypt_verify )] );

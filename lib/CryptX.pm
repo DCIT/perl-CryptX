@@ -2,7 +2,7 @@ package CryptX;
 
 use strict;
 use warnings ;
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 
 use base qw(Exporter);
 our @EXPORT_OK = qw( _decode_json _encode_json);
