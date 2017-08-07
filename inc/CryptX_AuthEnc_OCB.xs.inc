@@ -1,7 +1,7 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::OCB
 
 Crypt::AuthEnc::OCB
-_new(char * cipher_name, SV * key, SV * nonce)
+_new(char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
     CODE:
     {
         STRLEN k_len=0;
@@ -21,7 +21,7 @@ _new(char * cipher_name, SV * key, SV * nonce)
         Newz(0, RETVAL, 1, struct ocb_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        if (ocb3_init(&RETVAL->state, id, k, (unsigned long)k_len, n, (unsigned long)n_len) != CRYPT_OK) {
+        if (ocb3_init(&RETVAL->state, id, k, (unsigned long)k_len, n, (unsigned long)n_len, taglen) != CRYPT_OK) {
           croak("FATAL: ocb setup failed");
         }
     }

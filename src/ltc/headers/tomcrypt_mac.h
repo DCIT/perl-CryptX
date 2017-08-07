@@ -266,12 +266,14 @@ typedef struct {
    symmetric_key     key;                     /* scheduled key for cipher */
    unsigned long     block_index;             /* index # for current data block */
    int               cipher,                  /* cipher idx */
+                     tag_len,                 /* length of tag */
                      block_len;               /* length of block */
 } ocb3_state;
 
 int ocb3_init(ocb3_state *ocb, int cipher,
              const unsigned char *key, unsigned long keylen,
-             const unsigned char *nonce, unsigned long noncelen);
+             const unsigned char *nonce, unsigned long noncelen,
+             unsigned long taglen);
 
 int ocb3_encrypt(ocb3_state *ocb, const unsigned char *pt, unsigned long ptlen, unsigned char *ct);
 int ocb3_decrypt(ocb3_state *ocb, const unsigned char *ct, unsigned long ctlen, unsigned char *pt);
@@ -301,8 +303,6 @@ int ocb3_test(void);
 
 #ifdef LTC_SOURCE
 /* internal helper functions */
-int ocb3_int_aad_add_block(ocb3_state *ocb, const unsigned char *aad_block);
-void ocb3_int_calc_offset_zero(ocb3_state *ocb, const unsigned char *nonce, unsigned long noncelen);
 int ocb3_int_ntz(unsigned long x);
 void ocb3_int_xor_blocks(unsigned char *out, const unsigned char *block_a, const unsigned char *block_b, unsigned long block_len);
 #endif /* LTC_SOURCE */

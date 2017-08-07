@@ -19,9 +19,10 @@ sub ocb_encrypt_authenticate {
   my $key = shift;
   my $nonce = shift;
   my $adata = shift;
+  my $tag_len = shift;
   my $plaintext = shift;
 
-  my $m = Crypt::AuthEnc::OCB->new($cipher_name, $key, $nonce);
+  my $m = Crypt::AuthEnc::OCB->new($cipher_name, $key, $nonce, $tag_len);
   $m->adata_add($adata) if defined $adata;
   my $ct = $m->encrypt_last($plaintext);
   my $tag = $m->encrypt_done;
@@ -36,7 +37,7 @@ sub ocb_decrypt_verify {
   my $ciphertext = shift;
   my $tag = shift;
 
-  my $m = Crypt::AuthEnc::OCB->new($cipher_name, $key, $nonce);
+  my $m = Crypt::AuthEnc::OCB->new($cipher_name, $key, $nonce, length($tag));
   $m->adata_add($adata) if defined $adata;
   my $ct = $m->decrypt_last($ciphertext);
   return $m->decrypt_done($tag) ? $ct : undef;
@@ -59,7 +60,7 @@ Crypt::AuthEnc::OCB - Authenticated encryption in OCBv3 mode
  use Crypt::AuthEnc::OCB;
 
  # encrypt and authenticate
- my $ae = Crypt::AuthEnc::OCB->new("AES", $key, $nonce);
+ my $ae = Crypt::AuthEnc::OCB->new("AES", $key, $nonce, $tag_len);
  $ae->adata_add('additional_authenticated_data1');
  $ae->adata_add('additional_authenticated_data2');
  $ct = $ae->encrypt_add('data1');
@@ -69,7 +70,7 @@ Crypt::AuthEnc::OCB - Authenticated encryption in OCBv3 mode
  ($ct,$tag) = $ae->encrypt_done();
 
  # decrypt and verify
- my $ae = Crypt::AuthEnc::OCB->new("AES", $key, $nonce);
+ my $ae = Crypt::AuthEnc::OCB->new("AES", $key, $nonce, $tag_len);
  $ae->adata_add('additional_authenticated_data1');
  $ae->adata_add('additional_authenticated_data2');
  $pt = $ae->decrypt_add('ciphertext1');
@@ -81,12 +82,12 @@ Crypt::AuthEnc::OCB - Authenticated encryption in OCBv3 mode
  ### functional interface
  use Crypt::AuthEnc::OCB qw(ocb_encrypt_authenticate ocb_decrypt_verify);
 
- my ($ciphertext, $tag) = ocb_encrypt_authenticate('AES', $key, $nonce, $adata, $plaintext);
+ my ($ciphertext, $tag) = ocb_encrypt_authenticate('AES', $key, $nonce, $adata, $tag_len, $plaintext);
  my $plaintext = ocb_decrypt_verify('AES', $key, $nonce, $adata, $ciphertext, $tag);
 
 =head1 DESCRIPTION
 
-This module implements OCB version 3 according http://datatracker.ietf.org/doc/draft-irtf-cfrg-ocb/
+This module implements OCB v3 according to L<https://tools.ietf.org/html/rfc7253>
 
 =head1 EXPORT
 
@@ -100,12 +101,13 @@ You can export selected functions:
 
 =head2 ocb_encrypt_authenticate
 
- my ($ciphertext, $tag) = ocb_encrypt_authenticate($cipher, $key, $nonce, $adata, $plaintext);
+ my ($ciphertext, $tag) = ocb_encrypt_authenticate($cipher, $key, $nonce, $adata, $tag_len, $plaintext);
 
  # $cipher .. 'AES' or name of any other cipher with 16-byte block len
  # $key ..... AES key of proper length (128/192/256bits)
  # $nonce ... unique nonce/salt (no need to keep it secret)
  # $adata ... additional authenticated data
+ # $tag_len . required length of output tag
 
 =head2 ocb_decrypt_verify
 
@@ -117,11 +119,12 @@ You can export selected functions:
 
 =head2 new
 
- my $ae = Crypt::AuthEnc::OCB->new($cipher, $key, $nonce);
+ my $ae = Crypt::AuthEnc::OCB->new($cipher, $key, $nonce, $tag_len);
 
  # $cipher .. 'AES' or name of any other cipher with 16-byte block len
  # $key ..... AES key of proper length (128/192/256bits)
  # $nonce ... unique nonce/salt (no need to keep it secret)
+ # $tag_len . required length of output tag
 
 =head2 adata_add
 
@@ -167,6 +170,8 @@ You can export selected functions:
 
 =item * L<CryptX|CryptX>, L<Crypt::AuthEnc::CCM|Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::GCM|Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::EAX|Crypt::AuthEnc::EAX>
 
-=item * L<https://en.wikipedia.org/wiki/OCB_mode|https://en.wikipedia.org/wiki/OCB_mode>
+=item * L<https://en.wikipedia.org/wiki/OCB_mode>
+
+=item * L<https://tools.ietf.org/html/rfc7253>
 
 =back

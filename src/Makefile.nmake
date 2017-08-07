@@ -18,8 +18,7 @@ ltc/encauth/gcm/gcm_memory.obj ltc/encauth/gcm/gcm_mult_h.obj ltc/encauth/gcm/gc
 ltc/encauth/gcm/gcm_reset.obj ltc/encauth/ocb3/ocb3_add_aad.obj ltc/encauth/ocb3/ocb3_decrypt.obj \
 ltc/encauth/ocb3/ocb3_decrypt_last.obj ltc/encauth/ocb3/ocb3_decrypt_verify_memory.obj \
 ltc/encauth/ocb3/ocb3_done.obj ltc/encauth/ocb3/ocb3_encrypt.obj ltc/encauth/ocb3/ocb3_encrypt_authenticate_memory.obj \
-ltc/encauth/ocb3/ocb3_encrypt_last.obj ltc/encauth/ocb3/ocb3_init.obj ltc/encauth/ocb3/ocb3_int_aad_add_block.obj \
-ltc/encauth/ocb3/ocb3_int_calc_offset_zero.obj ltc/encauth/ocb3/ocb3_int_ntz.obj \
+ltc/encauth/ocb3/ocb3_encrypt_last.obj ltc/encauth/ocb3/ocb3_init.obj ltc/encauth/ocb3/ocb3_int_ntz.obj \
 ltc/encauth/ocb3/ocb3_int_xor_blocks.obj ltc/hashes/blake2b.obj ltc/hashes/blake2s.obj \
 ltc/hashes/md2.obj ltc/hashes/md4.obj ltc/hashes/md5.obj ltc/hashes/rmd128.obj ltc/hashes/rmd160.obj \
 ltc/hashes/rmd256.obj ltc/hashes/rmd320.obj ltc/hashes/sha1.obj ltc/hashes/sha3.obj \

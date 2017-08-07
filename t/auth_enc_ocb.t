@@ -11,7 +11,7 @@ my $key   = "12345678901234561234567890123456";
   my $pt    = "plain_half_12345";
   my $ct;
 
-  my $m1 = Crypt::AuthEnc::OCB->new("AES", $key, "123456789012");
+  my $m1 = Crypt::AuthEnc::OCB->new("AES", $key, "123456789012", 16);
   $m1->adata_add("adata-123456789012");
   $ct = $m1->encrypt_add($pt);
   $ct .= $m1->encrypt_last($pt);
@@ -20,7 +20,7 @@ my $key   = "12345678901234561234567890123456";
   is(unpack('H*', $ct), "4c85b38952e71220ecc323253547ae9b446f5a518717759ef8b0f24d5c4809a6", "enc: ciphertext");
   is(unpack('H*', $tag), "bd7a6a0aaf24420f97bf239ea5740a40", "enc: tag");
 
-  my $d1 = Crypt::AuthEnc::OCB->new("AES", $key, "123456789012");
+  my $d1 = Crypt::AuthEnc::OCB->new("AES", $key, "123456789012", 16);
   $d1->adata_add("adata-123456789012");
   my $pt2 = $d1->decrypt_last($ct);
   my $tag2 = $d1->decrypt_done();
@@ -30,7 +30,7 @@ my $key   = "12345678901234561234567890123456";
 }
 
 {
-  my ($ct, $tag) = ocb_encrypt_authenticate('AES', $key, "123456789012", "", "plain_half_12345plain_half_12345");
+  my ($ct, $tag) = ocb_encrypt_authenticate('AES', $key, "123456789012", "", 16, "plain_half_12345plain_half_12345");
   is(unpack('H*', $ct), "4c85b38952e71220ecc323253547ae9b446f5a518717759ef8b0f24d5c4809a6", "ocb_encrypt_authenticate: ciphertext (no header)");
   is(unpack('H*', $tag), "dfdfab80aca060268c0cc467040af4f9", "ocb_encrypt_authenticate: tag (no header)");
   my $pt = ocb_decrypt_verify('AES', $key, "123456789012", "", $ct, $tag);
@@ -38,7 +38,7 @@ my $key   = "12345678901234561234567890123456";
 }
 
 {
-  my ($ct, $tag) = ocb_encrypt_authenticate('AES', $key, "123456789012", "adata-123456789012", "plain_half_12345plain_half_12345");
+  my ($ct, $tag) = ocb_encrypt_authenticate('AES', $key, "123456789012", "adata-123456789012", 16, "plain_half_12345plain_half_12345");
   is(unpack('H*', $ct), "4c85b38952e71220ecc323253547ae9b446f5a518717759ef8b0f24d5c4809a6", "ocb_encrypt_authenticate: ciphertext (no header)");
   is(unpack('H*', $tag), "bd7a6a0aaf24420f97bf239ea5740a40", "ocb_encrypt_authenticate: tag (no header)");
   my $pt = ocb_decrypt_verify('AES', $key, "123456789012", "adata-123456789012", $ct, $tag);
