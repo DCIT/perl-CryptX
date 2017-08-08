@@ -561,6 +561,7 @@ extern const ltc_math_descriptor gmp_desc;
 #define mp_mul(a, b, c)              ltc_mp.mul(a, b, c)
 #define mp_mul_d(a, b, c)            ltc_mp.muli(a, b, c)
 #define mp_sqr(a, b)                 ltc_mp.sqr(a, b)
+#define mp_sqrtmod_prime(a, b, c)    ltc_mp.sqrtmod_prime(a, b, c)
 #define mp_div(a, b, c, d)           ltc_mp.mpdiv(a, b, c, d)
 #define mp_div_2(a, b)               ltc_mp.div_2(a, b)
 #define mp_mod(a, b, c)              ltc_mp.mpdiv(a, b, NULL, c)

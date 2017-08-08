@@ -561,7 +561,8 @@ CryptX__bin_to_radix(SV *in, int radix)
     CODE:
     {
         STRLEN len;
-        unsigned char *out_data, *in_data;
+        unsigned char *in_data;
+        char *out_data;
         mp_int mpi, tmp;
         mp_digit d;
         int digits = 0;
@@ -581,7 +582,7 @@ CryptX__bin_to_radix(SV *in, int radix)
 
           RETVAL = NEWSV(0, digits + 1);
           SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPV_nolen(RETVAL);
+          out_data = SvPV_nolen(RETVAL);
           mp_toradix(&mpi, out_data, radix);
           SvCUR_set(RETVAL, digits);
           mp_clear(&mpi);
@@ -667,7 +668,7 @@ CryptX__decode_b32(SV *base32, unsigned idx)
     CODE:
     {
         STRLEN x, inlen, outlen;
-        int y = 0, err = 0;
+        int y = 0;
         ulong64 t = 0;
         unsigned char c, *in, *out, *map;
         unsigned char tables[4][43] = {
@@ -678,7 +679,7 @@ CryptX__decode_b32(SV *base32, unsigned idx)
              13/*N*/,14/*O*/,15/*P*/,16/*Q*/,17/*R*/,18/*S*/,19/*T*/,20/*U*/,21/*V*/,22/*W*/,23/*X*/,24/*Y*/,25/*Z*/
           },
           {  /* base32hex 0123456789ABCDEFGHIJKLMNOPQRSTUV */
-              0/*0*/, 1/*1*/, 2/*2*/, 3/*3*/, 4/*4*/, 5/*5*/, 6/*6*/, 7/*7*/, 8/*8*/, 9/*9*/,
+               0/*0*/, 1/*1*/, 2/*2*/, 3/*3*/, 4/*4*/, 5/*5*/, 6/*6*/, 7/*7*/, 8/*8*/, 9/*9*/,
               99/*:*/,99/*;*/,99/*<*/,99/*=*/,99/*>*/,99/*?*/,99/*@*/,
               10/*A*/,11/*B*/,12/*C*/,13/*D*/,14/*E*/,15/*F*/,16/*G*/,17/*H*/,18/*I*/,19/*J*/,20/*K*/,21/*L*/,22/*M*/,
               23/*N*/,24/*O*/,25/*P*/,26/*Q*/,27/*R*/,28/*S*/,29/*T*/,30/*U*/,31/*V*/,99/*W*/,99/*X*/,99/*Y*/,99/*Z*/
