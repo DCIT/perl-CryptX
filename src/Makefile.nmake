@@ -47,42 +47,45 @@ ltc/misc/adler32.obj ltc/misc/burn_stack.obj ltc/misc/compare_testvector.obj ltc
 ltc/misc/error_to_string.obj ltc/misc/mem_neq.obj ltc/misc/pk_get_oid.obj ltc/misc/zeromem.obj \
 ltc/misc/base64/base64_decode.obj ltc/misc/base64/base64_encode.obj ltc/misc/crypt/crypt.obj \
 ltc/misc/crypt/crypt_argchk.obj ltc/misc/crypt/crypt_cipher_descriptor.obj ltc/misc/crypt/crypt_cipher_is_valid.obj \
-ltc/misc/crypt/crypt_find_cipher.obj ltc/misc/crypt/crypt_find_cipher_any.obj ltc/misc/crypt/crypt_find_cipher_id.obj \
-ltc/misc/crypt/crypt_find_hash.obj ltc/misc/crypt/crypt_find_hash_any.obj ltc/misc/crypt/crypt_find_hash_id.obj \
-ltc/misc/crypt/crypt_find_hash_oid.obj ltc/misc/crypt/crypt_find_prng.obj ltc/misc/crypt/crypt_fsa.obj \
-ltc/misc/crypt/crypt_hash_descriptor.obj ltc/misc/crypt/crypt_hash_is_valid.obj ltc/misc/crypt/crypt_inits.obj \
-ltc/misc/crypt/crypt_ltc_mp_descriptor.obj ltc/misc/crypt/crypt_prng_descriptor.obj \
-ltc/misc/crypt/crypt_prng_is_valid.obj ltc/misc/crypt/crypt_register_cipher.obj ltc/misc/crypt/crypt_register_hash.obj \
-ltc/misc/crypt/crypt_register_prng.obj ltc/misc/crypt/crypt_unregister_cipher.obj \
-ltc/misc/crypt/crypt_unregister_hash.obj ltc/misc/crypt/crypt_unregister_prng.obj \
-ltc/misc/hkdf/hkdf.obj ltc/misc/pkcs5/pkcs_5_1.obj ltc/misc/pkcs5/pkcs_5_2.obj ltc/modes/cbc/cbc_decrypt.obj \
-ltc/modes/cbc/cbc_done.obj ltc/modes/cbc/cbc_encrypt.obj ltc/modes/cbc/cbc_getiv.obj \
-ltc/modes/cbc/cbc_setiv.obj ltc/modes/cbc/cbc_start.obj ltc/modes/cfb/cfb_decrypt.obj \
-ltc/modes/cfb/cfb_done.obj ltc/modes/cfb/cfb_encrypt.obj ltc/modes/cfb/cfb_getiv.obj \
-ltc/modes/cfb/cfb_setiv.obj ltc/modes/cfb/cfb_start.obj ltc/modes/ctr/ctr_decrypt.obj \
-ltc/modes/ctr/ctr_done.obj ltc/modes/ctr/ctr_encrypt.obj ltc/modes/ctr/ctr_getiv.obj \
-ltc/modes/ctr/ctr_setiv.obj ltc/modes/ctr/ctr_start.obj ltc/modes/ecb/ecb_decrypt.obj \
-ltc/modes/ecb/ecb_done.obj ltc/modes/ecb/ecb_encrypt.obj ltc/modes/ecb/ecb_start.obj \
-ltc/modes/ofb/ofb_decrypt.obj ltc/modes/ofb/ofb_done.obj ltc/modes/ofb/ofb_encrypt.obj \
-ltc/modes/ofb/ofb_getiv.obj ltc/modes/ofb/ofb_setiv.obj ltc/modes/ofb/ofb_start.obj \
-ltc/pk/asn1/der/bit/der_decode_bit_string.obj ltc/pk/asn1/der/bit/der_decode_raw_bit_string.obj \
-ltc/pk/asn1/der/bit/der_encode_bit_string.obj ltc/pk/asn1/der/bit/der_encode_raw_bit_string.obj \
-ltc/pk/asn1/der/bit/der_length_bit_string.obj ltc/pk/asn1/der/boolean/der_decode_boolean.obj \
-ltc/pk/asn1/der/boolean/der_encode_boolean.obj ltc/pk/asn1/der/boolean/der_length_boolean.obj \
-ltc/pk/asn1/der/choice/der_decode_choice.obj ltc/pk/asn1/der/generalizedtime/der_decode_generalizedtime.obj \
-ltc/pk/asn1/der/generalizedtime/der_encode_generalizedtime.obj ltc/pk/asn1/der/generalizedtime/der_length_generalizedtime.obj \
-ltc/pk/asn1/der/ia5/der_decode_ia5_string.obj ltc/pk/asn1/der/ia5/der_encode_ia5_string.obj \
-ltc/pk/asn1/der/ia5/der_length_ia5_string.obj ltc/pk/asn1/der/integer/der_decode_integer.obj \
-ltc/pk/asn1/der/integer/der_encode_integer.obj ltc/pk/asn1/der/integer/der_length_integer.obj \
-ltc/pk/asn1/der/object_identifier/der_decode_object_identifier.obj ltc/pk/asn1/der/object_identifier/der_encode_object_identifier.obj \
-ltc/pk/asn1/der/object_identifier/der_length_object_identifier.obj ltc/pk/asn1/der/octet/der_decode_octet_string.obj \
-ltc/pk/asn1/der/octet/der_encode_octet_string.obj ltc/pk/asn1/der/octet/der_length_octet_string.obj \
-ltc/pk/asn1/der/printable_string/der_decode_printable_string.obj ltc/pk/asn1/der/printable_string/der_encode_printable_string.obj \
-ltc/pk/asn1/der/printable_string/der_length_printable_string.obj ltc/pk/asn1/der/sequence/der_decode_sequence_ex.obj \
-ltc/pk/asn1/der/sequence/der_decode_sequence_flexi.obj ltc/pk/asn1/der/sequence/der_decode_sequence_multi.obj \
-ltc/pk/asn1/der/sequence/der_decode_subject_public_key_info.obj ltc/pk/asn1/der/sequence/der_encode_sequence_ex.obj \
-ltc/pk/asn1/der/sequence/der_encode_sequence_multi.obj ltc/pk/asn1/der/sequence/der_encode_subject_public_key_info.obj \
-ltc/pk/asn1/der/sequence/der_length_sequence.obj ltc/pk/asn1/der/sequence/der_sequence_free.obj \
+ltc/misc/crypt/crypt_constants.obj ltc/misc/crypt/crypt_find_cipher.obj ltc/misc/crypt/crypt_find_cipher_any.obj \
+ltc/misc/crypt/crypt_find_cipher_id.obj ltc/misc/crypt/crypt_find_hash.obj ltc/misc/crypt/crypt_find_hash_any.obj \
+ltc/misc/crypt/crypt_find_hash_id.obj ltc/misc/crypt/crypt_find_hash_oid.obj ltc/misc/crypt/crypt_find_prng.obj \
+ltc/misc/crypt/crypt_fsa.obj ltc/misc/crypt/crypt_hash_descriptor.obj ltc/misc/crypt/crypt_hash_is_valid.obj \
+ltc/misc/crypt/crypt_inits.obj ltc/misc/crypt/crypt_ltc_mp_descriptor.obj ltc/misc/crypt/crypt_prng_descriptor.obj \
+ltc/misc/crypt/crypt_prng_is_valid.obj ltc/misc/crypt/crypt_prng_rng_descriptor.obj \
+ltc/misc/crypt/crypt_register_all_ciphers.obj ltc/misc/crypt/crypt_register_all_hashes.obj \
+ltc/misc/crypt/crypt_register_all_prngs.obj ltc/misc/crypt/crypt_register_cipher.obj \
+ltc/misc/crypt/crypt_register_hash.obj ltc/misc/crypt/crypt_register_prng.obj ltc/misc/crypt/crypt_sizes.obj \
+ltc/misc/crypt/crypt_unregister_cipher.obj ltc/misc/crypt/crypt_unregister_hash.obj \
+ltc/misc/crypt/crypt_unregister_prng.obj ltc/misc/hkdf/hkdf.obj ltc/misc/pkcs5/pkcs_5_1.obj \
+ltc/misc/pkcs5/pkcs_5_2.obj ltc/modes/cbc/cbc_decrypt.obj ltc/modes/cbc/cbc_done.obj \
+ltc/modes/cbc/cbc_encrypt.obj ltc/modes/cbc/cbc_getiv.obj ltc/modes/cbc/cbc_setiv.obj \
+ltc/modes/cbc/cbc_start.obj ltc/modes/cfb/cfb_decrypt.obj ltc/modes/cfb/cfb_done.obj \
+ltc/modes/cfb/cfb_encrypt.obj ltc/modes/cfb/cfb_getiv.obj ltc/modes/cfb/cfb_setiv.obj \
+ltc/modes/cfb/cfb_start.obj ltc/modes/ctr/ctr_decrypt.obj ltc/modes/ctr/ctr_done.obj \
+ltc/modes/ctr/ctr_encrypt.obj ltc/modes/ctr/ctr_getiv.obj ltc/modes/ctr/ctr_setiv.obj \
+ltc/modes/ctr/ctr_start.obj ltc/modes/ecb/ecb_decrypt.obj ltc/modes/ecb/ecb_done.obj \
+ltc/modes/ecb/ecb_encrypt.obj ltc/modes/ecb/ecb_start.obj ltc/modes/ofb/ofb_decrypt.obj \
+ltc/modes/ofb/ofb_done.obj ltc/modes/ofb/ofb_encrypt.obj ltc/modes/ofb/ofb_getiv.obj \
+ltc/modes/ofb/ofb_setiv.obj ltc/modes/ofb/ofb_start.obj ltc/pk/asn1/der/bit/der_decode_bit_string.obj \
+ltc/pk/asn1/der/bit/der_decode_raw_bit_string.obj ltc/pk/asn1/der/bit/der_encode_bit_string.obj \
+ltc/pk/asn1/der/bit/der_encode_raw_bit_string.obj ltc/pk/asn1/der/bit/der_length_bit_string.obj \
+ltc/pk/asn1/der/boolean/der_decode_boolean.obj ltc/pk/asn1/der/boolean/der_encode_boolean.obj \
+ltc/pk/asn1/der/boolean/der_length_boolean.obj ltc/pk/asn1/der/choice/der_decode_choice.obj \
+ltc/pk/asn1/der/generalizedtime/der_decode_generalizedtime.obj ltc/pk/asn1/der/generalizedtime/der_encode_generalizedtime.obj \
+ltc/pk/asn1/der/generalizedtime/der_length_generalizedtime.obj ltc/pk/asn1/der/ia5/der_decode_ia5_string.obj \
+ltc/pk/asn1/der/ia5/der_encode_ia5_string.obj ltc/pk/asn1/der/ia5/der_length_ia5_string.obj \
+ltc/pk/asn1/der/integer/der_decode_integer.obj ltc/pk/asn1/der/integer/der_encode_integer.obj \
+ltc/pk/asn1/der/integer/der_length_integer.obj ltc/pk/asn1/der/object_identifier/der_decode_object_identifier.obj \
+ltc/pk/asn1/der/object_identifier/der_encode_object_identifier.obj ltc/pk/asn1/der/object_identifier/der_length_object_identifier.obj \
+ltc/pk/asn1/der/octet/der_decode_octet_string.obj ltc/pk/asn1/der/octet/der_encode_octet_string.obj \
+ltc/pk/asn1/der/octet/der_length_octet_string.obj ltc/pk/asn1/der/printable_string/der_decode_printable_string.obj \
+ltc/pk/asn1/der/printable_string/der_encode_printable_string.obj ltc/pk/asn1/der/printable_string/der_length_printable_string.obj \
+ltc/pk/asn1/der/sequence/der_decode_sequence_ex.obj ltc/pk/asn1/der/sequence/der_decode_sequence_flexi.obj \
+ltc/pk/asn1/der/sequence/der_decode_sequence_multi.obj ltc/pk/asn1/der/sequence/der_decode_subject_public_key_info.obj \
+ltc/pk/asn1/der/sequence/der_encode_sequence_ex.obj ltc/pk/asn1/der/sequence/der_encode_sequence_multi.obj \
+ltc/pk/asn1/der/sequence/der_encode_subject_public_key_info.obj ltc/pk/asn1/der/sequence/der_length_sequence.obj \
+ltc/pk/asn1/der/sequence/der_sequence_free.obj ltc/pk/asn1/der/sequence/der_sequence_shrink.obj \
 ltc/pk/asn1/der/set/der_encode_set.obj ltc/pk/asn1/der/set/der_encode_setof.obj ltc/pk/asn1/der/short_integer/der_decode_short_integer.obj \
 ltc/pk/asn1/der/short_integer/der_encode_short_integer.obj ltc/pk/asn1/der/short_integer/der_length_short_integer.obj \
 ltc/pk/asn1/der/teletex_string/der_decode_teletex_string.obj ltc/pk/asn1/der/teletex_string/der_length_teletex_string.obj \

@@ -6,22 +6,11 @@
  * The library is free for all purposes without any express
  * guarantee it works.
  */
-
 #include "tomcrypt.h"
 
-#ifdef LTC_MDH
-
-/**
-  Free the allocated ram for a DH key
-  @param key   The key which you wish to free
-*/
-void dh_free(dh_key *key)
-{
-   LTC_ARGCHKVD(key != NULL);
-   mp_cleanup_multi(&key->prime, &key->base, &key->y, &key->x, NULL);
-}
-
-#endif /* LTC_MDH */
+#ifdef LTC_PRNG_ENABLE_LTC_RNG
+unsigned long (*ltc_rng)(unsigned char *out, unsigned long outlen, void (*callback)(void));
+#endif
 
 /* ref:         $Format:%D$ */
 /* git commit:  $Format:%H$ */
