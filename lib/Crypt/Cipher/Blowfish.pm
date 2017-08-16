@@ -33,7 +33,7 @@ Crypt::Cipher::Blowfish - Symetric cipher Blowfish, key size: 64-448 bits (Crypt
   my $cbc = Crypt::Mode::CBC->new('Blowfish');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::Blowfish;
 

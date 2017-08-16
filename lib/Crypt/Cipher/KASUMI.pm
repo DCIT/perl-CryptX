@@ -33,7 +33,7 @@ Crypt::Cipher::KASUMI - Symetric cipher KASUMI, key size: 128 bits (Crypt::CBC c
   my $cbc = Crypt::Mode::CBC->new('KASUMI');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::KASUMI;
 

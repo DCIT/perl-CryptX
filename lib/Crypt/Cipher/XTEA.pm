@@ -33,7 +33,7 @@ Crypt::Cipher::XTEA - Symetric cipher XTEA, key size: 128 bits (Crypt::CBC compl
   my $cbc = Crypt::Mode::CBC->new('XTEA');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::XTEA;
 

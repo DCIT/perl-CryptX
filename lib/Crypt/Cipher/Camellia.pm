@@ -33,7 +33,7 @@ Crypt::Cipher::Camellia - Symetric cipher Camellia, key size: 128/192/256 bits (
   my $cbc = Crypt::Mode::CBC->new('Camellia');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::Camellia;
 

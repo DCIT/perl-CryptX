@@ -33,7 +33,7 @@ Crypt::Cipher::AES - Symetric cipher AES (aka Rijndael), key size: 128/192/256 b
   my $cbc = Crypt::Mode::CBC->new('AES');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::AES;
 

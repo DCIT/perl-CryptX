@@ -33,7 +33,7 @@ Crypt::Cipher::Khazad - Symetric cipher Khazad, key size: 128 bits (Crypt::CBC c
   my $cbc = Crypt::Mode::CBC->new('Khazad');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::Khazad;
 

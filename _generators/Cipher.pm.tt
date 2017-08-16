@@ -4,7 +4,7 @@ package Crypt::Cipher::[%orig_name%];
 
 use strict;
 use warnings;
-our $VERSION = '0.001';
+our $VERSION = '0.051';
 
 use CryptX;
 use base 'Crypt::Cipher';
@@ -33,7 +33,7 @@ Crypt::Cipher::[%orig_name%] - [%info%]
   my $cbc = Crypt::Mode::CBC->new('[%orig_name%]');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::[%orig_name%];
 

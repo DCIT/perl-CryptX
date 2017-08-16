@@ -33,7 +33,7 @@ Crypt::Cipher::Anubis - Symetric cipher Anubis, key size: 128-320 bits (Crypt::C
   my $cbc = Crypt::Mode::CBC->new('Anubis');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::Anubis;
 

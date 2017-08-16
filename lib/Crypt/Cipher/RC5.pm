@@ -33,7 +33,7 @@ Crypt::Cipher::RC5 - Symetric cipher RC5, key size: 64-1024 bits (Crypt::CBC com
   my $cbc = Crypt::Mode::CBC->new('RC5');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::RC5;
 

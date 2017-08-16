@@ -42,7 +42,7 @@ my %list = (
                          spec_rounds=>199, spec_key=>'S' x 40 }, # default = 128, no-limits!
         Noekeon     => { info=>'Symetric cipher Noekeon, key size: 128 bits (Crypt::CBC compliant)', urls=>['http://en.wikipedia.org/wiki/NOEKEON'],
                          spec_rounds=>0, spec_key=>'XXX-ROUNDS-FIXED' },
-        RC2         => { info=>'Symetric cipher RC2, key size: 64-1024 bits (Crypt::CBC compliant)', urls=>['http://en.wikipedia.org/wiki/RC2'],
+        RC2         => { info=>'Symetric cipher RC2, key size: 40-1024 bits (Crypt::CBC compliant)', urls=>['http://en.wikipedia.org/wiki/RC2'],
                          spec_rounds=>0, spec_key=>'XXX-ROUNDS-FIXED' },
         RC5         => { info=>'Symetric cipher RC5, key size: 64-1024 bits (Crypt::CBC compliant)', urls=>['http://en.wikipedia.org/wiki/RC5'],
                          spec_rounds=>19, spec_key=>'S' x 100 }, # 12..24

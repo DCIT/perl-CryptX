@@ -33,7 +33,7 @@ Crypt::Cipher::SAFERP - Symetric cipher SAFER+, key size: 128/192/256 bits (Cryp
   my $cbc = Crypt::Mode::CBC->new('SAFERP');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::SAFERP;
 

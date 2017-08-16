@@ -33,7 +33,7 @@ Crypt::Cipher::SAFER_K128 - Symetric cipher SAFER_K128, key size: 128 bits (Cryp
   my $cbc = Crypt::Mode::CBC->new('SAFER_K128');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::SAFER_K128;
 

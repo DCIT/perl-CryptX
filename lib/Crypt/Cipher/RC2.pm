@@ -21,7 +21,7 @@ sub default_rounds { Crypt::Cipher::default_rounds(__PACKAGE__) }
 
 =head1 NAME
 
-Crypt::Cipher::RC2 - Symetric cipher RC2, key size: 64-1024 bits (Crypt::CBC compliant)
+Crypt::Cipher::RC2 - Symetric cipher RC2, key size: 40-1024 bits (Crypt::CBC compliant)
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ Crypt::Cipher::RC2 - Symetric cipher RC2, key size: 64-1024 bits (Crypt::CBC com
   my $cbc = Crypt::Mode::CBC->new('RC2');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::RC2;
 
