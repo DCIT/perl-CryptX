@@ -48,6 +48,6 @@ __END__
  
 =head1 NAME
 
-Crypt::mode - [internal only]
+Crypt::Mac - [internal only]
 
 =cut
