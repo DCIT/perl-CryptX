@@ -775,7 +775,7 @@ DONE:
 }
 
 /* perform a fixed point ECC mulmod */
-static int accel_fp_mul(int idx, void *k, ecc_point *R, void *a, void *modulus, void *mp, int map)
+static int _accel_fp_mul(int idx, void *k, ecc_point *R, void *a, void *modulus, void *mp, int map)
 {
    unsigned char kb[128];
    int      x;
@@ -1277,7 +1277,7 @@ int ltc_ecc_fp_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulu
             /* compute mp */
             if ((err = mp_montgomery_setup(modulus, &mp)) != CRYPT_OK) { goto LBL_ERR; }
          }
-         err = accel_fp_mul(idx, k, R, a, modulus, mp, map);
+         err = _accel_fp_mul(idx, k, R, a, modulus, mp, map);
       } else {
          err = ltc_ecc_mulmod(k, G, R, a, modulus, map);
       }
