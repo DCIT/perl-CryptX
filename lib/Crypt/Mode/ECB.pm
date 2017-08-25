@@ -70,15 +70,19 @@ B<BEWARE: ECB is inherently insecure>, if you are not sure go for L<Crypt::Mode:
 
 =head2 start_encrypt
 
-See example below L</finish>.
+   $m->start_encrypt($key);
 
 =head2 start_decrypt
 
-See example below L</finish>.
+   $m->start_decrypt($key);
 
 =head2 add
 
-See example below L</finish>.
+   # in encrypt mode
+   my $plaintext = $m->add($ciphertext);
+
+   # in decrypt mode
+   my $ciphertext = $m->add($plaintext);
 
 =head2 finish
 

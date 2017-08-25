@@ -16,6 +16,7 @@ sub equal_files {
 
 die "No args given!\n" unless $ARGV[0];
 my $outdir_l = ($ARGV[0] eq 'install_code')  ? catdir($FindBin::Bin, "..", "lib") : '';
+my $outdir_i = ($ARGV[0] eq 'install_code')  ? catdir($FindBin::Bin, "..", "inc") : '';
 my $outdir_t = ($ARGV[0] eq 'install_tests') ? catdir($FindBin::Bin, "..", "t")   : '';
 warn "STARTED: outdir_l='$outdir_l' outdir_t='$outdir_t'\n";
 
@@ -72,9 +73,9 @@ for my $n (keys %list) {
     #unlink "$t_out.$$";
   }
 
-  if ($outdir_l) {
+  if ($outdir_l && $outdir_i) {
     if (1) {  # if($n ne 'CBC' || $n ne 'ECB') {
-      my $xs_out = catfile($outdir_l, "CryptX_Mode_$n.xs.inc");
+      my $xs_out = catfile($outdir_i, "CryptX_Mode_$n.xs.inc");
       my $xs_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
       if ($n eq 'CBC' || $n eq 'ECB') {
         $xs_tt->process("$FindBin::Bin/Mode_p.xs.inc.tt", $data, "$xs_out.$$", {binmode=>1}) || die $xs_tt->error(), "\n";

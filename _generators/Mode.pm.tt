@@ -4,7 +4,7 @@ package Crypt::Mode::[%orig_name%];
 
 use strict;
 use warnings;
-our $VERSION = '0.001';
+our $VERSION = '0.052';
 
 use Crypt::Cipher;
 use base 'Crypt::Mode';
@@ -41,7 +41,7 @@ Crypt::Mode::[%orig_name%] - [%info%]
 [%-END%]
    my $ciphertext = $m->add('some data');
    $ciphertext .= $m->add('more data');
- [%-IF lc_name == 'ecb' or lc_name == 'cbc' %]
+[%-IF lc_name == 'ecb' or lc_name == 'cbc' %]
    $ciphertext .= $m->finish;
 [%-END%]
 
@@ -115,16 +115,29 @@ Crypt::Mode::[%orig_name%] - [%info%]
 
 =head2 start_encrypt
 
-See example below L</finish>.
+[%-IF lc_name == 'ecb' %]
+   $m->start_encrypt($key);
+[%-ELSE%]
+   $m->start_encrypt($key, $iv);
+[%-END%]
 
 =head2 start_decrypt
 
-See example below L</finish>.
+[%-IF lc_name == 'ecb' %]
+   $m->start_decrypt($key);
+[%-ELSE%]
+   $m->start_decrypt($key, $iv);
+[%-END%]
 
 =head2 add
 
-See example below L</finish>.
+   # in encrypt mode
+   my $plaintext = $m->add($ciphertext);
 
+   # in decrypt mode
+   my $ciphertext = $m->add($plaintext);
+
+[%-IF lc_name == 'ecb' or lc_name == 'cbc' %]
 =head2 finish
 
    #encrypt more chunks
@@ -153,6 +166,7 @@ See example below L</finish>.
    $plaintext .= $m->finish;
 [%-END%]
 
+[%-END%]
 =head1 SEE ALSO
 
 =over

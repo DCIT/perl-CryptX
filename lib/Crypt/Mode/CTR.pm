@@ -69,29 +69,19 @@ This module implements CTR cipher mode. B<NOTE:> it works only with ciphers from
 
 =head2 start_encrypt
 
-See example below L</finish>.
+   $m->start_encrypt($key, $iv);
 
 =head2 start_decrypt
 
-See example below L</finish>.
+   $m->start_decrypt($key, $iv);
 
 =head2 add
 
-See example below L</finish>.
+   # in encrypt mode
+   my $plaintext = $m->add($ciphertext);
 
-=head2 finish
-
-   #encrypt more chunks
-   $m->start_encrypt($key, $iv);
-   my $ciphertext = '';
-   $ciphertext .= $m->add('some data');
-   $ciphertext .= $m->add('more data');
-
-   #decrypt more chunks
-   $m->start_decrypt($key, $iv);
-   my $plaintext = '';
-   $plaintext .= $m->add($some_ciphertext);
-   $plaintext .= $m->add($more_ciphertext);
+   # in decrypt mode
+   my $ciphertext = $m->add($plaintext);
 
 =head1 SEE ALSO
 
