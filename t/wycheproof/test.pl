@@ -32,7 +32,7 @@ if (1) {
       # do the test
       my ($ct2, $tag2) = eval { gcm_encrypt_authenticate('AES', $key, $iv, $aad, $msg) };
       my $pt2 = eval { gcm_decrypt_verify('AES', $key, $iv, $aad, $ct, $tag) };
-      my $testname = "type: $type, tcId: $tcId, comment: $comment, result: $result";
+      my $testname = "type=$type tcId=$tcId comment='$comment' expected-result=$result";
       if ($result eq 'valid') {
         is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-v");
         is(unpack("H*", $tag2), $t->{tag}, "$testname TAG-v");
@@ -66,7 +66,7 @@ if (1) {
       my $message = pack "H*", $t->{message};
       my $sig     = pack "H*", $t->{sig};
       # do the test
-      my $testname = "type: $type/$sha, tcId: $tcId, comment: $comment, result: $result";
+      my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
       my $pk = Crypt::PK::RSA->new( \$keyPem );
       my $valid = $pk->verify_message($sig, $message, $sha,"v1.5");
       if ($result =~ /^(valid|acceptable)$/) {
@@ -90,8 +90,8 @@ if (1) {
     my $keyPem = $g->{keyPem};
     my $sha    = $g->{sha};    # "SHA-1"
     $sha =~ s/-//g; # SHA-1 >> SHA1
-    ok(Crypt::PK::DSA->new( \$keyDer ), "Crypt::PK::DSA->new + DER type: $type/$sha");
-    ok(Crypt::PK::DSA->new( \$keyPem ), "Crypt::PK::DSA->new + PEM type: $type/$sha");
+    ok(Crypt::PK::DSA->new( \$keyDer ), "Crypt::PK::DSA->new + DER type=$type/$sha");
+    ok(Crypt::PK::DSA->new( \$keyPem ), "Crypt::PK::DSA->new + PEM type=$type/$sha");
     for my $t (@{$g->{tests}}) {
       my $tcId    = $t->{tcId};
       my $comment = $t->{comment};
@@ -99,7 +99,7 @@ if (1) {
       my $message = pack "H*", $t->{message};
       my $sig     = pack "H*", $t->{sig};
       # do the test
-      my $testname = "type: $type/$sha, tcId: $tcId, comment: $comment, result: $result";
+      my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
       my $pk = Crypt::PK::DSA->new( \$keyPem );
       my $valid = $pk->verify_message($sig, $message, $sha);
       if ($result =~ /^(valid|acceptable)$/) {
@@ -113,16 +113,94 @@ if (1) {
 }
 
 if (0) {
+  use Crypt::PK::ECC;
+
   my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/ecdsa_test.json';
-  diag "Done: $tests->{algorithm}";
+  for my $g (@{$tests->{testGroups}}) {
+    my $type   = $g->{type};
+    my $keyDer = pack "H*", $g->{keyDer};
+    my $keyPem = $g->{keyPem};
+    my $sha    = $g->{sha};
+    $sha =~ s/-//g; # SHA-1 >> SHA1
+    ok(Crypt::PK::ECC->new( \$keyDer ), "Crypt::PK::ECC->new + DER type=$type/$sha");
+    ok(Crypt::PK::ECC->new( \$keyPem ), "Crypt::PK::ECC->new + PEM type=$type/$sha");
+    for my $t (@{$g->{tests}}) {
+      my $tcId    = $t->{tcId};
+      my $comment = $t->{comment};
+      my $result  = $t->{result};
+      my $message = pack "H*", $t->{message};
+      my $sig     = pack "H*", $t->{sig};
+      # do the test
+      my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
+      my $pk = Crypt::PK::ECC->new( \$keyPem );
+      my $valid = $pk->verify_message($sig, $message, $sha);
+      if ($result =~ /^(valid|acceptable)$/) {
+        ok($valid, "$testname verify_message=$valid");
+      }
+      else {
+        ok(!$valid, "$testname verify_message=$valid");
+      }
+    }
+  }
 }
 
 if (0) {
+  use Crypt::PK::ECC;
+
   my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/ecdsa_webcrypto_test.json';
-  diag "Done: $tests->{algorithm}";
+  for my $g (@{$tests->{testGroups}}) {
+    my $type   = $g->{type};
+    my $keyDer = pack "H*", $g->{keyDer};
+    my $keyPem = $g->{keyPem};
+    my $sha    = $g->{sha};
+    my $jwk    = $g->{jwk};
+    $sha =~ s/-//g; # SHA-1 >> SHA1
+    ok(Crypt::PK::ECC->new( \$keyDer ), "Crypt::PK::ECC->new + DER type=$type/$sha");
+    ok(Crypt::PK::ECC->new( \$keyPem ), "Crypt::PK::ECC->new + PEM type=$type/$sha");
+    ok(Crypt::PK::ECC->new( $jwk ),     "Crypt::PK::ECC->new + JWK type=$type/$sha");
+    for my $t (@{$g->{tests}}) {
+      my $tcId    = $t->{tcId};
+      my $comment = $t->{comment};
+      my $result  = $t->{result};
+      my $message = pack "H*", $t->{message};
+      my $sig     = pack "H*", $t->{sig};
+      # do the test
+      my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
+      my $pk = Crypt::PK::ECC->new( \$keyPem );
+      my $valid = $pk->verify_message($sig, $message, $sha);
+      if ($result =~ /^(valid|acceptable)$/) {
+        ok($valid, "$testname verify_message=$valid");
+      }
+      else {
+        ok(!$valid, "$testname verify_message=$valid");
+      }
+    }
+  }
 }
 
 if (0) {
+  use Crypt::PK::ECC;
+
   my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/ecdh_webcrypto_test.json';
-  diag "Done: $tests->{algorithm}";
+  for my $g (@{$tests->{testGroups}}) {
+    my $type   = $g->{type};
+    for my $t (@{$g->{tests}}) {
+      my $tcId    = $t->{tcId};
+      my $comment = $t->{comment};
+      my $name    = $t->{name};
+      my $result  = $t->{result};
+      my $shared  = pack "H*", $t->{shared};
+      # do the test
+      my $testname = "type=$type/$name tcId=$tcId comment='$comment' expected-result=$result";
+      my $pub = Crypt::PK::ECC->new( $t->{public} );
+      my $pri = Crypt::PK::ECC->new( $t->{private} );
+      my $shared_hex = unpack "H*", $pri->shared_secret($pub);
+      if ($result =~ /^(valid|acceptable)$/) {
+        is($shared_hex, $t->{shared}, $testname);
+      }
+      else {
+        isnt($shared_hex, $t->{shared}, $testname);
+      }
+    }
+  }
 }
