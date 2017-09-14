@@ -52,9 +52,17 @@ int dsa_int_validate_pqg(dsa_key *key, int *stat)
    void *tmp1, *tmp2;
    int  err;
 
-   *stat = 0;
    LTC_ARGCHK(key  != NULL);
    LTC_ARGCHK(stat != NULL);
+   *stat = 0;
+
+   /* check q-order */
+   if ( key->qord >= LTC_MDSA_MAX_GROUP || key->qord <= 15 ||
+        (unsigned long)key->qord >= mp_unsigned_bin_size(key->p) ||
+        (mp_unsigned_bin_size(key->p) - key->qord) >= LTC_MDSA_DELTA ) {
+      err = CRYPT_OK;
+      goto error;
+   }
 
    /* FIPS 186-4 chapter 4.1: 1 < g < p */
    if (mp_cmp_d(key->g, 1) != LTC_MP_GT || mp_cmp(key->g, key->p) != LTC_MP_LT) {
@@ -83,7 +91,7 @@ int dsa_int_validate_pqg(dsa_key *key, int *stat)
    err   = CRYPT_OK;
    *stat = 1;
 error:
-   mp_clear_multi(tmp1, tmp2, NULL);
+   mp_clear_multi(tmp2, tmp1, NULL);
    return err;
 }
 
@@ -103,7 +111,7 @@ int dsa_int_validate_primes(dsa_key *key, int *stat)
    LTC_ARGCHK(stat != NULL);
 
    /* key->q prime? */
-   if ((err = mp_prime_is_prime(key->q, 8, &res)) != CRYPT_OK) {
+   if ((err = mp_prime_is_prime(key->q, LTC_MILLER_RABIN_REPS, &res)) != CRYPT_OK) {
       return err;
    }
    if (res == LTC_MP_NO) {
@@ -111,7 +119,7 @@ int dsa_int_validate_primes(dsa_key *key, int *stat)
    }
 
    /* key->p prime? */
-   if ((err = mp_prime_is_prime(key->p, 8, &res)) != CRYPT_OK) {
+   if ((err = mp_prime_is_prime(key->p, LTC_MILLER_RABIN_REPS, &res)) != CRYPT_OK) {
       return err;
    }
    if (res == LTC_MP_NO) {
