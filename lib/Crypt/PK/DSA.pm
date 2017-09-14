@@ -33,7 +33,10 @@ sub generate_key {
     $p =~ s/^0x//;
     $q =~ s/^0x//;
     $g =~ s/^0x//;
-    return $self->_generate_key_pqg($p, $q, $g);
+    $p = "0$p" if length($p) % 2;
+    $q = "0$q" if length($q) % 2;
+    $g = "0$g" if length($g) % 2;
+    return $self->_generate_key_pqg(pack("H*",$p), pack("H*",$q), pack("H*",$g));
   }
   elsif (@_ == 1 && ref $_[0] eq 'SCALAR') {
     my $data = ${$_[0]};
