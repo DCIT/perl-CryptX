@@ -23,11 +23,12 @@ DESTROY(Crypt::Digest::SHAKE self)
 
 void
 reset(Crypt::Digest::SHAKE self)
-    CODE:
+    PPCODE:
     {
         int rv;
         rv = sha3_shake_init(&self->state, self->num);
         if (rv != CRYPT_OK) croak("FATAL: sha3_shake_init failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
     }
 
 Crypt::Digest::SHAKE

@@ -46,17 +46,15 @@ clone(Crypt::AuthEnc::GCM self)
     OUTPUT:
         RETVAL
 
-int
+void
 reset(Crypt::AuthEnc::GCM self)
-    CODE:
+    PPCODE:
     {
         int rv;
         rv = gcm_reset(&self->state);
         if (rv != CRYPT_OK) croak("FATAL: gcm_reset failed: %s", error_to_string(rv));
-        RETVAL = rv;
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
 SV *
 encrypt_add(Crypt::AuthEnc::GCM self, SV * data)
@@ -83,9 +81,9 @@ encrypt_add(Crypt::AuthEnc::GCM self, SV * data)
     OUTPUT:
         RETVAL
 
-int
+void
 iv_add(Crypt::AuthEnc::GCM self, SV * data)
-    CODE:
+    PPCODE:
     {
         int rv;
         STRLEN in_data_len;
@@ -94,14 +92,12 @@ iv_add(Crypt::AuthEnc::GCM self, SV * data)
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
         rv = gcm_add_iv(&self->state, in_data, (unsigned long)in_data_len);
         if (rv != CRYPT_OK) croak("FATAL: gcm_add_iv failed: %s", error_to_string(rv));
-        RETVAL = rv;
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
-int
+void
 adata_add(Crypt::AuthEnc::GCM self, SV * data)
-    CODE:
+    PPCODE:
     {
         int rv;
         STRLEN in_data_len;
@@ -110,10 +106,8 @@ adata_add(Crypt::AuthEnc::GCM self, SV * data)
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
         rv = gcm_add_aad(&self->state, in_data, (unsigned long)in_data_len);
         if (rv != CRYPT_OK) croak("FATAL: gcm_add_aad failed: %s", error_to_string(rv));
-        RETVAL = rv;
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
 SV *
 decrypt_add(Crypt::AuthEnc::GCM self, SV * data)

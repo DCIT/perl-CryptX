@@ -44,7 +44,7 @@ clone(Crypt::AuthEnc::OCB self)
 
 void
 adata_add(Crypt::AuthEnc::OCB self, SV * data)
-    CODE:
+    PPCODE:
     {
         int rv;
         STRLEN in_data_len;
@@ -56,6 +56,7 @@ adata_add(Crypt::AuthEnc::OCB self, SV * data)
           rv = ocb3_add_aad(&self->state, in_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) croak("FATAL: ocb3_add_aad failed: %s", error_to_string(rv));
         }
+        XPUSHs(ST(0)); /* return self */
     }
 
 SV *

@@ -16,8 +16,11 @@ DESTROY(Crypt::Checksum::CRC32 self)
 
 void
 reset(Crypt::Checksum::CRC32 self)
-    CODE:
+    PPCODE:
+    {
         crc32_init(self);
+        XPUSHs(ST(0)); /* return self */
+    }
 
 Crypt::Checksum::CRC32
 clone(Crypt::Checksum::CRC32 self)

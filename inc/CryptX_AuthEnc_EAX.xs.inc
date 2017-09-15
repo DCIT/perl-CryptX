@@ -139,14 +139,15 @@ decrypt_done(Crypt::AuthEnc::EAX self, ...)
         }
     }
 
-int
+void
 adata_add(Crypt::AuthEnc::EAX self, SV * adata)
-    CODE:
+    PPCODE:
     {
         STRLEN h_len;
+        int rv;
         unsigned char *h;
         h = (unsigned char *)SvPVbyte(adata, h_len);
-        RETVAL = eax_addheader(&self->state, h, (unsigned long)h_len);
+        rv = eax_addheader(&self->state, h, (unsigned long)h_len);
+        if (rv != CRYPT_OK) croak("FATAL: eax_addheader failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL

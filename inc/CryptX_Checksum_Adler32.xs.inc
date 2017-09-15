@@ -16,8 +16,11 @@ DESTROY(Crypt::Checksum::Adler32 self)
 
 void
 reset(Crypt::Checksum::Adler32 self)
-    CODE:
+    PPCODE:
+    {
         adler32_init(self);
+        XPUSHs(ST(0)); /* return self */
+    }
 
 Crypt::Checksum::Adler32
 clone(Crypt::Checksum::Adler32 self)

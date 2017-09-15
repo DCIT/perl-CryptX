@@ -43,9 +43,9 @@ clone(Crypt::AuthEnc::ChaCha20Poly1305 self)
     OUTPUT:
         RETVAL
 
-int
+void
 set_iv(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * nonce)
-    CODE:
+    PPCODE:
     {
         int rv;
         STRLEN iv_len=0;
@@ -55,14 +55,12 @@ set_iv(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * nonce)
         iv = (unsigned char *) SvPVbyte(nonce, iv_len);
         rv = chacha20poly1305_setiv(&self->state, iv, (unsigned long)iv_len);
         if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_setiv failed: %s", error_to_string(rv));
-        RETVAL = rv;
+        XPUSHs(ST(0)); /* return self */;
     }
-    OUTPUT:
-        RETVAL
 
-int
+void
 set_iv_rfc7905(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * nonce, UV seqnum)
-    CODE:
+    PPCODE:
     {
         int rv;
         STRLEN iv_len=0;
@@ -72,14 +70,12 @@ set_iv_rfc7905(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * nonce, UV seqnum)
         iv = (unsigned char *) SvPVbyte(nonce, iv_len);
         rv = chacha20poly1305_setiv_rfc7905(&self->state, iv, (unsigned long)iv_len, (ulong64)seqnum);
         if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_setiv_rfc7905 failed: %s", error_to_string(rv));
-        RETVAL = rv;
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
-int
+void
 adata_add(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * data)
-    CODE:
+    PPCODE:
     {
         int rv;
         STRLEN in_data_len;
@@ -88,10 +84,8 @@ adata_add(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * data)
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
         rv = chacha20poly1305_add_aad(&self->state, in_data, (unsigned long)in_data_len);
         if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_add_aad failed: %s", error_to_string(rv));
-        RETVAL = rv;
+        XPUSHs(ST(0)); /* return self */
     }
-    OUTPUT:
-        RETVAL
 
 SV *
 decrypt_add(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * data)

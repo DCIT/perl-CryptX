@@ -31,11 +31,12 @@ DESTROY(self)
 void
 reset(self)
     Crypt::Digest self
-    CODE:
+    PPCODE:
     {
         int rv;
         rv = self->desc->init(&self->state);
         if (rv != CRYPT_OK) croak("FATAL: digest init failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
     }
 
 Crypt::Digest
