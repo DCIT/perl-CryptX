@@ -1,6 +1,5 @@
-###XXX-FIXME unfinished
-
-# rm -f src/liballinone.a && touch CryptX.xs && make && perl -Mblib t/wycheproof/test.pl
+# rebuild:
+# rm -f src/liballinone.a && touch CryptX.xs && make && perl -Mblib t/wycheproof.t
 
 use strict;
 use warnings;
@@ -8,7 +7,7 @@ use warnings;
 use Test::More;
 
 plan skip_all => "No JSON::* module installed" unless eval { require JSON::PP } || eval { require JSON::XS } || eval { require Cpanel::JSON::XS };
-plan tests => 716;
+plan tests => 762;
 
 use CryptX;
 use Crypt::Misc 'read_rawfile';
@@ -38,10 +37,13 @@ if (1) {
         is(unpack("H*", $tag2), $t->{tag}, "$testname TAG-v");
         is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-v");
       }
-      else {
+      elsif ($result eq 'invalid') {
         #isnt(unpack("H*", $ct2),  $t->{ct},  "$testname CT-i");
         #isnt(unpack("H*", $tag2), $t->{tag}, "$testname TAG-i");
         is($pt2, undef, "$testname PT-i");
+      }
+      else {
+        ok(0, "UNEXPECTED result=$result");
       }
     }
   }
@@ -69,13 +71,15 @@ if (1) {
       my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
       my $pk = Crypt::PK::RSA->new( \$keyPem );
       my $valid = $pk->verify_message($sig, $message, $sha,"v1.5");
-      if ($result =~ /^(valid|acceptable)$/) {
+      if ($result eq 'valid' || $result eq 'acceptable') {
         ok($valid, $testname);
       }
-      else {
+      elsif ($result eq 'invalid') {
         ok(!$valid, $testname);
       }
-
+      else {
+        ok(0, "UNEXPECTED result=$result");
+      }
     }
   }
 }
@@ -98,21 +102,41 @@ if (1) {
       my $result  = $t->{result};
       my $message = pack "H*", $t->{message};
       my $sig     = pack "H*", $t->{sig};
+      # skip unsupported tests:
+      next if $tcId==12 && $result eq 'acceptable' && $comment eq "Legacy:ASN encoding of s misses leading 0";
+      next if $tcId==13 && $result eq 'acceptable' && $comment eq "BER:long form encoding of length";
+      next if $tcId==14 && $result eq 'acceptable' && $comment eq "BER:long form encoding of length";
+      next if $tcId==15 && $result eq 'acceptable' && $comment eq "BER:long form encoding of length";
+      next if $tcId==16 && $result eq 'acceptable' && $comment eq "BER:length contains leading 0";
+      next if $tcId==17 && $result eq 'acceptable' && $comment eq "BER:length contains leading 0";
+      next if $tcId==18 && $result eq 'acceptable' && $comment eq "BER:length contains leading 0";
+      next if $tcId==19 && $result eq 'acceptable' && $comment eq "BER:indefinite length";
+      next if $tcId==20 && $result eq 'acceptable' && $comment eq "BER:prepending 0's to integer";
+      next if $tcId==21 && $result eq 'acceptable' && $comment eq "BER:prepending 0's to integer";
       # do the test
       my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
       my $pk = Crypt::PK::DSA->new( \$keyPem );
       my $valid = $pk->verify_message($sig, $message, $sha);
-      if ($result =~ /^(valid|acceptable)$/) {
+      if ($result eq 'valid' || $result eq 'acceptable') {
         ok($valid, $testname);
       }
-      else {
+      elsif ($result eq 'invalid') {
         ok(!$valid, $testname);
+      }
+      else {
+        ok(0, "UNEXPECTED result=$result");
       }
     }
   }
 }
 
 if (0) {
+  #XXX-TODO:
+  # not ok 749 - type=ECDSAVer/SHA256 tcId=50 comment='appending unused 0's' expected-result=invalid verify_message=1
+  # not ok 819 - type=ECDSAVer/SHA256 tcId=120 comment='Modified r or s, e.g. by adding or subtracting the order of the group' expected-result=invalid verify_message=1
+  # not ok 820 - type=ECDSAVer/SHA256 tcId=121 comment='Modified r or s, e.g. by adding or subtracting the order of the group' expected-result=invalid verify_message=1
+  # not ok 821 - type=ECDSAVer/SHA256 tcId=122 comment='Modified r or s, e.g. by adding or subtracting the order of the group' expected-result=invalid verify_message=1
+
   use Crypt::PK::ECC;
 
   my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/ecdsa_test.json';
@@ -134,11 +158,18 @@ if (0) {
       my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
       my $pk = Crypt::PK::ECC->new( \$keyPem );
       my $valid = $pk->verify_message($sig, $message, $sha);
-      if ($result =~ /^(valid|acceptable)$/) {
+      if ($result eq 'valid') {
         ok($valid, "$testname verify_message=$valid");
       }
-      else {
+      elsif ($result eq 'acceptable') {
+        #XXX-TODO
+        #ok($valid, "$testname verify_message=$valid");
+      }
+      elsif ($result eq 'invalid') {
         ok(!$valid, "$testname verify_message=$valid");
+      }
+      else {
+        ok(0, "UNEXPECTED result=$result");
       }
     }
   }
@@ -168,17 +199,24 @@ if (0) {
       my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
       my $pk = Crypt::PK::ECC->new( \$keyPem );
       my $valid = $pk->verify_message($sig, $message, $sha);
-      if ($result =~ /^(valid|acceptable)$/) {
+      if ($result eq 'valid') {
         ok($valid, "$testname verify_message=$valid");
       }
-      else {
+      elsif ($result eq 'acceptable') {
+        #XXX-TODO
+        #ok($valid, "$testname verify_message=$valid");
+      }
+      elsif ($result eq 'invalid') {
         ok(!$valid, "$testname verify_message=$valid");
+      }
+      else {
+        ok(0, "UNEXPECTED result=$result");
       }
     }
   }
 }
 
-if (0) {
+if (1) {
   use Crypt::PK::ECC;
 
   my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/ecdh_webcrypto_test.json';
@@ -195,11 +233,14 @@ if (0) {
       my $pub = Crypt::PK::ECC->new( $t->{public} );
       my $pri = Crypt::PK::ECC->new( $t->{private} );
       my $shared_hex = unpack "H*", $pri->shared_secret($pub);
-      if ($result =~ /^(valid|acceptable)$/) {
+      if ($result eq 'valid' || $result eq 'acceptable') {
         is($shared_hex, $t->{shared}, $testname);
       }
-      else {
+      elsif ($result eq 'invalid') {
         isnt($shared_hex, $t->{shared}, $testname);
+      }
+      else {
+        ok(0, "UNEXPECTED result=$result");
       }
     }
   }
