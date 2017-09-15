@@ -41,12 +41,21 @@ my %eumm_args = (
   MIN_PERL_VERSION => '5.006',
   LICENSE          => 'perl_5',
   META_MERGE       => { resources  => { repository => 'https://github.com/DCIT/perl-CryptX', bugtracker => 'https://github.com/DCIT/perl-CryptX/issues' } },
-  DEFINE           => '-DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC',
-  INC              => '-Isrc/ltc/headers -Isrc/ltm',
-  LIBS             => [''],
-  MYEXTLIB         => $myextlib,
-  clean            => { 'FILES' => join(' ', @myobjs, $myextlib) },
   dist             => { 'PREOP' => 'perldoc -u lib/CryptX.pm | pod2markdown > README.md' },
+  ($ENV{CRYPTX_CFLAGS} || $ENV{CRYPTX_LDFLAGS})
+  ?
+  (
+    # e.g. CRYPTX_LDFLAGS='-L/usr/local/lib -ltommath -ltomcrypt' CRYPTX_CFLAGS='-DLTM_DESC -I/usr/local/include' perl Makefile.PL
+    INC      => $ENV{CRYPTX_CFLAGS},
+    LIBS     => [ $ENV{CRYPTX_LDFLAGS} ],
+  )
+  :
+  (
+    # bundled libtomcrypt + libtommath
+    INC      => '-DLTM_DESC -Isrc/ltc/headers -Isrc/ltm',
+    MYEXTLIB => $myextlib,
+    clean    => { 'FILES' => join(' ', @myobjs, $myextlib) },
+  )
 );
 
 my $eumm_ver  = eval $ExtUtils::MakeMaker::VERSION;
