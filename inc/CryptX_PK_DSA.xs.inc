@@ -45,17 +45,23 @@ _generate_key_dsaparam(Crypt::PK::DSA self, SV * dsaparam)
     }
 
 void
-_generate_key_pqg(Crypt::PK::DSA self, SV * psv, SV * qsv, SV * gsv)
+_generate_key_pqg_hex(Crypt::PK::DSA self, char *p, char *q, char *g)
     PPCODE:
     {
         int rv;
-        unsigned char *p=NULL, *q=NULL, *g=NULL;
-        STRLEN plen=0, qlen=0, glen=0;
-        p = (unsigned char *)SvPVbyte(psv, plen);
-        q = (unsigned char *)SvPVbyte(qsv, qlen);
-        g = (unsigned char *)SvPVbyte(gsv, glen);
+        unsigned char pbin[512], qbin[512], gbin[512];
+        unsigned long plen=sizeof(pbin), qlen=sizeof(qbin), glen=sizeof(gbin);
+        if (!p || !strlen(p) || !q || !strlen(q) || !g || !strlen(g)) {
+          croak("FATAL: generate_key_pqg_hex incomplete args");
+        }
         /* set p q g */
-        rv = dsa_set_pqg(p, plen, q, qlen, g, glen, &self->key);
+        rv = radix_to_bin(p, 16, pbin, &plen);
+        if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(p) failed: %s", error_to_string(rv));
+        rv = radix_to_bin(q, 16, qbin, &qlen);
+        if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(q) failed: %s", error_to_string(rv));
+        rv = radix_to_bin(g, 16, gbin, &glen);
+        if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(g) failed: %s", error_to_string(rv));
+        rv = dsa_set_pqg(pbin, plen, qbin, qlen, gbin, glen, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dsa_set_pqg failed: %s", error_to_string(rv));
         /* gen the key */
         rv = dsa_generate_key(&self->pstate, self->pindex, &self->key);
