@@ -750,6 +750,27 @@ CryptX__decode_b32(SV *base32, unsigned idx)
     OUTPUT:
         RETVAL
 
+SV *
+CryptX__ltc_build_settings()
+    CODE:
+        RETVAL = newSVpv(crypt_build_settings, 0);
+    OUTPUT:
+        RETVAL
+
+SV *
+CryptX__ltc_mp_name()
+    CODE:
+        RETVAL = newSVpv(ltc_mp.name, 0);
+    OUTPUT:
+        RETVAL
+
+int
+CryptX__ltc_mp_bits_per_digit()
+    CODE:
+        RETVAL = ltc_mp.bits_per_digit;
+    OUTPUT:
+        RETVAL
+
 ###############################################################################
 
 INCLUDE: inc/CryptX_Digest.xs.inc

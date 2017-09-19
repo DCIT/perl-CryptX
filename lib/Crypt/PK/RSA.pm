@@ -10,7 +10,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use Carp;
-use CryptX qw(_encode_json _decode_json);
+use CryptX;
 use Crypt::Digest qw(digest_data digest_data_b64u);
 use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pem_to_der der_to_pem);
 use Crypt::PK;
@@ -57,7 +57,7 @@ sub export_key_jwk {
       dq  => encode_b64u(pack("H*", $kh->{dQ})),
       qi  => encode_b64u(pack("H*", $kh->{qP})),
     };
-    return $wanthash ? $hash : _encode_json($hash);
+    return $wanthash ? $hash : CryptX::_encode_json($hash);
   }
   elsif ($type eq 'public') {
     return unless $kh->{N} && $kh->{e};
@@ -69,7 +69,7 @@ sub export_key_jwk {
       n   => encode_b64u(pack("H*", $kh->{N})),
       e   => encode_b64u(pack("H*", $kh->{e})),
     };
-    return $wanthash ? $hash : _encode_json($hash);
+    return $wanthash ? $hash : CryptX::_encode_json($hash);
   }
 }
 
@@ -77,7 +77,7 @@ sub export_key_jwk_thumbprint {
   my ($self, $hash_name) = @_;
   $hash_name ||= 'SHA256';
   my $h = $self->export_key_jwk('public', 1);
-  my $json = _encode_json({kty=>$h->{kty}, n=>$h->{n}, e=>$h->{e}});
+  my $json = CryptX::_encode_json({kty=>$h->{kty}, n=>$h->{n}, e=>$h->{e}});
   return digest_data_b64u($hash_name, $json);
 }
 
@@ -134,7 +134,7 @@ sub import_key {
   elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
     # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
     my $json = "$1";
-    my $h = _decode_json($json);
+    my $h = CryptX::_decode_json($json);
     if ($h && $h->{kty} eq "RSA") {
       for (qw/n e d p q dp dq qi/) {
         $h->{$_} = eval { unpack("H*", decode_b64u($h->{$_})) } if exists $h->{$_};

@@ -5,7 +5,7 @@ use warnings ;
 our $VERSION = '0.054';
 
 use base qw(Exporter);
-our @EXPORT_OK = qw( _decode_json _encode_json);
+our @EXPORT_OK = qw();
 
 require XSLoader;
 XSLoader::load('CryptX', $VERSION);

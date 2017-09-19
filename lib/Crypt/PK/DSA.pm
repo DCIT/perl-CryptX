@@ -10,7 +10,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use Carp;
-use CryptX qw(_encode_json _decode_json);
+use CryptX;
 use Crypt::Digest 'digest_data';
 use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pem_to_der der_to_pem);
 use Crypt::PK;

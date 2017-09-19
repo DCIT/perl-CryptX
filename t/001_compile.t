@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 
+use Config;
 use Test::More tests => 1;
 
-diag( "Testing CryptX $CryptX::VERSION, Perl $], $^X" );
+diag( "Testing CryptX $CryptX::VERSION, Perl $] $^O $^X" );
 
 my $ok;
 END { die "Could not load all modules" unless $ok }
@@ -68,6 +69,20 @@ use Crypt::Checksum;
 use Crypt::Checksum::Adler32;
 use Crypt::Checksum::CRC32;
 
+diag( "osname       = $Config{osname}" );
+diag( "myarchname   = $Config{myarchname}" );
+diag( "myuname      = $Config{myuname}" );
+diag( "intsize      = $Config{intsize}" );
+diag( "longsize     = $Config{longsize}" );
+diag( "longlongsize = $Config{longlongsize}" );
+diag( "ptrsize      = $Config{ptrsize}" );
+diag( "byteorder    = $Config{byteorder}" );
+diag( "" );
+diag( CryptX::_ltc_build_settings );
+diag( "" );
+diag( "MP_PROVIDER  = " . CryptX::_ltc_mp_name );
+diag( "MP_DIGIT_BIT = " . CryptX::_ltc_mp_bits_per_digit );
+diag( "" );
+
 ok 1, 'All modules loaded successfully';
 $ok = 1;
-
