@@ -11,6 +11,7 @@ plan tests => 762;
 
 use CryptX;
 use Crypt::Misc 'read_rawfile';
+use Crypt::Digest 'digest_data';
 
 if (1) {
   use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate gcm_decrypt_verify);
@@ -117,6 +118,15 @@ if (1) {
       my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
       my $pk = Crypt::PK::DSA->new( \$keyPem );
       my $valid = $pk->verify_message($sig, $message, $sha);
+      my $hash = digest_data($sha, $message);
+      my $valid_h = $pk->verify_hash($sig, $hash);
+      if ($tcId==55) {
+        diag "SPECIAL: tcId 55";
+        diag "sig-len:".length($sig)." sig-hex:".unpack("H*", $sig);
+        diag "msg-len:".length($message)." msg-hex:".unpack("H*", $message);
+        diag "hash-len:".length($hash)." hash-hex:".unpack("H*", $hash);
+        diag "hash:$sha valid_m:$valid valid_h:$valid_h";
+      }
       if ($result eq 'valid' || $result eq 'acceptable') {
         ok($valid, $testname);
       }
