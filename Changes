@@ -4,6 +4,9 @@ TODO:
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - CCM interface new-add-add-done
 
+0.053_* 2017/09/19
+        - more diagnostics during make test
+
 0.053   2017/09/15
         - fix Crypt::PK::DSA generate_key
 
