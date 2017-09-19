@@ -2,7 +2,7 @@ package Crypt::AuthEnc::ChaCha20Poly1305;
 
 use strict;
 use warnings;
-our $VERSION = '0.054';
+our $VERSION = '0.053_001';
 
 use base qw(Crypt::AuthEnc Exporter);
 our %EXPORT_TAGS = ( all => [qw( chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify )] );
