@@ -331,6 +331,7 @@ _verify(Crypt::PK::DSA self, SV * sig, SV * data)
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
 
         RETVAL = 1;
+        stat = 0;
         rv = dsa_verify_hash(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
         if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
     }
