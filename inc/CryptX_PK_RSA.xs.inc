@@ -436,6 +436,7 @@ _verify(Crypt::PK::RSA self, SV * sig, SV * data, char * padding, char * hash_na
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
 
         RETVAL = 1;
+        stat = 0;
         if (strnEQ(padding, "pss", 3)) {
           hash_id = find_hash(hash_name);
           if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);

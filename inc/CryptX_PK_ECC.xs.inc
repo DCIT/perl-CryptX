@@ -359,6 +359,7 @@ _verify(Crypt::PK::ECC self, SV * sig, SV * data)
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
 
         RETVAL = 1;
+        stat = 0;
         if (ix == 1) {
           rv = ecc_verify_hash_rfc7518(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
         }
