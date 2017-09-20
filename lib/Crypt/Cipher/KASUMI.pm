@@ -4,7 +4,7 @@ package Crypt::Cipher::KASUMI;
 
 use strict;
 use warnings;
-our $VERSION = '0.053_002';
+our $VERSION = '0.053_003';
 
 use CryptX;
 use base 'Crypt::Cipher';

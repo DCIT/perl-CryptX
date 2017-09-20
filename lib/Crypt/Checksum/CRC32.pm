@@ -2,7 +2,7 @@ package Crypt::Checksum::CRC32;
 
 use strict;
 use warnings;
-our $VERSION = '0.053_002';
+our $VERSION = '0.053_003';
 use Carp;
 use CryptX;
 
