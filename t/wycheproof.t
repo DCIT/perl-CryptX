@@ -120,13 +120,6 @@ if (1) {
       my $valid = $pk->verify_message($sig, $message, $sha);
       my $hash = digest_data($sha, $message);
       my $valid_h = $pk->verify_hash($sig, $hash);
-      if ($tcId==55) {
-        diag "SPECIAL: tcId 55";
-        diag "sig-len:".length($sig)." sig-hex:".unpack("H*", $sig);
-        diag "msg-len:".length($message)." msg-hex:".unpack("H*", $message);
-        diag "hash-len:".length($hash)." hash-hex:".unpack("H*", $hash);
-        diag "hash:$sha valid_m:$valid valid_h:$valid_h";
-      }
       if ($result eq 'valid' || $result eq 'acceptable') {
         ok($valid, $testname);
       }
