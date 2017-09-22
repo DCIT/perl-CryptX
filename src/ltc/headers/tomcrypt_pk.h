@@ -32,6 +32,7 @@ enum public_key_algorithms {
    PKA_EC,
    EC_PRIME_FIELD
 };
+#endif /* LTC_SOURCE */
 
 typedef struct Oid {
     unsigned long OID[16];
@@ -40,7 +41,6 @@ typedef struct Oid {
 } oid_st;
 
 int pk_get_oid(int pk, oid_st *st);
-#endif /* LTC_SOURCE */
 
 /* ---- RSA ---- */
 #ifdef LTC_MRSA
@@ -258,25 +258,25 @@ typedef struct {
    int size;
 
    /** name of curve */
-   const char *name;
+   char *name;
 
    /** The prime that defines the field the curve is in (encoded in hex) */
-   const char *prime;
+   char *prime;
 
    /** The fields A param (hex) */
-   const char *A;
+   char *A;
 
    /** The fields B param (hex) */
-   const char *B;
+   char *B;
 
    /** The order of the curve (hex) */
-   const char *order;
+   char *order;
 
    /** The x co-ordinate of the base point on the curve (hex) */
-   const char *Gx;
+   char *Gx;
 
    /** The y co-ordinate of the base point on the curve (hex) */
-   const char *Gy;
+   char *Gy;
 
    /** The co-factor */
    unsigned long cofactor;
