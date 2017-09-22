@@ -53,8 +53,6 @@ int gcm_process(gcm_state *gcm,
    }
 
    if (gcm->mode == LTC_GCM_MODE_IV) {
-      /* IV length must be > 0 */
-      if (gcm->buflen == 0 && gcm->totlen == 0) return CRYPT_ERROR;
       /* let's process the IV */
       if ((err = gcm_add_aad(gcm, NULL, 0)) != CRYPT_OK) return err;
    }
