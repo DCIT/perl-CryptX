@@ -19,11 +19,10 @@ enum {
 /* Indicates standard output formats that can be read e.g. by OpenSSL or GnuTLS */
 #define PK_STD          0x1000
 
-/* iterations limit for retry-loops */
-#define PK_MAX_RETRIES  20
-
 int rand_prime(void *N, long len, prng_state *prng, int wprng);
 
+#ifdef LTC_SOURCE
+/* internal helper functions */
 int rand_bn_bits(void *N, int bits, prng_state *prng, int wprng);
 int rand_bn_upto(void *N, void *limit, prng_state *prng, int wprng);
 
@@ -41,6 +40,7 @@ typedef struct Oid {
 } oid_st;
 
 int pk_get_oid(int pk, oid_st *st);
+#endif /* LTC_SOURCE */
 
 /* ---- RSA ---- */
 #ifdef LTC_MRSA
@@ -200,13 +200,6 @@ int katja_import(const unsigned char *in, unsigned long inlen, katja_key *key);
 #ifdef LTC_MDH
 
 typedef struct {
-  int size;
-  char *name, *base, *prime;
-} ltc_dh_set_type;
-
-extern const ltc_dh_set_type ltc_dh_sets[];
-
-typedef struct {
     int type;
     void *x;
     void *y;
@@ -236,6 +229,13 @@ void dh_free(dh_key *key);
 int dh_export_key(void *out, unsigned long *outlen, int type, dh_key *key);
 
 #ifdef LTC_SOURCE
+typedef struct {
+  int size;
+  const char *name, *base, *prime;
+} ltc_dh_set_type;
+
+extern const ltc_dh_set_type ltc_dh_sets[];
+
 /* internal helper functions */
 int dh_check_pubkey(dh_key *key);
 #endif
@@ -258,25 +258,25 @@ typedef struct {
    int size;
 
    /** name of curve */
-   char *name;
+   const char *name;
 
    /** The prime that defines the field the curve is in (encoded in hex) */
-   char *prime;
+   const char *prime;
 
    /** The fields A param (hex) */
-   char *A;
+   const char *A;
 
    /** The fields B param (hex) */
-   char *B;
+   const char *B;
 
    /** The order of the curve (hex) */
-   char *order;
+   const char *order;
 
    /** The x co-ordinate of the base point on the curve (hex) */
-   char *Gx;
+   const char *Gx;
 
    /** The y co-ordinate of the base point on the curve (hex) */
-   char *Gy;
+   const char *Gy;
 
    /** The co-factor */
    unsigned long cofactor;
