@@ -7,6 +7,7 @@ TODO:
 0.053_* 2017-10-XX
         - fix Crypt::PK::DSA verify
         - libtomcrypt updated to 1.18 (+ some extra patches)
+        - documentation fixes
 
 0.053   2017-09-15
         - fix Crypt::PK::DSA generate_key
