@@ -48,7 +48,7 @@ static const crypt_constant _crypt_constants[] = {
     _C_STRINGIFY(CRYPT_PK_INVALID_TYPE),
     _C_STRINGIFY(CRYPT_OVERFLOW),
     _C_STRINGIFY(CRYPT_UNUSED1),
-    _C_STRINGIFY(CRYPT_UNUSED2),
+    _C_STRINGIFY(CRYPT_INPUT_TOO_LONG),
     _C_STRINGIFY(CRYPT_PK_INVALID_SIZE),
     _C_STRINGIFY(CRYPT_INVALID_PRIME_SIZE),
     _C_STRINGIFY(CRYPT_PK_INVALID_PADDING),
@@ -77,8 +77,6 @@ static const crypt_constant _crypt_constants[] = {
 
 #ifdef LTC_MRSA
     {"LTC_MRSA", 1},
-    _C_STRINGIFY(MIN_RSA_SIZE),
-    _C_STRINGIFY(MAX_RSA_SIZE),
 #else
     {"LTC_MRSA", 0},
 #endif
@@ -107,9 +105,6 @@ static const crypt_constant _crypt_constants[] = {
     {"LTC_MDSA", 0},
 #endif
 
-#ifdef LTC_DER_MAX_PUBKEY_SIZE
-    _C_STRINGIFY(LTC_DER_MAX_PUBKEY_SIZE),
-#endif
 #ifdef LTC_MILLER_RABIN_REPS
     _C_STRINGIFY(LTC_MILLER_RABIN_REPS),
 #endif
@@ -152,6 +147,10 @@ static const crypt_constant _crypt_constants[] = {
     _C_STRINGIFY(LTC_GCM_MODE_AAD),
     _C_STRINGIFY(LTC_GCM_MODE_TEXT),
 #endif
+
+    _C_STRINGIFY(LTC_MP_LT),
+    _C_STRINGIFY(LTC_MP_EQ),
+    _C_STRINGIFY(LTC_MP_GT),
 
     _C_STRINGIFY(LTC_MP_NO),
     _C_STRINGIFY(LTC_MP_YES),

@@ -57,9 +57,10 @@ int ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, co
    /* find out what type of key it is */
    err = der_decode_sequence_multi(in, inlen, LTC_ASN1_BIT_STRING, 1UL, flags,
                                               LTC_ASN1_EOL,        0UL, NULL);
-   if (err != CRYPT_OK && err != CRYPT_PK_INVALID_SIZE) {
+   if (err != CRYPT_OK && err != CRYPT_INPUT_TOO_LONG) {
       goto done;
    }
+
 
    if (flags[0] == 1) {
       /* private key */
@@ -73,7 +74,7 @@ int ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, co
                                      LTC_ASN1_EOL,             0UL, NULL)) != CRYPT_OK) {
          goto done;
       }
-   } else {
+   } else if (flags[0] == 0) {
       /* public key */
       key->type = PK_PUBLIC;
       if ((err = der_decode_sequence_multi(in, inlen,
@@ -85,12 +86,12 @@ int ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, co
          goto done;
       }
    }
+   else {
+      err = CRYPT_INVALID_PACKET;
+      goto done;
+   }
 
    if (dp == NULL) {
-     /* BEWARE: Here we are looking up the curve params by keysize (neither curve name nor curve oid),
-      *         which might be ambiguous (there can more than one curve for given keysize).
-      *         Thus the chosen curve depends on order of items in ltc_ecc_sets[] - see ecc.c file.
-      */
      /* find the idx */
      for (key->idx = 0; ltc_ecc_sets[key->idx].size && (unsigned long)ltc_ecc_sets[key->idx].size != key_size; ++key->idx);
      if (ltc_ecc_sets[key->idx].size == 0) {

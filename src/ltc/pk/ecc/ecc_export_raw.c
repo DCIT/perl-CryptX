@@ -19,7 +19,7 @@
 /** Export raw public or private key (public keys = ANS X9.63 compressed or uncompressed; private keys = raw bytes)
   @param out    [out] destination of export
   @param outlen [in/out]  Length of destination and final output size
-  @param type   PK_PRIVATE, PK_PUBLIC or PK_PUBLIC_COMPRESSED
+  @param type   PK_PRIVATE, PK_PUBLIC or PK_PUBLIC|PK_COMPRESSED
   @param key    Key to export
   Return        CRYPT_OK on success
 */
@@ -27,7 +27,7 @@
 int ecc_export_raw(unsigned char *out, unsigned long *outlen, int type, ecc_key *key)
 {
    unsigned long size, ksize;
-   int err;
+   int err, compressed;
 
    LTC_ARGCHK(key    != NULL);
    LTC_ARGCHK(out    != NULL);
@@ -38,7 +38,10 @@ int ecc_export_raw(unsigned char *out, unsigned long *outlen, int type, ecc_key 
    }
    size = key->dp->size;
 
-   if (type == PK_PUBLIC_COMPRESSED) {
+   compressed = type & PK_COMPRESSED; 
+   type &= ~PK_COMPRESSED;
+
+   if (type == PK_PUBLIC && compressed) {
       if ((err = ltc_ecc_export_point(out, outlen, key->pubkey.x, key->pubkey.y, size, 1)) != CRYPT_OK) return err;
    }
    else if (type == PK_PUBLIC) {

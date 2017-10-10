@@ -82,7 +82,7 @@ int ecc_encrypt_key(const unsigned char *in,   unsigned long inlen,
     }
 
     pubkeysize = ECC_BUF_SIZE;
-    if ((err = ecc_export_raw(pub_expt, &pubkeysize, PK_PUBLIC_COMPRESSED, &pubkey)) != CRYPT_OK) {
+    if ((err = ecc_export_raw(pub_expt, &pubkeysize, PK_PUBLIC|PK_COMPRESSED, &pubkey)) != CRYPT_OK) {
        ecc_free(&pubkey);
        goto LBL_ERR;
     }

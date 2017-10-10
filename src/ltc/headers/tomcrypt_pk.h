@@ -11,13 +11,15 @@
 
 enum {
    PK_PUBLIC=0,
-   PK_PRIVATE=1,
-   PK_PUBLIC_COMPRESSED=2, /* used only when exporting public ECC key */
-   PK_CURVEOID=4           /* used only when exporting public ECC key */
+   PK_PRIVATE=1
 };
 
 /* Indicates standard output formats that can be read e.g. by OpenSSL or GnuTLS */
 #define PK_STD          0x1000
+/* Indicates compressed public ECC key */
+#define PK_COMPRESSED   0x2000
+/* Indicates ECC key with the curve specified by OID */
+#define PK_CURVEOID     0x4000
 
 int rand_prime(void *N, long len, prng_state *prng, int wprng);
 
