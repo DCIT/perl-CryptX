@@ -318,6 +318,91 @@ Or import all available functions:
 
  use Crypt::Misc ':all';
 
+=head2  read_rawfile
+
+I<Since: 0.029>
+
+ $rawdata = read_rawfile($filename);
+
+Read file C<$filename> into a scalar as a binary data (without decoding/transformation).
+
+=head2  write_rawfile
+
+I<Since: 0.029>
+
+ write_rawfile($filename, $rawdata);
+
+Write C<$rawdata> to file <$filename> as binary data.
+
+=head2  slow_eq
+
+I<Since: 0.029>
+
+ if (slow_eq($data1, $data2)) { ... }
+
+Constant time compare (to avoid timing side-channel).
+
+=head2  pem_to_der
+
+I<Since: 0.029>
+
+  $der_data = pem_to_der($pem_data);
+  #or
+  $der_data = pem_to_der($pem_data, $password);
+
+Convert PEM to DER representation. Supports also password protected PEM data.
+
+=head2  der_to_pem
+
+I<Since: 0.029>
+
+  $pem_data = der_to_pem($pem_data, $header_name);
+  #or
+  $pem_data = der_to_pem($pem_data, $header_name, $password);
+  #or
+  $pem_data = der_to_pem($pem_data, $header_name, $passord, $cipher_name);
+
+  # $header_name e.g. "PUBLIC KEY", "RSA PRIVATE KEY" ...
+  # $cipher_name e.g. "DES-EDE3-CBC", "AES-256-CBC" (DEFAULT) ...
+
+Convert DER to PEM representation. Supports also password protected PEM data.
+
+=head2  random_v4uuid
+
+I<Since: 0.031>
+
+ my $uuid = random_v4uuid();
+
+Returns cryptographically strong Version 4 random UUID: C<xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx>
+where C<x> is any hexadecimal digit and C<Y> is one of 8, 9, A, B (1000, 1001, 1010, 1011)
+e.g. C<f47ac10b-58cc-4372-a567-0e02b2c3d479>.
+
+=head2  is_v4uuid
+
+I<Since: 0.031>
+
+  if (is_v4uuid($uuid)) {
+    ...
+  }
+
+Checks the given C<$uuid> string whether it matches V4 UUID format and returns C<0> (mismatch) or C<1> (match).
+
+=head2 increment_octets_le
+
+I<Since: 0.048>
+
+ $octects = increment_octets_le($octets);
+
+Take input C<$octets> as a little-endian big number and return an increment.
+
+=head2 increment_octets_be
+
+I<Since: 0.048>
+
+ $octects = increment_octets_be($octets);
+
+Take input C<$octets> as a big-endian big number and return an increment.
+
 =head2 encode_b64
 
 I<Since: 0.029>
@@ -493,91 +578,6 @@ I<Since: 0.049>
  $rawdata = decode_b58s($string);
 
 Decode a Base58 (Stellar alphabet) string into bytes.
-
-=head2  read_rawfile
-
-I<Since: 0.029>
-
- $rawdata = read_rawfile($filename);
-
-Read file C<$filename> into a scalar as a binary data (without decoding/transformation).
-
-=head2  write_rawfile
-
-I<Since: 0.029>
-
- write_rawfile($filename, $rawdata);
-
-Write C<$rawdata> to file <$filename> as binary data.
-
-=head2  slow_eq
-
-I<Since: 0.029>
-
- if (slow_eq($data1, $data2)) { ... }
-
-Constant time compare (to avoid timing side-channel).
-
-=head2  pem_to_der
-
-I<Since: 0.029>
-
-  $der_data = pem_to_der($pem_data);
-  #or
-  $der_data = pem_to_der($pem_data, $password);
-
-Convert PEM to DER representation. Supports also password protected PEM data.
-
-=head2  der_to_pem
-
-I<Since: 0.029>
-
-  $pem_data = der_to_pem($pem_data, $header_name);
-  #or
-  $pem_data = der_to_pem($pem_data, $header_name, $password);
-  #or
-  $pem_data = der_to_pem($pem_data, $header_name, $passord, $cipher_name);
-
-  # $header_name e.g. "PUBLIC KEY", "RSA PRIVATE KEY" ...
-  # $cipher_name e.g. "DES-EDE3-CBC", "AES-256-CBC" (DEFAULT) ...
-
-Convert DER to PEM representation. Supports also password protected PEM data.
-
-=head2  random_v4uuid
-
-I<Since: 0.031>
-
- my $uuid = random_v4uuid();
-
-Returns cryptographically strong Version 4 random UUID: C<xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx>
-where C<x> is any hexadecimal digit and C<Y> is one of 8, 9, A, B (1000, 1001, 1010, 1011)
-e.g. C<f47ac10b-58cc-4372-a567-0e02b2c3d479>.
-
-=head2  is_v4uuid
-
-I<Since: 0.031>
-
-  if (is_v4uuid($uuid)) {
-    ...
-  }
-
-Checks the given C<$uuid> string whether it matches V4 UUID format and returns C<0> (mismatch) or C<1> (match).
-
-=head2 increment_octets_le
-
-I<Since: 0.048>
-
- $octects = increment_octets_le($octets);
-
-Take input C<$octets> as a little-endian big number and return an increment.
-
-=head2 increment_octets_be
-
-I<Since: 0.048>
-
- $octects = increment_octets_be($octets);
-
-Take input C<$octets> as a big-endian big number and return an increment.
 
 =head1 SEE ALSO
 

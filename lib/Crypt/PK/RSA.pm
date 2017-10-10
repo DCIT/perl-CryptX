@@ -611,7 +611,7 @@ I<Since: CryptX-0.031>
 
 Exports the key's JSON Web Key Thumbprint as a string.
 
-If you don't know what this is, see RFC 7638 (C<https://tools.ietf.org/html/rfc7638>).
+If you don't know what this is, see RFC 7638 L<https://tools.ietf.org/html/rfc7638>.
 
  my $thumbprint = $pk->export_key_jwk_thumbprint('SHA256');
 
@@ -854,10 +854,10 @@ Create encrypted file (from commandline):
 Decrypt file (Perl code):
 
   use Crypt::PK::RSA;
-  use File::Slurp 'read_file';
+  use Crypt::Misc 'read_rawfile';
 
   my $pkrsa = Crypt::PK::RSA->new("rsakey.priv.pem");
-  my $encfile = read_file("input.encrypted.rsa", binmode=>':raw');
+  my $encfile = read_rawfile("input.encrypted.rsa");
   my $plaintext = $pkrsa->decrypt($encfile, 'v1.5');
   print $plaintext;
 
@@ -866,12 +866,12 @@ Decrypt file (Perl code):
 Create encrypted file (Perl code):
 
   use Crypt::PK::RSA;
-  use File::Slurp 'write_file';
+  use Crypt::Misc 'write_rawfile';
 
   my $plaintext = 'secret message';
   my $pkrsa = Crypt::PK::RSA->new("rsakey.pub.pem");
   my $encrypted = $pkrsa->encrypt($plaintext, 'v1.5');
-  write_file("input.encrypted.rsa", {binmode=>':raw'}, $encrypted);
+  write_rawfile("input.encrypted.rsa", $encrypted);
 
 Decrypt file (from commandline):
 
@@ -887,10 +887,10 @@ Verify signature (Perl code):
 
  use Crypt::PK::RSA;
  use Crypt::Digest 'digest_file';
- use File::Slurp 'read_file';
+ use Crypt::Misc 'read_rawfile';
 
  my $pkrsa = Crypt::PK::RSA->new("rsakey.pub.pem");
- my $signature = read_file("input.sha1-rsa.sig", binmode=>':raw');
+ my $signature = read_rawfile("input.sha1-rsa.sig");
  my $valid = $pkrsa->verify_hash($signature, digest_file("SHA1", "input.data"), "SHA1", "v1.5");
  print $valid ? "SUCCESS" : "FAILURE";
 
@@ -900,11 +900,11 @@ Create signature (Perl code):
 
  use Crypt::PK::RSA;
  use Crypt::Digest 'digest_file';
- use File::Slurp 'write_file';
+ use Crypt::Misc 'write_rawfile';
 
  my $pkrsa = Crypt::PK::RSA->new("rsakey.priv.pem");
  my $signature = $pkrsa->sign_hash(digest_file("SHA1", "input.data"), "SHA1", "v1.5");
- write_file("input.sha1-rsa.sig", {binmode=>':raw'}, $signature);
+ write_rawfile("input.sha1-rsa.sig", $signature);
 
 Verify signature (from commandline):
 
@@ -915,15 +915,15 @@ Verify signature (from commandline):
 Generate keys (Perl code):
 
  use Crypt::PK::RSA;
- use File::Slurp 'write_file';
+ use Crypt::Misc 'write_rawfile';
 
  my $pkrsa = Crypt::PK::RSA->new;
  $pkrsa->generate_key(256, 65537);
- write_file("rsakey.pub.der",  {binmode=>':raw'}, $pkrsa->export_key_der('public'));
- write_file("rsakey.priv.der", {binmode=>':raw'}, $pkrsa->export_key_der('private'));
- write_file("rsakey.pub.pem",  $pkrsa->export_key_pem('public_x509'));
- write_file("rsakey.priv.pem", $pkrsa->export_key_pem('private'));
- write_file("rsakey-passwd.priv.pem", $pkrsa->export_key_pem('private', 'secret'));
+ write_rawfile("rsakey.pub.der",  $pkrsa->export_key_der('public'));
+ write_rawfile("rsakey.priv.der", $pkrsa->export_key_der('private'));
+ write_rawfile("rsakey.pub.pem",  $pkrsa->export_key_pem('public_x509'));
+ write_rawfile("rsakey.priv.pem", $pkrsa->export_key_pem('private'));
+ write_rawfile("rsakey-passwd.priv.pem", $pkrsa->export_key_pem('private', 'secret'));
 
 Use keys by OpenSSL:
 
@@ -946,7 +946,6 @@ Generate keys:
 Load keys (Perl code):
 
  use Crypt::PK::RSA;
- use File::Slurp 'write_file';
 
  my $pkrsa = Crypt::PK::RSA->new;
  $pkrsa->import_key("rsakey.pub.der");

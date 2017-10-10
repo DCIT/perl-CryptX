@@ -45,7 +45,7 @@ sub chacha20poly1305_decrypt_verify {
 
 =head1 NAME
 
-Crypt::AuthEnc::ChaCha20Poly1305 - Authenticated encryption in ChaCha20Poly1305 mode
+Crypt::AuthEnc::ChaCha20Poly1305 - Authenticated encryption in ChaCha20-Poly1305 mode
 
 =head1 SYNOPSIS
 
@@ -122,7 +122,7 @@ You can export selected functions:
 Add B<additional authenticated data>.
 Can be called before the first C<encrypt_add> or C<decrypt_add>;
 
- $ae->adata_add($aad_data);                       #can be called multiple times
+ $ae->adata_add($aad_data);                     #can be called multiple times
 
 =head2 encrypt_add
 
@@ -142,17 +142,22 @@ Can be called before the first C<encrypt_add> or C<decrypt_add>;
  #or
  my $tag = $ae->decrypt_done;           # returns $tag value
 
-=head2 clone
-
- my $ae_new = $ae->clone;
-
 =head2 set_iv
 
- $ae->set_iv($iv);
+ my $ae = Crypt::AuthEnc::ChaCha20Poly1305->new($key)->set_iv($iv);
+ # $iv ...... initialization vector (64 or 96 bits / 8 or 12 bytes)
 
 =head2 set_iv_rfc7905
 
- $ae->set_iv_rfc7905($iv, $seqnum);
+See L<https://tools.ietf.org/html/rfc7905>
+
+ my $ae = Crypt::AuthEnc::ChaCha20Poly1305->new($key)->set_iv_rfc7905($iv, $seqnum);
+ # $iv ...... initialization vector (96 bits / 12 bytes)
+ # $seqnum .. 64bit integer (sequence number)
+
+=head2 clone
+
+ my $ae_new = $ae->clone;
 
 =head1 SEE ALSO
 

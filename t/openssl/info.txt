@@ -1,3 +1,5 @@
+make && perl -Mblib t/openssl/dsa-test.pl && perl -Mblib t/openssl/rsa-test.pl && perl -Mblib t/openssl/ecc-test.pl && echo 'ALL DONE!'
+
 openssl genrsa -passout pass:secret -des3 -out rsa-des3.pem 1024
 openssl genrsa -passout pass:secret -des -out rsa-des.pem 1024
 openssl genrsa -passout pass:secret -seed -out rsa-seed.pem 1024

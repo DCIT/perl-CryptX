@@ -569,10 +569,10 @@ Verify signature (Perl code):
 
  use Crypt::PK::DSA;
  use Crypt::Digest 'digest_file';
- use File::Slurp 'read_file';
+ use Crypt::Misc 'read_rawfile';
 
  my $pkdsa = Crypt::PK::DSA->new("dsakey.pub.pem");
- my $signature = read_file("input.sha1-dsa.sig", binmode=>':raw');
+ my $signature = read_rawfile("input.sha1-dsa.sig");
  my $valid = $pkdsa->verify_hash($signature, digest_file("SHA1", "input.data"), "SHA1", "v1.5");
  print $valid ? "SUCCESS" : "FAILURE";
 
@@ -582,11 +582,11 @@ Create signature (Perl code):
 
  use Crypt::PK::DSA;
  use Crypt::Digest 'digest_file';
- use File::Slurp 'write_file';
+ use Crypt::Misc 'write_rawfile';
 
  my $pkdsa = Crypt::PK::DSA->new("dsakey.priv.pem");
  my $signature = $pkdsa->sign_hash(digest_file("SHA1", "input.data"), "SHA1", "v1.5");
- write_file("input.sha1-dsa.sig", {binmode=>':raw'}, $signature);
+ write_rawfile("input.sha1-dsa.sig", $signature);
 
 Verify signature (from commandline):
 
@@ -597,15 +597,15 @@ Verify signature (from commandline):
 Generate keys (Perl code):
 
  use Crypt::PK::DSA;
- use File::Slurp 'write_file';
+ use Crypt::Misc 'write_rawfile';
 
  my $pkdsa = Crypt::PK::DSA->new;
  $pkdsa->generate_key(20, 128);
- write_file("dsakey.pub.der",  {binmode=>':raw'}, $pkdsa->export_key_der('public'));
- write_file("dsakey.priv.der", {binmode=>':raw'}, $pkdsa->export_key_der('private'));
- write_file("dsakey.pub.pem",  $pkdsa->export_key_pem('public_x509'));
- write_file("dsakey.priv.pem", $pkdsa->export_key_pem('private'));
- write_file("dsakey-passwd.priv.pem", $pkdsa->export_key_pem('private', 'secret'));
+ write_rawfile("dsakey.pub.der",  $pkdsa->export_key_der('public'));
+ write_rawfile("dsakey.priv.der", $pkdsa->export_key_der('private'));
+ write_rawfile("dsakey.pub.pem",  $pkdsa->export_key_pem('public_x509'));
+ write_rawfile("dsakey.priv.pem", $pkdsa->export_key_pem('private'));
+ write_rawfile("dsakey-passwd.priv.pem", $pkdsa->export_key_pem('private', 'secret'));
 
 Use keys by OpenSSL:
 
@@ -628,7 +628,6 @@ Generate keys:
 Load keys (Perl code):
 
  use Crypt::PK::DSA;
- use File::Slurp 'write_file';
 
  my $pkdsa = Crypt::PK::DSA->new;
  $pkdsa->import_key("dsakey.pub.der");

@@ -1088,7 +1088,7 @@ I<Since: CryptX-0.031>
 
 Exports the key's JSON Web Key Thumbprint as a string.
 
-If you don't know what this is, see RFC 7638 (C<https://tools.ietf.org/html/rfc7638>).
+If you don't know what this is, see RFC 7638 L<https://tools.ietf.org/html/rfc7638>.
 
  my $thumbprint = $pk->export_key_jwk_thumbprint('SHA256');
 
@@ -1313,10 +1313,10 @@ Verify signature (Perl code):
 
  use Crypt::PK::ECC;
  use Crypt::Digest 'digest_file';
- use File::Slurp 'read_file';
+ use Crypt::Misc 'read_rawfile';
 
  my $pkec = Crypt::PK::ECC->new("eckey.pub.pem");
- my $signature = read_file("input.sha1-ec.sig", binmode=>':raw');
+ my $signature = read_rawfile("input.sha1-ec.sig");
  my $valid = $pkec->verify_hash($signature, digest_file("SHA1", "input.data"), "SHA1", "v1.5");
  print $valid ? "SUCCESS" : "FAILURE";
 
@@ -1326,11 +1326,11 @@ Create signature (Perl code):
 
  use Crypt::PK::ECC;
  use Crypt::Digest 'digest_file';
- use File::Slurp 'write_file';
+ use Crypt::Misc 'write_rawfile';
 
  my $pkec = Crypt::PK::ECC->new("eckey.priv.pem");
  my $signature = $pkec->sign_hash(digest_file("SHA1", "input.data"), "SHA1", "v1.5");
- write_file("input.sha1-ec.sig", {binmode=>':raw'}, $signature);
+ write_rawfile("input.sha1-ec.sig", $signature);
 
 Verify signature (from commandline):
 
@@ -1341,15 +1341,15 @@ Verify signature (from commandline):
 Generate keys (Perl code):
 
  use Crypt::PK::ECC;
- use File::Slurp 'write_file';
+ use Crypt::Misc 'write_rawfile';
 
  my $pkec = Crypt::PK::ECC->new;
  $pkec->generate_key('secp160k1');
- write_file("eckey.pub.der",  {binmode=>':raw'}, $pkec->export_key_der('public'));
- write_file("eckey.priv.der", {binmode=>':raw'}, $pkec->export_key_der('private'));
- write_file("eckey.pub.pem",  $pkec->export_key_pem('public'));
- write_file("eckey.priv.pem", $pkec->export_key_pem('private'));
- write_file("eckey-passwd.priv.pem", $pkec->export_key_pem('private', 'secret'));
+ write_rawfile("eckey.pub.der",  $pkec->export_key_der('public'));
+ write_rawfile("eckey.priv.der", $pkec->export_key_der('private'));
+ write_rawfile("eckey.pub.pem",  $pkec->export_key_pem('public'));
+ write_rawfile("eckey.priv.pem", $pkec->export_key_pem('private'));
+ write_rawfile("eckey-passwd.priv.pem", $pkec->export_key_pem('private', 'secret'));
 
 Use keys by OpenSSL:
 
@@ -1374,7 +1374,6 @@ Generate keys:
 Load keys (Perl code):
 
  use Crypt::PK::ECC;
- use File::Slurp 'write_file';
 
  my $pkec = Crypt::PK::ECC->new;
  $pkec->import_key("eckey.pub.der");
