@@ -4,7 +4,7 @@ TODO:
         - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
         - CCM interface new-add-add-done
 
-0.053_* 2017-10-XX
+0.054   2017-10-12
         - fix Crypt::PK::DSA verify
         - libtomcrypt updated to 1.18 (+ some extra patches)
         - documentation fixes

@@ -2,7 +2,7 @@ package Crypt::Misc;
 
 use strict;
 use warnings;
-our $VERSION = '0.053_004';
+our $VERSION = '0.054';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 use Carp 'croak';
@@ -332,7 +332,7 @@ I<Since: 0.029>
 
  write_rawfile($filename, $rawdata);
 
-Write C<$rawdata> to file <$filename> as binary data.
+Write C<$rawdata> to file C<$filename> as binary data.
 
 =head2  slow_eq
 
@@ -356,11 +356,11 @@ Convert PEM to DER representation. Supports also password protected PEM data.
 
 I<Since: 0.029>
 
-  $pem_data = der_to_pem($pem_data, $header_name);
+  $pem_data = der_to_pem($der_data, $header_name);
   #or
-  $pem_data = der_to_pem($pem_data, $header_name, $password);
+  $pem_data = der_to_pem($der_data, $header_name, $password);
   #or
-  $pem_data = der_to_pem($pem_data, $header_name, $passord, $cipher_name);
+  $pem_data = der_to_pem($der_data, $header_name, $passord, $cipher_name);
 
   # $header_name e.g. "PUBLIC KEY", "RSA PRIVATE KEY" ...
   # $cipher_name e.g. "DES-EDE3-CBC", "AES-256-CBC" (DEFAULT) ...
