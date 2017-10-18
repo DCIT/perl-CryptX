@@ -324,73 +324,11 @@ MODULE = CryptX       PACKAGE = CryptX      PREFIX = CryptX_
 PROTOTYPES: DISABLE
 
 BOOT:
-    if(register_cipher(&blowfish_desc)==-1)    { croak("FATAL: cannot register_cipher blowfish"); }
-    if(register_cipher(&rc5_desc)==-1)         { croak("FATAL: cannot register_cipher rc5"); }
-    if(register_cipher(&rc6_desc)==-1)         { croak("FATAL: cannot register_cipher rc6"); }
-    if(register_cipher(&rc2_desc)==-1)         { croak("FATAL: cannot register_cipher rc2"); }
-    if(register_cipher(&saferp_desc)==-1)      { croak("FATAL: cannot register_cipher saferp"); }
-    if(register_cipher(&safer_k64_desc)==-1)   { croak("FATAL: cannot register_cipher safer_k64"); }
-    if(register_cipher(&safer_k128_desc)==-1)  { croak("FATAL: cannot register_cipher safer_k128"); }
-    if(register_cipher(&safer_sk64_desc)==-1)  { croak("FATAL: cannot register_cipher safer_sk64"); }
-    if(register_cipher(&safer_sk128_desc)==-1) { croak("FATAL: cannot register_cipher safer_sk128"); }
-    if(register_cipher(&aes_desc)==-1)         { croak("FATAL: cannot register_cipher aes"); }
-    if(register_cipher(&xtea_desc)==-1)        { croak("FATAL: cannot register_cipher xtea"); }
-    if(register_cipher(&twofish_desc)==-1)     { croak("FATAL: cannot register_cipher twofish"); }
-    if(register_cipher(&des_desc)==-1)         { croak("FATAL: cannot register_cipher des"); }
-    if(register_cipher(&des3_desc)==-1)        { croak("FATAL: cannot register_cipher des3"); }
-    if(register_cipher(&cast5_desc)==-1)       { croak("FATAL: cannot register_cipher cast5"); }
-    if(register_cipher(&noekeon_desc)==-1)     { croak("FATAL: cannot register_cipher noekeon"); }
-    if(register_cipher(&skipjack_desc)==-1)    { croak("FATAL: cannot register_cipher skipjack"); }
-    if(register_cipher(&khazad_desc)==-1)      { croak("FATAL: cannot register_cipher khazad"); }
-    if(register_cipher(&anubis_desc)==-1)      { croak("FATAL: cannot register_cipher anubis"); }
-    if(register_cipher(&kseed_desc)==-1)       { croak("FATAL: cannot register_cipher kseed"); }
-    if(register_cipher(&kasumi_desc)==-1)      { croak("FATAL: cannot register_cipher kasumi"); }
-    if(register_cipher(&multi2_desc)==-1)      { croak("FATAL: cannot register_cipher multi2"); }
-    if(register_cipher(&camellia_desc)==-1)    { croak("FATAL: cannot register_cipher camellia"); }
-    /* --- */
-    if(register_hash(&chc_desc)==-1)           { croak("FATAL: cannot register_hash chc_hash"); }
-    if(register_hash(&md2_desc)==-1)           { croak("FATAL: cannot register_hash md2"); }
-    if(register_hash(&md4_desc)==-1)           { croak("FATAL: cannot register_hash md4"); }
-    if(register_hash(&md5_desc)==-1)           { croak("FATAL: cannot register_hash md5"); }
-    if(register_hash(&rmd128_desc)==-1)        { croak("FATAL: cannot register_hash rmd128"); }
-    if(register_hash(&rmd160_desc)==-1)        { croak("FATAL: cannot register_hash rmd160"); }
-    if(register_hash(&rmd256_desc)==-1)        { croak("FATAL: cannot register_hash rmd256"); }
-    if(register_hash(&rmd320_desc)==-1)        { croak("FATAL: cannot register_hash rmd320"); }
-    if(register_hash(&sha1_desc)==-1)          { croak("FATAL: cannot register_hash sha1"); }
-    if(register_hash(&sha224_desc)==-1)        { croak("FATAL: cannot register_hash sha224"); }
-    if(register_hash(&sha256_desc)==-1)        { croak("FATAL: cannot register_hash sha256"); }
-    if(register_hash(&sha384_desc)==-1)        { croak("FATAL: cannot register_hash sha384"); }
-    if(register_hash(&sha512_desc)==-1)        { croak("FATAL: cannot register_hash sha512"); }
-    if(register_hash(&sha512_224_desc)==-1)    { croak("FATAL: cannot register_hash sha512_224"); }
-    if(register_hash(&sha512_256_desc)==-1)    { croak("FATAL: cannot register_hash sha512_256"); }
-    if(register_hash(&sha3_224_desc)==-1)      { croak("FATAL: cannot register_hash sha3_224"); }
-    if(register_hash(&sha3_256_desc)==-1)      { croak("FATAL: cannot register_hash sha3_256"); }
-    if(register_hash(&sha3_384_desc)==-1)      { croak("FATAL: cannot register_hash sha3_384"); }
-    if(register_hash(&sha3_512_desc)==-1)      { croak("FATAL: cannot register_hash sha3_512"); }
-    if(register_hash(&tiger_desc)==-1)         { croak("FATAL: cannot register_hash tiger"); }
-    if(register_hash(&whirlpool_desc)==-1)     { croak("FATAL: cannot register_hash whirlpool"); }
-    if(register_hash(&blake2b_160_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_160"); }
-    if(register_hash(&blake2b_256_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_256"); }
-    if(register_hash(&blake2b_384_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_384"); }
-    if(register_hash(&blake2b_512_desc)==-1)   { croak("FATAL: cannot register_hash blake2b_512"); }
-    if(register_hash(&blake2s_128_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_128"); }
-    if(register_hash(&blake2s_160_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_160"); }
-    if(register_hash(&blake2s_224_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_224"); }
-    if(register_hash(&blake2s_256_desc)==-1)   { croak("FATAL: cannot register_hash blake2s_256"); }
-    /* --- */
-    if(chc_register(find_cipher("aes"))==-1)   { croak("FATAL: chc_register failed"); }
-    /* --- */
-    if(register_prng(&fortuna_desc)==-1)       { croak("FATAL: cannot register_prng fortuna"); }
-    if(register_prng(&yarrow_desc)==-1)        { croak("FATAL: cannot register_prng yarrow"); }
-    if(register_prng(&rc4_desc)==-1)           { croak("FATAL: cannot register_prng rc4"); }
-    if(register_prng(&sober128_desc)==-1)      { croak("FATAL: cannot register_prng sober128"); }
-    if(register_prng(&chacha20_prng_desc)==-1) { croak("FATAL: cannot register_prng chacha20"); }
-    /* --- */
-#ifdef TFM_DESC
-    ltc_mp = tfm_desc;
-#else
+    if(register_all_ciphers() == CRYPT_ERROR)     { croak("FATAL: register_all_ciphers failed"); }
+    if(register_all_hashes() == CRYPT_ERROR)      { croak("FATAL: register_all_hashes failed"); }
+    if(register_all_prngs() == CRYPT_ERROR)       { croak("FATAL: register_all_prngs failed"); }
+    if(chc_register(find_cipher("aes"))==-1)      { croak("FATAL: chc_register failed"); }
     ltc_mp = ltm_desc;
-#endif
 
 SV *
 CryptX__encode_base64url(SV * in)
