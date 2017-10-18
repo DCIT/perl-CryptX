@@ -68,7 +68,14 @@ my %list = (
                          spec_rounds=>0, spec_key=>'XXX-ROUNDS-FIXED' },
         Camellia    => { info=>'Symetric cipher Camellia, key size: 128/192/256 bits (Crypt::CBC compliant)', urls=>['http://en.wikipedia.org/wiki/Camellia_(cipher)'],
                          spec_rounds=>0, spec_key=>'XXX-DETERMINED-BY-KEYSIZE' },
+        IDEA        => { info=>'Symetric cipher IDEA, key size: 128 bits (Crypt::CBC compliant)', urls=>['http://en.wikipedia.org/wiki/International_Data_Encryption_Algorithm'],
+                         spec_rounds=>0, spec_key=>'XXX-ROUNDS-FIXED' },
+        Serpent     => { info=>'Symetric cipher Serpent, key size: 128/192/256 bits (Crypt::CBC compliant)', urls=>['http://en.wikipedia.org/wiki/Serpent_(cipher)'],
+                         spec_rounds=>0, spec_key=>'XXX-ROUNDS-FIXED' },
 );
+
+my ($pmver) = grep { /^our\s+\$VERSION/ } read_file("$FindBin::Bin/../lib/Crypt/Digest.pm");
+$pmver =~ s/our\s+\$VERSION\s*=\s*'(.*?)'.*$/$1/s;
 
 for my $n (keys %list) {
   warn "Processing cipher: '$n'\n";
@@ -76,6 +83,7 @@ for my $n (keys %list) {
   my $data = {
     %{$list{$n}},
     comment   => "### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!",
+    pmver     => $pmver,
     orig_name => $n,
     uc_name   => uc($n),
     lc_name   => lc($n),

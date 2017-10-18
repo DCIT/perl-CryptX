@@ -50,11 +50,15 @@ my %list = (
 #                 desc=>q[xxx-desc-goes here]},
 );
 
+my ($pmver) = grep { /^our\s+\$VERSION/ } read_file("$FindBin::Bin/../lib/Crypt/Digest.pm");
+$pmver =~ s/our\s+\$VERSION\s*=\s*'(.*?)'.*$/$1/s;
+
 for my $n (keys %list) {
   warn "Processing mode: '$n'\n";
 
   my $data = {
     comment   => "### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!",
+    pmver     => $pmver,
     orig_name => $n,
     uc_name   => uc($n),
     lc_name   => lc($n),
