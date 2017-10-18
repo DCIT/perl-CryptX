@@ -260,7 +260,7 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 =item * L<CryptX|CryptX>
 [% FOREACH v IN urls %]
-=item * L<[%v%]|[%v%]>
+=item * L<[%v%]>
 [% END %]
 =back
 

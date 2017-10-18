@@ -147,7 +147,7 @@ Logically joins all arguments into a single string, and returns its Poly1305 mes
 
 =item * L<CryptX|CryptX>
 
-=item * L<https://www.ietf.org/rfc/rfc7539.txt|https://www.ietf.org/rfc/rfc7539.txt>
+=item * L<https://www.ietf.org/rfc/rfc7539.txt>
 
 =back
 

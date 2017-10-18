@@ -110,9 +110,9 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
+=item * L<CryptX|CryptX>, L<Crypt::Cipher>
 
-=item * L<http://en.wikipedia.org/wiki/Anubis_(cipher)|http://en.wikipedia.org/wiki/Anubis_(cipher)>
+=item * L<https://en.wikipedia.org/wiki/Anubis_(cipher)>
 
 =back
 

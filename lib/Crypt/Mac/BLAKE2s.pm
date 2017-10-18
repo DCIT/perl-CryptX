@@ -147,7 +147,7 @@ Logically joins all arguments into a single string, and returns its BLAKE2s mess
 
 =item * L<CryptX|CryptX>
 
-=item * L<https://tools.ietf.org/html/rfc7693|https://tools.ietf.org/html/rfc7693>
+=item * L<https://tools.ietf.org/html/rfc7693>
 
 =back
 

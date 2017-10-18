@@ -216,9 +216,9 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX|CryptX>, L<Crypt::Digest>
 [% FOREACH v IN urls %]
-=item * L<[%v%]|[%v%]>
+=item * L<[%v%]>
 [% END %]
 =back
 

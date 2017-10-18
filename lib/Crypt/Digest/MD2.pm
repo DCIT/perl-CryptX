@@ -216,9 +216,9 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX|CryptX>, L<Crypt::Digest>
 
-=item * L<http://en.wikipedia.org/wiki/MD2_(cryptography)|http://en.wikipedia.org/wiki/MD2_(cryptography)>
+=item * L<https://en.wikipedia.org/wiki/MD2_(cryptography)>
 
 =back
 

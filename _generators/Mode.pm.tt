@@ -171,10 +171,10 @@ Crypt::Mode::[%orig_name%] - [%info%]
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Cipher|Crypt::Cipher>
+=item * L<CryptX|CryptX>, L<Crypt::Cipher>
 
-=item * L<Crypt::Cipher::AES|Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish|Crypt::Cipher::Blowfish>, ...
+=item * L<Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish>, ...
 [% FOREACH v IN urls %]
-=item * L<[%v%]|[%v%]>
+=item * L<[%v%]>
 [% END %]
 =back

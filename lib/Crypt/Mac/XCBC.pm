@@ -149,7 +149,7 @@ Logically joins all arguments into a single string, and returns its XCBC message
 
 =item * L<CryptX|CryptX>
 
-=item * L<https://www.ietf.org/rfc/rfc3566.txt|https://www.ietf.org/rfc/rfc3566.txt>
+=item * L<https://www.ietf.org/rfc/rfc3566.txt>
 
 =back
 
