@@ -1,11 +1,11 @@
 OBJS=ltc/ciphers/anubis.obj ltc/ciphers/blowfish.obj ltc/ciphers/camellia.obj ltc/ciphers/cast5.obj \
-ltc/ciphers/des.obj ltc/ciphers/kasumi.obj ltc/ciphers/khazad.obj ltc/ciphers/kseed.obj \
-ltc/ciphers/multi2.obj ltc/ciphers/noekeon.obj ltc/ciphers/rc2.obj ltc/ciphers/rc5.obj \
-ltc/ciphers/rc6.obj ltc/ciphers/skipjack.obj ltc/ciphers/xtea.obj ltc/ciphers/aes/aes.obj \
-ltc/ciphers/safer/safer.obj ltc/ciphers/safer/saferp.obj ltc/ciphers/twofish/twofish.obj \
-ltc/encauth/ccm/ccm_add_aad.obj ltc/encauth/ccm/ccm_add_nonce.obj ltc/encauth/ccm/ccm_done.obj \
-ltc/encauth/ccm/ccm_init.obj ltc/encauth/ccm/ccm_memory.obj ltc/encauth/ccm/ccm_process.obj \
-ltc/encauth/ccm/ccm_reset.obj ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj \
+ltc/ciphers/des.obj ltc/ciphers/idea.obj ltc/ciphers/kasumi.obj ltc/ciphers/khazad.obj \
+ltc/ciphers/kseed.obj ltc/ciphers/multi2.obj ltc/ciphers/noekeon.obj ltc/ciphers/rc2.obj \
+ltc/ciphers/rc5.obj ltc/ciphers/rc6.obj ltc/ciphers/serpent.obj ltc/ciphers/skipjack.obj \
+ltc/ciphers/xtea.obj ltc/ciphers/aes/aes.obj ltc/ciphers/safer/safer.obj ltc/ciphers/safer/saferp.obj \
+ltc/ciphers/twofish/twofish.obj ltc/encauth/ccm/ccm_add_aad.obj ltc/encauth/ccm/ccm_add_nonce.obj \
+ltc/encauth/ccm/ccm_done.obj ltc/encauth/ccm/ccm_init.obj ltc/encauth/ccm/ccm_memory.obj \
+ltc/encauth/ccm/ccm_process.obj ltc/encauth/ccm/ccm_reset.obj ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj \
 ltc/encauth/chachapoly/chacha20poly1305_decrypt.obj ltc/encauth/chachapoly/chacha20poly1305_done.obj \
 ltc/encauth/chachapoly/chacha20poly1305_encrypt.obj ltc/encauth/chachapoly/chacha20poly1305_init.obj \
 ltc/encauth/chachapoly/chacha20poly1305_memory.obj ltc/encauth/chachapoly/chacha20poly1305_setiv.obj \
@@ -123,7 +123,7 @@ ltc/pk/rsa/rsa_verify_hash.obj ltc/prngs/chacha20.obj ltc/prngs/fortuna.obj ltc/
 ltc/prngs/rng_get_bytes.obj ltc/prngs/rng_make_prng.obj ltc/prngs/sober128.obj ltc/prngs/sprng.obj \
 ltc/prngs/yarrow.obj ltc/stream/chacha/chacha_crypt.obj ltc/stream/chacha/chacha_done.obj \
 ltc/stream/chacha/chacha_ivctr32.obj ltc/stream/chacha/chacha_ivctr64.obj ltc/stream/chacha/chacha_keystream.obj \
-ltc/stream/chacha/chacha_setup.obj ltc/stream/rc4/rc4.obj ltc/stream/sober128/sober128.obj \
+ltc/stream/chacha/chacha_setup.obj ltc/stream/rc4/rc4_stream.obj ltc/stream/sober128/sober128_stream.obj \
 ltm/bncore.obj ltm/bn_error.obj ltm/bn_fast_mp_invmod.obj ltm/bn_fast_mp_montgomery_reduce.obj \
 ltm/bn_fast_s_mp_mul_digs.obj ltm/bn_fast_s_mp_mul_high_digs.obj ltm/bn_fast_s_mp_sqr.obj \
 ltm/bn_mp_2expt.obj ltm/bn_mp_abs.obj ltm/bn_mp_add.obj ltm/bn_mp_addmod.obj ltm/bn_mp_add_d.obj \

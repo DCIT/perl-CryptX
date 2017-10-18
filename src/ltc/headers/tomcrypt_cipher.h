@@ -154,6 +154,23 @@ struct camellia_key {
 };
 #endif
 
+#ifdef LTC_IDEA
+/* rounds */
+#define LTC_IDEA_ROUNDS 8
+/* key schedule length in # of unsigned shorts */
+#define LTC_IDEA_KEYLEN 6*LTC_IDEA_ROUNDS+4
+struct idea_key {
+   unsigned short int ek[LTC_IDEA_KEYLEN]; /* enc key */
+   unsigned short int dk[LTC_IDEA_KEYLEN]; /* dec key */
+};
+#endif
+
+#ifdef LTC_SERPENT
+struct serpent_key {
+   ulong32 k[33*4];
+};
+#endif
+
 typedef union Symmetric_key {
 #ifdef LTC_DES
    struct des_key des;
@@ -212,6 +229,12 @@ typedef union Symmetric_key {
 #endif
 #ifdef LTC_CAMELLIA
    struct camellia_key camellia;
+#endif
+#ifdef LTC_IDEA
+   struct idea_key     idea;
+#endif
+#ifdef LTC_SERPENT
+   struct serpent_key  serpent;
 #endif
    void   *data;
 } symmetric_key;
@@ -814,6 +837,26 @@ int camellia_test(void);
 void camellia_done(symmetric_key *skey);
 int camellia_keysize(int *keysize);
 extern const struct ltc_cipher_descriptor camellia_desc;
+#endif
+
+#ifdef LTC_IDEA
+int idea_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_key *skey);
+int idea_ecb_encrypt(const unsigned char *pt, unsigned char *ct, symmetric_key *skey);
+int idea_ecb_decrypt(const unsigned char *ct, unsigned char *pt, symmetric_key *skey);
+int idea_test(void);
+void idea_done(symmetric_key *skey);
+int idea_keysize(int *keysize);
+extern const struct ltc_cipher_descriptor idea_desc;
+#endif
+
+#ifdef LTC_SERPENT
+int serpent_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_key *skey);
+int serpent_ecb_encrypt(const unsigned char *pt, unsigned char *ct, symmetric_key *skey);
+int serpent_ecb_decrypt(const unsigned char *ct, unsigned char *pt, symmetric_key *skey);
+int serpent_test(void);
+void serpent_done(symmetric_key *skey);
+int serpent_keysize(int *keysize);
+extern const struct ltc_cipher_descriptor serpent_desc;
 #endif
 
 #ifdef LTC_ECB_MODE
