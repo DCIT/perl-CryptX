@@ -324,11 +324,10 @@ MODULE = CryptX       PACKAGE = CryptX      PREFIX = CryptX_
 PROTOTYPES: DISABLE
 
 BOOT:
-    if(register_all_ciphers() == CRYPT_ERROR)     { croak("FATAL: register_all_ciphers failed"); }
-    if(register_all_hashes() == CRYPT_ERROR)      { croak("FATAL: register_all_hashes failed"); }
-    if(register_all_prngs() == CRYPT_ERROR)       { croak("FATAL: register_all_prngs failed"); }
-    if(chc_register(find_cipher("aes"))==-1)      { croak("FATAL: chc_register failed"); }
-    ltc_mp = ltm_desc;
+    if(register_all_ciphers() != CRYPT_OK)     { croak("FATAL: register_all_ciphers failed"); }
+    if(register_all_hashes()  != CRYPT_OK)     { croak("FATAL: register_all_hashes failed"); }
+    if(register_all_prngs()   != CRYPT_OK)     { croak("FATAL: register_all_prngs failed"); }
+    if(crypt_mp_init("ltm")   != CRYPT_OK)     { croak("FATAL: crypt_mp_init failed"); }
 
 SV *
 CryptX__encode_base64url(SV * in)
