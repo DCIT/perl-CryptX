@@ -107,8 +107,7 @@ _encrypt(Crypt::Mode::CBC self, SV * data)
             RETVAL = NEWSV(0, i);
             SvPOK_only(RETVAL);
             SvCUR_set(RETVAL, i);
-            out_data = (unsigned char *)SvPV_nolen(RETVAL);
-
+            out_data = (unsigned char *)SvPVX(RETVAL);
             if (has_tmp_block) {
               Copy(tmp_block, out_data, blen, unsigned char);
               out_data += blen;
@@ -233,7 +232,7 @@ _decrypt(Crypt::Mode::CBC self, SV * data)
               RETVAL = NEWSV(0, i);
               SvPOK_only(RETVAL);
               SvCUR_set(RETVAL, i);
-              out_data = (unsigned char *)SvPV_nolen(RETVAL);
+              out_data = (unsigned char *)SvPVX(RETVAL);
               if (has_tmp_block) {
                 Copy(tmp_block, out_data, blen, unsigned char);
                 out_data += blen;

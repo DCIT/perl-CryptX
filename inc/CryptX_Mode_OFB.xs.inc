@@ -64,24 +64,31 @@ _crypt(Crypt::Mode::OFB self, SV * data)
         unsigned char *in_data, *out_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len==0) {
+        if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
           RETVAL = NEWSV(0, in_data_len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
-          out_data = (unsigned char *)SvPV_nolen(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
 
           if (self->direction == 1) {
             rv = ofb_encrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);
-            if (rv != CRYPT_OK) croak("FATAL: ofb_encrypt failed: %s", error_to_string(rv));
+            if (rv != CRYPT_OK) {
+              SvREFCNT_dec(RETVAL);
+              croak("FATAL: ofb_encrypt failed: %s", error_to_string(rv));
+            }
           }
           else if (self->direction == -1) {
             rv = ofb_decrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);
-            if (rv != CRYPT_OK) croak("FATAL: ofb_decrypt failed: %s", error_to_string(rv));
+            if (rv != CRYPT_OK) {
+              SvREFCNT_dec(RETVAL);
+              croak("FATAL: ofb_decrypt failed: %s", error_to_string(rv));
+            }
           }
           else {
+            SvREFCNT_dec(RETVAL);
             croak("FATAL: ofb_crypt failed: call start_encrypt or start_decrypt first");
           }
         }

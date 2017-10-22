@@ -65,7 +65,7 @@ encrypt_add(Crypt::AuthEnc::GCM self, SV * data)
         unsigned char *in_data, *out_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len==0) {
+        if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else
@@ -73,9 +73,12 @@ encrypt_add(Crypt::AuthEnc::GCM self, SV * data)
           RETVAL = NEWSV(0, in_data_len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
-          out_data = (unsigned char *)SvPV_nolen(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
           rv = gcm_process(&self->state, in_data, (unsigned long)in_data_len, out_data, GCM_ENCRYPT);
-          if (rv != CRYPT_OK) croak("FATAL: encrypt_add/gcm_process failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: encrypt_add/gcm_process failed: %s", error_to_string(rv));
+          }
         }
     }
     OUTPUT:
@@ -118,16 +121,19 @@ decrypt_add(Crypt::AuthEnc::GCM self, SV * data)
         unsigned char *in_data, *out_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len==0) {
+        if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
           RETVAL = NEWSV(0, in_data_len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
-          out_data = (unsigned char *)SvPV_nolen(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
           rv = gcm_process(&self->state, out_data, (unsigned long)in_data_len, in_data, GCM_DECRYPT);
-          if (rv != CRYPT_OK) croak("FATAL: encrypt_add/gcm_process failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: encrypt_add/gcm_process failed: %s", error_to_string(rv));
+          }
         }
     }
     OUTPUT:

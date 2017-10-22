@@ -84,9 +84,12 @@ _bytes(Crypt::PRNG self, IV curpid, STRLEN output_len)
         RETVAL = NEWSV(0, output_len);
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, output_len);
-        rdata = (unsigned char *)SvPV_nolen(RETVAL);
+        rdata = (unsigned char *)SvPVX(RETVAL);
         rv_len = (self->desc->read)(rdata, (unsigned long)output_len, &self->state);
-        if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
+        if ((UV)rv_len != output_len) {
+          SvREFCNT_dec(RETVAL);
+          croak("FATAL: PRNG_read failed");
+        }
     }
     OUTPUT:
         RETVAL

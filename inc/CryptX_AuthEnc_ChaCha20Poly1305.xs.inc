@@ -96,16 +96,19 @@ decrypt_add(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * data)
         unsigned char *in_data, *out_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len==0) {
+        if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
           RETVAL = NEWSV(0, in_data_len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
-          out_data = (unsigned char *)SvPV_nolen(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
           rv = chacha20poly1305_decrypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
-          if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_decrypt failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: chacha20poly1305_decrypt failed: %s", error_to_string(rv));
+          }
         }
     }
     OUTPUT:
@@ -120,16 +123,19 @@ encrypt_add(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * data)
         unsigned char *in_data, *out_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len==0) {
+        if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
           RETVAL = NEWSV(0, in_data_len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
-          out_data = (unsigned char *)SvPV_nolen(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
           rv = chacha20poly1305_encrypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
-          if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_encrypt failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: chacha20poly1305_encrypt failed: %s", error_to_string(rv));
+          }
         }
     }
     OUTPUT:

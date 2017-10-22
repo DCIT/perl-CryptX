@@ -59,9 +59,12 @@ keystream(Crypt::Stream::ChaCha self, STRLEN out_len)
         RETVAL = NEWSV(0, out_len);
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, out_len);
-        out_data = (unsigned char *)SvPV_nolen(RETVAL);
+        out_data = (unsigned char *)SvPVX(RETVAL);
         rv = chacha_keystream(&self->state, out_data, out_len);
-        if (rv != CRYPT_OK) croak("FATAL: chacha_keystream failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          SvREFCNT_dec(RETVAL);
+          croak("FATAL: chacha_keystream failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL
@@ -82,9 +85,12 @@ crypt(Crypt::Stream::ChaCha self, SV * data)
           RETVAL = NEWSV(0, in_data_len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
-          out_data = (unsigned char *)SvPV_nolen(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
           rv = chacha_crypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
-          if (rv != CRYPT_OK) croak("FATAL: chacha_crypt failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: chacha_crypt failed: %s", error_to_string(rv));
+          }
         }
     }
     OUTPUT:

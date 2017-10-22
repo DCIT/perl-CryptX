@@ -77,17 +77,21 @@ encrypt(self, data)
         STRLEN len;
         void *plaintext = SvPVbyte(data, len);
 
-        if (len==0)
+        if (len == 0) {
           RETVAL = newSVpvn("", 0);
-        else if (len % self->desc->block_length)
-          croak ("FATAL: sizeof(data) should be multiple of blocksize (%d)", self->desc->block_length);
-        else {
-          /* idea from Crypt::Rijndael */
+        }
+        else if (len == self->desc->block_length) {
           RETVAL = NEWSV(0, len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);
-          rv = self->desc->ecb_encrypt((unsigned char *)plaintext, (unsigned char *)SvPV_nolen(RETVAL), &self->skey);
-          if (rv!=CRYPT_OK) croak("FATAL: encrypt failed: %s", error_to_string(rv));
+          rv = self->desc->ecb_encrypt((unsigned char *)plaintext, (unsigned char *)SvPVX(RETVAL), &self->skey);
+          if (rv!=CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: encrypt failed: %s", error_to_string(rv));
+          }
+        }
+        else {
+          croak ("FATAL: input size not equal to blocksize (%d)", self->desc->block_length);
         }
     }
     OUTPUT:
@@ -103,17 +107,21 @@ decrypt(self, data)
         STRLEN len;
         void *ciphertext = SvPVbyte(data, len);
 
-        if (len==0)
+        if (len == 0) {
           RETVAL = newSVpvn("", 0);
-        else if (len % self->desc->block_length)
-          croak ("FATAL: sizeof(data) should be multiple of blocksize (%d)", self->desc->block_length);
-        else {
-          /* idea from Crypt::Rijndael */
+        }
+        else if (len == self->desc->block_length) {
           RETVAL = NEWSV(0, len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);
-          rv = self->desc->ecb_decrypt((unsigned char *)ciphertext, (unsigned char *)SvPV_nolen(RETVAL), &self->skey);
-          if (rv!=CRYPT_OK) croak("FATAL: decrypt failed: %s", error_to_string(rv));
+          rv = self->desc->ecb_decrypt((unsigned char *)ciphertext, (unsigned char *)SvPVX(RETVAL), &self->skey);
+          if (rv!=CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: decrypt failed: %s", error_to_string(rv));
+          }
+        }
+        else {
+          croak ("FATAL: input size not equal to blocksize (%d)", self->desc->block_length);
         }
     }
     OUTPUT:

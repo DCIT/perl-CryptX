@@ -29,7 +29,7 @@ _memory_encrypt(char *cipher_name, SV *key, SV *nonce, SV *header, unsigned long
         if(tag_len<4 || tag_len>16) tag_len = 16;
 
         rv = ccm_memory(id, k, (unsigned long)k_len, NULL, n, (unsigned long)n_len, h, (unsigned long)h_len,
-                        pt, (unsigned long)pt_len, (unsigned char *)SvPV_nolen(ct), tag, &tag_len, CCM_ENCRYPT);
+                        pt, (unsigned long)pt_len, (unsigned char *)SvPVX(ct), tag, &tag_len, CCM_ENCRYPT);
         if (rv != CRYPT_OK) croak("FATAL: ccm_memory failed: %s", error_to_string(rv));
 
         XPUSHs(sv_2mortal(ct));

@@ -67,9 +67,12 @@ done(Crypt::Digest::SHAKE self, STRLEN out_len)
         RETVAL = NEWSV(0, out_len);
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, out_len);
-        out_data = (unsigned char *)SvPV_nolen(RETVAL);
+        out_data = (unsigned char *)SvPVX(RETVAL);
         rv = sha3_shake_done(&self->state, out_data, out_len);
-        if (rv != CRYPT_OK) croak("FATAL: sha3_shake_done failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          SvREFCNT_dec(RETVAL);
+          croak("FATAL: sha3_shake_done failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL

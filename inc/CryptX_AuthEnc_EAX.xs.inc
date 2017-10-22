@@ -57,16 +57,19 @@ encrypt_add(Crypt::AuthEnc::EAX self, SV * data)
         unsigned char *in_data, *out_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len==0) {
+        if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
           RETVAL = NEWSV(0, in_data_len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
-          out_data = (unsigned char *)SvPV_nolen(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
           rv = eax_encrypt(&self->state, in_data, out_data, (unsigned long)in_data_len);
-          if (rv != CRYPT_OK) croak("FATAL: eax_encrypt failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: eax_encrypt failed: %s", error_to_string(rv));
+          }
         }
     }
     OUTPUT:
@@ -81,16 +84,19 @@ decrypt_add(Crypt::AuthEnc::EAX self, SV * data)
         unsigned char *in_data, *out_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len==0) {
+        if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
           RETVAL = NEWSV(0, in_data_len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
-          out_data = (unsigned char *)SvPV_nolen(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
           rv = eax_decrypt(&self->state, in_data, out_data, (unsigned long)in_data_len);
-          if (rv != CRYPT_OK) croak("FATAL: eax_decrypt failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: eax_decrypt failed: %s", error_to_string(rv));
+          }
         }
     }
     OUTPUT:
