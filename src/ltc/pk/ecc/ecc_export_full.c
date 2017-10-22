@@ -91,7 +91,6 @@ int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key
 
       /* ECParameters used by ECPrivateKey or SubjectPublicKeyInfo below */
       LTC_SET_ASN1(asn_ecparams, 0, LTC_ASN1_OBJECT_IDENTIFIER, key->dp->oid.OID, key->dp->oid.OIDlen);
-      type &= ~PK_CURVEOID;
   }
   else {
       /* from http://tools.ietf.org/html/rfc3279
@@ -132,6 +131,8 @@ int ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key
       /* ECParameters used by ECPrivateKey or SubjectPublicKeyInfo below */
       LTC_SET_ASN1(asn_ecparams, 0, LTC_ASN1_SEQUENCE, seq_ecparams, 6UL);
   }
+
+  type &= ~PK_CURVEOID;
 
   if (type == PK_PRIVATE) {
       /* private key format: http://tools.ietf.org/html/rfc5915
