@@ -13,7 +13,6 @@ use Carp;
 use CryptX;
 use Crypt::Digest 'digest_data';
 use Crypt::Misc qw(read_rawfile pem_to_der);
-use Scalar::Util 'looks_like_number';
 
 my %DH_PARAMS = (
   ike768  => { g => 2, p => 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1'.
@@ -226,7 +225,7 @@ sub generate_key {
     # group name
     return $self->_generate_key_gp($DH_PARAMS{$param}{g}, $DH_PARAMS{$param}{p}) if $DH_PARAMS{$param};
     # size
-    return $self->_generate_key_size($param) if looks_like_number($param);
+    return $self->_generate_key_size($param) if $param && $param =~ /^[0-9]+/;
   }
   elsif (ref $param eq 'SCALAR') {
     my $data = $$param;
