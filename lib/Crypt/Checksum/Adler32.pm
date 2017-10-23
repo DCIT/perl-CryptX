@@ -2,7 +2,7 @@ package Crypt::Checksum::Adler32;
 
 use strict;
 use warnings;
-our $VERSION = '0.054_001';
+our $VERSION = '0.054_002';
 use Carp;
 use CryptX;
 
