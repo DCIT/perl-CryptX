@@ -15,7 +15,10 @@ _new(SV * key)
         if (!RETVAL) croak("FATAL: Newz failed");
 
         rv = rc4_stream_setup(&RETVAL->state, k, (unsigned long)k_len);
-        if (rv != CRYPT_OK) croak("FATAL: rc4_stream_setup failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: rc4_stream_setup failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL
@@ -64,7 +67,7 @@ crypt(Crypt::Stream::RC4 self, SV * data)
         unsigned char *in_data, *out_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len==0) {
+        if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {

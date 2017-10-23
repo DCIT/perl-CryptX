@@ -9,9 +9,15 @@ _new()
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->key.type = -1;
         RETVAL->pindex = find_prng("chacha20");
-        if(RETVAL->pindex==-1) croak("FATAL: find_prng('chacha20') failed");
+        if (RETVAL->pindex == -1) {
+          Safefree(RETVAL);
+          croak("FATAL: find_prng('chacha20') failed");
+        }
         rv = rng_make_prng(320, RETVAL->pindex, &RETVAL->pstate, NULL); /* 320bits = 40bytes */
-        if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL
@@ -155,7 +161,7 @@ key2hash(Crypt::PK::RSA self)
         if (self->key.type == -1 || self->key.N == NULL) XSRETURN_UNDEF;
         nsize = mp_unsigned_bin_size(self->key.N);
         rv_hash = newHV();
-        /* =====> e */
+        /* e */
         siz = (self->key.e) ? mp_unsigned_bin_size(self->key.e) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'e' too big number");
@@ -167,7 +173,7 @@ key2hash(Crypt::PK::RSA self)
         else{
           not_used = hv_store(rv_hash, "e", 1, newSVpv("", 0), 0);
         }
-        /* =====> d */
+        /* d */
         siz = (self->key.d) ? mp_unsigned_bin_size(self->key.d) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'd' too big number");
@@ -179,7 +185,7 @@ key2hash(Crypt::PK::RSA self)
         else{
           not_used = hv_store(rv_hash, "d", 1, newSVpv("", 0), 0);
         }
-        /* =====> N */
+        /* N */
         siz = (self->key.N) ? nsize : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'N' too big number");
@@ -191,7 +197,7 @@ key2hash(Crypt::PK::RSA self)
         else{
           not_used = hv_store(rv_hash, "N", 1, newSVpv("", 0), 0);
         }
-        /* =====> q */
+        /* q */
         siz = (self->key.q) ? mp_unsigned_bin_size(self->key.q) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'q' too big number");
@@ -203,7 +209,7 @@ key2hash(Crypt::PK::RSA self)
         else{
           not_used = hv_store(rv_hash, "q", 1, newSVpv("", 0), 0);
         }
-        /* =====> p */
+        /* p */
         siz = (self->key.p) ? mp_unsigned_bin_size(self->key.p) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'p' too big number");
@@ -215,7 +221,7 @@ key2hash(Crypt::PK::RSA self)
         else{
           not_used = hv_store(rv_hash, "p", 1, newSVpv("", 0), 0);
         }
-        /* =====> qP */
+        /* qP */
         siz = (self->key.qP) ? mp_unsigned_bin_size(self->key.qP) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'qP' too big number");
@@ -227,7 +233,7 @@ key2hash(Crypt::PK::RSA self)
         else{
           not_used = hv_store(rv_hash, "qP", 2, newSVpv("", 0), 0);
         }
-        /* =====> dP */
+        /* dP */
         siz = (self->key.dP) ? mp_unsigned_bin_size(self->key.dP) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'dP' too big number");
@@ -239,7 +245,7 @@ key2hash(Crypt::PK::RSA self)
         else{
           not_used = hv_store(rv_hash, "dP", 2, newSVpv("", 0), 0);
         }
-        /* =====> dQ */
+        /* dQ */
         siz = (self->key.dQ) ? mp_unsigned_bin_size(self->key.dQ) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'dQ' too big number");
@@ -251,9 +257,9 @@ key2hash(Crypt::PK::RSA self)
         else{
           not_used = hv_store(rv_hash, "dQ", 2, newSVpv("", 0), 0);
         }
-        /* =====> size */
+        /* size */
         not_used = hv_store(rv_hash, "size", 4, newSViv(nsize), 0);
-        /* =====> type */
+        /* type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
         if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */
         RETVAL = newRV_noinc((SV*)rv_hash);
@@ -303,7 +309,7 @@ _encrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "oaep", 4)) {
           hash_id = find_hash(oaep_hash);
-          if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
+          if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
           lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_encrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
                                   &self->pstate, self->pindex,
@@ -348,7 +354,7 @@ _decrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "oaep", 4)) {
           hash_id = find_hash(oaep_hash);
-          if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
+          if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
           lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_decrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
                                   hash_id, LTC_PKCS_1_OAEP, &stat, &self->key);
@@ -391,7 +397,7 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name=NULL, uns
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "pss", 3)) {
           hash_id = find_hash(hash_name);
-          if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
+          if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_PSS,
                                 &self->pstate, self->pindex,
                                 hash_id, saltlen, &self->key);
@@ -400,7 +406,7 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name=NULL, uns
         }
         else if (strnEQ(padding, "v1.5", 4)) {
           hash_id = find_hash(hash_name);
-          if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
+          if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_V1_5,
                                 &self->pstate, self->pindex,
                                 hash_id, 0, &self->key);
@@ -439,14 +445,14 @@ _verify(Crypt::PK::RSA self, SV * sig, SV * data, char * padding, char * hash_na
         stat = 0;
         if (strnEQ(padding, "pss", 3)) {
           hash_id = find_hash(hash_name);
-          if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
+          if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_PKCS_1_PSS,
                                 hash_id, saltlen, &stat, &self->key);
           if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
         }
         else if (strnEQ(padding, "v1.5", 4)) {
           hash_id = find_hash(hash_name);
-          if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
+          if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_PKCS_1_V1_5,
                                 hash_id, 0, &stat, &self->key);
           if (rv != CRYPT_OK || stat != 1) RETVAL = 0;

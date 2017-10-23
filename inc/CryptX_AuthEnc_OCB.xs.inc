@@ -8,7 +8,7 @@ _new(char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
         unsigned char *k=NULL;
         unsigned char *n=NULL;
         STRLEN n_len=0;
-        int id;
+        int rv, id;
 
         if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
@@ -16,13 +16,15 @@ _new(char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
         n = (unsigned char *) SvPVbyte(nonce, n_len);
 
         id = find_cipher(cipher_name);
-        if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         Newz(0, RETVAL, 1, struct ocb_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        if (ocb3_init(&RETVAL->state, id, k, (unsigned long)k_len, n, (unsigned long)n_len, taglen) != CRYPT_OK) {
-          croak("FATAL: ocb setup failed");
+        rv = ocb3_init(&RETVAL->state, id, k, (unsigned long)k_len, n, (unsigned long)n_len, taglen);
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: ocb setup failed: %s", error_to_string(rv));
         }
     }
     OUTPUT:
@@ -98,20 +100,23 @@ encrypt_last(Crypt::AuthEnc::OCB self, SV * data)
         unsigned char *in_data, *out_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len > 0) {
+        if (in_data_len == 0) {
+          rv = ocb3_encrypt_last(&self->state, in_data, 0, NULL);
+          if (rv != CRYPT_OK) {
+            croak("FATAL: ocb3_encrypt_last failed: %s", error_to_string(rv));
+          }
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
           RETVAL = NEWSV(0, in_data_len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-        }
-        else {
-          RETVAL = newSVpvn("", 0);
-          out_data = NULL;
-        }
-        rv = ocb3_encrypt_last(&self->state, in_data, (unsigned long)in_data_len, out_data);
-        if (rv != CRYPT_OK) {
-          SvREFCNT_dec(RETVAL);
-          croak("FATAL: ocb3_encrypt_last failed: %s", error_to_string(rv));
+          rv = ocb3_encrypt_last(&self->state, in_data, (unsigned long)in_data_len, out_data);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: ocb3_encrypt_last failed: %s", error_to_string(rv));
+          }
         }
     }
     OUTPUT:
@@ -126,7 +131,7 @@ decrypt_add(Crypt::AuthEnc::OCB self, SV * data)
         unsigned char *in_data, *out_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len==0) {
+        if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
@@ -156,18 +161,24 @@ decrypt_last(Crypt::AuthEnc::OCB self, SV * data)
         unsigned char *in_data, *out_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len > 0) {
+        if (in_data_len == 0) {
+          rv = ocb3_decrypt_last(&self->state, in_data, 0, NULL);
+          if (rv != CRYPT_OK) {
+            croak("FATAL: ocb3_encrypt_last failed: %s", error_to_string(rv));
+          }
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
           RETVAL = NEWSV(0, in_data_len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
+          rv = ocb3_decrypt_last(&self->state, in_data, (unsigned long)in_data_len, out_data);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: ocb3_encrypt_last failed: %s", error_to_string(rv));
+          }
         }
-        else {
-          RETVAL = newSVpvn("", 0);
-          out_data = NULL;
-        }
-        rv = ocb3_decrypt_last(&self->state, in_data, (unsigned long)in_data_len, out_data);
-        if (rv != CRYPT_OK) croak("FATAL: ocb3_encrypt_last failed: %s", error_to_string(rv));
     }
     OUTPUT:
         RETVAL
@@ -202,7 +213,7 @@ decrypt_done(Crypt::AuthEnc::OCB self, ...)
           XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
         }
         else {
-          if(!SvPOK(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
+          if (!SvPOK(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
           expected_tag = (unsigned char *) SvPVbyte(ST(1), expected_tag_len);
           if (expected_tag_len!=tag_len) {
             XPUSHs(sv_2mortal(newSViv(0))); /* false */

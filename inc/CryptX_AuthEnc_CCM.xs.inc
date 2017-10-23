@@ -20,17 +20,20 @@ _memory_encrypt(char *cipher_name, SV *key, SV *nonce, SV *header, unsigned long
         pt = (unsigned char *) SvPVbyte(plaintext, pt_len);
 
         id = find_cipher(cipher_name);
-        if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         ct = NEWSV(0, pt_len);
         SvPOK_only(ct);
         SvCUR_set(ct, pt_len);
 
-        if(tag_len<4 || tag_len>16) tag_len = 16;
+        if (tag_len < 4 || tag_len > 16) tag_len = 16;
 
         rv = ccm_memory(id, k, (unsigned long)k_len, NULL, n, (unsigned long)n_len, h, (unsigned long)h_len,
                         pt, (unsigned long)pt_len, (unsigned char *)SvPVX(ct), tag, &tag_len, CCM_ENCRYPT);
-        if (rv != CRYPT_OK) croak("FATAL: ccm_memory failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          SvREFCNT_dec(ct);
+          croak("FATAL: ccm_memory failed: %s", error_to_string(rv));
+        }
 
         XPUSHs(sv_2mortal(ct));
         XPUSHs(sv_2mortal(newSVpvn((char*)tag,tag_len)));
@@ -70,7 +73,7 @@ _memory_decrypt(char *cipher_name, SV *key, SV *nonce, SV *header, SV *ciphertex
         t  = (unsigned char *) SvPVbyte(tag, t_len);
 
         id = find_cipher(cipher_name);
-        if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         pt = NEWSV(0, ct_len);
         SvPOK_only(pt);
@@ -82,6 +85,7 @@ _memory_decrypt(char *cipher_name, SV *key, SV *nonce, SV *header, SV *ciphertex
         rv = ccm_memory(id, k, (unsigned long)k_len, NULL, n, (unsigned long)n_len, h, (unsigned long)h_len,
                         (unsigned char *)SvPV_nolen(pt), (unsigned long)ct_len, ct, xtag, &xtag_len, CCM_DECRYPT);
         if (rv != CRYPT_OK) {
+          SvREFCNT_dec(pt);
           XPUSHs(sv_2mortal(newSVpvn(NULL,0))); /* undef */
         }
         else {

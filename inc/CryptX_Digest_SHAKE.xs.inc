@@ -11,7 +11,10 @@ _new(int num)
 
         RETVAL->num = num;
         rv = sha3_shake_init(&RETVAL->state, RETVAL->num);
-        if (rv != CRYPT_OK) croak("FATAL: sha3_shake_init failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: sha3_shake_init failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL
@@ -35,6 +38,7 @@ Crypt::Digest::SHAKE
 clone(Crypt::Digest::SHAKE self)
     CODE:
         Newz(0, RETVAL, 1, struct digest_shake_struct);
+        if (!RETVAL) croak("FATAL: Newz failed");
         Copy(&self->state, &RETVAL->state, 1, struct digest_shake_struct);
     OUTPUT:
         RETVAL

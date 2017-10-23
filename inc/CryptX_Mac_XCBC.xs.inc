@@ -12,7 +12,7 @@ _new(char * cipher_name, SV * key)
         int id;
 
         id = find_cipher(cipher_name);
-        if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
@@ -21,7 +21,10 @@ _new(char * cipher_name, SV * key)
         if (!RETVAL) croak("FATAL: Newz failed");
 
         rv = xcbc_init(&RETVAL->state, id, k, (unsigned long)k_len);
-        if (rv != CRYPT_OK) croak("FATAL: xcbc_init failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: xcbc_init failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL

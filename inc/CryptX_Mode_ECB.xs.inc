@@ -13,7 +13,10 @@ _new(char * cipher_name, int padding=1, int rounds=0)
         RETVAL->direction = 0;
         RETVAL->cipher_rounds = rounds;
         RETVAL->cipher_id = find_cipher(cipher_name);
-        if(RETVAL->cipher_id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (RETVAL->cipher_id == -1) {
+          Safefree(RETVAL);
+          croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        }
     }
     OUTPUT:
         RETVAL
@@ -66,11 +69,11 @@ _encrypt(Crypt::Mode::ECB self, SV * data)
         in_data_start = 0;
         has_tmp_block = 0;
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len==0) {
+        if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
-          if(self->padlen > 0) {
+          if (self->padlen > 0) {
             i = (blen - self->padlen);
             if (in_data_len >= i) { /* enough data to fill pad */
               Copy(in_data, self->pad+self->padlen, i, unsigned char);
@@ -95,7 +98,7 @@ _encrypt(Crypt::Mode::ECB self, SV * data)
             in_data_len -= i;
           }
 
-          if (in_data_len>0) {
+          if (in_data_len > 0) {
             i = (unsigned long)(has_tmp_block ? in_data_len + blen : in_data_len);
             RETVAL = NEWSV(0, i);
             SvPOK_only(RETVAL);
@@ -106,7 +109,10 @@ _encrypt(Crypt::Mode::ECB self, SV * data)
               out_data += blen;
             }
             rv = ecb_encrypt(in_data+in_data_start, out_data, (unsigned long)in_data_len, &self->state);
-            if (rv != CRYPT_OK) croak("FATAL: ecb_encrypt failed: %s", error_to_string(rv));
+            if (rv != CRYPT_OK) {
+              SvREFCNT_dec(RETVAL);
+              croak("FATAL: ecb_encrypt failed: %s", error_to_string(rv));
+            }
           } /* in_data_len>0 */
           else if (has_tmp_block) {
             RETVAL = newSVpvn((char*)tmp_block, blen);
@@ -129,14 +135,14 @@ _finish_enc(Crypt::Mode::ECB self)
         blen = (&self->state)->blocklen;
         if (self->padlen<0 || self->padlen>=blen) croak("FATAL: invalid padlen");
 
-        if(self->padding_mode == 1) { /* pkcs5|7 padding */
+        if (self->padding_mode == 1) { /* pkcs5|7 padding */
           i = blen - self->padlen;
           if (i == 0) i = blen;
           for(j=self->padlen; j<blen; j++) self->pad[j] = (unsigned char)i;
           rv = ecb_encrypt(self->pad, tmp_block, blen, &self->state);
           if (rv != CRYPT_OK) croak("FATAL: ecb_encrypt failed: %s", error_to_string(rv));
         }
-        else if(self->padding_mode == 2) { /* oneandzeroes padding */
+        else if (self->padding_mode == 2) { /* oneandzeroes padding */
           self->pad[self->padlen] = 0x80;
           for(j=self->padlen+1; j<blen; j++) self->pad[j] = 0;
           rv = ecb_encrypt(self->pad, tmp_block, blen, &self->state);
@@ -168,18 +174,18 @@ _decrypt(Crypt::Mode::ECB self, SV * data)
         in_data_start = 0;
         has_tmp_block = 0;
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len==0) {
+        if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
 
-          if(self->padlen == blen) {
+          if (self->padlen == blen) {
             rv = ecb_decrypt(self->pad, tmp_block, blen, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: ecb_decrypt failed: %s", error_to_string(rv));
             self->padlen = 0;
             has_tmp_block = 1;
           } /* padlen == blen */
-          else if(self->padlen > 0) {
+          else if (self->padlen > 0) {
             i = (blen - self->padlen); /* remaining bytes in padding buffer */
             if (in_data_len >= i) { /* enough data to fill pad */
               Copy(in_data, self->pad+self->padlen, i, unsigned char);
@@ -200,7 +206,7 @@ _decrypt(Crypt::Mode::ECB self, SV * data)
             }
           } /* padlen > 0 */
 
-          /* here: a/ padlen==1..16 && in_data_len==0; b/ padlen==0 && in_data_len>0 */
+          /* here: a/ padlen == 1..16 && in_data_len == 0; b/ padlen == 0 && in_data_len > 0 */
           if (in_data_len>0) {
             i = (unsigned long)(in_data_len % blen);
             if (i>0) { /* save tail of data into pad */
@@ -211,7 +217,7 @@ _decrypt(Crypt::Mode::ECB self, SV * data)
           }
 
           if (in_data_len>0) {
-            if(self->padlen == 0 && self->padding_mode !=0) {
+            if (self->padlen == 0 && self->padding_mode !=0) {
               /* in case of padding keep full pad if no more data */
               Copy(in_data+in_data_start+in_data_len-blen, self->pad, blen, unsigned char);
               self->padlen = blen;
@@ -231,7 +237,10 @@ _decrypt(Crypt::Mode::ECB self, SV * data)
                 out_data += blen;
               }
               rv = ecb_decrypt(in_data+in_data_start, out_data, (unsigned long)in_data_len, &self->state);
-              if (rv != CRYPT_OK) croak("FATAL: ecb_decrypt failed: %s", error_to_string(rv));
+              if (rv != CRYPT_OK) {
+                SvREFCNT_dec(RETVAL);
+                croak("FATAL: ecb_decrypt failed: %s", error_to_string(rv));
+              }
             }
           } /* in_data_len>0 */
           else if (has_tmp_block) {
@@ -260,14 +269,14 @@ _finish_dec(Crypt::Mode::ECB self)
           if (self->padlen != blen) croak("FATAL: cipher text length has to be multiple of %d (%d)", blen, self->padlen);
           rv = ecb_decrypt(self->pad, tmp_block, blen, &self->state);
           if (rv != CRYPT_OK) croak("FATAL: ecb_decrypt failed: %s", error_to_string(rv));
-          if(self->padding_mode == 0) {         /* no padding */
+          if (self->padding_mode == 0) {         /* no padding */
             rv_len = blen;
           }
-          else if(self->padding_mode == 1) {    /* pkcs5|7 padding */
+          else if (self->padding_mode == 1) {    /* pkcs5|7 padding */
             i = tmp_block[blen-1];
             rv_len = blen - (i>blen ? blen : i);
           }
-          else if(self->padding_mode == 2) {    /* oneandzeroes padding */
+          else if (self->padding_mode == 2) {    /* oneandzeroes padding */
             rv_len = blen;
             while ((unsigned char)tmp_block[rv_len-1] == 0x00) rv_len--;
             if ((unsigned char)tmp_block[rv_len-1] == 0x80) rv_len--;

@@ -17,7 +17,10 @@ _new(int size, SV * key)
         if (!RETVAL) croak("FATAL: Newz failed");
 
         rv = blake2smac_init(&RETVAL->state, size, k, (unsigned long)k_len);
-        if (rv != CRYPT_OK) croak("FATAL: blake2s_init failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: blake2s_init failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL

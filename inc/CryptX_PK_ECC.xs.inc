@@ -10,9 +10,15 @@ _new()
         RETVAL->pindex = find_prng("chacha20");
         RETVAL->key.type = -1;
         ecc_dp_init(&RETVAL->dp);
-        if(RETVAL->pindex==-1) croak("FATAL: find_prng('chacha20') failed");
+        if (RETVAL->pindex == -1) {
+          Safefree(RETVAL);
+          croak("FATAL: find_prng('chacha20') failed");
+        }
         rv = rng_make_prng(320, RETVAL->pindex, &RETVAL->pstate, NULL); /* 320bits = 40bytes */
-        if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL
@@ -108,7 +114,7 @@ key2hash(Crypt::PK::ECC self)
         if (self->key.type == -1) XSRETURN_UNDEF;
         esize = ecc_get_size(&self->key);
         rv_hash = newHV();
-        /* =====> k */
+        /* k */
         siz = (self->key.k) ? mp_unsigned_bin_size(self->key.k) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'k' too big number");
@@ -120,7 +126,7 @@ key2hash(Crypt::PK::ECC self)
         else{
           not_used = hv_store(rv_hash, "k", 1, newSVpv("", 0), 0);
         }
-        /* =====> pub_x */
+        /* pub_x */
         siz = (self->key.pubkey.x) ? mp_unsigned_bin_size(self->key.pubkey.x) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'pub_x' too big number");
@@ -132,7 +138,7 @@ key2hash(Crypt::PK::ECC self)
         else{
           not_used = hv_store(rv_hash, "pub_x", 5, newSVpv("", 0), 0);
         }
-        /* =====> pub_y */
+        /* pub_y */
         siz = (self->key.pubkey.y) ? mp_unsigned_bin_size(self->key.pubkey.y) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'pub_y' too big number");
@@ -144,7 +150,7 @@ key2hash(Crypt::PK::ECC self)
         else{
           not_used = hv_store(rv_hash, "pub_y", 5, newSVpv("", 0), 0);
         }
-        /* =====> curve_... */
+        /* curve_... */
         if (self->key.dp) {
           not_used = hv_store(rv_hash, "curve_cofactor", 14, newSViv(self->key.dp->cofactor), 0);
           /* prepend leading zero if we have odd number of hexadecimal digits */
@@ -195,9 +201,9 @@ key2hash(Crypt::PK::ECC self)
             not_used = hv_store(rv_hash, "curve_oid", 9, oid, 0);
           }
         }
-        /* =====> size */
+        /* size */
         not_used = hv_store(rv_hash, "size", 4, newSViv(esize), 0);
-        /* =====> type */
+        /* type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
         if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */
         RETVAL = newRV_noinc((SV*)rv_hash);
@@ -284,7 +290,7 @@ _encrypt(Crypt::PK::ECC self, SV * data, char * hash_name)
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
         hash_id = find_hash(hash_name);
-        if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
+        if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
         rv = ecc_encrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                              &self->pstate, self->pindex,
                              hash_id, &self->key);

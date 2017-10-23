@@ -3,9 +3,11 @@ MODULE = CryptX         PACKAGE = Crypt::Checksum::Adler32
 Crypt::Checksum::Adler32
 new(Class)
     CODE:
+    {
         Newz(0, RETVAL, 1, adler32_state);
         if (!RETVAL) croak("FATAL: Newz failed");
-        adler32_init(RETVAL);
+        adler32_init(RETVAL); /* returns void */
+    }
     OUTPUT:
         RETVAL
 
@@ -18,7 +20,7 @@ void
 reset(Crypt::Checksum::Adler32 self)
     PPCODE:
     {
-        adler32_init(self);
+        adler32_init(self); /* returns void */
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -40,7 +42,9 @@ add(Crypt::Checksum::Adler32 self, ...)
         unsigned char *in;
         for(i=1; i<items; i++) {
           in = (unsigned char *)SvPVbyte(ST(i), inlen);
-          if (inlen>0) adler32_update(self, in, (unsigned long)inlen);
+          if (inlen > 0) {
+            adler32_update(self, in, (unsigned long)inlen); /* returns void */
+          }
         }
         XPUSHs(ST(0)); /* return self */
     }
@@ -50,7 +54,7 @@ digest(Crypt::Checksum::Adler32 self)
     CODE:
     {
         unsigned char hash[4];
-        adler32_finish(self, hash, 4);
+        adler32_finish(self, hash, 4); /* returns void */
         RETVAL = newSVpvn((char *) hash, 4);
     }
     OUTPUT:
@@ -63,7 +67,7 @@ hexdigest(Crypt::Checksum::Adler32 self)
         unsigned long i;
         unsigned char hash[4];
         char hash_hex[4*2 + 1];
-        adler32_finish(self, hash, 4);
+        adler32_finish(self, hash, 4); /* returns void */
         hash_hex[0] = '\0';
         for(i=0; i<4; i++) sprintf(&hash_hex[2*i], "%02x", hash[i]);
         RETVAL = newSVpvn(hash_hex, strlen(hash_hex));

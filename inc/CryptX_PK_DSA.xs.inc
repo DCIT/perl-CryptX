@@ -9,9 +9,15 @@ _new()
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->key.type = -1;
         RETVAL->pindex = find_prng("chacha20");
-        if(RETVAL->pindex==-1) croak("FATAL: find_prng('chacha20') failed");
+        if (RETVAL->pindex == -1) {
+          Safefree(RETVAL);
+          croak("FATAL: find_prng('chacha20') failed");
+        }
         rv = rng_make_prng(320, RETVAL->pindex, &RETVAL->pstate, NULL); /* 320bits = 40bytes */
-        if (rv != CRYPT_OK) croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL
@@ -159,7 +165,7 @@ key2hash(Crypt::PK::DSA self)
         qsize = mp_unsigned_bin_size(self->key.q);
         psize = mp_unsigned_bin_size(self->key.p);
         rv_hash = newHV();
-        /* =====> g */
+        /* g */
         siz = (self->key.g) ? mp_unsigned_bin_size(self->key.g) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'g' too big number");
@@ -171,7 +177,7 @@ key2hash(Crypt::PK::DSA self)
         else{
           not_used = hv_store(rv_hash, "g", 1, newSVpv("", 0), 0);
         }
-        /* =====> q */
+        /* q */
         siz = (self->key.q) ? mp_unsigned_bin_size(self->key.q) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'q' too big number");
@@ -183,7 +189,7 @@ key2hash(Crypt::PK::DSA self)
         else{
           not_used = hv_store(rv_hash, "q", 1, newSVpv("", 0), 0);
         }
-        /* =====> p */
+        /* p */
         siz = (self->key.p) ? mp_unsigned_bin_size(self->key.p) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'p' too big number");
@@ -195,7 +201,7 @@ key2hash(Crypt::PK::DSA self)
         else{
           not_used = hv_store(rv_hash, "p", 1, newSVpv("", 0), 0);
         }
-        /* =====> x */
+        /* x */
         siz = (self->key.x) ? mp_unsigned_bin_size(self->key.x) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'x' too big number");
@@ -207,7 +213,7 @@ key2hash(Crypt::PK::DSA self)
         else{
           not_used = hv_store(rv_hash, "x", 1, newSVpv("", 0), 0);
         }
-        /* =====> y */
+        /* y */
         siz = (self->key.y) ? mp_unsigned_bin_size(self->key.y) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'y' too big number");
@@ -219,9 +225,9 @@ key2hash(Crypt::PK::DSA self)
         else{
           not_used = hv_store(rv_hash, "y", 1, newSVpv("", 0), 0);
         }
-        /* =====> size */
+        /* size */
         not_used = hv_store(rv_hash, "size", 4, newSViv(qsize), 0);
-        /* =====> type */
+        /* type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
         if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */
         RETVAL = newRV_noinc((SV*)rv_hash);
@@ -267,7 +273,7 @@ _encrypt(Crypt::PK::DSA self, SV * data, char * hash_name)
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
         hash_id = find_hash(hash_name);
-        if(hash_id==-1) croak("FATAL: find_hash failed for '%s'", hash_name);
+        if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
         rv = dsa_encrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                              &self->pstate, self->pindex,
                              hash_id, &self->key);

@@ -10,25 +10,27 @@ _new(char * cipher_name, SV * key, SV * nonce, SV * adata=&PL_sv_undef)
         STRLEN n_len=0;
         unsigned char *h=NULL;
         STRLEN h_len=0;
-        int id;
+        int rv, id;
 
         if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
         if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
         n = (unsigned char *) SvPVbyte(nonce, n_len);
-        if(SvOK(adata)) { /* adata is optional param */
-          if(!SvPOK(adata)) croak("FATAL: adata must be string/buffer scalar");
+        if (SvOK(adata)) { /* adata is optional param */
+          if (!SvPOK(adata)) croak("FATAL: adata must be string/buffer scalar");
           h = (unsigned char *) SvPVbyte(adata, h_len);
         }
 
         id = find_cipher(cipher_name);
-        if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         Newz(0, RETVAL, 1, struct eax_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        if (eax_init(&RETVAL->state, id, k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len) != CRYPT_OK) {
-          croak("FATAL: eax setup failed");
+        rv = eax_init(&RETVAL->state, id, k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len);
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: eax setup failed: %s", error_to_string(rv));
         }
     }
     OUTPUT:
@@ -131,7 +133,7 @@ decrypt_done(Crypt::AuthEnc::EAX self, ...)
           XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
         }
         else {
-          if(!SvPOK(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
+          if (!SvPOK(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
           expected_tag = (unsigned char *) SvPVbyte(ST(1), expected_tag_len);
           if (expected_tag_len!=tag_len) {
             XPUSHs(sv_2mortal(newSViv(0))); /* false */

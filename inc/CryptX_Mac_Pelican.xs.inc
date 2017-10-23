@@ -17,7 +17,10 @@ _new(SV * key)
         if (!RETVAL) croak("FATAL: Newz failed");
 
         rv = pelican_init(&RETVAL->state, k, (unsigned long)k_len);
-        if (rv != CRYPT_OK) croak("FATAL: pelican_init failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: pelican_init failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL

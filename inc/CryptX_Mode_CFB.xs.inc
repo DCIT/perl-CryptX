@@ -11,7 +11,10 @@ _new(char * cipher_name, int rounds=0)
         RETVAL->direction = 0;
         RETVAL->cipher_rounds = rounds;
         RETVAL->cipher_id = find_cipher(cipher_name);
-        if(RETVAL->cipher_id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (RETVAL->cipher_id == -1) {
+          Safefree(RETVAL);
+          croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        }
     }
     OUTPUT:
         RETVAL

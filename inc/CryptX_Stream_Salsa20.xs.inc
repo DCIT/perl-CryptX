@@ -10,21 +10,22 @@ _new(SV * key, SV * nonce, UV counter = 0, int rounds = 20)
 
         if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
         if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
-        k  = (unsigned char *) SvPVbyte(key, k_len);
-        iv = (unsigned char *) SvPVbyte(nonce, iv_len);
+        k  = (unsigned char *)SvPVbyte(key, k_len);
+        iv = (unsigned char *)SvPVbyte(nonce, iv_len);
 
         Newz(0, RETVAL, 1, struct salsa20_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
         rv = salsa20_setup(&RETVAL->state, k, (unsigned long)k_len, rounds);
-        if (rv != CRYPT_OK) croak("FATAL: salsa20_setup failed: %s", error_to_string(rv));
-
-        if (iv_len == 8) {
-          rv = salsa20_ivctr64(&RETVAL->state, iv, (unsigned long)iv_len, (ulong64)counter);
-          if (rv != CRYPT_OK) croak("FATAL: salsa20_ivctr64 failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: salsa20_setup failed: %s", error_to_string(rv));
         }
-        else {
-          croak("FATAL: chacha IV length must be 8 or 12 bytes");
+
+        rv = salsa20_ivctr64(&RETVAL->state, iv, (unsigned long)iv_len, (ulong64)counter);
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: salsa20_ivctr64 failed: %s", error_to_string(rv));
         }
     }
     OUTPUT:
@@ -74,7 +75,7 @@ crypt(Crypt::Stream::Salsa20 self, SV * data)
         unsigned char *in_data, *out_data;
 
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len==0) {
+        if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {

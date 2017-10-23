@@ -3,9 +3,12 @@ MODULE = CryptX         PACKAGE = Crypt::Checksum::CRC32
 Crypt::Checksum::CRC32
 new(Class)
     CODE:
+    {
+        int rv;
         Newz(0, RETVAL, 1, crc32_state);
         if (!RETVAL) croak("FATAL: Newz failed");
-        crc32_init(RETVAL);
+        crc32_init(RETVAL); /* returns void */
+    }
     OUTPUT:
         RETVAL
 
@@ -18,7 +21,7 @@ void
 reset(Crypt::Checksum::CRC32 self)
     PPCODE:
     {
-        crc32_init(self);
+        crc32_init(self); /* returns void */
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -40,7 +43,9 @@ add(Crypt::Checksum::CRC32 self, ...)
         unsigned char *in;
         for(i=1; i<items; i++) {
           in = (unsigned char *)SvPVbyte(ST(i), inlen);
-          if (inlen>0) crc32_update(self, in, (unsigned long)inlen);
+          if (inlen > 0) {
+            crc32_update(self, in, (unsigned long)inlen); /* returns void */
+          }
         }
         XPUSHs(ST(0)); /* return self */
     }
@@ -50,7 +55,7 @@ digest(Crypt::Checksum::CRC32 self)
     CODE:
     {
         unsigned char hash[4];
-        crc32_finish(self, hash, 4);
+        crc32_finish(self, hash, 4); /* returns void */
         RETVAL = newSVpvn((char *) hash, 4);
     }
     OUTPUT:
@@ -63,7 +68,7 @@ hexdigest(Crypt::Checksum::CRC32 self)
         unsigned long i;
         unsigned char hash[4];
         char hash_hex[4*2 + 1];
-        crc32_finish(self, hash, 4);
+        crc32_finish(self, hash, 4); /* returns void */
         hash_hex[0] = '\0';
         for(i=0; i<4; i++) sprintf(&hash_hex[2*i], "%02x", hash[i]);
         RETVAL = newSVpvn(hash_hex, strlen(hash_hex));

@@ -22,11 +22,17 @@ _new(char * cipher_name, SV * key, SV * nonce = NULL)
         if (!RETVAL) croak("FATAL: Newz failed");
 
         rv = gcm_init(&RETVAL->state, id, k, (unsigned long)k_len);
-        if (rv != CRYPT_OK) croak("FATAL: gcm_init failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: gcm_init failed: %s", error_to_string(rv));
+        }
 
         if (iv && iv_len > 0) {
           rv = gcm_add_iv(&RETVAL->state, iv, (unsigned long)iv_len);
-          if (rv != CRYPT_OK) croak("FATAL: gcm_add_iv failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) {
+            Safefree(RETVAL);
+            croak("FATAL: gcm_add_iv failed: %s", error_to_string(rv));
+          }
         }
     }
     OUTPUT:
@@ -169,7 +175,7 @@ decrypt_done(Crypt::AuthEnc::GCM self, ...)
           XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
         }
         else {
-          if(!SvPOK(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
+          if (!SvPOK(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
           expected_tag = (unsigned char *) SvPVbyte(ST(1), expected_tag_len);
           if (expected_tag_len!=tag_len) {
             XPUSHs(sv_2mortal(newSViv(0))); /* false */

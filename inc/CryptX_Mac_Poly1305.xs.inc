@@ -17,7 +17,10 @@ _new(SV * key)
         if (!RETVAL) croak("FATAL: Newz failed");
 
         rv = poly1305_init(&RETVAL->state, k, (unsigned long)k_len);
-        if (rv != CRYPT_OK) croak("FATAL: poly1305_init failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: poly1305_init failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL

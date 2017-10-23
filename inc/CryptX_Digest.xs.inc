@@ -9,7 +9,7 @@ _new(digest_name)
         int id;
 
         id = find_hash(digest_name);
-        if(id==-1) croak("FATAL: find_hash failed for '%s'", digest_name);
+        if (id == -1) croak("FATAL: find_hash failed for '%s'", digest_name);
 
         Newz(0, RETVAL, 1, struct digest_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
@@ -17,7 +17,10 @@ _new(digest_name)
         RETVAL->id = id;
         RETVAL->desc = &hash_descriptor[id];
         rv = RETVAL->desc->init(&RETVAL->state);
-        if(rv!=CRYPT_OK) croak("FATAL: digest setup failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          Safefree(RETVAL);
+          croak("FATAL: digest setup failed: %s", error_to_string(rv));
+        }
     }
     OUTPUT:
         RETVAL
@@ -44,6 +47,7 @@ clone(self)
     Crypt::Digest self
     CODE:
         Newz(0, RETVAL, 1, struct digest_struct);
+        if (!RETVAL) croak("FATAL: Newz failed");
         Copy(&self->state, &RETVAL->state, 1, struct digest_struct);
     OUTPUT:
         RETVAL
@@ -160,7 +164,7 @@ _hashsize_by_name(digest_name)
         int rv, id;
 
         id = find_hash(digest_name);
-        if(id==-1) croak("FATAL: find_digest failed for '%s'", digest_name);
+        if (id == -1) croak("FATAL: find_digest failed for '%s'", digest_name);
 
         rv = hash_descriptor[id].hashsize;
         if (!rv) croak("FATAL: invalid hashsize for '%s'", digest_name);;

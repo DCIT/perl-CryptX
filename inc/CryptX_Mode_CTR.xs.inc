@@ -11,7 +11,10 @@ _new(char * cipher_name, int ctr_mode=0, int ctr_width=0, int rounds=0)
         RETVAL->direction = 0;
         RETVAL->cipher_rounds = rounds;
         RETVAL->cipher_id = find_cipher(cipher_name);
-        if(RETVAL->cipher_id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (RETVAL->cipher_id == -1) {
+          Safefree(RETVAL);
+          croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        }
         if (ctr_mode == 0) RETVAL->ctr_mode_param = CTR_COUNTER_LITTLE_ENDIAN;
         if (ctr_mode == 1) RETVAL->ctr_mode_param = CTR_COUNTER_BIG_ENDIAN;
         if (ctr_mode == 2) RETVAL->ctr_mode_param = CTR_COUNTER_LITTLE_ENDIAN|LTC_CTR_RFC3686;
