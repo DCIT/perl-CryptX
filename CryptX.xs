@@ -581,7 +581,6 @@ CryptX__radix_to_bin(char *in, int radix)
         mp_int mpi;
 
         if (in == NULL || strlen(in) == 0)      XSRETURN_UNDEF;
-
         if (mp_init(&mpi) != CRYPT_OK)          XSRETURN_UNDEF;
 
         if (mp_read_radix(&mpi, in, radix) == CRYPT_OK) {
@@ -624,14 +623,21 @@ CryptX__bin_to_radix(SV *in, int radix)
           }
           mp_clear(&tmp);
 
-          RETVAL = NEWSV(0, digits + 1);
-          SvPOK_only(RETVAL);
-          out_data = SvPVX(RETVAL);
-          mp_toradix(&mpi, out_data, radix);
-          SvCUR_set(RETVAL, digits);
-          mp_clear(&mpi);
+          if (digits == 0) {
+            RETVAL = newSVpvn("", 0);
+            mp_clear(&mpi);
+          }
+          else {
+            RETVAL = NEWSV(0, digits + 2); /* +2 for sign and NUL byte */
+            SvPOK_only(RETVAL);
+            out_data = SvPVX(RETVAL);
+            mp_toradix(&mpi, out_data, radix);
+            SvCUR_set(RETVAL, strlen(out_data));
+            mp_clear(&mpi);
+          }
         }
         else {
+          mp_clear(&mpi);
           XSRETURN_UNDEF;
         }
     }

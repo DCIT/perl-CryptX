@@ -68,7 +68,7 @@ add_entropy(Crypt::PRNG self, SV * entropy=&PL_sv_undef)
     {
         STRLEN in_len=0;
         unsigned char *in_buffer=NULL;
-        unsigned char entropy_buf[32];
+        unsigned char entropy_buf[40];
         int rv;
         if (SvOK(entropy)) {
           in_buffer = (unsigned char *) SvPVbyte(entropy, in_len);
@@ -76,8 +76,8 @@ add_entropy(Crypt::PRNG self, SV * entropy=&PL_sv_undef)
           if (rv != CRYPT_OK) croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
         }
         else {
-          if (rng_get_bytes(entropy_buf, 32, NULL) != 32) croak("FATAL: rng_get_bytes failed");
-          rv = self->desc->add_entropy(entropy_buf, 32, &self->state);
+          if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
+          rv = self->desc->add_entropy(entropy_buf, 40, &self->state);
           if (rv != CRYPT_OK) croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
         }
         rv = self->desc->ready(&self->state);
@@ -90,11 +90,11 @@ _bytes(Crypt::PRNG self, IV curpid, STRLEN output_len)
     {
         int rv_len;
         unsigned char *rdata;
-        unsigned char entropy_buf[32];
+        unsigned char entropy_buf[40];
 
         if (self->last_pid != curpid) {
-          rng_get_bytes(entropy_buf, 32, NULL);
-          self->desc->add_entropy(entropy_buf, 32, &self->state);
+          if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
+          self->desc->add_entropy(entropy_buf, 40, &self->state);
           self->desc->ready(&self->state);
           self->last_pid = curpid;
         }
@@ -118,11 +118,11 @@ _int32(Crypt::PRNG self, IV curpid)
     {
         int i;
         unsigned char rdata[4];
-        unsigned char entropy_buf[32];
+        unsigned char entropy_buf[40];
 
         if (self->last_pid != curpid) {
-          rng_get_bytes(entropy_buf, 32, NULL);
-          self->desc->add_entropy(entropy_buf, 32, &self->state);
+          if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
+          self->desc->add_entropy(entropy_buf, 40, &self->state);
           self->desc->ready(&self->state);
           self->last_pid = curpid;
         }
@@ -141,12 +141,12 @@ _double(Crypt::PRNG self, IV curpid, ...)
         int i;
         unsigned long a, b;     /* 32bit is enough */
         unsigned char rdata[7]; /* for double we need 53 bits */
-        unsigned char entropy_buf[32];
+        unsigned char entropy_buf[40];
         NV limit;
 
         if (self->last_pid != curpid) {
-          rng_get_bytes(entropy_buf, 32, NULL);
-          self->desc->add_entropy(entropy_buf, 32, &self->state);
+          if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
+          self->desc->add_entropy(entropy_buf, 40, &self->state);
           self->desc->ready(&self->state);
           self->last_pid = curpid;
         }
