@@ -2,7 +2,7 @@ package Crypt::Cipher;
 
 use strict;
 use warnings;
-our $VERSION = '0.054_002';
+our $VERSION = '0.054_003';
 use CryptX;
 
 ### the following methods/functions are implemented in XS:
