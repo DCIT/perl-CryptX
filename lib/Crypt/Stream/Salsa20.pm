@@ -1,4 +1,4 @@
-package Crypt::Stream::ChaCha;
+package Crypt::Stream::Salsa20;
 
 use strict;
 use warnings;
@@ -14,38 +14,38 @@ sub new { my $class = shift; _new(@_) }
 
 =head1 NAME
 
-Crypt::Stream::ChaCha - Stream cipher ChaCha
+Crypt::Stream::Salsa20 - Stream cipher Salsa20
 
 =head1 SYNOPSIS
 
-   use Crypt::Stream::ChaCha;
+   use Crypt::Stream::Salsa20;
 
    # encrypt
    $key = "1234567890123456";
-   $iv  = "123456789012";
-   $stream = Crypt::Stream::ChaCha->new($key, $iv);
+   $iv  = "12345678";
+   $stream = Crypt::Stream::Salsa20->new($key, $iv);
    $ct = $stream->crypt("plain message");
 
    # decrypt
    $key = "1234567890123456";
-   $iv  = "123456789012";
-   $stream = Crypt::Stream::ChaCha->new($key, $iv);
+   $iv  = "12345678";
+   $stream = Crypt::Stream::Salsa20->new($key, $iv);
    $pt = $stream->crypt($ct);
 
 =head1 DESCRIPTION
 
-Provides an interface to the ChaCha stream cipher.
+Provides an interface to the Salsa20 stream cipher.
 
 =head1 METHODS
 
 =head2 new
 
- $stream = Crypt::Stream::ChaCha->new($key, $iv);
+ $stream = Crypt::Stream::Salsa20->new($key, $iv);
  #or
- $stream = Crypt::Stream::ChaCha->new($key, $iv, $counter, $rounds);
+ $stream = Crypt::Stream::Salsa20->new($key, $iv, $counter, $rounds);
 
  # $key     .. 32 or 16 bytes
- # $iv      .. 8 or 12 bytes
+ # $iv      .. 8 bytes
  # $counter .. initial counter value (DEFAULT: 0)
  # $rounds  .. rounds (DEFAULT: 20)
 
@@ -67,9 +67,7 @@ Provides an interface to the ChaCha stream cipher.
 
 =over
 
-=item * L<Crypt::Stream::RC4>, L<Crypt::Stream::Sober128>, L<Crypt::Stream::Salsa>
-
-=item * L<https://tools.ietf.org/html/rfc7539>
+=item * L<Crypt::Stream::ChaCha>, L<Crypt::Stream::RC4>, L<Crypt::Stream::Sober128>
 
 =back
 

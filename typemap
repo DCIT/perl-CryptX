@@ -17,6 +17,7 @@ Crypt::AuthEnc::OCB     T_PTROBJ
 Crypt::AuthEnc::ChaCha20Poly1305 T_PTROBJ
 
 Crypt::Stream::ChaCha   T_PTROBJ
+Crypt::Stream::Salsa20  T_PTROBJ
 Crypt::Stream::RC4      T_PTROBJ
 Crypt::Stream::Sober128 T_PTROBJ
 

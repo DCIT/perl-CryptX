@@ -61,6 +61,11 @@ typedef struct chacha_struct {          /* used by Crypt::Stream::ChaCha */
   int id;
 } *Crypt__Stream__ChaCha;
 
+typedef struct salsa20_struct {         /* used by Crypt::Stream::Salsa20 */
+  salsa20_state state;
+  int id;
+} *Crypt__Stream__Salsa20;
+
 typedef struct rc4_struct {             /* used by Crypt::Stream::RC4 */
   rc4_state state;
   int id;
@@ -670,6 +675,7 @@ INCLUDE: inc/CryptX_AuthEnc_CCM.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_ChaCha20Poly1305.xs.inc
 
 INCLUDE: inc/CryptX_Stream_ChaCha.xs.inc
+INCLUDE: inc/CryptX_Stream_Salsa20.xs.inc
 INCLUDE: inc/CryptX_Stream_RC4.xs.inc
 INCLUDE: inc/CryptX_Stream_Sober128.xs.inc
 

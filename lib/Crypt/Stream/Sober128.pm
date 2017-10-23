@@ -62,7 +62,7 @@ Provides an interface to the Sober128 stream cipher.
 
 =over
 
-=item * L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>
+=item * L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa>
 
 =item * L<https://en.wikipedia.org/wiki/SOBER-128|https://en.wikipedia.org/wiki/SOBER-128>
 
