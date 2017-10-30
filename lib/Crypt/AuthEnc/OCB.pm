@@ -63,21 +63,25 @@ Crypt::AuthEnc::OCB - Authenticated encryption in OCBv3 mode
  my $ae = Crypt::AuthEnc::OCB->new("AES", $key, $nonce, $tag_len);
  $ae->adata_add('additional_authenticated_data1');
  $ae->adata_add('additional_authenticated_data2');
- $ct = $ae->encrypt_add('data1');
- $ct = $ae->encrypt_add('data2');
- $ct = $ae->encrypt_add('data3');
- $ct = $ae->encrypt_last('rest of data');
- ($ct,$tag) = $ae->encrypt_done();
+ my $ct = $ae->encrypt_add('data1');
+ $ct .= $ae->encrypt_add('data2');
+ $ct .= $ae->encrypt_add('data3');
+ $ct .= $ae->encrypt_last('rest of data');
+ my $tag = $ae->encrypt_done();
 
  # decrypt and verify
  my $ae = Crypt::AuthEnc::OCB->new("AES", $key, $nonce, $tag_len);
  $ae->adata_add('additional_authenticated_data1');
  $ae->adata_add('additional_authenticated_data2');
- $pt = $ae->decrypt_add('ciphertext1');
- $pt = $ae->decrypt_add('ciphertext2');
- $pt = $ae->decrypt_add('ciphertext3');
- $pt = $ae->decrypt_last('rest of data');
- ($pt,$tag) = $ae->decrypt_done();
+ my $pt = $ae->decrypt_add('ciphertext1');
+ $pt .= $ae->decrypt_add('ciphertext2');
+ $pt .= $ae->decrypt_add('ciphertext3');
+ $pt .= $ae->decrypt_last('rest of data');
+ my $tag = $ae->decrypt_done();
+ die "decrypt failed" unless $tag eq $expected_tag;
+
+ #or
+ my $result = $ae->decrypt_done($expected_tag); # 0 or 1
 
  ### functional interface
  use Crypt::AuthEnc::OCB qw(ocb_encrypt_authenticate ocb_decrypt_verify);

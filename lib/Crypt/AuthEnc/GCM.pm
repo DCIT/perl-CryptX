@@ -67,23 +67,23 @@ Crypt::AuthEnc::GCM - Authenticated encryption in GCM mode
  my $ae = Crypt::AuthEnc::GCM->new("AES", $key, $iv);
  $ae->adata_add('additional_authenticated_data1');
  $ae->adata_add('additional_authenticated_data2');
- $ct = $ae->encrypt_add('data1');
- $ct = $ae->encrypt_add('data2');
- $ct = $ae->encrypt_add('data3');
- $tag = $ae->encrypt_done();
+ my $ct = $ae->encrypt_add('data1');
+ $ct .= $ae->encrypt_add('data2');
+ $ct .= $ae->encrypt_add('data3');
+ my $tag = $ae->encrypt_done();
 
  # decrypt and verify
  my $ae = Crypt::AuthEnc::GCM->new("AES", $key, $iv);
  $ae->adata_add('additional_authenticated_data1');
  $ae->adata_add('additional_authenticated_data2');
- $pt = $ae->decrypt_add('ciphertext1');
- $pt = $ae->decrypt_add('ciphertext2');
- $pt = $ae->decrypt_add('ciphertext3');
- $tag = $ae->decrypt_done();
+ my $pt = $ae->decrypt_add('ciphertext1');
+ $pt .= $ae->decrypt_add('ciphertext2');
+ $pt .= $ae->decrypt_add('ciphertext3');
+ my $tag = $ae->decrypt_done();
  die "decrypt failed" unless $tag eq $expected_tag;
 
  #or
- my $result = $ae->decrypt_done($expected_tag) die "decrypt failed";
+ my $result = $ae->decrypt_done($expected_tag); # 0 or 1
 
  ### functional interface
  use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate gcm_decrypt_verify);

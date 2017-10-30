@@ -68,22 +68,22 @@ Crypt::AuthEnc::CCM - Authenticated encryption in CCM mode
  use Crypt::AuthEnc::CCM;
 
  # encrypt and authenticate
- $ae  = Crypt::AuthEnc::CCM->new("AES", $key, $iv, $adata, $tag_len, $pt_len);
- $ct  = $ae->encrypt_add('data1');
+ my $ae = Crypt::AuthEnc::CCM->new("AES", $key, $iv, $adata, $tag_len, $pt_len);
+ my $ct = $ae->encrypt_add('data1');
  $ct .= $ae->encrypt_add('data2');
  $ct .= $ae->encrypt_add('data3');
- $tag = $ae->encrypt_done();
+ my $tag = $ae->encrypt_done();
 
  # decrypt and verify
- $ae  = Crypt::AuthEnc::CCM->new("AES", $key, $iv, $adata, $tag_len, $pt_len);
- $pt  = $ae->decrypt_add('ciphertext1');
+ my $ae = Crypt::AuthEnc::CCM->new("AES", $key, $iv, $adata, $tag_len, $pt_len);
+ my $pt = $ae->decrypt_add('ciphertext1');
  $pt .= $ae->decrypt_add('ciphertext2');
  $pt .= $ae->decrypt_add('ciphertext3');
- $tag = $ae->decrypt_done();
+ my $tag = $ae->decrypt_done();
  die "decrypt failed" unless $tag eq $expected_tag;
 
  #or
- $result = $ae->decrypt_done($expected_tag); # 0 or 1
+ my $result = $ae->decrypt_done($expected_tag); # 0 or 1
 
  ### functional interface
  use Crypt::AuthEnc::CCM qw(ccm_encrypt_authenticate ccm_decrypt_verify);
