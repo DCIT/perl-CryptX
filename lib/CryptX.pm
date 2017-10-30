@@ -31,6 +31,16 @@ BEGIN {
   }
 }
 
+sub _croak {
+  die @_ if ref $_[0];
+  if ($_[-1] =~ /\n$/s) {
+    my $arg = pop @_;
+    $arg =~ s/(.*)( at .*? line .*?\n$)/$1/s;
+    push @_, $arg;
+  }
+  die Carp::shortmess @_;
+}
+
 sub _decode_json {
   croak "FATAL: cannot find JSON::PP or JSON::XS or Cpanel::JSON::XS" if !$has_json;
   decode_json(shift);

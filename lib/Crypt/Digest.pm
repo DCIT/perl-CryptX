@@ -9,8 +9,7 @@ our %EXPORT_TAGS = ( all => [qw( digest_data digest_data_hex digest_data_b64 dig
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use Carp;
-$Carp::Internal{(__PACKAGE__)}++;
+use Carp; $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
 ### the following methods/functions are implemented in XS:
@@ -26,7 +25,7 @@ use CryptX;
 # - DESTROY
 
 sub _trans_digest_name {
-  my $name = shift;
+  my $name = shift || "";
   my %trans = (
     CHAES       => 'chc_hash',
     RIPEMD128   => 'rmd128',
@@ -59,22 +58,22 @@ sub _trans_digest_name {
 sub new {
   my $pkg = shift;
   unshift @_, ($pkg eq 'Crypt::Digest' ? _trans_digest_name(shift) : _trans_digest_name($pkg));
-  ###return _new(@_);
-  goto \&_new; # keep the real caller for croak()
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  return _new(@_);
 }
 
 sub hashsize {
   return unless defined $_[0];
 
   if (ref $_[0]) {
-    ###return _hashsize(@_);
-    goto \&_hashsize if ref $_[0];        # keep the real caller for croak()
+    local $SIG{__DIE__} = \&CryptX::_croak;
+    return _hashsize(@_);
   }
   else {
     my $pkg = shift;
     unshift @_, ($pkg eq 'Crypt::Digest' ? _trans_digest_name(shift) : _trans_digest_name($pkg));
-    ###return _hashsize_by_name(@_);
-    goto \&_hashsize_by_name;             # keep the real caller for croak()
+    local $SIG{__DIE__} = \&CryptX::_croak;
+    return _hashsize_by_name(@_);
   }
 }
 
@@ -105,22 +104,15 @@ sub CLONE_SKIP { 1 } # prevent cloning
 
 ### FUNCTIONS
 
-sub digest_data        { my $rv = eval {Crypt::Digest->new(shift)->add(@_)->digest}; _croak($@); $rv }
-sub digest_data_hex    { my $rv = eval {Crypt::Digest->new(shift)->add(@_)->hexdigest}; _croak($@); $rv }
-sub digest_data_b64    { my $rv = eval {Crypt::Digest->new(shift)->add(@_)->b64digest}; _croak($@); $rv }
-sub digest_data_b64u   { my $rv = eval {Crypt::Digest->new(shift)->add(@_)->b64udigest}; _croak($@); $rv }
+sub digest_data        { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->add(@_)->digest     }
+sub digest_data_hex    { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->add(@_)->hexdigest  }
+sub digest_data_b64    { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->add(@_)->b64digest  }
+sub digest_data_b64u   { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->add(@_)->b64udigest }
 
-sub digest_file        { my $rv = eval {Crypt::Digest->new(shift)->addfile(@_)->digest}; _croak($@); $rv }
-sub digest_file_hex    { my $rv = eval {Crypt::Digest->new(shift)->addfile(@_)->hexdigest}; _croak($@); $rv }
-sub digest_file_b64    { my $rv = eval {Crypt::Digest->new(shift)->addfile(@_)->b64digest}; _croak($@); $rv }
-sub digest_file_b64u   { my $rv = eval {Crypt::Digest->new(shift)->addfile(@_)->b64udigest}; _croak($@); $rv }
-
-sub _croak { #XXX-FIXME ugly hack for reporting real caller from XS croaks
-   if ($_[0]) {
-     $_[0] =~ s/ at .*?\.pm line \d+.[\n\r]*$//g;
-     croak $_[0];
-   }
-}
+sub digest_file        { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->addfile(@_)->digest     }
+sub digest_file_hex    { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->addfile(@_)->hexdigest  }
+sub digest_file_b64    { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->addfile(@_)->b64digest  }
+sub digest_file_b64u   { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->addfile(@_)->b64udigest }
 
 1;
 

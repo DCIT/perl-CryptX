@@ -9,12 +9,14 @@ our %EXPORT_TAGS = ( all => [qw( ccm_encrypt_authenticate ccm_decrypt_verify )] 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp; $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use Crypt::Cipher;
 
 sub new {
-  my ($class, $cipher, $key, $iv, $adata, $tag_len, $pt_len) = @_;
-  return _new(Crypt::Cipher::_trans_cipher_name($cipher), $key, $iv, $adata, $tag_len, $pt_len);
+  my $class = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  return _new(Crypt::Cipher::_trans_cipher_name(shift), @_);
 }
 
 sub ccm_encrypt_authenticate {
@@ -29,11 +31,11 @@ sub ccm_encrypt_authenticate {
   $adata = "" if !defined $adata;
   $plaintext = "" if !defined $plaintext;
 
-  return _memory_encrypt(Crypt::Cipher::_trans_cipher_name($cipher_name), $key, $iv, $adata, $tag_len, $plaintext);
-  #my $m = Crypt::AuthEnc::CCM->new($cipher_name, $key, $iv, $adata, $tag_len, length($plaintext));
-  #my $ct = $m->encrypt_add($plaintext);
-  #my $tag = $m->encrypt_done();
-  #return ($ct, $tag);
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  my $m = Crypt::AuthEnc::CCM->new($cipher_name, $key, $iv, $adata, $tag_len, length($plaintext));
+  my $ct = $m->encrypt_add($plaintext);
+  my $tag = $m->encrypt_done();
+  return ($ct, $tag);
 }
 
 sub ccm_decrypt_verify {
@@ -48,10 +50,10 @@ sub ccm_decrypt_verify {
   $adata = "" if !defined $adata;
   $ciphertext = "" if !defined $ciphertext;
 
-  return _memory_decrypt(Crypt::Cipher::_trans_cipher_name($cipher_name), $key, $iv, $adata, $ciphertext, $tag);
-  #my $m = Crypt::AuthEnc::CCM->new($cipher_name, $key, $iv, $adata, length($tag), length($ciphertext));
-  #my $pt = $m->decrypt_add($ciphertext);
-  #return $m->decrypt_done($tag) ? $pt : undef;
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  my $m = Crypt::AuthEnc::CCM->new($cipher_name, $key, $iv, $adata, length($tag), length($ciphertext));
+  my $pt = $m->decrypt_add($ciphertext);
+  return $m->decrypt_done($tag) ? $pt : undef;
 }
 
 1;

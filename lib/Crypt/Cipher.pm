@@ -22,7 +22,7 @@ use CryptX;
 # - _default_rounds_by_name
 
 sub _trans_cipher_name {
-  my $name = shift;
+  my $name = shift || "";
   my %trans = (
     DES_EDE     => '3des',
     SAFERP      => 'safer+',
