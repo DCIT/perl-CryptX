@@ -12,28 +12,46 @@ our @EXPORT = qw();
 use CryptX;
 use Crypt::Cipher;
 
-### the following functions are implemented in XS:
-# - _memory_encrypt
-# - _memory_decrypt
+sub new {
+  my ($class, $cipher, $key, $iv, $adata, $tag_len, $pt_len) = @_;
+  return _new(Crypt::Cipher::_trans_cipher_name($cipher), $key, $iv, $adata, $tag_len, $pt_len);
+}
 
 sub ccm_encrypt_authenticate {
   my $cipher_name = shift;
   my $key = shift;
-  my $nonce = shift;
+  my $iv = shift;
   my $adata = shift;
   my $tag_len = shift;
   my $plaintext = shift;
-  return _memory_encrypt(Crypt::Cipher::_trans_cipher_name($cipher_name), $key, $nonce, $adata, $tag_len, $plaintext);
+
+  $iv = "" if !defined $iv;
+  $adata = "" if !defined $adata;
+  $plaintext = "" if !defined $plaintext;
+
+  return _memory_encrypt(Crypt::Cipher::_trans_cipher_name($cipher_name), $key, $iv, $adata, $tag_len, $plaintext);
+  #my $m = Crypt::AuthEnc::CCM->new($cipher_name, $key, $iv, $adata, $tag_len, length($plaintext));
+  #my $ct = $m->encrypt_add($plaintext);
+  #my $tag = $m->encrypt_done();
+  #return ($ct, $tag);
 }
 
 sub ccm_decrypt_verify {
   my $cipher_name = shift;
   my $key = shift;
-  my $nonce = shift;
+  my $iv = shift;
   my $adata = shift;
   my $ciphertext = shift;
   my $tag = shift;
-  return _memory_decrypt(Crypt::Cipher::_trans_cipher_name($cipher_name), $key, $nonce, $adata, $ciphertext, $tag);
+
+  $iv = "" if !defined $iv;
+  $adata = "" if !defined $adata;
+  $ciphertext = "" if !defined $ciphertext;
+
+  return _memory_decrypt(Crypt::Cipher::_trans_cipher_name($cipher_name), $key, $iv, $adata, $ciphertext, $tag);
+  #my $m = Crypt::AuthEnc::CCM->new($cipher_name, $key, $iv, $adata, length($tag), length($ciphertext));
+  #my $pt = $m->decrypt_add($ciphertext);
+  #return $m->decrypt_done($tag) ? $pt : undef;
 }
 
 1;
@@ -46,11 +64,32 @@ Crypt::AuthEnc::CCM - Authenticated encryption in CCM mode
 
 =head1 SYNOPSIS
 
+ ### OO interface
+ use Crypt::AuthEnc::CCM;
+
+ # encrypt and authenticate
+ $ae  = Crypt::AuthEnc::CCM->new("AES", $key, $iv, $adata, $tag_len, $pt_len);
+ $ct  = $ae->encrypt_add('data1');
+ $ct .= $ae->encrypt_add('data2');
+ $ct .= $ae->encrypt_add('data3');
+ $tag = $ae->encrypt_done();
+
+ # decrypt and verify
+ $ae  = Crypt::AuthEnc::CCM->new("AES", $key, $iv, $adata, $tag_len, $pt_len);
+ $pt  = $ae->decrypt_add('ciphertext1');
+ $pt .= $ae->decrypt_add('ciphertext2');
+ $pt .= $ae->decrypt_add('ciphertext3');
+ $tag = $ae->decrypt_done();
+ die "decrypt failed" unless $tag eq $expected_tag;
+
+ #or
+ $result = $ae->decrypt_done($expected_tag); # 0 or 1
+
  ### functional interface
  use Crypt::AuthEnc::CCM qw(ccm_encrypt_authenticate ccm_decrypt_verify);
 
- my ($ciphertext, $tag) = ccm_encrypt_authenticate('AES', $key, $nonce, $adata, $tag_len, $plaintext);
- my $plaintext = ccm_decrypt_verify('AES', $key, $nonce, $adata, $ciphertext, $tag);
+ ($ciphertext, $tag) = ccm_encrypt_authenticate('AES', $key, $nonce, $adata, $tag_len, $plaintext);
+ $plaintext = ccm_decrypt_verify('AES', $key, $nonce, $adata, $ciphertext, $tag);
 
 =head1 DESCRIPTION
 
@@ -88,6 +127,41 @@ CCM parameters should follow L<http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistsp
   my $plaintext = ccm_decrypt_verify($cipher, $key, $nonce, $adata, $ciphertext, $tag);
 
   # on error returns undef
+
+=head1 METHODS
+
+=head2 new
+
+ my $ae = Crypt::AuthEnc::CCM->new($cipher, $key, $nonce, $adata, $tag_len, $pt_len);
+
+ # $cipher .. 'AES' or name of any other cipher with 16-byte block len
+ # $key ..... key of proper length (e.g. 128/192/256bits for AES)
+ # $nonce ... unique nonce/salt (no need to keep it secret)
+ # $adata ... additional authenticated data
+ # $tag_len . required length of output tag
+ # $pt_len .. expected length of plaintext/ciphertext to encrypt/decrypt
+
+=head2 encrypt_add
+
+ $ciphertext = $ae->encrypt_add($data);        #can be called multiple times
+
+=head2 encrypt_done
+
+ $tag = $ae->encrypt_done();
+
+=head2 decrypt_add
+
+ $plaintext = $ae->decrypt_add($ciphertext);   #can be called multiple times
+
+=head2 decrypt_done
+
+ my $result = $ae->decrypt_done($tag);  # returns 1 (success) or 0 (failure)
+ #or
+ my $tag = $ae->decrypt_done;           # returns $tag value
+
+=head2 clone
+
+ my $ae_new = $ae->clone;
 
 =head1 SEE ALSO
 

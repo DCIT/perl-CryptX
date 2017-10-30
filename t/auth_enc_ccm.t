@@ -1,12 +1,40 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 12;
 
 use Crypt::AuthEnc::CCM qw( ccm_encrypt_authenticate ccm_decrypt_verify );
 
 my $nonce = "random-nonce";
 my $key   = "12345678901234561234567890123456";
+
+{
+  my $pt    = "plain_half";
+  my $ct;
+
+  my $m1 = Crypt::AuthEnc::CCM->new("AES", $key, $nonce, "abc", 16, 20);
+  $ct = $m1->encrypt_add($pt);
+  $ct .= $m1->encrypt_add($pt);
+  my $tag = $m1->encrypt_done;
+
+  is(unpack('H*', $ct), "96b0114ff47da72e92631aadce84f203a8168b20", "enc: ciphertext");
+  is(unpack('H*', $tag), "fdc41ec07673ec132f1910ba771b9530", "enc: tag");
+
+  my $d1 = Crypt::AuthEnc::CCM->new("AES", $key, $nonce, "abc", 16, 20);
+  my $pt2 = $d1->decrypt_add($ct);
+  my $tag2 = $d1->decrypt_done();
+
+  is($pt2, "plain_halfplain_half", "dec1: plaintext");
+  is(unpack('H*', $tag2), "fdc41ec07673ec132f1910ba771b9530", "dec1: tag");
+
+  my $d2 = Crypt::AuthEnc::CCM->new("AES", $key, $nonce, "abc", 16, 20);
+  my $pt3;
+  $pt3 .= $d2->decrypt_add(substr($ct,$_-1,1)) for (1..length($ct));
+  my $tag3 = $d2->decrypt_done();
+
+  is($pt3, "plain_halfplain_half", "dec2: plaintext");
+  is(unpack('H*', $tag3), "fdc41ec07673ec132f1910ba771b9530", "dec2: tag");
+}
 
 {
   my ($ct, $tag) = ccm_encrypt_authenticate('AES', $key, $nonce, "header-abc", 16, "plain_halfplain_half");

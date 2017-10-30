@@ -33,6 +33,9 @@ typedef struct digest_shake_struct {    /* used by Crypt::Digest::SHAKE */
 
 typedef struct ccm_struct {             /* used by Crypt::AuthEnc::CCM */
   ccm_state state;
+  int direction;
+  int tag_len;
+  unsigned long pt_len;
   int id;
 } *Crypt__AuthEnc__CCM;
 

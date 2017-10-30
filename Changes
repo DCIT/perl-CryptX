@@ -1,13 +1,10 @@
 Changes for CryptX
 
-TODO:
-        - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
-        - CCM interface new-add-add-done
-
 0.054_* 2017-10-XX
         - new Crypt::Cipher::IDEA
         - new Crypt::Cipher::Serpent
         - new Crypt::Stream::Salsa20
+        - added CCM OO interface: new-add-add-done
 
 0.054   2017-10-12
         - fix Crypt::PK::DSA verify
