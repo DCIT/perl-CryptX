@@ -124,9 +124,8 @@ You can export selected functions:
 
 =head2 eax_decrypt_verify
 
-  my $plaintext = eax_decrypt_verify($cipher, $key, $iv, $adata, $ciphertext, $tag);
-
-  # on error returns undef
+ my $plaintext = eax_decrypt_verify($cipher, $key, $iv, $adata, $ciphertext, $tag);
+ # on error returns undef
 
 =head1 METHODS
 
@@ -143,25 +142,25 @@ You can export selected functions:
 
 =head2 adata_add
 
- $ae->adata_add($adata);                          #can be called multiple times
+ $ae->adata_add($adata);                        # can be called multiple times
 
 =head2 encrypt_add
 
- $ciphertext = $ae->encrypt_add($data);         #can be called multiple times
+ $ciphertext = $ae->encrypt_add($data);         # can be called multiple times
 
 =head2 encrypt_done
 
- $tag = $ae->encrypt_done();
+ $tag = $ae->encrypt_done();                    # returns $tag value
 
 =head2 decrypt_add
 
- $plaintext = $ae->decrypt_add($ciphertext);    #can be called multiple times
+ $plaintext = $ae->decrypt_add($ciphertext);    # can be called multiple times
 
 =head2 decrypt_done
 
- my $result = $ae->decrypt_done($tag);  # returns 1 (success) or 0 (failure)
- #or
  my $tag = $ae->decrypt_done;           # returns $tag value
+ #or
+ my $result = $ae->decrypt_done($tag);  # returns 1 (success) or 0 (failure)
 
 =head2 clone
 

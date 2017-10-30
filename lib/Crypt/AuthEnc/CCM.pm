@@ -102,7 +102,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::AuthEnc::CCM qw(ccm_encrypt_authenticate ccm_decrypt_verify);
+ use Crypt::AuthEnc::CCM qw(ccm_encrypt_authenticate ccm_decrypt_verify);
 
 =head1 FUNCTIONS
 
@@ -124,9 +124,8 @@ CCM parameters should follow L<http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistsp
 
 =head2 ccm_decrypt_verify
 
-  my $plaintext = ccm_decrypt_verify($cipher, $key, $nonce, $adata, $ciphertext, $tag);
-
-  # on error returns undef
+ my $plaintext = ccm_decrypt_verify($cipher, $key, $nonce, $adata, $ciphertext, $tag);
+ # on error returns undef
 
 =head1 METHODS
 
@@ -143,21 +142,21 @@ CCM parameters should follow L<http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistsp
 
 =head2 encrypt_add
 
- $ciphertext = $ae->encrypt_add($data);        #can be called multiple times
+ $ciphertext = $ae->encrypt_add($data);        # can be called multiple times
 
 =head2 encrypt_done
 
- $tag = $ae->encrypt_done();
+ my $tag = $ae->encrypt_done;                  # returns $tag value
 
 =head2 decrypt_add
 
- $plaintext = $ae->decrypt_add($ciphertext);   #can be called multiple times
+ $plaintext = $ae->decrypt_add($ciphertext);   # can be called multiple times
 
 =head2 decrypt_done
 
- my $result = $ae->decrypt_done($tag);  # returns 1 (success) or 0 (failure)
- #or
  my $tag = $ae->decrypt_done;           # returns $tag value
+ #or
+ my $result = $ae->decrypt_done($tag);  # returns 1 (success) or 0 (failure)
 
 =head2 clone
 

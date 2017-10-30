@@ -11,9 +11,10 @@ Currently available modules:
 - Ciphers - see [Crypt::Cipher](https://metacpan.org/pod/Crypt::Cipher) and related modules
 
     [Crypt::Cipher::AES](https://metacpan.org/pod/Crypt::Cipher::AES), [Crypt::Cipher::Anubis](https://metacpan.org/pod/Crypt::Cipher::Anubis), [Crypt::Cipher::Blowfish](https://metacpan.org/pod/Crypt::Cipher::Blowfish), [Crypt::Cipher::Camellia](https://metacpan.org/pod/Crypt::Cipher::Camellia), [Crypt::Cipher::CAST5](https://metacpan.org/pod/Crypt::Cipher::CAST5), [Crypt::Cipher::DES](https://metacpan.org/pod/Crypt::Cipher::DES),
-    [Crypt::Cipher::DES\_EDE](https://metacpan.org/pod/Crypt::Cipher::DES_EDE), [Crypt::Cipher::KASUMI](https://metacpan.org/pod/Crypt::Cipher::KASUMI), [Crypt::Cipher::Khazad](https://metacpan.org/pod/Crypt::Cipher::Khazad), [Crypt::Cipher::MULTI2](https://metacpan.org/pod/Crypt::Cipher::MULTI2), [Crypt::Cipher::Noekeon](https://metacpan.org/pod/Crypt::Cipher::Noekeon), [Crypt::Cipher::RC2](https://metacpan.org/pod/Crypt::Cipher::RC2),
-    [Crypt::Cipher::RC5](https://metacpan.org/pod/Crypt::Cipher::RC5), [Crypt::Cipher::RC6](https://metacpan.org/pod/Crypt::Cipher::RC6), [Crypt::Cipher::SAFERP](https://metacpan.org/pod/Crypt::Cipher::SAFERP), [Crypt::Cipher::SAFER\_K128](https://metacpan.org/pod/Crypt::Cipher::SAFER_K128), [Crypt::Cipher::SAFER\_K64](https://metacpan.org/pod/Crypt::Cipher::SAFER_K64), [Crypt::Cipher::SAFER\_SK128](https://metacpan.org/pod/Crypt::Cipher::SAFER_SK128),
-    [Crypt::Cipher::SAFER\_SK64](https://metacpan.org/pod/Crypt::Cipher::SAFER_SK64), [Crypt::Cipher::SEED](https://metacpan.org/pod/Crypt::Cipher::SEED), [Crypt::Cipher::Skipjack](https://metacpan.org/pod/Crypt::Cipher::Skipjack), [Crypt::Cipher::Twofish](https://metacpan.org/pod/Crypt::Cipher::Twofish), [Crypt::Cipher::XTEA](https://metacpan.org/pod/Crypt::Cipher::XTEA)
+    [Crypt::Cipher::DES\_EDE](https://metacpan.org/pod/Crypt::Cipher::DES_EDE), [Crypt::Cipher::IDEA](https://metacpan.org/pod/Crypt::Cipher::IDEA), [Crypt::Cipher::KASUMI](https://metacpan.org/pod/Crypt::Cipher::KASUMI), [Crypt::Cipher::Khazad](https://metacpan.org/pod/Crypt::Cipher::Khazad), [Crypt::Cipher::MULTI2](https://metacpan.org/pod/Crypt::Cipher::MULTI2), [Crypt::Cipher::Noekeon](https://metacpan.org/pod/Crypt::Cipher::Noekeon),
+    [Crypt::Cipher::RC2](https://metacpan.org/pod/Crypt::Cipher::RC2), [Crypt::Cipher::RC5](https://metacpan.org/pod/Crypt::Cipher::RC5), [Crypt::Cipher::RC6](https://metacpan.org/pod/Crypt::Cipher::RC6), [Crypt::Cipher::SAFERP](https://metacpan.org/pod/Crypt::Cipher::SAFERP), [Crypt::Cipher::SAFER\_K128](https://metacpan.org/pod/Crypt::Cipher::SAFER_K128), [Crypt::Cipher::SAFER\_K64](https://metacpan.org/pod/Crypt::Cipher::SAFER_K64),
+    [Crypt::Cipher::SAFER\_SK128](https://metacpan.org/pod/Crypt::Cipher::SAFER_SK128), [Crypt::Cipher::SAFER\_SK64](https://metacpan.org/pod/Crypt::Cipher::SAFER_SK64), [Crypt::Cipher::SEED](https://metacpan.org/pod/Crypt::Cipher::SEED), [Crypt::Cipher::Serpent](https://metacpan.org/pod/Crypt::Cipher::Serpent), [Crypt::Cipher::Skipjack](https://metacpan.org/pod/Crypt::Cipher::Skipjack),
+    [Crypt::Cipher::Twofish](https://metacpan.org/pod/Crypt::Cipher::Twofish), [Crypt::Cipher::XTEA](https://metacpan.org/pod/Crypt::Cipher::XTEA)
 
 - Block cipher modes
 
@@ -21,7 +22,7 @@ Currently available modules:
 
 - Stream ciphers
 
-    [Crypt::Stream::RC4](https://metacpan.org/pod/Crypt::Stream::RC4), [Crypt::Stream::ChaCha](https://metacpan.org/pod/Crypt::Stream::ChaCha), [Crypt::Stream::Sober128](https://metacpan.org/pod/Crypt::Stream::Sober128)
+    [Crypt::Stream::RC4](https://metacpan.org/pod/Crypt::Stream::RC4), [Crypt::Stream::ChaCha](https://metacpan.org/pod/Crypt::Stream::ChaCha), [Crypt::Stream::Salsa20](https://metacpan.org/pod/Crypt::Stream::Salsa20), [Crypt::Stream::Sober128](https://metacpan.org/pod/Crypt::Stream::Sober128)
 
 - Authenticated encryption modes
 
