@@ -4,7 +4,7 @@ package Crypt::Cipher::Noekeon;
 
 use strict;
 use warnings;
-our $VERSION = '0.054_003';
+our $VERSION = '0.054_004';
 
 use CryptX;
 use base 'Crypt::Cipher';
