@@ -4,7 +4,7 @@ package Crypt::Mode::CFB;
 
 use strict;
 use warnings;
-our $VERSION = '0.054_004';
+our $VERSION = '0.054_005';
 
 use Crypt::Cipher;
 use base 'Crypt::Mode';

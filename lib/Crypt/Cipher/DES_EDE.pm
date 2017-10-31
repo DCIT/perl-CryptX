@@ -4,7 +4,7 @@ package Crypt::Cipher::DES_EDE;
 
 use strict;
 use warnings;
-our $VERSION = '0.054_004';
+our $VERSION = '0.054_005';
 
 use CryptX;
 use base 'Crypt::Cipher';
