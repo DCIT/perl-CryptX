@@ -280,7 +280,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  $pk->generate_key(\$dsa_param)
  # $dsa_param is the content of DER or PEM file with DSA params
  # e.g. openssl dsaparam 2048
- 
+
 =head2 import_key
 
 Loads private or public key in DER or PEM format.

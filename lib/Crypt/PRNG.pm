@@ -53,7 +53,7 @@ sub string_from {
   my @ch = split(//, $chars);
   my $max_index = $#ch;
   return if $max_index > 65535;
-  
+
   my $mask;
   for my $n (1..31) {
     $mask = (1<<$n) - 1;

@@ -3,6 +3,9 @@ package Crypt::Cipher;
 use strict;
 use warnings;
 our $VERSION = '0.054_004';
+
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
 ### the following methods/functions are implemented in XS:
@@ -41,6 +44,7 @@ sub _trans_cipher_name {
 sub new {
   my $pkg = shift;
   my $cipher_name = $pkg eq __PACKAGE__ ? _trans_cipher_name(shift) : _trans_cipher_name($pkg);
+  local $SIG{__DIE__} = \&CryptX::_croak;
   return _new($cipher_name, @_);
 }
 
@@ -48,11 +52,8 @@ sub blocksize {
   my $self = shift;
   return $self->_blocksize if ref($self);
   $self = _trans_cipher_name(shift) if $self eq __PACKAGE__;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   return _block_length_by_name(_trans_cipher_name($self));
-}
-
-sub keysize {
-  max_keysize(@_);
 }
 
 sub max_keysize
@@ -61,6 +62,7 @@ sub max_keysize
   return unless defined $self;
   return $self->_max_keysize if ref($self);
   $self = _trans_cipher_name(shift) if $self eq __PACKAGE__;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   return _max_key_length_by_name(_trans_cipher_name($self));
 }
 
@@ -69,7 +71,12 @@ sub min_keysize {
   return unless defined $self;
   return $self->_min_keysize if ref($self);
   $self = _trans_cipher_name(shift) if $self eq __PACKAGE__;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   return _min_key_length_by_name(_trans_cipher_name($self));
+}
+
+sub keysize {
+  goto &max_keysize;
 }
 
 sub default_rounds {
@@ -77,6 +84,7 @@ sub default_rounds {
   return unless defined $self;
   return $self->_default_rounds if ref($self);
   $self = _trans_cipher_name(shift) if $self eq __PACKAGE__;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   return _default_rounds_by_name(_trans_cipher_name($self));
 }
 

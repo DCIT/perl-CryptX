@@ -354,7 +354,7 @@ The following variants are available since CryptX-0.032
  $pk->generate_key($param_hash)
  # $param_hash is { g => $g, p => $p }
  # where $g is the generator (base) in a hex string and $p is the prime in a hex string
- 
+
  $pk->generate_key(\$dh_param)
  # $dh_param is the content of DER or PEM file with DH params
  # e.g. openssl dhparam 2048

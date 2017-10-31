@@ -9,7 +9,8 @@ our %EXPORT_TAGS = ( all => [qw( ccm_encrypt_authenticate ccm_decrypt_verify )] 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use Carp; $Carp::Internal{(__PACKAGE__)}++;
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use Crypt::Cipher;
 

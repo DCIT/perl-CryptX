@@ -32,11 +32,10 @@ BEGIN {
 }
 
 sub _croak {
-  die @_ if ref $_[0];
-  if ($_[-1] =~ /\n$/s) {
-    my $arg = pop @_;
-    $arg =~ s/(.*)( at .*? line .*?\n$)/$1/s;
-    push @_, $arg;
+  die @_ if ref $_[0] || !$_[-1];
+  if ($_[-1] =~ /^(.*)( at .+ line .+\n$)/s) {
+    pop @_;
+    push @_, $1;
   }
   die Carp::shortmess @_;
 }

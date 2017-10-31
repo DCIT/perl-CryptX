@@ -9,9 +9,15 @@ our %EXPORT_TAGS = ( all => [qw( chacha20poly1305_encrypt_authenticate chacha20p
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
-sub new { my $class = shift; _new(@_) }
+sub new {
+  my $class = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  return _new(@_);
+}
 
 sub chacha20poly1305_encrypt_authenticate {
   my $key = shift;
@@ -19,6 +25,7 @@ sub chacha20poly1305_encrypt_authenticate {
   my $adata = shift;
   my $plaintext = shift;
 
+  local $SIG{__DIE__} = \&CryptX::_croak;
   my $m = Crypt::AuthEnc::ChaCha20Poly1305->new($key, $iv);
   $m->adata_add(defined $adata ? $adata : ''); #XXX-TODO if no aad we have to pass empty string
   my $ct = $m->encrypt_add($plaintext);
@@ -33,6 +40,7 @@ sub chacha20poly1305_decrypt_verify {
   my $ciphertext = shift;
   my $tag = shift;
 
+  local $SIG{__DIE__} = \&CryptX::_croak;
   my $m = Crypt::AuthEnc::ChaCha20Poly1305->new($key, $iv);
   $m->adata_add(defined $adata ? $adata : ''); #XXX-TODO if no aad we have to pass empty string
   my $ct = $m->decrypt_add($ciphertext);

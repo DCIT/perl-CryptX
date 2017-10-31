@@ -13,21 +13,23 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
+use CryptX;
 use Crypt::Checksum::Adler32;
 use Crypt::Checksum::CRC32;
 
-sub adler32_data        { Crypt::Checksum::Adler32->new->add(@_)->digest                  }
-sub adler32_data_hex    { Crypt::Checksum::Adler32->new->add(@_)->hexdigest               }
-sub adler32_data_int    { unpack("N", Crypt::Checksum::Adler32->new->add(@_)->digest)     }
-sub adler32_file        { Crypt::Checksum::Adler32->new->addfile(@_)->digest              }
-sub adler32_file_hex    { Crypt::Checksum::Adler32->new->addfile(@_)->hexdigest           }
-sub adler32_file_int    { unpack("N", Crypt::Checksum::Adler32->new->addfile(@_)->digest) }
-sub crc32_data          { Crypt::Checksum::CRC32->new->add(@_)->digest                    }
-sub crc32_data_hex      { Crypt::Checksum::CRC32->new->add(@_)->hexdigest                 }
-sub crc32_data_int      { unpack("N", Crypt::Checksum::CRC32->new->add(@_)->digest)       }
-sub crc32_file          { Crypt::Checksum::CRC32->new->addfile(@_)->digest                }
-sub crc32_file_hex      { Crypt::Checksum::CRC32->new->addfile(@_)->hexdigest             }
-sub crc32_file_int      { unpack("N", Crypt::Checksum::CRC32->new->addfile(@_)->digest)   }
+sub adler32_data        { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Checksum::Adler32->new->add(@_)->digest                  }
+sub adler32_data_hex    { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Checksum::Adler32->new->add(@_)->hexdigest               }
+sub adler32_data_int    { local $SIG{__DIE__} = \&CryptX::_croak; unpack("N", Crypt::Checksum::Adler32->new->add(@_)->digest)     }
+sub adler32_file        { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Checksum::Adler32->new->addfile(@_)->digest              }
+sub adler32_file_hex    { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Checksum::Adler32->new->addfile(@_)->hexdigest           }
+sub adler32_file_int    { local $SIG{__DIE__} = \&CryptX::_croak; unpack("N", Crypt::Checksum::Adler32->new->addfile(@_)->digest) }
+sub crc32_data          { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Checksum::CRC32->new->add(@_)->digest                    }
+sub crc32_data_hex      { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Checksum::CRC32->new->add(@_)->hexdigest                 }
+sub crc32_data_int      { local $SIG{__DIE__} = \&CryptX::_croak; unpack("N", Crypt::Checksum::CRC32->new->add(@_)->digest)       }
+sub crc32_file          { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Checksum::CRC32->new->addfile(@_)->digest                }
+sub crc32_file_hex      { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Checksum::CRC32->new->addfile(@_)->hexdigest             }
+sub crc32_file_int      { local $SIG{__DIE__} = \&CryptX::_croak; unpack("N", Crypt::Checksum::CRC32->new->addfile(@_)->digest)   }
 
 1;
 
@@ -40,7 +42,7 @@ Crypt::Checksum - functional interface to CRC32 and Adler32 checksums
 =head1 SYNOPSIS
 
    use Crypt::Checksum ':all';
-   
+
    # calculate Adler32 checksum from string/buffer
    $checksum_raw  = adler32_data($data);
    $checksum_hex  = adler32_data_hex($data);
@@ -64,7 +66,7 @@ Crypt::Checksum - functional interface to CRC32 and Adler32 checksums
    # calculate CRC32 checksum from filehandle
    $checksum_raw  = crc32_file(*FILEHANDLE);
    $checksum_hex  = crc32_file_hex(*FILEHANDLE);
-   
+
 =head1 DESCRIPTION
 
 Calculating CRC32 and Adler32 checksums (functional interface);

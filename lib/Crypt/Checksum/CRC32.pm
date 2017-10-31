@@ -3,7 +3,9 @@ package Crypt::Checksum::CRC32;
 use strict;
 use warnings;
 our $VERSION = '0.054_004';
+
 use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
 sub addfile {

@@ -9,7 +9,8 @@ our %EXPORT_TAGS = ( all => [qw( digest_data digest_data_hex digest_data_b64 dig
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use Carp; $Carp::Internal{(__PACKAGE__)}++;
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
 ### the following methods/functions are implemented in XS:

@@ -9,6 +9,8 @@ our %EXPORT_TAGS = ( all => [qw(pbkdf1 pbkdf2 hkdf hkdf_expand hkdf_extract)] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use Crypt::Digest;
 
@@ -17,6 +19,7 @@ sub pbkdf1 {
   $iteration_count ||= 5000;
   $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA256');
   $len ||= 32;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   return _pkcs_5_alg1($password, $salt, $iteration_count, $hash_name, $len);
 }
 
@@ -25,6 +28,7 @@ sub pbkdf2 {
   $iteration_count ||= 5000;
   $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA256');
   $len ||= 32;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   return _pkcs_5_alg2($password, $salt, $iteration_count, $hash_name, $len);
 }
 
@@ -34,6 +38,7 @@ sub hkdf_extract {
   my ($keying_material, $salt, $hash_name) = @_;
   $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA256');
   $salt = pack("H*", "00" x Crypt::Digest->hashsize($hash_name)) unless defined $salt; # according to rfc5869 defaults to HashLen zero octets
+  local $SIG{__DIE__} = \&CryptX::_croak;
   return _hkdf_extract($hash_name, $salt, $keying_material);
 }
 
@@ -44,6 +49,7 @@ sub hkdf_expand {
   $len ||= 32;
   $info ||= '';
   $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA256');
+  local $SIG{__DIE__} = \&CryptX::_croak;
   return _hkdf_expand($hash_name, $info, $keying_material, $len);
 }
 
@@ -54,6 +60,7 @@ sub hkdf {
   $info ||= '';
   $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA256');
   $salt = pack("H*", "00" x Crypt::Digest->hashsize($hash_name)) unless defined $salt; # according to rfc5869 defaults to HashLen zero octets
+  local $SIG{__DIE__} = \&CryptX::_croak;
   return _hkdf($hash_name, $salt, $info, $keying_material, $len);
 }
 
