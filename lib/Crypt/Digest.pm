@@ -185,7 +185,7 @@ Please note that all functions take as its first argument the algoritm name, sup
  'BLAKE2b_160', 'BLAKE2b_256', 'BLAKE2b_384', 'BLAKE2b_512',
  'BLAKE2s_128', 'BLAKE2s_160', 'BLAKE2s_224', 'BLAKE2s_256'
 
- (simply any <FUNCNAME> for which there is Crypt::Digest::<FUNCNAME> module)
+ (simply any <NAME> for which there is Crypt::Digest::<NAME> module)
 
 =head2 digest_data
 
@@ -350,7 +350,7 @@ Returns the digest encoded as a hexadecimal string.
 =head2 b64digest
 
 Returns the digest encoded as a Base64 string, B<with> trailing '=' padding (B<BEWARE:> this padding
-style might differ from other Digest::SOMETHING modules on CPAN).
+style might differ from other Digest::<SOMETHING> modules on CPAN).
 
  $result_b64 = $d->b64digest();
 
