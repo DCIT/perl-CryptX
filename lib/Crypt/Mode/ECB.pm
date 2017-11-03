@@ -49,12 +49,17 @@ B<BEWARE: ECB is inherently insecure>, if you are not sure go for L<Crypt::Mode:
 
 =head2 new
 
- my $m = Crypt::Mode::ECB->new('AES');
+ my $m = Crypt::Mode::ECB->new($name);
  #or
- my $m = Crypt::Mode::ECB->new('AES', $padding);
+ my $m = Crypt::Mode::ECB->new($name, $padding);
  #or
- my $m = Crypt::Mode::ECB->new('AES', $padding, $cipher_rounds);
+ my $m = Crypt::Mode::ECB->new($name, $padding, $cipher_rounds);
 
+ # $name ....... one of 'AES', 'Anubis', 'Blowfish', 'CAST5', 'Camellia', 'DES', 'DES_EDE',
+ #               'KASUMI', 'Khazad', 'MULTI2', 'Noekeon', 'RC2', 'RC5', 'RC6',
+ #               'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
+ #               'SEED', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
+ #               simply any <NAME> for which there exists Crypt::Cipher::<NAME>
  # $padding .... 0 no padding (plaintext size has to be myltiple of block length)
  #               1 PKCS5 padding, Crypt::CBC's "standard" - DEFAULT
  #               2 Crypt::CBC's "oneandzeroes"

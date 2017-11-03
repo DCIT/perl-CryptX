@@ -146,8 +146,8 @@ Constructor, returns a reference to the cipher object.
  # $name = one of 'AES', 'Anubis', 'Blowfish', 'CAST5', 'Camellia', 'DES', 'DES_EDE',
  #                'KASUMI', 'Khazad', 'MULTI2', 'Noekeon', 'RC2', 'RC5', 'RC6',
  #                'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
- #                'SEED', 'Skipjack', 'Twofish', 'XTEA'
- #                simply any <CNAME> for which there exists Crypt::Cipher::<NAME>
+ #                'SEED', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
+ #                simply any <NAME> for which there exists Crypt::Cipher::<NAME>
  # $key = binary key (keysize should comply with selected cipher requirements)
 
  ## some of the ciphers (e.g. MULTI2, RC5, SAFER) allows to set number of rounds

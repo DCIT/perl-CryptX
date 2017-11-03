@@ -46,10 +46,15 @@ This module implements OFB cipher mode. B<NOTE:> it works only with ciphers from
 
 =head2 new
 
- my $m = Crypt::Mode::OFB->new('AES');
+ my $m = Crypt::Mode::OFB->new($name);
  #or
- my $m = Crypt::Mode::OFB->new('AES', $cipher_rounds);
+ my $m = Crypt::Mode::OFB->new($name, $cipher_rounds);
 
+ # $name ............ one of 'AES', 'Anubis', 'Blowfish', 'CAST5', 'Camellia', 'DES', 'DES_EDE',
+ #                    'KASUMI', 'Khazad', 'MULTI2', 'Noekeon', 'RC2', 'RC5', 'RC6',
+ #                    'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
+ #                    'SEED', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
+ #                    simply any <NAME> for which there exists Crypt::Cipher::<NAME>
  # $cipher_rounds ... optional num of rounds for given cipher
 
 =head2 encrypt
