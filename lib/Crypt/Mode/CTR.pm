@@ -53,15 +53,15 @@ This module implements CTR cipher mode. B<NOTE:> it works only with ciphers from
  my $m = Crypt::Mode::CTR->new($cipher_name, $ctr_mode, $ctr_width, $cipher_rounds);
 
  # $cipher_name .. one of 'AES', 'Anubis', 'Blowfish', 'CAST5', 'Camellia', 'DES', 'DES_EDE',
- #                'KASUMI', 'Khazad', 'MULTI2', 'Noekeon', 'RC2', 'RC5', 'RC6',
- #                'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
- #                'SEED', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
- #                simply any <NAME> for which there exists Crypt::Cipher::<NAME>
- # $ctr_mode .... 0 little-endian counter (DEFAULT)
- #                1 big-endian counter
- #                2 little-endian + RFC3686 incrementing
- #                3 big-endian + RFC3686 incrementing
- # $ctr_width ... counter width in bytes (DEFAULT = full block width)
+ #                 'KASUMI', 'Khazad', 'MULTI2', 'Noekeon', 'RC2', 'RC5', 'RC6',
+ #                 'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
+ #                 'SEED', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
+ #                 simply any <NAME> for which there exists Crypt::Cipher::<NAME>
+ # $ctr_mode ..... 0 little-endian counter (DEFAULT)
+ #                 1 big-endian counter
+ #                 2 little-endian + RFC3686 incrementing
+ #                 3 big-endian + RFC3686 incrementing
+ # $ctr_width .... counter width in bytes (DEFAULT = full block width)
  # $cipher_rounds ... optional num of rounds for given cipher
 
 =head2 encrypt

@@ -222,6 +222,9 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 [%-IF lc_name == 'hmac' %]
  $d = Crypt::Mac::[%orig_name%]->new($hash_name, $key);
+
+ # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $key ......... the key (octets/bytes)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
  $d = Crypt::Mac::[%orig_name%]->new($size, $key);
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
