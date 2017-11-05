@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 14;
 
 use Crypt::Stream::RC4;
 use Crypt::Stream::Sober128;
@@ -54,3 +54,33 @@ use Crypt::Stream::Salsa20;
   is(unpack("H*", $enc), unpack("H*", $ct), "Crypt::Stream::Salsa encrypt");
   is($dec, $pt, "Crypt::Stream::Salsa decrypt");
 }
+
+{
+  my $key = pack("H*", "74657374206b65792031323862697473");
+  my $iv  = pack("H*", "11223344");
+  my $ct  = pack("H*", "c57260e45b747f4223c2fb3b372c3c0f8091686e");
+  my $pt  = pack("H*", "f31f8df318512fe05a6ee39aec075c2318071d27");
+  my $enc = Crypt::Stream::Sosemanuk->new($key, $iv)->crypt($pt);
+  my $dec = Crypt::Stream::Sosemanuk->new($key, $iv)->crypt($ct);
+  is(unpack("H*", $enc), unpack("H*", $ct), "Crypt::Stream::Sosemanuk encrypt");
+  is(unpack("H*", $dec), unpack("H*", $pt), "Crypt::Stream::Sosemanuk decrypt");
+}
+{
+  my $key = pack("H*", "74657374206b65792031323862697473");
+  my $ct  = pack("H*", "366ded17432550a279ac18a1db2b602c98967549");
+  my $pt  = pack("H*", "f31f8df318512fe05a6ee39aec075c2318071d27");
+  my $enc = Crypt::Stream::Sosemanuk->new($key, "")->crypt($pt);
+  my $dec = Crypt::Stream::Sosemanuk->new($key, "")->crypt($ct);
+  is(unpack("H*", $enc), unpack("H*", $ct), "Crypt::Stream::Sosemanuk encrypt (empty IV)");
+  is(unpack("H*", $dec), unpack("H*", $pt), "Crypt::Stream::Sosemanuk decrypt (empty IV)");
+}
+{
+  my $key = pack("H*", "74657374206b65792031323862697473");
+  my $ct  = pack("H*", "366ded17432550a279ac18a1db2b602c98967549");
+  my $pt  = pack("H*", "f31f8df318512fe05a6ee39aec075c2318071d27");
+  my $enc = Crypt::Stream::Sosemanuk->new($key)->crypt($pt);
+  my $dec = Crypt::Stream::Sosemanuk->new($key)->crypt($ct);
+  is(unpack("H*", $enc), unpack("H*", $ct), "Crypt::Stream::Sosemanuk encrypt (no IV)");
+  is(unpack("H*", $dec), unpack("H*", $pt), "Crypt::Stream::Sosemanuk decrypt (no IV)");
+}
+

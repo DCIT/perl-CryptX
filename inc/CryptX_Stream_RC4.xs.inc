@@ -1,7 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Stream::RC4
 
 Crypt::Stream::RC4
-_new(SV * key)
+new(Class, SV * key)
     CODE:
     {
         int rv;

@@ -1,7 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Stream::Sober128
 
 Crypt::Stream::Sober128
-_new(SV * key, SV * nonce)
+new(Class, SV * key, SV * nonce)
     CODE:
     {
         int rv;

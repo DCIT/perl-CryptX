@@ -1,4 +1,4 @@
-package Crypt::Stream::Sober128;
+package Crypt::Stream::Sosemanuk;
 
 use strict;
 use warnings;
@@ -12,35 +12,35 @@ use CryptX;
 
 =head1 NAME
 
-Crypt::Stream::Sober128 - Stream cipher Sober128
+Crypt::Stream::Sosemanuk - Stream cipher Sosemanuk
 
 =head1 SYNOPSIS
 
-   use Crypt::Stream::Sober128;
+   use Crypt::Stream::Sosemanuk;
 
    # encrypt
    $key = "1234567890123456";
    $iv  = "123456789012";
-   $stream = Crypt::Stream::Sober128->new($key, $iv);
+   $stream = Crypt::Stream::Sosemanuk->new($key, $iv);
    $ct = $stream->crypt("plain message");
 
    # decrypt
    $key = "1234567890123456";
    $iv  = "123456789012";
-   $stream = Crypt::Stream::Sober128->new($key, $iv);
+   $stream = Crypt::Stream::Sosemanuk->new($key, $iv);
    $pt = $stream->crypt($ct);
 
 =head1 DESCRIPTION
 
-Provides an interface to the Sober128 stream cipher.
+Provides an interface to the Sosemanuk stream cipher.
 
 =head1 METHODS
 
 =head2 new
 
- $stream = Crypt::Stream::Sober128->new($key, $iv);
+ $stream = Crypt::Stream::Sosemanuk->new($key, $iv);
  # $key .. keylen must be multiple of 4 bytes
- # $iv  .. ivlen must be multiple of 4 bytes
+ # $iv  .. ivlen must be multiple of 4 bytes (OPTIONAL)
 
 =head2 crypt
 
@@ -60,7 +60,7 @@ Provides an interface to the Sober128 stream cipher.
 
 =over
 
-=item * L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sosemanuk>
+=item * L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sober128>
 
 =item * L<https://en.wikipedia.org/wiki/SOBER-128|https://en.wikipedia.org/wiki/SOBER-128>
 

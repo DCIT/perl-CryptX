@@ -1,7 +1,7 @@
-MODULE = CryptX         PACKAGE = Crypt::Stream::Salsa20
+MODULE = CryptX         PACKAGE = Crypt::Stream::Sosemanuk
 
-Crypt::Stream::Salsa20
-new(Class, SV * key, SV * nonce, UV counter = 0, int rounds = 20)
+Crypt::Stream::Sosemanuk
+new(Class, SV * key, SV * nonce=&PL_sv_undef)
     CODE:
     {
         int rv;
@@ -9,45 +9,51 @@ new(Class, SV * key, SV * nonce, UV counter = 0, int rounds = 20)
         unsigned char *iv=NULL, *k=NULL;
 
         if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
-        if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
         k  = (unsigned char *)SvPVbyte(key, k_len);
-        iv = (unsigned char *)SvPVbyte(nonce, iv_len);
 
-        Newz(0, RETVAL, 1, struct salsa20_struct);
+        Newz(0, RETVAL, 1, struct sosemanuk_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = salsa20_setup(&RETVAL->state, k, (unsigned long)k_len, rounds);
+        rv = sosemanuk_setup(&RETVAL->state, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
-          croak("FATAL: salsa20_setup failed: %s", error_to_string(rv));
+          croak("FATAL: sosemanuk_setup failed: %s", error_to_string(rv));
         }
 
-        rv = salsa20_ivctr64(&RETVAL->state, iv, (unsigned long)iv_len, (ulong64)counter);
+        if (SvOK(nonce)) {
+          if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+          iv = (unsigned char *)SvPVbyte(nonce, iv_len);
+          rv = sosemanuk_setiv(&RETVAL->state, iv, (unsigned long)iv_len);
+        }
+        else {
+          rv = sosemanuk_setiv(&RETVAL->state, NULL, 0);
+        }
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
-          croak("FATAL: salsa20_ivctr64 failed: %s", error_to_string(rv));
+          croak("FATAL: sosemanuk_setiv failed: %s", error_to_string(rv));
         }
+
     }
     OUTPUT:
         RETVAL
 
 void
-DESTROY(Crypt::Stream::Salsa20 self)
+DESTROY(Crypt::Stream::Sosemanuk self)
     CODE:
-        salsa20_done(&self->state);
+        sosemanuk_done(&self->state);
         Safefree(self);
 
-Crypt::Stream::Salsa20
-clone(Crypt::Stream::Salsa20 self)
+Crypt::Stream::Sosemanuk
+clone(Crypt::Stream::Sosemanuk self)
     CODE:
-        Newz(0, RETVAL, 1, struct salsa20_struct);
+        Newz(0, RETVAL, 1, struct sosemanuk_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct salsa20_struct);
+        Copy(&self->state, &RETVAL->state, 1, struct sosemanuk_struct);
     OUTPUT:
         RETVAL
 
 SV *
-keystream(Crypt::Stream::Salsa20 self, STRLEN out_len)
+keystream(Crypt::Stream::Sosemanuk self, STRLEN out_len)
     CODE:
     {
         int rv;
@@ -57,17 +63,17 @@ keystream(Crypt::Stream::Salsa20 self, STRLEN out_len)
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, out_len);
         out_data = (unsigned char *)SvPVX(RETVAL);
-        rv = salsa20_keystream(&self->state, out_data, out_len);
+        rv = sosemanuk_keystream(&self->state, out_data, out_len);
         if (rv != CRYPT_OK) {
           SvREFCNT_dec(RETVAL);
-          croak("FATAL: salsa20_keystream failed: %s", error_to_string(rv));
+          croak("FATAL: sosemanuk_keystream failed: %s", error_to_string(rv));
         }
     }
     OUTPUT:
         RETVAL
 
 SV *
-crypt(Crypt::Stream::Salsa20 self, SV * data)
+crypt(Crypt::Stream::Sosemanuk self, SV * data)
     CODE:
     {
         int rv;
@@ -83,10 +89,10 @@ crypt(Crypt::Stream::Salsa20 self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = salsa20_crypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
+          rv = sosemanuk_crypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
-            croak("FATAL: salsa20_crypt failed: %s", error_to_string(rv));
+            croak("FATAL: sosemanuk_crypt failed: %s", error_to_string(rv));
           }
         }
     }

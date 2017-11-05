@@ -6,8 +6,6 @@ our $VERSION = '0.054_006';
 
 use CryptX;
 
-sub new { my $class = shift; _new(@_) }
-
 1;
 
 =pod
@@ -67,7 +65,7 @@ Provides an interface to the Salsa20 stream cipher.
 
 =over
 
-=item * L<Crypt::Stream::ChaCha>, L<Crypt::Stream::RC4>, L<Crypt::Stream::Sober128>
+=item * L<Crypt::Stream::ChaCha>, L<Crypt::Stream::RC4>, L<Crypt::Stream::Sober128>, L<Crypt::Stream::Sosemanuk>
 
 =back
 

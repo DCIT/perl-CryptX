@@ -1,7 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Stream::ChaCha
 
 Crypt::Stream::ChaCha
-_new(SV * key, SV * nonce, UV counter = 0, int rounds = 20)
+new(Class, SV * key, SV * nonce, UV counter = 0, int rounds = 20)
     CODE:
     {
         int rv;

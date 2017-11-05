@@ -6,8 +6,6 @@ our $VERSION = '0.054_006';
 
 use CryptX;
 
-sub new { my $class = shift; _new(@_) }
-
 1;
 
 =pod
@@ -59,7 +57,7 @@ Provides an interface to the RC4 stream cipher.
 
 =over
 
-=item * L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Sober128>, L<Crypt::Stream::Salsa>
+=item * L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Sober128>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sosemanuk>
 
 =item * L<https://en.wikipedia.org/wiki/RC4_cipher|https://en.wikipedia.org/wiki/RC4_cipher>
 
