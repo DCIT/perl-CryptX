@@ -24,7 +24,8 @@ int ccm_process(ccm_state *ccm,
                 unsigned char *ct,
                 int direction)
 {
-   unsigned char  y, z, b;
+   unsigned char  z, b;
+   unsigned long  y;
    int err;
 
    LTC_ARGCHK(ccm != NULL);
