@@ -196,12 +196,12 @@
 /*
  * Key schedule: initialize the key context structure with the provided
  * secret key. The secret key is an array of 1 to 32 bytes.
- * @param kc       The Sosemanuk key context
+ * @param ss       The Sosemanuk state
  * @param key      Key
- * @param key_len  Length of key
+ * @param keylen   Length of key
  * @return CRYPT_OK on success
  */
-int sosemanuk_setup(sosemanuk_state *ss, unsigned char *key, unsigned long key_len)
+int sosemanuk_setup(sosemanuk_state *ss, unsigned char *key, unsigned long keylen)
 {
     /*
      * This key schedule is actually a truncated Serpent key schedule.
@@ -255,20 +255,31 @@ int sosemanuk_setup(sosemanuk_state *ss, unsigned char *key, unsigned long key_l
     ulong32 w0, w1, w2, w3, w4, w5, w6, w7;
     int i = 0;
 
+   LTC_ARGCHK(ss  != NULL);
+   LTC_ARGCHK(key != NULL);
+
+    /*
+     * Initialize the pointer to 666 as a flag that can be checked
+     * by sosemanuk_crypt() as an indication sosemanuk_setiv() was
+     * not called.  (sosemanuk_setiv() will set the pointer to a
+     * more reasonable value.)
+     */
+    ss->ptr = 666;
+
     /*
      * The key is copied into the wbuf[] buffer and padded to 256 bits
      * as described in the Serpent specification.
      */
-    if (key_len == 0 || key_len > 32) {
+    if (keylen == 0 || keylen > 32) {
         fprintf(stderr, "invalid key size: %lu\n",
-            (unsigned long)key_len);
+            (unsigned long)keylen);
         exit(EXIT_FAILURE);
     }
-    XMEMCPY(wbuf, key, key_len);
-    if (key_len < 32) {
-        wbuf[key_len] = 0x01;
-        if (key_len < 31)
-            XMEMSET(wbuf + key_len + 1, 0, 31 - key_len);
+    XMEMCPY(wbuf, key, keylen);
+    if (keylen < 32) {
+        wbuf[keylen] = 0x01;
+        if (keylen < 31)
+            XMEMSET(wbuf + keylen + 1, 0, 31 - keylen);
     }
 
     LOAD32L(w0, wbuf);
@@ -326,14 +337,13 @@ int sosemanuk_setup(sosemanuk_state *ss, unsigned char *key, unsigned long key_l
 /*
  * Cipher initialization: the cipher internal state is initialized, using
  * the provided key context and IV. The IV length is up to 16 bytes. If
- * "iv_len" is 0 (no IV), then the "iv" parameter can be NULL.
- * @param rc       The Sosemanuk run context
- * @param kc       The Sosemanuk key context
+ * "ivlen" is 0 (no IV), then the "iv" parameter can be NULL.
+ * @param ss       The Sosemanuk state
  * @param iv       Initialization vector
- * @param iv_len   Length of iv
+ * @param ivlen    Length of iv
  * @return CRYPT_OK on success
  */
-int sosemanuk_setiv(sosemanuk_state *ss, unsigned char *iv, unsigned long iv_len)
+int sosemanuk_setiv(sosemanuk_state *ss, unsigned char *iv, unsigned long ivlen)
 {
 
     /*
@@ -371,15 +381,13 @@ int sosemanuk_setiv(sosemanuk_state *ss, unsigned char *iv, unsigned long iv_len
     } while (0)
 
     ulong32 r0, r1, r2, r3, r4;
-    unsigned char ivtmp[16];
+    unsigned char ivtmp[16] = {0};
 
-    if (iv_len >= sizeof ivtmp) {
-        XMEMCPY(ivtmp, iv, sizeof ivtmp);
-    } else {
-        if (iv_len > 0)
-            XMEMCPY(ivtmp, iv, iv_len);
-        XMEMSET(ivtmp + iv_len, 0, (sizeof ivtmp) - iv_len);
-    }
+    LTC_ARGCHK(ss != NULL);
+    LTC_ARGCHK(ivlen >= 0 && ivlen <= 16);
+    LTC_ARGCHK(iv != NULL || ivlen == 0);
+
+    if (ivlen > 0) XMEMCPY(ivtmp, iv, ivlen);
 
     /*
      * Decode IV into four 32-bit words (little-endian).
@@ -432,7 +440,7 @@ int sosemanuk_setiv(sosemanuk_state *ss, unsigned char *iv, unsigned long iv_len
     ss->s01 = r2;
     ss->s00 = r3;
 
-    ss->ptr = sizeof ss->buf;
+    ss->ptr = sizeof(ss->buf);
 
 #undef KA
 #undef FSS
@@ -720,14 +728,14 @@ static LTC_INLINE void _sosemanuk_internal(sosemanuk_state *ss)
 
 /*
  * Combine buffers in1[] and in2[] by XOR, result in out[]. The length
- * is "data_len" (in bytes). Partial overlap of out[] with either in1[]
+ * is "datalen" (in bytes). Partial overlap of out[] with either in1[]
  * or in2[] is not allowed. Total overlap (out == in1 and/or out == in2)
  * is allowed.
  */
 static LTC_INLINE void _xorbuf(const unsigned char *in1, const unsigned char *in2,
-    unsigned char *out, unsigned long data_len)
+    unsigned char *out, unsigned long datalen)
 {
-    while (data_len -- > 0)
+    while (datalen -- > 0)
         *out ++ = *in1 ++ ^ *in2 ++;
 }
 
@@ -737,37 +745,42 @@ static LTC_INLINE void _xorbuf(const unsigned char *in1, const unsigned char *in
  * buffer, combined by XOR with the stream, and the result is written
  * in the "out" buffer. "in" and "out" must be either equal, or
  * reference distinct buffers (no partial overlap is allowed).
- * @param rc       The Sosemanuk run context
+ * @param ss       The Sosemanuk state
  * @param in       Data in
  * @param out      Data out
- * @param data_len Length of data
+ * @param datalen  Length of data
  * @return CRYPT_OK on success
  */
 int sosemanuk_crypt(sosemanuk_state *ss,
-                        const unsigned char *in, unsigned long data_len, unsigned char *out)
+                        const unsigned char *in, unsigned long datalen, unsigned char *out)
 {
-    if (ss->ptr < (sizeof ss->buf)) {
-        unsigned long rlen = (sizeof ss->buf) - ss->ptr;
+    LTC_ARGCHK(ss  != NULL);
+    LTC_ARGCHK(in  != NULL);
+    LTC_ARGCHK(out != NULL);
+    LTC_ARGCHK(ss->ptr != 666); /* check whether sosemanuk_setiv was called */
 
-        if (rlen > data_len)
-            rlen = data_len;
+    if (ss->ptr < (sizeof(ss->buf))) {
+        unsigned long rlen = (sizeof(ss->buf)) - ss->ptr;
+
+        if (rlen > datalen)
+            rlen = datalen;
         _xorbuf(ss->buf + ss->ptr, in, out, rlen);
         in += rlen;
         out += rlen;
-        data_len -= rlen;
+        datalen -= rlen;
         ss->ptr += rlen;
     }
-    while (data_len > 0) {
+    while (datalen > 0) {
         _sosemanuk_internal(ss);
-        if (data_len >= sizeof ss->buf) {
-            _xorbuf(ss->buf, in, out, sizeof ss->buf);
-            in += sizeof ss->buf;
-            out += sizeof ss->buf;
-            data_len -= sizeof ss->buf;
+        if (datalen >= sizeof(ss->buf)) {
+            _xorbuf(ss->buf, in, out, sizeof(ss->buf));
+            in += sizeof(ss->buf);
+            out += sizeof(ss->buf);
+            datalen -= sizeof(ss->buf);
         } else {
-            _xorbuf(ss->buf, in, out, data_len);
-            ss->ptr = data_len;
-            data_len = 0;
+            _xorbuf(ss->buf, in, out, datalen);
+            ss->ptr = datalen;
+            datalen = 0;
         }
     }
     return CRYPT_OK;
@@ -777,36 +790,17 @@ int sosemanuk_crypt(sosemanuk_state *ss,
 /*
  * Cipher operation, as a PRNG: the provided output buffer is filled with
  * pseudo-random bytes as output from the stream cipher.
- * @param rc       The Sosemanuk run context
+ * @param ss       The Sosemanuk state
  * @param out      Data out
- * @param out_len  Length of output
+ * @param outlen   Length of output
  * @return CRYPT_OK on success
  */
-int sosemanuk_keystream(sosemanuk_state *ss, unsigned char *out, unsigned long out_len)
+int sosemanuk_keystream(sosemanuk_state *ss, unsigned char *out, unsigned long outlen)
 {
-    if (ss->ptr < (sizeof ss->buf)) {
-        unsigned long rlen = (sizeof ss->buf) - ss->ptr;
-
-        if (rlen > out_len)
-            rlen = out_len;
-        XMEMCPY(out, ss->buf + ss->ptr, rlen);
-        out += rlen;
-        out_len -= rlen;
-        ss->ptr += rlen;
-    }
-    while (out_len > 0) {
-        _sosemanuk_internal(ss);
-        if (out_len >= sizeof ss->buf) {
-            XMEMCPY(out, ss->buf, sizeof ss->buf);
-            out += sizeof ss->buf;
-            out_len -= sizeof ss->buf;
-        } else {
-            XMEMCPY(out, ss->buf, out_len);
-            ss->ptr = out_len;
-            out_len = 0;
-        }
-    }
-    return CRYPT_OK;
+   if (outlen == 0) return CRYPT_OK; /* nothing to do */
+   LTC_ARGCHK(out != NULL);
+   XMEMSET(out, 0, outlen);
+   return sosemanuk_crypt(ss, out, outlen, out);
 }
 
 
