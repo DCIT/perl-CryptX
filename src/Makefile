@@ -170,4 +170,4 @@ clean:
 .SUFFIXES: .o .c
 
 .c$(OBJ_EXT):
-	$(CC) -Iltm -Iltc/headers -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC $(CFLAGS) -c $< -o $@
+	$(CC) -Iltm -Iltc/headers -DLTC_SOURCE -DLTC_NO_TEST -DLTC_NO_PROTOTYPES -DLTM_DESC $(CFLAGS) $(CPPFLAGS) -c $< -o $@
