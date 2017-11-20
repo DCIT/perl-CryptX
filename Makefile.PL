@@ -24,6 +24,9 @@ $mycflags =~ s/-ansi\b//g;
 $mycflags =~ s/-Wwrite-strings\b//g;
 $mycflags =~ s/-Wcast-qual\b//g;
 
+#FIX: this is particularly useful for Debian https://github.com/DCIT/perl-CryptX/pull/39
+$mycflags = "$ENV{CFLAGS} $ENV{CPPFLAGS}" if $ENV{CFLAGS} || $ENV{CPPFLAGS};
+
 #FIX: avoid "ar: fatal: Numeric group ID too large" see https://github.com/DCIT/perl-CryptX/issues/33
 my $myarflags = '$(AR_STATIC_ARGS)';
 if ($^O ne 'MSWin32' && $Config{ar}) {
