@@ -60,7 +60,7 @@ __END__
 
 =head1 NAME
 
-CryptX - Crypto toolkit (self-contained no external libraries needed)
+CryptX - Cryptographic toolkit (self-contained, no external libraries needed)
 
 =head1 DESCRIPTION
 
@@ -70,7 +70,7 @@ Currently available modules:
 
 =over
 
-=item * Ciphers - see L<Crypt::Cipher> and related modules
+=item * Symmetric ciphers - see L<Crypt::Cipher> and related modules
 
 L<Crypt::Cipher::AES>, L<Crypt::Cipher::Anubis>, L<Crypt::Cipher::Blowfish>, L<Crypt::Cipher::Camellia>, L<Crypt::Cipher::CAST5>, L<Crypt::Cipher::DES>,
 L<Crypt::Cipher::DES_EDE>, L<Crypt::Cipher::IDEA>, L<Crypt::Cipher::KASUMI>, L<Crypt::Cipher::Khazad>, L<Crypt::Cipher::MULTI2>, L<Crypt::Cipher::Noekeon>,
@@ -84,7 +84,7 @@ L<Crypt::Mode::CBC>, L<Crypt::Mode::CFB>, L<Crypt::Mode::CTR>, L<Crypt::Mode::EC
 
 =item * Stream ciphers
 
-L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sober128>
+L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sober128>, L<Crypt::Stream::Sosemanuk>
 
 =item * Authenticated encryption modes
 
@@ -98,6 +98,10 @@ L<Crypt::Digest::CHAES>, L<Crypt::Digest::MD2>, L<Crypt::Digest::MD4>, L<Crypt::
 L<Crypt::Digest::RIPEMD256>, L<Crypt::Digest::RIPEMD320>, L<Crypt::Digest::SHA1>, L<Crypt::Digest::SHA224>, L<Crypt::Digest::SHA256>, L<Crypt::Digest::SHA384>,
 L<Crypt::Digest::SHA512>, L<Crypt::Digest::SHA512_224>, L<Crypt::Digest::SHA512_256>, L<Crypt::Digest::Tiger192>, L<Crypt::Digest::Whirlpool>,
 L<Crypt::Digest::SHA3_224>, L<Crypt::Digest::SHA3_256>, L<Crypt::Digest::SHA3_384>, L<Crypt::Digest::SHA3_512>, L<Crypt::Digest::SHAKE>
+
+=item * Checksums
+
+L<Crypt::Checksum>, L<Crypt::Checksum::Adler32>, L<Crypt::Checksum::CRC32>
 
 =item * Message Authentication Codes
 

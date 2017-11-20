@@ -1,6 +1,6 @@
 # NAME
 
-CryptX - Crypto toolkit (self-contained no external libraries needed)
+CryptX - Cryptographic toolkit (self-contained, no external libraries needed)
 
 # DESCRIPTION
 
@@ -8,7 +8,7 @@ Cryptography in CryptX is based on [https://github.com/libtom/libtomcrypt](https
 
 Currently available modules:
 
-- Ciphers - see [Crypt::Cipher](https://metacpan.org/pod/Crypt::Cipher) and related modules
+- Symmetric ciphers - see [Crypt::Cipher](https://metacpan.org/pod/Crypt::Cipher) and related modules
 
     [Crypt::Cipher::AES](https://metacpan.org/pod/Crypt::Cipher::AES), [Crypt::Cipher::Anubis](https://metacpan.org/pod/Crypt::Cipher::Anubis), [Crypt::Cipher::Blowfish](https://metacpan.org/pod/Crypt::Cipher::Blowfish), [Crypt::Cipher::Camellia](https://metacpan.org/pod/Crypt::Cipher::Camellia), [Crypt::Cipher::CAST5](https://metacpan.org/pod/Crypt::Cipher::CAST5), [Crypt::Cipher::DES](https://metacpan.org/pod/Crypt::Cipher::DES),
     [Crypt::Cipher::DES\_EDE](https://metacpan.org/pod/Crypt::Cipher::DES_EDE), [Crypt::Cipher::IDEA](https://metacpan.org/pod/Crypt::Cipher::IDEA), [Crypt::Cipher::KASUMI](https://metacpan.org/pod/Crypt::Cipher::KASUMI), [Crypt::Cipher::Khazad](https://metacpan.org/pod/Crypt::Cipher::Khazad), [Crypt::Cipher::MULTI2](https://metacpan.org/pod/Crypt::Cipher::MULTI2), [Crypt::Cipher::Noekeon](https://metacpan.org/pod/Crypt::Cipher::Noekeon),
@@ -22,7 +22,7 @@ Currently available modules:
 
 - Stream ciphers
 
-    [Crypt::Stream::RC4](https://metacpan.org/pod/Crypt::Stream::RC4), [Crypt::Stream::ChaCha](https://metacpan.org/pod/Crypt::Stream::ChaCha), [Crypt::Stream::Salsa20](https://metacpan.org/pod/Crypt::Stream::Salsa20), [Crypt::Stream::Sober128](https://metacpan.org/pod/Crypt::Stream::Sober128)
+    [Crypt::Stream::RC4](https://metacpan.org/pod/Crypt::Stream::RC4), [Crypt::Stream::ChaCha](https://metacpan.org/pod/Crypt::Stream::ChaCha), [Crypt::Stream::Salsa20](https://metacpan.org/pod/Crypt::Stream::Salsa20), [Crypt::Stream::Sober128](https://metacpan.org/pod/Crypt::Stream::Sober128), [Crypt::Stream::Sosemanuk](https://metacpan.org/pod/Crypt::Stream::Sosemanuk)
 
 - Authenticated encryption modes
 
@@ -36,6 +36,10 @@ Currently available modules:
     [Crypt::Digest::RIPEMD256](https://metacpan.org/pod/Crypt::Digest::RIPEMD256), [Crypt::Digest::RIPEMD320](https://metacpan.org/pod/Crypt::Digest::RIPEMD320), [Crypt::Digest::SHA1](https://metacpan.org/pod/Crypt::Digest::SHA1), [Crypt::Digest::SHA224](https://metacpan.org/pod/Crypt::Digest::SHA224), [Crypt::Digest::SHA256](https://metacpan.org/pod/Crypt::Digest::SHA256), [Crypt::Digest::SHA384](https://metacpan.org/pod/Crypt::Digest::SHA384),
     [Crypt::Digest::SHA512](https://metacpan.org/pod/Crypt::Digest::SHA512), [Crypt::Digest::SHA512\_224](https://metacpan.org/pod/Crypt::Digest::SHA512_224), [Crypt::Digest::SHA512\_256](https://metacpan.org/pod/Crypt::Digest::SHA512_256), [Crypt::Digest::Tiger192](https://metacpan.org/pod/Crypt::Digest::Tiger192), [Crypt::Digest::Whirlpool](https://metacpan.org/pod/Crypt::Digest::Whirlpool),
     [Crypt::Digest::SHA3\_224](https://metacpan.org/pod/Crypt::Digest::SHA3_224), [Crypt::Digest::SHA3\_256](https://metacpan.org/pod/Crypt::Digest::SHA3_256), [Crypt::Digest::SHA3\_384](https://metacpan.org/pod/Crypt::Digest::SHA3_384), [Crypt::Digest::SHA3\_512](https://metacpan.org/pod/Crypt::Digest::SHA3_512), [Crypt::Digest::SHAKE](https://metacpan.org/pod/Crypt::Digest::SHAKE)
+
+- Checksums
+
+    [Crypt::Checksum](https://metacpan.org/pod/Crypt::Checksum), [Crypt::Checksum::Adler32](https://metacpan.org/pod/Crypt::Checksum::Adler32), [Crypt::Checksum::CRC32](https://metacpan.org/pod/Crypt::Checksum::CRC32)
 
 - Message Authentication Codes
 
