@@ -100,8 +100,12 @@ versiondecdev:
 	$(NOECHO) perl _generators/version_patch.pl decdev
 gencode:
 	$(NOECHO) perl _generators/gen.pl gencode
-gentest:
+gentest: all
 	$(NOECHO) perl _generators/gen.pl gentest
+openssltest: all
+	$(NOECHO) perl -Mblib t/openssl/dsa-test.pl
+	$(NOECHO) perl -Mblib t/openssl/ecc-test.pl
+	$(NOECHO) perl -Mblib t/openssl/rsa-test.pl
 };
 
   return "$myextlib\n$version_patch";

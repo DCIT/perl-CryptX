@@ -129,4 +129,4 @@ MARKER
 doit();
 
 warn "\nSUCCESS\n";
-unlink $_ for (bsd_glob("test_*.der"), bsd_glob("test_*.pem"), bsd_glob("test_*.sig"), bsd_glob("test_*.data"));
+unlink $_ for (bsd_glob("test_*.der"), bsd_glob("test_*.pem"), bsd_glob("test_*.sig"), bsd_glob("test_*.rsa"), bsd_glob("test_*.data"));
