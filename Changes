@@ -1,11 +1,12 @@
 Changes for CryptX
 
-0.054_* 2017-10-XX
+0.055   2017-11-XX
         - new Crypt::Cipher::IDEA
         - new Crypt::Cipher::Serpent
         - new Crypt::Stream::Salsa20
         - new Crypt::Stream::Sosemanuk
-        - added CCM OO interface: new-add-add-done
+        - added CCM object oriented interface: new-add-add-done
+        - fix #39 accept CFLAGS and CPPFLAGS from the environment
 
 0.054   2017-10-12
         - fix Crypt::PK::DSA verify
