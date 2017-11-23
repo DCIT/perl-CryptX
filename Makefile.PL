@@ -90,18 +90,18 @@ sub MY::postamble {
   my $version_patch = q{
 versionsync:
 	$(NOECHO) perl _generators/version_patch.pl sync
-
 versioninc:
 	$(NOECHO) perl _generators/version_patch.pl inc
-
 versionincdev:
 	$(NOECHO) perl _generators/version_patch.pl incdev
-
 versiondec:
 	$(NOECHO) perl _generators/version_patch.pl dec
-
 versiondecdev:
 	$(NOECHO) perl _generators/version_patch.pl decdev
+gencode:
+	$(NOECHO) perl _generators/gen.pl gencode
+gentest:
+	$(NOECHO) perl _generators/gen.pl gentest
 };
 
   return "$myextlib\n$version_patch";
