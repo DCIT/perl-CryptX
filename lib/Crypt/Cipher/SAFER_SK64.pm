@@ -21,7 +21,7 @@ sub default_rounds { Crypt::Cipher::default_rounds(__PACKAGE__) }
 
 =head1 NAME
 
-Crypt::Cipher::SAFER_SK64 - Symetric cipher SAFER_SK64, key size: 64 bits (Crypt::CBC compliant)
+Crypt::Cipher::SAFER_SK64 - Symmetric cipher SAFER_SK64, key size: 64 bits (Crypt::CBC compliant)
 
 =head1 SYNOPSIS
 

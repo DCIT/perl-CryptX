@@ -129,7 +129,7 @@ Crypt::Cipher - Generic interface to cipher functions
 
 =head1 DESCRIPTION
 
-Provides an interface to various symetric cipher algorithms.
+Provides an interface to various symmetric cipher algorithms.
 
 B<BEWARE:> This module implements just elementary "one-block-(en|de)cryption" operation - if you want to
 encrypt/decrypt generic data you have to use some of the cipher block modes - check for example
@@ -150,7 +150,7 @@ Constructor, returns a reference to the cipher object.
  #                simply any <NAME> for which there exists Crypt::Cipher::<NAME>
  # $key = binary key (keysize should comply with selected cipher requirements)
 
- ## some of the ciphers (e.g. MULTI2, RC5, SAFER) allows to set number of rounds
+ ## some of the ciphers (e.g. MULTI2, RC5, SAFER) allow one to set number of rounds
  $d = Crypt::Cipher->new('MULTI2', $key, $rounds);
  # $rounds = positive integer (should comply with selected cipher requirements)
 
@@ -202,7 +202,7 @@ Returns block size (in bytes) for given cipher.
 
 =head2 default_rounds
 
-Returns default number of rounds for given cipher. NOTE: only some cipher (e.g. MULTI2, RC5, SAFER) allows to set number of rounds via new().
+Returns default number of rounds for given cipher. NOTE: only some ciphers (e.g. MULTI2, RC5, SAFER) allow one to set number of rounds via new().
 
  $d->default_rounds;
  #or

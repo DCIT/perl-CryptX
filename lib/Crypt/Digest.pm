@@ -176,7 +176,7 @@ Or all of them at once:
 
 =head1 FUNCTIONS
 
-Please note that all functions take as its first argument the algoritm name, supported values are:
+Please note that all functions take as its first argument the algorithm name, supported values are:
 
  'CHAES', 'MD2', 'MD4', 'MD5', 'RIPEMD128', 'RIPEMD160',
  'RIPEMD256', 'RIPEMD320', 'SHA1', 'SHA224', 'SHA256',

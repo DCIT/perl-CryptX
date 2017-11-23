@@ -21,7 +21,7 @@ sub default_rounds { Crypt::Cipher::default_rounds(__PACKAGE__) }
 
 =head1 NAME
 
-Crypt::Cipher::AES - Symetric cipher AES (aka Rijndael), key size: 128/192/256 bits (Crypt::CBC compliant)
+Crypt::Cipher::AES - Symmetric cipher AES (aka Rijndael), key size: 128/192/256 bits (Crypt::CBC compliant)
 
 =head1 SYNOPSIS
 

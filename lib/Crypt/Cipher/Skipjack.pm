@@ -21,7 +21,7 @@ sub default_rounds { Crypt::Cipher::default_rounds(__PACKAGE__) }
 
 =head1 NAME
 
-Crypt::Cipher::Skipjack - Symetric cipher Skipjack, key size: 80 bits (Crypt::CBC compliant)
+Crypt::Cipher::Skipjack - Symmetric cipher Skipjack, key size: 80 bits (Crypt::CBC compliant)
 
 =head1 SYNOPSIS
 

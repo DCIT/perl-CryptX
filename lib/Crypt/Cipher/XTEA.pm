@@ -21,7 +21,7 @@ sub default_rounds { Crypt::Cipher::default_rounds(__PACKAGE__) }
 
 =head1 NAME
 
-Crypt::Cipher::XTEA - Symetric cipher XTEA, key size: 128 bits (Crypt::CBC compliant)
+Crypt::Cipher::XTEA - Symmetric cipher XTEA, key size: 128 bits (Crypt::CBC compliant)
 
 =head1 SYNOPSIS
 
