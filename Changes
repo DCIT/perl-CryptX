@@ -7,6 +7,7 @@ Changes for CryptX
         - new Crypt::Stream::Sosemanuk
         - added CCM object oriented interface: new-add-add-done
         - fix #39 accept CFLAGS and CPPFLAGS from the environment
+        - fix #40 typos in POD
 
 0.054   2017-10-12
         - fix Crypt::PK::DSA verify

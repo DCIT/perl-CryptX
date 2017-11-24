@@ -13,6 +13,10 @@ my @myobjs = map { s|.c$|$Config{obj_ext}|; $_ } grep { $_ !~ m|^src/ltc/\.*tab\
 my $myextlib = "src/liballinone$Config{lib_ext}";
 my $mycflags = "$Config{ccflags} $Config{cccdlflags} $Config{optimize}";
 
+#FIX: this is particularly useful for Debian https://github.com/DCIT/perl-CryptX/pull/39
+$mycflags .= " $ENV{CFLAGS}"   if $ENV{CFLAGS};
+$mycflags .= " $ENV{CPPFLAGS}" if $ENV{CPPFLAGS};
+
 #FIX: gcc with -flto is a trouble maker see https://github.com/DCIT/perl-CryptX/issues/32
 $mycflags =~ s/-flto\b//g;
 
@@ -23,9 +27,6 @@ $mycflags =~ s/-std=c89\b//g;
 $mycflags =~ s/-ansi\b//g;
 $mycflags =~ s/-Wwrite-strings\b//g;
 $mycflags =~ s/-Wcast-qual\b//g;
-
-#FIX: this is particularly useful for Debian https://github.com/DCIT/perl-CryptX/pull/39
-$mycflags = "$ENV{CFLAGS} $ENV{CPPFLAGS}" if $ENV{CFLAGS} || $ENV{CPPFLAGS};
 
 #FIX: avoid "ar: fatal: Numeric group ID too large" see https://github.com/DCIT/perl-CryptX/issues/33
 my $myarflags = '$(AR_STATIC_ARGS)';
