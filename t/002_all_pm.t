@@ -13,10 +13,11 @@ sub _read {
   return do { local $/; <$fh> };
 }
 
+my @err;
+my $cryptx = _read("lib/CryptX.pm");
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');
 
-my @err;
 for my $m (sort @files) {
   my $content = _read($m);
   push @err, "ERROR: no newline at the end '$m'" unless $content =~ /\n$/s;
@@ -28,6 +29,7 @@ for my $m (sort @files) {
   $m =~ s|[\\/]|::|g;
   $m =~ s|^lib::||;
   $m =~ s|\.pm$||;
+  push @err, "ERROR: '$m' is missing in CryptX"  unless $cryptx =~ /L<$m>/s || $m =~ /^(CryptX|Math::BigInt::LTM|Crypt::(PK|Mode|Mac|AuthEnc))$/;
   eval "use $m; 1;" or push @err, "ERROR: 'use $m' failed";
 }
 

@@ -43,7 +43,8 @@ Currently available modules:
 
 - Message Authentication Codes
 
-    [Crypt::Mac::F9](https://metacpan.org/pod/Crypt::Mac::F9), [Crypt::Mac::HMAC](https://metacpan.org/pod/Crypt::Mac::HMAC), [Crypt::Mac::OMAC](https://metacpan.org/pod/Crypt::Mac::OMAC), [Crypt::Mac::Pelican](https://metacpan.org/pod/Crypt::Mac::Pelican), [Crypt::Mac::PMAC](https://metacpan.org/pod/Crypt::Mac::PMAC), [Crypt::Mac::XCBC](https://metacpan.org/pod/Crypt::Mac::XCBC), [Crypt::Mac::Poly1305](https://metacpan.org/pod/Crypt::Mac::Poly1305)
+    [Crypt::Mac::BLAKE2b](https://metacpan.org/pod/Crypt::Mac::BLAKE2b), [Crypt::Mac::BLAKE2s](https://metacpan.org/pod/Crypt::Mac::BLAKE2s), [Crypt::Mac::F9](https://metacpan.org/pod/Crypt::Mac::F9), [Crypt::Mac::HMAC](https://metacpan.org/pod/Crypt::Mac::HMAC), [Crypt::Mac::OMAC](https://metacpan.org/pod/Crypt::Mac::OMAC),
+    [Crypt::Mac::Pelican](https://metacpan.org/pod/Crypt::Mac::Pelican), [Crypt::Mac::PMAC](https://metacpan.org/pod/Crypt::Mac::PMAC), [Crypt::Mac::XCBC](https://metacpan.org/pod/Crypt::Mac::XCBC), [Crypt::Mac::Poly1305](https://metacpan.org/pod/Crypt::Mac::Poly1305)
 
 - Public key cryptography
 
