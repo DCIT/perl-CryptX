@@ -32,7 +32,7 @@ my %list = (
                          spec_rounds=>0, spec_key=>'XXX-DETERMINED-BY-KEYSIZE' }, # 12 (<=80bits), 16 (>80bits)
         DES         => { info=>'Symmetric cipher DES, key size: 64[56] bits (Crypt::CBC compliant)', urls=>['https://en.wikipedia.org/wiki/Data_Encryption_Standard'],
                          spec_rounds=>0, spec_key=>'XXX-ROUNDS-FIXED' },
-        DES_EDE     => { info=>'Symmetric cipher DES_EDE (aka Tripple-DES, 3DES), key size: 192[168] bits (Crypt::CBC compliant)', urls=>['https://en.wikipedia.org/wiki/Triple_DES'],
+        DES_EDE     => { info=>'Symmetric cipher DES_EDE (aka Triple-DES, 3DES), key size: 192[168] bits (Crypt::CBC compliant)', urls=>['https://en.wikipedia.org/wiki/Triple_DES'],
                          spec_rounds=>0, spec_key=>'XXX-ROUNDS-FIXED' },
         KASUMI      => { info=>'Symmetric cipher KASUMI, key size: 128 bits (Crypt::CBC compliant)', urls=>['https://en.wikipedia.org/wiki/KASUMI_(block_cipher)'],
                          spec_rounds=>0, spec_key=>'XXX-ROUNDS-FIXED' },

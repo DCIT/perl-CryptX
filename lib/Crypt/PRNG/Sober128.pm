@@ -157,3 +157,5 @@ See L<Crypt::PRNG/int32>.
 =item * L<https://en.wikipedia.org/wiki/SOBER-128|https://en.wikipedia.org/wiki/SOBER-128>
 
 =back
+
+=cut

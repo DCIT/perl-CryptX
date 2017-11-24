@@ -116,3 +116,5 @@ B<BEWARE: ECB is inherently insecure>, if you are not sure go for L<Crypt::Mode:
 =item * L<https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_codebook_.28ECB.29>
 
 =back
+
+=cut

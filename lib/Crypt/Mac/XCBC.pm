@@ -154,5 +154,3 @@ Logically joins all arguments into a single string, and returns its XCBC message
 =back
 
 =cut
-
-__END__

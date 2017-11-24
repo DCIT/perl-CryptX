@@ -373,5 +373,3 @@ Returns the digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 =back
 
 =cut
-
-__END__

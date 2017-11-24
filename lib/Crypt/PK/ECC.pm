@@ -774,7 +774,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  #or
  $pk->generate_key($hashref_with_curve_params);
 
-The following pre-defined C<$curve_name> values are supported:
+The following predefined C<$curve_name> values are supported:
 
  # curves from http://www.ecc-brainpool.org/download/Domain-parameters.pdf
  'brainpoolp160r1'
@@ -1395,3 +1395,5 @@ Load keys (Perl code):
 =item * L<https://en.wikipedia.org/wiki/ECDSA|https://en.wikipedia.org/wiki/ECDSA>
 
 =back
+
+=cut

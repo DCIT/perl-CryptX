@@ -193,3 +193,5 @@ Crypt::Mode::[%orig_name%] - [%info%]
 =item * L<[%v%]>
 [% END %]
 =back
+
+=cut

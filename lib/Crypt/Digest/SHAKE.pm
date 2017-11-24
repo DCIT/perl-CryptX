@@ -102,5 +102,3 @@ Provides an interface to the SHA3's sponge function SHAKE.
 =back
 
 =cut
-
-__END__

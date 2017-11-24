@@ -106,7 +106,7 @@ Returns checksum as a hexadecimal string.
 
 =head2 adler32_data_int
 
-Returns checksum as unsingned 32bit integer.
+Returns checksum as unsigned 32bit integer.
 
  $checksum_hex = adler32_data_int('data string');
  #or
@@ -130,11 +130,11 @@ Returns checksum as a hexadecimal string.
 
 =head2 adler32_file_int
 
-Returns checksum as unsingned 32bit integer.
+Returns checksum as unsigned 32bit integer.
 
- $checksum_hex = adler32_file_int('data string');
+ $checksum_hex = adler32_file_int('filename.dat');
  #or
- $checksum_hex = adler32_file_int('any data', 'more data', 'even more data');
+ $checksum_hex = adler32_file_int(*FILEHANDLE);
 
 =head2 crc32_data
 
@@ -154,7 +154,7 @@ Returns checksum as a hexadecimal string.
 
 =head2 crc32_data_int
 
-Returns checksum as unsingned 32bit integer.
+Returns checksum as unsigned 32bit integer.
 
  $checksum_hex = crc32_data_int('data string');
  #or
@@ -178,11 +178,11 @@ Returns checksum as a hexadecimal string.
 
 =head2 crc32_file_int
 
-Returns checksum as unsingned 32bit integer.
+Returns checksum as unsigned 32bit integer.
 
- $checksum_hex = crc32_file_int('data string');
+ $checksum_hex = crc32_file_int('filename.dat');
  #or
- $checksum_hex = crc32_file_int('any data', 'more data', 'even more data');
+ $checksum_hex = crc32_file_int(*FILEHANDLE);
 
 =head1 SEE ALSO
 

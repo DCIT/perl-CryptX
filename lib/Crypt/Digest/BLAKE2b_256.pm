@@ -225,5 +225,3 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 =back
 
 =cut
-
-__END__

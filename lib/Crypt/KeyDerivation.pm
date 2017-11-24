@@ -70,7 +70,7 @@ sub hkdf {
 
 =head1 NAME
 
-Crypt::KeyDerivation - PBKDF1, PBKFD2 and HKDF key derivation functions
+Crypt::KeyDerivation - PBKDF1, PBKDF2 and HKDF key derivation functions
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ Provides an interface to Key derivation functions:
 
 =over
 
-=item * PBKFD1 and PBKDF according to PKCS#5 v2.0 L<https://tools.ietf.org/html/rfc2898|https://tools.ietf.org/html/rfc2898>
+=item * PBKDF1 and PBKDF according to PKCS#5 v2.0 L<https://tools.ietf.org/html/rfc2898|https://tools.ietf.org/html/rfc2898>
 
 =item * HKDF (+ related) according to L<https://tools.ietf.org/html/rfc5869|https://tools.ietf.org/html/rfc5869>
 
@@ -172,3 +172,5 @@ B<BEWARE:> if you are not sure, do not use C<pbkdf1> but rather choose C<pbkdf2>
   # $hash_name .. optional, DEFAULT: 'SHA256'
   # $len ........ optional, derived key len, DEFAULT: 32
   # $info ....... optional context and application specific information, DEFAULT: ''
+
+=cut

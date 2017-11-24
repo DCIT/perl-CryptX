@@ -24,7 +24,7 @@ sub _ssh_parse {
 
 1;
 
-__END__
+=pod
 
 =head1 NAME
 

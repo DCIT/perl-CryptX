@@ -193,13 +193,13 @@ Similar to random_string_from, only C<$range> is fixed to C<'ABCDEFGHIJKLMNOPQRS
    #or
    $n = rand($limit);
 
-Returns a random floating point number from range C<[0,1)> (if called without param) or C<[0,$limit)>.
+Returns a random floating point number from range C<[0,1)> (if called without parameter) or C<[0,$limit)>.
 
 =head2 irand
 
    $i = irand;
 
-Returns a random unsigned 32bit integer - range 0 .. 0xFFFFFFFF.
+Returns a random unsigned 32bit integer - range C<0 .. 0xFFFFFFFF>.
 
 =head1 METHODS
 
@@ -281,3 +281,5 @@ See L<irand|/irand>
 =head1 SEE ALSO
 
 L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::RC4>, L<Crypt::PRNG::Sober128>, L<Crypt::PRNG::Yarrow>
+
+=cut

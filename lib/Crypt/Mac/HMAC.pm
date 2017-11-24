@@ -171,5 +171,3 @@ Logically joins all arguments into a single string, and returns its HMAC message
 =back
 
 =cut
-
-__END__

@@ -152,5 +152,3 @@ Logically joins all arguments into a single string, and returns its BLAKE2b mess
 =back
 
 =cut
-
-__END__

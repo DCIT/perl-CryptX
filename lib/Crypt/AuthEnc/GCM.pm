@@ -184,3 +184,5 @@ Can be called B<after> all C<iv_add> calls but before the first C<encrypt_add> o
 =item * L<https://en.wikipedia.org/wiki/Galois/Counter_Mode>
 
 =back
+
+=cut

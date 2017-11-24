@@ -183,3 +183,5 @@ You can export selected functions:
 =item * L<https://en.wikipedia.org/wiki/EAX_mode|https://en.wikipedia.org/wiki/EAX_mode>
 
 =back
+
+=cut

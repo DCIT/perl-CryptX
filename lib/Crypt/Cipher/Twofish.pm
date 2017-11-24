@@ -117,5 +117,3 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 =back
 
 =cut
-
-__END__

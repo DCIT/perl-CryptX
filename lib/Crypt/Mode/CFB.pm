@@ -92,3 +92,5 @@ This module implements CFB cipher mode. B<NOTE:> it works only with ciphers from
 =item * L<https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_feedback_.28CFB.29>
 
 =back
+
+=cut

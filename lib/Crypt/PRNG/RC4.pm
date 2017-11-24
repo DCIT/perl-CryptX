@@ -157,3 +157,5 @@ See L<Crypt::PRNG/int32>.
 =item * L<https://en.wikipedia.org/wiki/RC4_cipher|https://en.wikipedia.org/wiki/RC4_cipher>
 
 =back
+
+=cut

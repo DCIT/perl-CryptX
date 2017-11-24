@@ -158,3 +158,5 @@ See L<Crypt::PRNG/int32>.
 =item * L<https://en.wikipedia.org/wiki/Fortuna_%28PRNG%29|https://en.wikipedia.org/wiki/Fortuna_%28PRNG%29>
 
 =back
+
+=cut

@@ -21,7 +21,7 @@ sub default_rounds { Crypt::Cipher::default_rounds(__PACKAGE__) }
 
 =head1 NAME
 
-Crypt::Cipher::DES_EDE - Symmetric cipher DES_EDE (aka Tripple-DES, 3DES), key size: 192[168] bits (Crypt::CBC compliant)
+Crypt::Cipher::DES_EDE - Symmetric cipher DES_EDE (aka Triple-DES, 3DES), key size: 192[168] bits (Crypt::CBC compliant)
 
 =head1 SYNOPSIS
 
@@ -117,5 +117,3 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 =back
 
 =cut
-
-__END__

@@ -221,5 +221,3 @@ Returns default number of rounds for given cipher. NOTE: only some ciphers (e.g.
 =back
 
 =cut
-
-__END__

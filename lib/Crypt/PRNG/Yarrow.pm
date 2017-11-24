@@ -156,3 +156,5 @@ See L<Crypt::PRNG/int32>.
 =item * L<https://en.wikipedia.org/wiki/Yarrow_algorithm|https://en.wikipedia.org/wiki/Yarrow_algorithm>
 
 =back
+
+=cut

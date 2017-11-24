@@ -50,7 +50,7 @@ sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
 
-__END__
+=pod
 
 =head1 NAME
 

@@ -96,7 +96,7 @@ Crypt::AuthEnc::CCM - Authenticated encryption in CCM mode
 
 =head1 DESCRIPTION
 
-CCM is a encrypt+authenticate mode that is centered around using AES (or any 16-byte cipher) as aprimitive.
+CCM is a encrypt+authenticate mode that is centered around using AES (or any 16-byte cipher) as a primitive.
 Unlike EAX and OCB mode, it is only meant for packet mode where the length of the input is known in advance.
 
 =head1 EXPORT
@@ -174,3 +174,5 @@ CCM parameters should follow L<http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistsp
 =item * L<https://en.wikipedia.org/wiki/CCM_mode|https://en.wikipedia.org/wiki/CCM_mode>
 
 =back
+
+=cut

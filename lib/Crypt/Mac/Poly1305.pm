@@ -152,5 +152,3 @@ Logically joins all arguments into a single string, and returns its Poly1305 mes
 =back
 
 =cut
-
-__END__
