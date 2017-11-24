@@ -53,6 +53,7 @@ sub ocb_decrypt_verify {
 
 # obsolete, only for backwards compatibility
 sub aad_add { goto &adata_add }
+sub blocksize { return 16 }
 
 1;
 
@@ -161,7 +162,7 @@ You can export selected functions:
 
  #BEWARE: size of $ciphertext has to be multiple of blocklen (16 for AES)
 
-=head2 encrypt_last
+=head2 decrypt_last
 
  $plaintext = $ae->decrypt_last($data);
 

@@ -74,8 +74,8 @@ encrypt_add(Crypt::AuthEnc::OCB self, SV * data)
           RETVAL = newSVpvn("", 0);
         }
         else {
-          if (in_data_len % (&self->state)->block_len) {
-            croak ("FATAL: sizeof(data) should be multiple of blocksize (%d)", (&self->state)->block_len);
+          if (in_data_len % 16) {
+            croak ("FATAL: sizeof(data) should be multiple of 16");
           }
           RETVAL = NEWSV(0, in_data_len);
           SvPOK_only(RETVAL);
@@ -135,8 +135,8 @@ decrypt_add(Crypt::AuthEnc::OCB self, SV * data)
           RETVAL = newSVpvn("", 0);
         }
         else {
-          if (in_data_len % (&self->state)->block_len) {
-            croak ("FATAL: sizeof(data) should be multiple of blocksize (%d)", (&self->state)->block_len);
+          if (in_data_len % 16) {
+            croak ("FATAL: sizeof(data) should be multiple of 16");
           }
           RETVAL = NEWSV(0, in_data_len);
           SvPOK_only(RETVAL);
@@ -226,12 +226,3 @@ decrypt_done(Crypt::AuthEnc::OCB self, ...)
           }
         }
     }
-
-int
-blocksize(Crypt::AuthEnc::OCB self)
-    CODE:
-    {
-        RETVAL = (&self->state)->block_len;
-    }
-    OUTPUT:
-        RETVAL
