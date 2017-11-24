@@ -53,7 +53,7 @@ Currently available modules:
 
     [Crypt::PRNG](https://metacpan.org/pod/Crypt::PRNG), [Crypt::PRNG::Fortuna](https://metacpan.org/pod/Crypt::PRNG::Fortuna), [Crypt::PRNG::Yarrow](https://metacpan.org/pod/Crypt::PRNG::Yarrow), [Crypt::PRNG::RC4](https://metacpan.org/pod/Crypt::PRNG::RC4), [Crypt::PRNG::Sober128](https://metacpan.org/pod/Crypt::PRNG::Sober128), [Crypt::PRNG::ChaCha20](https://metacpan.org/pod/Crypt::PRNG::ChaCha20)
 
-- Key derivation functions - PBKDF1, PBKFD2 and HKDF
+- Key derivation functions - PBKDF1, PBKDF2 and HKDF
 
     [Crypt::KeyDerivation](https://metacpan.org/pod/Crypt::KeyDerivation)
 
