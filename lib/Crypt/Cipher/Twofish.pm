@@ -4,7 +4,7 @@ package Crypt::Cipher::Twofish;
 
 use strict;
 use warnings;
-our $VERSION = '0.054_008';
+our $VERSION = '0.054_009';
 
 use CryptX;
 use base 'Crypt::Cipher';
