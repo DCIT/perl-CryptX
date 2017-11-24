@@ -7,14 +7,14 @@ use Crypt::AuthEnc::GCM qw( gcm_encrypt_authenticate gcm_decrypt_verify );
 
 sub do_test {
   my %a = @_;
-  
-  my $key = pack("H*", $a{key}); 
+
+  my $key = pack("H*", $a{key});
   my $adata = pack("H*", $a{adata});
   my $iv = pack("H*", $a{iv});
   my $plaintext = pack("H*", $a{plaintext});
   my $ciphertext = pack("H*", $a{ciphertext});
   my $tag = pack("H*", $a{tag});
-  
+
   # encrypt
   my $m1 = Crypt::AuthEnc::GCM->new("AES", $key);
   $m1->iv_add($iv);
@@ -41,7 +41,7 @@ sub do_test {
   is(unpack('H*', $tag3), $a{tag}, "enc: tag");
   my $pt3 = gcm_decrypt_verify('AES', $key, $iv, $adata, $ciphertext, $tag);
   is(unpack('H*', $pt3), $a{plaintext}, "dec: plaintext");
-  
+
 }
 
 do_test(%$_) for (
@@ -55,7 +55,7 @@ do_test(%$_) for (
      # ciphertext => '',
      # tag => '58e2fccefa7e3061367f1d57a4e7455a',
   # },
-  
+
   #/* test case #2 */
   {
      key => '00000000000000000000000000000000',
@@ -65,7 +65,7 @@ do_test(%$_) for (
      ciphertext => '0388dace60b6a392f328c2b971b2fe78',
      tag => 'ab6e47d42cec13bdf53a67b21257bddf',
   },
-  
+
   #/* test case #3 */
   {
      key => 'feffe9928665731c6d6a8f9467308308',
@@ -75,7 +75,7 @@ do_test(%$_) for (
      ciphertext => '42831ec2217774244b7221b784d0d49ce3aa212f2c02a4e035c17e2329aca12e21d514b25466931c7d8f6a5aac84aa051ba30b396a0aac973d58e091473f5985',
      tag => '4d5c2af327cd64a62cf35abd2ba6fab4',
   },
-  
+
   #/* test case #4 */
   {
      key => 'feffe9928665731c6d6a8f9467308308',
@@ -85,7 +85,7 @@ do_test(%$_) for (
      ciphertext => '42831ec2217774244b7221b784d0d49ce3aa212f2c02a4e035c17e2329aca12e21d514b25466931c7d8f6a5aac84aa051ba30b396a0aac973d58e091',
      tag => '5bc94fbc3221a5db94fae95ae7121a47',
   },
-  
+
   #/* test case #5 */
   {
      key => 'feffe9928665731c6d6a8f9467308308',
@@ -95,7 +95,7 @@ do_test(%$_) for (
      ciphertext => '61353b4c2806934a777ff51fa22a4755699b2a714fcdc6f83766e5f97b6c742373806900e49f24b22b097544d4896b424989b5e1ebac0f07c23f4598',
      tag => '3612d2e79e3b0785561be14aaca2fccb',
   },
-  
+
   #/* test case #6 */
   {
      key => 'feffe9928665731c6d6a8f9467308308',
@@ -105,7 +105,7 @@ do_test(%$_) for (
      ciphertext => '8ce24998625615b603a033aca13fb894be9112a5c3a211a8ba262a3cca7e2ca701e4a9a4fba43c90ccdcb281d48c7c6fd62875d2aca417034c34aee5',
      tag => '619cc5aefffe0bfa462af43c1699d050',
   },
-  
+
   #/* test case #46 from BG (catches the LTC bug of v1.15) */
   {
      key => '00000000000000000000000000000000',
@@ -115,4 +115,4 @@ do_test(%$_) for (
      ciphertext => 'cbc8d2f15481a4cc7dd1e19aaa83de5678483ec359ae7dec2ab8d534e0906f4b4663faff58a8b2d733b845eef7c9b331e9e10eb2612c995feb1ac15a6286cce8b297a8',
      tag => '8d2d2a9372626f6bee8580276a6366bf',
   }
-);   
+);

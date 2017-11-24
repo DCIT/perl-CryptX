@@ -77,7 +77,7 @@ for my $h (@$data) {
 for my $h (@$data) {
   my $ec_pri  = Crypt::PK::ECC->new->import_key_raw(pack("H*",$h->{PRI}),  $h->{CURVE});
   my $ec_pub  = Crypt::PK::ECC->new->import_key_raw(pack("H*",$h->{PUB}),  $h->{CURVE});
-  my $ec_pubc = Crypt::PK::ECC->new->import_key_raw(pack("H*",$h->{PUBC}), $h->{CURVE});  
+  my $ec_pubc = Crypt::PK::ECC->new->import_key_raw(pack("H*",$h->{PUBC}), $h->{CURVE});
   is( unpack("H*", $ec_pub ->export_key_raw('public_compressed')), $h->{PUBC}, "$h->{PRI_FILE}/ec_pub  public compressed");
   is( unpack("H*", $ec_pub ->export_key_raw('public'))           , $h->{PUB},  "$h->{PRI_FILE}/ec_pub  public uncompressed");
   is( unpack("H*", $ec_pubc->export_key_raw('public_compressed')), $h->{PUBC}, "$h->{PRI_FILE}/ec_pubc public compressed");

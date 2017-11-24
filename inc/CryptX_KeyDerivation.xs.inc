@@ -31,7 +31,7 @@ _pkcs_5_alg1(SV * password, SV * salt, int iteration_count, char * hash_name, un
 
         rv = pkcs_5_alg1(password_ptr, (unsigned long)password_len, salt_ptr, iteration_count, id, output, &output_len);
         if (rv != CRYPT_OK) {
-          SvREFCNT_dec(RETVAL); 
+          SvREFCNT_dec(RETVAL);
           croak("FATAL: pkcs_5_alg1 process failed: %s", error_to_string(rv));
         }
         SvCUR_set(RETVAL, output_len);
@@ -69,7 +69,7 @@ _pkcs_5_alg2(SV * password, SV * salt, int iteration_count, char * hash_name, un
 
         rv = pkcs_5_alg2(password_ptr, (unsigned long)password_len, salt_ptr, (unsigned long)salt_len, iteration_count, id, output, &output_len);
         if (rv != CRYPT_OK) {
-          SvREFCNT_dec(RETVAL); 
+          SvREFCNT_dec(RETVAL);
           croak("FATAL: pkcs_5_alg2 process failed: %s", error_to_string(rv));
         }
         SvCUR_set(RETVAL, output_len);
@@ -138,7 +138,7 @@ _hkdf_expand(char * hash_name, SV * info, SV * in, unsigned long output_len)
 
         rv = hkdf_expand(id, info_ptr, (unsigned long)info_len, in_ptr, (unsigned long)in_len, output, output_len);
         if (rv != CRYPT_OK) {
-          SvREFCNT_dec(RETVAL); 
+          SvREFCNT_dec(RETVAL);
           croak("FATAL: hkdf_expand process failed: %s", error_to_string(rv));
         }
         SvCUR_set(RETVAL, output_len);
@@ -179,7 +179,7 @@ _hkdf(char * hash_name, SV * salt, SV * info, SV * in, unsigned long output_len)
 
         rv = hkdf(id, salt_ptr, (unsigned long)salt_len, info_ptr, (unsigned long)info_len, in_ptr, (unsigned long)in_len, output, output_len);
         if (rv != CRYPT_OK) {
-          SvREFCNT_dec(RETVAL); 
+          SvREFCNT_dec(RETVAL);
           croak("FATAL: hkdf_expand process failed: %s", error_to_string(rv));
         }
         SvCUR_set(RETVAL, output_len);

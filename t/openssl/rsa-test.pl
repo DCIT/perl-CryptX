@@ -22,7 +22,7 @@ MARKER
 {
   use Crypt::PK::RSA;
   use Crypt::Misc 'read_rawfile';
-  
+
   my $pkrsa = Crypt::PK::RSA->new("test_rsakey.priv.pem");
   my $encfile = read_rawfile("test_input.encrypted.rsa");
   my $plaintext = $pkrsa->decrypt($encfile, 'v1.5');
@@ -33,7 +33,7 @@ MARKER
 {
   use Crypt::PK::RSA;
   use Crypt::Misc 'write_rawfile';
-  
+
   my $plaintext = 'secret message';
   my $pkrsa = Crypt::PK::RSA->new("test_rsakey.pub.pem");
   my $encrypted = $pkrsa->encrypt($plaintext, 'v1.5');
@@ -53,7 +53,7 @@ MARKER
  use Crypt::PK::RSA;
  use Crypt::Digest 'digest_file';
  use Crypt::Misc 'read_rawfile';
-  
+
  my $pkrsa = Crypt::PK::RSA->new("test_rsakey.pub.pem");
  my $signature = read_rawfile("test_input.sha1-rsa.sig");
  my $valid = $pkrsa->verify_hash($signature, digest_file("SHA1", "test_input.data"), "SHA1", "v1.5");
@@ -65,7 +65,7 @@ MARKER
  use Crypt::PK::RSA;
  use Crypt::Digest 'digest_file';
  use Crypt::Misc 'write_rawfile';
-  
+
  my $pkrsa = Crypt::PK::RSA->new("test_rsakey.priv.pem");
  my $signature = $pkrsa->sign_hash(digest_file("SHA1", "test_input.data"), "SHA1", "v1.5");
  write_rawfile("test_input.sha1-rsa.sig", $signature);
@@ -85,7 +85,7 @@ write_rawfile("test_input.data", "test-file-content");
 {
  use Crypt::PK::RSA;
  use Crypt::Misc 'write_rawfile';
- 
+
  my $pkrsa = Crypt::PK::RSA->new;
  $pkrsa->generate_key(256, 65537);
  write_rawfile("test_rsakey.pub.der",  $pkrsa->export_key_der('public'));
@@ -100,7 +100,7 @@ runcmds <<'MARKER';
  openssl rsa -in test_rsakey.priv.pem -text
  openssl rsa -in test_rsakey-passwd.priv.pem -text -inform pem -passin pass:secret
  openssl rsa -in test_rsakey.pub.der -pubin -text -inform der
- openssl rsa -in test_rsakey.pub.pem -pubin -text 
+ openssl rsa -in test_rsakey.pub.pem -pubin -text
 MARKER
 
 doit();
@@ -117,7 +117,7 @@ MARKER
 
 {
  use Crypt::PK::RSA;
- 
+
  my $pkrsa = Crypt::PK::RSA->new;
  $pkrsa->import_key("test_rsakey.pub.der");
  $pkrsa->import_key("test_rsakey.priv.der");

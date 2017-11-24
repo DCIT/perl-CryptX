@@ -30,28 +30,28 @@ use Crypt::Misc qw(read_rawfile);
   $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc2.der');
   ok($k, 'load cryptx_priv_ecc2.der');
   ok($k->is_private, 'is_private cryptx_priv_ecc2.der');
-  
+
   $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc1.der');
   ok($k, 'load cryptx_pub_ecc1.der');
   ok(!$k->is_private, 'is_private cryptx_pub_ecc1.der');
-  
+
   $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.der');
   ok($k, 'load cryptx_pub_ecc2.der');
   ok(!$k->is_private, 'is_private cryptx_pub_ecc2.der');
-   
+
   ### XXX-TODO regenerate keys
   $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc1.pem');
   ok($k, 'load cryptx_priv_ecc1.pem');
   ok($k->is_private, 'is_private cryptx_priv_ecc1.pem');
-  
+
   $k = Crypt::PK::ECC->new('t/data/cryptx_priv_ecc2.pem');
   ok($k, 'load cryptx_priv_ecc2.pem');
   ok($k->is_private, 'is_private cryptx_priv_ecc2.pem');
-  
+
   $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc1.pem');
   ok($k, 'load cryptx_pub_ecc1.pem');
   ok(!$k->is_private, 'is_private cryptx_pub_ecc1.pem');
-  
+
   $k = Crypt::PK::ECC->new('t/data/cryptx_pub_ecc2.pem');
   ok($k, 'load cryptx_pub_ecc2.pem');
   ok(!$k->is_private, 'is_private cryptx_pub_ecc2.pem');
@@ -88,12 +88,12 @@ use Crypt::Misc qw(read_rawfile);
   $pr1->import_key('t/data/cryptx_priv_ecc1.der');
   my $pu1 = Crypt::PK::ECC->new;
   $pu1->import_key('t/data/cryptx_pub_ecc1.der');
- 
+
   my $ct = $pu1->encrypt("secret message");
   my $pt = $pr1->decrypt($ct);
   ok(length $ct > 30, 'encrypt ' . length($ct));
   is($pt, "secret message", 'decrypt');
- 
+
   my $sig = $pr1->sign_message("message");
   ok(length $sig > 60, 'sign_message ' . length($sig));
   ok($pu1->verify_message($sig, "message"), 'verify_message');
@@ -105,13 +105,13 @@ use Crypt::Misc qw(read_rawfile);
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
   $sig = $pr1->sign_hash($hash, 'SHA1');
   ok(length $sig > 60, 'sign_hash ' . length($sig));
-  ok($pu1->verify_hash($sig, $hash, 'SHA1'), 'verify_hash'); 
- 
+  ok($pu1->verify_hash($sig, $hash, 'SHA1'), 'verify_hash');
+
   my $pr2 = Crypt::PK::ECC->new;
   $pr2->import_key('t/data/cryptx_priv_ecc2.der');
   my $pu2 = Crypt::PK::ECC->new;
   $pu2->import_key('t/data/cryptx_pub_ecc2.der');
- 
+
   my $ss1 = $pr1->shared_secret($pu2);
   my $ss2 = $pr2->shared_secret($pu1);
   is(unpack("H*",$ss1), unpack("H*",$ss2), 'shared_secret');
@@ -142,7 +142,7 @@ use Crypt::Misc qw(read_rawfile);
   $sig = ecc_sign_hash('t/data/cryptx_priv_ecc1.der', $hash, 'SHA1');
   ok($sig, 'ecc_sign_hash');
   ok(ecc_verify_hash('t/data/cryptx_pub_ecc1.der', $sig, $hash, 'SHA1'), 'ecc_verify_hash');
-  
+
   my $ss1 = ecc_shared_secret('t/data/cryptx_priv_ecc1.der', 't/data/cryptx_pub_ecc2.der');
   my $ss2 = ecc_shared_secret('t/data/cryptx_priv_ecc2.der', 't/data/cryptx_pub_ecc1.der');
   is(unpack("H*",$ss1), unpack("H*",$ss2), 'shared_secret');

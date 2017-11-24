@@ -31,6 +31,18 @@ for my $m (sort @files) {
   eval "use $m; 1;" or push @err, "ERROR: 'use $m' failed";
 }
 
+my @others = ('CryptX.xs');
+File::Find::find({ wanted=>sub { push @others, $_ if /\.inc$/ }, no_chdir=>1 }, 'inc');
+File::Find::find({ wanted=>sub { push @others, $_ if /\.(t|pl)$/ }, no_chdir=>1 }, 't');
+
+for my $m (sort @others) {
+  my $content = _read($m);
+  push @err, "ERROR: no newline at the end '$m'" unless $content =~ /\n$/s;
+  push @err, "ERROR: trailing whitespace '$m'"   if $content =~ / \n/s;
+  push @err, "ERROR: avoid tabs '$m'"            if $content =~ /\t/s;
+  push @err, "ERROR: avoid CRLF '$m'"            if $content =~ /\r/s;
+}
+
 warn "$_\n" for (@err);
 die if @err;
 

@@ -6,14 +6,14 @@ use Crypt::Mode::CBC;
 my @tests;
 
 # test vectors from http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf
-push @tests, 
+push @tests,
   { padding=>'none', key=>'2b7e151628aed2a6abf7158809cf4f3c', iv=>'000102030405060708090a0b0c0d0e0f', pt=>'6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e5130c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710', ct=>'7649abac8119b246cee98e9b12e9197d5086cb9b507219ee95db113a917678b273bed6b8e3c1743b7116e69e222295163ff1caa1681fac09120eca307586e1a7' },
   { padding=>'none', key=>'8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b', iv=>'000102030405060708090a0b0c0d0e0f', pt=>'6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e5130c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710', ct=>'4f021db243bc633d7178183a9fa071e8b4d9ada9ad7dedf4e5e738763f69145a571b242012fb7ae07fa9baac3df102e008b0e27988598881d920a9e64f5615cd' },
   { padding=>'none', key=>'603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4', iv=>'000102030405060708090a0b0c0d0e0f', pt=>'6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e5130c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710', ct=>'f58c4c04d6e5f1ba779eabfb5f7bfbd69cfc4e967edb808d679f777bc6702c7d39f23369a9d9bacfa530e26304231461b2eb05e2c39be9fcda6c19078c6a9d1b' },
-;  
+;
 
 # test vectors produced by Crypt::CBC
-push @tests, 
+push @tests,
   { mode=>'AES+Crypt::CBC', padding=>'standard', len=>45,  key=>'4cdc909dc310796429e26bcaca1b21329f5060813b7d17bf1a65f293154b54a9',  iv=>'9124d8cfafd3d732e597f463d35a8a43',  pt=>'ad67301bcd23a5d7b4601f93db3e6b5db71243fa00244182d0a2df6f0384a09f117821b7b70a4bcdc0a73a70130851f704a7aca59b96a3e5b8dc89efa7ee7846a906a3eb591bf8b6b472ae07113ac3cccfb1bc84723ed1472c1f59705eae7b9fbd6df2b38d2eac2a6c726b9f92',  ct=>'588c33d96d99477bc6305c829a1fb188ab165f60ccadac67daaefb8054cfe8093cbb6fba14b684c26cd10c66db87cf1aa8cd69c98180d1d7cb6edc9191332863653ea707cb9ec4da0c7d4381cac33faa938a53df3519d06859260be7ac582674cdedfa411f4cd0204c8b2132d4b100cc' },
   { mode=>'AES+Crypt::CBC', padding=>'standard', len=>46,  key=>'0c1afd6567e265240aacef873eb78ff11ce0e53931ca7de49143d8a2b1c84df5',  iv=>'df5f1521ed1ee7b47ae7e5ef0ac49abb',  pt=>'13436402bb6c57b3f202e88cd4d21d828e85856415000e5ef01f9fe43bf100ee5b94ea29e3246200dcddbc5779dce5e219c078bbad8cd878727c0c27f179c100beefcc832f605c8e8f27251a8b51b2475d5170ff8100c95d4d875d386016535a13373f7e15d798e0c39c94193b24',  ct=>'3eb5203a12d11b2fe629cd764a9963ad7f314d0efe75806c12e00f3bfe916c765a318be81337d1cb43f20c030f8af6e31991fb09477d06baa3492836f884470177584ad32241ac8fd66469fdd858ce1d04e90375689e70a4bc40be149b1df6cabc5943cff8e7cecdac6fe81fc0aac8f8' },
   { mode=>'AES+Crypt::CBC', padding=>'standard', len=>47,  key=>'9dd6b591b1589ff6fb5bbd41a8da4b1449674155119285857d719d44281daa3d',  iv=>'321d48c36326dcc951aa208542d2fdd7',  pt=>'75e4309485e3df2006c411a316073973e8adf51bfd6287a7833f15e18f2f6b571c192a527bd6290722713eb77c9116a28b321cc5decd44a5a49a13750d43e99e4d360e647300cb7b9d31a82c39d8885e6d2b5521f1c7339b30d3947bddc7323a50891f4d37a7bc9cc6971037373722',  ct=>'f1f7d95a90ece772a931e3c1f919da110246268291d10d5b2a3ff62596f0cd2a0c3dbdab41e210424f5a1d35b72a4df26a32d4c9ac80e808438f31e07a4f16555a82bade488a73afe239e6c557f100cf17632a8f767445ad6db8f7d2775f63f4b4e73fc5180b20334f941f8c49f7968a' },
@@ -68,7 +68,7 @@ for (@tests) {
     my $m = Crypt::Mode::CBC->new('AES', $_->{padding});
 
     for my $l (1..33) {
-    
+
       {
         $m->start_encrypt(pack("H*",$_->{key}), pack("H*",$_->{iv}));
         my $i = 0;
@@ -80,7 +80,7 @@ for (@tests) {
         $ct .= $m->finish;
         is(unpack("H*",$ct), $_->{ct}, "cipher text match [l=$l]");
       }
-      
+
       {
         $m->start_decrypt(pack("H*",$_->{key}), pack("H*",$_->{iv}));
         my $i = 0;
@@ -92,7 +92,7 @@ for (@tests) {
         $pt .= $m->finish;
         is(unpack("H*",$pt), $_->{pt}, "plain text match  [l=$l]");
       }
-      
-    }    
+
+    }
   }
 }

@@ -32,7 +32,7 @@ my $name;
 my $size;
 
 while (my $l = <DATA>) {
-  $l =~ s/[\r\n]*$//;  
+  $l =~ s/[\r\n]*$//;
   $l =~ s/^[\s]*([^\s\r\n]+).*?/$1/;
   $l =~ s/\s+//g;
   my ($k, $v) = split /:/, $l;
@@ -58,7 +58,7 @@ for my $n (sort keys %$tv) {
       next unless $tv->{$n}->{$ks}->{$i};
       my $ct = Crypt::Cipher->new($N, $key)->encrypt($bytes);
       is(unpack('H*', $ct), lc($tv->{$n}->{$ks}->{$i}), "$N/$ks/$i");
-      $bytes = $ct; 
+      $bytes = $ct;
       $key = substr($ct x 100, 0, $ks);
     }
   }

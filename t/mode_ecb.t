@@ -6,14 +6,14 @@ use Crypt::Mode::ECB;
 my @tests;
 
 # test vectors from http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf
-push @tests, 
+push @tests,
   { padding=>'none', key=>'2b7e151628aed2a6abf7158809cf4f3c', pt=>'6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e5130c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710', ct=>'3ad77bb40d7a3660a89ecaf32466ef97f5d3d58503b9699de785895a96fdbaaf43b1cd7f598ece23881b00e3ed0306887b0c785e27e8ad3f8223207104725dd4' },
   { padding=>'none', key=>'8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b', pt=>'6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e5130c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710', ct=>'bd334f1d6e45f25ff712a214571fa5cc974104846d0ad3ad7734ecb3ecee4eefef7afd2270e2e60adce0ba2face6444e9a4b41ba738d6c72fb16691603c18e0e' },
   { padding=>'none', key=>'603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4', pt=>'6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e5130c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710', ct=>'f3eed1bdb5d2a03c064b5a7e3db181f8591ccb10d410ed26dc5ba74a31362870b6ed21b99ca6f4f9f153e7b1beafed1d23304b7a39f9f3ff067d8d8f9e24ecc7' },
-;  
+;
 
 # test vectors produced by Crypt::ECB
-push @tests, 
+push @tests,
   { mode=>'AES+Crypt::ECB', padding=>'standard', len=>45,  key=>'9c1975bc3f89e58f790e8e1cdaeea5cc1147fa43c5da2f9ae681274bd406a663', pt=>'a99303fcd37a6c39acb2dd2f3955cbcdf2d4643cc5542019f549ca2b62a4b27a099f42e0a8fb90fc53f0f32c5402f89822215472d1a5c5e8e299090cfeb80151222922c91aa0a8e21ff07147ca62a4542cc36fb437ff2f56be51e6db4e763252960b4a02cfda2fb8a74a63c0fa',  ct=>'b52d56dfbd230e87af5d6cd122b050ba4dacfa112e214359d04626efbf57ccde810246076261e0dd7be797bc9b07b20c3a737f72822498fecc68d73ff6c057a1313684058ff1110af0e59347953e1b337b6dbcb852f9210099ea4b54482ae4d9069193d5cb22c6cdfad968a27771b38b' },
   { mode=>'AES+Crypt::ECB', padding=>'standard', len=>46,  key=>'11748a8de11e393c610eb582ee3534414f7187790435cdcbe1fd5f7c6db757be', pt=>'ff6da3d97b3907fcc171090bdcc97a43d98cde4bd76937eb672e3a4ce04b15de634d6c320bbe0b84304e52fbf004111f0d0671674196b3ea380f09295a04deb1f26b4d49bc239669bbed6b9316277516914ca4f30d570c156ea90f58565cbf26ead7c6d04eb411b83ef2445a914c',  ct=>'91f00f683e3a381ebadb9553db928776fa972a06ca73a31e38ba6501d0f7b27c0013dcf3b25b3206ccd2083fcc815eaa3f843fa14ceca9e54a687b69d0e515dff1cf4b756744f242955b766c87473275ffa6c2191c89ad064c4b83e95ded84514613bc5d7763ffc0b0ec2281bf36d76c' },
   { mode=>'AES+Crypt::ECB', padding=>'standard', len=>47,  key=>'d36ba22781e756dfe5e64bc9729e7d50bc00a24133ea90de1d77e666e9b39bb5', pt=>'a74a52d0a02d9e959127a1fa84790605828c6e1e8a9d71ff78320b1bc888affb3e19db2c5e62233ef6ab4adf89524efe369b12259925461b88d412d8276e5e80f327addee10c3e99778e0df730cf70509faef08e7c22b2142cc6201474465b47af54e99299290117eca9514a583ecf',  ct=>'1e768190063599f2be4309a27c2d1b294714bb567f231ea9ad17fe31c183b3ab2d3db1b95a3e646aa88c35d98b3ce193640e2013e643b5da787087a2a115b1f61370e42943c90c384c64b128eeaa06c98b0c7b9e9a3c2b875100c5fb9703c5e94dc394c45ffc079d2ba75ad2b342100e' },
@@ -55,7 +55,7 @@ for (@tests) {
     my $ct = pack("H*", $_->{ct});
     my $m = Crypt::Mode::ECB->new('AES', $_->{padding});
     for my $l (1..33) {
-    
+
       {
         $m->start_encrypt(pack("H*",$_->{key}));
         my $i = 0;
@@ -67,7 +67,7 @@ for (@tests) {
         $ct .= $m->finish;
         is(unpack("H*",$ct), $_->{ct}, "cipher text match [l=$l]");
       }
-      
+
       {
         $m->start_decrypt(pack("H*",$_->{key}));
         my $i = 0;
@@ -79,7 +79,7 @@ for (@tests) {
         $pt .= $m->finish;
         is(unpack("H*",$pt), $_->{pt}, "plain text match  [l=$l]");
       }
-      
-    }    
+
+    }
   }
 }

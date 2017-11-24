@@ -7,14 +7,14 @@ use Crypt::AuthEnc::EAX qw( eax_encrypt_authenticate eax_decrypt_verify );
 
 sub do_test {
   my %a = @_;
-  
-  my $key = pack("H*", $a{key}); 
+
+  my $key = pack("H*", $a{key});
   my $nonce = pack("H*", $a{nonce});
   my $header = pack("H*", $a{header});
   my $plaintext = pack("H*", $a{plaintext});
   my $ciphertext = pack("H*", $a{ciphertext});
   my $tag = pack("H*", $a{tag});
-  
+
   # encrypt
   my $m1 = Crypt::AuthEnc::EAX->new("AES", $key, $nonce);
   $m1->header_add($header);
@@ -39,7 +39,7 @@ sub do_test {
   is(unpack('H*', $tag3), $a{tag}, "enc: tag");
   my $pt3 = eax_decrypt_verify('AES', $key, $nonce, $header, $ciphertext, $tag);
   is(unpack('H*', $pt3), $a{plaintext}, "dec: plaintext");
-  
+
 }
 
 do_test(%$_) for (
@@ -77,7 +77,7 @@ do_test(%$_) for (
   {
      #16, 16, 16, 32,
      key => '000102030405060708090a0b0c0d0e0f',
-     nonce => '000102030405060708090a0b0c0d0e0f',  
+     nonce => '000102030405060708090a0b0c0d0e0f',
      header => '000102030405060708090a0b0c0d0e0f',
      plaintext => '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f',
      ciphertext => '29d878d1a3be857b6fb8c8ea5950a778331fbf2ccf33986f35e8cf121dcb30bc',
@@ -87,13 +87,13 @@ do_test(%$_) for (
   {
      #16, 15, 14, 29,
      key => '000102030405060708090a0b0c0d0e0f',
-     nonce => '000102030405060708090a0b0c0d0e',  
+     nonce => '000102030405060708090a0b0c0d0e',
      header => '000102030405060708090a0b0c0d',
      plaintext => '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c',
      ciphertext => 'dd25c754c5b17c5928b69b73155f7bb8888faf37091ad92c8a24db868b',
      tag => '0d1a14e52224ffd23a05fa02cdef52da',
   },
-  
+
   #/* Vectors from Brian Gladman */
   {
      #16, 16, 8, 0,
@@ -122,4 +122,4 @@ do_test(%$_) for (
      ciphertext => 'd851d5bae0',
      tag => '3a59f238a23e39199dc9266626c40f80',
   },
-);   
+);

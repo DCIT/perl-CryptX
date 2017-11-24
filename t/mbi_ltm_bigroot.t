@@ -24,7 +24,7 @@ is (Math::BigInt->config()->{lib}, 'Math::BigInt::LTM', 'LTM loaded');
 my $cl = "Math::BigFloat";
 my $c = "Math::BigInt";
 
-# 2 ** 240 = 
+# 2 ** 240 =
 # 1766847064778384329583297500742918515827483896875618958121606201292619776
 
 # takes way too long
@@ -47,4 +47,3 @@ sub test_broot
   $result =~ s/\..*//;
   is ($c->new($x)->bpow($n)->broot($y,$scale),$result, "Try: $c $x->bpow($n)->broot($y,$s) == $result");
   }
-

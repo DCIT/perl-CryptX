@@ -23,7 +23,7 @@ my $tv;
 my $hash;
 
 while (my $l = <DATA>) {
-  $l =~ s/[\r\n]*$//;  
+  $l =~ s/[\r\n]*$//;
   $l =~ s/^[\s]*([^\s\r\n]+).*?/$1/;
   $l =~ s/\s+//;
   my ($k, $v) = split /:/, $l;

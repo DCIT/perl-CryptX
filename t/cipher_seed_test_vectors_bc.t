@@ -13,7 +13,7 @@ while (my $l = <DATA>) {
     my ($k, $v) = split /:/, $pair;
     $d->{$k} = $v;
   }
-  
+
   my $c = Crypt::Cipher::SEED->new(pack('H*',$d->{key}));
   my $result = pack('H*', $d->{pt});
   $result = $c->encrypt($result) for(1..$d->{iter});

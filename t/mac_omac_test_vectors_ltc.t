@@ -32,7 +32,7 @@ my $name;
 my $ks;
 
 while (my $l = <DATA>) {
-  $l =~ s/[\r\n]*$//;  
+  $l =~ s/[\r\n]*$//;
   $l =~ s/^[\s]*([^\s\r\n]+).*?/$1/;
   $l =~ s/\s+//;
   if ($l=~/^OMAC-([a-z0-9\+\-]+).*?(\d+)/i) {
@@ -52,13 +52,13 @@ my $zeros = '\0' x 255;
 for my $n (sort keys %$tv) {
   for my $ks (sort keys %{$tv->{$n}}) {
     my $N = $trans->{$n} || die "FATAL: unknown name '$n'";
-    my $key = substr($seq, 0, $ks);  
+    my $key = substr($seq, 0, $ks);
     for my $i (0..255) {
       my $bytes = substr($seq, 0, $i);
       next unless $tv->{$n}->{$ks}->{$i};
       my $result = Crypt::Mac::OMAC->new($N, $key)->add($bytes)->mac;
       is(unpack('H*', $result), lc($tv->{$n}->{$ks}->{$i}), "$N/$i");
-      $bytes = $result; 
+      $bytes = $result;
       $key = substr($result x 100, 0, $ks);
     }
   }

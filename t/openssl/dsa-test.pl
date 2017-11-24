@@ -23,7 +23,7 @@ MARKER
  use Crypt::PK::DSA;
  use Crypt::Digest 'digest_file';
  use Crypt::Misc 'read_rawfile';
-  
+
  my $pkdsa = Crypt::PK::DSA->new("test_dsakey.pub.pem");
  my $signature = read_rawfile("test_input.sha1-dsa.sig");
  my $valid = $pkdsa->verify_hash($signature, digest_file("SHA1", "test_input.data"), "SHA1", "v1.5");
@@ -35,7 +35,7 @@ MARKER
  use Crypt::PK::DSA;
  use Crypt::Digest 'digest_file';
  use Crypt::Misc 'write_rawfile';
-  
+
  my $pkdsa = Crypt::PK::DSA->new("test_dsakey.priv.pem");
  my $signature = $pkdsa->sign_hash(digest_file("SHA1", "test_input.data"), "SHA1", "v1.5");
  write_rawfile("test_input.sha1-dsa.sig", $signature);
@@ -55,7 +55,7 @@ write_rawfile("test_input.data", "test-file-content");
 {
  use Crypt::PK::DSA;
  use Crypt::Misc 'write_rawfile';
- 
+
  my $pkdsa = Crypt::PK::DSA->new;
  $pkdsa->generate_key(20, 128);
  write_rawfile("test_dsakey.pub.der",  $pkdsa->export_key_der('public'));
@@ -70,7 +70,7 @@ runcmds <<'MARKER';
  openssl dsa -in test_dsakey.priv.pem -text
  openssl dsa -in test_dsakey-passwd.priv.pem -text -inform pem -passin pass:secret
  openssl dsa -in test_dsakey.pub.der -pubin -text -inform der
- openssl dsa -in test_dsakey.pub.pem -pubin -text 
+ openssl dsa -in test_dsakey.pub.pem -pubin -text
 MARKER
 
 doit();
@@ -87,7 +87,7 @@ MARKER
 
 {
  use Crypt::PK::DSA;
- 
+
  my $pkdsa = Crypt::PK::DSA->new;
  $pkdsa->import_key("test_dsakey.pub.der");
  $pkdsa->import_key("test_dsakey.priv.der");

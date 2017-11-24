@@ -12,7 +12,7 @@ while (my $l = <DATA>) {
   chomp($l);
   next if $l =~ /^#/;
   $l =~ s/[\s\t]+/ /g;
-  
+
   if ($l eq '') {
     next unless defined $d->{C};
     my $A = pack('H*', $d->{A});
@@ -21,7 +21,7 @@ while (my $l = <DATA>) {
     my $K = pack('H*', $d->{K});
     my $N = pack('H*', $d->{N});
     my $tag_len = $d->{T} * 1;
-    
+
     { #ENCRYPT
       my $m = Crypt::AuthEnc::OCB->new('AES', $K, $N, $tag_len);
       $m->adata_add($A);
@@ -48,7 +48,7 @@ while (my $l = <DATA>) {
     $v =~ s/\s//g;
     $d->{$k} = $v;
   }
-  
+
 }
 
 #print $text;

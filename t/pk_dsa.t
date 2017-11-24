@@ -17,43 +17,43 @@ use Crypt::Misc 'decode_b64';
   $k = Crypt::PK::DSA->new('t/data/cryptx_priv_dsa2.der');
   ok($k, 'load cryptx_priv_dsa2.der');
   ok($k->is_private, 'is_private cryptx_priv_dsa2.der');
-  
+
   $k = Crypt::PK::DSA->new('t/data/cryptx_pub_dsa1.der');
   ok($k, 'load cryptx_pub_dsa1.der');
   ok(!$k->is_private, 'is_private cryptx_pub_dsa1.der');
-  
+
   $k = Crypt::PK::DSA->new('t/data/cryptx_pub_dsa2.der');
   ok($k, 'load cryptx_pub_dsa2.der');
   ok(!$k->is_private, 'is_private cryptx_pub_dsa2.der');
-  
+
   $k = Crypt::PK::DSA->new('t/data/openssl_dsa1.der');
   ok($k, 'load openssl_dsa1.der');
   ok($k->is_private, 'is_private openssl_dsa1.der');
-  
+
   $k = Crypt::PK::DSA->new('t/data/openssl_dsa2.der');
   ok($k, 'load openssl_dsa2.der');
   ok($k->is_private, 'is_private openssl_dsa2.der');
-  
+
   $k = Crypt::PK::DSA->new('t/data/cryptx_priv_dsa1.pem');
   ok($k, 'load cryptx_priv_dsa1.pem');
   ok($k->is_private, 'is_private cryptx_priv_dsa1.pem');
-  
+
   $k = Crypt::PK::DSA->new('t/data/cryptx_priv_dsa2.pem');
   ok($k, 'load cryptx_priv_dsa2.pem');
   ok($k->is_private, 'is_private cryptx_priv_dsa2.pem');
-  
+
   $k = Crypt::PK::DSA->new('t/data/cryptx_pub_dsa1.pem');
   ok($k, 'load cryptx_pub_dsa1.pem');
   ok(!$k->is_private, 'is_private cryptx_pub_dsa1.pem');
-  
+
   $k = Crypt::PK::DSA->new('t/data/cryptx_pub_dsa2.pem');
   ok($k, 'load cryptx_pub_dsa2.pem');
   ok(!$k->is_private, 'is_private cryptx_pub_dsa2.pem');
-  
+
   $k = Crypt::PK::DSA->new('t/data/openssl_dsa1.pem');
   ok($k, 'load openssl_dsa1.pem');
   ok($k->is_private, 'is_private openssl_dsa1.pem');
-  
+
   $k = Crypt::PK::DSA->new('t/data/openssl_dsa2.pem');
   ok($k, 'load openssl_dsa2.pem');
   ok($k->is_private, 'is_private openssl_dsa2.pem');
@@ -64,7 +64,7 @@ use Crypt::Misc 'decode_b64';
   $pr1->import_key('t/data/cryptx_priv_dsa1.der');
   my $pu1 = Crypt::PK::DSA->new;
   $pu1->import_key('t/data/cryptx_pub_dsa1.der');
- 
+
   my $ct = $pu1->encrypt("secret message");
   my $pt = $pr1->decrypt($ct);
   ok(length $ct > 200, 'encrypt ' . length($ct));
@@ -77,13 +77,13 @@ use Crypt::Misc 'decode_b64';
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
   $sig = $pr1->sign_hash($hash, 'SHA1');
   ok(length $sig > 60, 'sign_hash ' . length($sig));
-  ok($pu1->verify_hash($sig, $hash, 'SHA1'), 'verify_hash'); 
- 
+  ok($pu1->verify_hash($sig, $hash, 'SHA1'), 'verify_hash');
+
   my $pr2 = Crypt::PK::DSA->new;
   $pr2->import_key('t/data/cryptx_priv_dsa2.der');
   my $pu2 = Crypt::PK::DSA->new;
   $pu2->import_key('t/data/cryptx_pub_dsa2.der');
- 
+
   #my $ss1 = $pr1->shared_secret($pu2);
   #my $ss2 = $pr2->shared_secret($pu1);
   #is(unpack("H*",$ss1), unpack("H*",$ss2), 'shared_secret');
