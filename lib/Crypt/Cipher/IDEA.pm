@@ -21,7 +21,7 @@ sub default_rounds { Crypt::Cipher::default_rounds(__PACKAGE__) }
 
 =head1 NAME
 
-Crypt::Cipher::IDEA - Symetric cipher IDEA, key size: 128 bits (Crypt::CBC compliant)
+Crypt::Cipher::IDEA - Symmetric cipher IDEA, key size: 128 bits (Crypt::CBC compliant)
 
 =head1 SYNOPSIS
 
