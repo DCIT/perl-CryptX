@@ -473,7 +473,12 @@ Support for password protected PEM keys
 =head2 size
 
  my $size = $pk->size;
- # returns key size in bytes or undef if no key loaded
+ # returns key size (length of the prime p) in bytes or undef if key not loaded
+
+=head2 size_q
+
+ my $size = $pk->size_q;
+ # returns length of the prime q in bytes or undef if key not loaded
 
 =head2 key2hash
 

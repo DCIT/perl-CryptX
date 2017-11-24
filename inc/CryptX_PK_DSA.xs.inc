@@ -141,7 +141,7 @@ int
 size(Crypt::PK::DSA self)
     CODE:
         if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
-        RETVAL = mp_unsigned_bin_size(self->key.g);
+        RETVAL = mp_unsigned_bin_size(self->key.p);
     OUTPUT:
         RETVAL
 
@@ -149,7 +149,7 @@ int
 size_q(Crypt::PK::DSA self)
     CODE:
         if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
-        RETVAL = self->key.qord;
+        RETVAL = mp_unsigned_bin_size(self->key.q);
     OUTPUT:
         RETVAL
 
