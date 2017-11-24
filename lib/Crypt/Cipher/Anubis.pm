@@ -4,7 +4,7 @@ package Crypt::Cipher::Anubis;
 
 use strict;
 use warnings;
-our $VERSION = '0.054_007';
+our $VERSION = '0.054_008';
 
 use CryptX;
 use base 'Crypt::Cipher';

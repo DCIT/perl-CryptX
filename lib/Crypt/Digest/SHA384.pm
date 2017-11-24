@@ -4,7 +4,7 @@ package Crypt::Digest::SHA384;
 
 use strict;
 use warnings;
-our $VERSION = '0.054_007';
+our $VERSION = '0.054_008';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( sha384 sha384_hex sha384_b64 sha384_b64u sha384_file sha384_file_hex sha384_file_b64 sha384_file_b64u )] );

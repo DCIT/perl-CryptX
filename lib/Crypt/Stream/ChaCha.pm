@@ -2,7 +2,7 @@ package Crypt::Stream::ChaCha;
 
 use strict;
 use warnings;
-our $VERSION = '0.054_007';
+our $VERSION = '0.054_008';
 
 use CryptX;
 

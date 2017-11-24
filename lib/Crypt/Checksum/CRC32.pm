@@ -2,7 +2,7 @@ package Crypt::Checksum::CRC32;
 
 use strict;
 use warnings;
-our $VERSION = '0.054_007';
+our $VERSION = '0.054_008';
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
