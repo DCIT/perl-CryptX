@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More;
 
+plan skip_all => "set TEST_POD to enable this test (developer only!)" unless $ENV{TEST_POD};
 plan skip_all => "File::Find not installed" unless eval { require File::Find };
 plan skip_all => "Test::Pod::Spelling or Text::Aspell not installed" unless eval { require Test::Pod::Spelling; require Text::Aspell; };
 

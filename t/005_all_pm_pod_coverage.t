@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More;
 
+plan skip_all => "set TEST_POD to enable this test (developer only!)" unless $ENV{TEST_POD};
 plan skip_all => "Pod::Coverage not installed" unless eval { require Pod::Coverage };
 plan skip_all => "File::Find not installed" unless eval { require File::Find };
 plan tests => 102;
