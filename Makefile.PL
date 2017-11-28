@@ -12,6 +12,7 @@ my @myobjs = map { s|.c$|$Config{obj_ext}|; $_ } grep { $_ !~ m|^src/ltc/\.*tab\
 );
 my $myextlib = "src/liballinone$Config{lib_ext}";
 my $mycflags = "$Config{ccflags} $Config{cccdlflags} $Config{optimize}";
+$mycflags .= " $ENV{CFLAGS}" if $ENV{CFLAGS};
 
 #FIX: this is particularly useful for Debian https://github.com/DCIT/perl-CryptX/pull/39
 $mycflags .= " $ENV{CFLAGS}"   if $ENV{CFLAGS};
