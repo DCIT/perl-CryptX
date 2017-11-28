@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.055   2017-11-XX
+0.055   2017-11-28
         - new Crypt::Cipher::IDEA
         - new Crypt::Cipher::Serpent
         - new Crypt::Stream::Salsa20
@@ -8,6 +8,7 @@ Changes for CryptX
         - added CCM object oriented interface: new-add-add-done
         - fix #39 accept CFLAGS and CPPFLAGS from the environment
         - fix #40 typos in POD
+        - fix HMAC+SHA3 (now compliant with NIST test vectors)
 
 0.054   2017-10-12
         - fix Crypt::PK::DSA verify
