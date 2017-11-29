@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More;
 
+plan skip_all => "set TEST_POD to enable this test (developer only!)" unless $ENV{TEST_POD};
 plan skip_all => "File::Find not installed" unless eval { require File::Find };
 plan tests => 1;
 
@@ -15,6 +16,7 @@ sub _read {
 
 my @err;
 my $cryptx = _read("lib/CryptX.pm");
+my $compile_t = _read("t/001_compile.t");
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');
 
@@ -29,7 +31,8 @@ for my $m (sort @files) {
   $m =~ s|[\\/]|::|g;
   $m =~ s|^lib::||;
   $m =~ s|\.pm$||;
-  push @err, "ERROR: '$m' is missing in CryptX"  unless $cryptx =~ /L<$m>/s || $m =~ /^(CryptX|Math::BigInt::LTM|Crypt::(PK|Mode|Mac|AuthEnc))$/;
+  push @err, "ERROR: '$m' is missing in CryptX.pm"  unless $cryptx =~ /L<$m>/s || $m =~ /^(CryptX|Math::BigInt::LTM|Crypt::(PK|Mode|Mac|AuthEnc))$/;
+  push @err, "ERROR: '$m' is missing in 001_compile.t"  unless $compile_t =~ /\nuse $m;/s;
   eval "use $m; 1;" or push @err, "ERROR: 'use $m' failed";
 }
 
