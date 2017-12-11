@@ -16,17 +16,17 @@
  */
 
 /* get the lower unsigned long long of an mp_int, platform dependent */
-unsigned long long mp_get_long_long(const mp_int *a)
+uint64_t mp_get_long_long(const mp_int *a)
 {
    int i;
-   unsigned long long res;
+   uint64_t res;
 
    if (a->used == 0) {
       return 0;
    }
 
    /* get number of digits of the lsb we have to read */
-   i = MIN(a->used, ((((int)sizeof(unsigned long long) * CHAR_BIT) + DIGIT_BIT - 1) / DIGIT_BIT)) - 1;
+   i = MIN(a->used, ((((int)sizeof(uint64_t) * CHAR_BIT) + DIGIT_BIT - 1) / DIGIT_BIT)) - 1;
 
    /* get most significant digit of result */
    res = DIGIT(a, i);
