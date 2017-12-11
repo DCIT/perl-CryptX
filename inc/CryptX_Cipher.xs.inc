@@ -83,7 +83,7 @@ encrypt(self, data)
         if (len == 0) {
           RETVAL = newSVpvn("", 0);
         }
-        else if (len == self->desc->block_length) {
+        else if (len == (STRLEN)self->desc->block_length) {
           RETVAL = NEWSV(0, len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);
@@ -113,7 +113,7 @@ decrypt(self, data)
         if (len == 0) {
           RETVAL = newSVpvn("", 0);
         }
-        else if (len == self->desc->block_length) {
+        else if (len == (STRLEN)self->desc->block_length) {
           RETVAL = NEWSV(0, len);
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);

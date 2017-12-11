@@ -64,7 +64,7 @@ _import_pkcs8(Crypt::PK::ECC self, SV * key_data, SV * passwd)
           pwd = (unsigned char *)SvPVbyte(passwd, pwd_len);
         }
         _ecc_free_key(&self->key, &self->dp);
-        rv = ecc_import_pkcs8(data, (unsigned long)data_len, pwd, pwd_len, &self->key, &self->dp);
+        rv = ecc_import_pkcs8(data, (unsigned long)data_len, pwd, (unsigned long)pwd_len, &self->key, &self->dp);
         if (rv != CRYPT_OK) croak("FATAL: ecc_import_pkcs8 failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }

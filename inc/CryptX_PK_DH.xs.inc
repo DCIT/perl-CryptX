@@ -66,7 +66,7 @@ _generate_key_dhparam(Crypt::PK::DH self, SV * dhparam)
         STRLEN data_len=0;
         data = (unsigned char *)SvPVbyte(dhparam, data_len);
         /* load d p q */
-        rv = dh_set_pg_dhparam(data, data_len, &self->key);
+        rv = dh_set_pg_dhparam(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dh_set_pg_dhparam failed: %s", error_to_string(rv));
         /* gen the key */
         rv = dh_generate_key(&self->pstate, self->pindex, &self->key);

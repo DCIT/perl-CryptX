@@ -4,7 +4,6 @@ Crypt::Checksum::CRC32
 new(Class)
     CODE:
     {
-        int rv;
         Newz(0, RETVAL, 1, crc32_state);
         if (!RETVAL) croak("FATAL: Newz failed");
         crc32_init(RETVAL); /* returns void */

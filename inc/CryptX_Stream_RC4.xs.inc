@@ -49,7 +49,7 @@ keystream(Crypt::Stream::RC4 self, STRLEN out_len)
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, out_len);
         out_data = (unsigned char *)SvPVX(RETVAL);
-        rv = rc4_stream_keystream(&self->state, out_data, out_len);
+        rv = rc4_stream_keystream(&self->state, out_data, (unsigned long)out_len);
         if (rv != CRYPT_OK) {
           SvREFCNT_dec(RETVAL);
           croak("FATAL: rc4_stream_keystream failed: %s", error_to_string(rv));

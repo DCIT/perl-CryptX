@@ -62,7 +62,7 @@ _import_pkcs8(Crypt::PK::RSA self, SV * key_data, SV * passwd)
           pwd = (unsigned char *)SvPVbyte(passwd, pwd_len);
         }
         if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
-        rv = rsa_import_pkcs8(data, (unsigned long)data_len, pwd, pwd_len, &self->key);
+        rv = rsa_import_pkcs8(data, (unsigned long)data_len, pwd, (unsigned long)pwd_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: rsa_import_pkcs8 failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }

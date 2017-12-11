@@ -70,7 +70,7 @@ keystream(Crypt::Stream::ChaCha self, STRLEN out_len)
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, out_len);
         out_data = (unsigned char *)SvPVX(RETVAL);
-        rv = chacha_keystream(&self->state, out_data, out_len);
+        rv = chacha_keystream(&self->state, out_data, (unsigned long)out_len);
         if (rv != CRYPT_OK) {
           SvREFCNT_dec(RETVAL);
           croak("FATAL: chacha_keystream failed: %s", error_to_string(rv));

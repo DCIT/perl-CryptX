@@ -57,7 +57,7 @@ keystream(Crypt::Stream::Salsa20 self, STRLEN out_len)
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, out_len);
         out_data = (unsigned char *)SvPVX(RETVAL);
-        rv = salsa20_keystream(&self->state, out_data, out_len);
+        rv = salsa20_keystream(&self->state, out_data, (unsigned long)out_len);
         if (rv != CRYPT_OK) {
           SvREFCNT_dec(RETVAL);
           croak("FATAL: salsa20_keystream failed: %s", error_to_string(rv));

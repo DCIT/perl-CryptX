@@ -623,7 +623,7 @@ CryptX__bin_to_radix(SV *in, int radix)
         if (len == 0) XSRETURN_UNDEF;
 
         mp_init(&mpi);
-        if (mp_read_unsigned_bin(&mpi, in_data, len) == CRYPT_OK) {
+        if (mp_read_unsigned_bin(&mpi, in_data, (unsigned long)len) == CRYPT_OK) {
           mp_init_copy(&tmp, &mpi);
           while (mp_iszero(&tmp) == MP_NO) {
             mp_div_d(&tmp, (mp_digit)radix, &tmp, &d);

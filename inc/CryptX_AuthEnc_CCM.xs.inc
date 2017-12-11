@@ -27,7 +27,7 @@ _new(char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, int pt_l
         Newz(0, RETVAL, 1, struct ccm_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = ccm_init(&RETVAL->state, id, k, (unsigned long)k_len, pt_len, tag_len, h_len);
+        rv = ccm_init(&RETVAL->state, id, k, (int)k_len, (int)pt_len, (int)tag_len, (int)h_len); /* XXX-TODO why int? */
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: ccm_init failed: %s", error_to_string(rv));
@@ -90,7 +90,7 @@ encrypt_add(Crypt::AuthEnc::CCM self, SV * data)
             SvREFCNT_dec(RETVAL);
             croak("FATAL: ccm_process failed: %s", error_to_string(rv));
           }
-          self->pt_len -= in_data_len;
+          self->pt_len -= (unsigned long)in_data_len;
         }
     }
     OUTPUT:
@@ -100,7 +100,7 @@ SV *
 decrypt_add(Crypt::AuthEnc::CCM self, SV * data)
     CODE:
     {
-        int rv, i;
+        int rv;
         STRLEN in_data_len;
         unsigned char *in_data, *out_data;
 
@@ -123,7 +123,7 @@ decrypt_add(Crypt::AuthEnc::CCM self, SV * data)
             SvREFCNT_dec(RETVAL);
             croak("FATAL: ccm_process failed: %s", error_to_string(rv));
           }
-          self->pt_len -= in_data_len;
+          self->pt_len -= (unsigned long)in_data_len;
         }
     }
     OUTPUT:

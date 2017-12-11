@@ -42,7 +42,7 @@ _generate_key_dsaparam(Crypt::PK::DSA self, SV * dsaparam)
         STRLEN data_len=0;
         data = (unsigned char *)SvPVbyte(dsaparam, data_len);
         /* load d p q */
-        rv = dsa_set_pqg_dsaparam(data, data_len, &self->key);
+        rv = dsa_set_pqg_dsaparam(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dsa_set_pqg_dsaparam failed: %s", error_to_string(rv));
         /* gen the key */
         rv = dsa_generate_key(&self->pstate, self->pindex, &self->key);
