@@ -2,7 +2,7 @@ package CryptX;
 
 use strict;
 use warnings ;
-our $VERSION = '0.055';
+our $VERSION = '0.055_001';
 
 use base qw(Exporter);
 our @EXPORT_OK = qw();
