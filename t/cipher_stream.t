@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 20;
 
 use Crypt::Stream::RC4;
 use Crypt::Stream::Sober128;
@@ -88,11 +88,29 @@ use Crypt::Stream::Rabbit;
 
 {
   my $key = pack("H*", "74657374206b65792031323862697473");
-  my $iv  = pack("H*", "00000000");
-  my $ct  = pack("H*", "442cf424c5da8d78000c6b874050260792ae8ce0");
+  my $iv  = pack("H*", "1122334455");
+  my $ct  = pack("H*", "91d4ba9044faa26e08db767d34b88d5cf4c884db");
   my $pt  = pack("H*", "0000000000000000000000000000000000000000");
   my $enc = Crypt::Stream::Rabbit->new($key, $iv)->crypt($pt);
   my $dec = Crypt::Stream::Rabbit->new($key, $iv)->crypt($ct);
   is(unpack("H*", $enc), unpack("H*", $ct), "Crypt::Stream::Rabbit encrypt");
   is(unpack("H*", $dec), unpack("H*", $pt), "Crypt::Stream::Rabbit decrypt");
+}
+{
+  my $key = pack("H*", "74657374206b65792031323862697473");
+  my $ct  = pack("H*", "e8c99affb8ffb7541b6da2e06887994e800b70c9");
+  my $pt  = pack("H*", "0000000000000000000000000000000000000000");
+  my $enc = Crypt::Stream::Rabbit->new($key)->crypt($pt);
+  my $dec = Crypt::Stream::Rabbit->new($key)->crypt($ct);
+  is(unpack("H*", $enc), unpack("H*", $ct), "Crypt::Stream::Rabbit encrypt (no IV)");
+  is(unpack("H*", $dec), unpack("H*", $pt), "Crypt::Stream::Rabbit decrypt (no IV)");
+}
+{
+  my $key = pack("H*", "74657374206b65792031323862697473");
+  my $ct  = pack("H*", "442cf424c5da8d78000c6b874050260792ae8ce0");
+  my $pt  = pack("H*", "0000000000000000000000000000000000000000");
+  my $enc = Crypt::Stream::Rabbit->new($key, "")->crypt($pt);
+  my $dec = Crypt::Stream::Rabbit->new($key, "")->crypt($ct);
+  is(unpack("H*", $enc), unpack("H*", $ct), "Crypt::Stream::Rabbit encrypt (empty IV)");
+  is(unpack("H*", $dec), unpack("H*", $pt), "Crypt::Stream::Rabbit decrypt (empty IV)");
 }

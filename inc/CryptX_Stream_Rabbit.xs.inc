@@ -24,14 +24,10 @@ new(Class, SV * key, SV * nonce=&PL_sv_undef)
           if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
           iv = (unsigned char *)SvPVbyte(nonce, iv_len);
           rv = rabbit_setiv(&RETVAL->state, iv, (unsigned long)iv_len);
-        }
-        else {
-          /* rv = rabbit_setiv(&RETVAL->state, NULL, 0); */
-          rv = CRYPT_OK; /* XXX-FIXME this is a hack - skip rabbit_setiv if undefined nonce */
-        }
-        if (rv != CRYPT_OK) {
-          Safefree(RETVAL);
-          croak("FATAL: rabbit_setiv failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) {
+            Safefree(RETVAL);
+            croak("FATAL: rabbit_setiv failed: %s", error_to_string(rv));
+          }
         }
 
     }
