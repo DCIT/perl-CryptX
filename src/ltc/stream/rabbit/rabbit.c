@@ -223,11 +223,11 @@ int rabbit_setiv(rabbit_state* st, const unsigned char *iv, unsigned long ivlen)
    unsigned char  tmpiv[8] = {0};
 
    LTC_ARGCHK(st != NULL);
-   LTC_ARGCHK(iv != NULL);
    LTC_ARGCHK(ivlen <= 8);
+   LTC_ARGCHK(iv != NULL || ivlen == 0);
 
    /* pad iv in tmpiv */
-   XMEMCPY(tmpiv, iv, ivlen);
+   if (ivlen > 0) XMEMCPY(tmpiv, iv, ivlen);
 
    /* Generate four subvectors */
    LOAD32L(i0, tmpiv+0);
