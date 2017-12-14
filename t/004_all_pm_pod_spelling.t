@@ -10,7 +10,7 @@ plan skip_all => "Test::Pod::Spelling or Text::Aspell not installed" unless eval
 Test::Pod::Spelling->import(
         spelling => {
                         allow_words => [qw(
-                          AES BLAKEb BLAKEs CPAN CRC ChaCha CryptX DCIT DER Diffie EAX ECCDH ECDH ECDSA Flickr HKDF JSON JWA JWK
+                          ASN AES BLAKEb BLAKEs CPAN CRC ChaCha CryptX DCIT DER Diffie EAX ECCDH ECDH ECDSA Flickr HKDF JSON JWA JWK
                           Karel Miko OCB OCBv OID OMAC OO OpenSSL PBKDF PEM PKCS RIPEMD Rijndael SHA UUID RFC
                           decrypt decrypts interoperability cryptographically cryptographic octects
                           libtomcrypt libtommath
@@ -21,7 +21,7 @@ Test::Pod::Spelling->import(
                     },
 );
 
-plan tests => 102;
+plan tests => 103;
 
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');

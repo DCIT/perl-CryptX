@@ -6,7 +6,7 @@ use Test::More;
 plan skip_all => "set TEST_POD to enable this test (developer only!)" unless $ENV{TEST_POD};
 plan skip_all => "File::Find not installed" unless eval { require File::Find };
 plan skip_all => "Test::Pod not installed" unless eval { require Test::Pod };
-plan tests => 102;
+plan tests => 103;
 
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');

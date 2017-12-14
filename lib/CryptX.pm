@@ -85,7 +85,8 @@ L<Crypt::Mode::CBC>, L<Crypt::Mode::CFB>, L<Crypt::Mode::CTR>, L<Crypt::Mode::EC
 
 =item * Stream ciphers
 
-L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sober128>, L<Crypt::Stream::Sosemanuk>
+L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sober128>,
+L<Crypt::Stream::Sosemanuk>, L<Crypt::Stream::Rabbit>
 
 =item * Authenticated encryption modes
 

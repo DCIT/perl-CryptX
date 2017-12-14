@@ -1,4 +1,4 @@
-package Crypt::Stream::Sosemanuk;
+package Crypt::Stream::Rabbit;
 
 use strict;
 use warnings;
@@ -12,33 +12,33 @@ use CryptX;
 
 =head1 NAME
 
-Crypt::Stream::Sosemanuk - Stream cipher Sosemanuk
+Crypt::Stream::Rabbit - Stream cipher Rabbit
 
 =head1 SYNOPSIS
 
-   use Crypt::Stream::Sosemanuk;
+   use Crypt::Stream::Rabbit;
 
    # encrypt
    $key = "1234567890123456";
    $iv  = "123456789012";
-   $stream = Crypt::Stream::Sosemanuk->new($key, $iv);
+   $stream = Crypt::Stream::Rabbit->new($key, $iv);
    $ct = $stream->crypt("plain message");
 
    # decrypt
    $key = "1234567890123456";
    $iv  = "123456789012";
-   $stream = Crypt::Stream::Sosemanuk->new($key, $iv);
+   $stream = Crypt::Stream::Rabbit->new($key, $iv);
    $pt = $stream->crypt($ct);
 
 =head1 DESCRIPTION
 
-Provides an interface to the Sosemanuk stream cipher.
+Provides an interface to the Rabbit stream cipher.
 
 =head1 METHODS
 
 =head2 new
 
- $stream = Crypt::Stream::Sosemanuk->new($key, $iv);
+ $stream = Crypt::Stream::Rabbit->new($key, $iv);
  # $key .. keylen must be multiple of 4 bytes
  # $iv  .. ivlen must be multiple of 4 bytes (OPTIONAL)
 
@@ -62,7 +62,7 @@ Provides an interface to the Sosemanuk stream cipher.
 
 =item * L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sober128>
 
-=item * L<https://en.wikipedia.org/wiki/SOSEMANUK>
+=item * L<https://en.wikipedia.org/wiki/Rabbit_(cipher)>
 
 =back
 

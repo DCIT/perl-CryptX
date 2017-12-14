@@ -74,6 +74,11 @@ typedef struct sosemanuk_struct {       /* used by Crypt::Stream::Sosemanuk */
   int id;
 } *Crypt__Stream__Sosemanuk;
 
+typedef struct rabbit_struct {          /* used by Crypt::Stream::Rabbit */
+  rabbit_state state;
+  int id;
+} *Crypt__Stream__Rabbit;
+
 typedef struct rc4_struct {             /* used by Crypt::Stream::RC4 */
   rc4_state state;
   int id;
@@ -693,6 +698,7 @@ INCLUDE: inc/CryptX_Stream_Salsa20.xs.inc
 INCLUDE: inc/CryptX_Stream_RC4.xs.inc
 INCLUDE: inc/CryptX_Stream_Sober128.xs.inc
 INCLUDE: inc/CryptX_Stream_Sosemanuk.xs.inc
+INCLUDE: inc/CryptX_Stream_Rabbit.xs.inc
 
 INCLUDE: inc/CryptX_Mac_F9.xs.inc
 INCLUDE: inc/CryptX_Mac_HMAC.xs.inc

@@ -109,6 +109,7 @@ use Crypt::Stream::RC4;
 use Crypt::Stream::Salsa20;
 use Crypt::Stream::Sober128;
 use Crypt::Stream::Sosemanuk;
+use Crypt::Stream::Rabbit;
 use CryptX;
 use Math::BigInt::LTM;
 

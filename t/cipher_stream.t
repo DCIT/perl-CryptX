@@ -1,12 +1,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 16;
 
 use Crypt::Stream::RC4;
 use Crypt::Stream::Sober128;
 use Crypt::Stream::ChaCha;
 use Crypt::Stream::Salsa20;
+use Crypt::Stream::Sosemanuk;
+use Crypt::Stream::Rabbit;
 
 {
   my $key = pack("H*", "0123456789abcdef");
@@ -84,3 +86,13 @@ use Crypt::Stream::Salsa20;
   is(unpack("H*", $dec), unpack("H*", $pt), "Crypt::Stream::Sosemanuk decrypt (no IV)");
 }
 
+{
+  my $key = pack("H*", "74657374206b65792031323862697473");
+  my $iv  = pack("H*", "00000000");
+  my $ct  = pack("H*", "442cf424c5da8d78000c6b874050260792ae8ce0");
+  my $pt  = pack("H*", "0000000000000000000000000000000000000000");
+  my $enc = Crypt::Stream::Rabbit->new($key, $iv)->crypt($pt);
+  my $dec = Crypt::Stream::Rabbit->new($key, $iv)->crypt($ct);
+  is(unpack("H*", $enc), unpack("H*", $ct), "Crypt::Stream::Rabbit encrypt");
+  is(unpack("H*", $dec), unpack("H*", $pt), "Crypt::Stream::Rabbit decrypt");
+}
