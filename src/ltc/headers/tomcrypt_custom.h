@@ -209,6 +209,7 @@
 #define LTC_CHACHA
 #define LTC_SALSA20
 #define LTC_SOSEMANUK
+#define LTC_RABBIT
 #define LTC_RC4_STREAM
 #define LTC_SOBER128_STREAM
 
@@ -583,6 +584,7 @@
 #define LTC_MUTEX_INIT(x)     LTC_ARGCHK(pthread_mutex_init(x, NULL) == 0);
 #define LTC_MUTEX_LOCK(x)     LTC_ARGCHK(pthread_mutex_lock(x) == 0);
 #define LTC_MUTEX_UNLOCK(x)   LTC_ARGCHK(pthread_mutex_unlock(x) == 0);
+#define LTC_MUTEX_DESTROY(x)  LTC_ARGCHK(pthread_mutex_destroy(x) == 0);
 
 #else
 
@@ -593,6 +595,7 @@
 #define LTC_MUTEX_INIT(x)
 #define LTC_MUTEX_LOCK(x)
 #define LTC_MUTEX_UNLOCK(x)
+#define LTC_MUTEX_DESTROY(x)
 
 #endif
 

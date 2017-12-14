@@ -116,19 +116,19 @@ ltc/pk/rsa/rsa_verify_hash.o ltc/prngs/chacha20.o ltc/prngs/fortuna.o ltc/prngs/
 ltc/prngs/rng_get_bytes.o ltc/prngs/rng_make_prng.o ltc/prngs/sober128.o ltc/prngs/sprng.o \
 ltc/prngs/yarrow.o ltc/stream/chacha/chacha_crypt.o ltc/stream/chacha/chacha_done.o \
 ltc/stream/chacha/chacha_ivctr32.o ltc/stream/chacha/chacha_ivctr64.o ltc/stream/chacha/chacha_keystream.o \
-ltc/stream/chacha/chacha_setup.o ltc/stream/rc4/rc4_stream.o ltc/stream/salsa20/salsa20_crypt.o \
-ltc/stream/salsa20/salsa20_done.o ltc/stream/salsa20/salsa20_ivctr64.o ltc/stream/salsa20/salsa20_keystream.o \
-ltc/stream/salsa20/salsa20_setup.o ltc/stream/sober128/sober128_stream.o ltc/stream/sosemanuk/sosemanuk.o \
-ltm/bncore.o ltm/bn_error.o ltm/bn_fast_mp_invmod.o ltm/bn_fast_mp_montgomery_reduce.o \
-ltm/bn_fast_s_mp_mul_digs.o ltm/bn_fast_s_mp_mul_high_digs.o ltm/bn_fast_s_mp_sqr.o \
-ltm/bn_mp_2expt.o ltm/bn_mp_abs.o ltm/bn_mp_add.o ltm/bn_mp_addmod.o ltm/bn_mp_add_d.o \
-ltm/bn_mp_and.o ltm/bn_mp_clamp.o ltm/bn_mp_clear.o ltm/bn_mp_clear_multi.o ltm/bn_mp_cmp.o \
-ltm/bn_mp_cmp_d.o ltm/bn_mp_cmp_mag.o ltm/bn_mp_cnt_lsb.o ltm/bn_mp_copy.o ltm/bn_mp_count_bits.o \
-ltm/bn_mp_div.o ltm/bn_mp_div_2.o ltm/bn_mp_div_2d.o ltm/bn_mp_div_3.o ltm/bn_mp_div_d.o \
-ltm/bn_mp_dr_is_modulus.o ltm/bn_mp_dr_reduce.o ltm/bn_mp_dr_setup.o ltm/bn_mp_exch.o \
-ltm/bn_mp_export.o ltm/bn_mp_exptmod.o ltm/bn_mp_exptmod_fast.o ltm/bn_mp_expt_d.o \
-ltm/bn_mp_expt_d_ex.o ltm/bn_mp_exteuclid.o ltm/bn_mp_fread.o ltm/bn_mp_fwrite.o \
-ltm/bn_mp_gcd.o ltm/bn_mp_get_int.o ltm/bn_mp_get_long.o ltm/bn_mp_get_long_long.o \
+ltc/stream/chacha/chacha_setup.o ltc/stream/rabbit/rabbit.o ltc/stream/rc4/rc4_stream.o \
+ltc/stream/salsa20/salsa20_crypt.o ltc/stream/salsa20/salsa20_done.o ltc/stream/salsa20/salsa20_ivctr64.o \
+ltc/stream/salsa20/salsa20_keystream.o ltc/stream/salsa20/salsa20_setup.o ltc/stream/sober128/sober128_stream.o \
+ltc/stream/sosemanuk/sosemanuk.o ltm/bncore.o ltm/bn_error.o ltm/bn_fast_mp_invmod.o \
+ltm/bn_fast_mp_montgomery_reduce.o ltm/bn_fast_s_mp_mul_digs.o ltm/bn_fast_s_mp_mul_high_digs.o \
+ltm/bn_fast_s_mp_sqr.o ltm/bn_mp_2expt.o ltm/bn_mp_abs.o ltm/bn_mp_add.o ltm/bn_mp_addmod.o \
+ltm/bn_mp_add_d.o ltm/bn_mp_and.o ltm/bn_mp_clamp.o ltm/bn_mp_clear.o ltm/bn_mp_clear_multi.o \
+ltm/bn_mp_cmp.o ltm/bn_mp_cmp_d.o ltm/bn_mp_cmp_mag.o ltm/bn_mp_cnt_lsb.o ltm/bn_mp_copy.o \
+ltm/bn_mp_count_bits.o ltm/bn_mp_div.o ltm/bn_mp_div_2.o ltm/bn_mp_div_2d.o ltm/bn_mp_div_3.o \
+ltm/bn_mp_div_d.o ltm/bn_mp_dr_is_modulus.o ltm/bn_mp_dr_reduce.o ltm/bn_mp_dr_setup.o \
+ltm/bn_mp_exch.o ltm/bn_mp_export.o ltm/bn_mp_exptmod.o ltm/bn_mp_exptmod_fast.o \
+ltm/bn_mp_expt_d.o ltm/bn_mp_expt_d_ex.o ltm/bn_mp_exteuclid.o ltm/bn_mp_fread.o \
+ltm/bn_mp_fwrite.o ltm/bn_mp_gcd.o ltm/bn_mp_get_int.o ltm/bn_mp_get_long.o ltm/bn_mp_get_long_long.o \
 ltm/bn_mp_grow.o ltm/bn_mp_import.o ltm/bn_mp_init.o ltm/bn_mp_init_copy.o ltm/bn_mp_init_multi.o \
 ltm/bn_mp_init_set.o ltm/bn_mp_init_set_int.o ltm/bn_mp_init_size.o ltm/bn_mp_invmod.o \
 ltm/bn_mp_invmod_slow.o ltm/bn_mp_is_square.o ltm/bn_mp_jacobi.o ltm/bn_mp_karatsuba_mul.o \
