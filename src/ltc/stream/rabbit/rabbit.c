@@ -211,6 +211,11 @@ int rabbit_setup(rabbit_state* st, const unsigned char *key, unsigned long keyle
       st->work_ctx.c[i] = st->master_ctx.c[i];
    }
    st->work_ctx.carry = st->master_ctx.carry;
+
+   /* reset keystream buffer and unused count */
+   XMEMSET(&(st->block), 0, sizeof(st->block));
+   st->unused = 0;
+
    return CRYPT_OK;
 }
 
