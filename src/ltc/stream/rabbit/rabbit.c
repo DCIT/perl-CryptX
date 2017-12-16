@@ -211,8 +211,7 @@ int rabbit_setup(rabbit_state* st, const unsigned char *key, unsigned long keyle
       st->work_ctx.c[i] = st->master_ctx.c[i];
    }
    st->work_ctx.carry = st->master_ctx.carry;
-
-   /* reset keystream buffer and unused count */
+   /* ...and prepare block for crypt() */
    XMEMSET(&(st->block), 0, sizeof(st->block));
    st->unused = 0;
 
@@ -228,11 +227,11 @@ int rabbit_setiv(rabbit_state* st, const unsigned char *iv, unsigned long ivlen)
    unsigned char  tmpiv[8] = {0};
 
    LTC_ARGCHK(st != NULL);
-   LTC_ARGCHK(ivlen <= 8);
    LTC_ARGCHK(iv != NULL || ivlen == 0);
+   LTC_ARGCHK(ivlen <= 8);
 
    /* pad iv in tmpiv */
-   if (ivlen > 0) XMEMCPY(tmpiv, iv, ivlen);
+   if (iv && ivlen > 0) XMEMCPY(tmpiv, iv, ivlen);
 
    /* Generate four subvectors */
    LOAD32L(i0, tmpiv+0);
