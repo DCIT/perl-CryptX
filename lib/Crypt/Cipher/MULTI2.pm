@@ -4,7 +4,7 @@ package Crypt::Cipher::MULTI2;
 
 use strict;
 use warnings;
-our $VERSION = '0.055_001';
+our $VERSION = '0.055_002';
 
 use CryptX;
 use base 'Crypt::Cipher';
