@@ -40,17 +40,17 @@ ltc/mac/poly1305/poly1305_memory.o ltc/mac/poly1305/poly1305_memory_multi.o ltc/
 ltc/mac/xcbc/xcbc_file.o ltc/mac/xcbc/xcbc_init.o ltc/mac/xcbc/xcbc_memory.o ltc/mac/xcbc/xcbc_memory_multi.o \
 ltc/mac/xcbc/xcbc_process.o ltc/math/ltm_desc.o ltc/math/multi.o ltc/math/radix_to_bin.o \
 ltc/math/rand_bn.o ltc/math/rand_prime.o ltc/math/tfm_desc.o ltc/math/fp/ltc_ecc_fp_mulmod.o \
-ltc/misc/adler32.o ltc/misc/burn_stack.o ltc/misc/compare_testvector.o ltc/misc/crc32.o \
-ltc/misc/error_to_string.o ltc/misc/mem_neq.o ltc/misc/pk_get_oid.o ltc/misc/zeromem.o \
-ltc/misc/base32/base32_decode.o ltc/misc/base32/base32_encode.o ltc/misc/base64/base64_decode.o \
-ltc/misc/base64/base64_encode.o ltc/misc/crypt/crypt.o ltc/misc/crypt/crypt_argchk.o \
-ltc/misc/crypt/crypt_cipher_descriptor.o ltc/misc/crypt/crypt_cipher_is_valid.o ltc/misc/crypt/crypt_constants.o \
-ltc/misc/crypt/crypt_find_cipher.o ltc/misc/crypt/crypt_find_cipher_any.o ltc/misc/crypt/crypt_find_cipher_id.o \
-ltc/misc/crypt/crypt_find_hash.o ltc/misc/crypt/crypt_find_hash_any.o ltc/misc/crypt/crypt_find_hash_id.o \
-ltc/misc/crypt/crypt_find_hash_oid.o ltc/misc/crypt/crypt_find_prng.o ltc/misc/crypt/crypt_fsa.o \
-ltc/misc/crypt/crypt_hash_descriptor.o ltc/misc/crypt/crypt_hash_is_valid.o ltc/misc/crypt/crypt_inits.o \
-ltc/misc/crypt/crypt_ltc_mp_descriptor.o ltc/misc/crypt/crypt_prng_descriptor.o ltc/misc/crypt/crypt_prng_is_valid.o \
-ltc/misc/crypt/crypt_prng_rng_descriptor.o ltc/misc/crypt/crypt_register_all_ciphers.o \
+ltc/misc/adler32.o ltc/misc/burn_stack.o ltc/misc/compare_testvector.o ltc/misc/copy_or_zeromem.o \
+ltc/misc/crc32.o ltc/misc/error_to_string.o ltc/misc/mem_neq.o ltc/misc/pk_get_oid.o \
+ltc/misc/zeromem.o ltc/misc/base32/base32_decode.o ltc/misc/base32/base32_encode.o \
+ltc/misc/base64/base64_decode.o ltc/misc/base64/base64_encode.o ltc/misc/crypt/crypt.o \
+ltc/misc/crypt/crypt_argchk.o ltc/misc/crypt/crypt_cipher_descriptor.o ltc/misc/crypt/crypt_cipher_is_valid.o \
+ltc/misc/crypt/crypt_constants.o ltc/misc/crypt/crypt_find_cipher.o ltc/misc/crypt/crypt_find_cipher_any.o \
+ltc/misc/crypt/crypt_find_cipher_id.o ltc/misc/crypt/crypt_find_hash.o ltc/misc/crypt/crypt_find_hash_any.o \
+ltc/misc/crypt/crypt_find_hash_id.o ltc/misc/crypt/crypt_find_hash_oid.o ltc/misc/crypt/crypt_find_prng.o \
+ltc/misc/crypt/crypt_fsa.o ltc/misc/crypt/crypt_hash_descriptor.o ltc/misc/crypt/crypt_hash_is_valid.o \
+ltc/misc/crypt/crypt_inits.o ltc/misc/crypt/crypt_ltc_mp_descriptor.o ltc/misc/crypt/crypt_prng_descriptor.o \
+ltc/misc/crypt/crypt_prng_is_valid.o ltc/misc/crypt/crypt_prng_rng_descriptor.o ltc/misc/crypt/crypt_register_all_ciphers.o \
 ltc/misc/crypt/crypt_register_all_hashes.o ltc/misc/crypt/crypt_register_all_prngs.o \
 ltc/misc/crypt/crypt_register_cipher.o ltc/misc/crypt/crypt_register_hash.o ltc/misc/crypt/crypt_register_prng.o \
 ltc/misc/crypt/crypt_sizes.o ltc/misc/crypt/crypt_unregister_cipher.o ltc/misc/crypt/crypt_unregister_hash.o \

@@ -325,7 +325,7 @@ int rabbit_done(rabbit_state *st)
 {
    LTC_ARGCHK(st != NULL);
 
-   XMEMSET(st, 0, sizeof(rabbit_state));
+   zeromem(st, sizeof(rabbit_state));
    return CRYPT_OK;
 }
 
