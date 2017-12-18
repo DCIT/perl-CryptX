@@ -22,7 +22,8 @@ Currently available modules:
 
 - Stream ciphers
 
-    [Crypt::Stream::RC4](https://metacpan.org/pod/Crypt::Stream::RC4), [Crypt::Stream::ChaCha](https://metacpan.org/pod/Crypt::Stream::ChaCha), [Crypt::Stream::Salsa20](https://metacpan.org/pod/Crypt::Stream::Salsa20), [Crypt::Stream::Sober128](https://metacpan.org/pod/Crypt::Stream::Sober128), [Crypt::Stream::Sosemanuk](https://metacpan.org/pod/Crypt::Stream::Sosemanuk)
+    [Crypt::Stream::RC4](https://metacpan.org/pod/Crypt::Stream::RC4), [Crypt::Stream::ChaCha](https://metacpan.org/pod/Crypt::Stream::ChaCha), [Crypt::Stream::Salsa20](https://metacpan.org/pod/Crypt::Stream::Salsa20), [Crypt::Stream::Sober128](https://metacpan.org/pod/Crypt::Stream::Sober128),
+    [Crypt::Stream::Sosemanuk](https://metacpan.org/pod/Crypt::Stream::Sosemanuk), [Crypt::Stream::Rabbit](https://metacpan.org/pod/Crypt::Stream::Rabbit)
 
 - Authenticated encryption modes
 
