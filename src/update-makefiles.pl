@@ -12,6 +12,7 @@ system 'rm', '-rf', "$FindBin::Bin/ltc/modes/f8/";
 system 'rm', '-rf', "$FindBin::Bin/ltc/modes/lrw/";
 system 'rm', '-rf', "$FindBin::Bin/ltc/modes/xts/";
 system 'rm', '-rf', "$FindBin::Bin/ltc/pk/katja/";
+system 'rm', '-rf', "$FindBin::Bin/ltc/math/gmp_desc.c";
 find({ wanted=>sub { unlink $_ if $_ =~ /test\.c$/ && $_ !~ /sha3_test.c$/ }, no_chdir=>1 }, "$FindBin::Bin/ltc");
 
 #fix modes
