@@ -20,13 +20,13 @@ Crypt::Stream::Rabbit - Stream cipher Rabbit
 
    # encrypt
    $key = "1234567890123456";
-   $iv  = "123456789012";
+   $iv  = "12345678";
    $stream = Crypt::Stream::Rabbit->new($key, $iv);
    $ct = $stream->crypt("plain message");
 
    # decrypt
    $key = "1234567890123456";
-   $iv  = "123456789012";
+   $iv  = "12345678";
    $stream = Crypt::Stream::Rabbit->new($key, $iv);
    $pt = $stream->crypt($ct);
 
@@ -39,8 +39,11 @@ Provides an interface to the Rabbit stream cipher.
 =head2 new
 
  $stream = Crypt::Stream::Rabbit->new($key, $iv);
- # $key .. keylen must be multiple of 4 bytes
- # $iv  .. ivlen must be multiple of 4 bytes (OPTIONAL)
+ # $key .. keylen must be up to 16 bytes
+ # $iv  .. ivlen must be up to 8 bytes
+
+ $stream = Crypt::Stream::Rabbit->new($key);
+ #BEWARE: this is different from new($key, "")
 
 =head2 crypt
 
