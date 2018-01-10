@@ -107,6 +107,11 @@ openssltest: all
 	$(NOECHO) perl -Mblib t/openssl/dsa-test.pl
 	$(NOECHO) perl -Mblib t/openssl/ecc-test.pl
 	$(NOECHO) perl -Mblib t/openssl/rsa-test.pl
+rebuild-pre:
+	$(RM_F) src/liballinone.a
+	$(TOUCH) CryptX.xs
+rebuild: rebuild-pre all
+
 };
 
   return "$myextlib\n$version_patch";
