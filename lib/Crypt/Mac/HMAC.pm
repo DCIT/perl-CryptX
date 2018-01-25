@@ -12,9 +12,6 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use Crypt::Digest;
-
-sub new { my $class = shift; _new(Crypt::Digest::_trans_digest_name(shift), @_) }
 sub hmac { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->mac }
 sub hmac_hex  { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->hexmac }
 sub hmac_b64  { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->b64mac }

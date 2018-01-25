@@ -1,21 +1,29 @@
 MODULE = CryptX         PACKAGE = Crypt::Cipher
 
 Crypt::Cipher
-_new(cipher_name, key, rounds=0)
-        char * cipher_name
-        SV * key
-        int rounds
+new(char * class, ...)
     CODE:
     {
         STRLEN key_len;
-        unsigned char *key_data=NULL;
-        int rv;
-        int id;
+        unsigned char *key_data = NULL;
+        SV *key;
+        char *cipher_name;
+        int rv, id, rounds = 0, idx;
+
+        /* we need to handle:
+           Crypt::Cipher->new('AES');
+           Crypt::Cipher::AES->new();
+         */
+        idx = strcmp("Crypt::Cipher", class) == 0 ? 1 : 0;
+        if (idx + 1 > items) croak("FATAL: missing argument");
+        cipher_name = SvPVX(ST(idx));
+        key = ST(idx + 1);
+        if (idx + 3 <= items) rounds = (int)SvIV(ST(idx + 2));
 
         if (!SvPOK (key)) croak("FATAL: key must be string scalar");
         key_data = (unsigned char *)SvPVbyte(key, key_len);
 
-        id = find_cipher(cipher_name);
+        id = _find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         Newz(0, RETVAL, 1, struct cipher_struct);
@@ -33,47 +41,12 @@ _new(cipher_name, key, rounds=0)
         RETVAL
 
 void
-DESTROY(self)
-        Crypt::Cipher self
+DESTROY(Crypt::Cipher self)
     CODE:
         Safefree(self);
 
-int
-_max_keysize(self, ...)
-        Crypt::Cipher self
-    CODE:
-        RETVAL = self->desc->max_key_length;
-    OUTPUT:
-        RETVAL
-
-int
-_min_keysize(self, ...)
-        Crypt::Cipher self
-    CODE:
-        RETVAL = self->desc->min_key_length;
-    OUTPUT:
-        RETVAL
-
-int
-_blocksize(self, ...)
-        Crypt::Cipher self
-    CODE:
-        RETVAL = self->desc->block_length;
-    OUTPUT:
-        RETVAL
-
-int
-_default_rounds(self, ...)
-        Crypt::Cipher self
-    CODE:
-        RETVAL = self->desc->default_rounds;
-    OUTPUT:
-        RETVAL
-
 SV *
-encrypt(self, data)
-        Crypt::Cipher self
-        SV * data
+encrypt(Crypt::Cipher self, SV * data)
     CODE:
     {
         int rv;
@@ -101,9 +74,7 @@ encrypt(self, data)
         RETVAL
 
 SV *
-decrypt(self, data)
-        Crypt::Cipher self
-        SV * data
+decrypt(Crypt::Cipher self, SV * data)
     CODE:
     {
         int rv;
@@ -131,69 +102,85 @@ decrypt(self, data)
         RETVAL
 
 int
-_block_length_by_name(cipher_name)
-        char * cipher_name
+blocksize(SV * param, char * extra = NULL)
     CODE:
     {
-        int rv, id;
-
-        id = find_cipher(cipher_name);
-        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
-
-        rv = cipher_descriptor[id].block_length;
-        if (!rv) XSRETURN_UNDEF;
-        RETVAL = rv;
+        if (sv_isobject(param) && sv_derived_from(param, "Crypt::Cipher")) {
+          IV tmp = SvIV((SV*)SvRV(param));
+          Crypt__Cipher obj = INT2PTR(Crypt__Cipher, tmp);
+          RETVAL = obj->desc->block_length;
+        }
+        else {
+          char *name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Cipher") ? SvPVX(param) : extra;
+          int rv, id = _find_cipher(name);
+          if (id == -1) croak("FATAL: find_cipher failed for '%s'", name);
+          rv = cipher_descriptor[id].block_length;
+          if (!rv) croak("FATAL: invalid block_length for '%s'", name);
+          RETVAL = rv;
+        }
     }
     OUTPUT:
         RETVAL
 
 int
-_min_key_length_by_name(cipher_name)
-        char * cipher_name
+max_keysize(SV * param, char * extra = NULL)
     CODE:
     {
-        int rv, id;
-
-        id = find_cipher(cipher_name);
-        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
-
-        rv = cipher_descriptor[id].min_key_length;
-        if (!rv) XSRETURN_UNDEF;
-        RETVAL = rv;
+        if (sv_isobject(param) && sv_derived_from(param, "Crypt::Cipher")) {
+          IV tmp = SvIV((SV*)SvRV(param));
+          Crypt__Cipher obj = INT2PTR(Crypt__Cipher, tmp);
+          RETVAL = obj->desc->max_key_length;
+        }
+        else {
+          char *name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Cipher") ? SvPVX(param) : extra;
+          int rv, id = _find_cipher(name);
+          if (id == -1) croak("FATAL: find_cipher failed for '%s'", name);
+          rv = cipher_descriptor[id].max_key_length;
+          if (!rv) croak("FATAL: invalid max_key_length for '%s'", name);
+          RETVAL = rv;
+        }
     }
     OUTPUT:
         RETVAL
 
 int
-_max_key_length_by_name(cipher_name)
-        char * cipher_name
+min_keysize(SV * param, char * extra = NULL)
     CODE:
     {
-        int rv, id;
-
-        id = find_cipher(cipher_name);
-        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
-
-        rv = cipher_descriptor[id].max_key_length;
-        if (!rv) XSRETURN_UNDEF;
-        RETVAL = rv;
+        if (sv_isobject(param) && sv_derived_from(param, "Crypt::Cipher")) {
+          IV tmp = SvIV((SV*)SvRV(param));
+          Crypt__Cipher obj = INT2PTR(Crypt__Cipher, tmp);
+          RETVAL = obj->desc->min_key_length;
+        }
+        else {
+          char *name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Cipher") ? SvPVX(param) : extra;
+          int rv, id = _find_cipher(name);
+          if (id == -1) croak("FATAL: find_cipher failed for '%s'", name);
+          rv = cipher_descriptor[id].min_key_length;
+          if (!rv) croak("FATAL: invalid min_key_length for '%s'", name);
+          RETVAL = rv;
+        }
     }
     OUTPUT:
         RETVAL
 
 int
-_default_rounds_by_name(cipher_name)
-        char * cipher_name
+default_rounds(SV * param, char * extra = NULL)
     CODE:
     {
-        int rv, id;
-
-        id = find_cipher(cipher_name);
-        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
-
-        rv = cipher_descriptor[id].default_rounds;
-        if (!rv) XSRETURN_UNDEF;
-        RETVAL = rv;
+        if (sv_isobject(param) && sv_derived_from(param, "Crypt::Cipher")) {
+          IV tmp = SvIV((SV*)SvRV(param));
+          Crypt__Cipher obj = INT2PTR(Crypt__Cipher, tmp);
+          RETVAL = obj->desc->default_rounds;
+        }
+        else {
+          char *name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Cipher") ? SvPVX(param) : extra;
+          int rv, id = _find_cipher(name);
+          if (id == -1) croak("FATAL: find_cipher failed for '%s'", name);
+          rv = cipher_descriptor[id].default_rounds;
+          if (!rv) XSRETURN_UNDEF;
+          RETVAL = rv;
+        }
     }
     OUTPUT:
         RETVAL

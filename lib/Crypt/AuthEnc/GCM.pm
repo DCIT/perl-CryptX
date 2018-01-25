@@ -14,15 +14,6 @@ $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use Crypt::Cipher;
 
-sub new {
-  my ($class, $cipher, $key, $iv) = @_;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $self = _new(Crypt::Cipher::_trans_cipher_name($cipher), $key);
-  # for backwards compatibility the $iv is optional
-  $self->iv_add($iv) if defined $iv;
-  return $self;
-}
-
 sub gcm_encrypt_authenticate {
   my $cipher_name = shift;
   my $key = shift;

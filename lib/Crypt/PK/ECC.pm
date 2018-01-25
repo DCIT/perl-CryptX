@@ -570,7 +570,7 @@ sub import_key {
 
 sub encrypt {
   my ($self, $data, $hash_name) = @_;
-  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
+  $hash_name ||= 'SHA1';
   return $self->_encrypt($data, $hash_name);
 }
 

@@ -289,7 +289,7 @@ _encrypt(Crypt::PK::ECC self, SV * data, char * hash_name)
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
-        hash_id = find_hash(hash_name);
+        hash_id = _find_hash(hash_name);
         if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
         rv = ecc_encrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                              &self->pstate, self->pindex,

@@ -1,14 +1,14 @@
 MODULE = CryptX         PACKAGE = Crypt::Digest
 
 Crypt::Digest
-_new(digest_name)
-        char * digest_name
+new(char * cname, char * pname = NULL)
     CODE:
     {
         int rv;
         int id;
+        char *digest_name = strcmp(cname, "Crypt::Digest") == 0 ? pname : cname;
 
-        id = find_hash(digest_name);
+        id = _find_hash(digest_name);
         if (id == -1) croak("FATAL: find_hash failed for '%s'", digest_name);
 
         Newz(0, RETVAL, 1, struct digest_struct);
@@ -26,14 +26,12 @@ _new(digest_name)
         RETVAL
 
 void
-DESTROY(self)
-        Crypt::Digest self
+DESTROY(Crypt::Digest self)
     CODE:
         Safefree(self);
 
 void
-reset(self)
-    Crypt::Digest self
+reset(Crypt::Digest self)
     PPCODE:
     {
         int rv;
@@ -43,8 +41,7 @@ reset(self)
     }
 
 Crypt::Digest
-clone(self)
-    Crypt::Digest self
+clone(Crypt::Digest self)
     CODE:
         Newz(0, RETVAL, 1, struct digest_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
@@ -71,8 +68,7 @@ add(Crypt::Digest self, ...)
     }
 
 SV *
-digest(self)
-        Crypt::Digest self
+digest(Crypt::Digest self)
     CODE:
     {
         unsigned char hash[MAXBLOCKSIZE];
@@ -86,89 +82,173 @@ digest(self)
         RETVAL
 
 SV *
-hexdigest(self)
-        Crypt::Digest self
-    CODE:
-    {
-        int rv;
-        unsigned long i;
-        unsigned char hash[MAXBLOCKSIZE];
-        char hash_hex[MAXBLOCKSIZE*2 + 1];
-
-        rv = self->desc->done(&self->state, hash);
-        if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
-
-        hash_hex[0] = '\0';
-        for(i=0; i<self->desc->hashsize; i++)
-            sprintf(&hash_hex[2*i], "%02x", hash[i]);
-        RETVAL = newSVpvn(hash_hex, strlen(hash_hex));
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-b64digest(self)
-        Crypt::Digest self
+hexdigest(Crypt::Digest self)
     CODE:
     {
         int rv;
         unsigned long outlen;
         unsigned char hash[MAXBLOCKSIZE];
-        char hash_base64[MAXBLOCKSIZE*2 + 1];
+        char out[MAXBLOCKSIZE*2];
 
         rv = self->desc->done(&self->state, hash);
         if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
 
-        outlen = sizeof(hash_base64);
-        rv = base64_encode(hash, self->desc->hashsize, (unsigned char *)hash_base64, &outlen);
+        outlen = sizeof(out);
+        rv = _base16_encode(hash, self->desc->hashsize, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn(out, outlen);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+b64digest(Crypt::Digest self)
+    CODE:
+    {
+        int rv;
+        unsigned long outlen;
+        unsigned char hash[MAXBLOCKSIZE];
+        char out[MAXBLOCKSIZE*2];
+
+        rv = self->desc->done(&self->state, hash);
+        if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
+
+        outlen = sizeof(out);
+        rv = base64_encode(hash, self->desc->hashsize, (unsigned char *)out, &outlen);
         if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn(hash_base64, outlen);
+        RETVAL = newSVpvn(out, outlen);
     }
     OUTPUT:
         RETVAL
 
 SV *
-b64udigest(self)
-        Crypt::Digest self
+b64udigest(Crypt::Digest self)
     CODE:
     {
         int rv;
         unsigned long outlen;
         unsigned char hash[MAXBLOCKSIZE];
-        char hash_base64[MAXBLOCKSIZE*2 + 1];
+        char out[MAXBLOCKSIZE*2];
 
         rv = self->desc->done(&self->state, hash);
         if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
 
-        outlen = sizeof(hash_base64);
-        rv = base64url_encode(hash, self->desc->hashsize, (unsigned char *)hash_base64, &outlen);
+        outlen = sizeof(out);
+        rv = base64url_encode(hash, self->desc->hashsize, (unsigned char *)out, &outlen);
         if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn(hash_base64, outlen);
+        RETVAL = newSVpvn(out, outlen);
     }
     OUTPUT:
         RETVAL
 
 int
-_hashsize(self)
-        Crypt::Digest self
+hashsize(SV * param, char * extra = NULL)
     CODE:
-        RETVAL = self->desc->hashsize;
+    {
+        if (sv_isobject(param) && sv_derived_from(param, "Crypt::Digest")) {
+          IV tmp = SvIV((SV*)SvRV(param));
+          Crypt__Digest obj = INT2PTR(Crypt__Digest, tmp);
+          RETVAL = obj->desc->hashsize;
+        }
+        else {
+          char *digest_name;
+          int rv, id;
+          digest_name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Digest") ? SvPVX(param) : extra;
+          id = _find_hash(digest_name);
+          if (id == -1) croak("FATAL: find_hash failed for '%s'", digest_name);
+          rv = hash_descriptor[id].hashsize;
+          if (!rv) croak("FATAL: invalid hashsize for '%s'", digest_name);;
+          RETVAL = rv;
+        }
+    }
     OUTPUT:
         RETVAL
 
-int
-_hashsize_by_name(digest_name)
-        char * digest_name
+SV *
+digest_data(char * digest_name, SV * data)
     CODE:
     {
+        STRLEN inlen;
         int rv, id;
+        unsigned char *in, hash[MAXBLOCKSIZE];
+        unsigned long len = sizeof(hash);
 
-        id = find_hash(digest_name);
+        id = _find_hash(digest_name);
         if (id == -1) croak("FATAL: find_digest failed for '%s'", digest_name);
+        in = (unsigned char *)SvPVbyte(data, inlen);
+        rv = hash_memory(id, in, inlen, hash, &len);
+        if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) hash, len);
+    }
+    OUTPUT:
+        RETVAL
 
-        rv = hash_descriptor[id].hashsize;
-        if (!rv) croak("FATAL: invalid hashsize for '%s'", digest_name);;
-        RETVAL = rv;
+SV *
+digest_data_hex(char * digest_name, SV * data)
+    CODE:
+    {
+        STRLEN inlen;
+        int rv, id;
+        unsigned char *in, hash[MAXBLOCKSIZE];
+        unsigned long len = sizeof(hash), outlen;
+        char out[MAXBLOCKSIZE*2];
+
+        id = _find_hash(digest_name);
+        if (id == -1) croak("FATAL: find_digest failed for '%s'", digest_name);
+        in = (unsigned char *)SvPVbyte(data, inlen);
+        rv = hash_memory(id, in, inlen, hash, &len);
+        if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = _base16_encode(hash, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+digest_data_b64(char * digest_name, SV * data)
+    CODE:
+    {
+        STRLEN inlen;
+        int rv, id;
+        unsigned char *in, hash[MAXBLOCKSIZE];
+        unsigned long len = sizeof(hash), outlen;
+        char out[MAXBLOCKSIZE*2];
+
+        id = _find_hash(digest_name);
+        if (id == -1) croak("FATAL: find_digest failed for '%s'", digest_name);
+        in = (unsigned char *)SvPVbyte(data, inlen);
+        rv = hash_memory(id, in, inlen, hash, &len);
+        if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = base64_encode(hash, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
+
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+digest_data_b64u(char * digest_name, SV * data)
+    CODE:
+    {
+        STRLEN inlen;
+        int rv, id;
+        unsigned char *in, hash[MAXBLOCKSIZE];
+        unsigned long len = sizeof(hash), outlen;
+        char out[MAXBLOCKSIZE*2];
+
+        id = _find_hash(digest_name);
+        if (id == -1) croak("FATAL: find_digest failed for '%s'", digest_name);
+        in = (unsigned char *)SvPVbyte(data, inlen);
+        rv = hash_memory(id, in, inlen, hash, &len);
+        if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = base64url_encode(hash, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
     }
     OUTPUT:
         RETVAL

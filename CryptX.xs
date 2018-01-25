@@ -262,6 +262,78 @@ int mp_tohex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
   return str_add_leading_zero(str, maxlen, minlen);
 }
 
+int _base16_encode(const unsigned char *in, unsigned long inlen, unsigned char *out, unsigned long *outlen)
+{
+   unsigned long i;
+   const char alphabet[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+
+   if (*outlen < inlen * 2) {
+      *outlen = inlen * 2;
+      return CRYPT_BUFFER_OVERFLOW;
+   }
+
+   for (i = 0; i < inlen; i++) {
+     out[i*2]   = (unsigned char)alphabet[in[i] >> 4];
+     out[i*2+1] = (unsigned char)alphabet[in[i] & 0xF];
+   }
+
+   *outlen = inlen * 2;
+   return CRYPT_OK;
+}
+
+int _find_hash(const char *name)
+{
+   char ltcname[100] = { 0 };
+   size_t i, start = 0, ltclen = sizeof(ltcname) - 1;
+   if (name == NULL || strlen(name) + 1 > ltclen) croak("FATAL: invalid hash name") ;
+   /* normalize */
+   for (i = 0; i < ltclen && name[i] > 0; i++) {
+     if (name[i] >= 'A' && name[i] <= 'Z') {
+       ltcname[i] = name[i] + 32; /* lowecase */
+     }
+     else if (name[i] == '_') {
+       ltcname[i] = '-';
+     }
+     else {
+       ltcname[i] = name[i];
+     }
+     if (name[i] == ':') start = i + 1;
+   }
+   /* special cases */
+   if (strcmp(ltcname + start, "ripemd128") == 0) return find_hash("rmd128");
+   if (strcmp(ltcname + start, "ripemd160") == 0) return find_hash("rmd160");
+   if (strcmp(ltcname + start, "ripemd256") == 0) return find_hash("rmd256");
+   if (strcmp(ltcname + start, "ripemd320") == 0) return find_hash("rmd320");
+   if (strcmp(ltcname + start, "tiger192")  == 0) return find_hash("tiger");
+   if (strcmp(ltcname + start, "chaes")     == 0) return find_hash("chc_hash");
+   if (strcmp(ltcname + start, "chc-hash")  == 0) return find_hash("chc_hash");
+   return find_hash(ltcname + start);
+}
+
+int _find_cipher(const char *name)
+{
+   char ltcname[100] = { 0 };
+   size_t i, start = 0, ltclen = sizeof(ltcname) - 1;
+   if (name == NULL || strlen(name) + 1 > ltclen) croak("FATAL: invalid cipher name") ;
+   /* normalize */
+   for (i = 0; i < ltclen && name[i] > 0; i++) {
+     if (name[i] >= 'A' && name[i] <= 'Z') {
+       ltcname[i] = name[i] + 32; /* lowecase */
+     }
+     else if (name[i] == '_') {
+       ltcname[i] = '-';
+     }
+     else {
+       ltcname[i] = name[i];
+     }
+     if (name[i] == ':') start = i + 1;
+   }
+   /* special cases */
+   if (strcmp(ltcname + start, "des-ede") == 0) return find_cipher("3des");
+   if (strcmp(ltcname + start, "saferp")  == 0) return find_cipher("safer+");
+   return find_cipher(ltcname + start);
+}
+
 /* Math::BigInt::LTM related */
 typedef mp_int * Math__BigInt__LTM;
 STATIC SV * sv_from_mpi(mp_int *mpi) {

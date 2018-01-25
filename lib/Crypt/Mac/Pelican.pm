@@ -12,7 +12,6 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-sub new { my $class = shift; _new(@_) }
 sub pelican { Crypt::Mac::Pelican->new(shift)->add(@_)->mac }
 sub pelican_hex  { Crypt::Mac::Pelican->new(shift)->add(@_)->hexmac }
 sub pelican_b64  { Crypt::Mac::Pelican->new(shift)->add(@_)->b64mac }

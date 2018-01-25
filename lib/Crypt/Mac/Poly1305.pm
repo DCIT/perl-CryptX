@@ -12,7 +12,6 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-sub new { my $class = shift; _new(@_) }
 sub poly1305 { Crypt::Mac::Poly1305->new(shift)->add(@_)->mac }
 sub poly1305_hex  { Crypt::Mac::Poly1305->new(shift)->add(@_)->hexmac }
 sub poly1305_b64  { Crypt::Mac::Poly1305->new(shift)->add(@_)->b64mac }

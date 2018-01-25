@@ -13,12 +13,6 @@ use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
-sub new {
-  my $class = shift;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _new(@_);
-}
-
 sub chacha20poly1305_encrypt_authenticate {
   my $key = shift;
   my $iv = shift;

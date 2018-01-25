@@ -15,7 +15,7 @@ use CryptX;
 use Crypt::Cipher;
 
 ### the following methods/functions are implemented in XS:
-# - _new
+# - new
 # - DESTROY
 # - clone
 # - encrypt_add
@@ -23,12 +23,6 @@ use Crypt::Cipher;
 # - decrypt_add
 # - decrypt_done
 # - adata_add
-
-sub new {
-  my $class = shift;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _new(Crypt::Cipher::_trans_cipher_name(shift), @_);
-}
 
 sub eax_encrypt_authenticate {
   my $cipher_name = shift;

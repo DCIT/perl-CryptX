@@ -1,7 +1,7 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::ChaCha20Poly1305
 
 Crypt::AuthEnc::ChaCha20Poly1305
-_new(SV * key, SV * nonce = NULL)
+new(char * class, SV * key, SV * nonce = NULL)
     CODE:
     {
         int rv;

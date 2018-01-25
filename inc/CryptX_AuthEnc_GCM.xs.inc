@@ -1,7 +1,7 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::GCM
 
 Crypt::AuthEnc::GCM
-_new(char * cipher_name, SV * key, SV * nonce = NULL)
+new(char * class, char * cipher_name, SV * key, SV * nonce = NULL)
     CODE:
     {
         STRLEN k_len = 0, iv_len = 0;
@@ -15,7 +15,7 @@ _new(char * cipher_name, SV * key, SV * nonce = NULL)
           iv = (unsigned char *)SvPVbyte(nonce, iv_len);
         }
 
-        id = find_cipher(cipher_name);
+        id = _find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         Newz(0, RETVAL, 1, struct gcm_struct);

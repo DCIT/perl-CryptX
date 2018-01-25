@@ -169,7 +169,7 @@ sub encrypt {
   my ($self, $data, $padding, $hash_name, $lparam) = @_;
   $lparam ||= '';
   $padding ||= 'oaep';
-  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
+  $hash_name ||= 'SHA1';
 
   return $self->_encrypt($data, $padding, $hash_name, $lparam);
 }
@@ -178,7 +178,7 @@ sub decrypt {
   my ($self, $data, $padding, $hash_name, $lparam) = @_;
   $lparam ||= '';
   $padding ||= 'oaep';
-  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
+  $hash_name ||= 'SHA1';
 
   return $self->_decrypt($data, $padding, $hash_name, $lparam);
 }
@@ -187,7 +187,7 @@ sub sign_hash {
   my ($self, $data, $hash_name, $padding, $saltlen) = @_;
   $saltlen ||= 12;
   $padding ||= 'pss';
-  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
+  $hash_name ||= 'SHA1';
 
   return $self->_sign($data, $padding, $hash_name, $saltlen);
 }
@@ -196,7 +196,7 @@ sub sign_message {
   my ($self, $data, $hash_name, $padding, $saltlen) = @_;
   $saltlen ||= 12;
   $padding ||= 'pss';
-  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
+  $hash_name ||= 'SHA1';
 
   return $self->_sign(digest_data($hash_name, $data), $padding, $hash_name, $saltlen);
 }
@@ -205,7 +205,7 @@ sub verify_hash {
   my ($self, $sig, $data, $hash_name, $padding, $saltlen) = @_;
   $saltlen ||= 12;
   $padding ||= 'pss';
-  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
+  $hash_name ||= 'SHA1';
 
   return $self->_verify($sig, $data, $padding, $hash_name, $saltlen);
 }
@@ -214,7 +214,7 @@ sub verify_message {
   my ($self, $sig, $data, $hash_name, $padding, $saltlen) = @_;
   $saltlen ||= 12;
   $padding ||= 'pss';
-  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
+  $hash_name ||= 'SHA1';
 
   return $self->_verify($sig, digest_data($hash_name, $data), $padding, $hash_name, $saltlen);
 }

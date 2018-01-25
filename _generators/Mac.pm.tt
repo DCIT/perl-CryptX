@@ -13,29 +13,21 @@ our @EXPORT = qw();
 
 use CryptX;
 [%-IF lc_name == 'hmac' %]
-use Crypt::Digest;
-
-sub new { my $class = shift; _new(Crypt::Digest::_trans_digest_name(shift), @_) }
 sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->mac }
 sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->hexmac }
 sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64mac }
 sub [%lc_name%]_b64u { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64umac }
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
-sub new { my $class = shift; _new(@_) }
 sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->mac }
 sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->hexmac }
 sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64mac }
 sub [%lc_name%]_b64u { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64umac }
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
-sub new { my $class = shift; _new(@_) }
 sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->mac }
 sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->hexmac }
 sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->b64mac }
 sub [%lc_name%]_b64u { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->b64umac }
 [%-ELSE%]
-use Crypt::Cipher;
-
-sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
 sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->mac }
 sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->hexmac }
 sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64mac }

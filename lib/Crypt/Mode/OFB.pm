@@ -9,8 +9,6 @@ our $VERSION = '0.056_001';
 use Crypt::Cipher;
 use base 'Crypt::Mode';
 
-sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
-
 1;
 
 =pod

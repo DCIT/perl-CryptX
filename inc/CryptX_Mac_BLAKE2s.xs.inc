@@ -3,7 +3,7 @@ MODULE = CryptX         PACKAGE = Crypt::Mac::BLAKE2s
 ### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
 
 Crypt::Mac::BLAKE2s
-_new(int size, SV * key)
+new(char * class, int size, SV * key)
     CODE:
     {
         STRLEN k_len=0;
@@ -59,13 +59,13 @@ mac(Crypt::Mac::BLAKE2s self)
     CODE:
     {
         char mac[MAXBLOCKSIZE];
-        unsigned long mac_len;
+        unsigned long maclen;
         int rv;
 
-        mac_len = sizeof(mac);
-        rv = blake2smac_done(&self->state, (unsigned char*)mac, &mac_len);
+        maclen = sizeof(mac);
+        rv = blake2smac_done(&self->state, (unsigned char*)mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: blake2smac_done failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn(mac, mac_len);
+        RETVAL = newSVpvn(mac, maclen);
     }
     OUTPUT:
         RETVAL
@@ -75,18 +75,18 @@ b64mac(Crypt::Mac::BLAKE2s self)
     CODE:
     {
         unsigned char mac[MAXBLOCKSIZE];
-        unsigned long mac_len;
+        unsigned long maclen;
         int rv;
         unsigned long outlen;
-        char mac_base64[MAXBLOCKSIZE*2 + 1];
+        char out[MAXBLOCKSIZE*2];
 
-        mac_len = sizeof(mac);
-        rv = blake2smac_done(&self->state, mac, &mac_len);
+        maclen = sizeof(mac);
+        rv = blake2smac_done(&self->state, mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: blake2smac_done failed: %s", error_to_string(rv));
-        outlen = sizeof(mac_base64);
-        rv = base64_encode(mac, mac_len, (unsigned char*)mac_base64, &outlen);
+        outlen = sizeof(out);
+        rv = base64_encode(mac, maclen, (unsigned char*)out, &outlen);
         if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn(mac_base64, outlen);
+        RETVAL = newSVpvn(out, outlen);
     }
     OUTPUT:
         RETVAL
@@ -96,18 +96,18 @@ b64umac(Crypt::Mac::BLAKE2s self)
     CODE:
     {
         unsigned char mac[MAXBLOCKSIZE];
-        unsigned long mac_len;
+        unsigned long maclen;
         int rv;
         unsigned long outlen;
-        char mac_base64[MAXBLOCKSIZE*2 + 1];
+        char out[MAXBLOCKSIZE*2 + 1];
 
-        mac_len = sizeof(mac);
-        rv = blake2smac_done(&self->state, mac, &mac_len);
+        maclen = sizeof(mac);
+        rv = blake2smac_done(&self->state, mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: blake2smac_done failed: %s", error_to_string(rv));
-        outlen = sizeof(mac_base64);
-        rv = base64url_encode(mac, mac_len, (unsigned char*)mac_base64, &outlen);
+        outlen = sizeof(out);
+        rv = base64url_encode(mac, maclen, (unsigned char*)out, &outlen);
         if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn(mac_base64, outlen);
+        RETVAL = newSVpvn(out, outlen);
     }
     OUTPUT:
         RETVAL
@@ -117,17 +117,17 @@ hexmac(Crypt::Mac::BLAKE2s self)
     CODE:
     {
         unsigned char mac[MAXBLOCKSIZE];
-        unsigned long mac_len, i;
+        unsigned long maclen, outlen;
         int rv;
-        char mac_hex[MAXBLOCKSIZE*2 + 1];
+        char out[MAXBLOCKSIZE*2];
 
-        mac_len = sizeof(mac);
-        rv = blake2smac_done(&self->state, mac, &mac_len);
+        maclen = sizeof(mac);
+        rv = blake2smac_done(&self->state, mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: blake2smac_done failed: %s", error_to_string(rv));
-        mac_hex[0] = '\0';
-        for(i=0; i<mac_len; i++)
-            sprintf(&mac_hex[2*i], "%02x", mac[i]);
-        RETVAL = newSVpvn(mac_hex, strlen(mac_hex));
+        outlen = sizeof(out);
+        rv = _base16_encode(mac, maclen, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn(out, outlen);
     }
     OUTPUT:
         RETVAL

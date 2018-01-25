@@ -308,7 +308,7 @@ _encrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "oaep", 4)) {
-          hash_id = find_hash(oaep_hash);
+          hash_id = _find_hash(oaep_hash);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
           lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_encrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
@@ -353,7 +353,7 @@ _decrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "oaep", 4)) {
-          hash_id = find_hash(oaep_hash);
+          hash_id = _find_hash(oaep_hash);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
           lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_decrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
@@ -396,7 +396,7 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name=NULL, uns
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "pss", 3)) {
-          hash_id = find_hash(hash_name);
+          hash_id = _find_hash(hash_name);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_PSS,
                                 &self->pstate, self->pindex,
@@ -405,7 +405,7 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name=NULL, uns
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
-          hash_id = find_hash(hash_name);
+          hash_id = _find_hash(hash_name);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_V1_5,
                                 &self->pstate, self->pindex,
@@ -444,14 +444,14 @@ _verify(Crypt::PK::RSA self, SV * sig, SV * data, char * padding, char * hash_na
         RETVAL = 1;
         stat = 0;
         if (strnEQ(padding, "pss", 3)) {
-          hash_id = find_hash(hash_name);
+          hash_id = _find_hash(hash_name);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_PKCS_1_PSS,
                                 hash_id, saltlen, &stat, &self->key);
           if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
         }
         else if (strnEQ(padding, "v1.5", 4)) {
-          hash_id = find_hash(hash_name);
+          hash_id = _find_hash(hash_name);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_PKCS_1_V1_5,
                                 hash_id, 0, &stat, &self->key);

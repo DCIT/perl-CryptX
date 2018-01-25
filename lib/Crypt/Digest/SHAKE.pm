@@ -8,8 +8,6 @@ use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
-sub new { my $class = shift; _new(@_) }
-
 sub addfile {
   my ($self, $file) = @_;
 

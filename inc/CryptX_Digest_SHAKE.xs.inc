@@ -1,7 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Digest::SHAKE
 
 Crypt::Digest::SHAKE
-_new(int num)
+new(char * class, int num)
     CODE:
     {
         int rv;

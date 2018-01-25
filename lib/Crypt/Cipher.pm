@@ -9,84 +9,16 @@ $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
 ### the following methods/functions are implemented in XS:
-# - _new
+# - new
 # - DESTROY
-# - _keysize
-# - _max_keysize
-# - _min_keysize
-# - _blocksize
-# - _default_rounds
-# - encrypt
+# - blocksize
 # - decrypt
-#functions, not methods:
-# - _block_length_by_name
-# - _min_key_length_by_name
-# - _max_key_length_by_name
-# - _default_rounds_by_name
+# - default_rounds
+# - encrypt
+# - max_keysize
+# - min_keysize
 
-sub _trans_cipher_name {
-  my $name = shift || "";
-  my %trans = (
-    DES_EDE     => '3des',
-    SAFERP      => 'safer+',
-    SAFER_K128  => 'safer-k128',
-    SAFER_K64   => 'safer-k64',
-    SAFER_SK128 => 'safer-sk128',
-    SAFER_SK64  => 'safer-sk64',
-  );
-  $name =~ s/^Crypt::Cipher:://;
-  return $trans{uc($name)} if defined $trans{uc($name)};
-  return lc($name);
-}
-
-### METHODS
-
-sub new {
-  my $pkg = shift;
-  my $cipher_name = $pkg eq __PACKAGE__ ? _trans_cipher_name(shift) : _trans_cipher_name($pkg);
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _new($cipher_name, @_);
-}
-
-sub blocksize {
-  my $self = shift;
-  return $self->_blocksize if ref($self);
-  $self = _trans_cipher_name(shift) if $self eq __PACKAGE__;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _block_length_by_name(_trans_cipher_name($self));
-}
-
-sub max_keysize
-{
-  my $self = shift;
-  return unless defined $self;
-  return $self->_max_keysize if ref($self);
-  $self = _trans_cipher_name(shift) if $self eq __PACKAGE__;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _max_key_length_by_name(_trans_cipher_name($self));
-}
-
-sub min_keysize {
-  my $self = shift;
-  return unless defined $self;
-  return $self->_min_keysize if ref($self);
-  $self = _trans_cipher_name(shift) if $self eq __PACKAGE__;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _min_key_length_by_name(_trans_cipher_name($self));
-}
-
-sub keysize {
-  goto &max_keysize;
-}
-
-sub default_rounds {
-  my $self = shift;
-  return unless defined $self;
-  return $self->_default_rounds if ref($self);
-  $self = _trans_cipher_name(shift) if $self eq __PACKAGE__;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _default_rounds_by_name(_trans_cipher_name($self));
-}
+sub keysize { goto \&max_keysize; } # for Crypt::CBC compatibility
 
 sub CLONE_SKIP { 1 } # prevent cloning
 

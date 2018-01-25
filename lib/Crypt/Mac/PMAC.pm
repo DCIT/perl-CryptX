@@ -12,9 +12,6 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use Crypt::Cipher;
-
-sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
 sub pmac { Crypt::Mac::PMAC->new(shift, shift)->add(@_)->mac }
 sub pmac_hex  { Crypt::Mac::PMAC->new(shift, shift)->add(@_)->hexmac }
 sub pmac_b64  { Crypt::Mac::PMAC->new(shift, shift)->add(@_)->b64mac }

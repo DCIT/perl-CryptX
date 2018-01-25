@@ -1,7 +1,7 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::OCB
 
 Crypt::AuthEnc::OCB
-_new(char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
+new(char * class, char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
     CODE:
     {
         STRLEN k_len=0;
@@ -15,7 +15,7 @@ _new(char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
         if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
         n = (unsigned char *) SvPVbyte(nonce, n_len);
 
-        id = find_cipher(cipher_name);
+        id = _find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         Newz(0, RETVAL, 1, struct ocb_struct);

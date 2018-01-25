@@ -14,12 +14,6 @@ $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use Crypt::Cipher;
 
-sub new {
-  my $class = shift;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _new(Crypt::Cipher::_trans_cipher_name(shift), @_);
-}
-
 sub ccm_encrypt_authenticate {
   my $cipher_name = shift;
   my $key = shift;

@@ -3,14 +3,14 @@ MODULE = CryptX         PACKAGE = Crypt::Mode::CTR
 ### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
 
 Crypt::Mode::CTR
-_new(char * cipher_name, int ctr_mode=0, int ctr_width=0, int rounds=0)
+new(char * class, char * cipher_name, int ctr_mode=0, int ctr_width=0, int rounds=0)
     CODE:
     {
         Newz(0, RETVAL, 1, struct ctr_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->direction = 0;
         RETVAL->cipher_rounds = rounds;
-        RETVAL->cipher_id = find_cipher(cipher_name);
+        RETVAL->cipher_id = _find_cipher(cipher_name);
         if (RETVAL->cipher_id == -1) {
           Safefree(RETVAL);
           croak("FATAL: find_cipfer failed for '%s'", cipher_name);

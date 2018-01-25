@@ -17,7 +17,7 @@ _pkcs_5_alg1(SV * password, SV * salt, int iteration_count, char * hash_name, un
         unsigned char *salt_ptr=NULL;
         STRLEN salt_len=0;
 
-        id = find_hash(hash_name);
+        id = _find_hash(hash_name);
         if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
         password_ptr = (unsigned char *)SvPVbyte(password, password_len);
@@ -56,7 +56,7 @@ _pkcs_5_alg2(SV * password, SV * salt, int iteration_count, char * hash_name, un
         unsigned char *salt_ptr=NULL;
         STRLEN salt_len=0;
 
-        id = find_hash(hash_name);
+        id = _find_hash(hash_name);
         if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
         password_ptr = (unsigned char *)SvPVbyte(password, password_len);
@@ -94,7 +94,7 @@ _hkdf_extract(char * hash_name, SV * salt, SV * in)
         unsigned char *salt_ptr=NULL;
         STRLEN salt_len=0;
 
-        id = find_hash(hash_name);
+        id = _find_hash(hash_name);
         if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
         in_ptr = (unsigned char *)SvPVbyte(in, in_len);
@@ -125,7 +125,7 @@ _hkdf_expand(char * hash_name, SV * info, SV * in, unsigned long output_len)
         unsigned char *info_ptr=NULL;
         STRLEN info_len=0;
 
-        id = find_hash(hash_name);
+        id = _find_hash(hash_name);
         if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
         in_ptr = (unsigned char *)SvPVbyte(in, in_len);
@@ -165,7 +165,7 @@ _hkdf(char * hash_name, SV * salt, SV * info, SV * in, unsigned long output_len)
         unsigned char *salt_ptr=NULL;
         STRLEN salt_len=0;
 
-        id = find_hash(hash_name);
+        id = _find_hash(hash_name);
         if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
         in_ptr   = (unsigned char *)SvPVbyte(in, in_len);

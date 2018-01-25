@@ -1,7 +1,7 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::CCM
 
 Crypt::AuthEnc::CCM
-_new(char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, int pt_len)
+new(char * class, char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, int pt_len)
     CODE:
     {
         unsigned char *k=NULL;
@@ -21,7 +21,7 @@ _new(char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, int pt_l
         if (!SvPOK(adata)) croak("FATAL: adata must be string/buffer scalar");
         h = (unsigned char *) SvPVbyte(adata, h_len);
 
-        id = find_cipher(cipher_name);
+        id = _find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         Newz(0, RETVAL, 1, struct ccm_struct);

@@ -12,7 +12,6 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-sub new { my $class = shift; _new(@_) }
 sub blake2b { Crypt::Mac::BLAKE2b->new(shift, shift)->add(@_)->mac }
 sub blake2b_hex  { Crypt::Mac::BLAKE2b->new(shift, shift)->add(@_)->hexmac }
 sub blake2b_b64  { Crypt::Mac::BLAKE2b->new(shift, shift)->add(@_)->b64mac }
