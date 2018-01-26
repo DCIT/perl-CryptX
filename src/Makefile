@@ -66,7 +66,12 @@ ltc/modes/ofb/ofb_start.o ltc/pk/asn1/der/bit/der_decode_bit_string.o ltc/pk/asn
 ltc/pk/asn1/der/bit/der_encode_bit_string.o ltc/pk/asn1/der/bit/der_encode_raw_bit_string.o \
 ltc/pk/asn1/der/bit/der_length_bit_string.o ltc/pk/asn1/der/boolean/der_decode_boolean.o \
 ltc/pk/asn1/der/boolean/der_encode_boolean.o ltc/pk/asn1/der/boolean/der_length_boolean.o \
-ltc/pk/asn1/der/choice/der_decode_choice.o ltc/pk/asn1/der/generalizedtime/der_decode_generalizedtime.o \
+ltc/pk/asn1/der/choice/der_decode_choice.o ltc/pk/asn1/der/custom_type/der_decode_custom_type.o \
+ltc/pk/asn1/der/custom_type/der_encode_custom_type.o ltc/pk/asn1/der/custom_type/der_length_custom_type.o \
+ltc/pk/asn1/der/general/der_asn1_maps.o ltc/pk/asn1/der/general/der_decode_asn1_identifier.o \
+ltc/pk/asn1/der/general/der_decode_asn1_length.o ltc/pk/asn1/der/general/der_encode_asn1_identifier.o \
+ltc/pk/asn1/der/general/der_encode_asn1_length.o ltc/pk/asn1/der/general/der_length_asn1_identifier.o \
+ltc/pk/asn1/der/general/der_length_asn1_length.o ltc/pk/asn1/der/generalizedtime/der_decode_generalizedtime.o \
 ltc/pk/asn1/der/generalizedtime/der_encode_generalizedtime.o ltc/pk/asn1/der/generalizedtime/der_length_generalizedtime.o \
 ltc/pk/asn1/der/ia5/der_decode_ia5_string.o ltc/pk/asn1/der/ia5/der_encode_ia5_string.o \
 ltc/pk/asn1/der/ia5/der_length_ia5_string.o ltc/pk/asn1/der/integer/der_decode_integer.o \
@@ -77,8 +82,7 @@ ltc/pk/asn1/der/octet/der_encode_octet_string.o ltc/pk/asn1/der/octet/der_length
 ltc/pk/asn1/der/printable_string/der_decode_printable_string.o ltc/pk/asn1/der/printable_string/der_encode_printable_string.o \
 ltc/pk/asn1/der/printable_string/der_length_printable_string.o ltc/pk/asn1/der/sequence/der_decode_sequence_ex.o \
 ltc/pk/asn1/der/sequence/der_decode_sequence_flexi.o ltc/pk/asn1/der/sequence/der_decode_sequence_multi.o \
-ltc/pk/asn1/der/sequence/der_decode_subject_public_key_info.o ltc/pk/asn1/der/sequence/der_encode_sequence_ex.o \
-ltc/pk/asn1/der/sequence/der_encode_sequence_multi.o ltc/pk/asn1/der/sequence/der_encode_subject_public_key_info.o \
+ltc/pk/asn1/der/sequence/der_encode_sequence_ex.o ltc/pk/asn1/der/sequence/der_encode_sequence_multi.o \
 ltc/pk/asn1/der/sequence/der_length_sequence.o ltc/pk/asn1/der/sequence/der_sequence_free.o \
 ltc/pk/asn1/der/sequence/der_sequence_shrink.o ltc/pk/asn1/der/set/der_encode_set.o \
 ltc/pk/asn1/der/set/der_encode_setof.o ltc/pk/asn1/der/short_integer/der_decode_short_integer.o \
@@ -87,6 +91,7 @@ ltc/pk/asn1/der/teletex_string/der_decode_teletex_string.o ltc/pk/asn1/der/telet
 ltc/pk/asn1/der/utctime/der_decode_utctime.o ltc/pk/asn1/der/utctime/der_encode_utctime.o \
 ltc/pk/asn1/der/utctime/der_length_utctime.o ltc/pk/asn1/der/utf8/der_decode_utf8_string.o \
 ltc/pk/asn1/der/utf8/der_encode_utf8_string.o ltc/pk/asn1/der/utf8/der_length_utf8_string.o \
+ltc/pk/asn1/x509/x509_decode_subject_public_key_info.o ltc/pk/asn1/x509/x509_encode_subject_public_key_info.o \
 ltc/pk/dh/dh.o ltc/pk/dh/dh_check_pubkey.o ltc/pk/dh/dh_export.o ltc/pk/dh/dh_export_key.o \
 ltc/pk/dh/dh_free.o ltc/pk/dh/dh_generate_key.o ltc/pk/dh/dh_import.o ltc/pk/dh/dh_set.o \
 ltc/pk/dh/dh_set_pg_dhparam.o ltc/pk/dh/dh_shared_secret.o ltc/pk/dsa/dsa_decrypt_key.o \
@@ -94,24 +99,23 @@ ltc/pk/dsa/dsa_encrypt_key.o ltc/pk/dsa/dsa_export.o ltc/pk/dsa/dsa_free.o ltc/p
 ltc/pk/dsa/dsa_generate_pqg.o ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_make_key.o ltc/pk/dsa/dsa_set.o \
 ltc/pk/dsa/dsa_set_pqg_dsaparam.o ltc/pk/dsa/dsa_shared_secret.o ltc/pk/dsa/dsa_sign_hash.o \
 ltc/pk/dsa/dsa_verify_hash.o ltc/pk/dsa/dsa_verify_key.o ltc/pk/ecc/ecc.o ltc/pk/ecc/ecc_ansi_x963_export.o \
-ltc/pk/ecc/ecc_ansi_x963_import.o ltc/pk/ecc/ecc_decrypt_key.o ltc/pk/ecc/ecc_dp_clear.o \
-ltc/pk/ecc/ecc_dp_fill_from_sets.o ltc/pk/ecc/ecc_dp_from_oid.o ltc/pk/ecc/ecc_dp_from_params.o \
-ltc/pk/ecc/ecc_dp_init.o ltc/pk/ecc/ecc_dp_set.o ltc/pk/ecc/ecc_encrypt_key.o ltc/pk/ecc/ecc_export.o \
-ltc/pk/ecc/ecc_export_full.o ltc/pk/ecc/ecc_export_raw.o ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_size.o \
-ltc/pk/ecc/ecc_import.o ltc/pk/ecc/ecc_import_full.o ltc/pk/ecc/ecc_import_pkcs8.o \
-ltc/pk/ecc/ecc_import_raw.o ltc/pk/ecc/ecc_make_key.o ltc/pk/ecc/ecc_shared_secret.o \
-ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sizes.o ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ecc_verify_key.o \
-ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o ltc/pk/ecc/ltc_ecc_is_point.o \
-ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_is_valid_idx.o ltc/pk/ecc/ltc_ecc_map.o \
+ltc/pk/ecc/ecc_ansi_x963_import.o ltc/pk/ecc/ecc_decrypt_key.o ltc/pk/ecc/ecc_encrypt_key.o \
+ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_key.o \
+ltc/pk/ecc/ecc_get_set.o ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o ltc/pk/ecc/ecc_import_openssl.o \
+ltc/pk/ecc/ecc_import_pkcs8.o ltc/pk/ecc/ecc_import_x509.o ltc/pk/ecc/ecc_make_key.o \
+ltc/pk/ecc/ecc_set_dp.o ltc/pk/ecc/ecc_set_dp_internal.o ltc/pk/ecc/ecc_set_key.o \
+ltc/pk/ecc/ecc_shared_secret.o ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sizes.o \
+ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o \
+ltc/pk/ecc/ltc_ecc_is_point.o ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_map.o \
 ltc/pk/ecc/ltc_ecc_mul2add.o ltc/pk/ecc/ltc_ecc_mulmod.o ltc/pk/ecc/ltc_ecc_mulmod_timing.o \
 ltc/pk/ecc/ltc_ecc_points.o ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc/ltc_ecc_projective_dbl_point.o \
-ltc/pk/pkcs1/pkcs_1_i2osp.o ltc/pk/pkcs1/pkcs_1_mgf1.o ltc/pk/pkcs1/pkcs_1_oaep_decode.o \
-ltc/pk/pkcs1/pkcs_1_oaep_encode.o ltc/pk/pkcs1/pkcs_1_os2ip.o ltc/pk/pkcs1/pkcs_1_pss_decode.o \
-ltc/pk/pkcs1/pkcs_1_pss_encode.o ltc/pk/pkcs1/pkcs_1_v1_5_decode.o ltc/pk/pkcs1/pkcs_1_v1_5_encode.o \
-ltc/pk/rsa/rsa_decrypt_key.o ltc/pk/rsa/rsa_encrypt_key.o ltc/pk/rsa/rsa_export.o \
-ltc/pk/rsa/rsa_exptmod.o ltc/pk/rsa/rsa_free.o ltc/pk/rsa/rsa_get_size.o ltc/pk/rsa/rsa_import.o \
-ltc/pk/rsa/rsa_import_pkcs8.o ltc/pk/rsa/rsa_import_x509.o ltc/pk/rsa/rsa_make_key.o \
-ltc/pk/rsa/rsa_set.o ltc/pk/rsa/rsa_sign_hash.o ltc/pk/rsa/rsa_sign_saltlen_get.o \
+ltc/pk/ecc/ltc_ecc_verify_key.o ltc/pk/pkcs1/pkcs_1_i2osp.o ltc/pk/pkcs1/pkcs_1_mgf1.o \
+ltc/pk/pkcs1/pkcs_1_oaep_decode.o ltc/pk/pkcs1/pkcs_1_oaep_encode.o ltc/pk/pkcs1/pkcs_1_os2ip.o \
+ltc/pk/pkcs1/pkcs_1_pss_decode.o ltc/pk/pkcs1/pkcs_1_pss_encode.o ltc/pk/pkcs1/pkcs_1_v1_5_decode.o \
+ltc/pk/pkcs1/pkcs_1_v1_5_encode.o ltc/pk/rsa/rsa_decrypt_key.o ltc/pk/rsa/rsa_encrypt_key.o \
+ltc/pk/rsa/rsa_export.o ltc/pk/rsa/rsa_exptmod.o ltc/pk/rsa/rsa_free.o ltc/pk/rsa/rsa_get_size.o \
+ltc/pk/rsa/rsa_import.o ltc/pk/rsa/rsa_import_pkcs8.o ltc/pk/rsa/rsa_import_x509.o \
+ltc/pk/rsa/rsa_make_key.o ltc/pk/rsa/rsa_set.o ltc/pk/rsa/rsa_sign_hash.o ltc/pk/rsa/rsa_sign_saltlen_get.o \
 ltc/pk/rsa/rsa_verify_hash.o ltc/prngs/chacha20.o ltc/prngs/fortuna.o ltc/prngs/rc4.o \
 ltc/prngs/rng_get_bytes.o ltc/prngs/rng_make_prng.o ltc/prngs/sober128.o ltc/prngs/sprng.o \
 ltc/prngs/yarrow.o ltc/stream/chacha/chacha_crypt.o ltc/stream/chacha/chacha_done.o \

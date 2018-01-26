@@ -265,6 +265,16 @@ static int sqr(void *a, void *b)
    return CRYPT_OK;
 }
 
+/* sqrtmod_prime */
+static int sqrtmod_prime(void *a, void *b, void *c)
+{
+   LTC_ARGCHK(a != NULL);
+   LTC_ARGCHK(b != NULL);
+   LTC_ARGCHK(c != NULL);
+   fprintf(stderr, "TFM does not support sqrtmod_prime\n"); /* XXX-FIXME */
+   return CRYPT_ERROR;
+}
+
 /* div */
 static int divide(void *a, void *b, void *c, void *d)
 {
@@ -424,7 +434,7 @@ static int isprime(void *a, int b, int *c)
 
 #if defined(LTC_MECC) && defined(LTC_MECC_ACCEL)
 
-static int tfm_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, void *modulus, void *Mp)
+static int tfm_ecc_projective_dbl_point(const ecc_point *P, ecc_point *R, void *ma, void *modulus, void *Mp)
 {
    fp_int t1, t2;
    fp_digit mp;
@@ -445,6 +455,14 @@ static int tfm_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, void *modulu
       fp_copy(P->z, R->z);
    }
 
+   if (ltc_ecc_is_point_at_infinity(P, modulus)) {
+      /* if P is point at infinity >> Result = point at infinity */
+      ltc_mp.set_int(R->x, 1);
+      ltc_mp.set_int(R->y, 1);
+      ltc_mp.set_int(R->z, 0);
+      return CRYPT_OK;
+   }
+
    /* t1 = Z * Z */
    fp_sqr(R->z, &t1);
    fp_montgomery_reduce(&t1, modulus, mp);
@@ -457,28 +475,56 @@ static int tfm_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, void *modulu
       fp_sub(R->z, modulus, R->z);
    }
 
-   /* &t2 = X - T1 */
-   fp_sub(R->x, &t1, &t2);
-   if (fp_cmp_d(&t2, 0) == FP_LT) {
-      fp_add(&t2, modulus, &t2);
+   if (ma == NULL) { /* special case for curves with a == -3 (10% faster than general case) */
+      /* T2 = X - T1 */
+      fp_sub(R->x, &t1, &t2);
+      if (fp_cmp_d(&t2, 0) == LTC_MP_LT) {
+         fp_add(&t2, modulus, &t2);
+      }
+      /* T1 = X + T1 */
+      fp_add(&t1, R->x, &t1);
+      if (fp_cmp(&t1, modulus) != FP_LT) {
+         fp_sub(&t1, modulus, &t1);
+      }
+      /* T2 = T1 * T2 */
+      fp_mul(&t1, &t2, &t2);
+      fp_montgomery_reduce(&t2, modulus, mp);
+      /* T1 = 2T2 */
+      fp_add(&t2, &t2, &t1);
+      if (fp_cmp(&t1, modulus) != FP_LT) {
+         fp_sub(&t1, modulus, &t1);
+      }
+      /* T1 = T1 + T2 */
+      fp_add(&t1, &t2, &t1);
+      if (fp_cmp(&t1, modulus) != FP_LT) {
+         fp_sub(&t1, modulus, &t1);
+      }
    }
-   /* T1 = X + T1 */
-   fp_add(&t1, R->x, &t1);
-   if (fp_cmp(&t1, modulus) != FP_LT) {
-      fp_sub(&t1, modulus, &t1);
-   }
-   /* T2 = T1 * T2 */
-   fp_mul(&t1, &t2, &t2);
-   fp_montgomery_reduce(&t2, modulus, mp);
-   /* T1 = 2T2 */
-   fp_add(&t2, &t2, &t1);
-   if (fp_cmp(&t1, modulus) != FP_LT) {
-      fp_sub(&t1, modulus, &t1);
-   }
-   /* T1 = T1 + T2 */
-   fp_add(&t1, &t2, &t1);
-   if (fp_cmp(&t1, modulus) != FP_LT) {
-      fp_sub(&t1, modulus, &t1);
+   else {
+      /* T2 = T1 * T1 */
+      fp_sqr(&t1, &t2);
+      fp_montgomery_reduce(&t2, modulus, mp);
+      /* T1 = T2 * a */
+      fp_mul(&t2, ma, &t1);
+      fp_montgomery_reduce(&t1, modulus, mp);
+      /* T2 = X * X */
+      fp_sqr(R->x, &t2);
+      fp_montgomery_reduce(&t2, modulus, mp);
+      /* T1 = T1 + T2 */
+      fp_add(&t1, &t2, &t1);
+      if (fp_cmp(&t1, modulus) != FP_LT) {
+         fp_sub(&t1, modulus, &t1);
+      }
+      /* T1 = T1 + T2 */
+      fp_add(&t1, &t2, &t1);
+      if (fp_cmp(&t1, modulus) != FP_LT) {
+         fp_sub(&t1, modulus, &t1);
+      }
+      /* T1 = T1 + T2 */
+      fp_add(&t1, &t2, &t1);
+      if (fp_cmp(&t1, modulus) != FP_LT) {
+         fp_sub(&t1, modulus, &t1);
+      }
    }
 
    /* Y = 2Y */
@@ -541,7 +587,7 @@ static int tfm_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, void *modulu
    @param Mp       The "b" value from montgomery_setup()
    @return CRYPT_OK on success
 */
-static int tfm_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void *modulus, void *Mp)
+static int tfm_ecc_projective_add_point(const ecc_point *P, const ecc_point *Q, ecc_point *R, void *ma, void *modulus, void *Mp)
 {
    fp_int  t1, t2, x, y, z;
    fp_digit mp;
@@ -560,12 +606,28 @@ static int tfm_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R
    fp_init(&y);
    fp_init(&z);
 
+   if (ltc_ecc_is_point_at_infinity(P, modulus)) {
+      /* P is point at infinity >> Result = Q */
+      ltc_mp.copy(Q->x, R->x);
+      ltc_mp.copy(Q->y, R->y);
+      ltc_mp.copy(Q->z, R->z);
+      return CRYPT_OK;
+   }
+
+   if (ltc_ecc_is_point_at_infinity(Q, modulus)) {
+      /* Q is point at infinity >> Result = P */
+      ltc_mp.copy(P->x, R->x);
+      ltc_mp.copy(P->y, R->y);
+      ltc_mp.copy(P->z, R->z);
+      return CRYPT_OK;
+   }
+
    /* should we dbl instead? */
    fp_sub(modulus, Q->y, &t1);
    if ( (fp_cmp(P->x, Q->x) == FP_EQ) &&
         (Q->z != NULL && fp_cmp(P->z, Q->z) == FP_EQ) &&
         (fp_cmp(P->y, Q->y) == FP_EQ || fp_cmp(P->y, &t1) == FP_EQ)) {
-        return tfm_ecc_projective_dbl_point(P, R, modulus, Mp);
+        return tfm_ecc_projective_dbl_point(P, R, ma, modulus, Mp);
    }
 
    fp_copy(P->x, &x);
@@ -741,6 +803,7 @@ const ltc_math_descriptor tfm_desc = {
    &mul,
    &muli,
    &sqr,
+   &sqrtmod_prime,
    &divide,
    &div_2,
    &modi,

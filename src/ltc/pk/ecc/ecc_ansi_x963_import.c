@@ -7,9 +7,6 @@
  * guarantee it works.
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
- *
- */
 #include "tomcrypt.h"
 
 /**
@@ -29,9 +26,9 @@ int ecc_ansi_x963_import(const unsigned char *in, unsigned long inlen, ecc_key *
    return ecc_ansi_x963_import_ex(in, inlen, key, NULL);
 }
 
-int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp)
+int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_set_type *dp)
 {
-   int x, err;
+   int err;
 
    LTC_ARGCHK(in  != NULL);
    LTC_ARGCHK(key != NULL);
@@ -41,60 +38,21 @@ int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_ke
       return CRYPT_INVALID_ARG;
    }
 
-   /* init key */
-   if (mp_init_multi(&key->pubkey.x, &key->pubkey.y, &key->pubkey.z, &key->k, NULL) != CRYPT_OK) {
-      return CRYPT_MEM;
-   }
-
-   /* check for 4, 6 or 7 */
-   if (in[0] != 4 && in[0] != 6 && in[0] != 7) {
-      err = CRYPT_INVALID_PACKET;
-      goto error;
-   }
-
-   /* read data */
-   if ((err = mp_read_unsigned_bin(key->pubkey.x, (unsigned char *)in+1, (inlen-1)>>1)) != CRYPT_OK) {
-      goto error;
-   }
-
-   if ((err = mp_read_unsigned_bin(key->pubkey.y, (unsigned char *)in+1+((inlen-1)>>1), (inlen-1)>>1)) != CRYPT_OK) {
-      goto error;
-   }
-   if ((err = mp_set(key->pubkey.z, 1)) != CRYPT_OK) { goto error; }
-
+   /* initialize key->dp */
    if (dp == NULL) {
-     /* BEWARE: Here we are looking up the curve params by keysize (neither curve name nor curve oid),
-      *         which might be ambiguous (there can more than one curve for given keysize).
-      *         Thus the chosen curve depends on order of items in ltc_ecc_sets[] - see ecc.c file.
-      */
-     /* determine the idx */
-      for (x = 0; ltc_ecc_sets[x].size != 0; x++) {
-         if ((unsigned)ltc_ecc_sets[x].size >= ((inlen-1)>>1)) {
-            break;
-         }
-      }
-      if (ltc_ecc_sets[x].size == 0) {
-         err = CRYPT_INVALID_PACKET;
-         goto error;
-      }
-      /* set the idx */
-      key->idx  = x;
-      key->dp = &ltc_ecc_sets[x];
-   } else {
-      if (((inlen-1)>>1) != (unsigned long) dp->size) {
-         err = CRYPT_INVALID_PACKET;
-         goto error;
-      }
-      key->idx = -1;
-      key->dp  = dp;
+      /* this case works only for uncompressed public keys  */
+      if ((err = ecc_set_dp_size((inlen-1)>>1, key)) != CRYPT_OK)                   { return err; }
    }
-   key->type = PK_PUBLIC;
+   else {
+      /* this one works for both compressed / uncompressed pubkeys */
+      if ((err = ecc_set_dp(dp, key)) != CRYPT_OK)                                  { return err; }
+   }
+
+   /* load public key */
+   if ((err = ecc_set_key((unsigned char *)in, inlen, PK_PUBLIC, key)) != CRYPT_OK) { return err; }
 
    /* we're done */
    return CRYPT_OK;
-error:
-   mp_clear_multi(key->pubkey.x, key->pubkey.y, key->pubkey.z, key->k, NULL);
-   return err;
 }
 
 #endif

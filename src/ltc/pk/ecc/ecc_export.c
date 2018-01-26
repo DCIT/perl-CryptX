@@ -7,9 +7,6 @@
  * guarantee it works.
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
- *
- */
 #include "tomcrypt.h"
 
 /**
@@ -42,12 +39,8 @@ int ecc_export(unsigned char *out, unsigned long *outlen, int type, ecc_key *key
       return CRYPT_PK_TYPE_MISMATCH;
    }
 
-   if (ltc_ecc_is_valid_idx(key->idx) == 0) {
-      return CRYPT_INVALID_ARG;
-   }
-
    /* we store the NIST byte size */
-   key_size = key->dp->size;
+   key_size = key->dp.size;
 
    if (type == PK_PRIVATE) {
        flags[0] = 1;

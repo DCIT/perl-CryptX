@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 12;
 
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
@@ -38,7 +38,7 @@ for my $f (qw/pkcs8.rsa-priv-nopass.pem pkcs8.rsa-priv-nopass.der/) {
 
 ### XXX-FIXME password protected pkcs8 private keys are not supported
 ### for my $f (qw/pkcs8.rsa-priv-pass.der pkcs8.rsa-priv-pass.pem/) {
-###   $rsa->import_key("t/data/$f");
+###   $rsa->import_key("t/data/$f", "secret");
 ###   ok($rsa->is_private, "RSA is_private $f");
 ### }
 
@@ -47,8 +47,7 @@ for my $f (qw/pkcs8.ec-short-priv-nopass.der pkcs8.ec-short-priv-nopass.pem pkcs
   ok($ec->is_private, "ECC is_private $f");
 }
 
-### XXX-FIXME password protected pkcs8 private keys are not supported
-### for my $f (qw/pkcs8.ec-priv-pass.der pkcs8.ec-priv-pass.pem pkcs8.ec-short-priv-pass.der pkcs8.ec-short-priv-pass.pem/) {
-###   $ec->import_key("t/data/$f");
-###   ok($ec->is_private, "ECC is_private $f");
-### }
+for my $f (qw/pkcs8.ec-priv-pass.der pkcs8.ec-priv-pass.pem pkcs8.ec-short-priv-pass.der pkcs8.ec-short-priv-pass.pem/) {
+  $ec->import_key("t/data/$f", "secret");
+  ok($ec->is_private, "ECC is_private $f (pw)");
+}

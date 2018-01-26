@@ -32,17 +32,17 @@ enum public_key_algorithms {
    PKA_RSA,
    PKA_DSA,
    PKA_EC,
-   EC_PRIME_FIELD
+   PKA_EC_PRIMEF
 };
-#endif /* LTC_SOURCE */
 
 typedef struct Oid {
     unsigned long OID[16];
-    /** Length of DER encoding */
+    /** Number of OID digits in use */
     unsigned long OIDlen;
 } oid_st;
 
 int pk_get_oid(int pk, oid_st *st);
+#endif /* LTC_SOURCE */
 
 /* ---- RSA ---- */
 #ifdef LTC_MRSA
@@ -254,37 +254,35 @@ int dh_check_pubkey(dh_key *key);
 /* max private key size */
 #define ECC_MAXSIZE  66
 
-/** Structure defines a NIST GF(p) curve */
+/** Structure defines a GF(p) curve */
 typedef struct {
-   /** The size of the curve in octets */
-   int size;
-
    /** name of curve */
-   char *name;
+   const char *name;
 
    /** The prime that defines the field the curve is in (encoded in hex) */
-   char *prime;
+   const char *prime;
 
    /** The fields A param (hex) */
-   char *A;
+   const char *A;
 
    /** The fields B param (hex) */
-   char *B;
+   const char *B;
 
    /** The order of the curve (hex) */
-   char *order;
+   const char *order;
 
    /** The x co-ordinate of the base point on the curve (hex) */
-   char *Gx;
+   const char *Gx;
 
    /** The y co-ordinate of the base point on the curve (hex) */
-   char *Gy;
+   const char *Gy;
 
    /** The co-factor */
    unsigned long cofactor;
 
-   /** The OID stucture */
-   oid_st oid;
+   /** The OID */
+   unsigned long oid[16];
+   unsigned long oidlen;
 } ltc_ecc_set_type;
 
 /** A point on a ECC curve, stored in Jacbobian format such that (x,y,z) => (x/z^2, y/z^3, 1) when interpretted as affine */
@@ -299,18 +297,36 @@ typedef struct {
     void *z;
 } ecc_point;
 
+/** ECC key's domain parameters */
+typedef struct {
+   /** The size of the curve in octets */
+   int size;
+   /** The prime that defines the field the curve is in */
+   void *prime;
+   /** The fields A param */
+   void *A;
+   /** The fields B param */
+   void *B;
+   /** The order of the curve */
+   void *order;
+   /** The base point G on the curve */
+   ecc_point base;
+   /** The co-factor */
+   unsigned long cofactor;
+   /** The OID */
+   unsigned long oid[16];
+   unsigned long oidlen;
+} ltc_ecc_dp;
+
 /** An ECC key */
 typedef struct {
     /** Type of key, PK_PRIVATE or PK_PUBLIC */
     int type;
 
-    /** Index into the ltc_ecc_sets[] for the parameters of this curve; if -1, then this key is using user supplied curve in dp */
-    int idx;
+    /** Structure with domain parameters */
+    ltc_ecc_dp dp;
 
-    /** pointer to domain parameters; either points to NIST curves (identified by idx >= 0) or user supplied curve */
-    const ltc_ecc_set_type *dp;
-
-    /** The public key */
+    /** Structure with the public key */
     ecc_point pubkey;
 
     /** The private key */
@@ -324,12 +340,11 @@ int  ecc_test(void);
 void ecc_sizes(int *low, int *high);
 int  ecc_get_size(ecc_key *key);
 
-int  ecc_dp_init(ltc_ecc_set_type *dp);
-int  ecc_dp_set(ltc_ecc_set_type *dp, char *ch_prime, char *ch_A, char *ch_B, char *ch_order, char *ch_Gx, char *ch_Gy, unsigned long cofactor, char *ch_name, char *oid);
-int  ecc_dp_set_bn(ltc_ecc_set_type *dp, void *a, void *b, void *prime, void *order, void *gx, void *gy, unsigned long cofactor);
-int  ecc_dp_set_by_oid(ltc_ecc_set_type *dp, unsigned long *oid, unsigned long oidsize);
-int  ecc_dp_fill_from_sets(ltc_ecc_set_type *dp);
-int  ecc_dp_clear(ltc_ecc_set_type *dp);
+int  ecc_get_set_by_name(const char* name, const ltc_ecc_set_type** dp);
+int  ecc_set_dp(const ltc_ecc_set_type *set, ecc_key *key);
+int  ecc_generate_key(prng_state *prng, int wprng, ecc_key *key);
+int  ecc_set_key(const unsigned char *in, unsigned long inlen, int type, ecc_key *key);
+int  ecc_get_key(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
 
 int  ecc_make_key(prng_state *prng, int wprng, int keysize, ecc_key *key);
 int  ecc_make_key_ex(prng_state *prng, int wprng, ecc_key *key, const ltc_ecc_set_type *dp);
@@ -338,15 +353,15 @@ void ecc_free(ecc_key *key);
 int  ecc_export(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
 int  ecc_import(const unsigned char *in, unsigned long inlen, ecc_key *key);
 int  ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_set_type *dp);
-int  ecc_import_pkcs8(const unsigned char *in,  unsigned long inlen, const void *pwd, unsigned long pwdlen, ecc_key *key, ltc_ecc_set_type *dp);
-int  ecc_export_full(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
-int  ecc_import_full(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
-int  ecc_export_raw(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
-int  ecc_import_raw(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
 
 int ecc_ansi_x963_export(ecc_key *key, unsigned char *out, unsigned long *outlen);
 int ecc_ansi_x963_import(const unsigned char *in, unsigned long inlen, ecc_key *key);
-int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, ltc_ecc_set_type *dp);
+int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_set_type *dp);
+
+int ecc_export_openssl(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
+int ecc_import_openssl(const unsigned char *in, unsigned long inlen, ecc_key *key);
+int ecc_import_pkcs8(const unsigned char *in, unsigned long inlen, const void *pwd, unsigned long pwdlen, ecc_key *key);
+int ecc_import_x509(const unsigned char *in, unsigned long inlen, ecc_key *key);
 
 int  ecc_shared_secret(ecc_key *private_key, ecc_key *public_key,
                        unsigned char *out, unsigned long *outlen);
@@ -376,24 +391,31 @@ int  ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
                      const unsigned char *hash, unsigned long hashlen,
                      int *stat, ecc_key *key);
 
-int  ecc_verify_key(ecc_key *key);
+
+#ifdef LTC_SOURCE
+/* INTERNAL ONLY - it should be later moved to src/headers/tomcrypt_internal.h */
+
+int ecc_set_dp_bn(void *a, void *b, void *prime, void *order, void *gx, void *gy, unsigned long cofactor, ecc_key *key);
+int ecc_set_dp_oid(unsigned long *oid, unsigned long oidsize, ecc_key *key);
+int ecc_set_dp_copy(ecc_key *srckey, ecc_key *key);
+int ecc_set_dp_size(int size, ecc_key *key);
 
 /* low level functions */
 ecc_point *ltc_ecc_new_point(void);
 void       ltc_ecc_del_point(ecc_point *p);
-int        ltc_ecc_is_valid_idx(int n);
-int        ltc_ecc_is_point(const ltc_ecc_set_type *dp, void *x, void *y);
-int        ltc_ecc_is_point_at_infinity(ecc_point *p, void *modulus);
+int        ltc_ecc_is_point(const ltc_ecc_dp *dp, void *x, void *y);
+int        ltc_ecc_is_point_at_infinity(const ecc_point *p, void *modulus);
 int        ltc_ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y);
 int        ltc_ecc_export_point(unsigned char *out, unsigned long *outlen, void *x, void *y, unsigned long size, int compressed);
+int        ltc_ecc_verify_key(ecc_key *key);
 
 /* point ops (mp == montgomery digit) */
 #if !defined(LTC_MECC_ACCEL) || defined(LTM_DESC) || defined(GMP_DESC)
 /* R = 2P */
-int ltc_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, void *a, void *modulus, void *mp);
+int ltc_ecc_projective_dbl_point(const ecc_point *P, ecc_point *R, void *ma, void *modulus, void *mp);
 
 /* R = P + Q */
-int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void *a, void *modulus, void *mp);
+int ltc_ecc_projective_add_point(const ecc_point *P, const ecc_point *Q, ecc_point *R, void *ma, void *modulus, void *mp);
 #endif
 
 #if defined(LTC_MECC_FP)
@@ -411,23 +433,23 @@ void ltc_ecc_fp_tablelock(int lock);
 #endif
 
 /* R = kG */
-int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, int map);
+int ltc_ecc_mulmod(void *k, const ecc_point *G, ecc_point *R, void *a, void *modulus, int map);
 
 #ifdef LTC_ECC_SHAMIR
 /* kA*A + kB*B = C */
-int ltc_ecc_mul2add(ecc_point *A, void *kA,
-                    ecc_point *B, void *kB,
-                    ecc_point *C,
-                         void *a,
-                         void *modulus);
+int ltc_ecc_mul2add(const ecc_point *A, void *kA,
+                    const ecc_point *B, void *kB,
+                          ecc_point *C,
+                               void *ma,
+                               void *modulus);
 
 #ifdef LTC_MECC_FP
 /* Shamir's trick with optimized point multiplication using fixed point cache */
-int ltc_ecc_fp_mul2add(ecc_point *A, void *kA,
-                       ecc_point *B, void *kB,
-                       ecc_point *C,
-                            void *a,
-                            void *modulus);
+int ltc_ecc_fp_mul2add(const ecc_point *A, void *kA,
+                       const ecc_point *B, void *kB,
+                             ecc_point *C,
+                                  void *ma,
+                                  void *modulus);
 #endif
 
 #endif
@@ -435,6 +457,8 @@ int ltc_ecc_fp_mul2add(ecc_point *A, void *kA,
 
 /* map P to affine from projective */
 int ltc_ecc_map(ecc_point *P, void *modulus, void *mp);
+
+#endif /* LTC_SOURCE */
 
 #endif
 
@@ -549,11 +573,21 @@ typedef enum ltc_asn1_type_ {
  LTC_ASN1_SETOF,
  LTC_ASN1_RAW_BIT_STRING,
  LTC_ASN1_TELETEX_STRING,
- LTC_ASN1_CONSTRUCTED,
- LTC_ASN1_CONTEXT_SPECIFIC,
- /* 20 */
  LTC_ASN1_GENERALIZEDTIME,
+ LTC_ASN1_CUSTOM_TYPE,
 } ltc_asn1_type;
+
+typedef enum {
+   LTC_ASN1_CL_UNIVERSAL = 0x0,
+   LTC_ASN1_CL_APPLICATION = 0x1,
+   LTC_ASN1_CL_CONTEXT_SPECIFIC = 0x2,
+   LTC_ASN1_CL_PRIVATE = 0x3,
+} ltc_asn1_class;
+
+typedef enum {
+   LTC_ASN1_PC_PRIMITIVE = 0x0,
+   LTC_ASN1_PC_CONSTRUCTED = 0x1,
+} ltc_asn1_pc;
 
 /** A LTC ASN.1 list type */
 typedef struct ltc_asn1_list_ {
@@ -563,12 +597,17 @@ typedef struct ltc_asn1_list_ {
    void         *data;
    /** The size of the input or resulting output */
    unsigned long size;
-   /** The used flag, this is used by the CHOICE ASN.1 type to indicate which choice was made */
+   /** The used flag
+    * 1. This is used by the CHOICE ASN.1 type to indicate which choice was made
+    * 2. This is used by the ASN.1 decoder to indicate if an element is used
+    * 3. This is used by the flexi-decoder to indicate the first byte of the identifier */
    int           used;
    /** Flag used to indicate optional items in ASN.1 sequences */
    int           optional;
-   /** Flag used to indicate context specific tags on ASN.1 sequence items */
-   unsigned char tag;
+   /** ASN.1 identifier */
+   ltc_asn1_class class;
+   ltc_asn1_pc    pc;
+   ulong64        tag;
    /** prev/next entry in the list */
    struct ltc_asn1_list_ *prev, *next, *child, *parent;
 } ltc_asn1_list;
@@ -581,9 +620,45 @@ typedef struct ltc_asn1_list_ {
       LTC_MACRO_list[LTC_MACRO_temp].data = (void*)(Data);  \
       LTC_MACRO_list[LTC_MACRO_temp].size = (Size);  \
       LTC_MACRO_list[LTC_MACRO_temp].used = 0;       \
-      LTC_MACRO_list[LTC_MACRO_temp].tag = 0;        \
       LTC_MACRO_list[LTC_MACRO_temp].optional = 0;   \
+      LTC_MACRO_list[LTC_MACRO_temp].class = 0;      \
+      LTC_MACRO_list[LTC_MACRO_temp].pc = 0;         \
+      LTC_MACRO_list[LTC_MACRO_temp].tag = 0;        \
    } while (0)
+
+#define __LTC_SET_ASN1_IDENTIFIER(list, index, Class, Pc, Tag)      \
+   do {                                                           \
+      int LTC_MACRO_temp            = (index);                    \
+      ltc_asn1_list *LTC_MACRO_list = (list);                     \
+      LTC_MACRO_list[LTC_MACRO_temp].type = LTC_ASN1_CUSTOM_TYPE; \
+      LTC_MACRO_list[LTC_MACRO_temp].class = (Class);             \
+      LTC_MACRO_list[LTC_MACRO_temp].pc = (Pc);                   \
+      LTC_MACRO_list[LTC_MACRO_temp].tag = (Tag);                 \
+   } while (0)
+
+#define LTC_SET_ASN1_CUSTOM_CONSTRUCTED(list, index, Class, Tag, Data)    \
+   do {                                                           \
+      int LTC_MACRO_temp##__LINE__ = (index);                     \
+      LTC_SET_ASN1(list, LTC_MACRO_temp##__LINE__, LTC_ASN1_CUSTOM_TYPE, Data, 1);   \
+      __LTC_SET_ASN1_IDENTIFIER(list, LTC_MACRO_temp##__LINE__, Class, LTC_ASN1_PC_CONSTRUCTED, Tag);       \
+   } while (0)
+
+#define LTC_SET_ASN1_CUSTOM_PRIMITIVE(list, index, Class, Tag, Type, Data, Size)    \
+   do {                                                           \
+      int LTC_MACRO_temp##__LINE__ = (index);                     \
+      LTC_SET_ASN1(list, LTC_MACRO_temp##__LINE__, LTC_ASN1_CUSTOM_TYPE, Data, Size);   \
+      __LTC_SET_ASN1_IDENTIFIER(list, LTC_MACRO_temp##__LINE__, Class, LTC_ASN1_PC_PRIMITIVE, Tag);       \
+      list[LTC_MACRO_temp##__LINE__].used = (int)(Type);       \
+   } while (0)
+
+extern const char*          der_asn1_class_to_string_map[];
+extern const unsigned long  der_asn1_class_to_string_map_sz;
+
+extern const char*          der_asn1_pc_to_string_map[];
+extern const unsigned long  der_asn1_pc_to_string_map_sz;
+
+extern const char*          der_asn1_tag_to_string_map[];
+extern const unsigned long  der_asn1_tag_to_string_map_sz;
 
 /* SEQUENCE */
 int der_encode_sequence_ex(ltc_asn1_list *list, unsigned long inlen,
@@ -591,36 +666,74 @@ int der_encode_sequence_ex(ltc_asn1_list *list, unsigned long inlen,
 
 #define der_encode_sequence(list, inlen, out, outlen) der_encode_sequence_ex(list, inlen, out, outlen, LTC_ASN1_SEQUENCE)
 
-int der_decode_sequence_ex(const unsigned char *in, unsigned long  inlen,
-                           ltc_asn1_list *list,     unsigned long  outlen, int ordered);
+/** The supported bitmap for all the
+ * decoders with a `flags` argument.
+ */
+enum ltc_der_seq {
+   LTC_DER_SEQ_ZERO = 0x0u,
 
-#define der_decode_sequence(in, inlen, list, outlen) der_decode_sequence_ex(in, inlen, list, outlen, 1)
+   /** Bit0  - [0]=Unordered (SET or SETOF)
+    *          [1]=Ordered (SEQUENCE) */
+   LTC_DER_SEQ_UNORDERED = LTC_DER_SEQ_ZERO,
+   LTC_DER_SEQ_ORDERED = 0x1u,
+
+   /** Bit1  - [0]=Relaxed
+    *          [1]=Strict */
+   LTC_DER_SEQ_RELAXED = LTC_DER_SEQ_ZERO,
+   LTC_DER_SEQ_STRICT = 0x2u,
+
+   /** Alternative naming */
+   LTC_DER_SEQ_SET = LTC_DER_SEQ_UNORDERED,
+   LTC_DER_SEQ_SEQUENCE = LTC_DER_SEQ_ORDERED,
+};
+
+int der_decode_sequence_ex(const unsigned char *in, unsigned long  inlen,
+                           ltc_asn1_list *list,     unsigned long  outlen, unsigned int flags);
+
+#define der_decode_sequence(in, inlen, list, outlen) der_decode_sequence_ex(in, inlen, list, outlen, LTC_DER_SEQ_SEQUENCE | LTC_DER_SEQ_RELAXED)
+#define der_decode_sequence_strict(in, inlen, list, outlen) der_decode_sequence_ex(in, inlen, list, outlen, LTC_DER_SEQ_SEQUENCE | LTC_DER_SEQ_STRICT)
 
 int der_length_sequence(ltc_asn1_list *list, unsigned long inlen,
                         unsigned long *outlen);
 
 
+/* Custom-types */
+int der_encode_custom_type(const ltc_asn1_list *root,
+                                 unsigned char *out, unsigned long *outlen);
+
+int der_decode_custom_type(const unsigned char *in, unsigned long inlen,
+                                 ltc_asn1_list *root);
+
+int der_length_custom_type(const ltc_asn1_list *root,
+                                 unsigned long *outlen,
+                                 unsigned long *payloadlen);
+
 #ifdef LTC_SOURCE
 /* internal helper functions */
+int der_decode_custom_type_ex(const unsigned char *in, unsigned long  inlen,
+                           ltc_asn1_list *root,
+                           ltc_asn1_list *list,     unsigned long  outlen, unsigned int flags);
+
+int der_encode_asn1_identifier(const ltc_asn1_list *id, unsigned char *out, unsigned long *outlen);
+int der_decode_asn1_identifier(const unsigned char *in, unsigned long *inlen, ltc_asn1_list *id);
+int der_length_asn1_identifier(const ltc_asn1_list *id, unsigned long *idlen);
+
+int der_encode_asn1_length(unsigned long len, unsigned char* out, unsigned long* outlen);
+int der_decode_asn1_length(const unsigned char* len, unsigned long* lenlen, unsigned long* outlen);
+int der_length_asn1_length(unsigned long len, unsigned long *outlen);
+
 int der_length_sequence_ex(ltc_asn1_list *list, unsigned long inlen,
                            unsigned long *outlen, unsigned long *payloadlen);
-/* SUBJECT PUBLIC KEY INFO */
-int der_encode_subject_public_key_info(unsigned char *out, unsigned long *outlen,
-        unsigned int algorithm, void* public_key, unsigned long public_key_len,
-        unsigned long parameters_type, void* parameters, unsigned long parameters_len);
 
-int der_decode_subject_public_key_info(const unsigned char *in, unsigned long inlen,
-        unsigned int algorithm, void* public_key, unsigned long* public_key_len,
-        unsigned long parameters_type, ltc_asn1_list* parameters, unsigned long parameters_len);
+extern const ltc_asn1_type  der_asn1_tag_to_type_map[];
+extern const unsigned long  der_asn1_tag_to_type_map_sz;
 
-int der_decode_subject_public_key_info_ex(const unsigned char *in, unsigned long inlen,
-        unsigned int algorithm, void* public_key, unsigned long* public_key_len,
-        unsigned long parameters_type, void* parameters, unsigned long parameters_len,
-        unsigned long *parameters_outsize);
+extern const int der_asn1_type_to_identifier_map[];
+extern const unsigned long der_asn1_type_to_identifier_map_sz;
 #endif /* LTC_SOURCE */
 
 /* SET */
-#define der_decode_set(in, inlen, list, outlen) der_decode_sequence_ex(in, inlen, list, outlen, 0)
+#define der_decode_set(in, inlen, list, outlen) der_decode_sequence_ex(in, inlen, list, outlen, LTC_DER_SEQ_SET)
 #define der_length_set der_length_sequence
 int der_encode_set(ltc_asn1_list *list, unsigned long inlen,
                    unsigned char *out,  unsigned long *outlen);
@@ -631,6 +744,10 @@ int der_encode_setof(ltc_asn1_list *list, unsigned long inlen,
 /* VA list handy helpers with triplets of <type, size, data> */
 int der_encode_sequence_multi(unsigned char *out, unsigned long *outlen, ...);
 int der_decode_sequence_multi(const unsigned char *in, unsigned long inlen, ...);
+#ifdef LTC_SOURCE
+/* internal helper functions */
+int der_decode_sequence_multi_ex(const unsigned char *in, unsigned long inlen, unsigned int flags, ...);
+#endif /* LTC_SOURCE */
 
 /* FLEXI DECODER handle unknown list decoder */
 int  der_decode_sequence_flexi(const unsigned char *in, unsigned long *inlen, ltc_asn1_list **out);
@@ -786,6 +903,17 @@ int der_decode_generalizedtime(const unsigned char *in, unsigned long *inlen,
 
 int der_length_generalizedtime(ltc_generalizedtime *gtime, unsigned long *outlen);
 
+#ifdef LTC_SOURCE
+/* internal helper functions */
+/* SUBJECT PUBLIC KEY INFO */
+int x509_encode_subject_public_key_info(unsigned char *out, unsigned long *outlen,
+        unsigned int algorithm, void* public_key, unsigned long public_key_len,
+        unsigned long parameters_type, void* parameters, unsigned long parameters_len);
+
+int x509_decode_subject_public_key_info(const unsigned char *in, unsigned long inlen,
+        unsigned int algorithm, void* public_key, unsigned long* public_key_len,
+        unsigned long parameters_type, void* parameters, unsigned long *parameters_len);
+#endif /* LTC_SOURCE */
 
 #endif
 

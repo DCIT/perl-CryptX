@@ -51,7 +51,12 @@ MARKER
 my $curve;
 write_rawfile("test_input.data", "test-file-content");
 
+# list supported curves: openssl ecparam -list_curves | grep "prime field"
+
 for $curve (qw/brainpoolp160r1 brainpoolp192r1 brainpoolp224r1 brainpoolp256r1 brainpoolp320r1 brainpoolp384r1 brainpoolp512r1
+               brainpoolp160t1 brainpoolp192t1 brainpoolp224t1 brainpoolp256t1 brainpoolp320t1 brainpoolp384t1 brainpoolp512t1
+               wap-wsg-idm-ecid-wtls8 wap-wsg-idm-ecid-wtls9
+               wap-wsg-idm-ecid-wtls6 wap-wsg-idm-ecid-wtls7 wap-wsg-idm-ecid-wtls12
                secp112r1 secp112r2 secp128r1 secp128r2 secp160k1 secp160r1 secp160r2 secp192k1
                secp192r1 secp224k1 secp224r1 secp256k1 secp256r1 secp384r1 secp521r1
                prime192v1 prime192v2 prime192v3 prime239v1 prime239v2 prime239v3 prime256v1

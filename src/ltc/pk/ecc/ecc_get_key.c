@@ -5,11 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- */
-
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
- *
  */
 
 #include "tomcrypt.h"
@@ -24,7 +19,7 @@
   Return        CRYPT_OK on success
 */
 
-int ecc_export_raw(unsigned char *out, unsigned long *outlen, int type, ecc_key *key)
+int ecc_get_key(unsigned char *out, unsigned long *outlen, int type, ecc_key *key)
 {
    unsigned long size, ksize;
    int err, compressed;
@@ -33,19 +28,14 @@ int ecc_export_raw(unsigned char *out, unsigned long *outlen, int type, ecc_key 
    LTC_ARGCHK(out    != NULL);
    LTC_ARGCHK(outlen != NULL);
 
-   if (ltc_ecc_is_valid_idx(key->idx) == 0) {
-      return CRYPT_INVALID_ARG;
-   }
-   size = key->dp->size;
-
-   compressed = type & PK_COMPRESSED; 
+   size = key->dp.size;
+   compressed = type & PK_COMPRESSED ? 1 : 0;
    type &= ~PK_COMPRESSED;
 
-   if (type == PK_PUBLIC && compressed) {
-      if ((err = ltc_ecc_export_point(out, outlen, key->pubkey.x, key->pubkey.y, size, 1)) != CRYPT_OK) return err;
-   }
-   else if (type == PK_PUBLIC) {
-      if ((err = ltc_ecc_export_point(out, outlen, key->pubkey.x, key->pubkey.y, size, 0)) != CRYPT_OK) return err;
+   if (type == PK_PUBLIC) {
+      if ((err = ltc_ecc_export_point(out, outlen, key->pubkey.x, key->pubkey.y, size, compressed)) != CRYPT_OK) {
+         return err;
+      }
    }
    else if (type == PK_PRIVATE) {
       if (key->type != PK_PRIVATE)                                                return CRYPT_PK_TYPE_MISMATCH;
@@ -64,3 +54,7 @@ int ecc_export_raw(unsigned char *out, unsigned long *outlen, int type, ecc_key 
 }
 
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

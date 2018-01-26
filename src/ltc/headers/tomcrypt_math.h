@@ -374,48 +374,48 @@ typedef struct {
        @param k   The integer to multiply the point by
        @param G   The point to multiply
        @param R   The destination for kG
-       @param a   ECC curve parameter a (if NULL we assume a == -3)
+       @param a   ECC curve parameter a
        @param modulus  The modulus for the field
        @param map Boolean indicated whether to map back to affine or not
                   (can be ignored if you work in affine only)
        @return CRYPT_OK on success
    */
    int (*ecc_ptmul)(     void *k,
-                    ecc_point *G,
-                    ecc_point *R,
-                         void *a,
-                         void *modulus,
-                          int  map);
+                    const ecc_point *G,
+                          ecc_point *R,
+                               void *a,
+                               void *modulus,
+                                int  map);
 
    /** ECC GF(p) point addition
        @param P    The first point
        @param Q    The second point
        @param R    The destination of P + Q
-       @param a    ECC curve parameter a (if NULL we assume a == -3)
+       @param ma   The curve parameter "a" in montgomery form
        @param modulus  The modulus
        @param mp   The "b" value from montgomery_setup()
        @return CRYPT_OK on success
    */
-   int (*ecc_ptadd)(ecc_point *P,
-                    ecc_point *Q,
-                    ecc_point *R,
-                         void *a,
-                         void *modulus,
-                         void *mp);
+   int (*ecc_ptadd)(const ecc_point *P,
+                    const ecc_point *Q,
+                          ecc_point *R,
+                               void *ma,
+                               void *modulus,
+                               void *mp);
 
    /** ECC GF(p) point double
        @param P    The first point
        @param R    The destination of 2P
-       @param a    ECC curve parameter a (if NULL we assume a == -3)
+       @param ma   The curve parameter "a" in montgomery form
        @param modulus  The modulus
        @param mp   The "b" value from montgomery_setup()
        @return CRYPT_OK on success
    */
-   int (*ecc_ptdbl)(ecc_point *P,
-                    ecc_point *R,
-                         void *a,
-                         void *modulus,
-                         void *mp);
+   int (*ecc_ptdbl)(const ecc_point *P,
+                          ecc_point *R,
+                               void *ma,
+                               void *modulus,
+                               void *mp);
 
    /** ECC mapping from projective to affine,
        currently uses (x,y,z) => (x/z^2, y/z^3, 1)
@@ -435,14 +435,15 @@ typedef struct {
        @param B        Second point to multiply
        @param kB       What to multiple B by
        @param C        [out] Destination point (can overlap with A or B)
+       @param ma       The curve parameter "a" in montgomery form
        @param modulus  Modulus for curve
        @return CRYPT_OK on success
    */
-   int (*ecc_mul2add)(ecc_point *A, void *kA,
-                      ecc_point *B, void *kB,
-                      ecc_point *C,
-                           void *a,
-                           void *modulus);
+   int (*ecc_mul2add)(const ecc_point *A, void *kA,
+                      const ecc_point *B, void *kB,
+                            ecc_point *C,
+                                 void *ma,
+                                 void *modulus);
 
 /* ---- (optional) rsa optimized math (for internal CRT) ---- */
 

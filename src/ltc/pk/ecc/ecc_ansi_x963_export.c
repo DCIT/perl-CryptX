@@ -7,9 +7,6 @@
  * guarantee it works.
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
- *
- */
 #include "tomcrypt.h"
 
 /**
@@ -34,10 +31,7 @@ int ecc_ansi_x963_export(ecc_key *key, unsigned char *out, unsigned long *outlen
    LTC_ARGCHK(out    != NULL);
    LTC_ARGCHK(outlen != NULL);
 
-   if (ltc_ecc_is_valid_idx(key->idx) == 0) {
-      return CRYPT_INVALID_ARG;
-   }
-   numlen = key->dp->size;
+   numlen = key->dp.size;
    xlen = mp_unsigned_bin_size(key->pubkey.x);
    ylen = mp_unsigned_bin_size(key->pubkey.y);
 

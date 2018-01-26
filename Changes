@@ -1,5 +1,8 @@
 Changes for CryptX
 
+0.059   2018-03-XX
+        - new: Crypt::PK::ECC - sign_hash_rfc7518 + verify_hash_rfc7518
+
 0.058   2018-02-27
         - fix: decode_b58b + invalid input
 

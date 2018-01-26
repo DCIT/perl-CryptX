@@ -5,11 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- */
-
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
- *
  */
 
 #include "tomcrypt.h"
@@ -70,3 +65,7 @@ cleanup:
 }
 
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

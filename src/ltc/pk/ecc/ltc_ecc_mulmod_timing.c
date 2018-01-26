@@ -7,9 +7,6 @@
  * guarantee it works.
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
- *
- */
 #include "tomcrypt.h"
 
 /**
@@ -31,11 +28,11 @@
    @param map      Boolean whether to map back to affine or not (1==map, 0 == leave in projective)
    @return CRYPT_OK on success
 */
-int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, int map)
+int ltc_ecc_mulmod(void *k, const ecc_point *G, ecc_point *R, void *a, void *modulus, int map)
 {
    ecc_point *tG, *M[3];
    int        i, j, err;
-   void       *mu, *mp, *ma;
+   void       *mp = NULL, *mu = NULL, *ma = NULL, *a_plus3 = NULL;
    ltc_mp_digit buf;
    int        bitcnt, mode, digidx;
 
@@ -53,22 +50,16 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
    }
 
    /* init montgomery reduction */
-   if ((err = mp_montgomery_setup(modulus, &mp)) != CRYPT_OK) {
-      return err;
-   }
-   if ((err = mp_init_multi(&mu, &ma, NULL)) != CRYPT_OK) {
-      mp_montgomery_free(mp);
-      return err;
-   }
-   if ((err = mp_montgomery_normalization(mu, modulus)) != CRYPT_OK) {
-      mp_clear(mu);
-      mp_montgomery_free(mp);
-      return err;
-   }
-   if ((err = mp_mulmod(a, mu, modulus, ma)) != CRYPT_OK) {
-      mp_montgomery_free(mp);
-      mp_clear_multi(mu, ma, NULL);
-      return err;
+   if ((err = mp_montgomery_setup(modulus, &mp)) != CRYPT_OK)        { goto error; }
+   if ((err = mp_init(&mu)) != CRYPT_OK)                             { goto error; }
+   if ((err = mp_montgomery_normalization(mu, modulus)) != CRYPT_OK) { goto error; }
+
+   /* for curves with a == -3 keep ma == NULL */
+   if ((err = mp_init(&a_plus3)) != CRYPT_OK)                        { goto error; }
+   if ((err = mp_add_d(a, 3, a_plus3)) != CRYPT_OK)                  { goto error; }
+   if (mp_cmp(a_plus3, modulus) != LTC_MP_EQ) {
+      if ((err = mp_init(&ma)) != CRYPT_OK)                          { goto error; }
+      if ((err = mp_mulmod(a, mu, modulus, ma)) != CRYPT_OK)         { goto error; }
    }
 
    /* alloc ram for window temps */
@@ -156,15 +147,15 @@ int ltc_ecc_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, 
       err = CRYPT_OK;
    }
 done:
-   if (mu != NULL) {
-      mp_clear(mu);
-   }
-   mp_clear(ma);
-   mp_montgomery_free(mp);
    ltc_ecc_del_point(tG);
    for (i = 0; i < 3; i++) {
        ltc_ecc_del_point(M[i]);
    }
+error:
+   if (ma != NULL) mp_clear(ma);
+   if (a_plus3 != NULL) mp_clear(a_plus3);
+   if (mu != NULL) mp_clear(mu);
+   if (mp != NULL) mp_montgomery_free(mp);
    return err;
 }
 

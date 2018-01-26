@@ -7,9 +7,6 @@
  * guarantee it works.
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
- *
- */
 #include "tomcrypt.h"
 
 /**
@@ -26,7 +23,14 @@
 void ecc_free(ecc_key *key)
 {
    LTC_ARGCHKVD(key != NULL);
-   mp_clear_multi(key->pubkey.x, key->pubkey.y, key->pubkey.z, key->k, NULL);
+   /* clean dp */
+   mp_cleanup_multi(&key->dp.prime, &key->dp.order,
+                    &key->dp.A, &key->dp.B,
+                    &key->dp.base.x, &key->dp.base.y, &key->dp.base.z,
+                    NULL);
+
+   /* clean key */
+   mp_cleanup_multi(&key->pubkey.x, &key->pubkey.y, &key->pubkey.z, &key->k, NULL);
 }
 
 #endif

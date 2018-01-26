@@ -7,9 +7,6 @@
  * guarantee it works.
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
- *
- */
 #include "tomcrypt.h"
 
 /**
@@ -24,12 +21,12 @@
    @param P        The point to add
    @param Q        The point to add
    @param R        [out] The destination of the double
-   @param ma       ECC curve parameter a in montgomery form (if NULL we assume a == -3)
+   @param ma       ECC curve parameter a in montgomery form
    @param modulus  The modulus of the field the ECC curve is in
    @param mp       The "b" value from montgomery_setup()
    @return CRYPT_OK on success
 */
-int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, void *ma, void *modulus, void *mp)
+int ltc_ecc_projective_add_point(const ecc_point *P, const ecc_point *Q, ecc_point *R, void *ma, void *modulus, void *mp)
 {
    void  *t1, *t2, *x, *y, *z;
    int    err;

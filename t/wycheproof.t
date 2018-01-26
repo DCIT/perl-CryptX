@@ -7,7 +7,7 @@ use warnings;
 use Test::More;
 
 plan skip_all => "No JSON::* module installed" unless eval { require JSON::PP } || eval { require JSON::XS } || eval { require Cpanel::JSON::XS };
-plan tests => 984;
+plan tests => 1298;
 
 use CryptX;
 use Crypt::Misc 'read_rawfile';
@@ -133,7 +133,7 @@ if (1) {
   }
 }
 
-if (0) {
+if (1) {
   use Crypt::PK::ECC;
 
   my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/ecdsa_test.json';

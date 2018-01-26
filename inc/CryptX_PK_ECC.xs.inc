@@ -11,7 +11,6 @@ _new(Class)
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->pindex = find_prng("chacha20");
         RETVAL->key.type = -1;
-        ecc_dp_init(&RETVAL->dp);
         if (RETVAL->pindex == -1) {
           Safefree(RETVAL);
           croak("FATAL: find_prng('chacha20') failed");
@@ -31,10 +30,11 @@ generate_key(Crypt::PK::ECC self, SV *curve)
     {
         int rv;
         /* setup dp structure */
-        _ecc_set_dp_from_SV(&self->dp, curve); /* croaks on error */
+        rv = _ecc_set_dp_from_SV(&self->key, curve); /* croaks on error */
+        if (rv != CRYPT_OK) croak("FATAL: ecc_set_dp failed: %s", error_to_string(rv));
         /* gen the key */
-        rv = ecc_make_key_ex(&self->pstate, self->pindex, &self->key, &self->dp);
-        if (rv != CRYPT_OK) croak("FATAL: ecc_make_key_ex failed: %s", error_to_string(rv));
+        rv = ecc_generate_key(&self->pstate, self->pindex, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: ecc_generate_key failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -47,9 +47,9 @@ _import(Crypt::PK::ECC self, SV * key_data)
         STRLEN data_len=0;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        _ecc_free_key(&self->key, &self->dp);
-        rv = ecc_import_full(data, (unsigned long)data_len, &self->key, &self->dp);
-        if (rv != CRYPT_OK) croak("FATAL: ecc_import_full failed: %s", error_to_string(rv));
+        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
+        rv = ecc_import_openssl(data, (unsigned long)data_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: ecc_import_openssl failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -65,14 +65,14 @@ _import_pkcs8(Crypt::PK::ECC self, SV * key_data, SV * passwd)
         if (SvOK(passwd)) {
           pwd = (unsigned char *)SvPVbyte(passwd, pwd_len);
         }
-        _ecc_free_key(&self->key, &self->dp);
-        rv = ecc_import_pkcs8(data, (unsigned long)data_len, pwd, (unsigned long)pwd_len, &self->key, &self->dp);
+        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
+        rv = ecc_import_pkcs8(data, (unsigned long)data_len, pwd, (unsigned long)pwd_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_import_pkcs8 failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
 
 void
-import_key_raw(Crypt::PK::ECC self, SV * key_data, SV * curve)
+_import_x509(Crypt::PK::ECC self, SV * key_data)
     PPCODE:
     {
         int rv;
@@ -80,12 +80,29 @@ import_key_raw(Crypt::PK::ECC self, SV * key_data, SV * curve)
         STRLEN data_len=0;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        _ecc_free_key(&self->key, &self->dp);
+        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
+        rv = ecc_import_x509(data, (unsigned long)data_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: ecc_import_x509 failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
+    }
 
-        _ecc_set_dp_from_SV(&self->dp, curve); /* croaks on error */
+void
+import_key_raw(Crypt::PK::ECC self, SV * key_data, SV * curve)
+    PPCODE:
+    {
+        int rv, type;
+        unsigned char *data=NULL;
+        STRLEN data_len=0;
 
-        rv = ecc_import_raw(data, (unsigned long)data_len, &self->key, &self->dp);
-        if (rv != CRYPT_OK) croak("FATAL: ecc_import_raw failed: %s", error_to_string(rv));
+        data = (unsigned char *)SvPVbyte(key_data, data_len);
+        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
+        /* setup dp structure */
+        rv = _ecc_set_dp_from_SV(&self->key, curve); /* croaks on error */
+        if (rv != CRYPT_OK) croak("FATAL: ecc_set_dp failed: %s", error_to_string(rv));
+        /* import key */
+        type = (data_len == (STRLEN)ecc_get_size(&self->key)) ? PK_PRIVATE : PK_PUBLIC;
+        rv = ecc_set_key(data, (unsigned long)data_len, type, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: ecc_set_key failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -153,54 +170,48 @@ key2hash(Crypt::PK::ECC self)
           not_used = hv_store(rv_hash, "pub_y", 5, newSVpv("", 0), 0);
         }
         /* curve_... */
-        if (self->key.dp) {
-          not_used = hv_store(rv_hash, "curve_cofactor", 14, newSViv(self->key.dp->cofactor), 0);
-          /* prepend leading zero if we have odd number of hexadecimal digits */
-          strncpy(buf, self->key.dp->prime, 20000); str_add_leading_zero(buf, 20000, 0);
-          not_used = hv_store(rv_hash, "curve_prime", 11, newSVpv(buf, strlen(buf)), 0);
-          strncpy(buf, self->key.dp->A,     20000); str_add_leading_zero(buf, 20000, 0);
-          not_used = hv_store(rv_hash, "curve_A",      7, newSVpv(buf, strlen(buf)), 0);
-          strncpy(buf, self->key.dp->B,     20000); str_add_leading_zero(buf, 20000, 0);
-          not_used = hv_store(rv_hash, "curve_B",      7, newSVpv(buf, strlen(buf)), 0);
-          strncpy(buf, self->key.dp->order, 20000); str_add_leading_zero(buf, 20000, 0);
-          not_used = hv_store(rv_hash, "curve_order", 11, newSVpv(buf, strlen(buf)), 0);
-          strncpy(buf, self->key.dp->Gx,    20000); str_add_leading_zero(buf, 20000, 0);
-          not_used = hv_store(rv_hash, "curve_Gx",     8, newSVpv(buf, strlen(buf)), 0);
-          strncpy(buf, self->key.dp->Gy,    20000); str_add_leading_zero(buf, 20000, 0);
-          not_used = hv_store(rv_hash, "curve_Gy",     8, newSVpv(buf, strlen(buf)), 0);
-          /* OLD approach
-            not_used = hv_store(rv_hash, "curve_prime", 11, newSVpv(self->key.dp->prime, strlen(self->key.dp->prime)), 0);
-            not_used = hv_store(rv_hash, "curve_A",      7, newSVpv(self->key.dp->A,     strlen(self->key.dp->A)), 0);
-            not_used = hv_store(rv_hash, "curve_B",      7, newSVpv(self->key.dp->B,     strlen(self->key.dp->B)), 0);
-            not_used = hv_store(rv_hash, "curve_order", 11, newSVpv(self->key.dp->order, strlen(self->key.dp->order)), 0);
-            not_used = hv_store(rv_hash, "curve_Gx",     8, newSVpv(self->key.dp->Gx,    strlen(self->key.dp->Gx)), 0);
-            not_used = hv_store(rv_hash, "curve_Gy",     8, newSVpv(self->key.dp->Gy,    strlen(self->key.dp->Gy)), 0);
-          */
-          {
-            mp_int p_num;
-            mp_init(&p_num);
-            mp_read_radix(&p_num, self->key.dp->prime, 16);
-            not_used = hv_store(rv_hash, "curve_bytes", 11, newSViv(mp_unsigned_bin_size(&p_num)), 0);
-            not_used = hv_store(rv_hash, "curve_bits",  10, newSViv(mp_count_bits(&p_num)), 0);
-            mp_clear(&p_num);
-          }
-          {
-            unsigned long i;
-            SV *name;
-            char *name_ptr;
-            STRLEN name_len;
+        {
+          not_used = hv_store(rv_hash, "curve_cofactor",                14, newSViv(self->key.dp.cofactor), 0);
+          mp_tohex_with_leading_zero(self->key.dp.prime, buf, 20000, 0);
+          not_used = hv_store(rv_hash, "curve_prime",                   11, newSVpv(buf, strlen(buf)), 0);
+          mp_tohex_with_leading_zero(self->key.dp.A, buf, 20000, 0);
+          not_used = hv_store(rv_hash, "curve_A",                        7, newSVpv(buf, strlen(buf)), 0);
+          mp_tohex_with_leading_zero(self->key.dp.B, buf, 20000, 0);
+          not_used = hv_store(rv_hash, "curve_B",                        7, newSVpv(buf, strlen(buf)), 0);
+          mp_tohex_with_leading_zero(self->key.dp.order, buf, 20000, 0);
+          not_used = hv_store(rv_hash, "curve_order",                   11, newSVpv(buf, strlen(buf)), 0);
+          mp_tohex_with_leading_zero(self->key.dp.base.x, buf, 20000, 0);
+          not_used = hv_store(rv_hash, "curve_Gx",                       8, newSVpv(buf, strlen(buf)), 0);
+          mp_tohex_with_leading_zero(self->key.dp.base.y, buf, 20000, 0);
+          not_used = hv_store(rv_hash, "curve_Gy",                       8, newSVpv(buf, strlen(buf)), 0);
+          not_used = hv_store(rv_hash, "curve_bytes",                   11, newSViv(mp_unsigned_bin_size(self->key.dp.prime)), 0);
+          not_used = hv_store(rv_hash, "curve_bits",                    10, newSViv(mp_count_bits(self->key.dp.prime)), 0);
 
-            name = newSVpv(self->key.dp->name,  strlen(self->key.dp->name));
-            name_ptr = SvPV(name, name_len);
-            for (i=0; i<name_len && name_ptr[i]>0; i++) name_ptr[i] = toLOWER(name_ptr[i]);
-            not_used = hv_store(rv_hash, "curve_name", 10, name, 0);
-          }
-          if (self->key.dp->oid.OIDlen > 0) {
+          if (self->key.dp.oidlen > 0) {
             unsigned long i;
+            HV *h;
+            SV **pref, *cname;
+            char *cname_ptr, *oid_ptr;
+            STRLEN cname_len;
+
+            /* OID -> "curve_oid" */
             SV *oid = newSVpv("", 0);
-            for(i = 0; i < self->key.dp->oid.OIDlen - 1; i++) sv_catpvf(oid, "%lu.", self->key.dp->oid.OID[i]);
-            sv_catpvf(oid, "%lu", self->key.dp->oid.OID[i]);
+            for(i = 0; i < self->key.dp.oidlen - 1; i++) sv_catpvf(oid, "%lu.", self->key.dp.oid[i]);
+            sv_catpvf(oid, "%lu", self->key.dp.oid[i]);
+            oid_ptr = SvPVX(oid);
             not_used = hv_store(rv_hash, "curve_oid", 9, oid, 0);
+
+            /* curve name -> "curve_name" */
+            if ((h = get_hv("Crypt::PK::ECC::curve2ltc", 0)) != NULL) {
+              pref = hv_fetch(h, oid_ptr, (U32)strlen(oid_ptr), 0);
+              if (pref) {
+                cname_ptr = SvPV(*pref, cname_len);
+                cname = newSVpv(cname_ptr, cname_len);
+                cname_ptr = SvPVX(cname);
+                for (i=0; i<cname_len && cname_ptr[i]>0; i++) cname_ptr[i] = toLOWER(cname_ptr[i]);
+                not_used = hv_store(rv_hash, "curve_name", 10, cname, 0);
+              }
+            }
           }
         }
         /* size */
@@ -220,25 +231,35 @@ export_key_der(Crypt::PK::ECC self, char * type)
         unsigned char out[4096];
         unsigned long int out_len = 4096;
 
-        RETVAL = newSVpvn(NULL, 0); /* undef */
+        if (self->key.type == -1) croak("FATAL: export_key_der no key");
         if (strnEQ(type, "private_short", 16)) {
-          rv = ecc_export_full(out, &out_len, PK_PRIVATE|PK_CURVEOID, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: ecc_export(PK_PRIVATE|PK_CURVEOID) failed: %s", error_to_string(rv));
+          rv = ecc_export_openssl(out, &out_len, PK_PRIVATE|PK_CURVEOID, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_export_openssl(PK_PRIVATE|PK_CURVEOID) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
+        }
+        else if (strnEQ(type, "private_compressed", 16)) {
+          rv = ecc_export_openssl(out, &out_len, PK_PRIVATE|PK_CURVEOID|PK_COMPRESSED, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_export_openssl(PK_PRIVATE|PK_CURVEOID|PK_COMPRESSED) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "private", 7)) {
-          rv = ecc_export_full(out, &out_len, PK_PRIVATE, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: ecc_export(PK_PRIVATE) failed: %s", error_to_string(rv));
+          rv = ecc_export_openssl(out, &out_len, PK_PRIVATE, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_export_openssl(PK_PRIVATE) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
+        }
+        else if (strnEQ(type, "public_compressed", 15)) {
+          rv = ecc_export_openssl(out, &out_len, PK_PUBLIC|PK_CURVEOID|PK_COMPRESSED, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_export_openssl(PK_PUBLIC|PK_CURVEOID|PK_COMPRESSED) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "public_short", 15)) {
-          rv = ecc_export_full(out, &out_len, PK_PUBLIC|PK_CURVEOID, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: ecc_export(PK_PUBLIC|PK_CURVEOID) failed: %s", error_to_string(rv));
+          rv = ecc_export_openssl(out, &out_len, PK_PUBLIC|PK_CURVEOID, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_export_openssl(PK_PUBLIC|PK_CURVEOID) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "public", 6)) {
-          rv = ecc_export_full(out, &out_len, PK_PUBLIC, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: ecc_export(PK_PUBLIC) failed: %s", error_to_string(rv));
+          rv = ecc_export_openssl(out, &out_len, PK_PUBLIC, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_export_openssl(PK_PUBLIC) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else {
@@ -256,20 +277,20 @@ export_key_raw(Crypt::PK::ECC self, char * type)
         unsigned char out[4096];
         unsigned long int out_len = sizeof(out);
 
-        RETVAL = newSVpvn(NULL, 0); /* undef */
+        if (self->key.type == -1) croak("FATAL: export_key_der no key");
         if (strnEQ(type, "private", 7)) {
-          rv = ecc_export_raw(out, &out_len, PK_PRIVATE, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: ecc_export_raw(private) failed: %s", error_to_string(rv));
+          rv = ecc_get_key(out, &out_len, PK_PRIVATE, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_get_key(private) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "public_compressed", 17)) {
-          rv = ecc_export_raw(out, &out_len, PK_PUBLIC|PK_COMPRESSED, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: ecc_export_raw(public_compressed) failed: %s", error_to_string(rv));
+          rv = ecc_get_key(out, &out_len, PK_PUBLIC|PK_COMPRESSED, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_get_key(public_compressed) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "public", 6)) {
-          rv = ecc_export_raw(out, &out_len, PK_PUBLIC, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: ecc_export_raw(public) failed: %s", error_to_string(rv));
+          rv = ecc_get_key(out, &out_len, PK_PUBLIC, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ecc_get_key(public) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else {
@@ -324,6 +345,7 @@ decrypt(Crypt::PK::ECC self, SV * data)
 SV *
 sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
     ALIAS:
+        sign_hash_rfc7518    = 3
         sign_message         = 1
         sign_message_rfc7518 = 2
     CODE:
@@ -342,7 +364,7 @@ sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
           data_ptr = tmp;
           data_len = tmp_len;
         }
-        if (ix == 2) {
+        if (ix == 2 || ix == 3) {
           rv = ecc_sign_hash_rfc7518(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                              &self->pstate, self->pindex,
                              &self->key);
@@ -361,6 +383,7 @@ sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
 int
 verify_hash(Crypt::PK::ECC self, SV * sig, SV * data, const char * hash_name = "SHA1")
     ALIAS:
+        verify_hash_rfc7518    = 3
         verify_message         = 1
         verify_message_rfc7518 = 2
     CODE:
@@ -382,7 +405,7 @@ verify_hash(Crypt::PK::ECC self, SV * sig, SV * data, const char * hash_name = "
         }
         RETVAL = 1;
         stat = 0;
-        if (ix == 2) {
+        if (ix == 2 || ix == 3) {
           rv = ecc_verify_hash_rfc7518(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
         }
         else {
@@ -411,6 +434,6 @@ shared_secret(Crypt::PK::ECC self, Crypt::PK::ECC pubkey)
 void
 DESTROY(Crypt::PK::ECC self)
     CODE:
-        _ecc_free_key(&self->key, &self->dp);
+        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
         Safefree(self);
 

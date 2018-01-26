@@ -136,36 +136,35 @@ typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
   prng_state pstate;
   int pindex;
   ecc_key key;
-  ltc_ecc_set_type dp;
 } *Crypt__PK__ECC;
 
-int str_add_leading_zero(char *str, int maxlen, int minlen) {
-  int len;
-  len = (int)strlen(str);
-  if (len > 0 && len % 2 && len < maxlen-2) {
-    memmove(str+1, str, len+1); /* incl. NUL byte */
-    *str = '0';                 /* add leading zero */
-  }
-  len = (int)strlen(str);
-  if (len < minlen && minlen < maxlen-1) {
-    memmove(str+(minlen-len), str, len+1); /* incl. NUL byte */
-    memset(str, '0', minlen-len);          /* add leading zero */
-  }
-  return MP_OKAY;
-}
-
 int mp_tohex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
-  int rv;
+  int len, rv;
+
   if (mp_isneg(a) == MP_YES) {
     *str = '\0';
     return MP_VAL;
   }
+
   rv = mp_toradix_n(a, str, 16, maxlen);
   if (rv != MP_OKAY) {
     *str = '\0';
     return rv;
   }
-  return str_add_leading_zero(str, maxlen, minlen);
+
+  len = (int)strlen(str);
+  if (len > 0 && len % 2 && len < maxlen-2) {
+    memmove(str+1, str, len+1); /* incl. NUL byte */
+    *str = '0';                 /* add leading zero */
+  }
+
+  len = (int)strlen(str);
+  if (len < minlen && minlen < maxlen-1) {
+    memmove(str+(minlen-len), str, len+1); /* incl. NUL byte */
+    memset(str, '0', minlen-len);          /* add leading zero */
+  }
+
+  return MP_OKAY;
 }
 
 int _base16_encode(const unsigned char *in, unsigned long inlen, unsigned char *out, unsigned long *outlen)
@@ -248,71 +247,137 @@ STATIC SV * sv_from_mpi(mp_int *mpi) {
   return obj;
 }
 
-ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
+void _ecc_oid_lookup(ecc_key *key)
+{
+   int err;
+   unsigned i;
+   void *tmp;
+   const ltc_ecc_set_type *set;
+
+   key->dp.oidlen = 0;
+   if ((err = ltc_mp.init(&tmp)) != CRYPT_OK) return;
+   for (set = ltc_ecc_sets; set->name != NULL; set++) {
+      if ((err = mp_read_radix(tmp, set->prime, 16)) != CRYPT_OK) continue;
+      if ((mp_cmp(tmp, key->dp.prime) != LTC_MP_EQ))              continue;
+      if ((err = mp_read_radix(tmp, set->order, 16)) != CRYPT_OK) continue;
+      if ((mp_cmp(tmp, key->dp.order) != LTC_MP_EQ))              continue;
+      if ((err = mp_read_radix(tmp, set->A,     16)) != CRYPT_OK) continue;
+      if ((mp_cmp(tmp, key->dp.A) != LTC_MP_EQ))                  continue;
+      if ((err = mp_read_radix(tmp, set->B,     16)) != CRYPT_OK) continue;
+      if ((mp_cmp(tmp, key->dp.B) != LTC_MP_EQ))                  continue;
+      if ((err = mp_read_radix(tmp, set->Gx,    16)) != CRYPT_OK) continue;
+      if ((mp_cmp(tmp, key->dp.base.x) != LTC_MP_EQ))             continue;
+      if ((err = mp_read_radix(tmp, set->Gy,    16)) != CRYPT_OK) continue;
+      if ((mp_cmp(tmp, key->dp.base.y) != LTC_MP_EQ))             continue;
+      if (key->dp.cofactor != set->cofactor)                      continue;
+      break; /* found */
+   }
+   ltc_mp.deinit(tmp);
+   if (set->name != NULL) {
+     key->dp.oidlen = set->oidlen;
+     for(i = 0; i < set->oidlen; i++) key->dp.oid[i] = set->oid[i];
+   }
+}
+
+int _ecc_set_dp_from_SV(ecc_key *key, SV *curve)
 {
   dTHX; /* fetch context */
-  HV *h;
-  SV *param, **pref;
-  SV **sv_cofactor, **sv_prime, **sv_A, **sv_B, **sv_order, **sv_Gx, **sv_Gy;
-  int err;
+  HV *hc, *hl, *h;
+  SV *sv_crv, **pref;
+  SV **sv_cofactor, **sv_prime, **sv_A, **sv_B, **sv_order, **sv_Gx, **sv_Gy, **sv_oid;
   char *ch_name;
-  STRLEN l_name;
+  STRLEN l_name, i, j;
+  int err;
+
+  if (!SvOK(curve)) croak("FATAL: undefined curve");
 
   if (SvPOK(curve)) {
+    /* string */
     ch_name = SvPV(curve, l_name);
-    if ((h = get_hv("Crypt::PK::ECC::curve", 0)) == NULL) croak("FATAL: generate_key_ex: no curve register");
-    if ((pref = hv_fetch(h, ch_name, (U32)l_name, 0)) == NULL)  croak("FATAL: generate_key_ex: unknown curve/1 '%s'", ch_name);
-    if (!SvOK(*pref)) croak("FATAL: generate_key_ex: unknown curve/2 '%s'", ch_name);
-    param = *pref;
+    if ((hl = get_hv("Crypt::PK::ECC::curve2ltc", 0)) == NULL) croak("FATAL: no curve2ltc register");
+    pref = hv_fetch(hl, ch_name, (U32)l_name, 0);
+    if (pref && SvOK(*pref)) {
+      sv_crv = *pref; /* found in %cutve2ltc */
+    }
+    else {
+      if ((hc = get_hv("Crypt::PK::ECC::curve", 0)) == NULL) croak("FATAL: no curve register");
+      pref = hv_fetch(hc, ch_name, (U32)l_name, 0);
+      if (pref && SvOK(*pref)) {
+        sv_crv = *pref; /* found in %curve */
+      }
+      else {
+        sv_crv = curve;
+      }
+    }
   }
   else if (SvROK(curve)) {
-    param = curve;
+    /* hashref */
+    sv_crv = curve;
   }
   else {
     croak("FATAL: curve has to be a string or a hashref");
   }
 
-  if ((h = (HV*)(SvRV(param))) == NULL) croak("FATAL: ecparams: param is not valid hashref");
-
-  if ((sv_prime    = hv_fetchs(h, "prime",    0)) == NULL) croak("FATAL: ecparams: missing param prime");
-  if ((sv_A        = hv_fetchs(h, "A",        0)) == NULL) croak("FATAL: ecparams: missing param A");
-  if ((sv_B        = hv_fetchs(h, "B",        0)) == NULL) croak("FATAL: ecparams: missing param B");
-  if ((sv_order    = hv_fetchs(h, "order",    0)) == NULL) croak("FATAL: ecparams: missing param order");
-  if ((sv_Gx       = hv_fetchs(h, "Gx",       0)) == NULL) croak("FATAL: ecparams: missing param Gx");
-  if ((sv_Gy       = hv_fetchs(h, "Gy",       0)) == NULL) croak("FATAL: ecparams: missing param Gy");
-  if ((sv_cofactor = hv_fetchs(h, "cofactor", 0)) == NULL) croak("FATAL: ecparams: missing param cofactor");
-
-  if (!SvOK(*sv_prime   )) croak("FATAL: ecparams: undefined param prime");
-  if (!SvOK(*sv_A       )) croak("FATAL: ecparams: undefined param A");
-  if (!SvOK(*sv_B       )) croak("FATAL: ecparams: undefined param B");
-  if (!SvOK(*sv_order   )) croak("FATAL: ecparams: undefined param order");
-  if (!SvOK(*sv_Gx      )) croak("FATAL: ecparams: undefined param Gx");
-  if (!SvOK(*sv_Gy      )) croak("FATAL: ecparams: undefined param Gy");
-  if (!SvOK(*sv_cofactor)) croak("FATAL: ecparams: undefined param cofactor");
-
-  err = ecc_dp_set( dp,
-                    SvPV_nolen(*sv_prime),
-                    SvPV_nolen(*sv_A),
-                    SvPV_nolen(*sv_B),
-                    SvPV_nolen(*sv_order),
-                    SvPV_nolen(*sv_Gx),
-                    SvPV_nolen(*sv_Gy),
-                    (unsigned long)SvUV(*sv_cofactor),
-                    NULL, /* we intentionally don't allow setting custom names */
-                    NULL  /* we intentionally don't allow setting custom OIDs */
-                  );
-  return err == CRYPT_OK ? dp : NULL;
-}
-
-void _ecc_free_key(ecc_key *key, ltc_ecc_set_type *dp)
-{
-  if(dp) {
-    ecc_dp_clear(dp);
+  if (SvPOK(sv_crv)) {
+    /* string - curve name */
+    const ltc_ecc_set_type *dp;
+    ch_name = SvPV(sv_crv, l_name);
+    if (ecc_get_set_by_name(ch_name, &dp) != CRYPT_OK) croak("FATAL: ecparams: unknown curve '%s'", ch_name);
+    return ecc_set_dp(dp, key);
   }
-  if (key->type != -1) {
-    ecc_free(key);
-    key->type = -1;
-    key->dp = NULL;
+  else {
+    /* hashref */
+    ltc_ecc_set_type set = { 0 };
+
+    if ((h = (HV*)(SvRV(sv_crv))) == NULL) croak("FATAL: ecparams: param is not valid hashref");
+
+    if ((sv_prime    = hv_fetchs(h, "prime",    0)) == NULL) croak("FATAL: ecparams: missing param prime");
+    if ((sv_A        = hv_fetchs(h, "A",        0)) == NULL) croak("FATAL: ecparams: missing param A");
+    if ((sv_B        = hv_fetchs(h, "B",        0)) == NULL) croak("FATAL: ecparams: missing param B");
+    if ((sv_order    = hv_fetchs(h, "order",    0)) == NULL) croak("FATAL: ecparams: missing param order");
+    if ((sv_Gx       = hv_fetchs(h, "Gx",       0)) == NULL) croak("FATAL: ecparams: missing param Gx");
+    if ((sv_Gy       = hv_fetchs(h, "Gy",       0)) == NULL) croak("FATAL: ecparams: missing param Gy");
+    if ((sv_cofactor = hv_fetchs(h, "cofactor", 0)) == NULL) croak("FATAL: ecparams: missing param cofactor");
+
+    if (!SvOK(*sv_prime   )) croak("FATAL: ecparams: undefined param prime");
+    if (!SvOK(*sv_A       )) croak("FATAL: ecparams: undefined param A");
+    if (!SvOK(*sv_B       )) croak("FATAL: ecparams: undefined param B");
+    if (!SvOK(*sv_order   )) croak("FATAL: ecparams: undefined param order");
+    if (!SvOK(*sv_Gx      )) croak("FATAL: ecparams: undefined param Gx");
+    if (!SvOK(*sv_Gy      )) croak("FATAL: ecparams: undefined param Gy");
+    if (!SvOK(*sv_cofactor)) croak("FATAL: ecparams: undefined param cofactor");
+
+    set.prime    = SvPV_nolen(*sv_prime);
+    set.A        = SvPV_nolen(*sv_A);
+    set.B        = SvPV_nolen(*sv_B);
+    set.order    = SvPV_nolen(*sv_order);
+    set.Gx       = SvPV_nolen(*sv_Gx);
+    set.Gy       = SvPV_nolen(*sv_Gy);
+    set.cofactor = (unsigned long)SvUV(*sv_cofactor),
+    set.name     = NULL;
+    set.oidlen   = 0;
+
+    sv_oid = hv_fetchs(h, "oid", 0);
+    if (sv_oid && SvPOK(*sv_oid)) {
+      ch_name = SvPV(*sv_oid, l_name);
+      for (i = 0, j = 0; i < l_name; i++) {
+        if (ch_name[i] == '.') {
+          if (++j >= 16) return CRYPT_ERROR;
+        }
+        else if(ch_name[i] >= '0' && ch_name[i] <= '9') {
+          set.oid[j] = set.oid[j] * 10 + (ch_name[i] - '0');
+        }
+        else {
+          return CRYPT_ERROR;
+        }
+      }
+      if (j == 0) return CRYPT_ERROR;
+      set.oidlen = j + 1;
+    }
+
+    if ((err = ecc_set_dp(&set, key)) != CRYPT_OK) return err;
+    if (key->dp.oidlen == 0) _ecc_oid_lookup(key);
+    return CRYPT_OK;
   }
 }
 

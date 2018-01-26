@@ -7,9 +7,6 @@
  * guarantee it works.
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + a*x + b
- *
- */
 #include "tomcrypt.h"
 
 /**
@@ -26,22 +23,23 @@
   @param kA       What to multiple A by
   @param B        Second point to multiply
   @param kB       What to multiple B by
-  @param C        [out] Destination point (can overlap with A or B
+  @param C        [out] Destination point (can overlap with A or B)
+  @param ma       ECC curve parameter a in montgomery form
   @param modulus  Modulus for curve
   @return CRYPT_OK on success
 */
-int ltc_ecc_mul2add(ecc_point *A, void *kA,
-                    ecc_point *B, void *kB,
-                    ecc_point *C,
-                         void *a,
-                         void *modulus)
+int ltc_ecc_mul2add(const ecc_point *A, void *kA,
+                    const ecc_point *B, void *kB,
+                          ecc_point *C,
+                               void *ma,
+                               void *modulus)
 {
   ecc_point     *precomp[16];
   unsigned       bitbufA, bitbufB, lenA, lenB, len, nA, nB, nibble;
   unsigned       x, y;
   unsigned char *tA, *tB;
   int            err, first;
-  void          *mp, *mu, *ma;
+  void          *mp, *mu;
 
   /* argchks */
   LTC_ARGCHK(A       != NULL);
@@ -95,13 +93,10 @@ int ltc_ecc_mul2add(ecc_point *A, void *kA,
   if ((err = mp_montgomery_setup(modulus, &mp)) != CRYPT_OK) {
       goto ERR_P;
   }
-  if ((err = mp_init_multi(&mu, &ma, NULL)) != CRYPT_OK) {
+  if ((err = mp_init(&mu)) != CRYPT_OK) {
       goto ERR_MP;
   }
   if ((err = mp_montgomery_normalization(mu, modulus)) != CRYPT_OK) {
-      goto ERR_MU;
-  }
-  if ((err = mp_mulmod(a, mu, modulus, ma)) != CRYPT_OK) {
       goto ERR_MU;
   }
 
@@ -183,7 +178,7 @@ int ltc_ecc_mul2add(ecc_point *A, void *kA,
 
   /* clean up */
 ERR_MU:
-   mp_clear_multi(mu, ma, NULL);
+   mp_clear(mu);
 ERR_MP:
    mp_montgomery_free(mp);
 ERR_P:
