@@ -13,19 +13,17 @@ our @EXPORT = qw();
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
-use CryptX;
+use Crypt::Digest;
 
-sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
-
-sub ripemd256             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
-sub ripemd256_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub ripemd256_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
-sub ripemd256_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
-
-sub ripemd256_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
-sub ripemd256_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub ripemd256_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
-sub ripemd256_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
+sub hashsize                { Crypt::Digest::hashsize('RIPEMD256')             }
+sub ripemd256             { Crypt::Digest::digest_data('RIPEMD256', @_)      }
+sub ripemd256_hex         { Crypt::Digest::digest_data_hex('RIPEMD256', @_)  }
+sub ripemd256_b64         { Crypt::Digest::digest_data_b64('RIPEMD256', @_)  }
+sub ripemd256_b64u        { Crypt::Digest::digest_data_b64u('RIPEMD256', @_) }
+sub ripemd256_file        { Crypt::Digest::digest_file('RIPEMD256', @_)      }
+sub ripemd256_file_hex    { Crypt::Digest::digest_file_hex('RIPEMD256', @_)  }
+sub ripemd256_file_b64    { Crypt::Digest::digest_file_b64('RIPEMD256', @_)  }
+sub ripemd256_file_b64u   { Crypt::Digest::digest_file_b64u('RIPEMD256', @_) }
 
 1;
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::RIPEMD320 qw( ripemd320 ripemd320_hex ripemd320_b64 ripemd320_b64u ripemd320_file ripemd320_file_hex ripemd320_file_b64 ripemd320_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::RIPEMD320::hashsize, 40, 'hashsize/3');
 is( Crypt::Digest::RIPEMD320->hashsize, 40, 'hashsize/4');
 is( Crypt::Digest->new('RIPEMD320')->hashsize, 40, 'hashsize/5');
 is( Crypt::Digest::RIPEMD320->new->hashsize, 40, 'hashsize/6');
+
+is( ripemd320("A","A","A"), pack("H*","4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60"), 'ripemd320 (raw/tripple_A)');
+is( ripemd320_hex("A","A","A"), "4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60", 'ripemd320 (hex/tripple_A)');
+is( ripemd320_b64("A","A","A"), "TPNLKIfx3RVD+wzpUL8VX7fJPGPWGtxn6FjBCD/VTkp+HasbmzO6YA==", 'ripemd320 (base64/tripple_A)');
+is( ripemd320_b64u("A","A","A"), "TPNLKIfx3RVD-wzpUL8VX7fJPGPWGtxn6FjBCD_VTkp-HasbmzO6YA", 'ripemd320 (base64url/tripple_A)');
+is( digest_data('RIPEMD320', "A","A","A"), pack("H*","4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60"), 'ripemd320 (digest_data_raw/tripple_A)');
+is( digest_data_hex('RIPEMD320', "A","A","A"), "4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60", 'ripemd320 (digest_data_hex/tripple_A)');
+is( digest_data_b64('RIPEMD320', "A","A","A"), "TPNLKIfx3RVD+wzpUL8VX7fJPGPWGtxn6FjBCD/VTkp+HasbmzO6YA==", 'ripemd320 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('RIPEMD320', "A","A","A"), "TPNLKIfx3RVD-wzpUL8VX7fJPGPWGtxn6FjBCD_VTkp-HasbmzO6YA", 'ripemd320 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::RIPEMD320->new->add("A","A","A")->hexdigest, "4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60", 'ripemd320 (OO/tripple_A)');
+is( Crypt::Digest::RIPEMD320->new->add("A")->add("A")->add("A")->hexdigest, "4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60", 'ripemd320 (OO3/tripple_A)');
 
 
 is( ripemd320(""), pack("H*","22d65d5661536cdc75c1fdf5c6de7b41b9f27325ebc61e8557177d705a0ec880151c3a32a00899b8"), 'ripemd320 (raw/1)');

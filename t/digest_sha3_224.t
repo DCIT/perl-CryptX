@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA3_224 qw( sha3_224 sha3_224_hex sha3_224_b64 sha3_224_b64u sha3_224_file sha3_224_file_hex sha3_224_file_b64 sha3_224_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::SHA3_224::hashsize, 28, 'hashsize/3');
 is( Crypt::Digest::SHA3_224->hashsize, 28, 'hashsize/4');
 is( Crypt::Digest->new('SHA3_224')->hashsize, 28, 'hashsize/5');
 is( Crypt::Digest::SHA3_224->new->hashsize, 28, 'hashsize/6');
+
+is( sha3_224("A","A","A"), pack("H*","c09d5af7d9a021c484041218f3c3787fd4274b64ffd012edca0fe55b"), 'sha3_224 (raw/tripple_A)');
+is( sha3_224_hex("A","A","A"), "c09d5af7d9a021c484041218f3c3787fd4274b64ffd012edca0fe55b", 'sha3_224 (hex/tripple_A)');
+is( sha3_224_b64("A","A","A"), "wJ1a99mgIcSEBBIY88N4f9QnS2T/0BLtyg/lWw==", 'sha3_224 (base64/tripple_A)');
+is( sha3_224_b64u("A","A","A"), "wJ1a99mgIcSEBBIY88N4f9QnS2T_0BLtyg_lWw", 'sha3_224 (base64url/tripple_A)');
+is( digest_data('SHA3_224', "A","A","A"), pack("H*","c09d5af7d9a021c484041218f3c3787fd4274b64ffd012edca0fe55b"), 'sha3_224 (digest_data_raw/tripple_A)');
+is( digest_data_hex('SHA3_224', "A","A","A"), "c09d5af7d9a021c484041218f3c3787fd4274b64ffd012edca0fe55b", 'sha3_224 (digest_data_hex/tripple_A)');
+is( digest_data_b64('SHA3_224', "A","A","A"), "wJ1a99mgIcSEBBIY88N4f9QnS2T/0BLtyg/lWw==", 'sha3_224 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('SHA3_224', "A","A","A"), "wJ1a99mgIcSEBBIY88N4f9QnS2T_0BLtyg_lWw", 'sha3_224 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::SHA3_224->new->add("A","A","A")->hexdigest, "c09d5af7d9a021c484041218f3c3787fd4274b64ffd012edca0fe55b", 'sha3_224 (OO/tripple_A)');
+is( Crypt::Digest::SHA3_224->new->add("A")->add("A")->add("A")->hexdigest, "c09d5af7d9a021c484041218f3c3787fd4274b64ffd012edca0fe55b", 'sha3_224 (OO3/tripple_A)');
 
 
 is( sha3_224(""), pack("H*","6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7"), 'sha3_224 (raw/1)');

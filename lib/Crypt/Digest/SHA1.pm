@@ -13,19 +13,17 @@ our @EXPORT = qw();
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
-use CryptX;
+use Crypt::Digest;
 
-sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
-
-sub sha1             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
-sub sha1_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub sha1_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
-sub sha1_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
-
-sub sha1_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
-sub sha1_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub sha1_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
-sub sha1_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
+sub hashsize                { Crypt::Digest::hashsize('SHA1')             }
+sub sha1             { Crypt::Digest::digest_data('SHA1', @_)      }
+sub sha1_hex         { Crypt::Digest::digest_data_hex('SHA1', @_)  }
+sub sha1_b64         { Crypt::Digest::digest_data_b64('SHA1', @_)  }
+sub sha1_b64u        { Crypt::Digest::digest_data_b64u('SHA1', @_) }
+sub sha1_file        { Crypt::Digest::digest_file('SHA1', @_)      }
+sub sha1_file_hex    { Crypt::Digest::digest_file_hex('SHA1', @_)  }
+sub sha1_file_b64    { Crypt::Digest::digest_file_b64('SHA1', @_)  }
+sub sha1_file_b64u   { Crypt::Digest::digest_file_b64u('SHA1', @_) }
 
 1;
 

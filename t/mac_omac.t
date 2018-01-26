@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 72;
+use Test::More tests => 72 + 8;
 
 use Crypt::Mac::OMAC qw( omac omac_hex omac_b64 omac_b64u );
 
@@ -79,3 +79,12 @@ is( unpack('H*', omac('Blowfish','12345678901234561234567890123456',"test\0test\
 is( omac_hex('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), '40e6d018b49ada77', 'OMAC/func+hex/12');
 is( omac_b64('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), 'QObQGLSa2nc=', 'OMAC/func+b64/12');
 is( omac_b64u('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), 'QObQGLSa2nc', 'OMAC/func+b64u/12');
+
+is( unpack('H*', Crypt::Mac::OMAC->new('AES', '1234567890123456')->add("A","A","A")->mac), '49b745733f380fb4cdd8ce1ff1e52abc', 'OMAC/oo+raw/tripple_A');
+is( unpack('H*', Crypt::Mac::OMAC->new('AES', '1234567890123456')->add("A")->add("A")->add("A")->mac), '49b745733f380fb4cdd8ce1ff1e52abc', 'OMAC/oo3+raw/tripple_A');
+is( Crypt::Mac::OMAC->new('AES', '1234567890123456')->add("A","A","A")->hexmac, '49b745733f380fb4cdd8ce1ff1e52abc', 'OMAC/oo+hex/tripple_A');
+is( Crypt::Mac::OMAC->new('AES', '1234567890123456')->add("A")->add("A")->add("A")->hexmac, '49b745733f380fb4cdd8ce1ff1e52abc', 'OMAC/oo3+hex/tripple_A');
+is( unpack('H*', omac('AES', '1234567890123456',"A","A","A")), '49b745733f380fb4cdd8ce1ff1e52abc', 'OMAC/func+raw/tripple_A');
+is( omac_hex ('AES', '1234567890123456',"A","A","A"), '49b745733f380fb4cdd8ce1ff1e52abc',  'OMAC/func+hex/tripple_A');
+is( omac_b64 ('AES', '1234567890123456',"A","A","A"), 'SbdFcz84D7TN2M4f8eUqvA==',  'OMAC/func+b64/tripple_A');
+is( omac_b64u('AES', '1234567890123456',"A","A","A"), 'SbdFcz84D7TN2M4f8eUqvA', 'OMAC/func+b64u/tripple_A');

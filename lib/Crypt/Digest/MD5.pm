@@ -13,19 +13,17 @@ our @EXPORT = qw();
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
-use CryptX;
+use Crypt::Digest;
 
-sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
-
-sub md5             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
-sub md5_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub md5_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
-sub md5_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
-
-sub md5_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
-sub md5_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub md5_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
-sub md5_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
+sub hashsize                { Crypt::Digest::hashsize('MD5')             }
+sub md5             { Crypt::Digest::digest_data('MD5', @_)      }
+sub md5_hex         { Crypt::Digest::digest_data_hex('MD5', @_)  }
+sub md5_b64         { Crypt::Digest::digest_data_b64('MD5', @_)  }
+sub md5_b64u        { Crypt::Digest::digest_data_b64u('MD5', @_) }
+sub md5_file        { Crypt::Digest::digest_file('MD5', @_)      }
+sub md5_file_hex    { Crypt::Digest::digest_file_hex('MD5', @_)  }
+sub md5_file_b64    { Crypt::Digest::digest_file_b64('MD5', @_)  }
+sub md5_file_b64u   { Crypt::Digest::digest_file_b64u('MD5', @_) }
 
 1;
 

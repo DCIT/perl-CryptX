@@ -6,14 +6,13 @@ use strict;
 use warnings;
 our $VERSION = '0.056_001';
 
-use CryptX;
-use base 'Crypt::Cipher';
+use base qw(Crypt::Cipher);
 
-sub blocksize      { Crypt::Cipher::blocksize(__PACKAGE__) }
-sub keysize        { Crypt::Cipher::keysize(__PACKAGE__) }
-sub max_keysize    { Crypt::Cipher::max_keysize(__PACKAGE__) }
-sub min_keysize    { Crypt::Cipher::min_keysize(__PACKAGE__) }
-sub default_rounds { Crypt::Cipher::default_rounds(__PACKAGE__) }
+sub blocksize      { Crypt::Cipher::blocksize('DES')      }
+sub keysize        { Crypt::Cipher::keysize('DES')        }
+sub max_keysize    { Crypt::Cipher::max_keysize('DES')    }
+sub min_keysize    { Crypt::Cipher::min_keysize('DES')    }
+sub default_rounds { Crypt::Cipher::default_rounds('DES') }
 
 1;
 

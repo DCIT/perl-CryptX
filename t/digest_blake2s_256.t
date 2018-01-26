@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::BLAKE2s_256 qw( blake2s_256 blake2s_256_hex blake2s_256_b64 blake2s_256_b64u blake2s_256_file blake2s_256_file_hex blake2s_256_file_b64 blake2s_256_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::BLAKE2s_256::hashsize, 32, 'hashsize/3');
 is( Crypt::Digest::BLAKE2s_256->hashsize, 32, 'hashsize/4');
 is( Crypt::Digest->new('BLAKE2s_256')->hashsize, 32, 'hashsize/5');
 is( Crypt::Digest::BLAKE2s_256->new->hashsize, 32, 'hashsize/6');
+
+is( blake2s_256("A","A","A"), pack("H*","8d4fe9f5368ff397ce7444640f522f090597591c21392262138da6750bf1dff6"), 'blake2s_256 (raw/tripple_A)');
+is( blake2s_256_hex("A","A","A"), "8d4fe9f5368ff397ce7444640f522f090597591c21392262138da6750bf1dff6", 'blake2s_256 (hex/tripple_A)');
+is( blake2s_256_b64("A","A","A"), "jU/p9TaP85fOdERkD1IvCQWXWRwhOSJiE42mdQvx3/Y=", 'blake2s_256 (base64/tripple_A)');
+is( blake2s_256_b64u("A","A","A"), "jU_p9TaP85fOdERkD1IvCQWXWRwhOSJiE42mdQvx3_Y", 'blake2s_256 (base64url/tripple_A)');
+is( digest_data('BLAKE2s_256', "A","A","A"), pack("H*","8d4fe9f5368ff397ce7444640f522f090597591c21392262138da6750bf1dff6"), 'blake2s_256 (digest_data_raw/tripple_A)');
+is( digest_data_hex('BLAKE2s_256', "A","A","A"), "8d4fe9f5368ff397ce7444640f522f090597591c21392262138da6750bf1dff6", 'blake2s_256 (digest_data_hex/tripple_A)');
+is( digest_data_b64('BLAKE2s_256', "A","A","A"), "jU/p9TaP85fOdERkD1IvCQWXWRwhOSJiE42mdQvx3/Y=", 'blake2s_256 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('BLAKE2s_256', "A","A","A"), "jU_p9TaP85fOdERkD1IvCQWXWRwhOSJiE42mdQvx3_Y", 'blake2s_256 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::BLAKE2s_256->new->add("A","A","A")->hexdigest, "8d4fe9f5368ff397ce7444640f522f090597591c21392262138da6750bf1dff6", 'blake2s_256 (OO/tripple_A)');
+is( Crypt::Digest::BLAKE2s_256->new->add("A")->add("A")->add("A")->hexdigest, "8d4fe9f5368ff397ce7444640f522f090597591c21392262138da6750bf1dff6", 'blake2s_256 (OO3/tripple_A)');
 
 
 is( blake2s_256(""), pack("H*","69217a3079908094e11121d042354a7c1f55b6482ca1a51e1b250dfd1ed0eef9"), 'blake2s_256 (raw/1)');

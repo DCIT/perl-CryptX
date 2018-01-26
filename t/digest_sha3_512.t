@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA3_512 qw( sha3_512 sha3_512_hex sha3_512_b64 sha3_512_b64u sha3_512_file sha3_512_file_hex sha3_512_file_b64 sha3_512_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::SHA3_512::hashsize, 64, 'hashsize/3');
 is( Crypt::Digest::SHA3_512->hashsize, 64, 'hashsize/4');
 is( Crypt::Digest->new('SHA3_512')->hashsize, 64, 'hashsize/5');
 is( Crypt::Digest::SHA3_512->new->hashsize, 64, 'hashsize/6');
+
+is( sha3_512("A","A","A"), pack("H*","852cf44eb8d38715c847976b6de526564136d756fa99b4ad5a825fd6e3ba5d891c7b4576b11410a6e951fffa3399b14be1da4222d53b5a35ff236d659899e857"), 'sha3_512 (raw/tripple_A)');
+is( sha3_512_hex("A","A","A"), "852cf44eb8d38715c847976b6de526564136d756fa99b4ad5a825fd6e3ba5d891c7b4576b11410a6e951fffa3399b14be1da4222d53b5a35ff236d659899e857", 'sha3_512 (hex/tripple_A)');
+is( sha3_512_b64("A","A","A"), "hSz0TrjThxXIR5drbeUmVkE211b6mbStWoJf1uO6XYkce0V2sRQQpulR//ozmbFL4dpCItU7WjX/I21lmJnoVw==", 'sha3_512 (base64/tripple_A)');
+is( sha3_512_b64u("A","A","A"), "hSz0TrjThxXIR5drbeUmVkE211b6mbStWoJf1uO6XYkce0V2sRQQpulR__ozmbFL4dpCItU7WjX_I21lmJnoVw", 'sha3_512 (base64url/tripple_A)');
+is( digest_data('SHA3_512', "A","A","A"), pack("H*","852cf44eb8d38715c847976b6de526564136d756fa99b4ad5a825fd6e3ba5d891c7b4576b11410a6e951fffa3399b14be1da4222d53b5a35ff236d659899e857"), 'sha3_512 (digest_data_raw/tripple_A)');
+is( digest_data_hex('SHA3_512', "A","A","A"), "852cf44eb8d38715c847976b6de526564136d756fa99b4ad5a825fd6e3ba5d891c7b4576b11410a6e951fffa3399b14be1da4222d53b5a35ff236d659899e857", 'sha3_512 (digest_data_hex/tripple_A)');
+is( digest_data_b64('SHA3_512', "A","A","A"), "hSz0TrjThxXIR5drbeUmVkE211b6mbStWoJf1uO6XYkce0V2sRQQpulR//ozmbFL4dpCItU7WjX/I21lmJnoVw==", 'sha3_512 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('SHA3_512', "A","A","A"), "hSz0TrjThxXIR5drbeUmVkE211b6mbStWoJf1uO6XYkce0V2sRQQpulR__ozmbFL4dpCItU7WjX_I21lmJnoVw", 'sha3_512 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::SHA3_512->new->add("A","A","A")->hexdigest, "852cf44eb8d38715c847976b6de526564136d756fa99b4ad5a825fd6e3ba5d891c7b4576b11410a6e951fffa3399b14be1da4222d53b5a35ff236d659899e857", 'sha3_512 (OO/tripple_A)');
+is( Crypt::Digest::SHA3_512->new->add("A")->add("A")->add("A")->hexdigest, "852cf44eb8d38715c847976b6de526564136d756fa99b4ad5a825fd6e3ba5d891c7b4576b11410a6e951fffa3399b14be1da4222d53b5a35ff236d659899e857", 'sha3_512 (OO3/tripple_A)');
 
 
 is( sha3_512(""), pack("H*","a69f73cca23a9ac5c8b567dc185a756e97c982164fe25859e0d1dcc1475c80a615b2123af1f5f94c11e3e9402c3ac558f500199d95b6d3e301758586281dcd26"), 'sha3_512 (raw/1)');

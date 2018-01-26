@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::RIPEMD160 qw( ripemd160 ripemd160_hex ripemd160_b64 ripemd160_b64u ripemd160_file ripemd160_file_hex ripemd160_file_b64 ripemd160_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::RIPEMD160::hashsize, 20, 'hashsize/3');
 is( Crypt::Digest::RIPEMD160->hashsize, 20, 'hashsize/4');
 is( Crypt::Digest->new('RIPEMD160')->hashsize, 20, 'hashsize/5');
 is( Crypt::Digest::RIPEMD160->new->hashsize, 20, 'hashsize/6');
+
+is( ripemd160("A","A","A"), pack("H*","e4e130acc1d2a5a63c17efb1eedbd02be28443d1"), 'ripemd160 (raw/tripple_A)');
+is( ripemd160_hex("A","A","A"), "e4e130acc1d2a5a63c17efb1eedbd02be28443d1", 'ripemd160 (hex/tripple_A)');
+is( ripemd160_b64("A","A","A"), "5OEwrMHSpaY8F++x7tvQK+KEQ9E=", 'ripemd160 (base64/tripple_A)');
+is( ripemd160_b64u("A","A","A"), "5OEwrMHSpaY8F--x7tvQK-KEQ9E", 'ripemd160 (base64url/tripple_A)');
+is( digest_data('RIPEMD160', "A","A","A"), pack("H*","e4e130acc1d2a5a63c17efb1eedbd02be28443d1"), 'ripemd160 (digest_data_raw/tripple_A)');
+is( digest_data_hex('RIPEMD160', "A","A","A"), "e4e130acc1d2a5a63c17efb1eedbd02be28443d1", 'ripemd160 (digest_data_hex/tripple_A)');
+is( digest_data_b64('RIPEMD160', "A","A","A"), "5OEwrMHSpaY8F++x7tvQK+KEQ9E=", 'ripemd160 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('RIPEMD160', "A","A","A"), "5OEwrMHSpaY8F--x7tvQK-KEQ9E", 'ripemd160 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::RIPEMD160->new->add("A","A","A")->hexdigest, "e4e130acc1d2a5a63c17efb1eedbd02be28443d1", 'ripemd160 (OO/tripple_A)');
+is( Crypt::Digest::RIPEMD160->new->add("A")->add("A")->add("A")->hexdigest, "e4e130acc1d2a5a63c17efb1eedbd02be28443d1", 'ripemd160 (OO3/tripple_A)');
 
 
 is( ripemd160(""), pack("H*","9c1185a5c5e9fc54612808977ee8f548b2258d31"), 'ripemd160 (raw/1)');

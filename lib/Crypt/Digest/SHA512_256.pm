@@ -13,19 +13,17 @@ our @EXPORT = qw();
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
-use CryptX;
+use Crypt::Digest;
 
-sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
-
-sub sha512_256             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
-sub sha512_256_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub sha512_256_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
-sub sha512_256_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
-
-sub sha512_256_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
-sub sha512_256_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub sha512_256_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
-sub sha512_256_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
+sub hashsize                { Crypt::Digest::hashsize('SHA512_256')             }
+sub sha512_256             { Crypt::Digest::digest_data('SHA512_256', @_)      }
+sub sha512_256_hex         { Crypt::Digest::digest_data_hex('SHA512_256', @_)  }
+sub sha512_256_b64         { Crypt::Digest::digest_data_b64('SHA512_256', @_)  }
+sub sha512_256_b64u        { Crypt::Digest::digest_data_b64u('SHA512_256', @_) }
+sub sha512_256_file        { Crypt::Digest::digest_file('SHA512_256', @_)      }
+sub sha512_256_file_hex    { Crypt::Digest::digest_file_hex('SHA512_256', @_)  }
+sub sha512_256_file_b64    { Crypt::Digest::digest_file_b64('SHA512_256', @_)  }
+sub sha512_256_file_b64u   { Crypt::Digest::digest_file_b64u('SHA512_256', @_) }
 
 1;
 

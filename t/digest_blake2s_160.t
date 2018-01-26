@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::BLAKE2s_160 qw( blake2s_160 blake2s_160_hex blake2s_160_b64 blake2s_160_b64u blake2s_160_file blake2s_160_file_hex blake2s_160_file_b64 blake2s_160_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::BLAKE2s_160::hashsize, 20, 'hashsize/3');
 is( Crypt::Digest::BLAKE2s_160->hashsize, 20, 'hashsize/4');
 is( Crypt::Digest->new('BLAKE2s_160')->hashsize, 20, 'hashsize/5');
 is( Crypt::Digest::BLAKE2s_160->new->hashsize, 20, 'hashsize/6');
+
+is( blake2s_160("A","A","A"), pack("H*","f44c709aebd62a7a13bd6ee5979981970a60e117"), 'blake2s_160 (raw/tripple_A)');
+is( blake2s_160_hex("A","A","A"), "f44c709aebd62a7a13bd6ee5979981970a60e117", 'blake2s_160 (hex/tripple_A)');
+is( blake2s_160_b64("A","A","A"), "9ExwmuvWKnoTvW7ll5mBlwpg4Rc=", 'blake2s_160 (base64/tripple_A)');
+is( blake2s_160_b64u("A","A","A"), "9ExwmuvWKnoTvW7ll5mBlwpg4Rc", 'blake2s_160 (base64url/tripple_A)');
+is( digest_data('BLAKE2s_160', "A","A","A"), pack("H*","f44c709aebd62a7a13bd6ee5979981970a60e117"), 'blake2s_160 (digest_data_raw/tripple_A)');
+is( digest_data_hex('BLAKE2s_160', "A","A","A"), "f44c709aebd62a7a13bd6ee5979981970a60e117", 'blake2s_160 (digest_data_hex/tripple_A)');
+is( digest_data_b64('BLAKE2s_160', "A","A","A"), "9ExwmuvWKnoTvW7ll5mBlwpg4Rc=", 'blake2s_160 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('BLAKE2s_160', "A","A","A"), "9ExwmuvWKnoTvW7ll5mBlwpg4Rc", 'blake2s_160 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::BLAKE2s_160->new->add("A","A","A")->hexdigest, "f44c709aebd62a7a13bd6ee5979981970a60e117", 'blake2s_160 (OO/tripple_A)');
+is( Crypt::Digest::BLAKE2s_160->new->add("A")->add("A")->add("A")->hexdigest, "f44c709aebd62a7a13bd6ee5979981970a60e117", 'blake2s_160 (OO3/tripple_A)');
 
 
 is( blake2s_160(""), pack("H*","354c9c33f735962418bdacb9479873429c34916f"), 'blake2s_160 (raw/1)');

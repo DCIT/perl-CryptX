@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::Tiger192 qw( tiger192 tiger192_hex tiger192_b64 tiger192_b64u tiger192_file tiger192_file_hex tiger192_file_b64 tiger192_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::Tiger192::hashsize, 24, 'hashsize/3');
 is( Crypt::Digest::Tiger192->hashsize, 24, 'hashsize/4');
 is( Crypt::Digest->new('Tiger192')->hashsize, 24, 'hashsize/5');
 is( Crypt::Digest::Tiger192->new->hashsize, 24, 'hashsize/6');
+
+is( tiger192("A","A","A"), pack("H*","04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9"), 'tiger192 (raw/tripple_A)');
+is( tiger192_hex("A","A","A"), "04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9", 'tiger192 (hex/tripple_A)');
+is( tiger192_b64("A","A","A"), "BGgiU6zE5gkgFCKtUK1r4sUc8WmLCkHJ", 'tiger192 (base64/tripple_A)');
+is( tiger192_b64u("A","A","A"), "BGgiU6zE5gkgFCKtUK1r4sUc8WmLCkHJ", 'tiger192 (base64url/tripple_A)');
+is( digest_data('Tiger192', "A","A","A"), pack("H*","04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9"), 'tiger192 (digest_data_raw/tripple_A)');
+is( digest_data_hex('Tiger192', "A","A","A"), "04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9", 'tiger192 (digest_data_hex/tripple_A)');
+is( digest_data_b64('Tiger192', "A","A","A"), "BGgiU6zE5gkgFCKtUK1r4sUc8WmLCkHJ", 'tiger192 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('Tiger192', "A","A","A"), "BGgiU6zE5gkgFCKtUK1r4sUc8WmLCkHJ", 'tiger192 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::Tiger192->new->add("A","A","A")->hexdigest, "04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9", 'tiger192 (OO/tripple_A)');
+is( Crypt::Digest::Tiger192->new->add("A")->add("A")->add("A")->hexdigest, "04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9", 'tiger192 (OO3/tripple_A)');
 
 
 is( tiger192(""), pack("H*","3293ac630c13f0245f92bbb1766e16167a4e58492dde73f3"), 'tiger192 (raw/1)');

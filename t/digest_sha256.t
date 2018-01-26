@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA256 qw( sha256 sha256_hex sha256_b64 sha256_b64u sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::SHA256::hashsize, 32, 'hashsize/3');
 is( Crypt::Digest::SHA256->hashsize, 32, 'hashsize/4');
 is( Crypt::Digest->new('SHA256')->hashsize, 32, 'hashsize/5');
 is( Crypt::Digest::SHA256->new->hashsize, 32, 'hashsize/6');
+
+is( sha256("A","A","A"), pack("H*","cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358"), 'sha256 (raw/tripple_A)');
+is( sha256_hex("A","A","A"), "cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358", 'sha256 (hex/tripple_A)');
+is( sha256_b64("A","A","A"), "yxrSEZ2Pr7aVZlEO5xJmH58UuDOFAG75KuxH9SOjg1g=", 'sha256 (base64/tripple_A)');
+is( sha256_b64u("A","A","A"), "yxrSEZ2Pr7aVZlEO5xJmH58UuDOFAG75KuxH9SOjg1g", 'sha256 (base64url/tripple_A)');
+is( digest_data('SHA256', "A","A","A"), pack("H*","cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358"), 'sha256 (digest_data_raw/tripple_A)');
+is( digest_data_hex('SHA256', "A","A","A"), "cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358", 'sha256 (digest_data_hex/tripple_A)');
+is( digest_data_b64('SHA256', "A","A","A"), "yxrSEZ2Pr7aVZlEO5xJmH58UuDOFAG75KuxH9SOjg1g=", 'sha256 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('SHA256', "A","A","A"), "yxrSEZ2Pr7aVZlEO5xJmH58UuDOFAG75KuxH9SOjg1g", 'sha256 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::SHA256->new->add("A","A","A")->hexdigest, "cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358", 'sha256 (OO/tripple_A)');
+is( Crypt::Digest::SHA256->new->add("A")->add("A")->add("A")->hexdigest, "cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358", 'sha256 (OO3/tripple_A)');
 
 
 is( sha256(""), pack("H*","e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"), 'sha256 (raw/1)');

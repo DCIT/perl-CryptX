@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::BLAKE2s_224 qw( blake2s_224 blake2s_224_hex blake2s_224_b64 blake2s_224_b64u blake2s_224_file blake2s_224_file_hex blake2s_224_file_b64 blake2s_224_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::BLAKE2s_224::hashsize, 28, 'hashsize/3');
 is( Crypt::Digest::BLAKE2s_224->hashsize, 28, 'hashsize/4');
 is( Crypt::Digest->new('BLAKE2s_224')->hashsize, 28, 'hashsize/5');
 is( Crypt::Digest::BLAKE2s_224->new->hashsize, 28, 'hashsize/6');
+
+is( blake2s_224("A","A","A"), pack("H*","8c2738e18d0b9645870d7da4b52756cef46c5f3d185f4ea93c361006"), 'blake2s_224 (raw/tripple_A)');
+is( blake2s_224_hex("A","A","A"), "8c2738e18d0b9645870d7da4b52756cef46c5f3d185f4ea93c361006", 'blake2s_224 (hex/tripple_A)');
+is( blake2s_224_b64("A","A","A"), "jCc44Y0LlkWHDX2ktSdWzvRsXz0YX06pPDYQBg==", 'blake2s_224 (base64/tripple_A)');
+is( blake2s_224_b64u("A","A","A"), "jCc44Y0LlkWHDX2ktSdWzvRsXz0YX06pPDYQBg", 'blake2s_224 (base64url/tripple_A)');
+is( digest_data('BLAKE2s_224', "A","A","A"), pack("H*","8c2738e18d0b9645870d7da4b52756cef46c5f3d185f4ea93c361006"), 'blake2s_224 (digest_data_raw/tripple_A)');
+is( digest_data_hex('BLAKE2s_224', "A","A","A"), "8c2738e18d0b9645870d7da4b52756cef46c5f3d185f4ea93c361006", 'blake2s_224 (digest_data_hex/tripple_A)');
+is( digest_data_b64('BLAKE2s_224', "A","A","A"), "jCc44Y0LlkWHDX2ktSdWzvRsXz0YX06pPDYQBg==", 'blake2s_224 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('BLAKE2s_224', "A","A","A"), "jCc44Y0LlkWHDX2ktSdWzvRsXz0YX06pPDYQBg", 'blake2s_224 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::BLAKE2s_224->new->add("A","A","A")->hexdigest, "8c2738e18d0b9645870d7da4b52756cef46c5f3d185f4ea93c361006", 'blake2s_224 (OO/tripple_A)');
+is( Crypt::Digest::BLAKE2s_224->new->add("A")->add("A")->add("A")->hexdigest, "8c2738e18d0b9645870d7da4b52756cef46c5f3d185f4ea93c361006", 'blake2s_224 (OO3/tripple_A)');
 
 
 is( blake2s_224(""), pack("H*","1fa1291e65248b37b3433475b2a0dd63d54a11ecc4e3e034e7bc1ef4"), 'blake2s_224 (raw/1)');

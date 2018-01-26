@@ -11,10 +11,6 @@ our %EXPORT_TAGS = ( all => [qw( pmac pmac_hex pmac_b64 pmac_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use Carp;
-$Carp::Internal{(__PACKAGE__)}++;
-use CryptX;
-
 1;
 
 =pod
@@ -69,24 +65,32 @@ Or all of them at once:
 Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a binary string.
 
  $pmac_raw = pmac($cipher_name, $key, 'data buffer');
+ #or
+ $pmac_raw = pmac($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 pmac_hex
 
 Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a hexadecimal string.
 
  $pmac_hex = pmac_hex($cipher_name, $key, 'data buffer');
+ #or
+ $pmac_hex = pmac_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 pmac_b64
 
 Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a Base64 string.
 
  $pmac_b64 = pmac_b64($cipher_name, $key, 'data buffer');
+ #or
+ $pmac_b64 = pmac_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 pmac_b64u
 
 Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
  $pmac_b64url = pmac_b64u($cipher_name, $key, 'data buffer');
+ #or
+ $pmac_b64url = pmac_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 
@@ -105,6 +109,8 @@ Logically joins all arguments into a single string, and returns its PMAC message
 =head2 add
 
  $d->add('any data');
+ #or
+ $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 

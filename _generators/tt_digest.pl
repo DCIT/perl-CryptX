@@ -100,6 +100,11 @@ for my $n (sort keys %list) {
     $data->{t_files_count} = scalar(@{$data->{t_files}});
     $data->{t_strings_count} = scalar(@{$data->{t_strings}});
     $data->{hashsize} = Crypt::Digest->hashsize($n);
+    $data->{tripple_A} = { 
+                           hex       => Crypt::Digest::digest_data_hex($n, "AAA"),
+                           base64    => Crypt::Digest::digest_data_b64($n, "AAA"),
+                           base64url => Crypt::Digest::digest_data_b64u($n, "AAA"),
+                         };
 
     my $t_out = catfile($outdir_t, "digest_".lc($n).".t");
     my $t_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";

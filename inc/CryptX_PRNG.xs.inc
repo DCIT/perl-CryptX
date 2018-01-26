@@ -96,35 +96,10 @@ add_entropy(Crypt::PRNG self, SV * entropy=&PL_sv_undef)
 
 SV *
 bytes(Crypt::PRNG self, STRLEN output_len)
-    CODE:
-    {
-        IV curpid = (IV)PerlProc_getpid();
-        int rv_len;
-        unsigned char *rdata;
-        unsigned char entropy_buf[40];
-
-        if (self->last_pid != curpid) {
-          if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
-          self->desc->add_entropy(entropy_buf, 40, &self->state);
-          self->desc->ready(&self->state);
-          self->last_pid = curpid;
-        }
-
-        RETVAL = NEWSV(0, output_len);
-        SvPOK_only(RETVAL);
-        SvCUR_set(RETVAL, output_len);
-        rdata = (unsigned char *)SvPVX(RETVAL);
-        rv_len = (self->desc->read)(rdata, (unsigned long)output_len, &self->state);
-        if ((UV)rv_len != output_len) {
-          SvREFCNT_dec(RETVAL);
-          croak("FATAL: PRNG_read failed");
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-bytes_hex(Crypt::PRNG self, STRLEN output_len)
+    ALIAS:
+        bytes_hex  = 1
+        bytes_b64  = 2
+        bytes_b64u = 3
     CODE:
     {
         IV curpid = (IV)PerlProc_getpid();
@@ -139,95 +114,56 @@ bytes_hex(Crypt::PRNG self, STRLEN output_len)
           self->desc->ready(&self->state);
           self->last_pid = curpid;
         }
-
-        Newz(0, tmp, output_len, unsigned char);
-        if (tmp == NULL) croak("FATAL: Newz failed");
-        rv_len = (self->desc->read)(tmp, (unsigned long)output_len, &self->state);
-        if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
-        RETVAL = NEWSV(0, output_len * 2);
-        SvPOK_only(RETVAL);
-        SvCUR_set(RETVAL, output_len * 2);
-        rdata = (unsigned char *)SvPVX(RETVAL);
-        len = output_len * 2;
-        rv = _base16_encode(tmp, output_len, rdata, &len);
-        Safefree(tmp);
-        if (rv != CRYPT_OK) {
-          SvREFCNT_dec(RETVAL);
-          croak("FATAL: base16_encode failed");
+        
+        if (ix == 1) {
+          /* HEX */
+          Newz(0, tmp, output_len, unsigned char);
+          if (tmp == NULL) croak("FATAL: Newz failed");
+          rv_len = (self->desc->read)(tmp, (unsigned long)output_len, &self->state);
+          if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
+          RETVAL = NEWSV(0, output_len * 2);
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, output_len * 2);
+          rdata = (unsigned char *)SvPVX(RETVAL);
+          len = output_len * 2;
+          rv = _base16_encode(tmp, output_len, rdata, &len);
+          Safefree(tmp);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: base16_encode failed");
+          }
         }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-bytes_b64(Crypt::PRNG self, STRLEN output_len)
-    CODE:
-    {
-        IV curpid = (IV)PerlProc_getpid();
-        int rv_len, rv;
-        unsigned long len;
-        unsigned char *rdata, *tmp;
-        unsigned char entropy_buf[40];
-
-        if (self->last_pid != curpid) {
-          if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
-          self->desc->add_entropy(entropy_buf, 40, &self->state);
-          self->desc->ready(&self->state);
-          self->last_pid = curpid;
+        else if (ix == 2 || ix == 3) {
+          /* BASE64 or BASE64URL */
+          Newz(0, tmp, output_len, unsigned char);
+          if (tmp == NULL) croak("FATAL: Newz failed");
+          rv_len = (self->desc->read)(tmp, (unsigned long)output_len, &self->state);
+          if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
+          RETVAL = NEWSV(0, output_len * 2);
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, output_len * 2);
+          rdata = (unsigned char *)SvPVX(RETVAL);
+          len = output_len * 2;
+          rv = ix == 3 ? base64url_encode(tmp, output_len, rdata, &len) :
+                         base64_encode(tmp, output_len, rdata, &len);
+          SvCUR_set(RETVAL, len);
+          Safefree(tmp);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak(ix == 3 ? "FATAL: base64url_encode failed" : "FATAL: base64_encode failed");
+          }
         }
-
-        Newz(0, tmp, output_len, unsigned char);
-        if (tmp == NULL) croak("FATAL: Newz failed");
-        rv_len = (self->desc->read)(tmp, (unsigned long)output_len, &self->state);
-        if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
-        RETVAL = NEWSV(0, output_len * 2);
-        SvPOK_only(RETVAL);
-        SvCUR_set(RETVAL, output_len * 2);
-        rdata = (unsigned char *)SvPVX(RETVAL);
-        len = output_len * 2;
-        rv = base64_encode(tmp, output_len, rdata, &len);
-        SvCUR_set(RETVAL, len);
-        Safefree(tmp);
-        if (rv != CRYPT_OK) {
-          SvREFCNT_dec(RETVAL);
-          croak("FATAL: base64_encode failed");
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-bytes_b64u(Crypt::PRNG self, STRLEN output_len)
-    CODE:
-    {
-        IV curpid = (IV)PerlProc_getpid();
-        int rv_len, rv;
-        unsigned long len;
-        unsigned char *rdata, *tmp;
-        unsigned char entropy_buf[40];
-
-        if (self->last_pid != curpid) {
-          if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
-          self->desc->add_entropy(entropy_buf, 40, &self->state);
-          self->desc->ready(&self->state);
-          self->last_pid = curpid;
-        }
-
-        Newz(0, tmp, output_len, unsigned char);
-        if (tmp == NULL) croak("FATAL: Newz failed");
-        rv_len = (self->desc->read)(tmp, (unsigned long)output_len, &self->state);
-        if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
-        RETVAL = NEWSV(0, output_len * 2);
-        SvPOK_only(RETVAL);
-        SvCUR_set(RETVAL, output_len * 2);
-        rdata = (unsigned char *)SvPVX(RETVAL);
-        len = output_len * 2;
-        rv = base64url_encode(tmp, output_len, rdata, &len);
-        SvCUR_set(RETVAL, len);
-        Safefree(tmp);
-        if (rv != CRYPT_OK) {
-          SvREFCNT_dec(RETVAL);
-          croak("FATAL: base64url_encode failed");
+        else {
+          /* RAW BYTES */
+          RETVAL = NEWSV(0, output_len);
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, output_len);
+          rdata = (unsigned char *)SvPVX(RETVAL);
+          rv_len = (self->desc->read)(rdata, (unsigned long)output_len, &self->state);
+          if ((UV)rv_len != output_len) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: PRNG_read failed");
+          }
         }
     }
     OUTPUT:
@@ -257,7 +193,7 @@ int32(Crypt::PRNG self)
         RETVAL
 
 NV
-double(Crypt::PRNG self, ...)
+double(Crypt::PRNG self, SV * limit_sv = NULL)
     CODE:
     {
         IV curpid = (IV)PerlProc_getpid();
@@ -265,7 +201,6 @@ double(Crypt::PRNG self, ...)
         unsigned long a, b;     /* 32bit is enough */
         unsigned char rdata[7]; /* for double we need 53 bits */
         unsigned char entropy_buf[40];
-        NV limit;
 
         if (self->last_pid != curpid) {
           if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
@@ -279,8 +214,8 @@ double(Crypt::PRNG self, ...)
         a = (((unsigned long)(rdata[0])<<16) + ((unsigned long)(rdata[1])<<8) + ((unsigned long)(rdata[2]))) & 0x1FFFFF;                      /* 21 bits */
         b = ((unsigned long)(rdata[3])<<24) + ((unsigned long)(rdata[4])<<16) + ((unsigned long)(rdata[5])<<8) + ((unsigned long)(rdata[6])); /* 32 bits */
         RETVAL = ( (NV)a * 4294967296.0 + (NV)b ) / 9007199254740992.0;                           /* (a * 2^32 + b) / 2^53 */
-        if (items > 1 && SvOK(ST(1))) {
-          limit = SvNV(ST(1));
+        if (limit_sv && SvOK(limit_sv)) {
+          NV limit = SvNV(limit_sv);
           if (limit > 0 || limit < 0) RETVAL = RETVAL * limit;
         }
     }

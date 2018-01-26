@@ -13,19 +13,17 @@ our @EXPORT = qw();
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
-use CryptX;
+use Crypt::Digest;
 
-sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
-
-sub md2             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
-sub md2_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub md2_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
-sub md2_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
-
-sub md2_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
-sub md2_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub md2_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
-sub md2_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
+sub hashsize                { Crypt::Digest::hashsize('MD2')             }
+sub md2             { Crypt::Digest::digest_data('MD2', @_)      }
+sub md2_hex         { Crypt::Digest::digest_data_hex('MD2', @_)  }
+sub md2_b64         { Crypt::Digest::digest_data_b64('MD2', @_)  }
+sub md2_b64u        { Crypt::Digest::digest_data_b64u('MD2', @_) }
+sub md2_file        { Crypt::Digest::digest_file('MD2', @_)      }
+sub md2_file_hex    { Crypt::Digest::digest_file_hex('MD2', @_)  }
+sub md2_file_b64    { Crypt::Digest::digest_file_b64('MD2', @_)  }
+sub md2_file_b64u   { Crypt::Digest::digest_file_b64u('MD2', @_) }
 
 1;
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::Whirlpool qw( whirlpool whirlpool_hex whirlpool_b64 whirlpool_b64u whirlpool_file whirlpool_file_hex whirlpool_file_b64 whirlpool_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::Whirlpool::hashsize, 64, 'hashsize/3');
 is( Crypt::Digest::Whirlpool->hashsize, 64, 'hashsize/4');
 is( Crypt::Digest->new('Whirlpool')->hashsize, 64, 'hashsize/5');
 is( Crypt::Digest::Whirlpool->new->hashsize, 64, 'hashsize/6');
+
+is( whirlpool("A","A","A"), pack("H*","a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64"), 'whirlpool (raw/tripple_A)');
+is( whirlpool_hex("A","A","A"), "a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64", 'whirlpool (hex/tripple_A)');
+is( whirlpool_b64("A","A","A"), "pN6jjHQ/MY23Fp4orCev8XOUK2e1b5iB2kZL2sSPR8xIHuKXRlV88BPRxUx6dpEsE4CxaCUd9xGCk1Ef2JqaZA==", 'whirlpool (base64/tripple_A)');
+is( whirlpool_b64u("A","A","A"), "pN6jjHQ_MY23Fp4orCev8XOUK2e1b5iB2kZL2sSPR8xIHuKXRlV88BPRxUx6dpEsE4CxaCUd9xGCk1Ef2JqaZA", 'whirlpool (base64url/tripple_A)');
+is( digest_data('Whirlpool', "A","A","A"), pack("H*","a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64"), 'whirlpool (digest_data_raw/tripple_A)');
+is( digest_data_hex('Whirlpool', "A","A","A"), "a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64", 'whirlpool (digest_data_hex/tripple_A)');
+is( digest_data_b64('Whirlpool', "A","A","A"), "pN6jjHQ/MY23Fp4orCev8XOUK2e1b5iB2kZL2sSPR8xIHuKXRlV88BPRxUx6dpEsE4CxaCUd9xGCk1Ef2JqaZA==", 'whirlpool (digest_data_b64/tripple_A)');
+is( digest_data_b64u('Whirlpool', "A","A","A"), "pN6jjHQ_MY23Fp4orCev8XOUK2e1b5iB2kZL2sSPR8xIHuKXRlV88BPRxUx6dpEsE4CxaCUd9xGCk1Ef2JqaZA", 'whirlpool (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::Whirlpool->new->add("A","A","A")->hexdigest, "a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64", 'whirlpool (OO/tripple_A)');
+is( Crypt::Digest::Whirlpool->new->add("A")->add("A")->add("A")->hexdigest, "a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64", 'whirlpool (OO3/tripple_A)');
 
 
 is( whirlpool(""), pack("H*","19fa61d75522a4669b44e39c1d2e1726c530232130d407f89afee0964997f7a73e83be698b288febcf88e3e03c4f0757ea8964e59b63d93708b138cc42a66eb3"), 'whirlpool (raw/1)');

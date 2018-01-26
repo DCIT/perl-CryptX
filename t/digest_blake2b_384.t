@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::BLAKE2b_384 qw( blake2b_384 blake2b_384_hex blake2b_384_b64 blake2b_384_b64u blake2b_384_file blake2b_384_file_hex blake2b_384_file_b64 blake2b_384_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::BLAKE2b_384::hashsize, 48, 'hashsize/3');
 is( Crypt::Digest::BLAKE2b_384->hashsize, 48, 'hashsize/4');
 is( Crypt::Digest->new('BLAKE2b_384')->hashsize, 48, 'hashsize/5');
 is( Crypt::Digest::BLAKE2b_384->new->hashsize, 48, 'hashsize/6');
+
+is( blake2b_384("A","A","A"), pack("H*","9aa07d9caf17bff49747fc9488eb6babcdcd575616f85a91758ee50e6e49a4884bf6fb46b424e0ae669071ccd8cb1685"), 'blake2b_384 (raw/tripple_A)');
+is( blake2b_384_hex("A","A","A"), "9aa07d9caf17bff49747fc9488eb6babcdcd575616f85a91758ee50e6e49a4884bf6fb46b424e0ae669071ccd8cb1685", 'blake2b_384 (hex/tripple_A)');
+is( blake2b_384_b64("A","A","A"), "mqB9nK8Xv/SXR/yUiOtrq83NV1YW+FqRdY7lDm5JpIhL9vtGtCTgrmaQcczYyxaF", 'blake2b_384 (base64/tripple_A)');
+is( blake2b_384_b64u("A","A","A"), "mqB9nK8Xv_SXR_yUiOtrq83NV1YW-FqRdY7lDm5JpIhL9vtGtCTgrmaQcczYyxaF", 'blake2b_384 (base64url/tripple_A)');
+is( digest_data('BLAKE2b_384', "A","A","A"), pack("H*","9aa07d9caf17bff49747fc9488eb6babcdcd575616f85a91758ee50e6e49a4884bf6fb46b424e0ae669071ccd8cb1685"), 'blake2b_384 (digest_data_raw/tripple_A)');
+is( digest_data_hex('BLAKE2b_384', "A","A","A"), "9aa07d9caf17bff49747fc9488eb6babcdcd575616f85a91758ee50e6e49a4884bf6fb46b424e0ae669071ccd8cb1685", 'blake2b_384 (digest_data_hex/tripple_A)');
+is( digest_data_b64('BLAKE2b_384', "A","A","A"), "mqB9nK8Xv/SXR/yUiOtrq83NV1YW+FqRdY7lDm5JpIhL9vtGtCTgrmaQcczYyxaF", 'blake2b_384 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('BLAKE2b_384', "A","A","A"), "mqB9nK8Xv_SXR_yUiOtrq83NV1YW-FqRdY7lDm5JpIhL9vtGtCTgrmaQcczYyxaF", 'blake2b_384 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::BLAKE2b_384->new->add("A","A","A")->hexdigest, "9aa07d9caf17bff49747fc9488eb6babcdcd575616f85a91758ee50e6e49a4884bf6fb46b424e0ae669071ccd8cb1685", 'blake2b_384 (OO/tripple_A)');
+is( Crypt::Digest::BLAKE2b_384->new->add("A")->add("A")->add("A")->hexdigest, "9aa07d9caf17bff49747fc9488eb6babcdcd575616f85a91758ee50e6e49a4884bf6fb46b424e0ae669071ccd8cb1685", 'blake2b_384 (OO3/tripple_A)');
 
 
 is( blake2b_384(""), pack("H*","b32811423377f52d7862286ee1a72ee540524380fda1724a6f25d7978c6fd3244a6caf0498812673c5e05ef583825100"), 'blake2b_384 (raw/1)');

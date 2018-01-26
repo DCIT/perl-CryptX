@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA3_256 qw( sha3_256 sha3_256_hex sha3_256_b64 sha3_256_b64u sha3_256_file sha3_256_file_hex sha3_256_file_b64 sha3_256_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::SHA3_256::hashsize, 32, 'hashsize/3');
 is( Crypt::Digest::SHA3_256->hashsize, 32, 'hashsize/4');
 is( Crypt::Digest->new('SHA3_256')->hashsize, 32, 'hashsize/5');
 is( Crypt::Digest::SHA3_256->new->hashsize, 32, 'hashsize/6');
+
+is( sha3_256("A","A","A"), pack("H*","7dcb827a1f5a7cbea423e763a7dd0c7824e3512c7f1ce48cd5710f603b4f1efa"), 'sha3_256 (raw/tripple_A)');
+is( sha3_256_hex("A","A","A"), "7dcb827a1f5a7cbea423e763a7dd0c7824e3512c7f1ce48cd5710f603b4f1efa", 'sha3_256 (hex/tripple_A)');
+is( sha3_256_b64("A","A","A"), "fcuCeh9afL6kI+djp90MeCTjUSx/HOSM1XEPYDtPHvo=", 'sha3_256 (base64/tripple_A)');
+is( sha3_256_b64u("A","A","A"), "fcuCeh9afL6kI-djp90MeCTjUSx_HOSM1XEPYDtPHvo", 'sha3_256 (base64url/tripple_A)');
+is( digest_data('SHA3_256', "A","A","A"), pack("H*","7dcb827a1f5a7cbea423e763a7dd0c7824e3512c7f1ce48cd5710f603b4f1efa"), 'sha3_256 (digest_data_raw/tripple_A)');
+is( digest_data_hex('SHA3_256', "A","A","A"), "7dcb827a1f5a7cbea423e763a7dd0c7824e3512c7f1ce48cd5710f603b4f1efa", 'sha3_256 (digest_data_hex/tripple_A)');
+is( digest_data_b64('SHA3_256', "A","A","A"), "fcuCeh9afL6kI+djp90MeCTjUSx/HOSM1XEPYDtPHvo=", 'sha3_256 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('SHA3_256', "A","A","A"), "fcuCeh9afL6kI-djp90MeCTjUSx_HOSM1XEPYDtPHvo", 'sha3_256 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::SHA3_256->new->add("A","A","A")->hexdigest, "7dcb827a1f5a7cbea423e763a7dd0c7824e3512c7f1ce48cd5710f603b4f1efa", 'sha3_256 (OO/tripple_A)');
+is( Crypt::Digest::SHA3_256->new->add("A")->add("A")->add("A")->hexdigest, "7dcb827a1f5a7cbea423e763a7dd0c7824e3512c7f1ce48cd5710f603b4f1efa", 'sha3_256 (OO3/tripple_A)');
 
 
 is( sha3_256(""), pack("H*","a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a"), 'sha3_256 (raw/1)');

@@ -44,80 +44,29 @@ clone(Crypt::Mac::F9 self)
         RETVAL
 
 void
-_add_single(Crypt::Mac::F9 self, SV * data)
-    CODE:
+add(Crypt::Mac::F9 self, ...)
+    PPCODE:
     {
-        int rv;
+        int rv, i;
         STRLEN in_data_len;
         unsigned char *in_data;
 
-        in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len>0) {
-          rv = f9_process(&self->state, in_data, (unsigned long)in_data_len);
-          if (rv != CRYPT_OK) croak("FATAL: f9_process failed: %s", error_to_string(rv));
+        for(i = 1; i < items; i++) {
+          in_data = (unsigned char *)SvPVbyte(ST(i), in_data_len);
+          if (in_data_len > 0) {
+            rv = f9_process(&self->state, in_data, (unsigned long)in_data_len);
+            if (rv != CRYPT_OK) croak("FATAL: f9_process failed: %s", error_to_string(rv));
+          }
         }
+        XPUSHs(ST(0)); /* return self */
     }
 
 SV *
 mac(Crypt::Mac::F9 self)
-    CODE:
-    {
-        char mac[MAXBLOCKSIZE];
-        unsigned long maclen;
-        int rv;
-
-        maclen = sizeof(mac);
-        rv = f9_done(&self->state, (unsigned char*)mac, &maclen);
-        if (rv != CRYPT_OK) croak("FATAL: f9_done failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn(mac, maclen);
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-b64mac(Crypt::Mac::F9 self)
-    CODE:
-    {
-        unsigned char mac[MAXBLOCKSIZE];
-        unsigned long maclen;
-        int rv;
-        unsigned long outlen;
-        char out[MAXBLOCKSIZE*2];
-
-        maclen = sizeof(mac);
-        rv = f9_done(&self->state, mac, &maclen);
-        if (rv != CRYPT_OK) croak("FATAL: f9_done failed: %s", error_to_string(rv));
-        outlen = sizeof(out);
-        rv = base64_encode(mac, maclen, (unsigned char*)out, &outlen);
-        if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn(out, outlen);
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-b64umac(Crypt::Mac::F9 self)
-    CODE:
-    {
-        unsigned char mac[MAXBLOCKSIZE];
-        unsigned long maclen;
-        int rv;
-        unsigned long outlen;
-        char out[MAXBLOCKSIZE*2 + 1];
-
-        maclen = sizeof(mac);
-        rv = f9_done(&self->state, mac, &maclen);
-        if (rv != CRYPT_OK) croak("FATAL: f9_done failed: %s", error_to_string(rv));
-        outlen = sizeof(out);
-        rv = base64url_encode(mac, maclen, (unsigned char*)out, &outlen);
-        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn(out, outlen);
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-hexmac(Crypt::Mac::F9 self)
+    ALIAS:
+        hexmac  = 1
+        b64mac  = 2
+        b64umac = 3
     CODE:
     {
         unsigned char mac[MAXBLOCKSIZE];
@@ -129,98 +78,78 @@ hexmac(Crypt::Mac::F9 self)
         rv = f9_done(&self->state, mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: f9_done failed: %s", error_to_string(rv));
         outlen = sizeof(out);
-        rv = _base16_encode(mac, maclen, (unsigned char *)out, &outlen);
-        if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn(out, outlen);
+        if (ix == 3) {
+          rv = base64url_encode(mac, maclen, (unsigned char*)out, &outlen);
+          if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn(out, outlen);
+        }
+        if (ix == 2) {
+          rv = base64_encode(mac, maclen, (unsigned char*)out, &outlen);
+          if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn(out, outlen);
+        }
+        if (ix == 1) {
+          rv = _base16_encode(mac, maclen, (unsigned char *)out, &outlen);
+          if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn(out, outlen);
+        }
+        else {
+          RETVAL = newSVpvn(mac, maclen);
+        }
     }
     OUTPUT:
         RETVAL
 
 SV *
-f9(char * cipher_name, SV * key, SV * data)
+f9(char * cipher_name, SV * key, ...)
+    ALIAS:
+        f9_hex  = 1
+        f9_b64  = 2
+        f9_b64u = 3
     CODE:
     {
         STRLEN inlen, klen;
-        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *in;
         unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
-        int rv;
-        unsigned char mac[MAXBLOCKSIZE];
-        unsigned long len = sizeof(mac);
-        int id = _find_cipher(cipher_name);
-        if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
-        rv = f9_memory(id, k, klen, in, inlen, mac, &len);
-        if (rv != CRYPT_OK) croak("FATAL: f9_memory failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn((char *) mac, len);
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-f9_hex(char * cipher_name, SV * key, SV * data)
-    CODE:
-    {
-        STRLEN inlen, klen;
-        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
-        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
-        int rv;
-        unsigned char mac[MAXBLOCKSIZE];
-        unsigned long len = sizeof(mac), outlen;
-        char out[MAXBLOCKSIZE*2];
-        int id = _find_cipher(cipher_name);
-        if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
-        rv = f9_memory(id, k, klen, in, inlen, mac, &len);
-        if (rv != CRYPT_OK) croak("FATAL: f9_memory failed: %s", error_to_string(rv));
-        outlen = sizeof(out);
-        rv = _base16_encode(mac, len, (unsigned char *)out, &outlen);
-        if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn((char *) out, outlen);
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-f9_b64(char * cipher_name, SV * key, SV * data)
-    CODE:
-    {
-        STRLEN inlen, klen;
-        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
-        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
-        int rv;
+        int rv, i;
         unsigned char mac[MAXBLOCKSIZE];
         unsigned long len = sizeof(mac), outlen;
         char out[MAXBLOCKSIZE*2];
+        f9_state st;
+
         int id = _find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
-        rv = f9_memory(id, k, klen, in, inlen, mac, &len);
-        if (rv != CRYPT_OK) croak("FATAL: f9_memory failed: %s", error_to_string(rv));
-        outlen = sizeof(out);
-        rv = base64_encode(mac, len, (unsigned char *)out, &outlen);
-        if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn((char *) out, outlen);
+        rv = f9_init(&st, id, k, klen);
+        if (rv != CRYPT_OK) croak("FATAL: f9_init failed: %s", error_to_string(rv));
+        for (i = 2; i < items; i++) {
+          in = (unsigned char *)SvPVbyte(ST(i), inlen);
+          if (inlen > 0) {
+            rv = f9_process(&st, in, inlen);
+            if (rv != CRYPT_OK) croak("FATAL: f9_process failed: %s", error_to_string(rv));
+          }
+        }
+        rv = f9_done(&st, mac, &len);
+        if (rv != CRYPT_OK) croak("FATAL: f9_done failed: %s", error_to_string(rv));
 
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-f9_b64u(char * cipher_name, SV * key, SV * data)
-    CODE:
-    {
-        STRLEN inlen, klen;
-        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
-        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
-        int rv;
-        unsigned char mac[MAXBLOCKSIZE];
-        unsigned long len = sizeof(mac), outlen;
-        char out[MAXBLOCKSIZE*2];
-        int id = _find_cipher(cipher_name);
-        if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
-        rv = f9_memory(id, k, klen, in, inlen, mac, &len);
-        if (rv != CRYPT_OK) croak("FATAL: f9_memory failed: %s", error_to_string(rv));
         outlen = sizeof(out);
-        rv = base64url_encode(mac, len, (unsigned char *)out, &outlen);
-        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
-        RETVAL = newSVpvn((char *) out, outlen);
+        if (ix == 3) {
+          rv = base64url_encode(mac, len, (unsigned char *)out, &outlen);
+          if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char *) out, outlen);
+        }
+        else if (ix == 2) {
+          rv = base64_encode(mac, len, (unsigned char *)out, &outlen);
+          if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char *) out, outlen);
+        }
+        else if (ix == 1) {
+          rv = _base16_encode(mac, len, (unsigned char *)out, &outlen);
+          if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char *) out, outlen);
+        }
+        else {
+          RETVAL = newSVpvn((char *) mac, len);
+        }
     }
     OUTPUT:
         RETVAL

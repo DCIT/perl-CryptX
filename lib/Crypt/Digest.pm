@@ -139,24 +139,32 @@ Please note that all functions take as its first argument the algorithm name, su
 Logically joins all arguments into a single string, and returns its SHA1 digest encoded as a binary string.
 
  $digest_raw = digest_data('SHA1', 'data string');
+ #or
+ $digest_raw = digest_data('SHA1', 'any data', 'more data', 'even more data');
 
 =head2 digest_data_hex
 
 Logically joins all arguments into a single string, and returns its SHA1 digest encoded as a hexadecimal string.
 
  $digest_hex = digest_data_hex('SHA1', 'data string');
+ #or
+ $digest_hex = digest_data_hex('SHA1', 'any data', 'more data', 'even more data');
 
 =head2 digest_data_b64
 
 Logically joins all arguments into a single string, and returns its SHA1 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
  $digest_b64 = digest_data_b64('SHA1', 'data string');
+ #or
+ $digest_b64 = digest_data_b64('SHA1', 'any data', 'more data', 'even more data');
 
 =head2 digest_data_b64u
 
 Logically joins all arguments into a single string, and returns its SHA1 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
  $digest_b64url = digest_data_b64u('SHA1', 'data string');
+ #or
+ $digest_b64url = digest_data_b64u('SHA1', 'any data', 'more data', 'even more data');
 
 =head2 digest_file
 

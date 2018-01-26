@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::MD5 qw( md5 md5_hex md5_b64 md5_b64u md5_file md5_file_hex md5_file_b64 md5_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::MD5::hashsize, 16, 'hashsize/3');
 is( Crypt::Digest::MD5->hashsize, 16, 'hashsize/4');
 is( Crypt::Digest->new('MD5')->hashsize, 16, 'hashsize/5');
 is( Crypt::Digest::MD5->new->hashsize, 16, 'hashsize/6');
+
+is( md5("A","A","A"), pack("H*","e1faffb3e614e6c2fba74296962386b7"), 'md5 (raw/tripple_A)');
+is( md5_hex("A","A","A"), "e1faffb3e614e6c2fba74296962386b7", 'md5 (hex/tripple_A)');
+is( md5_b64("A","A","A"), "4fr/s+YU5sL7p0KWliOGtw==", 'md5 (base64/tripple_A)');
+is( md5_b64u("A","A","A"), "4fr_s-YU5sL7p0KWliOGtw", 'md5 (base64url/tripple_A)');
+is( digest_data('MD5', "A","A","A"), pack("H*","e1faffb3e614e6c2fba74296962386b7"), 'md5 (digest_data_raw/tripple_A)');
+is( digest_data_hex('MD5', "A","A","A"), "e1faffb3e614e6c2fba74296962386b7", 'md5 (digest_data_hex/tripple_A)');
+is( digest_data_b64('MD5', "A","A","A"), "4fr/s+YU5sL7p0KWliOGtw==", 'md5 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('MD5', "A","A","A"), "4fr_s-YU5sL7p0KWliOGtw", 'md5 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::MD5->new->add("A","A","A")->hexdigest, "e1faffb3e614e6c2fba74296962386b7", 'md5 (OO/tripple_A)');
+is( Crypt::Digest::MD5->new->add("A")->add("A")->add("A")->hexdigest, "e1faffb3e614e6c2fba74296962386b7", 'md5 (OO3/tripple_A)');
 
 
 is( md5(""), pack("H*","d41d8cd98f00b204e9800998ecf8427e"), 'md5 (raw/1)');

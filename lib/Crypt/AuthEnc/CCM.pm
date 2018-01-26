@@ -12,7 +12,6 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-use Crypt::Cipher;
 
 sub ccm_encrypt_authenticate {
   my $cipher_name = shift;

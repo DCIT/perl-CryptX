@@ -13,19 +13,17 @@ our @EXPORT = qw();
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
-use CryptX;
+use Crypt::Digest;
 
-sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
-
-sub blake2s_128             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
-sub blake2s_128_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub blake2s_128_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
-sub blake2s_128_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
-
-sub blake2s_128_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
-sub blake2s_128_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub blake2s_128_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
-sub blake2s_128_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
+sub hashsize                { Crypt::Digest::hashsize('BLAKE2s_128')             }
+sub blake2s_128             { Crypt::Digest::digest_data('BLAKE2s_128', @_)      }
+sub blake2s_128_hex         { Crypt::Digest::digest_data_hex('BLAKE2s_128', @_)  }
+sub blake2s_128_b64         { Crypt::Digest::digest_data_b64('BLAKE2s_128', @_)  }
+sub blake2s_128_b64u        { Crypt::Digest::digest_data_b64u('BLAKE2s_128', @_) }
+sub blake2s_128_file        { Crypt::Digest::digest_file('BLAKE2s_128', @_)      }
+sub blake2s_128_file_hex    { Crypt::Digest::digest_file_hex('BLAKE2s_128', @_)  }
+sub blake2s_128_file_b64    { Crypt::Digest::digest_file_b64('BLAKE2s_128', @_)  }
+sub blake2s_128_file_b64u   { Crypt::Digest::digest_file_b64u('BLAKE2s_128', @_) }
 
 1;
 

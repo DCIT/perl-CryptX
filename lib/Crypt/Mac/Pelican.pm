@@ -11,10 +11,6 @@ our %EXPORT_TAGS = ( all => [qw( pelican pelican_hex pelican_b64 pelican_b64u )]
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use Carp;
-$Carp::Internal{(__PACKAGE__)}++;
-use CryptX;
-
 1;
 
 =pod
@@ -69,24 +65,32 @@ Or all of them at once:
 Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a binary string.
 
  $pelican_raw = pelican($key, 'data buffer');
+ #or
+ $pelican_raw = pelican($key, 'any data', 'more data', 'even more data');
 
 =head2 pelican_hex
 
 Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a hexadecimal string.
 
  $pelican_hex = pelican_hex($key, 'data buffer');
+ #or
+ $pelican_hex = pelican_hex($key, 'any data', 'more data', 'even more data');
 
 =head2 pelican_b64
 
 Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a Base64 string.
 
  $pelican_b64 = pelican_b64($key, 'data buffer');
+ #or
+ $pelican_b64 = pelican_b64($key, 'any data', 'more data', 'even more data');
 
 =head2 pelican_b64u
 
 Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
  $pelican_b64url = pelican_b64u($key, 'data buffer');
+ #or
+ $pelican_b64url = pelican_b64u($key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 
@@ -105,6 +109,8 @@ Logically joins all arguments into a single string, and returns its Pelican mess
 =head2 add
 
  $d->add('any data');
+ #or
+ $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 

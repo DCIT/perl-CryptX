@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA224 qw( sha224 sha224_hex sha224_b64 sha224_b64u sha224_file sha224_file_hex sha224_file_b64 sha224_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::SHA224::hashsize, 28, 'hashsize/3');
 is( Crypt::Digest::SHA224->hashsize, 28, 'hashsize/4');
 is( Crypt::Digest->new('SHA224')->hashsize, 28, 'hashsize/5');
 is( Crypt::Digest::SHA224->new->hashsize, 28, 'hashsize/6');
+
+is( sha224("A","A","A"), pack("H*","808751af5f7936f20d1c79508d98c079e42ec26802ee238a5a486018"), 'sha224 (raw/tripple_A)');
+is( sha224_hex("A","A","A"), "808751af5f7936f20d1c79508d98c079e42ec26802ee238a5a486018", 'sha224 (hex/tripple_A)');
+is( sha224_b64("A","A","A"), "gIdRr195NvINHHlQjZjAeeQuwmgC7iOKWkhgGA==", 'sha224 (base64/tripple_A)');
+is( sha224_b64u("A","A","A"), "gIdRr195NvINHHlQjZjAeeQuwmgC7iOKWkhgGA", 'sha224 (base64url/tripple_A)');
+is( digest_data('SHA224', "A","A","A"), pack("H*","808751af5f7936f20d1c79508d98c079e42ec26802ee238a5a486018"), 'sha224 (digest_data_raw/tripple_A)');
+is( digest_data_hex('SHA224', "A","A","A"), "808751af5f7936f20d1c79508d98c079e42ec26802ee238a5a486018", 'sha224 (digest_data_hex/tripple_A)');
+is( digest_data_b64('SHA224', "A","A","A"), "gIdRr195NvINHHlQjZjAeeQuwmgC7iOKWkhgGA==", 'sha224 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('SHA224', "A","A","A"), "gIdRr195NvINHHlQjZjAeeQuwmgC7iOKWkhgGA", 'sha224 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::SHA224->new->add("A","A","A")->hexdigest, "808751af5f7936f20d1c79508d98c079e42ec26802ee238a5a486018", 'sha224 (OO/tripple_A)');
+is( Crypt::Digest::SHA224->new->add("A")->add("A")->add("A")->hexdigest, "808751af5f7936f20d1c79508d98c079e42ec26802ee238a5a486018", 'sha224 (OO3/tripple_A)');
 
 
 is( sha224(""), pack("H*","d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f"), 'sha224 (raw/1)');

@@ -93,6 +93,31 @@ for my $n (keys %list) {
     $_->{b64umac} = encode_base64url(pack("H*", $_->{mac}),'') for (@{$data->{t_strings}});
     $data->{t_strings_count} = defined $data->{t_strings} ? scalar(@{$data->{t_strings}}) : 0;
 
+    # tripple_A
+    if ($n eq 'HMAC') {
+      $data->{tripple_A}{mac}  = Crypt::Mac::HMAC->new('SHA1', 'secretkey')->add("AAA")->mac;
+      $data->{tripple_A}{args} = "'SHA1', 'secretkey'";
+    }
+    elsif ($n eq 'Pelican') {
+      $data->{tripple_A}{mac} = Crypt::Mac::Pelican->new('1234567890123456')->add("AAA")->mac;
+      $data->{tripple_A}{args} = "'1234567890123456'";
+    }
+    elsif ($n eq 'Poly1305') {
+      $data->{tripple_A}{mac} = Crypt::Mac::Poly1305->new('12345678901234561234567890123456')->add("AAA")->mac;
+      $data->{tripple_A}{args} = "'12345678901234561234567890123456'";
+    }
+    elsif ($n =~ /BLAKE2(s|b)/) {
+      $data->{tripple_A}{mac} = "Crypt::Mac::$n"->new(32, '12345678901234561234567890123456')->add("AAA")->mac;
+      $data->{tripple_A}{args} = "32, '12345678901234561234567890123456'";
+    }
+    else {
+      $data->{tripple_A}{mac} = "Crypt::Mac::$n"->new('AES', '1234567890123456')->add("AAA")->mac;
+      $data->{tripple_A}{args} = "'AES', '1234567890123456'";
+    }
+    $data->{tripple_A}{hexmac}  = unpack('H*', $data->{tripple_A}{mac});
+    $data->{tripple_A}{b64mac}  = encode_base64($data->{tripple_A}{mac},'');
+    $data->{tripple_A}{b64umac} = encode_base64url($data->{tripple_A}{mac},'');
+
     my $t_out = catfile($outdir_t, "mac_".lc($n).".t");
     my $t_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";
     $t_tt->process("$FindBin::Bin/Mac.t.tt", $data, "$t_out.$$", {binmode=>1}) || die $t_tt->error(), "\n";

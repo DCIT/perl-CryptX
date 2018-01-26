@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::MD2 qw( md2 md2_hex md2_b64 md2_b64u md2_file md2_file_hex md2_file_b64 md2_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::MD2::hashsize, 16, 'hashsize/3');
 is( Crypt::Digest::MD2->hashsize, 16, 'hashsize/4');
 is( Crypt::Digest->new('MD2')->hashsize, 16, 'hashsize/5');
 is( Crypt::Digest::MD2->new->hashsize, 16, 'hashsize/6');
+
+is( md2("A","A","A"), pack("H*","8788c1729761fdad983b830f04b19e86"), 'md2 (raw/tripple_A)');
+is( md2_hex("A","A","A"), "8788c1729761fdad983b830f04b19e86", 'md2 (hex/tripple_A)');
+is( md2_b64("A","A","A"), "h4jBcpdh/a2YO4MPBLGehg==", 'md2 (base64/tripple_A)');
+is( md2_b64u("A","A","A"), "h4jBcpdh_a2YO4MPBLGehg", 'md2 (base64url/tripple_A)');
+is( digest_data('MD2', "A","A","A"), pack("H*","8788c1729761fdad983b830f04b19e86"), 'md2 (digest_data_raw/tripple_A)');
+is( digest_data_hex('MD2', "A","A","A"), "8788c1729761fdad983b830f04b19e86", 'md2 (digest_data_hex/tripple_A)');
+is( digest_data_b64('MD2', "A","A","A"), "h4jBcpdh/a2YO4MPBLGehg==", 'md2 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('MD2', "A","A","A"), "h4jBcpdh_a2YO4MPBLGehg", 'md2 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::MD2->new->add("A","A","A")->hexdigest, "8788c1729761fdad983b830f04b19e86", 'md2 (OO/tripple_A)');
+is( Crypt::Digest::MD2->new->add("A")->add("A")->add("A")->hexdigest, "8788c1729761fdad983b830f04b19e86", 'md2 (OO3/tripple_A)');
 
 
 is( md2(""), pack("H*","8350e5a3e24c153df2275c9f80692773"), 'md2 (raw/1)');

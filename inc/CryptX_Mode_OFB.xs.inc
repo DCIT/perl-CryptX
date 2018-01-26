@@ -24,16 +24,12 @@ DESTROY(Crypt::Mode::OFB self)
     CODE:
         Safefree(self);
 
-int
-_get_dir(Crypt::Mode::OFB self)
-    CODE:
-        RETVAL = self->direction;
-    OUTPUT:
-        RETVAL
-
 void
-_start(Crypt::Mode::OFB self, int dir, SV * key, SV * iv)
-    CODE:
+_start(Crypt::Mode::OFB self, SV * key, SV * iv)
+    ALIAS:
+        start_encrypt = 1
+        start_decrypt = 2
+    PPCODE:
     {
         STRLEN k_len=0;
         unsigned char *k=NULL;
@@ -55,7 +51,8 @@ _start(Crypt::Mode::OFB self, int dir, SV * key, SV * iv)
           croak("FATAL: ofb_start failed: %s", error_to_string(rv));
         }
 
-        self->direction = dir;
+        self->direction = ix == 1 ? 1 : -1;
+        XPUSHs(ST(0)); /* return self */
     }
 
 SV *
@@ -100,7 +97,7 @@ _crypt(Crypt::Mode::OFB self, SV * data)
         RETVAL
 
 SV *
-_finish(Crypt::Mode::OFB self)
+finish(Crypt::Mode::OFB self)
     CODE:
           self->direction = 0;
           RETVAL = newSVpvn("", 0);

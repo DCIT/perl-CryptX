@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA512_256 qw( sha512_256 sha512_256_hex sha512_256_b64 sha512_256_b64u sha512_256_file sha512_256_file_hex sha512_256_file_b64 sha512_256_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::SHA512_256::hashsize, 32, 'hashsize/3');
 is( Crypt::Digest::SHA512_256->hashsize, 32, 'hashsize/4');
 is( Crypt::Digest->new('SHA512_256')->hashsize, 32, 'hashsize/5');
 is( Crypt::Digest::SHA512_256->new->hashsize, 32, 'hashsize/6');
+
+is( sha512_256("A","A","A"), pack("H*","b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4"), 'sha512_256 (raw/tripple_A)');
+is( sha512_256_hex("A","A","A"), "b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4", 'sha512_256 (hex/tripple_A)');
+is( sha512_256_b64("A","A","A"), "sopilp2LmwIpe6YVxIW+Lf/vkHykGcKklABAJtbEvfQ=", 'sha512_256 (base64/tripple_A)');
+is( sha512_256_b64u("A","A","A"), "sopilp2LmwIpe6YVxIW-Lf_vkHykGcKklABAJtbEvfQ", 'sha512_256 (base64url/tripple_A)');
+is( digest_data('SHA512_256', "A","A","A"), pack("H*","b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4"), 'sha512_256 (digest_data_raw/tripple_A)');
+is( digest_data_hex('SHA512_256', "A","A","A"), "b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4", 'sha512_256 (digest_data_hex/tripple_A)');
+is( digest_data_b64('SHA512_256', "A","A","A"), "sopilp2LmwIpe6YVxIW+Lf/vkHykGcKklABAJtbEvfQ=", 'sha512_256 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('SHA512_256', "A","A","A"), "sopilp2LmwIpe6YVxIW-Lf_vkHykGcKklABAJtbEvfQ", 'sha512_256 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::SHA512_256->new->add("A","A","A")->hexdigest, "b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4", 'sha512_256 (OO/tripple_A)');
+is( Crypt::Digest::SHA512_256->new->add("A")->add("A")->add("A")->hexdigest, "b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4", 'sha512_256 (OO3/tripple_A)');
 
 
 is( sha512_256(""), pack("H*","c672b8d1ef56ed28ab87c3622c5114069bdd3ad7b8f9737498d0c01ecef0967a"), 'sha512_256 (raw/1)');

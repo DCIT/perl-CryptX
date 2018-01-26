@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::BLAKE2s_128 qw( blake2s_128 blake2s_128_hex blake2s_128_b64 blake2s_128_b64u blake2s_128_file blake2s_128_file_hex blake2s_128_file_b64 blake2s_128_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::BLAKE2s_128::hashsize, 16, 'hashsize/3');
 is( Crypt::Digest::BLAKE2s_128->hashsize, 16, 'hashsize/4');
 is( Crypt::Digest->new('BLAKE2s_128')->hashsize, 16, 'hashsize/5');
 is( Crypt::Digest::BLAKE2s_128->new->hashsize, 16, 'hashsize/6');
+
+is( blake2s_128("A","A","A"), pack("H*","a2a5699c7579ee354f4d20fa75f09cb6"), 'blake2s_128 (raw/tripple_A)');
+is( blake2s_128_hex("A","A","A"), "a2a5699c7579ee354f4d20fa75f09cb6", 'blake2s_128 (hex/tripple_A)');
+is( blake2s_128_b64("A","A","A"), "oqVpnHV57jVPTSD6dfCctg==", 'blake2s_128 (base64/tripple_A)');
+is( blake2s_128_b64u("A","A","A"), "oqVpnHV57jVPTSD6dfCctg", 'blake2s_128 (base64url/tripple_A)');
+is( digest_data('BLAKE2s_128', "A","A","A"), pack("H*","a2a5699c7579ee354f4d20fa75f09cb6"), 'blake2s_128 (digest_data_raw/tripple_A)');
+is( digest_data_hex('BLAKE2s_128', "A","A","A"), "a2a5699c7579ee354f4d20fa75f09cb6", 'blake2s_128 (digest_data_hex/tripple_A)');
+is( digest_data_b64('BLAKE2s_128', "A","A","A"), "oqVpnHV57jVPTSD6dfCctg==", 'blake2s_128 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('BLAKE2s_128', "A","A","A"), "oqVpnHV57jVPTSD6dfCctg", 'blake2s_128 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::BLAKE2s_128->new->add("A","A","A")->hexdigest, "a2a5699c7579ee354f4d20fa75f09cb6", 'blake2s_128 (OO/tripple_A)');
+is( Crypt::Digest::BLAKE2s_128->new->add("A")->add("A")->add("A")->hexdigest, "a2a5699c7579ee354f4d20fa75f09cb6", 'blake2s_128 (OO3/tripple_A)');
 
 
 is( blake2s_128(""), pack("H*","64550d6ffe2c0a01a14aba1eade0200c"), 'blake2s_128 (raw/1)');

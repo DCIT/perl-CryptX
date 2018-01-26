@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::RIPEMD256 qw( ripemd256 ripemd256_hex ripemd256_b64 ripemd256_b64u ripemd256_file ripemd256_file_hex ripemd256_file_b64 ripemd256_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::RIPEMD256::hashsize, 32, 'hashsize/3');
 is( Crypt::Digest::RIPEMD256->hashsize, 32, 'hashsize/4');
 is( Crypt::Digest->new('RIPEMD256')->hashsize, 32, 'hashsize/5');
 is( Crypt::Digest::RIPEMD256->new->hashsize, 32, 'hashsize/6');
+
+is( ripemd256("A","A","A"), pack("H*","0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82"), 'ripemd256 (raw/tripple_A)');
+is( ripemd256_hex("A","A","A"), "0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82", 'ripemd256 (hex/tripple_A)');
+is( ripemd256_b64("A","A","A"), "DJdlgmMUNdT7xCR1gQWgWmIq4ncm85V3SFjX6isvXYI=", 'ripemd256 (base64/tripple_A)');
+is( ripemd256_b64u("A","A","A"), "DJdlgmMUNdT7xCR1gQWgWmIq4ncm85V3SFjX6isvXYI", 'ripemd256 (base64url/tripple_A)');
+is( digest_data('RIPEMD256', "A","A","A"), pack("H*","0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82"), 'ripemd256 (digest_data_raw/tripple_A)');
+is( digest_data_hex('RIPEMD256', "A","A","A"), "0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82", 'ripemd256 (digest_data_hex/tripple_A)');
+is( digest_data_b64('RIPEMD256', "A","A","A"), "DJdlgmMUNdT7xCR1gQWgWmIq4ncm85V3SFjX6isvXYI=", 'ripemd256 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('RIPEMD256', "A","A","A"), "DJdlgmMUNdT7xCR1gQWgWmIq4ncm85V3SFjX6isvXYI", 'ripemd256 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::RIPEMD256->new->add("A","A","A")->hexdigest, "0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82", 'ripemd256 (OO/tripple_A)');
+is( Crypt::Digest::RIPEMD256->new->add("A")->add("A")->add("A")->hexdigest, "0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82", 'ripemd256 (OO3/tripple_A)');
 
 
 is( ripemd256(""), pack("H*","02ba4c4e5f8ecd1877fc52d64d30e37a2d9774fb1e5d026380ae0168e3c5522d"), 'ripemd256 (raw/1)');

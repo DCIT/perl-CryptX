@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 6;
+use Test::More tests => 8*3 + 9*4 + 10 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA512_224 qw( sha512_224 sha512_224_hex sha512_224_b64 sha512_224_b64u sha512_224_file sha512_224_file_hex sha512_224_file_b64 sha512_224_file_b64u );
@@ -14,6 +14,17 @@ is( Crypt::Digest::SHA512_224::hashsize, 28, 'hashsize/3');
 is( Crypt::Digest::SHA512_224->hashsize, 28, 'hashsize/4');
 is( Crypt::Digest->new('SHA512_224')->hashsize, 28, 'hashsize/5');
 is( Crypt::Digest::SHA512_224->new->hashsize, 28, 'hashsize/6');
+
+is( sha512_224("A","A","A"), pack("H*","3d5a0b742f4c61d315c6ce86457a9fa30903880d30558c68ce4713b3"), 'sha512_224 (raw/tripple_A)');
+is( sha512_224_hex("A","A","A"), "3d5a0b742f4c61d315c6ce86457a9fa30903880d30558c68ce4713b3", 'sha512_224 (hex/tripple_A)');
+is( sha512_224_b64("A","A","A"), "PVoLdC9MYdMVxs6GRXqfowkDiA0wVYxozkcTsw==", 'sha512_224 (base64/tripple_A)');
+is( sha512_224_b64u("A","A","A"), "PVoLdC9MYdMVxs6GRXqfowkDiA0wVYxozkcTsw", 'sha512_224 (base64url/tripple_A)');
+is( digest_data('SHA512_224', "A","A","A"), pack("H*","3d5a0b742f4c61d315c6ce86457a9fa30903880d30558c68ce4713b3"), 'sha512_224 (digest_data_raw/tripple_A)');
+is( digest_data_hex('SHA512_224', "A","A","A"), "3d5a0b742f4c61d315c6ce86457a9fa30903880d30558c68ce4713b3", 'sha512_224 (digest_data_hex/tripple_A)');
+is( digest_data_b64('SHA512_224', "A","A","A"), "PVoLdC9MYdMVxs6GRXqfowkDiA0wVYxozkcTsw==", 'sha512_224 (digest_data_b64/tripple_A)');
+is( digest_data_b64u('SHA512_224', "A","A","A"), "PVoLdC9MYdMVxs6GRXqfowkDiA0wVYxozkcTsw", 'sha512_224 (digest_data_b64u/tripple_A)');
+is( Crypt::Digest::SHA512_224->new->add("A","A","A")->hexdigest, "3d5a0b742f4c61d315c6ce86457a9fa30903880d30558c68ce4713b3", 'sha512_224 (OO/tripple_A)');
+is( Crypt::Digest::SHA512_224->new->add("A")->add("A")->add("A")->hexdigest, "3d5a0b742f4c61d315c6ce86457a9fa30903880d30558c68ce4713b3", 'sha512_224 (OO3/tripple_A)');
 
 
 is( sha512_224(""), pack("H*","6ed0dd02806fa89e25de060c19d3ac86cabb87d6a0ddd05c333b84f4"), 'sha512_224 (raw/1)');

@@ -29,16 +29,12 @@ DESTROY(Crypt::Mode::CTR self)
     CODE:
         Safefree(self);
 
-int
-_get_dir(Crypt::Mode::CTR self)
-    CODE:
-        RETVAL = self->direction;
-    OUTPUT:
-        RETVAL
-
 void
-_start(Crypt::Mode::CTR self, int dir, SV * key, SV * iv)
-    CODE:
+_start(Crypt::Mode::CTR self, SV * key, SV * iv)
+    ALIAS:
+        start_encrypt = 1
+        start_decrypt = 2
+    PPCODE:
     {
         STRLEN k_len=0;
         unsigned char *k=NULL;
@@ -60,7 +56,8 @@ _start(Crypt::Mode::CTR self, int dir, SV * key, SV * iv)
           croak("FATAL: ctr_start failed: %s", error_to_string(rv));
         }
 
-        self->direction = dir;
+        self->direction = ix == 1 ? 1 : -1;
+        XPUSHs(ST(0)); /* return self */
     }
 
 SV *
@@ -105,7 +102,7 @@ _crypt(Crypt::Mode::CTR self, SV * data)
         RETVAL
 
 SV *
-_finish(Crypt::Mode::CTR self)
+finish(Crypt::Mode::CTR self)
     CODE:
           self->direction = 0;
           RETVAL = newSVpvn("", 0);

@@ -12,7 +12,6 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-use Crypt::Cipher;
 
 ### the following methods/functions are implemented in XS:
 # - new

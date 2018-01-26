@@ -35,13 +35,6 @@ DESTROY(Crypt::Mode::[%orig_name%] self)
     CODE:
         Safefree(self);
 
-int
-_get_dir(Crypt::Mode::[%orig_name%] self)
-    CODE:
-        RETVAL = self->direction;
-    OUTPUT:
-        RETVAL
-
 void
 [%-IF lc_name == 'xts' %]
 _start(_XXX_XXX_XXX_)
@@ -50,9 +43,12 @@ _start(_XXX_XXX_XXX_)
 [%-ELSIF lc_name == 'lrw' %]
 _start(_XXX_XXX_XXX_)
 [%-ELSE%]
-_start(Crypt::Mode::[%orig_name%] self, int dir, SV * key, SV * iv)
+_start(Crypt::Mode::[%orig_name%] self, SV * key, SV * iv)
 [%-END%]
-    CODE:
+    ALIAS:
+        start_encrypt = 1
+        start_decrypt = 2
+    PPCODE:
     {
         STRLEN k_len=0;
         unsigned char *k=NULL;
@@ -84,7 +80,8 @@ _start(Crypt::Mode::[%orig_name%] self, int dir, SV * key, SV * iv)
           croak("FATAL: [%lc_name%]_start failed: %s", error_to_string(rv));
         }
 
-        self->direction = dir;
+        self->direction = ix == 1 ? 1 : -1;
+        XPUSHs(ST(0)); /* return self */
     }
 
 SV *
@@ -129,7 +126,7 @@ _crypt(Crypt::Mode::[%orig_name%] self, SV * data)
         RETVAL
 
 SV *
-_finish(Crypt::Mode::[%orig_name%] self)
+finish(Crypt::Mode::[%orig_name%] self)
     CODE:
           self->direction = 0;
           RETVAL = newSVpvn("", 0);

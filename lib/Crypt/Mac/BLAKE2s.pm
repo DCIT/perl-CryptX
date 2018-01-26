@@ -11,10 +11,6 @@ our %EXPORT_TAGS = ( all => [qw( blake2s blake2s_hex blake2s_b64 blake2s_b64u )]
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use Carp;
-$Carp::Internal{(__PACKAGE__)}++;
-use CryptX;
-
 1;
 
 =pod
@@ -69,24 +65,32 @@ Or all of them at once:
 Logically joins all arguments into a single string, and returns its BLAKE2s message authentication code encoded as a binary string.
 
  $blake2s_raw = blake2s($size, $key, 'data buffer');
+ #or
+ $blake2s_raw = blake2s($size, $key, 'any data', 'more data', 'even more data');
 
 =head2 blake2s_hex
 
 Logically joins all arguments into a single string, and returns its BLAKE2s message authentication code encoded as a hexadecimal string.
 
  $blake2s_hex = blake2s_hex($size, $key, 'data buffer');
+ #or
+ $blake2s_hex = blake2s_hex($size, $key, 'any data', 'more data', 'even more data');
 
 =head2 blake2s_b64
 
 Logically joins all arguments into a single string, and returns its BLAKE2s message authentication code encoded as a Base64 string.
 
  $blake2s_b64 = blake2s_b64($size, $key, 'data buffer');
+ #or
+ $blake2s_b64 = blake2s_b64($size, $key, 'any data', 'more data', 'even more data');
 
 =head2 blake2s_b64u
 
 Logically joins all arguments into a single string, and returns its BLAKE2s message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
  $blake2s_b64url = blake2s_b64u($size, $key, 'data buffer');
+ #or
+ $blake2s_b64url = blake2s_b64u($size, $key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 
@@ -105,6 +109,8 @@ Logically joins all arguments into a single string, and returns its BLAKE2s mess
 =head2 add
 
  $d->add('any data');
+ #or
+ $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 

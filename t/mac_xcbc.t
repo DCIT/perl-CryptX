@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 72;
+use Test::More tests => 72 + 8;
 
 use Crypt::Mac::XCBC qw( xcbc xcbc_hex xcbc_b64 xcbc_b64u );
 
@@ -79,3 +79,12 @@ is( unpack('H*', xcbc('Blowfish','12345678901234561234567890123456',"test\0test\
 is( xcbc_hex('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), '98276a4a6aafd86b', 'XCBC/func+hex/12');
 is( xcbc_b64('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), 'mCdqSmqv2Gs=', 'XCBC/func+b64/12');
 is( xcbc_b64u('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"), 'mCdqSmqv2Gs', 'XCBC/func+b64u/12');
+
+is( unpack('H*', Crypt::Mac::XCBC->new('AES', '1234567890123456')->add("A","A","A")->mac), 'da243c0a133fc33cd1f96b872c0bec9b', 'XCBC/oo+raw/tripple_A');
+is( unpack('H*', Crypt::Mac::XCBC->new('AES', '1234567890123456')->add("A")->add("A")->add("A")->mac), 'da243c0a133fc33cd1f96b872c0bec9b', 'XCBC/oo3+raw/tripple_A');
+is( Crypt::Mac::XCBC->new('AES', '1234567890123456')->add("A","A","A")->hexmac, 'da243c0a133fc33cd1f96b872c0bec9b', 'XCBC/oo+hex/tripple_A');
+is( Crypt::Mac::XCBC->new('AES', '1234567890123456')->add("A")->add("A")->add("A")->hexmac, 'da243c0a133fc33cd1f96b872c0bec9b', 'XCBC/oo3+hex/tripple_A');
+is( unpack('H*', xcbc('AES', '1234567890123456',"A","A","A")), 'da243c0a133fc33cd1f96b872c0bec9b', 'XCBC/func+raw/tripple_A');
+is( xcbc_hex ('AES', '1234567890123456',"A","A","A"), 'da243c0a133fc33cd1f96b872c0bec9b',  'XCBC/func+hex/tripple_A');
+is( xcbc_b64 ('AES', '1234567890123456',"A","A","A"), '2iQ8ChM/wzzR+WuHLAvsmw==',  'XCBC/func+b64/tripple_A');
+is( xcbc_b64u('AES', '1234567890123456',"A","A","A"), '2iQ8ChM_wzzR-WuHLAvsmw', 'XCBC/func+b64u/tripple_A');
