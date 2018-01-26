@@ -131,3 +131,88 @@ hexmac(Crypt::Mac::Pelican self)
     }
     OUTPUT:
         RETVAL
+
+SV *
+pelican(SV * key, SV * data)
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac);
+        len = 16;
+        rv = pelican_memory(k, klen, in, inlen, mac);
+        if (rv != CRYPT_OK) croak("FATAL: pelican_memory failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) mac, len);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+pelican_hex(SV * key, SV * data)
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac), outlen;
+        char out[MAXBLOCKSIZE*2];
+        len = 16;
+        rv = pelican_memory(k, klen, in, inlen, mac);
+        if (rv != CRYPT_OK) croak("FATAL: pelican_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = _base16_encode(mac, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+pelican_b64(SV * key, SV * data)
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac), outlen;
+        char out[MAXBLOCKSIZE*2];
+        len = 16;
+        rv = pelican_memory(k, klen, in, inlen, mac);
+        if (rv != CRYPT_OK) croak("FATAL: pelican_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = base64_encode(mac, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
+
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+pelican_b64u(SV * key, SV * data)
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac), outlen;
+        char out[MAXBLOCKSIZE*2];
+        len = 16;
+        rv = pelican_memory(k, klen, in, inlen, mac);
+        if (rv != CRYPT_OK) croak("FATAL: pelican_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = base64url_encode(mac, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
+    }
+    OUTPUT:
+        RETVAL

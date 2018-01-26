@@ -6,7 +6,7 @@ Crypt::Mac::[%orig_name%]
 [%-IF lc_name == 'hmac' %]
 new(char * class, char * hash_name, SV * key)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
-new(char * class, int size, SV * key)
+new(char * class, unsigned long size, SV * key)
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
 new(char * class, SV * key)
 [%-ELSE%]
@@ -199,6 +199,183 @@ hexmac(Crypt::Mac::[%orig_name%] self)
         rv = _base16_encode(mac, maclen, (unsigned char *)out, &outlen);
         if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
         RETVAL = newSVpvn(out, outlen);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+[%-IF lc_name == 'hmac' %]
+[%lc_name%](char * hash_name, SV * key, SV * data)
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+[%lc_name%](unsigned long size, SV * key, SV * data)
+[%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
+[%lc_name%](SV * key, SV * data)
+[%-ELSE%]
+[%lc_name%](char * cipher_name, SV * key, SV * data)
+[%-END%]
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac);
+[%-IF lc_name == 'hmac' %]
+        int id = _find_hash(hash_name);
+        if (id == -1) croak("FATAL: find_digest failed for '%s'", hash_name);
+        rv = [%lc_name%]_memory(id, k, klen, in, inlen, mac, &len);
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+        if (size < len) len = size;
+        rv = [%lc_name%]mac_memory(k, klen, in, inlen, mac, &len);
+[%-ELSIF lc_name == 'pelican' %]
+        len = 16;
+        rv = [%lc_name%]_memory(k, klen, in, inlen, mac);
+[%-ELSIF lc_name == 'poly1305' %]
+        rv = [%lc_name%]_memory(k, klen, in, inlen, mac, &len);
+[%-ELSE%]
+        int id = _find_cipher(cipher_name);
+        if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
+        rv = [%lc_name%]_memory(id, k, klen, in, inlen, mac, &len);
+[%-END%]
+        if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_memory failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) mac, len);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+[%-IF lc_name == 'hmac' %]
+[%lc_name%]_hex(char * hash_name, SV * key, SV * data)
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+[%lc_name%]_hex(unsigned long size, SV * key, SV * data)
+[%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
+[%lc_name%]_hex(SV * key, SV * data)
+[%-ELSE%]
+[%lc_name%]_hex(char * cipher_name, SV * key, SV * data)
+[%-END%]
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac), outlen;
+        char out[MAXBLOCKSIZE*2];
+[%-IF lc_name == 'hmac' %]
+        int id = _find_hash(hash_name);
+        if (id == -1) croak("FATAL: find_digest failed for '%s'", hash_name);
+        rv = [%lc_name%]_memory(id, k, klen, in, inlen, mac, &len);
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+        if (size < len) len = size;
+        rv = [%lc_name%]mac_memory(k, klen, in, inlen, mac, &len);
+[%-ELSIF lc_name == 'pelican' %]
+        len = 16;
+        rv = [%lc_name%]_memory(k, klen, in, inlen, mac);
+[%-ELSIF lc_name == 'poly1305' %]
+        rv = [%lc_name%]_memory(k, klen, in, inlen, mac, &len);
+[%-ELSE%]
+        int id = _find_cipher(cipher_name);
+        if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
+        rv = [%lc_name%]_memory(id, k, klen, in, inlen, mac, &len);
+[%-END%]
+        if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = _base16_encode(mac, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+[%-IF lc_name == 'hmac' %]
+[%lc_name%]_b64(char * hash_name, SV * key, SV * data)
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+[%lc_name%]_b64(unsigned long size, SV * key, SV * data)
+[%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
+[%lc_name%]_b64(SV * key, SV * data)
+[%-ELSE%]
+[%lc_name%]_b64(char * cipher_name, SV * key, SV * data)
+[%-END%]
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac), outlen;
+        char out[MAXBLOCKSIZE*2];
+[%-IF lc_name == 'hmac' %]
+        int id = _find_hash(hash_name);
+        if (id == -1) croak("FATAL: find_digest failed for '%s'", hash_name);
+        rv = [%lc_name%]_memory(id, k, klen, in, inlen, mac, &len);
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+        if (size < len) len = size;
+        rv = [%lc_name%]mac_memory(k, klen, in, inlen, mac, &len);
+[%-ELSIF lc_name == 'pelican' %]
+        len = 16;
+        rv = [%lc_name%]_memory(k, klen, in, inlen, mac);
+[%-ELSIF lc_name == 'poly1305' %]
+        rv = [%lc_name%]_memory(k, klen, in, inlen, mac, &len);
+[%-ELSE%]
+        int id = _find_cipher(cipher_name);
+        if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
+        rv = [%lc_name%]_memory(id, k, klen, in, inlen, mac, &len);
+[%-END%]
+        if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = base64_encode(mac, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
+
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+[%-IF lc_name == 'hmac' %]
+[%lc_name%]_b64u(char * hash_name, SV * key, SV * data)
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+[%lc_name%]_b64u(unsigned long size, SV * key, SV * data)
+[%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
+[%lc_name%]_b64u(SV * key, SV * data)
+[%-ELSE%]
+[%lc_name%]_b64u(char * cipher_name, SV * key, SV * data)
+[%-END%]
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac), outlen;
+        char out[MAXBLOCKSIZE*2];
+[%-IF lc_name == 'hmac' %]
+        int id = _find_hash(hash_name);
+        if (id == -1) croak("FATAL: find_digest failed for '%s'", hash_name);
+        rv = [%lc_name%]_memory(id, k, klen, in, inlen, mac, &len);
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+        if (size < len) len = size;
+        rv = [%lc_name%]mac_memory(k, klen, in, inlen, mac, &len);
+[%-ELSIF lc_name == 'pelican' %]
+        len = 16;
+        rv = [%lc_name%]_memory(k, klen, in, inlen, mac);
+[%-ELSIF lc_name == 'poly1305' %]
+        rv = [%lc_name%]_memory(k, klen, in, inlen, mac, &len);
+[%-ELSE%]
+        int id = _find_cipher(cipher_name);
+        if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
+        rv = [%lc_name%]_memory(id, k, klen, in, inlen, mac, &len);
+[%-END%]
+        if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = base64url_encode(mac, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
     }
     OUTPUT:
         RETVAL

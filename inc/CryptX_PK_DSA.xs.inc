@@ -1,7 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::PK::DSA
 
 Crypt::PK::DSA
-_new()
+_new(char * class)
     CODE:
     {
         int rv;
@@ -261,7 +261,7 @@ export_key_der(Crypt::PK::DSA self, char * type)
         RETVAL
 
 SV *
-_encrypt(Crypt::PK::DSA self, SV * data, char * hash_name)
+encrypt(Crypt::PK::DSA self, SV * data, char * hash_name="SHA1")
     CODE:
     {
         int rv, hash_id;
@@ -284,7 +284,7 @@ _encrypt(Crypt::PK::DSA self, SV * data, char * hash_name)
         RETVAL
 
 SV *
-_decrypt(Crypt::PK::DSA self, SV * data)
+decrypt(Crypt::PK::DSA self, SV * data)
     CODE:
     {
         int rv;
@@ -303,7 +303,7 @@ _decrypt(Crypt::PK::DSA self, SV * data)
         RETVAL
 
 SV *
-_sign(Crypt::PK::DSA self, SV * data)
+sign_hash(Crypt::PK::DSA self, SV * data)
     CODE:
     {
         int rv;
@@ -324,7 +324,7 @@ _sign(Crypt::PK::DSA self, SV * data)
         RETVAL
 
 int
-_verify(Crypt::PK::DSA self, SV * sig, SV * data)
+verify_hash(Crypt::PK::DSA self, SV * sig, SV * data)
     CODE:
     {
         int rv, stat;

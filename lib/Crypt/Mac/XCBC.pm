@@ -11,11 +11,9 @@ our %EXPORT_TAGS = ( all => [qw( xcbc xcbc_hex xcbc_b64 xcbc_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-sub xcbc { Crypt::Mac::XCBC->new(shift, shift)->add(@_)->mac }
-sub xcbc_hex  { Crypt::Mac::XCBC->new(shift, shift)->add(@_)->hexmac }
-sub xcbc_b64  { Crypt::Mac::XCBC->new(shift, shift)->add(@_)->b64mac }
-sub xcbc_b64u { Crypt::Mac::XCBC->new(shift, shift)->add(@_)->b64umac }
 
 1;
 
@@ -71,32 +69,24 @@ Or all of them at once:
 Logically joins all arguments into a single string, and returns its XCBC message authentication code encoded as a binary string.
 
  $xcbc_raw = xcbc($cipher_name, $key, 'data buffer');
- #or
- $xcbc_raw = xcbc($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 xcbc_hex
 
 Logically joins all arguments into a single string, and returns its XCBC message authentication code encoded as a hexadecimal string.
 
  $xcbc_hex = xcbc_hex($cipher_name, $key, 'data buffer');
- #or
- $xcbc_hex = xcbc_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 xcbc_b64
 
 Logically joins all arguments into a single string, and returns its XCBC message authentication code encoded as a Base64 string.
 
  $xcbc_b64 = xcbc_b64($cipher_name, $key, 'data buffer');
- #or
- $xcbc_b64 = xcbc_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 xcbc_b64u
 
 Logically joins all arguments into a single string, and returns its XCBC message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
  $xcbc_b64url = xcbc_b64u($cipher_name, $key, 'data buffer');
- #or
- $xcbc_b64url = xcbc_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 
@@ -115,8 +105,6 @@ Logically joins all arguments into a single string, and returns its XCBC message
 =head2 add
 
  $d->add('any data');
- #or
- $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 

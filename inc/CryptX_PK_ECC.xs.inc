@@ -1,7 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::PK::ECC
 
 Crypt::PK::ECC
-_new()
+_new(char * class)
     CODE:
     {
         int rv;

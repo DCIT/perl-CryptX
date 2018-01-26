@@ -11,11 +11,9 @@ our %EXPORT_TAGS = ( all => [qw( omac omac_hex omac_b64 omac_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-sub omac { Crypt::Mac::OMAC->new(shift, shift)->add(@_)->mac }
-sub omac_hex  { Crypt::Mac::OMAC->new(shift, shift)->add(@_)->hexmac }
-sub omac_b64  { Crypt::Mac::OMAC->new(shift, shift)->add(@_)->b64mac }
-sub omac_b64u { Crypt::Mac::OMAC->new(shift, shift)->add(@_)->b64umac }
 
 1;
 
@@ -71,32 +69,24 @@ Or all of them at once:
 Logically joins all arguments into a single string, and returns its OMAC message authentication code encoded as a binary string.
 
  $omac_raw = omac($cipher_name, $key, 'data buffer');
- #or
- $omac_raw = omac($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 omac_hex
 
 Logically joins all arguments into a single string, and returns its OMAC message authentication code encoded as a hexadecimal string.
 
  $omac_hex = omac_hex($cipher_name, $key, 'data buffer');
- #or
- $omac_hex = omac_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 omac_b64
 
 Logically joins all arguments into a single string, and returns its OMAC message authentication code encoded as a Base64 string.
 
  $omac_b64 = omac_b64($cipher_name, $key, 'data buffer');
- #or
- $omac_b64 = omac_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 omac_b64u
 
 Logically joins all arguments into a single string, and returns its OMAC message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
  $omac_b64url = omac_b64u($cipher_name, $key, 'data buffer');
- #or
- $omac_b64url = omac_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 
@@ -115,8 +105,6 @@ Logically joins all arguments into a single string, and returns its OMAC message
 =head2 add
 
  $d->add('any data');
- #or
- $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 

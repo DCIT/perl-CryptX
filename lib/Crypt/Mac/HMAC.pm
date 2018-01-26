@@ -11,11 +11,9 @@ our %EXPORT_TAGS = ( all => [qw( hmac hmac_hex hmac_b64 hmac_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-sub hmac { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->mac }
-sub hmac_hex  { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->hexmac }
-sub hmac_b64  { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->b64mac }
-sub hmac_b64u { Crypt::Mac::HMAC->new(shift, shift)->add(@_)->b64umac }
 
 1;
 
@@ -71,8 +69,6 @@ Or all of them at once:
 Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a binary string.
 
  $hmac_raw = hmac($hash_name, $key, 'data buffer');
- #or
- $hmac_raw = hmac($hash_name, $key, 'any data', 'more data', 'even more data');
 
  # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
  # $key ......... the key (octets/bytes)
@@ -82,8 +78,6 @@ Logically joins all arguments into a single string, and returns its HMAC message
 Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a hexadecimal string.
 
  $hmac_hex = hmac_hex($hash_name, $key, 'data buffer');
- #or
- $hmac_hex = hmac_hex($hash_name, $key, 'any data', 'more data', 'even more data');
 
  # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
  # $key ......... the key (octets/bytes, not hex!)
@@ -93,8 +87,6 @@ Logically joins all arguments into a single string, and returns its HMAC message
 Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a Base64 string.
 
  $hmac_b64 = hmac_b64($hash_name, $key, 'data buffer');
- #or
- $hmac_b64 = hmac_b64($hash_name, $key, 'any data', 'more data', 'even more data');
 
  # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
  # $key ......... the key (octets/bytes, not Base64!)
@@ -104,8 +96,6 @@ Logically joins all arguments into a single string, and returns its HMAC message
 Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
  $hmac_b64url = hmac_b64u($hash_name, $key, 'data buffer');
- #or
- $hmac_b64url = hmac_b64u($hash_name, $key, 'any data', 'more data', 'even more data');
 
  # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
  # $key ......... the key (octets/bytes, not Base64url!)
@@ -130,8 +120,6 @@ Logically joins all arguments into a single string, and returns its HMAC message
 =head2 add
 
  $d->add('any data');
- #or
- $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 

@@ -281,11 +281,10 @@ int _base16_encode(const unsigned char *in, unsigned long inlen, unsigned char *
    return CRYPT_OK;
 }
 
-int _find_hash(const char *name)
+int _find_start(const char *name, char *ltcname, size_t ltclen)
 {
-   char ltcname[100] = { 0 };
-   size_t i, start = 0, ltclen = sizeof(ltcname) - 1;
-   if (name == NULL || strlen(name) + 1 > ltclen) croak("FATAL: invalid hash name") ;
+   size_t i, start = 0;
+   if (name == NULL || strlen(name) + 1 > ltclen) croak("FATAL: invalid name") ;
    /* normalize */
    for (i = 0; i < ltclen && name[i] > 0; i++) {
      if (name[i] >= 'A' && name[i] <= 'Z') {
@@ -299,6 +298,13 @@ int _find_hash(const char *name)
      }
      if (name[i] == ':') start = i + 1;
    }
+   return start;
+}
+
+int _find_hash(const char *name)
+{
+   char ltcname[100] = { 0 };
+   size_t start = _find_start(name, ltcname, sizeof(ltcname) - 1);
    /* special cases */
    if (strcmp(ltcname + start, "ripemd128") == 0) return find_hash("rmd128");
    if (strcmp(ltcname + start, "ripemd160") == 0) return find_hash("rmd160");
@@ -313,25 +319,18 @@ int _find_hash(const char *name)
 int _find_cipher(const char *name)
 {
    char ltcname[100] = { 0 };
-   size_t i, start = 0, ltclen = sizeof(ltcname) - 1;
-   if (name == NULL || strlen(name) + 1 > ltclen) croak("FATAL: invalid cipher name") ;
-   /* normalize */
-   for (i = 0; i < ltclen && name[i] > 0; i++) {
-     if (name[i] >= 'A' && name[i] <= 'Z') {
-       ltcname[i] = name[i] + 32; /* lowecase */
-     }
-     else if (name[i] == '_') {
-       ltcname[i] = '-';
-     }
-     else {
-       ltcname[i] = name[i];
-     }
-     if (name[i] == ':') start = i + 1;
-   }
+   size_t start = _find_start(name, ltcname, sizeof(ltcname) - 1);
    /* special cases */
    if (strcmp(ltcname + start, "des-ede") == 0) return find_cipher("3des");
    if (strcmp(ltcname + start, "saferp")  == 0) return find_cipher("safer+");
    return find_cipher(ltcname + start);
+}
+
+int _find_prng(const char *name)
+{
+  char ltcname[100] = { 0 };
+  size_t start = _find_start(name, ltcname, sizeof(ltcname) - 1);
+  return find_prng(ltcname + start);
 }
 
 /* Math::BigInt::LTM related */

@@ -425,10 +425,8 @@ sub _curve_name_lookup {
 }
 
 sub new {
-  my ($class, $f, $p) = @_;
-  my $self = _new();
-  $self->import_key($f, $p) if $f;
-  return  $self;
+  my $self = shift->_new();
+  return @_ > 0 ? $self->import_key(@_) : $self;
 }
 
 sub export_key_pem {
@@ -635,6 +633,7 @@ sub curve2hash {
 
 sub ecc_encrypt {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->encrypt(@_);
@@ -642,6 +641,7 @@ sub ecc_encrypt {
 
 sub ecc_decrypt {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->decrypt(@_);
@@ -649,6 +649,7 @@ sub ecc_decrypt {
 
 sub ecc_sign_message {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_message(@_);
@@ -656,6 +657,7 @@ sub ecc_sign_message {
 
 sub ecc_verify_message {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_message(@_);
@@ -663,6 +665,7 @@ sub ecc_verify_message {
 
 sub ecc_sign_hash {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_hash(@_);
@@ -670,6 +673,7 @@ sub ecc_sign_hash {
 
 sub ecc_verify_hash {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_hash(@_);
@@ -677,6 +681,7 @@ sub ecc_verify_hash {
 
 sub ecc_shared_secret {
   my ($privkey, $pubkey) = @_;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $privkey = __PACKAGE__->new($privkey) unless ref $privkey;
   $pubkey  = __PACKAGE__->new($pubkey)  unless ref $pubkey;
   carp "FATAL: invalid 'privkey' param" unless ref($privkey) eq __PACKAGE__ && $privkey->is_private;

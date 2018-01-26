@@ -11,28 +11,9 @@ our %EXPORT_TAGS = ( all => [qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_b64 [%l
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-[%-IF lc_name == 'hmac' %]
-sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->mac }
-sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->hexmac }
-sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64mac }
-sub [%lc_name%]_b64u { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64umac }
-[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
-sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->mac }
-sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->hexmac }
-sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64mac }
-sub [%lc_name%]_b64u { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64umac }
-[%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
-sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->mac }
-sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->hexmac }
-sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->b64mac }
-sub [%lc_name%]_b64u { Crypt::Mac::[%orig_name%]->new(shift)->add(@_)->b64umac }
-[%-ELSE%]
-sub [%lc_name%] { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->mac }
-sub [%lc_name%]_hex  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->hexmac }
-sub [%lc_name%]_b64  { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64mac }
-sub [%lc_name%]_b64u { Crypt::Mac::[%orig_name%]->new(shift, shift)->add(@_)->b64umac }
-[%-END%]
 
 1;
 
@@ -114,23 +95,15 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 [%-IF lc_name == 'hmac' %]
  $[%lc_name%]_raw = [%lc_name%]($hash_name, $key, 'data buffer');
- #or
- $[%lc_name%]_raw = [%lc_name%]($hash_name, $key, 'any data', 'more data', 'even more data');
 
  # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
  # $key ......... the key (octets/bytes)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
  $[%lc_name%]_raw = [%lc_name%]($size, $key, 'data buffer');
- #or
- $[%lc_name%]_raw = [%lc_name%]($size, $key, 'any data', 'more data', 'even more data');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
  $[%lc_name%]_raw = [%lc_name%]($key, 'data buffer');
- #or
- $[%lc_name%]_raw = [%lc_name%]($key, 'any data', 'more data', 'even more data');
 [%-ELSE%]
  $[%lc_name%]_raw = [%lc_name%]($cipher_name, $key, 'data buffer');
- #or
- $[%lc_name%]_raw = [%lc_name%]($cipher_name, $key, 'any data', 'more data', 'even more data');
 [%-END%]
 
 =head2 [%lc_name%]_hex
@@ -139,23 +112,15 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 [%-IF lc_name == 'hmac' %]
  $[%lc_name%]_hex = [%lc_name%]_hex($hash_name, $key, 'data buffer');
- #or
- $[%lc_name%]_hex = [%lc_name%]_hex($hash_name, $key, 'any data', 'more data', 'even more data');
 
  # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
  # $key ......... the key (octets/bytes, not hex!)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
  $[%lc_name%]_hex = [%lc_name%]_hex($size, $key, 'data buffer');
- #or
- $[%lc_name%]_hex = [%lc_name%]_hex($size, $key, 'any data', 'more data', 'even more data');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
  $[%lc_name%]_hex = [%lc_name%]_hex($key, 'data buffer');
- #or
- $[%lc_name%]_hex = [%lc_name%]_hex($key, 'any data', 'more data', 'even more data');
 [%-ELSE%]
  $[%lc_name%]_hex = [%lc_name%]_hex($cipher_name, $key, 'data buffer');
- #or
- $[%lc_name%]_hex = [%lc_name%]_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
 [%-END%]
 
 =head2 [%lc_name%]_b64
@@ -164,23 +129,15 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 [%-IF lc_name == 'hmac' %]
  $[%lc_name%]_b64 = [%lc_name%]_b64($hash_name, $key, 'data buffer');
- #or
- $[%lc_name%]_b64 = [%lc_name%]_b64($hash_name, $key, 'any data', 'more data', 'even more data');
 
  # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
  # $key ......... the key (octets/bytes, not Base64!)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
  $[%lc_name%]_b64 = [%lc_name%]_b64($size, $key, 'data buffer');
- #or
- $[%lc_name%]_b64 = [%lc_name%]_b64($size, $key, 'any data', 'more data', 'even more data');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
  $[%lc_name%]_b64 = [%lc_name%]_b64($key, 'data buffer');
- #or
- $[%lc_name%]_b64 = [%lc_name%]_b64($key, 'any data', 'more data', 'even more data');
 [%-ELSE%]
  $[%lc_name%]_b64 = [%lc_name%]_b64($cipher_name, $key, 'data buffer');
- #or
- $[%lc_name%]_b64 = [%lc_name%]_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 [%-END%]
 
 =head2 [%lc_name%]_b64u
@@ -189,23 +146,15 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 [%-IF lc_name == 'hmac' %]
  $[%lc_name%]_b64url = [%lc_name%]_b64u($hash_name, $key, 'data buffer');
- #or
- $[%lc_name%]_b64url = [%lc_name%]_b64u($hash_name, $key, 'any data', 'more data', 'even more data');
 
  # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
  # $key ......... the key (octets/bytes, not Base64url!)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
  $[%lc_name%]_b64url = [%lc_name%]_b64u($size, $key, 'data buffer');
- #or
- $[%lc_name%]_b64url = [%lc_name%]_b64u($size, $key, 'any data', 'more data', 'even more data');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
  $[%lc_name%]_b64url = [%lc_name%]_b64u($key, 'data buffer');
- #or
- $[%lc_name%]_b64url = [%lc_name%]_b64u($key, 'any data', 'more data', 'even more data');
 [%-ELSE%]
  $[%lc_name%]_b64url = [%lc_name%]_b64u($cipher_name, $key, 'data buffer');
- #or
- $[%lc_name%]_b64url = [%lc_name%]_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
 [%-END%]
 
 =head1 METHODS
@@ -236,8 +185,6 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 =head2 add
 
  $d->add('any data');
- #or
- $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 

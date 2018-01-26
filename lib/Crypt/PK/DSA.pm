@@ -10,16 +10,15 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use Crypt::Digest 'digest_data';
 use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pem_to_der der_to_pem);
 use Crypt::PK;
 
 sub new {
-  my ($class, $f, $p) = @_;
-  my $self = _new();
-  $self->import_key($f, $p) if $f;
-  return  $self;
+  my $self = shift->_new();
+  return @_ > 0 ? $self->import_key(@_) : $self;
 }
 
 sub generate_key {
@@ -96,55 +95,22 @@ sub import_key {
   croak "FATAL: invalid or unsupported DSA key format";
 }
 
-sub encrypt {
-  my ($self, $data, $hash_name) = @_;
-  $hash_name ||= 'SHA1';
-  return $self->_encrypt($data, $hash_name);
-}
-
-sub decrypt {
-  my ($self, $data) = @_;
-  return $self->_decrypt($data);
-}
-
-sub _truncate {
-  my ($self, $hash) = @_;
-  ### section 4.6 of FIPS 186-4
-  # let N be the bit length of q
-  # z = the leftmost min(N, outlen) bits of Hash(M).
-  my $q = $self->size_q; # = size in bytes
-  return $hash if $q >= length($hash);
-  return substr($hash, 0, $q);
-}
-
 sub sign_message {
   my ($self, $data, $hash_name) = @_;
   $hash_name ||= 'SHA1';
-  my $data_hash = digest_data($hash_name, $data);
-  return $self->_sign($self->_truncate($data_hash));
+  return $self->sign_hash(digest_data($hash_name, $data));
 }
 
 sub verify_message {
   my ($self, $sig, $data, $hash_name) = @_;
-  $hash_name ||= 'SHA1';
-  my $data_hash = digest_data($hash_name, $data);
-  return $self->_verify($sig, $self->_truncate($data_hash));
-}
-
-sub sign_hash {
-  my ($self, $data_hash) = @_;
-  return $self->_sign($self->_truncate($data_hash));
-}
-
-sub verify_hash {
-  my ($self, $sig, $data_hash) = @_;
-  return $self->_verify($sig, $self->_truncate($data_hash));
+  return $self->verify_hash($sig, digest_data($hash_name||'SHA1', $data));
 }
 
 ### FUNCTIONS
 
 sub dsa_encrypt {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->encrypt(@_);
@@ -152,6 +118,7 @@ sub dsa_encrypt {
 
 sub dsa_decrypt {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->decrypt(@_);
@@ -159,6 +126,7 @@ sub dsa_decrypt {
 
 sub dsa_sign_message {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_message(@_);
@@ -166,6 +134,7 @@ sub dsa_sign_message {
 
 sub dsa_verify_message {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_message(@_);
@@ -173,6 +142,7 @@ sub dsa_verify_message {
 
 sub dsa_sign_hash {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_hash(@_);
@@ -180,6 +150,7 @@ sub dsa_sign_hash {
 
 sub dsa_verify_hash {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_hash(@_);

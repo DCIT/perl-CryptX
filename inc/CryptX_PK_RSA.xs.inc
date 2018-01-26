@@ -1,7 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::PK::RSA
 
 Crypt::PK::RSA
-_new()
+_new(char * class)
     CODE:
     {
         int rv;
@@ -293,7 +293,7 @@ export_key_der(Crypt::PK::RSA self, char * type)
         RETVAL
 
 SV *
-_encrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * oaep_lparam)
+encrypt(Crypt::PK::RSA self, SV * data, char * padding="oaep", char * oaep_hash="SHA1", SV * oaep_lparam=NULL)
     CODE:
     {
         int rv, hash_id;
@@ -310,7 +310,7 @@ _encrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
         if (strnEQ(padding, "oaep", 4)) {
           hash_id = _find_hash(oaep_hash);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
-          lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
+          if (oaep_lparam) lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_encrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
                                   &self->pstate, self->pindex,
                                   hash_id, LTC_PKCS_1_OAEP, &self->key);
@@ -338,7 +338,7 @@ _encrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
         RETVAL
 
 SV *
-_decrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * oaep_lparam)
+decrypt(Crypt::PK::RSA self, SV * data, char * padding="oaep", char * oaep_hash="SHA1", SV * oaep_lparam=NULL)
     CODE:
     {
         int rv, hash_id, stat;
@@ -355,7 +355,7 @@ _decrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
         if (strnEQ(padding, "oaep", 4)) {
           hash_id = _find_hash(oaep_hash);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
-          lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
+          if (oaep_lparam) lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_decrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
                                   hash_id, LTC_PKCS_1_OAEP, &stat, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_decrypt_key_ex failed: %s", error_to_string(rv));
@@ -383,7 +383,7 @@ _decrypt(Crypt::PK::RSA self, SV * data, char * padding, char * oaep_hash, SV * 
         RETVAL
 
 SV *
-_sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name=NULL, unsigned long saltlen=12)
+sign_hash(Crypt::PK::RSA self, SV * data, char * hash_name="SHA1", char * padding="pss", unsigned long saltlen=12)
     CODE:
     {
         int rv, hash_id;
@@ -427,7 +427,7 @@ _sign(Crypt::PK::RSA self, SV * data, char * padding, char * hash_name=NULL, uns
         RETVAL
 
 int
-_verify(Crypt::PK::RSA self, SV * sig, SV * data, char * padding, char * hash_name=NULL, unsigned long saltlen=12)
+verify_hash(Crypt::PK::RSA self, SV * sig, SV * data, char * hash_name="SHA1", char * padding="pss", unsigned long saltlen=12)
     CODE:
     {
         int rv, hash_id, stat;

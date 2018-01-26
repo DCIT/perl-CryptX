@@ -16,10 +16,8 @@ use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pe
 use Crypt::PK;
 
 sub new {
-  my ($class, $f, $p) = @_;
-  my $self = _new();
-  $self->import_key($f, $p) if $f;
-  return  $self;
+  my $self = shift->_new();
+  return @_ > 0 ? $self->import_key(@_) : $self;
 }
 
 sub export_key_pem {
@@ -165,49 +163,12 @@ sub import_key {
   croak "FATAL: invalid or unsupported RSA key format";
 }
 
-sub encrypt {
-  my ($self, $data, $padding, $hash_name, $lparam) = @_;
-  $lparam ||= '';
-  $padding ||= 'oaep';
-  $hash_name ||= 'SHA1';
-
-  return $self->_encrypt($data, $padding, $hash_name, $lparam);
-}
-
-sub decrypt {
-  my ($self, $data, $padding, $hash_name, $lparam) = @_;
-  $lparam ||= '';
-  $padding ||= 'oaep';
-  $hash_name ||= 'SHA1';
-
-  return $self->_decrypt($data, $padding, $hash_name, $lparam);
-}
-
-sub sign_hash {
-  my ($self, $data, $hash_name, $padding, $saltlen) = @_;
-  $saltlen ||= 12;
-  $padding ||= 'pss';
-  $hash_name ||= 'SHA1';
-
-  return $self->_sign($data, $padding, $hash_name, $saltlen);
-}
-
 sub sign_message {
   my ($self, $data, $hash_name, $padding, $saltlen) = @_;
   $saltlen ||= 12;
   $padding ||= 'pss';
   $hash_name ||= 'SHA1';
-
-  return $self->_sign(digest_data($hash_name, $data), $padding, $hash_name, $saltlen);
-}
-
-sub verify_hash {
-  my ($self, $sig, $data, $hash_name, $padding, $saltlen) = @_;
-  $saltlen ||= 12;
-  $padding ||= 'pss';
-  $hash_name ||= 'SHA1';
-
-  return $self->_verify($sig, $data, $padding, $hash_name, $saltlen);
+  return $self->sign_hash(digest_data($hash_name, $data), $hash_name, $padding, $saltlen);
 }
 
 sub verify_message {
@@ -215,14 +176,14 @@ sub verify_message {
   $saltlen ||= 12;
   $padding ||= 'pss';
   $hash_name ||= 'SHA1';
-
-  return $self->_verify($sig, digest_data($hash_name, $data), $padding, $hash_name, $saltlen);
+  return $self->verify_hash($sig, digest_data($hash_name, $data), $hash_name, $padding, $saltlen);
 }
 
 ### FUNCTIONS
 
 sub rsa_encrypt {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->encrypt(@_);
@@ -230,6 +191,7 @@ sub rsa_encrypt {
 
 sub rsa_decrypt {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->decrypt(@_);
@@ -237,6 +199,7 @@ sub rsa_decrypt {
 
 sub rsa_sign_hash {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_hash(@_);
@@ -244,6 +207,7 @@ sub rsa_sign_hash {
 
 sub rsa_verify_hash {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_hash(@_);
@@ -251,6 +215,7 @@ sub rsa_verify_hash {
 
 sub rsa_sign_message {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_message(@_);
@@ -258,6 +223,7 @@ sub rsa_sign_message {
 
 sub rsa_verify_message {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_message(@_);

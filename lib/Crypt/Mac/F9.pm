@@ -11,11 +11,9 @@ our %EXPORT_TAGS = ( all => [qw( f9 f9_hex f9_b64 f9_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
+use Carp;
+$Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-sub f9 { Crypt::Mac::F9->new(shift, shift)->add(@_)->mac }
-sub f9_hex  { Crypt::Mac::F9->new(shift, shift)->add(@_)->hexmac }
-sub f9_b64  { Crypt::Mac::F9->new(shift, shift)->add(@_)->b64mac }
-sub f9_b64u { Crypt::Mac::F9->new(shift, shift)->add(@_)->b64umac }
 
 1;
 
@@ -71,32 +69,24 @@ Or all of them at once:
 Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a binary string.
 
  $f9_raw = f9($cipher_name, $key, 'data buffer');
- #or
- $f9_raw = f9($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 f9_hex
 
 Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a hexadecimal string.
 
  $f9_hex = f9_hex($cipher_name, $key, 'data buffer');
- #or
- $f9_hex = f9_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 f9_b64
 
 Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a Base64 string.
 
  $f9_b64 = f9_b64($cipher_name, $key, 'data buffer');
- #or
- $f9_b64 = f9_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 f9_b64u
 
 Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
  $f9_b64url = f9_b64u($cipher_name, $key, 'data buffer');
- #or
- $f9_b64url = f9_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 
@@ -115,8 +105,6 @@ Logically joins all arguments into a single string, and returns its F9 message a
 =head2 add
 
  $d->add('any data');
- #or
- $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 

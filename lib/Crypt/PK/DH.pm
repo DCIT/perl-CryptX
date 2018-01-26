@@ -168,10 +168,8 @@ my %DH_PARAMS = (
 );
 
 sub new {
-  my ($class, $f) = @_;
-  my $self = _new();
-  $self->import_key($f) if $f;
-  return  $self;
+  my $self = shift->_new();
+  return @_ > 0 ? $self->import_key(@_) : $self;
 }
 
 sub import_key {

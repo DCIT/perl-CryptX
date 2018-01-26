@@ -3,7 +3,7 @@ MODULE = CryptX         PACKAGE = Crypt::Mac::BLAKE2s
 ### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
 
 Crypt::Mac::BLAKE2s
-new(char * class, int size, SV * key)
+new(char * class, unsigned long size, SV * key)
     CODE:
     {
         STRLEN k_len=0;
@@ -128,6 +128,91 @@ hexmac(Crypt::Mac::BLAKE2s self)
         rv = _base16_encode(mac, maclen, (unsigned char *)out, &outlen);
         if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
         RETVAL = newSVpvn(out, outlen);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+blake2s(unsigned long size, SV * key, SV * data)
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac);
+        if (size < len) len = size;
+        rv = blake2smac_memory(k, klen, in, inlen, mac, &len);
+        if (rv != CRYPT_OK) croak("FATAL: blake2s_memory failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) mac, len);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+blake2s_hex(unsigned long size, SV * key, SV * data)
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac), outlen;
+        char out[MAXBLOCKSIZE*2];
+        if (size < len) len = size;
+        rv = blake2smac_memory(k, klen, in, inlen, mac, &len);
+        if (rv != CRYPT_OK) croak("FATAL: blake2s_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = _base16_encode(mac, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+blake2s_b64(unsigned long size, SV * key, SV * data)
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac), outlen;
+        char out[MAXBLOCKSIZE*2];
+        if (size < len) len = size;
+        rv = blake2smac_memory(k, klen, in, inlen, mac, &len);
+        if (rv != CRYPT_OK) croak("FATAL: blake2s_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = base64_encode(mac, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
+
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+blake2s_b64u(unsigned long size, SV * key, SV * data)
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac), outlen;
+        char out[MAXBLOCKSIZE*2];
+        if (size < len) len = size;
+        rv = blake2smac_memory(k, klen, in, inlen, mac, &len);
+        if (rv != CRYPT_OK) croak("FATAL: blake2s_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = base64url_encode(mac, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
     }
     OUTPUT:
         RETVAL

@@ -1,7 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::PK::DH
 
 Crypt::PK::DH
-_new()
+_new(char * class)
     CODE:
     {
         int rv;

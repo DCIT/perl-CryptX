@@ -75,9 +75,9 @@ use Crypt::Misc 'decode_b64';
   ok($pu1->verify_message($sig, "message"), 'verify_message');
 
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  $sig = $pr1->sign_hash($hash, 'SHA1');
+  $sig = $pr1->sign_hash($hash);
   ok(length $sig > 60, 'sign_hash ' . length($sig));
-  ok($pu1->verify_hash($sig, $hash, 'SHA1'), 'verify_hash');
+  ok($pu1->verify_hash($sig, $hash), 'verify_hash');
 
   my $pr2 = Crypt::PK::DSA->new;
   $pr2->import_key('t/data/cryptx_priv_dsa2.der');
@@ -195,7 +195,7 @@ MARKER
   ok($sig, 'dsa_sign_message');
   ok(dsa_verify_message('t/data/cryptx_pub_dsa1.der', $sig, 'test string'), 'dsa_verify_message');
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  $sig = dsa_sign_hash('t/data/cryptx_priv_dsa1.der', $hash, 'SHA1');
+  $sig = dsa_sign_hash('t/data/cryptx_priv_dsa1.der', $hash);
   ok($sig, 'dsa_sign_hash');
-  ok(dsa_verify_hash('t/data/cryptx_pub_dsa1.der', $sig, $hash, 'SHA1'), 'dsa_verify_hash');
+  ok(dsa_verify_hash('t/data/cryptx_pub_dsa1.der', $sig, $hash), 'dsa_verify_hash');
 }

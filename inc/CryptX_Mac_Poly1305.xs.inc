@@ -131,3 +131,84 @@ hexmac(Crypt::Mac::Poly1305 self)
     }
     OUTPUT:
         RETVAL
+
+SV *
+poly1305(SV * key, SV * data)
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac);
+        rv = poly1305_memory(k, klen, in, inlen, mac, &len);
+        if (rv != CRYPT_OK) croak("FATAL: poly1305_memory failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) mac, len);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+poly1305_hex(SV * key, SV * data)
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac), outlen;
+        char out[MAXBLOCKSIZE*2];
+        rv = poly1305_memory(k, klen, in, inlen, mac, &len);
+        if (rv != CRYPT_OK) croak("FATAL: poly1305_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = _base16_encode(mac, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+poly1305_b64(SV * key, SV * data)
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac), outlen;
+        char out[MAXBLOCKSIZE*2];
+        rv = poly1305_memory(k, klen, in, inlen, mac, &len);
+        if (rv != CRYPT_OK) croak("FATAL: poly1305_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = base64_encode(mac, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
+
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+poly1305_b64u(SV * key, SV * data)
+    CODE:
+    {
+        STRLEN inlen, klen;
+        unsigned char *in = (unsigned char *)SvPVbyte(data, inlen);
+        unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
+        int rv;
+        unsigned char mac[MAXBLOCKSIZE];
+        unsigned long len = sizeof(mac), outlen;
+        char out[MAXBLOCKSIZE*2];
+        rv = poly1305_memory(k, klen, in, inlen, mac, &len);
+        if (rv != CRYPT_OK) croak("FATAL: poly1305_memory failed: %s", error_to_string(rv));
+        outlen = sizeof(out);
+        rv = base64url_encode(mac, len, (unsigned char *)out, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char *) out, outlen);
+    }
+    OUTPUT:
+        RETVAL
