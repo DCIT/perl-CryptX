@@ -114,7 +114,7 @@ bytes(Crypt::PRNG self, STRLEN output_len)
           self->desc->ready(&self->state);
           self->last_pid = curpid;
         }
-        
+
         if (ix == 1) {
           /* HEX */
           Newz(0, tmp, output_len, unsigned char);

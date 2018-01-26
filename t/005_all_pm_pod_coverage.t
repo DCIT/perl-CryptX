@@ -31,6 +31,9 @@ for my $m (sort @files) {
   elsif ($m eq 'Crypt::Mac') {
     $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(add|addfile)$/] );
   }
+  elsif ($m =~ /^Crypt::Mode::(CTR|CFB|OFB)$/) {
+    $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(finish)$/] );
+  }
   elsif ($m eq 'Crypt::AuthEnc::OCB') {
     $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(blocksize|aad_add)$/] );
   }

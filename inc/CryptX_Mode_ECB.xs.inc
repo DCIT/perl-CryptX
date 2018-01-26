@@ -85,14 +85,14 @@ _crypt(Crypt::Mode::ECB self, SV * data)
                 in_data_len = 0;
               }
             } /* padlen > 0 */
-          
+
             i = (unsigned long)(in_data_len % blen);
             if (in_data_len>0 && i>0) { /* save tail of data into pad */
               Copy(in_data+in_data_start+in_data_len-i, self->pad, i, unsigned char);
               self->padlen = i;
               in_data_len -= i;
             }
-          
+
             if (in_data_len > 0) {
               i = (unsigned long)(has_tmp_block ? in_data_len + blen : in_data_len);
               RETVAL = NEWSV(0, i);
@@ -126,7 +126,7 @@ _crypt(Crypt::Mode::ECB self, SV * data)
             RETVAL = newSVpvn("", 0);
           }
           else {
-          
+
             if (self->padlen == blen) {
               rv = ecb_decrypt(self->pad, tmp_block, blen, &self->state);
               if (rv != CRYPT_OK) croak("FATAL: ecb_decrypt failed: %s", error_to_string(rv));
@@ -153,7 +153,7 @@ _crypt(Crypt::Mode::ECB self, SV * data)
                 in_data_len = 0;
               }
             } /* padlen > 0 */
-          
+
             /* here: a/ padlen == 1..16 && in_data_len == 0; b/ padlen == 0 && in_data_len > 0 */
             if (in_data_len>0) {
               i = (unsigned long)(in_data_len % blen);
@@ -163,7 +163,7 @@ _crypt(Crypt::Mode::ECB self, SV * data)
                 in_data_len -= i;
               }
             }
-          
+
             if (in_data_len>0) {
               if (self->padlen == 0 && self->padding_mode !=0) {
                 /* in case of padding keep full pad if no more data */

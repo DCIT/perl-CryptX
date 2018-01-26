@@ -1,5 +1,8 @@
 Changes for CryptX
 
+0.056_* 2018-01-26
+        - speed-up (nore stuff handled on XS level)
+
 0.056   2017-12-22
         - new Crypt::Stream::Rabbit
 
