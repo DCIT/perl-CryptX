@@ -13,43 +13,6 @@ use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
-sub ccm_encrypt_authenticate {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $iv = shift;
-  my $adata = shift;
-  my $tag_len = shift;
-  my $plaintext = shift;
-
-  $iv = "" if !defined $iv;
-  $adata = "" if !defined $adata;
-  $plaintext = "" if !defined $plaintext;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::CCM->new($cipher_name, $key, $iv, $adata, $tag_len, length($plaintext));
-  my $ct = $m->encrypt_add($plaintext);
-  my $tag = $m->encrypt_done();
-  return ($ct, $tag);
-}
-
-sub ccm_decrypt_verify {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $iv = shift;
-  my $adata = shift;
-  my $ciphertext = shift;
-  my $tag = shift;
-
-  $iv = "" if !defined $iv;
-  $adata = "" if !defined $adata;
-  $ciphertext = "" if !defined $ciphertext;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::CCM->new($cipher_name, $key, $iv, $adata, length($tag), length($ciphertext));
-  my $pt = $m->decrypt_add($ciphertext);
-  return $m->decrypt_done($tag) ? $pt : undef;
-}
-
 1;
 
 =pod

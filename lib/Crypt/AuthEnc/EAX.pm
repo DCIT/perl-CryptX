@@ -13,46 +13,6 @@ use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
-### the following methods/functions are implemented in XS:
-# - new
-# - DESTROY
-# - clone
-# - encrypt_add
-# - encrypt_done
-# - decrypt_add
-# - decrypt_done
-# - adata_add
-
-sub eax_encrypt_authenticate {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $iv = shift;
-  my $adata = shift;
-  my $plaintext = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::EAX->new($cipher_name, $key, $iv);
-  $m->adata_add($adata) if defined $adata;
-  my $ct = $m->encrypt_add($plaintext);
-  my $tag = $m->encrypt_done;
-  return ($ct, $tag);
-}
-
-sub eax_decrypt_verify {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $iv = shift;
-  my $adata = shift;
-  my $ciphertext = shift;
-  my $tag = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::EAX->new($cipher_name, $key, $iv);
-  $m->adata_add($adata) if defined $adata;
-  my $ct = $m->decrypt_add($ciphertext);
-  return $m->decrypt_done($tag) ? $ct : undef;
-}
-
 # obsolete, only for backwards compatibility
 sub header_add { goto &adata_add }
 sub aad_add    { goto &adata_add }

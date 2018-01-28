@@ -10,6 +10,7 @@ new(char * class, SV * key)
         unsigned char *k=NULL;
         int rv;
 
+        LTC_UNUSED_PARAM(class);
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
@@ -90,7 +91,7 @@ mac(Crypt::Mac::Pelican self)
           RETVAL = newSVpvn(out, outlen);
         }
         else {
-          RETVAL = newSVpvn(mac, maclen);
+          RETVAL = newSVpvn((char * )mac, maclen);
         }
     }
     OUTPUT:
@@ -114,12 +115,12 @@ pelican(SV * key, ...)
         pelican_state st;
 
         len = 16;
-        rv = pelican_init(&st, k, klen);
+        rv = pelican_init(&st, k, (unsigned long)klen);
         if (rv != CRYPT_OK) croak("FATAL: pelican_init failed: %s", error_to_string(rv));
         for (i = 1; i < items; i++) {
           in = (unsigned char *)SvPVbyte(ST(i), inlen);
           if (inlen > 0) {
-            rv = pelican_process(&st, in, inlen);
+            rv = pelican_process(&st, in, (unsigned long)inlen);
             if (rv != CRYPT_OK) croak("FATAL: pelican_process failed: %s", error_to_string(rv));
           }
         }

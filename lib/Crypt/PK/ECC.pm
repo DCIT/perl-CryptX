@@ -566,55 +566,6 @@ sub import_key {
   croak "FATAL: invalid or unsupported EC key format";
 }
 
-sub encrypt {
-  my ($self, $data, $hash_name) = @_;
-  $hash_name ||= 'SHA1';
-  return $self->_encrypt($data, $hash_name);
-}
-
-sub decrypt {
-  my ($self, $data) = @_;
-  return $self->_decrypt($data);
-}
-
-sub sign_message {
-  my ($self, $data, $hash_name) = @_;
-  $hash_name ||= 'SHA1';
-  my $data_hash = digest_data($hash_name, $data);
-  return $self->_sign($data_hash);
-}
-
-sub sign_message_rfc7518 {
-  my ($self, $data, $hash_name) = @_;
-  $hash_name ||= 'SHA1';
-  my $data_hash = digest_data($hash_name, $data);
-  return $self->_sign_rfc7518($data_hash);
-}
-
-sub verify_message {
-  my ($self, $sig, $data, $hash_name) = @_;
-  $hash_name ||= 'SHA1';
-  my $data_hash = digest_data($hash_name, $data);
-  return $self->_verify($sig, $data_hash);
-}
-
-sub verify_message_rfc7518 {
-  my ($self, $sig, $data, $hash_name) = @_;
-  $hash_name ||= 'SHA1';
-  my $data_hash = digest_data($hash_name, $data);
-  return $self->_verify_rfc7518($sig, $data_hash);
-}
-
-sub sign_hash {
-  my ($self, $data_hash) = @_;
-  return $self->_sign($data_hash);
-}
-
-sub verify_hash {
-  my ($self, $sig, $data_hash) = @_;
-  return $self->_verify($sig, $data_hash);
-}
-
 sub curve2hash {
   my $self = shift;
   my $kh = $self->key2hash;
@@ -625,7 +576,8 @@ sub curve2hash {
      Gx       => $kh->{curve_Gx},
      Gy       => $kh->{curve_Gy},
      cofactor => $kh->{curve_cofactor},
-     order    => $kh->{curve_order}
+     order    => $kh->{curve_order},
+     oid      => $kh->{curve_oid},
   };
 }
 

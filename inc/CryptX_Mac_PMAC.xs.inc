@@ -14,6 +14,7 @@ new(char * class, char * cipher_name, SV * key)
         id = _find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
+        LTC_UNUSED_PARAM(class);
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
@@ -94,7 +95,7 @@ mac(Crypt::Mac::PMAC self)
           RETVAL = newSVpvn(out, outlen);
         }
         else {
-          RETVAL = newSVpvn(mac, maclen);
+          RETVAL = newSVpvn((char * )mac, maclen);
         }
     }
     OUTPUT:
@@ -119,12 +120,12 @@ pmac(char * cipher_name, SV * key, ...)
 
         int id = _find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
-        rv = pmac_init(&st, id, k, klen);
+        rv = pmac_init(&st, id, k, (unsigned long)klen);
         if (rv != CRYPT_OK) croak("FATAL: pmac_init failed: %s", error_to_string(rv));
         for (i = 2; i < items; i++) {
           in = (unsigned char *)SvPVbyte(ST(i), inlen);
           if (inlen > 0) {
-            rv = pmac_process(&st, in, inlen);
+            rv = pmac_process(&st, in, (unsigned long)inlen);
             if (rv != CRYPT_OK) croak("FATAL: pmac_process failed: %s", error_to_string(rv));
           }
         }

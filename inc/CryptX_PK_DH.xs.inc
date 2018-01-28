@@ -5,6 +5,7 @@ _new(char * class)
     CODE:
     {
         int rv;
+        LTC_UNUSED_PARAM(class);
         Newz(0, RETVAL, 1, struct dh_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->key.type = -1;
@@ -208,7 +209,7 @@ key2hash(Crypt::PK::DH self)
         not_used = hv_store(rv_hash, "size", 4, newSViv(dh_get_groupsize(&self->key)), 0);
         /* type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
-        if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */
+        LTC_UNUSED_PARAM(not_used);
         RETVAL = newRV_noinc((SV*)rv_hash);
     OUTPUT:
         RETVAL

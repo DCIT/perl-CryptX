@@ -12,57 +12,6 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-use Crypt::Digest;
-
-sub pbkdf1 {
-  my ($password, $salt, $iteration_count, $hash_name, $len) = @_;
-  $iteration_count ||= 5000;
-  $hash_name ||= 'SHA256';
-  $len ||= 32;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _pkcs_5_alg1($password, $salt, $iteration_count, $hash_name, $len);
-}
-
-sub pbkdf2 {
-  my ($password, $salt, $iteration_count, $hash_name, $len) = @_;
-  $iteration_count ||= 5000;
-  $hash_name ||= 'SHA256';
-  $len ||= 32;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _pkcs_5_alg2($password, $salt, $iteration_count, $hash_name, $len);
-}
-
-sub hkdf_extract {
-  # RFC: HKDF-Extract(salt, IKM, [Hash]) -> PRK
-  #my ($hash_name, $salt, $keying_material) = @_;
-  my ($keying_material, $salt, $hash_name) = @_;
-  $hash_name ||= 'SHA256';
-  $salt = pack("H*", "00" x Crypt::Digest->hashsize($hash_name)) unless defined $salt; # according to rfc5869 defaults to HashLen zero octets
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _hkdf_extract($hash_name, $salt, $keying_material);
-}
-
-sub hkdf_expand {
-  # RFC: HKDF-Expand(PRK, info, L, [Hash]) -> OKM
-  #my ($hash_name, $info, $keying_material, $len) = @_;
-  my ($keying_material, $hash_name, $len, $info) = @_;
-  $len ||= 32;
-  $info ||= '';
-  $hash_name ||= 'SHA256';
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _hkdf_expand($hash_name, $info, $keying_material, $len);
-}
-
-sub hkdf {
-  #my ($hash_name, $salt, $info, $keying_material, $len) = @_;
-  my ($keying_material, $salt, $hash_name, $len, $info) = @_;
-  $len ||= 32;
-  $info ||= '';
-  $hash_name ||= 'SHA256';
-  $salt = pack("H*", "00" x Crypt::Digest->hashsize($hash_name)) unless defined $salt; # according to rfc5869 defaults to HashLen zero octets
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _hkdf($hash_name, $salt, $info, $keying_material, $len);
-}
 
 1;
 

@@ -6,6 +6,7 @@ Crypt::Mode::OFB
 new(char * class, char * cipher_name, int rounds=0)
     CODE:
     {
+        LTC_UNUSED_PARAM(class);
         Newz(0, RETVAL, 1, struct ofb_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->direction = 0;
@@ -25,10 +26,9 @@ DESTROY(Crypt::Mode::OFB self)
         Safefree(self);
 
 void
-_start(Crypt::Mode::OFB self, SV * key, SV * iv)
+start_decrypt(Crypt::Mode::OFB self, SV * key, SV * iv)
     ALIAS:
         start_encrypt = 1
-        start_decrypt = 2
     PPCODE:
     {
         STRLEN k_len=0;
@@ -68,7 +68,7 @@ _crypt(Crypt::Mode::OFB self, SV * data)
           RETVAL = newSVpvn("", 0);
         }
         else {
-          RETVAL = NEWSV(0, in_data_len);
+          RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);

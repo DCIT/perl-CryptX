@@ -13,38 +13,6 @@ use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
-sub gcm_encrypt_authenticate {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $iv = shift;
-  my $adata = shift;
-  my $plaintext = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::GCM->new($cipher_name, $key);
-  $m->iv_add($iv);
-  $m->adata_add(defined $adata ? $adata : ''); #XXX-TODO if no aad we have to pass empty string
-  my $ct = $m->encrypt_add($plaintext);
-  my $tag = $m->encrypt_done;
-  return ($ct, $tag);
-}
-
-sub gcm_decrypt_verify {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $iv = shift;
-  my $adata = shift;
-  my $ciphertext = shift;
-  my $tag = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::GCM->new($cipher_name, $key);
-  $m->iv_add($iv);
-  $m->adata_add(defined $adata ? $adata : ''); #XXX-TODO if no aad we have to pass empty string
-  my $ct = $m->decrypt_add($ciphertext);
-  return $m->decrypt_done($tag) ? $ct : undef;
-}
-
 1;
 
 =pod

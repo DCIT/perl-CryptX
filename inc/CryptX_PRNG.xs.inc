@@ -9,8 +9,7 @@ new(char * class, ...)
         unsigned char *ent=NULL;
         STRLEN ent_len=0;
         unsigned char entropy_buf[40];
-        char *default_name = "ChaCha20";
-        char *prng_name = default_name;
+        char *prng_name = (char *)"ChaCha20";
         SV *entropy = &PL_sv_undef;
 
         /* we need to handle:
@@ -95,7 +94,7 @@ add_entropy(Crypt::PRNG self, SV * entropy=&PL_sv_undef)
     }
 
 SV *
-bytes(Crypt::PRNG self, STRLEN output_len)
+bytes(Crypt::PRNG self, unsigned long output_len)
     ALIAS:
         bytes_hex  = 1
         bytes_b64  = 2
@@ -108,61 +107,65 @@ bytes(Crypt::PRNG self, STRLEN output_len)
         unsigned char *rdata, *tmp;
         unsigned char entropy_buf[40];
 
-        if (self->last_pid != curpid) {
-          if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
-          self->desc->add_entropy(entropy_buf, 40, &self->state);
-          self->desc->ready(&self->state);
-          self->last_pid = curpid;
-        }
-
-        if (ix == 1) {
-          /* HEX */
-          Newz(0, tmp, output_len, unsigned char);
-          if (tmp == NULL) croak("FATAL: Newz failed");
-          rv_len = (self->desc->read)(tmp, (unsigned long)output_len, &self->state);
-          if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
-          RETVAL = NEWSV(0, output_len * 2);
-          SvPOK_only(RETVAL);
-          SvCUR_set(RETVAL, output_len * 2);
-          rdata = (unsigned char *)SvPVX(RETVAL);
-          len = output_len * 2;
-          rv = _base16_encode(tmp, output_len, rdata, &len);
-          Safefree(tmp);
-          if (rv != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            croak("FATAL: base16_encode failed");
-          }
-        }
-        else if (ix == 2 || ix == 3) {
-          /* BASE64 or BASE64URL */
-          Newz(0, tmp, output_len, unsigned char);
-          if (tmp == NULL) croak("FATAL: Newz failed");
-          rv_len = (self->desc->read)(tmp, (unsigned long)output_len, &self->state);
-          if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
-          RETVAL = NEWSV(0, output_len * 2);
-          SvPOK_only(RETVAL);
-          SvCUR_set(RETVAL, output_len * 2);
-          rdata = (unsigned char *)SvPVX(RETVAL);
-          len = output_len * 2;
-          rv = ix == 3 ? base64url_encode(tmp, output_len, rdata, &len) :
-                         base64_encode(tmp, output_len, rdata, &len);
-          SvCUR_set(RETVAL, len);
-          Safefree(tmp);
-          if (rv != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            croak(ix == 3 ? "FATAL: base64url_encode failed" : "FATAL: base64_encode failed");
-          }
+        if (output_len == 0) {
+          RETVAL = newSVpvn("", 0);
         }
         else {
-          /* RAW BYTES */
-          RETVAL = NEWSV(0, output_len);
-          SvPOK_only(RETVAL);
-          SvCUR_set(RETVAL, output_len);
-          rdata = (unsigned char *)SvPVX(RETVAL);
-          rv_len = (self->desc->read)(rdata, (unsigned long)output_len, &self->state);
-          if ((UV)rv_len != output_len) {
-            SvREFCNT_dec(RETVAL);
-            croak("FATAL: PRNG_read failed");
+          if (self->last_pid != curpid) {
+            if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
+            self->desc->add_entropy(entropy_buf, 40, &self->state);
+            self->desc->ready(&self->state);
+            self->last_pid = curpid;
+          }
+          if (ix == 1) {
+            /* HEX */
+            Newz(0, tmp, output_len, unsigned char);
+            if (tmp == NULL) croak("FATAL: Newz failed");
+            rv_len = (self->desc->read)(tmp, (unsigned long)output_len, &self->state);
+            if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
+            RETVAL = NEWSV(0, output_len * 2); /* avoid zero! */
+            SvPOK_only(RETVAL);
+            SvCUR_set(RETVAL, output_len * 2);
+            rdata = (unsigned char *)SvPVX(RETVAL);
+            len = output_len * 2;
+            rv = _base16_encode(tmp, output_len, rdata, &len);
+            Safefree(tmp);
+            if (rv != CRYPT_OK) {
+              SvREFCNT_dec(RETVAL);
+              croak("FATAL: base16_encode failed");
+            }
+          }
+          else if (ix == 2 || ix == 3) {
+            /* BASE64 or BASE64URL */
+            Newz(0, tmp, output_len, unsigned char);
+            if (tmp == NULL) croak("FATAL: Newz failed");
+            rv_len = (self->desc->read)(tmp, (unsigned long)output_len, &self->state);
+            if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
+            RETVAL = NEWSV(0, output_len * 2); /* avoid zero! */
+            SvPOK_only(RETVAL);
+            SvCUR_set(RETVAL, output_len * 2);
+            rdata = (unsigned char *)SvPVX(RETVAL);
+            len = output_len * 2;
+            rv = ix == 3 ? base64url_encode(tmp, output_len, rdata, &len) :
+                           base64_encode(tmp, output_len, rdata, &len);
+            SvCUR_set(RETVAL, len);
+            Safefree(tmp);
+            if (rv != CRYPT_OK) {
+              SvREFCNT_dec(RETVAL);
+              croak(ix == 3 ? "FATAL: base64url_encode failed" : "FATAL: base64_encode failed");
+            }
+          }
+          else {
+            /* RAW BYTES */
+            RETVAL = NEWSV(0, output_len); /* avoid zero! */
+            SvPOK_only(RETVAL);
+            SvCUR_set(RETVAL, output_len);
+            rdata = (unsigned char *)SvPVX(RETVAL);
+            rv_len = (self->desc->read)(rdata, (unsigned long)output_len, &self->state);
+            if ((UV)rv_len != output_len) {
+              SvREFCNT_dec(RETVAL);
+              croak("FATAL: PRNG_read failed");
+            }
           }
         }
     }

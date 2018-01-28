@@ -14,6 +14,7 @@ new(char * class, char * hash_name, SV * key)
         id = _find_hash(hash_name);
         if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
+        LTC_UNUSED_PARAM(class);
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
@@ -94,7 +95,7 @@ mac(Crypt::Mac::HMAC self)
           RETVAL = newSVpvn(out, outlen);
         }
         else {
-          RETVAL = newSVpvn(mac, maclen);
+          RETVAL = newSVpvn((char * )mac, maclen);
         }
     }
     OUTPUT:
@@ -119,12 +120,12 @@ hmac(char * hash_name, SV * key, ...)
 
         int id = _find_hash(hash_name);
         if (id == -1) croak("FATAL: find_digest failed for '%s'", hash_name);
-        rv = hmac_init(&st, id, k, klen);
+        rv = hmac_init(&st, id, k, (unsigned long)klen);
         if (rv != CRYPT_OK) croak("FATAL: hmac_init failed: %s", error_to_string(rv));
         for (i = 2; i < items; i++) {
           in = (unsigned char *)SvPVbyte(ST(i), inlen);
           if (inlen > 0) {
-            rv = hmac_process(&st, in, inlen);
+            rv = hmac_process(&st, in, (unsigned long)inlen);
             if (rv != CRYPT_OK) croak("FATAL: hmac_process failed: %s", error_to_string(rv));
           }
         }

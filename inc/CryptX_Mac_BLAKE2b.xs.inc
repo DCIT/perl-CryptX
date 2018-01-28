@@ -10,6 +10,7 @@ new(char * class, unsigned long size, SV * key)
         unsigned char *k=NULL;
         int rv;
 
+        LTC_UNUSED_PARAM(class);
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
@@ -90,7 +91,7 @@ mac(Crypt::Mac::BLAKE2b self)
           RETVAL = newSVpvn(out, outlen);
         }
         else {
-          RETVAL = newSVpvn(mac, maclen);
+          RETVAL = newSVpvn((char * )mac, maclen);
         }
     }
     OUTPUT:
@@ -114,12 +115,12 @@ blake2b(unsigned long size, SV * key, ...)
         blake2bmac_state st;
 
         if (size < len) len = size;
-        rv = blake2bmac_init(&st, len, k, klen);
+        rv = blake2bmac_init(&st, len, k, (unsigned long)klen);
         if (rv != CRYPT_OK) croak("FATAL: blake2bmac_init failed: %s", error_to_string(rv));
         for (i = 2; i < items; i++) {
           in = (unsigned char *)SvPVbyte(ST(i), inlen);
           if (inlen > 0) {
-            rv = blake2bmac_process(&st, in, inlen);
+            rv = blake2bmac_process(&st, in, (unsigned long)inlen);
             if (rv != CRYPT_OK) croak("FATAL: blake2bmac_process failed: %s", error_to_string(rv));
           }
         }

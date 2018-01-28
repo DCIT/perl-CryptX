@@ -5,6 +5,7 @@ _new(char * class)
     CODE:
     {
         int rv;
+        LTC_UNUSED_PARAM(class);
         Newz(0, RETVAL, 1, struct rsa_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->key.type = -1;
@@ -261,7 +262,7 @@ key2hash(Crypt::PK::RSA self)
         not_used = hv_store(rv_hash, "size", 4, newSViv(nsize), 0);
         /* type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
-        if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */
+        LTC_UNUSED_PARAM(not_used);
         RETVAL = newRV_noinc((SV*)rv_hash);
     OUTPUT:
         RETVAL
@@ -293,7 +294,7 @@ export_key_der(Crypt::PK::RSA self, char * type)
         RETVAL
 
 SV *
-encrypt(Crypt::PK::RSA self, SV * data, char * padding="oaep", char * oaep_hash="SHA1", SV * oaep_lparam=NULL)
+encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * oaep_hash = "SHA1", SV * oaep_lparam = NULL)
     CODE:
     {
         int rv, hash_id;
@@ -338,7 +339,7 @@ encrypt(Crypt::PK::RSA self, SV * data, char * padding="oaep", char * oaep_hash=
         RETVAL
 
 SV *
-decrypt(Crypt::PK::RSA self, SV * data, char * padding="oaep", char * oaep_hash="SHA1", SV * oaep_lparam=NULL)
+decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * oaep_hash = "SHA1", SV * oaep_lparam = NULL)
     CODE:
     {
         int rv, hash_id, stat;
@@ -383,18 +384,25 @@ decrypt(Crypt::PK::RSA self, SV * data, char * padding="oaep", char * oaep_hash=
         RETVAL
 
 SV *
-sign_hash(Crypt::PK::RSA self, SV * data, char * hash_name="SHA1", char * padding="pss", unsigned long saltlen=12)
+sign_hash(Crypt::PK::RSA self, SV * data, const char * hash_name = "SHA1", const char * padding = "pss", unsigned long saltlen=12)
+    ALIAS:
+        sign_message = 1
     CODE:
     {
         int rv, hash_id;
-        unsigned char *data_ptr=NULL;
-        STRLEN data_len=0;
-        unsigned char buffer[1024];
-        unsigned long buffer_len = 1024;
+        unsigned char buffer[1024], tmp[MAXBLOCKSIZE], *data_ptr = NULL;
+        unsigned long tmp_len = MAXBLOCKSIZE, buffer_len = 1024;
+        STRLEN data_len = 0;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
-
-        RETVAL = newSVpvn(NULL, 0); /* undef */
+        if (ix == 1) {
+          hash_id = _find_hash(hash_name);
+          if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
+          rv = hash_memory(hash_id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
+          if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
+          data_ptr = tmp;
+          data_len = tmp_len;
+        }
         if (strnEQ(padding, "pss", 3)) {
           hash_id = _find_hash(hash_name);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
@@ -427,20 +435,26 @@ sign_hash(Crypt::PK::RSA self, SV * data, char * hash_name="SHA1", char * paddin
         RETVAL
 
 int
-verify_hash(Crypt::PK::RSA self, SV * sig, SV * data, char * hash_name="SHA1", char * padding="pss", unsigned long saltlen=12)
+verify_hash(Crypt::PK::RSA self, SV * sig, SV * data, const char * hash_name = "SHA1", const char * padding = "pss", unsigned long saltlen = 12)
+    ALIAS:
+        verify_message = 1
     CODE:
     {
         int rv, hash_id, stat;
-        unsigned char *data_ptr=NULL;
-        STRLEN data_len=0;
-        unsigned char *sig_ptr=NULL;
-        STRLEN sig_len=0;
-        unsigned char buffer[1024];
-        unsigned long i, buffer_len = 1024;
+        unsigned char tmp[MAXBLOCKSIZE], buffer[1024], *data_ptr = NULL, *sig_ptr = NULL;
+        unsigned long i, tmp_len = MAXBLOCKSIZE, buffer_len = 1024;
+        STRLEN data_len = 0, sig_len = 0;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
-
+        if (ix == 1) {
+          hash_id = _find_hash(hash_name);
+          if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
+          rv = hash_memory(hash_id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
+          if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
+          data_ptr = tmp;
+          data_len = tmp_len;
+        }
         RETVAL = 1;
         stat = 0;
         if (strnEQ(padding, "pss", 3)) {

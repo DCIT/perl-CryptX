@@ -13,37 +13,6 @@ use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
-sub ocb_encrypt_authenticate {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $nonce = shift;
-  my $adata = shift;
-  my $tag_len = shift;
-  my $plaintext = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::OCB->new($cipher_name, $key, $nonce, $tag_len);
-  $m->adata_add($adata) if defined $adata;
-  my $ct = $m->encrypt_last($plaintext);
-  my $tag = $m->encrypt_done;
-  return ($ct, $tag);
-}
-
-sub ocb_decrypt_verify {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $nonce = shift;
-  my $adata = shift;
-  my $ciphertext = shift;
-  my $tag = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::OCB->new($cipher_name, $key, $nonce, length($tag));
-  $m->adata_add($adata) if defined $adata;
-  my $ct = $m->decrypt_last($ciphertext);
-  return $m->decrypt_done($tag) ? $ct : undef;
-}
-
 # obsolete, only for backwards compatibility
 sub aad_add { goto &adata_add }
 sub blocksize { return 16 }

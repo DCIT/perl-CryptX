@@ -163,22 +163,6 @@ sub import_key {
   croak "FATAL: invalid or unsupported RSA key format";
 }
 
-sub sign_message {
-  my ($self, $data, $hash_name, $padding, $saltlen) = @_;
-  $saltlen ||= 12;
-  $padding ||= 'pss';
-  $hash_name ||= 'SHA1';
-  return $self->sign_hash(digest_data($hash_name, $data), $hash_name, $padding, $saltlen);
-}
-
-sub verify_message {
-  my ($self, $sig, $data, $hash_name, $padding, $saltlen) = @_;
-  $saltlen ||= 12;
-  $padding ||= 'pss';
-  $hash_name ||= 'SHA1';
-  return $self->verify_hash($sig, digest_data($hash_name, $data), $hash_name, $padding, $saltlen);
-}
-
 ### FUNCTIONS
 
 sub rsa_encrypt {

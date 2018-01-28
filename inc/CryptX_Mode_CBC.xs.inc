@@ -6,6 +6,7 @@ Crypt::Mode::CBC
 new(char * class, char * cipher_name, int padding=1, int rounds=0)
     CODE:
     {
+        LTC_UNUSED_PARAM(class);
         Newz(0, RETVAL, 1, struct cbc_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->padding_mode = padding;
@@ -27,10 +28,9 @@ DESTROY(Crypt::Mode::CBC self)
         Safefree(self);
 
 void
-_start(Crypt::Mode::CBC self, SV * key, SV * iv)
+start_decrypt(Crypt::Mode::CBC self, SV * key, SV * iv)
     ALIAS:
         start_encrypt = 1
-        start_decrypt = 2
     PPCODE:
     {
         int rv;
@@ -102,7 +102,7 @@ _crypt(Crypt::Mode::CBC self, SV * data)
 
             if (in_data_len > 0) {
               i = (unsigned long)(has_tmp_block ? in_data_len + blen : in_data_len);
-              RETVAL = NEWSV(0, i);
+              RETVAL = NEWSV(0, i); /* avoid zero! */
               SvPOK_only(RETVAL);
               SvCUR_set(RETVAL, i);
               out_data = (unsigned char *)SvPVX(RETVAL);
@@ -183,7 +183,7 @@ _crypt(Crypt::Mode::CBC self, SV * data)
                 RETVAL = newSVpvn("", 0);
               }
               else {
-                RETVAL = NEWSV(0, i);
+                RETVAL = NEWSV(0, i); /* avoid zero! */
                 SvPOK_only(RETVAL);
                 SvCUR_set(RETVAL, i);
                 out_data = (unsigned char *)SvPVX(RETVAL);

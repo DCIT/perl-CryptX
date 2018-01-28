@@ -95,17 +95,6 @@ sub import_key {
   croak "FATAL: invalid or unsupported DSA key format";
 }
 
-sub sign_message {
-  my ($self, $data, $hash_name) = @_;
-  $hash_name ||= 'SHA1';
-  return $self->sign_hash(digest_data($hash_name, $data));
-}
-
-sub verify_message {
-  my ($self, $sig, $data, $hash_name) = @_;
-  return $self->verify_hash($sig, digest_data($hash_name||'SHA1', $data));
-}
-
 ### FUNCTIONS
 
 sub dsa_encrypt {

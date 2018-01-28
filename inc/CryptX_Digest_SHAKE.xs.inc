@@ -5,6 +5,7 @@ new(char * class, int num)
     CODE:
     {
         int rv;
+        LTC_UNUSED_PARAM(class);
 
         Newz(0, RETVAL, 1, struct digest_shake_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
@@ -68,14 +69,19 @@ done(Crypt::Digest::SHAKE self, STRLEN out_len)
         int rv;
         unsigned char *out_data;
 
-        RETVAL = NEWSV(0, out_len);
-        SvPOK_only(RETVAL);
-        SvCUR_set(RETVAL, out_len);
-        out_data = (unsigned char *)SvPVX(RETVAL);
-        rv = sha3_shake_done(&self->state, out_data, (unsigned long)out_len);
-        if (rv != CRYPT_OK) {
-          SvREFCNT_dec(RETVAL);
-          croak("FATAL: sha3_shake_done failed: %s", error_to_string(rv));
+        if (out_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          RETVAL = NEWSV(0, out_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, out_len);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          rv = sha3_shake_done(&self->state, out_data, (unsigned long)out_len);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: sha3_shake_done failed: %s", error_to_string(rv));
+          }
         }
     }
     OUTPUT:

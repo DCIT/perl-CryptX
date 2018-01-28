@@ -7,6 +7,7 @@ new(char * class, SV * key, SV * nonce = NULL)
         int rv;
         STRLEN iv_len=0, k_len=0;
         unsigned char *iv=NULL, *k=NULL;
+        LTC_UNUSED_PARAM(class);
 
         if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
         k  = (unsigned char *) SvPVbyte(key, k_len);
@@ -106,7 +107,7 @@ decrypt_add(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * data)
           RETVAL = newSVpvn("", 0);
         }
         else {
-          RETVAL = NEWSV(0, in_data_len);
+          RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
@@ -133,7 +134,7 @@ encrypt_add(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * data)
           RETVAL = newSVpvn("", 0);
         }
         else {
-          RETVAL = NEWSV(0, in_data_len);
+          RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
@@ -187,5 +188,73 @@ decrypt_done(Crypt::AuthEnc::ChaCha20Poly1305 self, ...)
           else {
             XPUSHs(sv_2mortal(newSViv(1))); /* true */
           }
+        }
+    }
+
+void
+chacha20poly1305_encrypt_authenticate(SV *key, SV *nonce, SV *header, SV *plaintext)
+    PPCODE:
+    {
+        STRLEN k_len = 0, n_len = 0, h_len = 0, pt_len = 0;
+        unsigned char *k = NULL, *n = NULL, *h = NULL, *pt = NULL;
+        int rv;
+        unsigned char tag[MAXBLOCKSIZE];
+        unsigned long tag_len = sizeof(tag);
+        SV *output;
+
+        if (SvPOK(key))       k  = (unsigned char *) SvPVbyte(key, k_len);
+        if (SvPOK(nonce))     n  = (unsigned char *) SvPVbyte(nonce, n_len);
+        if (SvPOK(plaintext)) pt = (unsigned char *) SvPVbyte(plaintext, pt_len);
+        if (SvPOK(header))    h  = (unsigned char *) SvPVbyte(header, h_len);
+
+        output = NEWSV(0, pt_len > 0 ? pt_len : 1); /* avoid zero! */
+        SvPOK_only(output);
+        SvCUR_set(output, pt_len);
+
+        rv = chacha20poly1305_memory(k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len,
+                                     pt, (unsigned long)pt_len, (unsigned char *)SvPVX(output), tag, &tag_len,
+                                     CHACHA20POLY1305_ENCRYPT);
+
+        if (rv != CRYPT_OK) {
+          SvREFCNT_dec(output);
+          croak("FATAL: ccm_memory failed: %s", error_to_string(rv));
+        }
+        XPUSHs(sv_2mortal(output));
+        XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
+    }
+
+void
+chacha20poly1305_decrypt_verify(SV *key, SV *nonce, SV *header, SV *ciphertext, SV *tagsv)
+    PPCODE:
+    {
+        STRLEN k_len = 0, n_len = 0, h_len = 0, ct_len = 0, t_len = 0;
+        unsigned char *k = NULL, *n = NULL, *h = NULL, *ct = NULL, *t = NULL;
+        int rv;
+        unsigned char tag[MAXBLOCKSIZE];
+        unsigned long tag_len;
+        SV *output;
+
+        if (SvPOK(key))        k  = (unsigned char *) SvPVbyte(key, k_len);
+        if (SvPOK(nonce))      n  = (unsigned char *) SvPVbyte(nonce, n_len);
+        if (SvPOK(ciphertext)) ct = (unsigned char *) SvPVbyte(ciphertext, ct_len);
+        if (SvPOK(tagsv))      t  = (unsigned char *) SvPVbyte(tagsv, t_len);
+        if (SvPOK(header))     h  = (unsigned char *) SvPVbyte(header, h_len);
+
+        output = NEWSV(0, ct_len > 0 ? ct_len : 1); /* avoid zero! */
+        SvPOK_only(output);
+        SvCUR_set(output, ct_len);
+        tag_len = (unsigned long)t_len;
+        Copy(t, tag, t_len, unsigned char);
+
+        rv = chacha20poly1305_memory(k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len,
+                                     ct, (unsigned long)ct_len, (unsigned char *)SvPVX(output), tag, &tag_len,
+                                     CHACHA20POLY1305_DECRYPT);
+
+        if (rv != CRYPT_OK) {
+          SvREFCNT_dec(output);
+          XPUSHs(sv_2mortal(newSVpvn(NULL,0))); /* undef */
+        }
+        else {
+          XPUSHs(sv_2mortal(output));
         }
     }

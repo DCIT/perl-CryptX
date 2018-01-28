@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 use Crypt::AuthEnc::CCM qw( ccm_encrypt_authenticate ccm_decrypt_verify );
 
@@ -45,7 +45,9 @@ my $key   = "12345678901234561234567890123456";
 }
 
 {
-  my ($ct, $tag) = ccm_encrypt_authenticate('AES', $key, $nonce, "", 16, "plain_halfplain_half");
+  my ($ct, $tag)   = ccm_encrypt_authenticate('AES', $key, $nonce, "", 16, "plain_halfplain_half");
+  my ($ct2, $tag2) = ccm_encrypt_authenticate('AES', $key, $nonce, undef, 16, "plain_halfplain_half");
+  ok($ct eq $ct2 && $tag eq $tag2, "header '' vs. undef");
   is(unpack('H*', $ct), "96b0114ff47da72e92631aadce84f203a8168b20", "ccm_encrypt_authenticate: ciphertext (no header)");
   is(unpack('H*', $tag), "9e9cba5dd4939d0d8e2687c85c5d3b89", "ccm_encrypt_authenticate: tag (no header)");
   my $pt = ccm_decrypt_verify('AES', $key, $nonce, "", $ct, $tag);
