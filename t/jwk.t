@@ -147,7 +147,7 @@ my $EC1 = {
   curve_cofactor => 1,
   curve_Gx       => "6B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C296",
   curve_Gy       => "4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5",
-  curve_name     => "secp256r1",
+  curve_oid      => "1.2.840.10045.3.1.7",
   curve_order    => "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551",
   curve_prime    => "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF",
   k              => "F3BD0C07A81FB932781ED52752F60CC89A6BE5E51934FE01938DDB55D8F77801",
@@ -167,7 +167,7 @@ my $EC2 = {
   curve_cofactor => 1,
   curve_Gx       => "6B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C296",
   curve_Gy       => "4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5",
-  curve_name     => "secp256r1",
+  curve_oid      => "1.2.840.10045.3.1.7",
   curve_order    => "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551",
   curve_prime    => "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF",
   k              => "",
@@ -183,7 +183,7 @@ my $EC2 = {
   is($kh->{pub_x}, $EC1->{pub_x}, "EC x test HASH1");
   is($kh->{pub_y}, $EC1->{pub_y}, "EC y test HASH1");
   is($kh->{k},     $EC1->{k},     "EC k test HASH1");
-  is($kh->{curve_name}, "secp256r1", "EC curve test HASH1");
+  is($kh->{curve_oid}, "1.2.840.10045.3.1.7", "EC curve test HASH1");
   ok($ec->is_private, "EC private test HASH1");
   my $jwk = $ec->export_key_jwk('private');
   my $jwkp = $ec->export_key_jwk('public');
@@ -205,7 +205,7 @@ my $EC2 = {
   is($kh->{pub_x}, $EC1->{pub_x}, "EC x test JWK1");
   is($kh->{pub_y}, $EC1->{pub_y}, "EC y test JWK1");
   is($kh->{k},     $EC1->{k},     "EC k test JWK1");
-  is($kh->{curve_name}, "secp256r1", "EC curve test JWK1");
+  is($kh->{curve_oid}, "1.2.840.10045.3.1.7", "EC curve test JWK1");
   ok($ec->is_private, "EC private test JWK1");
   $jwk_tp = $ec->export_key_jwk_thumbprint('SHA256');
   is($jwk_tp, $ec1_jwk_thumbprint_sha256, 'export_key_jwk_thumbprint(SHA256)');
@@ -215,7 +215,7 @@ my $EC2 = {
   is($kh->{pub_x}, $EC1->{pub_x}, "EC x test JWK2");
   is($kh->{pub_y}, $EC1->{pub_y}, "EC y test JWK2");
   is($kh->{k}, "", "EC k test JWK2");
-  is($kh->{curve_name}, "secp256r1", "EC curve test JWK2");
+  is($kh->{curve_oid}, "1.2.840.10045.3.1.7", "EC curve test JWK2");
   ok(!$ec->is_private, "EC !private test JWK2");
   $jwk_tp = $ec->export_key_jwk_thumbprint('SHA256');
   is($jwk_tp, $ec1_jwk_thumbprint_sha256, 'export_key_jwk_thumbprint(SHA256)');
@@ -227,7 +227,7 @@ my $EC2 = {
   is($kh->{pub_x}, $EC1->{pub_x}, "EC x test HASH2");
   is($kh->{pub_y}, $EC1->{pub_y}, "EC y test HASH2");
   is($kh->{k}, "", "EC k test HASH2");
-  is($kh->{curve_name}, "secp256r1", "EC curve test HASH2");
+  is($kh->{curve_oid}, "1.2.840.10045.3.1.7", "EC curve test HASH2");
   ok(!$ec->is_private, "EC private test HASH2");
 }
 

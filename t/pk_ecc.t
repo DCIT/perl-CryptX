@@ -179,16 +179,24 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   ok($@, 'key not generated');
 
   # known curves lookup
-  my $params = $Crypt::PK::ECC::curve{secp384r1};
+  my $params = { # NIST P-384
+      prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF",
+      A        => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFC",
+      B        => "B3312FA7E23EE7E4988E056BE3F82D19181D9C6EFE8141120314088F5013875AC656398D8A2ED19D2A85C8EDD3EC2AEF",
+      Gx       => "AA87CA22BE8B05378EB1C71EF320AD746E1D3B628BA79B9859F741E082542A385502F25DBF55296C3A545E3872760AB7",
+      Gy       => "3617DE4A96262C6F5D9E98BF9292DC29F8F41DBD289A147CE9DA3113B5F0B8C00A60B1CE1D7E819D7A431D7C90EA0E5F",
+      order    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC7634D81F4372DDF581A0DB248B0A77AECEC196ACCC52973",
+      cofactor => 1,
+  };
   $k = Crypt::PK::ECC->new;
   ok($k->generate_key($params), "generate_key hash params");
   is($k->key2hash->{curve_name}, 'secp384r1',    "key2hash curve_name");
-  is($k->key2hash->{curve_oid},  $params->{oid}, "key2hash curve_oid");
+  is($k->key2hash->{curve_oid},  '1.3.132.0.34', "key2hash curve_oid");
   ok($k->export_key_der('private_short'), "export_key_der auto oid");
 
   $k = Crypt::PK::ECC->new;
-  ok($k->generate_key({ %$params, A => '0' }), "generate_key invalid auto oid");
-  is($k->key2hash->{curve_name}, 'custom', "key2hash custom curve_name");
+  ok($k->generate_key({ %$params, cofactor => 6 }), "generate_key invalid auto oid");
+  ok(!exists($k->key2hash->{curve_name}) || $k->key2hash->{curve_name} eq 'custom', "key2hash custom curve_name");
   ok(!exists($k->key2hash->{curve_oid}), "key2hash curve_oid doesn't exist");
   eval { $k->export_key_der('private_short'); };
   ok($@, "export_key_der invalid auto oid");
