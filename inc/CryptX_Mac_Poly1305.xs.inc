@@ -3,14 +3,13 @@ MODULE = CryptX         PACKAGE = Crypt::Mac::Poly1305
 ### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
 
 Crypt::Mac::Poly1305
-new(char * class, SV * key)
+new(Class, SV * key)
     CODE:
     {
         STRLEN k_len=0;
         unsigned char *k=NULL;
         int rv;
 
-        LTC_UNUSED_PARAM(class);
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 

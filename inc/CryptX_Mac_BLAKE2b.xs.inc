@@ -3,14 +3,13 @@ MODULE = CryptX         PACKAGE = Crypt::Mac::BLAKE2b
 ### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
 
 Crypt::Mac::BLAKE2b
-new(char * class, unsigned long size, SV * key)
+new(Class, unsigned long size, SV * key)
     CODE:
     {
         STRLEN k_len=0;
         unsigned char *k=NULL;
         int rv;
 
-        LTC_UNUSED_PARAM(class);
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 

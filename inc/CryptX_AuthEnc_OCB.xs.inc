@@ -1,7 +1,7 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::OCB
 
 Crypt::AuthEnc::OCB
-new(char * class, char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
+new(Class, char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
     CODE:
     {
         STRLEN k_len=0;
@@ -9,7 +9,6 @@ new(char * class, char * cipher_name, SV * key, SV * nonce, unsigned long taglen
         unsigned char *n=NULL;
         STRLEN n_len=0;
         int rv, id;
-        LTC_UNUSED_PARAM(class);
 
         if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);

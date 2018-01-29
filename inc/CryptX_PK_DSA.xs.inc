@@ -1,11 +1,10 @@
 MODULE = CryptX         PACKAGE = Crypt::PK::DSA
 
 Crypt::PK::DSA
-_new(char * class)
+_new(Class)
     CODE:
     {
         int rv;
-        LTC_UNUSED_PARAM(class);
         Newz(0, RETVAL, 1, struct dsa_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->key.type = -1;

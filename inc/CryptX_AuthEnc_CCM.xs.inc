@@ -1,7 +1,7 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::CCM
 
 Crypt::AuthEnc::CCM
-new(char * class, char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, int pt_len)
+new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, int pt_len)
     CODE:
     {
         unsigned char *k=NULL;
@@ -11,7 +11,6 @@ new(char * class, char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_
         unsigned char *h=NULL;
         STRLEN h_len=0;
         int rv, id;
-        LTC_UNUSED_PARAM(class);
 
         if (tag_len < 1 || tag_len > MAXBLOCKSIZE) croak("FATAL: invalid tag_len %d", tag_len);
         if (pt_len < 0)    croak("FATAL: invalid pt_len");

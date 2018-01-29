@@ -4,13 +4,13 @@ MODULE = CryptX         PACKAGE = Crypt::Mac::[%orig_name%]
 
 Crypt::Mac::[%orig_name%]
 [%-IF lc_name == 'hmac' %]
-new(char * class, char * hash_name, SV * key)
+new(Class, char * hash_name, SV * key)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
-new(char * class, unsigned long size, SV * key)
+new(Class, unsigned long size, SV * key)
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
-new(char * class, SV * key)
+new(Class, SV * key)
 [%-ELSE%]
-new(char * class, char * cipher_name, SV * key)
+new(Class, char * cipher_name, SV * key)
 [%-END%]
     CODE:
     {
@@ -31,7 +31,6 @@ new(char * class, char * cipher_name, SV * key)
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 [%-END%]
 
-        LTC_UNUSED_PARAM(class);
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 

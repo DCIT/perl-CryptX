@@ -1,11 +1,10 @@
 MODULE = CryptX         PACKAGE = Crypt::PK::ECC
 
 Crypt::PK::ECC
-_new(char * class)
+_new(Class)
     CODE:
     {
         int rv;
-        LTC_UNUSED_PARAM(class);
         Newz(0, RETVAL, 1, struct ecc_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->pindex = find_prng("chacha20");

@@ -1,7 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::AuthEnc::EAX
 
 Crypt::AuthEnc::EAX
-new(char * class, char * cipher_name, SV * key, SV * nonce, SV * adata=&PL_sv_undef)
+new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata=&PL_sv_undef)
     CODE:
     {
         STRLEN k_len=0;
@@ -11,7 +11,6 @@ new(char * class, char * cipher_name, SV * key, SV * nonce, SV * adata=&PL_sv_un
         unsigned char *h=NULL;
         STRLEN h_len=0;
         int rv, id;
-        LTC_UNUSED_PARAM(class);
 
         if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);

@@ -7,7 +7,28 @@ use warnings;
 our $VERSION = '[%(pmver || "0.000")%]';
 
 use Crypt::Cipher;
-use base 'Crypt::Mode';
+
+sub encrypt {
+  my ($self, $pt) = (shift, shift);
+  local $SIG{__DIE__} = \&CryptX::_croak;
+[%-IF lc_name == 'ecb' or lc_name == 'cbc' %]
+  $self->start_encrypt(@_)->add($pt) . $self->finish;
+[%-ELSE%]
+  $self->start_encrypt(@_)->add($pt);
+[%-END%]
+}
+
+sub decrypt {
+  my ($self, $ct) = (shift, shift);
+  local $SIG{__DIE__} = \&CryptX::_croak;
+[%-IF lc_name == 'ecb' or lc_name == 'cbc' %]
+  $self->start_decrypt(@_)->add($ct) . $self->finish;
+[%-ELSE%]
+  $self->start_decrypt(@_)->add($ct);
+[%-END%]
+}
+
+sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
 

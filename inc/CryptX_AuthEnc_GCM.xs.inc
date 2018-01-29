@@ -1,13 +1,12 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::GCM
 
 Crypt::AuthEnc::GCM
-new(char * class, char * cipher_name, SV * key, SV * nonce = NULL)
+new(Class, char * cipher_name, SV * key, SV * nonce = NULL)
     CODE:
     {
         STRLEN k_len = 0, iv_len = 0;
         unsigned char *k = NULL, *iv = NULL;
         int id, rv;
-        LTC_UNUSED_PARAM(class);
 
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);

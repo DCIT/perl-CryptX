@@ -3,10 +3,9 @@ MODULE = CryptX         PACKAGE = Crypt::Mode::OFB
 ### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
 
 Crypt::Mode::OFB
-new(char * class, char * cipher_name, int rounds=0)
+new(Class, char * cipher_name, int rounds=0)
     CODE:
     {
-        LTC_UNUSED_PARAM(class);
         Newz(0, RETVAL, 1, struct ofb_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->direction = 0;
@@ -56,42 +55,40 @@ start_decrypt(Crypt::Mode::OFB self, SV * key, SV * iv)
     }
 
 SV *
-_crypt(Crypt::Mode::OFB self, SV * data)
+add(Crypt::Mode::OFB self, ...)
     CODE:
     {
-        int rv;
-        STRLEN in_data_len;
+        int rv, j;
+        STRLEN in_data_len, out_len = 0;
         unsigned char *in_data, *out_data;
 
-        in_data = (unsigned char *)SvPVbyte(data, in_data_len);
-        if (in_data_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
-          SvPOK_only(RETVAL);
-          SvCUR_set(RETVAL, in_data_len);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-
-          if (self->direction == 1) {
-            rv = ofb_encrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);
-            if (rv != CRYPT_OK) {
+        RETVAL = newSVpvn("", 0);
+        for (j = 1; j < items; j++) {
+          in_data = (unsigned char *)SvPVbyte(ST(j), in_data_len);
+          if (in_data_len > 0) {
+            out_data = SvGROW(RETVAL, out_len + in_data_len + 1) + out_len;
+            out_len += in_data_len;
+            if (self->direction == 1) {
+              rv = ofb_encrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);
+              if (rv != CRYPT_OK) {
+                SvREFCNT_dec(RETVAL);
+                croak("FATAL: ofb_encrypt failed: %s", error_to_string(rv));
+              }
+            }
+            else if (self->direction == -1) {
+              rv = ofb_decrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);
+              if (rv != CRYPT_OK) {
+                SvREFCNT_dec(RETVAL);
+                croak("FATAL: ofb_decrypt failed: %s", error_to_string(rv));
+              }
+            }
+            else {
               SvREFCNT_dec(RETVAL);
-              croak("FATAL: ofb_encrypt failed: %s", error_to_string(rv));
+              croak("FATAL: ofb_crypt failed: call start_encrypt or start_decrypt first");
             }
           }
-          else if (self->direction == -1) {
-            rv = ofb_decrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);
-            if (rv != CRYPT_OK) {
-              SvREFCNT_dec(RETVAL);
-              croak("FATAL: ofb_decrypt failed: %s", error_to_string(rv));
-            }
-          }
-          else {
-            SvREFCNT_dec(RETVAL);
-            croak("FATAL: ofb_crypt failed: call start_encrypt or start_decrypt first");
-          }
         }
+        if (out_len > 0) SvCUR_set(RETVAL, out_len);
     }
     OUTPUT:
         RETVAL

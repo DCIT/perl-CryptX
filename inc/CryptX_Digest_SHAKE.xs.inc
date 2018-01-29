@@ -1,11 +1,10 @@
 MODULE = CryptX         PACKAGE = Crypt::Digest::SHAKE
 
 Crypt::Digest::SHAKE
-new(char * class, int num)
+new(Class, int num)
     CODE:
     {
         int rv;
-        LTC_UNUSED_PARAM(class);
 
         Newz(0, RETVAL, 1, struct digest_shake_struct);
         if (!RETVAL) croak("FATAL: Newz failed");

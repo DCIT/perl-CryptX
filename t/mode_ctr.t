@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 24;
 
 use Crypt::Mode::CTR;
 
@@ -15,10 +15,28 @@ sub do_test {
   my $pt  = pack("H*", $a{pt});
   my $key = pack("H*", $a{key});
   my $iv  = pack("H*", $a{iv});
+  # test: encrypt/decrypt in a single step
   my $ct_out = Crypt::Mode::CTR->new('AES', $a{mode}, $a{width})->encrypt($pt, $key, $iv);
-  is(unpack("H*", $ct_out), $a{ct}, "cipher text [m=$a{mode}, w=$a{width}]");
+  is(unpack("H*", $ct_out), $a{ct}, "cipher text1 [m=$a{mode}, w=$a{width}]");
   my $pt_out = Crypt::Mode::CTR->new('AES', $a{mode}, $a{width})->decrypt($ct_out, $key, $iv);
-  is(unpack("H*", $pt_out), $a{pt}, "plain text [m=$a{mode}, w=$a{width}]");
+  is(unpack("H*", $pt_out), $a{pt}, "plain text1 [m=$a{mode}, w=$a{width}]");
+  # test: add(@in)
+  my $mode;
+  my @in = map { pack("H*", $_) } ($a{pt} =~ /(..)/g);
+  $mode = Crypt::Mode::CTR->new('AES', $a{mode}, $a{width})->start_encrypt($key, $iv);
+  $ct_out = $mode->add(@in) . $mode->finish;
+  is(unpack("H*", $ct_out), $a{ct}, "cipher text2 [m=$a{mode}, w=$a{width}]");
+  $mode = Crypt::Mode::CTR->new('AES', $a{mode}, $a{width})->start_encrypt($key, $iv);
+  $ct_out = join ('', map { $mode->add($_) } @in) . $mode->finish;
+  is(unpack("H*", $ct_out), $a{ct}, "cipher text3 [m=$a{mode}, w=$a{width}]");
+  # test: add(?)->add(?)->add(?)->add(?)
+  @in = split //, $ct_out;
+  $mode = Crypt::Mode::CTR->new('AES', $a{mode}, $a{width})->start_decrypt($key, $iv);
+  $pt_out = $mode->add(@in) . $mode->finish;
+  is(unpack("H*", $pt_out), $a{pt}, "plain text2 [m=$a{mode}, w=$a{width}]");
+  $mode = Crypt::Mode::CTR->new('AES', $a{mode}, $a{width})->start_decrypt($key, $iv);
+  $pt_out = join ('', map { $mode->add($_) } @in) . $mode->finish;
+  is(unpack("H*", $pt_out), $a{pt}, "plain text3 [m=$a{mode}, w=$a{width}]");
 }
 
 do_test(%$_) for (

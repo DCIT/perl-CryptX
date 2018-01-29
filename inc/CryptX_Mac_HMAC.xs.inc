@@ -3,7 +3,7 @@ MODULE = CryptX         PACKAGE = Crypt::Mac::HMAC
 ### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
 
 Crypt::Mac::HMAC
-new(char * class, char * hash_name, SV * key)
+new(Class, char * hash_name, SV * key)
     CODE:
     {
         STRLEN k_len=0;
@@ -14,7 +14,6 @@ new(char * class, char * hash_name, SV * key)
         id = _find_hash(hash_name);
         if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
-        LTC_UNUSED_PARAM(class);
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 

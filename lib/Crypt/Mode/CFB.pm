@@ -7,7 +7,20 @@ use warnings;
 our $VERSION = '0.056_003';
 
 use Crypt::Cipher;
-use base 'Crypt::Mode';
+
+sub encrypt {
+  my ($self, $pt) = (shift, shift);
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  $self->start_encrypt(@_)->add($pt);
+}
+
+sub decrypt {
+  my ($self, $ct) = (shift, shift);
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  $self->start_decrypt(@_)->add($ct);
+}
+
+sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
 

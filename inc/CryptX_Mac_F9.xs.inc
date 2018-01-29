@@ -3,7 +3,7 @@ MODULE = CryptX         PACKAGE = Crypt::Mac::F9
 ### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
 
 Crypt::Mac::F9
-new(char * class, char * cipher_name, SV * key)
+new(Class, char * cipher_name, SV * key)
     CODE:
     {
         STRLEN k_len=0;
@@ -14,7 +14,6 @@ new(char * class, char * cipher_name, SV * key)
         id = _find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
-        LTC_UNUSED_PARAM(class);
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 

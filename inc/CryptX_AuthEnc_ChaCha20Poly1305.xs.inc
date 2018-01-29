@@ -1,13 +1,12 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::ChaCha20Poly1305
 
 Crypt::AuthEnc::ChaCha20Poly1305
-new(char * class, SV * key, SV * nonce = NULL)
+new(Class, SV * key, SV * nonce = NULL)
     CODE:
     {
         int rv;
         STRLEN iv_len=0, k_len=0;
         unsigned char *iv=NULL, *k=NULL;
-        LTC_UNUSED_PARAM(class);
 
         if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
         k  = (unsigned char *) SvPVbyte(key, k_len);
