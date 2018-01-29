@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Stream::Sosemanuk
 
+PROTOTYPES: DISABLE
+
 Crypt::Stream::Sosemanuk
 new(Class, SV * key, SV * nonce=&PL_sv_undef)
     CODE:

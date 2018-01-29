@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::AuthEnc::EAX
 
+PROTOTYPES: DISABLE
+
 Crypt::AuthEnc::EAX
 new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata=&PL_sv_undef)
     CODE:

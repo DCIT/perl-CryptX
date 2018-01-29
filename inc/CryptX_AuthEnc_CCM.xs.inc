@@ -1,5 +1,7 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::CCM
 
+PROTOTYPES: DISABLE
+
 Crypt::AuthEnc::CCM
 new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, int pt_len)
     CODE:

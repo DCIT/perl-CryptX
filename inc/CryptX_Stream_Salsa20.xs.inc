@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Stream::Salsa20
 
+PROTOTYPES: DISABLE
+
 Crypt::Stream::Salsa20
 new(Class, SV * key, SV * nonce, UV counter = 0, int rounds = 20)
     CODE:

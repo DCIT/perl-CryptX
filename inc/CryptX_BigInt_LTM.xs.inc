@@ -1,5 +1,6 @@
 MODULE = CryptX         PACKAGE = Math::BigInt::LTM
 
+PROTOTYPES: DISABLE
 
 ##############################################################################
 # _new()

@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::KeyDerivation
 
+PROTOTYPES: DISABLE
+
 SV *
 pbkdf1(SV * password, SV * salt, int iteration_count = 5000, const char * hash_name = "SHA256", unsigned long output_len = 32)
     CODE:

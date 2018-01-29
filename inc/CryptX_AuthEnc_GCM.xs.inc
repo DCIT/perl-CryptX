@@ -1,5 +1,7 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::GCM
 
+PROTOTYPES: DISABLE
+
 Crypt::AuthEnc::GCM
 new(Class, char * cipher_name, SV * key, SV * nonce = NULL)
     CODE:

@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Stream::ChaCha
 
+PROTOTYPES: DISABLE
+
 Crypt::Stream::ChaCha
 new(Class, SV * key, SV * nonce, UV counter = 0, int rounds = 20)
     CODE:

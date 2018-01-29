@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Mac::Pelican
 
+PROTOTYPES: DISABLE
+
 ### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
 
 Crypt::Mac::Pelican

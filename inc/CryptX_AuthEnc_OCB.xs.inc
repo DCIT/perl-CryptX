@@ -1,5 +1,7 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::OCB
 
+PROTOTYPES: DISABLE
+
 Crypt::AuthEnc::OCB
 new(Class, char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
     CODE:

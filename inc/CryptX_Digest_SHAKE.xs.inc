@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Digest::SHAKE
 
+PROTOTYPES: DISABLE
+
 Crypt::Digest::SHAKE
 new(Class, int num)
     CODE:

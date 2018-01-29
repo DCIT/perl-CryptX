@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Stream::Rabbit
 
+PROTOTYPES: DISABLE
+
 Crypt::Stream::Rabbit
 new(Class, SV * key, SV * nonce=&PL_sv_undef)
     CODE:

@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Stream::Sober128
 
+PROTOTYPES: DISABLE
+
 Crypt::Stream::Sober128
 new(Class, SV * key, SV * nonce)
     CODE:

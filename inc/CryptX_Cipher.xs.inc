@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Cipher
 
+PROTOTYPES: DISABLE
+
 Crypt::Cipher
 new(char * class, ...)
     CODE:

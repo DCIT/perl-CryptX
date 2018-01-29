@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Checksum::Adler32
 
+PROTOTYPES: DISABLE
+
 Crypt::Checksum::Adler32
 new(Class)
     CODE:

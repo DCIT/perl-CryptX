@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::PRNG
 
+PROTOTYPES: DISABLE
+
 Crypt::PRNG
 new(char * class, ...)
     CODE:

@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Digest
 
+PROTOTYPES: DISABLE
+
 Crypt::Digest
 new(char * cname, char * pname = NULL)
     CODE:

@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Checksum::CRC32
 
+PROTOTYPES: DISABLE
+
 Crypt::Checksum::CRC32
 new(Class)
     CODE:

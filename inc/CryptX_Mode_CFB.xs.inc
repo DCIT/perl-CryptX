@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Mode::CFB
 
+PROTOTYPES: DISABLE
+
 ### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
 
 Crypt::Mode::CFB

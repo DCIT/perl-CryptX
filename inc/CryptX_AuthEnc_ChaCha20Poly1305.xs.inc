@@ -1,5 +1,7 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::ChaCha20Poly1305
 
+PROTOTYPES: DISABLE
+
 Crypt::AuthEnc::ChaCha20Poly1305
 new(Class, SV * key, SV * nonce = NULL)
     CODE:

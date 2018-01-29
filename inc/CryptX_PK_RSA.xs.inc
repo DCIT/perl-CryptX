@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::PK::RSA
 
+PROTOTYPES: DISABLE
+
 Crypt::PK::RSA
 _new(Class)
     CODE:

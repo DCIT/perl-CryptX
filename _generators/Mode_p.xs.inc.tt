@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Mode::[%orig_name%]
 
+PROTOTYPES: DISABLE
+
 [%comment%]
 
 Crypt::Mode::[%orig_name%]

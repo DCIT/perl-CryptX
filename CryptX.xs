@@ -1,3 +1,4 @@
+#define PERL_NO_GET_CONTEXT     /* we want efficiency */
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -336,6 +337,7 @@ int _find_prng(const char *name)
 /* Math::BigInt::LTM related */
 typedef mp_int * Math__BigInt__LTM;
 STATIC SV * sv_from_mpi(mp_int *mpi) {
+  dTHX; /* fetch context */
   SV *obj = newSV(0);
   sv_setref_pv(obj, "Math::BigInt::LTM", (void*)mpi);
   return obj;
@@ -343,6 +345,7 @@ STATIC SV * sv_from_mpi(mp_int *mpi) {
 
 ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
 {
+  dTHX; /* fetch context */
   HV *h;
   SV *param, **pref;
   SV **sv_cofactor, **sv_prime, **sv_A, **sv_B, **sv_order, **sv_Gx, **sv_Gy;

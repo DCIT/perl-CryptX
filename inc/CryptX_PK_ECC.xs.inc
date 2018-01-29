@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::PK::ECC
 
+PROTOTYPES: DISABLE
+
 Crypt::PK::ECC
 _new(Class)
     CODE:

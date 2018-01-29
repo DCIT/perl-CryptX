@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::PK::DH
 
+PROTOTYPES: DISABLE
+
 Crypt::PK::DH
 _new(Class)
     CODE:

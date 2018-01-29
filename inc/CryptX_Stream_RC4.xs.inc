@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Stream::RC4
 
+PROTOTYPES: DISABLE
+
 Crypt::Stream::RC4
 new(Class, SV * key)
     CODE:

@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Mac::Poly1305
 
+PROTOTYPES: DISABLE
+
 ### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
 
 Crypt::Mac::Poly1305
