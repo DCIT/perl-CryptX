@@ -26,7 +26,7 @@ MARKER
 
    my $pkec = Crypt::PK::ECC->new("test_eckey.pub.pem");
    my $signature = read_rawfile("test_input.sha1-ec.sig");
-   my $valid = $pkec->verify_hash($signature, digest_file("SHA1", "test_input.data"), "SHA1", "v1.5");
+   my $valid = $pkec->verify_hash($signature, digest_file("SHA1", "test_input.data"), "SHA1");
    print $valid ? "SUCCESS" : "FAILURE";
   }
 
@@ -37,7 +37,7 @@ MARKER
    use Crypt::Misc 'write_rawfile';
 
    my $pkec = Crypt::PK::ECC->new("test_eckey.priv.pem");
-   my $signature = $pkec->sign_hash(digest_file("SHA1", "test_input.data"), "SHA1", "v1.5");
+   my $signature = $pkec->sign_hash(digest_file("SHA1", "test_input.data"), "SHA1");
    write_rawfile("test_input.sha1-ec.sig", $signature);
   }
 

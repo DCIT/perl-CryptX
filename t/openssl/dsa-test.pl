@@ -26,7 +26,7 @@ MARKER
 
  my $pkdsa = Crypt::PK::DSA->new("test_dsakey.pub.pem");
  my $signature = read_rawfile("test_input.sha1-dsa.sig");
- my $valid = $pkdsa->verify_hash($signature, digest_file("SHA1", "test_input.data"), "SHA1", "v1.5");
+ my $valid = $pkdsa->verify_hash($signature, digest_file("SHA1", "test_input.data"));
  print $valid ? "SUCCESS" : "FAILURE";
 }
 
@@ -37,7 +37,7 @@ MARKER
  use Crypt::Misc 'write_rawfile';
 
  my $pkdsa = Crypt::PK::DSA->new("test_dsakey.priv.pem");
- my $signature = $pkdsa->sign_hash(digest_file("SHA1", "test_input.data"), "SHA1", "v1.5");
+ my $signature = $pkdsa->sign_hash(digest_file("SHA1", "test_input.data"));
  write_rawfile("test_input.sha1-dsa.sig", $signature);
 }
 
