@@ -53,8 +53,8 @@ SV *
 add(Crypt::Mode::ECB self, ...)
     CODE:
     {
-        int rv, has_tmp_block, blen;
-        unsigned long i, j;
+        int rv, has_tmp_block, blen, j;
+        unsigned long i;
         STRLEN in_data_len, in_data_start, out_len = 0;
         unsigned char *in_data, *out_data, tmp_block[MAXBLOCKSIZE];
 
