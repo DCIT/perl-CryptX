@@ -7,7 +7,7 @@ use warnings;
 use Test::More;
 
 plan skip_all => "No JSON::* module installed" unless eval { require JSON::PP } || eval { require JSON::XS } || eval { require Cpanel::JSON::XS };
-plan tests => 762;
+plan tests => 984;
 
 use CryptX;
 use Crypt::Misc 'read_rawfile';
@@ -117,9 +117,9 @@ if (1) {
       # do the test
       my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
       my $pk = Crypt::PK::DSA->new( \$keyPem );
-      my $valid = $pk->verify_message($sig, $message, $sha);
       my $hash = digest_data($sha, $message);
       my $valid_h = $pk->verify_hash($sig, $hash);
+      my $valid = $pk->verify_message($sig, $message, $sha);
       if ($result eq 'valid' || $result eq 'acceptable') {
         ok($valid, $testname);
       }
@@ -134,12 +134,6 @@ if (1) {
 }
 
 if (0) {
-  #XXX-TODO:
-  # not ok 749 - type=ECDSAVer/SHA256 tcId=50 comment='appending unused 0's' expected-result=invalid verify_message=1
-  # not ok 819 - type=ECDSAVer/SHA256 tcId=120 comment='Modified r or s, e.g. by adding or subtracting the order of the group' expected-result=invalid verify_message=1
-  # not ok 820 - type=ECDSAVer/SHA256 tcId=121 comment='Modified r or s, e.g. by adding or subtracting the order of the group' expected-result=invalid verify_message=1
-  # not ok 821 - type=ECDSAVer/SHA256 tcId=122 comment='Modified r or s, e.g. by adding or subtracting the order of the group' expected-result=invalid verify_message=1
-
   use Crypt::PK::ECC;
 
   my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/ecdsa_test.json';
@@ -157,16 +151,20 @@ if (0) {
       my $result  = $t->{result};
       my $message = pack "H*", $t->{message};
       my $sig     = pack "H*", $t->{sig};
+      # skip unsupported tests:
+      next if $tcId==9  && $result eq 'acceptable' && $comment eq "BER:long form encoding of length";
+      next if $tcId==10 && $result eq 'acceptable' && $comment eq "BER:long form encoding of length";
+      next if $tcId==12 && $result eq 'acceptable' && $comment eq "BER:length contains leading 0";
+      next if $tcId==13 && $result eq 'acceptable' && $comment eq "BER:length contains leading 0";
+      next if $tcId==14 && $result eq 'acceptable' && $comment eq "BER:indefinite length";
+      next if $tcId==15 && $result eq 'acceptable' && $comment eq "BER:prepending 0's to integer";
+      next if $tcId==16 && $result eq 'acceptable' && $comment eq "BER:prepending 0's to integer";
       # do the test
       my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
       my $pk = Crypt::PK::ECC->new( \$keyPem );
       my $valid = $pk->verify_message($sig, $message, $sha);
-      if ($result eq 'valid') {
+      if ($result eq 'valid' || $result eq 'acceptable') {
         ok($valid, "$testname verify_message=$valid");
-      }
-      elsif ($result eq 'acceptable') {
-        #XXX-TODO
-        #ok($valid, "$testname verify_message=$valid");
       }
       elsif ($result eq 'invalid') {
         ok(!$valid, "$testname verify_message=$valid");
@@ -178,7 +176,7 @@ if (0) {
   }
 }
 
-if (0) {
+if (1) {
   use Crypt::PK::ECC;
 
   my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/ecdsa_webcrypto_test.json';
@@ -201,13 +199,9 @@ if (0) {
       # do the test
       my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
       my $pk = Crypt::PK::ECC->new( \$keyPem );
-      my $valid = $pk->verify_message($sig, $message, $sha);
-      if ($result eq 'valid') {
+      my $valid = $pk->verify_message_rfc7518($sig, $message, $sha);
+      if ($result eq 'valid' || $result eq 'acceptable') {
         ok($valid, "$testname verify_message=$valid");
-      }
-      elsif ($result eq 'acceptable') {
-        #XXX-TODO
-        #ok($valid, "$testname verify_message=$valid");
       }
       elsif ($result eq 'invalid') {
         ok(!$valid, "$testname verify_message=$valid");
