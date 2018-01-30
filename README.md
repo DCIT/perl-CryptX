@@ -6,7 +6,7 @@ CryptX - Cryptographic toolkit (self-contained, no external libraries needed)
 
 Cryptography in CryptX is based on [https://github.com/libtom/libtomcrypt](https://github.com/libtom/libtomcrypt)
 
-Currently available modules:
+Available modules:
 
 - Symmetric ciphers - see [Crypt::Cipher](https://metacpan.org/pod/Crypt::Cipher) and related modules
 
@@ -51,9 +51,9 @@ Currently available modules:
 
     [Crypt::PK::RSA](https://metacpan.org/pod/Crypt::PK::RSA), [Crypt::PK::DSA](https://metacpan.org/pod/Crypt::PK::DSA), [Crypt::PK::ECC](https://metacpan.org/pod/Crypt::PK::ECC), [Crypt::PK::DH](https://metacpan.org/pod/Crypt::PK::DH)
 
-- Cryptographically secure random number generators
+- Cryptographically secure random number generators - see [Crypt::PRNG](https://metacpan.org/pod/Crypt::PRNG) and related modules
 
-    [Crypt::PRNG](https://metacpan.org/pod/Crypt::PRNG), [Crypt::PRNG::Fortuna](https://metacpan.org/pod/Crypt::PRNG::Fortuna), [Crypt::PRNG::Yarrow](https://metacpan.org/pod/Crypt::PRNG::Yarrow), [Crypt::PRNG::RC4](https://metacpan.org/pod/Crypt::PRNG::RC4), [Crypt::PRNG::Sober128](https://metacpan.org/pod/Crypt::PRNG::Sober128), [Crypt::PRNG::ChaCha20](https://metacpan.org/pod/Crypt::PRNG::ChaCha20)
+    [Crypt::PRNG::Fortuna](https://metacpan.org/pod/Crypt::PRNG::Fortuna), [Crypt::PRNG::Yarrow](https://metacpan.org/pod/Crypt::PRNG::Yarrow), [Crypt::PRNG::RC4](https://metacpan.org/pod/Crypt::PRNG::RC4), [Crypt::PRNG::Sober128](https://metacpan.org/pod/Crypt::PRNG::Sober128), [Crypt::PRNG::ChaCha20](https://metacpan.org/pod/Crypt::PRNG::ChaCha20)
 
 - Key derivation functions - PBKDF1, PBKDF2 and HKDF
 

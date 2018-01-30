@@ -64,7 +64,7 @@ CryptX - Cryptographic toolkit (self-contained, no external libraries needed)
 
 Cryptography in CryptX is based on L<https://github.com/libtom/libtomcrypt>
 
-Currently available modules:
+Available modules:
 
 =over
 
@@ -111,9 +111,9 @@ L<Crypt::Mac::Pelican>, L<Crypt::Mac::PMAC>, L<Crypt::Mac::XCBC>, L<Crypt::Mac::
 
 L<Crypt::PK::RSA>, L<Crypt::PK::DSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DH>
 
-=item * Cryptographically secure random number generators
+=item * Cryptographically secure random number generators - see L<Crypt::PRNG> and related modules
 
-L<Crypt::PRNG>, L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::Yarrow>, L<Crypt::PRNG::RC4>, L<Crypt::PRNG::Sober128>, L<Crypt::PRNG::ChaCha20>
+L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::Yarrow>, L<Crypt::PRNG::RC4>, L<Crypt::PRNG::Sober128>, L<Crypt::PRNG::ChaCha20>
 
 =item * Key derivation functions - PBKDF1, PBKDF2 and HKDF
 
