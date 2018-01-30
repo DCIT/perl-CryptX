@@ -422,251 +422,32 @@ BOOT:
     if(crypt_mp_init("ltm")   != CRYPT_OK)     { croak("FATAL: crypt_mp_init failed"); }
 
 SV *
-CryptX__encode_base64url(SV * in)
+CryptX__ltc_build_settings()
     CODE:
-    {
-        STRLEN in_len;
-        unsigned long out_len;
-        unsigned char *out_data, *in_data;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *) SvPVbyte(in, in_len);
-        if (in_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          out_len = (unsigned long)(4 * ((in_len + 2) / 3) + 1);
-          RETVAL = NEWSV(0, out_len); /* avoid zero! */
-          SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base64url_encode(in_data, (unsigned long)in_len, out_data, &out_len) != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            XSRETURN_UNDEF;
-          }
-          SvCUR_set(RETVAL, out_len);
-        }
-    }
+        RETVAL = newSVpv(crypt_build_settings, 0);
     OUTPUT:
         RETVAL
 
 SV *
-CryptX__decode_base64url(SV * in)
+CryptX__ltc_mp_name()
     CODE:
-    {
-        STRLEN in_len;
-        unsigned long out_len;
-        unsigned char *out_data, *in_data;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *) SvPVbyte(in, in_len);
-        if (in_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          out_len = (unsigned long)in_len;
-          RETVAL = NEWSV(0, out_len); /* avoid zero! */
-          SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base64url_decode(in_data, (unsigned long)in_len, out_data, &out_len) != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            XSRETURN_UNDEF;
-          }
-          SvCUR_set(RETVAL, out_len);
-        }
-    }
+        RETVAL = newSVpv(ltc_mp.name, 0);
     OUTPUT:
         RETVAL
 
-SV *
-CryptX__encode_base64(SV * in)
+int
+CryptX__ltc_mp_bits_per_digit()
     CODE:
-    {
-        STRLEN in_len;
-        unsigned long out_len;
-        unsigned char *out_data, *in_data;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *) SvPVbyte(in, in_len);
-        if (in_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          out_len = (unsigned long)(4 * ((in_len + 2) / 3) + 1);
-          RETVAL = NEWSV(0, out_len); /* avoid zero! */
-          SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base64_encode(in_data, (unsigned long)in_len, out_data, &out_len) != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            XSRETURN_UNDEF;
-          }
-          SvCUR_set(RETVAL, out_len);
-        }
-    }
+        RETVAL = ltc_mp.bits_per_digit;
     OUTPUT:
         RETVAL
 
-SV *
-CryptX__decode_base64(SV * in)
-    CODE:
-    {
-        STRLEN in_len;
-        unsigned long out_len;
-        unsigned char *out_data, *in_data;
+MODULE = CryptX       PACKAGE = Crypt::Misc
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *)SvPVbyte(in, in_len);
-        if (in_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          out_len = (unsigned long)in_len;
-          RETVAL = NEWSV(0, out_len); /* avoid zero! */
-          SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base64_decode(in_data, (unsigned long)in_len, out_data, &out_len) != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            XSRETURN_UNDEF;
-          }
-          SvCUR_set(RETVAL, out_len);
-        }
-    }
-    OUTPUT:
-        RETVAL
+PROTOTYPES: DISABLE
 
 SV *
-CryptX__encode_b32(SV *in, unsigned idx)
-    CODE:
-    {
-        STRLEN in_len;
-        unsigned long out_len;
-        unsigned char *out_data, *in_data;
-        int id = -1;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        if (idx == 0) id = BASE32_RFC4648;
-        if (idx == 1) id = BASE32_BASE32HEX;
-        if (idx == 2) id = BASE32_ZBASE32;
-        if (idx == 3) id = BASE32_CROCKFORD;
-        if (id == -1) XSRETURN_UNDEF;
-        in_data = (unsigned char *) SvPVbyte(in, in_len);
-        if (in_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          out_len = (unsigned long)((8 * in_len + 4) / 5);
-          RETVAL = NEWSV(0, out_len); /* avoid zero! */
-          SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base32_encode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            XSRETURN_UNDEF;
-          }
-          SvCUR_set(RETVAL, out_len);
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__decode_b32(SV *in, unsigned idx)
-    CODE:
-    {
-        STRLEN in_len;
-        unsigned long out_len;
-        unsigned char *out_data, *in_data;
-        int id = -1;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        if (idx == 0) id = BASE32_RFC4648;
-        if (idx == 1) id = BASE32_BASE32HEX;
-        if (idx == 2) id = BASE32_ZBASE32;
-        if (idx == 3) id = BASE32_CROCKFORD;
-        if (id == -1) XSRETURN_UNDEF;
-        in_data = (unsigned char *)SvPVbyte(in, in_len);
-        if (in_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          out_len = (unsigned long)in_len;
-          RETVAL = NEWSV(0, out_len); /* avoid zero! */
-          SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base32_decode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            XSRETURN_UNDEF;
-          }
-          SvCUR_set(RETVAL, out_len);
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__increment_octets_le(SV * in)
-    CODE:
-    {
-        STRLEN len, i = 0;
-        unsigned char *out_data, *in_data;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *)SvPVbyte(in, len);
-        if (len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          RETVAL = NEWSV(0, len); /* avoid zero! */
-          SvPOK_only(RETVAL);
-          SvCUR_set(RETVAL, len);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          Copy(in_data, out_data, len, unsigned char);
-          while (i < len) {
-            out_data[i]++;
-            if (0 != out_data[i]) break;
-            i++;
-          }
-          if (i == len) {
-            SvREFCNT_dec(RETVAL);
-            croak("FATAL: increment_octets_le overflow");
-          }
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__increment_octets_be(SV * in)
-    CODE:
-    {
-        STRLEN len, i = 0;
-        unsigned char *out_data, *in_data;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *)SvPVbyte(in, len);
-        if (len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          RETVAL = NEWSV(0, len); /* avoid zero! */
-          SvPOK_only(RETVAL);
-          SvCUR_set(RETVAL, len);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          Copy(in_data, out_data, len, unsigned char);
-          while (i < len) {
-            out_data[len - 1 - i]++;
-            if (0 != out_data[len - 1 - i]) break;
-            i++;
-          }
-          if (i == len) {
-            SvREFCNT_dec(RETVAL);
-            croak("FATAL: increment_octets_be overflow");
-          }
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__radix_to_bin(char *in, int radix)
+_radix_to_bin(char *in, int radix)
     CODE:
     {
         STRLEN len;
@@ -700,7 +481,7 @@ CryptX__radix_to_bin(char *in, int radix)
         RETVAL
 
 SV *
-CryptX__bin_to_radix(SV *in, int radix)
+_bin_to_radix(SV *in, int radix)
     CODE:
     {
         STRLEN len;
@@ -744,23 +525,213 @@ CryptX__bin_to_radix(SV *in, int radix)
         RETVAL
 
 SV *
-CryptX__ltc_build_settings()
+encode_b64(SV * in)
+    ALIAS:
+        encode_b64u = 1
     CODE:
-        RETVAL = newSVpv(crypt_build_settings, 0);
+    {
+        int rv;
+        STRLEN in_len;
+        unsigned long out_len;
+        unsigned char *out_data, *in_data;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *) SvPVbyte(in, in_len);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)(4 * ((in_len + 2) / 3) + 1);
+          RETVAL = NEWSV(0, out_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (ix == 1)
+            rv = base64url_encode(in_data, (unsigned long)in_len, out_data, &out_len);
+          else
+            rv = base64_encode(in_data, (unsigned long)in_len, out_data, &out_len);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
+    }
     OUTPUT:
         RETVAL
 
 SV *
-CryptX__ltc_mp_name()
+decode_b64(SV * in)
+    ALIAS:
+        decode_b64u = 1
     CODE:
-        RETVAL = newSVpv(ltc_mp.name, 0);
+    {
+        int rv;
+        STRLEN in_len;
+        unsigned long out_len;
+        unsigned char *out_data, *in_data;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *)SvPVbyte(in, in_len);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)in_len;
+          RETVAL = NEWSV(0, out_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (ix == 1)
+            rv = base64url_decode(in_data, (unsigned long)in_len, out_data, &out_len);
+          else
+            rv = base64_decode(in_data, (unsigned long)in_len, out_data, &out_len);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
+    }
     OUTPUT:
         RETVAL
 
-int
-CryptX__ltc_mp_bits_per_digit()
+SV *
+encode_b32r(SV *in)
+    ALIAS:
+        encode_b32b = 1
+        encode_b32z = 2
+        encode_b32c = 3
     CODE:
-        RETVAL = ltc_mp.bits_per_digit;
+    {
+        STRLEN in_len;
+        unsigned long out_len;
+        unsigned char *out_data, *in_data;
+        int id = -1;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (ix == 0) id = BASE32_RFC4648;
+        if (ix == 1) id = BASE32_BASE32HEX;
+        if (ix == 2) id = BASE32_ZBASE32;
+        if (ix == 3) id = BASE32_CROCKFORD;
+        if (id == -1) XSRETURN_UNDEF;
+        in_data = (unsigned char *) SvPVbyte(in, in_len);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)((8 * in_len + 4) / 5);
+          RETVAL = NEWSV(0, out_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (base32_encode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+decode_b32r(SV *in)
+    ALIAS:
+        decode_b32b = 1
+        decode_b32z = 2
+        decode_b32c = 3
+    CODE:
+    {
+        int rv;
+        STRLEN in_len;
+        unsigned long out_len;
+        unsigned char *out_data, *in_data;
+        int id = -1;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (ix == 0) id = BASE32_RFC4648;
+        if (ix == 1) id = BASE32_BASE32HEX;
+        if (ix == 2) id = BASE32_ZBASE32;
+        if (ix == 3) id = BASE32_CROCKFORD;
+        if (id == -1) XSRETURN_UNDEF;
+        in_data = (unsigned char *)SvPVbyte(in, in_len);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)in_len;
+          RETVAL = NEWSV(0, out_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (base32_decode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+increment_octets_le(SV * in)
+    CODE:
+    {
+        STRLEN len, i = 0;
+        unsigned char *out_data, *in_data;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *)SvPVbyte(in, len);
+        if (len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          RETVAL = NEWSV(0, len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, len);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          Copy(in_data, out_data, len, unsigned char);
+          while (i < len) {
+            out_data[i]++;
+            if (0 != out_data[i]) break;
+            i++;
+          }
+          if (i == len) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: increment_octets_le overflow");
+          }
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+increment_octets_be(SV * in)
+    CODE:
+    {
+        STRLEN len, i = 0;
+        unsigned char *out_data, *in_data;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *)SvPVbyte(in, len);
+        if (len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          RETVAL = NEWSV(0, len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, len);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          Copy(in_data, out_data, len, unsigned char);
+          while (i < len) {
+            out_data[len - 1 - i]++;
+            if (0 != out_data[len - 1 - i]) break;
+            i++;
+          }
+          if (i == len) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: increment_octets_be overflow");
+          }
+        }
+    }
     OUTPUT:
         RETVAL
 

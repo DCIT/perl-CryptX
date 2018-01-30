@@ -35,22 +35,6 @@ use Crypt::Mode::OFB;
 use Crypt::Cipher;
 use Crypt::PRNG 'random_bytes';
 
-sub encode_b64 {
-  CryptX::_encode_base64(@_);
-}
-
-sub decode_b64  {
-  CryptX::_decode_base64(@_);
-}
-
-sub encode_b64u {
-  CryptX::_encode_base64url(@_);
-}
-
-sub decode_b64u {
-  CryptX::_decode_base64url(@_);
-}
-
 sub _encode_b58 {
   my ($bytes, $alphabet) = @_;
 
@@ -61,7 +45,7 @@ sub _encode_b58 {
   if ($bytes =~ /^(\x00+)/) {
     $base58 = ('0' x length($1));
   }
-  $base58 .= CryptX::_bin_to_radix($bytes, 58);
+  $base58 .= _bin_to_radix($bytes, 58);
 
   if (defined $alphabet) {
     my $default = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuv";
@@ -92,7 +76,7 @@ sub _decode_b58 {
     $base58 = $2;
     $bytes = ("\x00" x length($1));
   }
-  $bytes .= CryptX::_radix_to_bin($base58, 58) if defined $base58 && length($base58) > 0;
+  $bytes .= _radix_to_bin($base58, 58) if defined $base58 && length($base58) > 0;
 
   return $bytes;
 }
@@ -108,27 +92,6 @@ sub encode_b58f { _encode_b58(shift, "123456789abcdefghijkmnopqrstuvwxyzABCDEFGH
 sub encode_b58r { _encode_b58(shift, "rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz") } # Ripple
 sub encode_b58t { _encode_b58(shift, "RPShNAF39wBUDnEGHJKLM4pQrsT7VWXYZ2bcdeCg65jkm8ofqi1tuvaxyz") } # Tipple
 sub encode_b58s { _encode_b58(shift, "gsphnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCr65jkm8oFqi1tuvAxyz") } # Stellar
-
-sub encode_b32r { CryptX::_encode_b32(shift, 0) } # rfc4648
-sub encode_b32b { CryptX::_encode_b32(shift, 1) } # base32hex
-sub encode_b32z { CryptX::_encode_b32(shift, 2) } # zbase32
-sub encode_b32c { CryptX::_encode_b32(shift, 3) } # crockford
-
-sub decode_b32r { CryptX::_decode_b32(shift, 0) } # rfc4648
-sub decode_b32b { CryptX::_decode_b32(shift, 1) } # base32hex
-sub decode_b32z { CryptX::_decode_b32(shift, 2) } # zbase32
-sub decode_b32c { CryptX::_decode_b32(shift, 3) } # crockford
-
-
-sub increment_octets_be {
-  CryptX::_increment_octets_be(@_);
-  #$_[0] = CryptX::_increment_octets_be($_[0]);
-}
-
-sub increment_octets_le {
-  CryptX::_increment_octets_le(@_);
-  #$_[0] = CryptX::_increment_octets_le($_[0]);
-}
 
 sub pem_to_der {
   my ($data, $password) = @_;
@@ -194,6 +157,7 @@ sub der_to_pem {
 }
 
 sub read_rawfile {
+  # $data = read_rawfile($filename);
   my $f = shift;
   croak "FATAL: read_rawfile() non-existing file '$f'" unless -f $f;
   open my $fh, "<", $f or croak "FATAL: read_rawfile() cannot open file '$f': $!";
