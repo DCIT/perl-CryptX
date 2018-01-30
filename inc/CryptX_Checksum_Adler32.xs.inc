@@ -67,7 +67,7 @@ digest(Crypt::Checksum::Adler32 self)
         if (ix == 1) {
           rv = _base16_encode(hash, 4, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn(out, outlen);
+          RETVAL = newSVpvn((char *)out, outlen);
         }
         else if (ix == 2) {
           LOAD32H(ui32, hash);
@@ -105,7 +105,7 @@ adler32_data(...)
         if (ix == 1) {
           rv = _base16_encode(hash, 4, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn(out, outlen);
+          RETVAL = newSVpvn((char *)out, outlen);
         }
         else if (ix == 2) {
           LOAD32H(ui32, hash);
