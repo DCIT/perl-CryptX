@@ -31,7 +31,7 @@ for my $m (sort @files) {
   $m =~ s|[\\/]|::|g;
   $m =~ s|^lib::||;
   $m =~ s|\.pm$||;
-  push @err, "ERROR: '$m' is missing in CryptX.pm"  unless $cryptx =~ /L<$m>/s || $m =~ /^(CryptX|Math::BigInt::LTM|Crypt::(PK|Mode|Mac|AuthEnc))$/;
+  push @err, "ERROR: '$m' is missing in CryptX.pm"  unless $cryptx =~ /L<$m>/s || $m =~ /^(CryptX|Math::BigInt::LTM|Crypt::(PK|Mode|Mac|AuthEnc|Checksum))$/;
   push @err, "ERROR: '$m' is missing in 001_compile.t"  unless $compile_t =~ /\nuse $m;/s;
   eval "use $m; 1;" or push @err, "ERROR: 'use $m' failed";
 }

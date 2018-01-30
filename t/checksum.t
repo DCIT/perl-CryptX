@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 54;
+use Test::More tests => 56;
 
 use Crypt::Checksum::Adler32 ':all';
 use Crypt::Checksum::CRC32 ':all';
@@ -47,6 +47,7 @@ use Crypt::Checksum::CRC32 ':all';
   is(adler32_file("t/data/binary-test.file"), pack("H*", "f35fb68a"));
   is(adler32_file_int("t/data/binary-test.file"), 4083136138);
   is(adler32_file_hex("t/data/binary-test.file"), "f35fb68a");
+  is(Crypt::Checksum::Adler32->new->addfile("t/data/binary-test.file")->hexdigest, "f35fb68a");
 
   is(adler32_file_hex("t/data/text-CR.file"), "948e2644");
   is(adler32_file_hex("t/data/text-CRLF.file"), "3f0e2702");
@@ -94,6 +95,7 @@ use Crypt::Checksum::CRC32 ':all';
   is(crc32_file("t/data/binary-test.file"), pack("H*", "24111fed"));
   is(crc32_file_int("t/data/binary-test.file"), 605102061);
   is(crc32_file_hex("t/data/binary-test.file"), "24111fed");
+  is(Crypt::Checksum::CRC32->new->addfile("t/data/binary-test.file")->hexdigest, "24111fed");
 
   is(crc32_file_hex("t/data/text-CR.file"), "1ca430c6");
   is(crc32_file_hex("t/data/text-CRLF.file"), "4d434dfb");
