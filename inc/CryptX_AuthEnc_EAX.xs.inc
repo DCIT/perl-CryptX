@@ -26,10 +26,10 @@ new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata=&PL_sv_undef)
         id = _find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
-        Newz(0, RETVAL, 1, struct eax_struct);
+        Newz(0, RETVAL, 1, eax_state);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = eax_init(&RETVAL->state, id, k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len);
+        rv = eax_init(RETVAL, id, k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: eax setup failed: %s", error_to_string(rv));
@@ -46,9 +46,9 @@ DESTROY(Crypt::AuthEnc::EAX self)
 Crypt::AuthEnc::EAX
 clone(Crypt::AuthEnc::EAX self)
     CODE:
-        Newz(0, RETVAL, 1, struct eax_struct);
+        Newz(0, RETVAL, 1, eax_state);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct eax_struct);
+        Copy(self, RETVAL, 1, eax_state);
     OUTPUT:
         RETVAL
 
@@ -69,7 +69,7 @@ encrypt_add(Crypt::AuthEnc::EAX self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = eax_encrypt(&self->state, in_data, out_data, (unsigned long)in_data_len);
+          rv = eax_encrypt(self, in_data, out_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: eax_encrypt failed: %s", error_to_string(rv));
@@ -96,7 +96,7 @@ decrypt_add(Crypt::AuthEnc::EAX self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = eax_decrypt(&self->state, in_data, out_data, (unsigned long)in_data_len);
+          rv = eax_decrypt(self, in_data, out_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: eax_decrypt failed: %s", error_to_string(rv));
@@ -114,7 +114,7 @@ encrypt_done(Crypt::AuthEnc::EAX self)
         unsigned char tag[MAXBLOCKSIZE];
         unsigned long tag_len = sizeof(tag);
 
-        rv = eax_done(&self->state, tag, &tag_len);
+        rv = eax_done(self, tag, &tag_len);
         if (rv != CRYPT_OK) croak("FATAL: eax_done failed: %s", error_to_string(rv));
         XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
     }
@@ -129,7 +129,7 @@ decrypt_done(Crypt::AuthEnc::EAX self, ...)
         STRLEN expected_tag_len;
         unsigned char *expected_tag;
 
-        rv = eax_done(&self->state, tag, &tag_len);
+        rv = eax_done(self, tag, &tag_len);
         if (rv != CRYPT_OK) croak("FATAL: eax_done failed: %s", error_to_string(rv));
         if (items == 1) {
           XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
@@ -157,7 +157,7 @@ adata_add(Crypt::AuthEnc::EAX self, SV * adata)
         int rv;
         unsigned char *h;
         h = (unsigned char *)SvPVbyte(adata, h_len);
-        rv = eax_addheader(&self->state, h, (unsigned long)h_len);
+        rv = eax_addheader(self, h, (unsigned long)h_len);
         if (rv != CRYPT_OK) croak("FATAL: eax_addheader failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }

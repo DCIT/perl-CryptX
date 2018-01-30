@@ -30,7 +30,6 @@ new(char * class, ...)
           Safefree(RETVAL);
           croak("FATAL: find_prng failed for '%s'", prng_name);
         }
-        RETVAL->id = id;
         RETVAL->last_pid = curpid;
         RETVAL->desc = &prng_descriptor[id];
 

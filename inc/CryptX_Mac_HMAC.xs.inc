@@ -19,10 +19,10 @@ new(Class, char * hash_name, SV * key)
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        Newz(0, RETVAL, 1, struct hmac_struct);
+        Newz(0, RETVAL, 1, hmac_state);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = hmac_init(&RETVAL->state, id, k, (unsigned long)k_len);
+        rv = hmac_init(RETVAL, id, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: hmac_init failed: %s", error_to_string(rv));
@@ -39,9 +39,9 @@ DESTROY(Crypt::Mac::HMAC self)
 Crypt::Mac::HMAC
 clone(Crypt::Mac::HMAC self)
     CODE:
-        Newz(0, RETVAL, 1, struct hmac_struct);
+        Newz(0, RETVAL, 1, hmac_state);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct hmac_struct);
+        Copy(self, RETVAL, 1, hmac_state);
     OUTPUT:
         RETVAL
 
@@ -56,7 +56,7 @@ add(Crypt::Mac::HMAC self, ...)
         for(i = 1; i < items; i++) {
           in_data = (unsigned char *)SvPVbyte(ST(i), in_data_len);
           if (in_data_len > 0) {
-            rv = hmac_process(&self->state, in_data, (unsigned long)in_data_len);
+            rv = hmac_process(self, in_data, (unsigned long)in_data_len);
             if (rv != CRYPT_OK) croak("FATAL: hmac_process failed: %s", error_to_string(rv));
           }
         }
@@ -77,7 +77,7 @@ mac(Crypt::Mac::HMAC self)
         char out[MAXBLOCKSIZE*2];
 
         maclen = sizeof(mac);
-        rv = hmac_done(&self->state, mac, &maclen);
+        rv = hmac_done(self, mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: hmac_done failed: %s", error_to_string(rv));
         outlen = sizeof(out);
         if (ix == 3) {

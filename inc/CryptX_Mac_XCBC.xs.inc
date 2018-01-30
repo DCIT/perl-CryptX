@@ -19,10 +19,10 @@ new(Class, char * cipher_name, SV * key)
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        Newz(0, RETVAL, 1, struct xcbc_struct);
+        Newz(0, RETVAL, 1, xcbc_state);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = xcbc_init(&RETVAL->state, id, k, (unsigned long)k_len);
+        rv = xcbc_init(RETVAL, id, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: xcbc_init failed: %s", error_to_string(rv));
@@ -39,9 +39,9 @@ DESTROY(Crypt::Mac::XCBC self)
 Crypt::Mac::XCBC
 clone(Crypt::Mac::XCBC self)
     CODE:
-        Newz(0, RETVAL, 1, struct xcbc_struct);
+        Newz(0, RETVAL, 1, xcbc_state);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct xcbc_struct);
+        Copy(self, RETVAL, 1, xcbc_state);
     OUTPUT:
         RETVAL
 
@@ -56,7 +56,7 @@ add(Crypt::Mac::XCBC self, ...)
         for(i = 1; i < items; i++) {
           in_data = (unsigned char *)SvPVbyte(ST(i), in_data_len);
           if (in_data_len > 0) {
-            rv = xcbc_process(&self->state, in_data, (unsigned long)in_data_len);
+            rv = xcbc_process(self, in_data, (unsigned long)in_data_len);
             if (rv != CRYPT_OK) croak("FATAL: xcbc_process failed: %s", error_to_string(rv));
           }
         }
@@ -77,7 +77,7 @@ mac(Crypt::Mac::XCBC self)
         char out[MAXBLOCKSIZE*2];
 
         maclen = sizeof(mac);
-        rv = xcbc_done(&self->state, mac, &maclen);
+        rv = xcbc_done(self, mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: xcbc_done failed: %s", error_to_string(rv));
         outlen = sizeof(out);
         if (ix == 3) {

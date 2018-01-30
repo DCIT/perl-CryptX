@@ -16,7 +16,6 @@ new(char * cname, char * pname = NULL)
         Newz(0, RETVAL, 1, struct digest_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        RETVAL->id = id;
         RETVAL->desc = &hash_descriptor[id];
         rv = RETVAL->desc->init(&RETVAL->state);
         if (rv != CRYPT_OK) {

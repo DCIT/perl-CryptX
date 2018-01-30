@@ -31,7 +31,6 @@ new(char * class, ...)
         Newz(0, RETVAL, 1, struct cipher_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        RETVAL->id = id;
         RETVAL->desc = &cipher_descriptor[id];
         rv = RETVAL->desc->setup(key_data, (int)key_len, rounds, &RETVAL->skey);
         if (rv != CRYPT_OK) {

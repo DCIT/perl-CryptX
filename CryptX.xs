@@ -12,18 +12,39 @@
 #include "tomcrypt.h"
 #include "tommath.h"
 
-typedef adler32_state *Crypt__Checksum__Adler32;
-typedef crc32_state   *Crypt__Checksum__CRC32;
+typedef adler32_state           *Crypt__Checksum__Adler32;
+typedef crc32_state             *Crypt__Checksum__CRC32;
+
+typedef ccm_state               *Crypt__AuthEnc__CCM;
+typedef eax_state               *Crypt__AuthEnc__EAX;
+typedef gcm_state               *Crypt__AuthEnc__GCM;
+typedef chacha20poly1305_state  *Crypt__AuthEnc__ChaCha20Poly1305;
+typedef ocb3_state              *Crypt__AuthEnc__OCB;
+
+typedef chacha_state            *Crypt__Stream__ChaCha;
+typedef salsa20_state           *Crypt__Stream__Salsa20;
+typedef sosemanuk_state         *Crypt__Stream__Sosemanuk;
+typedef rabbit_state            *Crypt__Stream__Rabbit;
+typedef rc4_state               *Crypt__Stream__RC4;
+typedef sober128_state          *Crypt__Stream__Sober128;
+
+typedef f9_state                *Crypt__Mac__F9;
+typedef hmac_state              *Crypt__Mac__HMAC;
+typedef omac_state              *Crypt__Mac__OMAC;
+typedef pelican_state           *Crypt__Mac__Pelican;
+typedef pmac_state              *Crypt__Mac__PMAC;
+typedef xcbc_state              *Crypt__Mac__XCBC;
+typedef poly1305_state          *Crypt__Mac__Poly1305;
+typedef blake2smac_state        *Crypt__Mac__BLAKE2s;
+typedef blake2bmac_state        *Crypt__Mac__BLAKE2b;
 
 typedef struct cipher_struct {          /* used by Crypt::Cipher */
   symmetric_key skey;
-  int id;
   struct ltc_cipher_descriptor *desc;
 } *Crypt__Cipher;
 
 typedef struct digest_struct {          /* used by Crypt::Digest */
   hash_state state;
-  int id;
   struct ltc_hash_descriptor *desc;
 } *Crypt__Digest;
 
@@ -32,109 +53,6 @@ typedef struct digest_shake_struct {    /* used by Crypt::Digest::SHAKE */
   int num;
 } *Crypt__Digest__SHAKE;
 
-typedef struct ccm_struct {             /* used by Crypt::AuthEnc::CCM */
-  ccm_state state;
-  int direction;
-  int tag_len;
-  unsigned long pt_len;
-  int id;
-} *Crypt__AuthEnc__CCM;
-
-typedef struct eax_struct {             /* used by Crypt::AuthEnc::EAX */
-  eax_state state;
-  int id;
-} *Crypt__AuthEnc__EAX;
-
-typedef struct gcm_struct {             /* used by Crypt::AuthEnc::GCM */
-  gcm_state state;
-  int id;
-} *Crypt__AuthEnc__GCM;
-
-typedef struct chacha20poly1305_struct {/* used by Crypt::AuthEnc::ChaCha20Poly1305 */
-  chacha20poly1305_state state;
-  int id;
-} *Crypt__AuthEnc__ChaCha20Poly1305;
-
-typedef struct ocb_struct {             /* used by Crypt::AuthEnc::OCB */
-  ocb3_state state;
-  int id;
-} *Crypt__AuthEnc__OCB;
-
-typedef struct chacha_struct {          /* used by Crypt::Stream::ChaCha */
-  chacha_state state;
-  int id;
-} *Crypt__Stream__ChaCha;
-
-typedef struct salsa20_struct {         /* used by Crypt::Stream::Salsa20 */
-  salsa20_state state;
-  int id;
-} *Crypt__Stream__Salsa20;
-
-typedef struct sosemanuk_struct {       /* used by Crypt::Stream::Sosemanuk */
-  sosemanuk_state state;
-  int id;
-} *Crypt__Stream__Sosemanuk;
-
-typedef struct rabbit_struct {          /* used by Crypt::Stream::Rabbit */
-  rabbit_state state;
-  int id;
-} *Crypt__Stream__Rabbit;
-
-typedef struct rc4_struct {             /* used by Crypt::Stream::RC4 */
-  rc4_state state;
-  int id;
-} *Crypt__Stream__RC4;
-
-typedef struct sober128_struct {        /* used by Crypt::Stream::Sober128 */
-  sober128_state state;
-  int id;
-} *Crypt__Stream__Sober128;
-
-typedef struct f9_struct {              /* used by Crypt::Mac::F9 */
-  f9_state state;
-  int id;
-} *Crypt__Mac__F9;
-
-typedef struct hmac_struct {            /* used by Crypt::Mac::HMAC */
-  hmac_state state;
-  int id;
-} *Crypt__Mac__HMAC;
-
-typedef struct omac_struct {            /* used by Crypt::Mac::OMAC */
-  omac_state state;
-  int id;
-} *Crypt__Mac__OMAC;
-
-typedef struct pelican_struct {         /* used by Crypt::Mac::Pelican */
-  pelican_state state;
-  int id;
-} *Crypt__Mac__Pelican;
-
-typedef struct pmac_struct {            /* used by Crypt::Mac::PMAC */
-  pmac_state state;
-  int id;
-} *Crypt__Mac__PMAC;
-
-typedef struct xcbc_struct {            /* used by Crypt::Mac::XCBC */
-  xcbc_state state;
-  int id;
-} *Crypt__Mac__XCBC;
-
-typedef struct poly1305_struct {        /* used by Crypt::Mac::Poly1305 */
-  poly1305_state state;
-  int id;
-} *Crypt__Mac__Poly1305;
-
-typedef struct blake2s_struct {         /* used by Crypt::Mac::BLAKE2s */
-  blake2smac_state state;
-  int id;
-} *Crypt__Mac__BLAKE2s;
-
-typedef struct blake2b_struct {         /* used by Crypt::Mac::BLAKE2b */
-  blake2bmac_state state;
-  int id;
-} *Crypt__Mac__BLAKE2b;
-
 typedef struct cbc_struct {             /* used by Crypt::Mode::CBC */
   int cipher_id, cipher_rounds;
   symmetric_CBC state;
@@ -142,7 +60,6 @@ typedef struct cbc_struct {             /* used by Crypt::Mode::CBC */
   int padlen;
   int padding_mode;
   int direction;
-  int id;
 } *Crypt__Mode__CBC;
 
 typedef struct ecb_struct {             /* used by Crypt::Mode::ECB */
@@ -152,14 +69,12 @@ typedef struct ecb_struct {             /* used by Crypt::Mode::ECB */
   int padlen;
   int padding_mode;
   int direction;
-  int id;
 } *Crypt__Mode__ECB;
 
 typedef struct cfb_struct {             /* used by Crypt::Mode::CFB */
   int cipher_id, cipher_rounds;
   symmetric_CFB state;
   int direction;
-  int id;
 } *Crypt__Mode__CFB;
 
 typedef struct ctr_struct {             /* used by Crypt::Mode::CTR */
@@ -167,63 +82,54 @@ typedef struct ctr_struct {             /* used by Crypt::Mode::CTR */
   int ctr_mode_param;
   symmetric_CTR state;
   int direction;
-  int id;
 } *Crypt__Mode__CTR;
 
 typedef struct f8_struct {              /* used by Crypt::Mode::F8 */
   int cipher_id, cipher_rounds;
   symmetric_F8 state;
   int direction;
-  int id;
 } *Crypt__Mode__F8;
 
 typedef struct lrw_struct {             /* used by Crypt::Mode::LRW */
   int cipher_id, cipher_rounds;
   symmetric_LRW state;
   int direction;
-  int id;
 } *Crypt__Mode__LRW;
 
 typedef struct ofb_struct {             /* used by Crypt::Mode::OFB */
   int cipher_id, cipher_rounds;
   symmetric_OFB state;
   int direction;
-  int id;
 } *Crypt__Mode__OFB;
 
 typedef struct xts_struct {             /* used by Crypt::Mode::XTS */
   int cipher_id, cipher_rounds;
   symmetric_xts state;
   int direction;
-  int id;
 } *Crypt__Mode__XTS;
 
 typedef struct prng_struct {            /* used by Crypt::PRNG */
   prng_state state;
   struct ltc_prng_descriptor *desc;
   IV last_pid;
-  int id;
 } *Crypt__PRNG;
 
 typedef struct rsa_struct {             /* used by Crypt::PK::RSA */
   prng_state pstate;
   int pindex;
   rsa_key key;
-  int id;
 } *Crypt__PK__RSA;
 
 typedef struct dsa_struct {             /* used by Crypt::PK::DSA */
   prng_state pstate;
   int pindex;
   dsa_key key;
-  int id;
 } *Crypt__PK__DSA;
 
 typedef struct dh_struct {              /* used by Crypt::PK::DH */
   prng_state pstate;
   int pindex;
   dh_key key;
-  int id;
 } *Crypt__PK__DH;
 
 typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
@@ -231,7 +137,6 @@ typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
   int pindex;
   ecc_key key;
   ltc_ecc_set_type dp;
-  int id;
 } *Crypt__PK__ECC;
 
 int str_add_leading_zero(char *str, int maxlen, int minlen) {

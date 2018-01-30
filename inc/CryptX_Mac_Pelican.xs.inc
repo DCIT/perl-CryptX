@@ -15,10 +15,10 @@ new(Class, SV * key)
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        Newz(0, RETVAL, 1, struct pelican_struct);
+        Newz(0, RETVAL, 1, pelican_state);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = pelican_init(&RETVAL->state, k, (unsigned long)k_len);
+        rv = pelican_init(RETVAL, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: pelican_init failed: %s", error_to_string(rv));
@@ -35,9 +35,9 @@ DESTROY(Crypt::Mac::Pelican self)
 Crypt::Mac::Pelican
 clone(Crypt::Mac::Pelican self)
     CODE:
-        Newz(0, RETVAL, 1, struct pelican_struct);
+        Newz(0, RETVAL, 1, pelican_state);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct pelican_struct);
+        Copy(self, RETVAL, 1, pelican_state);
     OUTPUT:
         RETVAL
 
@@ -52,7 +52,7 @@ add(Crypt::Mac::Pelican self, ...)
         for(i = 1; i < items; i++) {
           in_data = (unsigned char *)SvPVbyte(ST(i), in_data_len);
           if (in_data_len > 0) {
-            rv = pelican_process(&self->state, in_data, (unsigned long)in_data_len);
+            rv = pelican_process(self, in_data, (unsigned long)in_data_len);
             if (rv != CRYPT_OK) croak("FATAL: pelican_process failed: %s", error_to_string(rv));
           }
         }
@@ -73,7 +73,7 @@ mac(Crypt::Mac::Pelican self)
         char out[MAXBLOCKSIZE*2];
 
         maclen = 16;
-        rv = pelican_done(&self->state, mac);
+        rv = pelican_done(self, mac);
         if (rv != CRYPT_OK) croak("FATAL: pelican_done failed: %s", error_to_string(rv));
         outlen = sizeof(out);
         if (ix == 3) {

@@ -15,10 +15,10 @@ new(Class, SV * key)
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        Newz(0, RETVAL, 1, struct poly1305_struct);
+        Newz(0, RETVAL, 1, poly1305_state);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = poly1305_init(&RETVAL->state, k, (unsigned long)k_len);
+        rv = poly1305_init(RETVAL, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: poly1305_init failed: %s", error_to_string(rv));
@@ -35,9 +35,9 @@ DESTROY(Crypt::Mac::Poly1305 self)
 Crypt::Mac::Poly1305
 clone(Crypt::Mac::Poly1305 self)
     CODE:
-        Newz(0, RETVAL, 1, struct poly1305_struct);
+        Newz(0, RETVAL, 1, poly1305_state);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct poly1305_struct);
+        Copy(self, RETVAL, 1, poly1305_state);
     OUTPUT:
         RETVAL
 
@@ -52,7 +52,7 @@ add(Crypt::Mac::Poly1305 self, ...)
         for(i = 1; i < items; i++) {
           in_data = (unsigned char *)SvPVbyte(ST(i), in_data_len);
           if (in_data_len > 0) {
-            rv = poly1305_process(&self->state, in_data, (unsigned long)in_data_len);
+            rv = poly1305_process(self, in_data, (unsigned long)in_data_len);
             if (rv != CRYPT_OK) croak("FATAL: poly1305_process failed: %s", error_to_string(rv));
           }
         }
@@ -73,7 +73,7 @@ mac(Crypt::Mac::Poly1305 self)
         char out[MAXBLOCKSIZE*2];
 
         maclen = sizeof(mac);
-        rv = poly1305_done(&self->state, mac, &maclen);
+        rv = poly1305_done(self, mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: poly1305_done failed: %s", error_to_string(rv));
         outlen = sizeof(out);
         if (ix == 3) {

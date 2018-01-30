@@ -15,10 +15,10 @@ new(Class, unsigned long size, SV * key)
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        Newz(0, RETVAL, 1, struct blake2b_struct);
+        Newz(0, RETVAL, 1, blake2bmac_state);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = blake2bmac_init(&RETVAL->state, size, k, (unsigned long)k_len);
+        rv = blake2bmac_init(RETVAL, size, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: blake2b_init failed: %s", error_to_string(rv));
@@ -35,9 +35,9 @@ DESTROY(Crypt::Mac::BLAKE2b self)
 Crypt::Mac::BLAKE2b
 clone(Crypt::Mac::BLAKE2b self)
     CODE:
-        Newz(0, RETVAL, 1, struct blake2b_struct);
+        Newz(0, RETVAL, 1, blake2bmac_state);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct blake2b_struct);
+        Copy(self, RETVAL, 1, blake2bmac_state);
     OUTPUT:
         RETVAL
 
@@ -52,7 +52,7 @@ add(Crypt::Mac::BLAKE2b self, ...)
         for(i = 1; i < items; i++) {
           in_data = (unsigned char *)SvPVbyte(ST(i), in_data_len);
           if (in_data_len > 0) {
-            rv = blake2bmac_process(&self->state, in_data, (unsigned long)in_data_len);
+            rv = blake2bmac_process(self, in_data, (unsigned long)in_data_len);
             if (rv != CRYPT_OK) croak("FATAL: blake2b_process failed: %s", error_to_string(rv));
           }
         }
@@ -73,7 +73,7 @@ mac(Crypt::Mac::BLAKE2b self)
         char out[MAXBLOCKSIZE*2];
 
         maclen = sizeof(mac);
-        rv = blake2bmac_done(&self->state, mac, &maclen);
+        rv = blake2bmac_done(self, mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: blake2bmac_done failed: %s", error_to_string(rv));
         outlen = sizeof(out);
         if (ix == 3) {

@@ -36,15 +36,19 @@ new(Class, char * cipher_name, SV * key)
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        Newz(0, RETVAL, 1, struct [%lc_name%]_struct);
+[%-IF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+        Newz(0, RETVAL, 1, [%lc_name%]mac_state);
+[%-ELSE%]
+        Newz(0, RETVAL, 1, [%lc_name%]_state);
+[%-END%]
         if (!RETVAL) croak("FATAL: Newz failed");
 
 [%-IF lc_name == 'pelican' || lc_name == 'poly1305' %]
-        rv = [%lc_name%]_init(&RETVAL->state, k, (unsigned long)k_len);
+        rv = [%lc_name%]_init(RETVAL, k, (unsigned long)k_len);
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
-        rv = [%lc_name%]mac_init(&RETVAL->state, size, k, (unsigned long)k_len);
+        rv = [%lc_name%]mac_init(RETVAL, size, k, (unsigned long)k_len);
 [%-ELSE%]
-        rv = [%lc_name%]_init(&RETVAL->state, id, k, (unsigned long)k_len);
+        rv = [%lc_name%]_init(RETVAL, id, k, (unsigned long)k_len);
 [%-END%]
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
@@ -62,9 +66,15 @@ DESTROY(Crypt::Mac::[%orig_name%] self)
 Crypt::Mac::[%orig_name%]
 clone(Crypt::Mac::[%orig_name%] self)
     CODE:
-        Newz(0, RETVAL, 1, struct [%lc_name%]_struct);
+[%-IF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+        Newz(0, RETVAL, 1, [%lc_name%]mac_state);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct [%lc_name%]_struct);
+        Copy(self, RETVAL, 1, [%lc_name%]mac_state);
+[%-ELSE%]
+        Newz(0, RETVAL, 1, [%lc_name%]_state);
+        if (!RETVAL) croak("FATAL: Newz failed");
+        Copy(self, RETVAL, 1, [%lc_name%]_state);
+[%-END%]
     OUTPUT:
         RETVAL
 
@@ -80,9 +90,9 @@ add(Crypt::Mac::[%orig_name%] self, ...)
           in_data = (unsigned char *)SvPVbyte(ST(i), in_data_len);
           if (in_data_len > 0) {
 [%-IF lc_name == 'blake2s' || lc_name == 'blake2b' %]
-            rv = [%lc_name%]mac_process(&self->state, in_data, (unsigned long)in_data_len);
+            rv = [%lc_name%]mac_process(self, in_data, (unsigned long)in_data_len);
 [%-ELSE%]
-            rv = [%lc_name%]_process(&self->state, in_data, (unsigned long)in_data_len);
+            rv = [%lc_name%]_process(self, in_data, (unsigned long)in_data_len);
 [%-END%]
             if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_process failed: %s", error_to_string(rv));
           }
@@ -105,15 +115,15 @@ mac(Crypt::Mac::[%orig_name%] self)
 
 [%-IF lc_name == 'pelican' %]
         maclen = 16;
-        rv = [%lc_name%]_done(&self->state, mac);
+        rv = [%lc_name%]_done(self, mac);
         if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_done failed: %s", error_to_string(rv));
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
         maclen = sizeof(mac);
-        rv = [%lc_name%]mac_done(&self->state, mac, &maclen);
+        rv = [%lc_name%]mac_done(self, mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]mac_done failed: %s", error_to_string(rv));
 [%-ELSE%]
         maclen = sizeof(mac);
-        rv = [%lc_name%]_done(&self->state, mac, &maclen);
+        rv = [%lc_name%]_done(self, mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_done failed: %s", error_to_string(rv));
 [%-END%]
         outlen = sizeof(out);
