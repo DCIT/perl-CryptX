@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.056_* 2018-01-30
+0.057   2018-02-XX
         - significant speed-up (more stuff handled on XS level)
         - Crypt::Checksum is deprecated in favour of Crypt::Checksum::Adler32 + Crypt::Checksum::CRC32
 

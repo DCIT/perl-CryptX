@@ -4,7 +4,7 @@ package Crypt::Digest::CHAES;
 
 use strict;
 use warnings;
-our $VERSION = '0.056_007';
+our $VERSION = '0.057';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( chaes chaes_hex chaes_b64 chaes_b64u chaes_file chaes_file_hex chaes_file_b64 chaes_file_b64u )] );
