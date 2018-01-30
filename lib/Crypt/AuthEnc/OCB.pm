@@ -2,7 +2,7 @@ package Crypt::AuthEnc::OCB;
 
 use strict;
 use warnings;
-our $VERSION = '0.056_008';
+our $VERSION = '0.056_009';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( ocb_encrypt_authenticate ocb_decrypt_verify )] );

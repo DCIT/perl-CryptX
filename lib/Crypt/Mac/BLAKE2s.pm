@@ -4,7 +4,7 @@ package Crypt::Mac::BLAKE2s;
 
 use strict;
 use warnings;
-our $VERSION = '0.056_008';
+our $VERSION = '0.056_009';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( blake2s blake2s_hex blake2s_b64 blake2s_b64u )] );
