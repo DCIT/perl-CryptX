@@ -545,7 +545,6 @@ decode_b32r(SV *in)
         decode_b32c = 3
     CODE:
     {
-        int rv;
         STRLEN in_len;
         unsigned long out_len;
         unsigned char *out_data, *in_data;
