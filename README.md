@@ -40,7 +40,7 @@ Currently available modules:
 
 - Checksums
 
-    [Crypt::Checksum](https://metacpan.org/pod/Crypt::Checksum), [Crypt::Checksum::Adler32](https://metacpan.org/pod/Crypt::Checksum::Adler32), [Crypt::Checksum::CRC32](https://metacpan.org/pod/Crypt::Checksum::CRC32)
+    [Crypt::Checksum::Adler32](https://metacpan.org/pod/Crypt::Checksum::Adler32), [Crypt::Checksum::CRC32](https://metacpan.org/pod/Crypt::Checksum::CRC32)
 
 - Message Authentication Codes
 

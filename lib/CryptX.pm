@@ -100,7 +100,7 @@ L<Crypt::Digest::SHA3_224>, L<Crypt::Digest::SHA3_256>, L<Crypt::Digest::SHA3_38
 
 =item * Checksums
 
-L<Crypt::Checksum>, L<Crypt::Checksum::Adler32>, L<Crypt::Checksum::CRC32>
+L<Crypt::Checksum::Adler32>, L<Crypt::Checksum::CRC32>
 
 =item * Message Authentication Codes
 

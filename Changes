@@ -2,7 +2,7 @@ Changes for CryptX
 
 0.056_* 2018-01-30
         - speed-up (more stuff handled on XS level)
-        - no intentional API breakage
+        - Crypt::Checksum is deprecated in favour of Crypt::Checksum::Adler32 + Crypt::Checksum::CRC32
 
 0.056   2017-12-22
         - new Crypt::Stream::Rabbit
