@@ -73,7 +73,7 @@ add(Crypt::Mode::CTR self, ...)
         for (j = 1; j < items; j++) {
           in_data = (unsigned char *)SvPVbyte(ST(j), in_data_len);
           if (in_data_len > 0) {
-            out_data = SvGROW(RETVAL, out_len + in_data_len + 1) + out_len;
+            out_data = (unsigned char*)SvGROW(RETVAL, out_len + in_data_len + 1) + out_len;
             out_len += in_data_len;
             if (self->direction == 1) {
               rv = ctr_encrypt(in_data, out_data, (unsigned long)in_data_len, &self->state);

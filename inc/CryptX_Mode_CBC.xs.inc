@@ -106,7 +106,7 @@ add(Crypt::Mode::CBC self, ...)
 
               if (in_data_len > 0) {
                 i = (unsigned long)(has_tmp_block ? in_data_len + blen : in_data_len);
-                out_data = SvGROW(RETVAL, out_len + i + 1) + out_len;
+                out_data = (unsigned char*)SvGROW(RETVAL, out_len + i + 1) + out_len;
                 out_len += i;
                 if (has_tmp_block) {
                   Copy(tmp_block, out_data, blen, unsigned char);
@@ -119,7 +119,7 @@ add(Crypt::Mode::CBC self, ...)
                 }
               } /* in_data_len > 0 */
               else if (has_tmp_block) {
-                out_data = SvGROW(RETVAL, out_len + blen + 1) + out_len;
+                out_data = (unsigned char*)SvGROW(RETVAL, out_len + blen + 1) + out_len;
                 out_len += blen;
                 Copy(tmp_block, out_data, blen, unsigned char);
               }
@@ -177,7 +177,7 @@ add(Crypt::Mode::CBC self, ...)
                 }
                 i = (unsigned long)(has_tmp_block ? in_data_len + blen : in_data_len);
                 if (i > 0) {
-                  out_data = SvGROW(RETVAL, out_len + i + 1) + out_len;
+                  out_data = (unsigned char*)SvGROW(RETVAL, out_len + i + 1) + out_len;
                   out_len += i;
                   if (has_tmp_block) {
                     Copy(tmp_block, out_data, blen, unsigned char);
@@ -191,7 +191,7 @@ add(Crypt::Mode::CBC self, ...)
                 }
               } /* in_data_len>0 */
               else if (has_tmp_block) {
-                out_data = SvGROW(RETVAL, out_len + blen + 1) + out_len;
+                out_data = (unsigned char*)SvGROW(RETVAL, out_len + blen + 1) + out_len;
                 out_len += blen;
                 Copy(tmp_block, out_data, blen, unsigned char);
               }
