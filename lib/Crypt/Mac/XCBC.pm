@@ -4,7 +4,7 @@ package Crypt::Mac::XCBC;
 
 use strict;
 use warnings;
-our $VERSION = '0.057';
+our $VERSION = '0.056_008';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( xcbc xcbc_hex xcbc_b64 xcbc_b64u )] );
