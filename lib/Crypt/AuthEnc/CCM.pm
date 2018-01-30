@@ -4,7 +4,7 @@ use strict;
 use warnings;
 our $VERSION = '0.056_006';
 
-use base qw(Crypt::AuthEnc Exporter);
+require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( ccm_encrypt_authenticate ccm_decrypt_verify )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
@@ -12,6 +12,8 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
+
+sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
 

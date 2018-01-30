@@ -4,9 +4,6 @@ use strict;
 use warnings ;
 our $VERSION = '0.056_006';
 
-use base qw(Exporter);
-our @EXPORT_OK = qw();
-
 require XSLoader;
 XSLoader::load('CryptX', $VERSION);
 

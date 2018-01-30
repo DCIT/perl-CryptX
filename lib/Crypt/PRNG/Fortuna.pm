@@ -10,7 +10,6 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use CryptX;
-use base 'Crypt::PRNG';
 
 {
   ### stolen from Bytes::Random::Secure

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 our $VERSION = '0.056_006';
 
-sub CLONE_SKIP { 1 } # prevent cloning
+### not used
 
 1;
 
