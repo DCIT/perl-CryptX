@@ -95,9 +95,9 @@ Returns checksum as a hexadecimal string.
 
 Returns checksum as unsigned 32bit integer.
 
- $checksum_hex = adler32_data_int('data string');
+ $checksum_int = adler32_data_int('data string');
  #or
- $checksum_hex = adler32_data_int('any data', 'more data', 'even more data');
+ $checksum_int = adler32_data_int('any data', 'more data', 'even more data');
 
 =head2 adler32_file
 
@@ -119,9 +119,9 @@ Returns checksum as a hexadecimal string.
 
 Returns checksum as unsigned 32bit integer.
 
- $checksum_hex = adler32_file_int('filename.dat');
+ $checksum_int = adler32_file_int('filename.dat');
  #or
- $checksum_hex = adler32_file_int(*FILEHANDLE);
+ $checksum_int = adler32_file_int(*FILEHANDLE);
 
 =head1 METHODS
 

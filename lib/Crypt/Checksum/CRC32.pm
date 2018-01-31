@@ -95,9 +95,9 @@ Returns checksum as a hexadecimal string.
 
 Returns checksum as unsigned 32bit integer.
 
- $checksum_hex = crc32_data_int('data string');
+ $checksum_int = crc32_data_int('data string');
  #or
- $checksum_hex = crc32_data_int('any data', 'more data', 'even more data');
+ $checksum_int = crc32_data_int('any data', 'more data', 'even more data');
 
 =head2 crc32_file
 
@@ -119,9 +119,9 @@ Returns checksum as a hexadecimal string.
 
 Returns checksum as unsigned 32bit integer.
 
- $checksum_hex = crc32_file_int('filename.dat');
+ $checksum_int = crc32_file_int('filename.dat');
  #or
- $checksum_hex = crc32_file_int(*FILEHANDLE);
+ $checksum_int = crc32_file_int(*FILEHANDLE);
 
 =head1 METHODS
 
