@@ -64,7 +64,7 @@ sub _decode_b58 {
 
   my $default = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuv";
   if (defined $alphabet) {
-    return undef if $alphabet !~ /^[a-zA-Z0-9]{58}$/;
+    return undef if $alphabet !~ /^[a-zA-Z0-9]{58}$/ || $base58 !~ /^[$alphabet]+$/;
     eval "\$base58 =~ tr/$alphabet/$default/"; # HACK: https://stackoverflow.com/questions/11415045/using-a-char-variable-in-tr
     return undef if $@;
   }

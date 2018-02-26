@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 679;
+use Test::More tests => 680;
 
 use Crypt::Misc qw( encode_b64   decode_b64
                     encode_b64u  decode_b64u
@@ -143,3 +143,5 @@ for my $h (@hex) {
   is(unpack("H*", decode_b32z(encode_b32z($b))), $h);
   is(unpack("H*", decode_b32c(encode_b32c($b))), $h);
 }
+
+is(decode_b58b("111OIl0"), undef, "bug: decode_b58b + invalid input");
