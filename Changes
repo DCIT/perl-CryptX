@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.058   2018-02-XX
+0.058   2018-02-27
         - fix: decode_b58b + invalid input
 
 0.057   2018-01-31
