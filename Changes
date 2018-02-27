@@ -1,5 +1,8 @@
 Changes for CryptX
 
+0.058   2018-02-XX
+        - fix: decode_b58b + invalid input
+
 0.057   2018-01-31
         - significant speed-up (more stuff handled on XS level)
         - Crypt::Checksum is deprecated in favour of Crypt::Checksum::Adler32|CRC32
