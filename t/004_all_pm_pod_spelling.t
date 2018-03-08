@@ -17,11 +17,12 @@ Test::Pod::Spelling->import(
                           params paramshash irand perl endian zbase bumac bmac budigest bdigest md de
                           blakes_ blakeb_
                           XOR'ing XOR'ed
+                          keccak
                         )]
                     },
 );
 
-plan tests => 103;
+plan tests => 107;
 
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');
