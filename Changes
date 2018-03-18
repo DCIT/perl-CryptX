@@ -5,6 +5,7 @@ Changes for CryptX
         - Crypt::PK::ECC - improved import of pkcs#8 private keys
         - fix #28 Apple's APNS pkcs8 auth key import fails (Crypt::PK::ECC)
         - new Crypt::Digest::Keccak(224|256|384|512)
+        - fix cpantesters failure (5.8.1 related)
 
 0.058   2018-02-27
         - fix: decode_b58b + invalid input
