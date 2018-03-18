@@ -622,6 +622,13 @@ Supported key formats:
  lBQ9T/RsLLc+PmpB1+7yPAR+oR5gZn3kJQ==
  -----END EC PRIVATE KEY-----
 
+=item * EC private keys with curve defined by OID + compressed form (supported since: CryptX-0.059)
+
+ -----BEGIN EC PRIVATE KEY-----
+ MFcCAQEEIBG1c3z52T8XwMsahGVdOZWgKCQJfv+l7djuJjgetdbDoAoGCCqGSM49
+ AwEHoSQDIgADoBUyo8CQAFPeYPvv78ylh5MwFZjTCLQeb042TjiMJxE=
+ -----END EC PRIVATE KEY-----
+
 =item * EC private keys in password protected PEM format
 
  -----BEGIN EC PRIVATE KEY-----
@@ -654,6 +661,13 @@ Supported key formats:
  CLQeb042TjiMJxG+9DLFmRSMlBQ9T/RsLLc+PmpB1+7yPAR+oR5gZn3kJQ==
  -----END PUBLIC KEY-----
 
+=item * EC public keys with curve defined by OID + public point in compressed form (supported since: CryptX-0.059)
+
+ -----BEGIN PUBLIC KEY-----
+ MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADoBUyo8CQAFPeYPvv78ylh5MwFZjT
+ CLQeb042TjiMJxE=
+ -----END PUBLIC KEY-----
+
 =item * PKCS#8 private keys with all curve parameters
 
  -----BEGIN PRIVATE KEY-----
@@ -674,7 +688,7 @@ Supported key formats:
  lEHQYjWya2YnHaPq/iMFa7A=
  -----END PRIVATE KEY-----
 
-=item * PKCS#8 encrypted private keys
+=item * PKCS#8 encrypted private keys - password protected keys (supported since: CryptX-0.059)
 
  -----BEGIN ENCRYPTED PRIVATE KEY-----
  MIGYMBwGCiqGSIb3DQEMAQMwDgQINApjTa6oFl0CAggABHi+59l4d4e6KtG9yci2
@@ -758,6 +772,13 @@ that does not explicitly contain curve parameters but only curve OID.
  #or
  my $public_der = $pk->export_key_der('public_short');
 
+Since CryptX-0.59 C<export_key_der> can also export keys in "compressed" format
+that defines curve by OID + stores public point in compressed form.
+
+ my $private_pem = $pk->export_key_der('private_compressed');
+ #or
+ my $public_pem = $pk->export_key_der('public_compressed');
+
 =head2 export_key_pem
 
  my $private_pem = $pk->export_key_pem('private');
@@ -771,7 +792,7 @@ that does not explicitly contain curve parameters but only curve OID.
  #or
  my $public_pem = $pk->export_key_pem('public_short');
 
-Since CryptX-0.58 C<export_key_pem> can also export keys in "compressed" format
+Since CryptX-0.59 C<export_key_pem> can also export keys in "compressed" format
 that defines curve by OID + stores public point in compressed form.
 
  my $private_pem = $pk->export_key_pem('private_compressed');
