@@ -28,7 +28,7 @@ int ecc_import_openssl(const unsigned char *in, unsigned long inlen, ecc_key *ke
 
    len_xy = sizeof(bin_xy);
    len_oid = 16;
-   err = x509_decode_subject_public_key_info(in, inlen, PKA_EC, bin_xy, &len_xy, LTC_ASN1_OBJECT_IDENTIFIER, curveoid, &len_oid);
+   err = x509_decode_subject_public_key_info(in, inlen, PKA_EC, bin_xy, &len_xy, LTC_ASN1_OBJECT_IDENTIFIER, (void *)curveoid, &len_oid);
    if (err == CRYPT_OK) {
       /* load curve parameters for given curve OID */
       if ((err = ecc_set_dp_oid(curveoid, len_oid, key)) != CRYPT_OK) { goto error; }

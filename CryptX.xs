@@ -584,7 +584,8 @@ encode_b32r(SV *in)
     {
         STRLEN in_len;
         unsigned long out_len;
-        unsigned char *out_data, *in_data;
+        unsigned char *in_data;
+        char *out_data;
         int id = -1;
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
@@ -601,7 +602,7 @@ encode_b32r(SV *in)
           out_len = (unsigned long)((8 * in_len + 4) / 5);
           RETVAL = NEWSV(0, out_len); /* avoid zero! */
           SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
+          out_data = SvPVX(RETVAL);
           if (base32_encode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             XSRETURN_UNDEF;
@@ -622,7 +623,8 @@ decode_b32r(SV *in)
     {
         STRLEN in_len;
         unsigned long out_len;
-        unsigned char *out_data, *in_data;
+        unsigned char *out_data;
+        char *in_data;
         int id = -1;
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
@@ -631,7 +633,7 @@ decode_b32r(SV *in)
         if (ix == 2) id = BASE32_ZBASE32;
         if (ix == 3) id = BASE32_CROCKFORD;
         if (id == -1) XSRETURN_UNDEF;
-        in_data = (unsigned char *)SvPVbyte(in, in_len);
+        in_data = SvPVbyte(in, in_len);
         if (in_len == 0) {
           RETVAL = newSVpvn("", 0);
         }

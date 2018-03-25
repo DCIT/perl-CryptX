@@ -414,6 +414,9 @@ const char *crypt_build_settings =
 #if defined(LTC_BASE32)
     " BASE32 "
 #endif
+#if defined(LTC_BASE16)
+    " BASE16 "
+#endif
 #if defined(LTC_CRC32)
     " CRC32 "
 #endif
@@ -425,6 +428,9 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_PKCS_5)
     " PKCS#5 "
+#endif
+#if defined(LTC_PADDING)
+    " PADDING "
 #endif
 #if defined(LTC_HKDF)
     " HKDF "

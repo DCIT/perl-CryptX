@@ -9,17 +9,19 @@
 
 /* ---- NUMBER THEORY ---- */
 
-enum {
-   PK_PUBLIC=0,
-   PK_PRIVATE=1
-};
+enum public_key_type {
+   /* Refers to the public key */
+   PK_PUBLIC      = 0x0000,
+   /* Refers to the private key */
+   PK_PRIVATE     = 0x0001,
 
-/* Indicates standard output formats that can be read e.g. by OpenSSL or GnuTLS */
-#define PK_STD          0x1000
-/* Indicates compressed public ECC key */
-#define PK_COMPRESSED   0x2000
-/* Indicates ECC key with the curve specified by OID */
-#define PK_CURVEOID     0x4000
+   /* Indicates standard output formats that can be read e.g. by OpenSSL or GnuTLS */
+   PK_STD         = 0x1000,
+   /* Indicates compressed public ECC key */
+   PK_COMPRESSED  = 0x2000,
+   /* Indicates ECC key with the curve specified by OID */
+   PK_CURVEOID    = 0x4000
+};
 
 int rand_prime(void *N, long len, prng_state *prng, int wprng);
 
@@ -605,7 +607,7 @@ typedef struct ltc_asn1_list_ {
    /** Flag used to indicate optional items in ASN.1 sequences */
    int           optional;
    /** ASN.1 identifier */
-   ltc_asn1_class class;
+   ltc_asn1_class klass;
    ltc_asn1_pc    pc;
    ulong64        tag;
    /** prev/next entry in the list */
@@ -621,7 +623,7 @@ typedef struct ltc_asn1_list_ {
       LTC_MACRO_list[LTC_MACRO_temp].size = (Size);  \
       LTC_MACRO_list[LTC_MACRO_temp].used = 0;       \
       LTC_MACRO_list[LTC_MACRO_temp].optional = 0;   \
-      LTC_MACRO_list[LTC_MACRO_temp].class = 0;      \
+      LTC_MACRO_list[LTC_MACRO_temp].klass = 0;      \
       LTC_MACRO_list[LTC_MACRO_temp].pc = 0;         \
       LTC_MACRO_list[LTC_MACRO_temp].tag = 0;        \
    } while (0)
@@ -631,7 +633,7 @@ typedef struct ltc_asn1_list_ {
       int LTC_MACRO_temp            = (index);                    \
       ltc_asn1_list *LTC_MACRO_list = (list);                     \
       LTC_MACRO_list[LTC_MACRO_temp].type = LTC_ASN1_CUSTOM_TYPE; \
-      LTC_MACRO_list[LTC_MACRO_temp].class = (Class);             \
+      LTC_MACRO_list[LTC_MACRO_temp].klass = (Class);             \
       LTC_MACRO_list[LTC_MACRO_temp].pc = (Pc);                   \
       LTC_MACRO_list[LTC_MACRO_temp].tag = (Tag);                 \
    } while (0)
@@ -907,12 +909,12 @@ int der_length_generalizedtime(ltc_generalizedtime *gtime, unsigned long *outlen
 /* internal helper functions */
 /* SUBJECT PUBLIC KEY INFO */
 int x509_encode_subject_public_key_info(unsigned char *out, unsigned long *outlen,
-        unsigned int algorithm, void* public_key, unsigned long public_key_len,
-        unsigned long parameters_type, void* parameters, unsigned long parameters_len);
+        unsigned int algorithm, const void* public_key, unsigned long public_key_len,
+        ltc_asn1_type parameters_type, ltc_asn1_list* parameters, unsigned long parameters_len);
 
 int x509_decode_subject_public_key_info(const unsigned char *in, unsigned long inlen,
         unsigned int algorithm, void* public_key, unsigned long* public_key_len,
-        unsigned long parameters_type, void* parameters, unsigned long *parameters_len);
+        ltc_asn1_type parameters_type, ltc_asn1_list* parameters, unsigned long *parameters_len);
 #endif /* LTC_SOURCE */
 
 #endif
