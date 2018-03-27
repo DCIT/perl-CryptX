@@ -10,23 +10,27 @@
 /* ---- LTC_BASE64 Routines ---- */
 #ifdef LTC_BASE64
 int base64_encode(const unsigned char *in,  unsigned long len,
-                        unsigned char *out, unsigned long *outlen);
+                                 char *out, unsigned long *outlen);
 
-int base64_decode(const unsigned char *in,  unsigned long len,
+int base64_decode(const char *in,  unsigned long len,
                         unsigned char *out, unsigned long *outlen);
-int base64_strict_decode(const unsigned char *in,  unsigned long len,
+int base64_strict_decode(const char *in,  unsigned long len,
+                        unsigned char *out, unsigned long *outlen);
+int base64_sane_decode(const char *in,  unsigned long inlen,
                         unsigned char *out, unsigned long *outlen);
 #endif
 
 #ifdef LTC_BASE64_URL
 int base64url_encode(const unsigned char *in,  unsigned long len,
-                        unsigned char *out, unsigned long *outlen);
+                                    char *out, unsigned long *outlen);
 int base64url_strict_encode(const unsigned char *in,  unsigned long inlen,
-                        unsigned char *out, unsigned long *outlen);
+                                           char *out, unsigned long *outlen);
 
-int base64url_decode(const unsigned char *in,  unsigned long len,
+int base64url_decode(const char *in,  unsigned long len,
                         unsigned char *out, unsigned long *outlen);
-int base64url_strict_decode(const unsigned char *in,  unsigned long len,
+int base64url_strict_decode(const char *in,  unsigned long len,
+                        unsigned char *out, unsigned long *outlen);
+int base64url_sane_decode(const char *in,  unsigned long inlen,
                         unsigned char *out, unsigned long *outlen);
 #endif
 
@@ -51,7 +55,7 @@ int base32_decode(const          char *in,  unsigned long inlen,
 int base16_encode(const unsigned char *in,  unsigned long  inlen,
                                  char *out, unsigned long *outlen,
                                  int  caps);
-int base16_decode(const          char *in,
+int base16_decode(const          char *in,  unsigned long  inlen,
                         unsigned char *out, unsigned long *outlen);
 #endif
 

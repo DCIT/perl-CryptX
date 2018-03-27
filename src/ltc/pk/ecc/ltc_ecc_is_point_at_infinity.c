@@ -15,16 +15,22 @@
  * a point at infinity is any point (x,y,0) such that y^2 == x^3, except (0,0,0)
  */
 
-int ltc_ecc_is_point_at_infinity(const ecc_point *P, void *modulus)
+int ltc_ecc_is_point_at_infinity(const ecc_point *P, void *modulus, int *retval)
 {
-   int err, retval = 0;
+   int err;
    void  *x3, *y2;
 
    /* trivial case */
-   if (!mp_iszero(P->z))                                         goto done;
+   if (!mp_iszero(P->z)) {
+      *retval = 0;
+      return CRYPT_OK;
+   }
 
    /* point (0,0,0) is not at infinity */
-   if (mp_iszero(P->x) && mp_iszero(P->y))                       goto done;
+   if (mp_iszero(P->x) && mp_iszero(P->y)) {
+      *retval = 0;
+      return CRYPT_OK;
+   }
 
    /* initialize */
    if ((err = mp_init_multi(&x3, &y2, NULL))      != CRYPT_OK)   goto done;
@@ -37,12 +43,16 @@ int ltc_ecc_is_point_at_infinity(const ecc_point *P, void *modulus)
    if ((err = mp_mulmod(P->x, x3, modulus, x3))   != CRYPT_OK)   goto cleanup;
 
    /* test y^2 == x^3 */
-   if ((mp_cmp(x3, y2) == LTC_MP_EQ) && !mp_iszero(y2)) retval = 1;
+   err = CRYPT_OK;
+   if ((mp_cmp(x3, y2) == LTC_MP_EQ) && !mp_iszero(y2))
+      *retval = 1;
+   else
+      *retval = 0;
 
 cleanup:
    mp_clear_multi(x3, y2, NULL);
 done:
-   return retval;
+   return err;
 }
 
 #endif

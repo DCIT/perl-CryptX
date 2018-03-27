@@ -102,8 +102,8 @@ ltc/pk/dsa/dsa_generate_pqg.o ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_make_key.o 
 ltc/pk/dsa/dsa_set_pqg_dsaparam.o ltc/pk/dsa/dsa_shared_secret.o ltc/pk/dsa/dsa_sign_hash.o \
 ltc/pk/dsa/dsa_verify_hash.o ltc/pk/dsa/dsa_verify_key.o ltc/pk/ecc/ecc.o ltc/pk/ecc/ecc_ansi_x963_export.o \
 ltc/pk/ecc/ecc_ansi_x963_import.o ltc/pk/ecc/ecc_decrypt_key.o ltc/pk/ecc/ecc_encrypt_key.o \
-ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_key.o \
-ltc/pk/ecc/ecc_get_set.o ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o ltc/pk/ecc/ecc_import_openssl.o \
+ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_curve_by_name.o \
+ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o ltc/pk/ecc/ecc_import_openssl.o \
 ltc/pk/ecc/ecc_import_pkcs8.o ltc/pk/ecc/ecc_import_x509.o ltc/pk/ecc/ecc_make_key.o \
 ltc/pk/ecc/ecc_set_dp.o ltc/pk/ecc/ecc_set_dp_internal.o ltc/pk/ecc/ecc_set_key.o \
 ltc/pk/ecc/ecc_shared_secret.o ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sizes.o \

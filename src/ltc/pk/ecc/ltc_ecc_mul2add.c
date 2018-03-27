@@ -163,9 +163,7 @@ int ltc_ecc_mul2add(const ecc_point *A, void *kA,
         if (first == 1) {
            /* if first, copy from table */
            first = 0;
-           if ((err = mp_copy(precomp[nA + (nB<<2)]->x, C->x)) != CRYPT_OK)           { goto ERR_MU; }
-           if ((err = mp_copy(precomp[nA + (nB<<2)]->y, C->y)) != CRYPT_OK)           { goto ERR_MU; }
-           if ((err = mp_copy(precomp[nA + (nB<<2)]->z, C->z)) != CRYPT_OK)           { goto ERR_MU; }
+           if ((err = ltc_ecc_copy_point(precomp[nA + (nB<<2)], C)) != CRYPT_OK)      { goto ERR_MU; }
         } else {
            /* if not first, add from table */
            if ((err = ltc_mp.ecc_ptadd(C, precomp[nA + (nB<<2)], C, ma, modulus, mp)) != CRYPT_OK) { goto ERR_MU; }

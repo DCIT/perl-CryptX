@@ -23,14 +23,12 @@
 void ecc_free(ecc_key *key)
 {
    LTC_ARGCHKVD(key != NULL);
-   /* clean dp */
+
    mp_cleanup_multi(&key->dp.prime, &key->dp.order,
                     &key->dp.A, &key->dp.B,
                     &key->dp.base.x, &key->dp.base.y, &key->dp.base.z,
-                    NULL);
-
-   /* clean key */
-   mp_cleanup_multi(&key->pubkey.x, &key->pubkey.y, &key->pubkey.z, &key->k, NULL);
+                    &key->pubkey.x, &key->pubkey.y, &key->pubkey.z,
+                    &key->k, NULL);
 }
 
 #endif

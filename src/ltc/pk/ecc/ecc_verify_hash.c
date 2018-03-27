@@ -109,12 +109,8 @@ static int _ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
    if ((err = mp_mulmod(r, w, p, u2)) != CRYPT_OK)                                                      { goto error; }
 
    /* find mG and mQ */
-   if ((err = mp_copy(key->dp.base.x, mG->x)) != CRYPT_OK)                                              { goto error; }
-   if ((err = mp_copy(key->dp.base.y, mG->y)) != CRYPT_OK)                                              { goto error; }
-   if ((err = mp_copy(key->dp.base.z, mG->z)) != CRYPT_OK)                                              { goto error; }
-   if ((err = mp_copy(key->pubkey.x, mQ->x)) != CRYPT_OK)                                               { goto error; }
-   if ((err = mp_copy(key->pubkey.y, mQ->y)) != CRYPT_OK)                                               { goto error; }
-   if ((err = mp_copy(key->pubkey.z, mQ->z)) != CRYPT_OK)                                               { goto error; }
+   if ((err = ltc_ecc_copy_point(&key->dp.base, mG)) != CRYPT_OK)                                       { goto error; }
+   if ((err = ltc_ecc_copy_point(&key->pubkey, mQ)) != CRYPT_OK)                                        { goto error; }
 
    /* find the montgomery mp */
    if ((err = mp_montgomery_setup(m, &mp)) != CRYPT_OK)                                                 { goto error; }

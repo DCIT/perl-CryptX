@@ -259,7 +259,7 @@ int dh_check_pubkey(dh_key *key);
 /** Structure defines a GF(p) curve */
 typedef struct {
    /** name of curve */
-   const char *name;
+   const char *names[6];
 
    /** The prime that defines the field the curve is in (encoded in hex) */
    const char *prime;
@@ -285,7 +285,7 @@ typedef struct {
    /** The OID */
    unsigned long oid[16];
    unsigned long oidlen;
-} ltc_ecc_set_type;
+} ltc_ecc_curve;
 
 /** A point on a ECC curve, stored in Jacbobian format such that (x,y,z) => (x/z^2, y/z^3, 1) when interpretted as affine */
 typedef struct {
@@ -336,29 +336,29 @@ typedef struct {
 } ecc_key;
 
 /** the ECC params provided */
-extern const ltc_ecc_set_type ltc_ecc_sets[];
+extern const ltc_ecc_curve ltc_ecc_curves[];
 
 int  ecc_test(void);
 void ecc_sizes(int *low, int *high);
 int  ecc_get_size(ecc_key *key);
 
-int  ecc_get_set_by_name(const char* name, const ltc_ecc_set_type** dp);
-int  ecc_set_dp(const ltc_ecc_set_type *set, ecc_key *key);
+int  ecc_get_curve_by_name(const char* name, const ltc_ecc_curve** cu);
+int  ecc_set_dp(const ltc_ecc_curve *cu, ecc_key *key);
 int  ecc_generate_key(prng_state *prng, int wprng, ecc_key *key);
 int  ecc_set_key(const unsigned char *in, unsigned long inlen, int type, ecc_key *key);
 int  ecc_get_key(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
 
 int  ecc_make_key(prng_state *prng, int wprng, int keysize, ecc_key *key);
-int  ecc_make_key_ex(prng_state *prng, int wprng, ecc_key *key, const ltc_ecc_set_type *dp);
+int  ecc_make_key_ex(prng_state *prng, int wprng, ecc_key *key, const ltc_ecc_curve *cu);
 void ecc_free(ecc_key *key);
 
 int  ecc_export(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
 int  ecc_import(const unsigned char *in, unsigned long inlen, ecc_key *key);
-int  ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_set_type *dp);
+int  ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_curve *cu);
 
 int ecc_ansi_x963_export(ecc_key *key, unsigned char *out, unsigned long *outlen);
 int ecc_ansi_x963_import(const unsigned char *in, unsigned long inlen, ecc_key *key);
-int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_set_type *dp);
+int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_curve *cu);
 
 int ecc_export_openssl(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
 int ecc_import_openssl(const unsigned char *in, unsigned long inlen, ecc_key *key);
@@ -397,16 +397,18 @@ int  ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
 #ifdef LTC_SOURCE
 /* INTERNAL ONLY - it should be later moved to src/headers/tomcrypt_internal.h */
 
-int ecc_set_dp_bn(void *a, void *b, void *prime, void *order, void *gx, void *gy, unsigned long cofactor, ecc_key *key);
-int ecc_set_dp_oid(unsigned long *oid, unsigned long oidsize, ecc_key *key);
-int ecc_set_dp_copy(ecc_key *srckey, ecc_key *key);
-int ecc_set_dp_size(int size, ecc_key *key);
+int ecc_set_dp_from_mpis(void *a, void *b, void *prime, void *order, void *gx, void *gy, unsigned long cofactor, ecc_key *key);
+int ecc_set_dp_by_oid(unsigned long *oid, unsigned long oidsize, ecc_key *key);
+int ecc_copy_dp(const ecc_key *srckey, ecc_key *key);
+int ecc_set_dp_by_size(int size, ecc_key *key);
 
 /* low level functions */
 ecc_point *ltc_ecc_new_point(void);
 void       ltc_ecc_del_point(ecc_point *p);
+int        ltc_ecc_set_point_xyz(ltc_mp_digit x, ltc_mp_digit y, ltc_mp_digit z, ecc_point *p);
+int        ltc_ecc_copy_point(const ecc_point *src, ecc_point *dst);
 int        ltc_ecc_is_point(const ltc_ecc_dp *dp, void *x, void *y);
-int        ltc_ecc_is_point_at_infinity(const ecc_point *p, void *modulus);
+int        ltc_ecc_is_point_at_infinity(const ecc_point *P, void *modulus, int *retval);
 int        ltc_ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y);
 int        ltc_ecc_export_point(unsigned char *out, unsigned long *outlen, void *x, void *y, unsigned long size, int compressed);
 int        ltc_ecc_verify_key(ecc_key *key);

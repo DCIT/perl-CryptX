@@ -31,7 +31,7 @@
 int ltc_ecc_mulmod(void *k, const ecc_point *G, ecc_point *R, void *a, void *modulus, int map)
 {
    ecc_point *tG, *M[3];
-   int        i, j, err;
+   int        i, j, err, inf;
    void       *mp = NULL, *mu = NULL, *ma = NULL, *a_plus3 = NULL;
    ltc_mp_digit buf;
    int        bitcnt, mode, digidx;
@@ -41,12 +41,10 @@ int ltc_ecc_mulmod(void *k, const ecc_point *G, ecc_point *R, void *a, void *mod
    LTC_ARGCHK(R       != NULL);
    LTC_ARGCHK(modulus != NULL);
 
-   if (ltc_ecc_is_point_at_infinity(G, modulus)) {
+   if ((err = ltc_ecc_is_point_at_infinity(G, modulus, &inf)) != CRYPT_OK) return err;
+   if (inf) {
       /* return the point at infinity */
-      if ((err = mp_set(R->x, 1)) != CRYPT_OK) { return err; }
-      if ((err = mp_set(R->y, 1)) != CRYPT_OK) { return err; }
-      if ((err = mp_set(R->z, 0)) != CRYPT_OK) { return err; }
-      return CRYPT_OK;
+      return ltc_ecc_set_point_xyz(1, 1, 0, R);
    }
 
    /* init montgomery reduction */
@@ -88,9 +86,7 @@ int ltc_ecc_mulmod(void *k, const ecc_point *G, ecc_point *R, void *a, void *mod
 
    /* calc the M tab */
    /* M[0] == G */
-   if ((err = mp_copy(tG->x, M[0]->x)) != CRYPT_OK)                                  { goto done; }
-   if ((err = mp_copy(tG->y, M[0]->y)) != CRYPT_OK)                                  { goto done; }
-   if ((err = mp_copy(tG->z, M[0]->z)) != CRYPT_OK)                                  { goto done; }
+   if ((err = ltc_ecc_copy_point(tG, M[0])) != CRYPT_OK)                             { goto done; }
    /* M[1] == 2G */
    if ((err = ltc_mp.ecc_ptdbl(tG, M[1], ma, modulus, mp)) != CRYPT_OK)              { goto done; }
 
@@ -136,9 +132,7 @@ int ltc_ecc_mulmod(void *k, const ecc_point *G, ecc_point *R, void *a, void *mod
    }
 
    /* copy result out */
-   if ((err = mp_copy(M[0]->x, R->x)) != CRYPT_OK)                                   { goto done; }
-   if ((err = mp_copy(M[0]->y, R->y)) != CRYPT_OK)                                   { goto done; }
-   if ((err = mp_copy(M[0]->z, R->z)) != CRYPT_OK)                                   { goto done; }
+   if ((err = ltc_ecc_copy_point(M[0], R)) != CRYPT_OK)                              { goto done; }
 
    /* map R back from projective space */
    if (map) {

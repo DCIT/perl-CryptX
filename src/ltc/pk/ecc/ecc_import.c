@@ -33,10 +33,10 @@ int ecc_import(const unsigned char *in, unsigned long inlen, ecc_key *key)
   @param in      The packet to import
   @param inlen   The length of the packet
   @param key     [out] The destination of the import
-  @param dp      pointer to user supplied params; must be the same as the params used when exporting
+  @param cu      pointer to user supplied params; must be the same as the params used when exporting
   @return CRYPT_OK if successful, upon error all allocated memory will be freed
 */
-int ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_set_type *dp)
+int ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_curve *cu)
 {
    unsigned long key_size;
    unsigned char flags[1];
@@ -55,10 +55,10 @@ int ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, co
    }
 
    /* allocate & initialize the key */
-   if (dp == NULL) {
-      if ((err = ecc_set_dp_size(key_size, key)) != CRYPT_OK)   { goto done; }
+   if (cu == NULL) {
+      if ((err = ecc_set_dp_by_size(key_size, key)) != CRYPT_OK) { goto done; }
    } else {
-      if ((err = ecc_set_dp(dp, key)) != CRYPT_OK)              { goto done; }
+      if ((err = ecc_set_dp(cu, key)) != CRYPT_OK)               { goto done; }
    }
 
    if (flags[0] == 1) {

@@ -500,7 +500,7 @@ int ecc_import_pkcs8(const unsigned char *in, unsigned long inlen,
              * 23:d=1  hl=2 l=  77 prim:   OCTET STRING   :bytes (== privatekey)
              */
             ltc_asn1_list *loid = lseq->child->next;
-            if ((err = ecc_set_dp_oid(loid->data, loid->size, key)) != CRYPT_OK) {
+            if ((err = ecc_set_dp_by_oid(loid->data, loid->size, key)) != CRYPT_OK) {
                goto LBL_DONE;
             }
          }
@@ -553,7 +553,7 @@ int ecc_import_pkcs8(const unsigned char *in, unsigned long inlen,
                   if ((err = ltc_ecc_import_point(lg->data, lg->size, lprime->data, a, b, gx, gy)) != CRYPT_OK) {
                      goto LBL_DONE;
                   }
-                  if ((err = ecc_set_dp_bn(a, b, lprime->data, lorder->data, gx, gy, cofactor, key)) != CRYPT_OK) {
+                  if ((err = ecc_set_dp_from_mpis(a, b, lprime->data, lorder->data, gx, gy, cofactor, key)) != CRYPT_OK) {
                      goto LBL_DONE;
                   }
                }

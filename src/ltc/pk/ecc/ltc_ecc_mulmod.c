@@ -32,7 +32,7 @@
 int ltc_ecc_mulmod(void *k, const ecc_point *G, ecc_point *R, void *a, void *modulus, int map)
 {
    ecc_point *tG, *M[8];
-   int        i, j, err;
+   int        i, j, err, inf;
    void       *mp = NULL, *mu = NULL, *ma = NULL, *a_plus3 = NULL;
    ltc_mp_digit buf;
    int        first, bitbuf, bitcpy, bitcnt, mode, digidx;
@@ -42,12 +42,10 @@ int ltc_ecc_mulmod(void *k, const ecc_point *G, ecc_point *R, void *a, void *mod
    LTC_ARGCHK(R       != NULL);
    LTC_ARGCHK(modulus != NULL);
 
-   if (ltc_ecc_is_point_at_infinity(G, modulus)) {
+   if ((err = ltc_ecc_is_point_at_infinity(G, modulus, &inf)) != CRYPT_OK) return err;
+   if (inf) {
       /* return the point at infinity */
-      if ((err = mp_set(R->x, 1)) != CRYPT_OK) { return err; }
-      if ((err = mp_set(R->y, 1)) != CRYPT_OK) { return err; }
-      if ((err = mp_set(R->z, 0)) != CRYPT_OK) { return err; }
-      return CRYPT_OK;
+      return ltc_ecc_set_point_xyz(1, 1, 0, R);
    }
 
    /* init montgomery reduction */
@@ -81,9 +79,7 @@ int ltc_ecc_mulmod(void *k, const ecc_point *G, ecc_point *R, void *a, void *mod
 
    /* tG = G  and convert to montgomery */
    if (mp_cmp_d(mu, 1) == LTC_MP_EQ) {
-      if ((err = mp_copy(G->x, tG->x)) != CRYPT_OK)                                  { goto done; }
-      if ((err = mp_copy(G->y, tG->y)) != CRYPT_OK)                                  { goto done; }
-      if ((err = mp_copy(G->z, tG->z)) != CRYPT_OK)                                  { goto done; }
+      if ((err = ltc_ecc_copy_point(G, tG)) != CRYPT_OK)                             { goto done; }
    } else {
       if ((err = mp_mulmod(G->x, mu, modulus, tG->x)) != CRYPT_OK)                   { goto done; }
       if ((err = mp_mulmod(G->y, mu, modulus, tG->y)) != CRYPT_OK)                   { goto done; }
@@ -146,9 +142,7 @@ int ltc_ecc_mulmod(void *k, const ecc_point *G, ecc_point *R, void *a, void *mod
        /* if this is the first window we do a simple copy */
        if (first == 1) {
           /* R = kG [k = first window] */
-          if ((err = mp_copy(M[bitbuf-8]->x, R->x)) != CRYPT_OK)                     { goto done; }
-          if ((err = mp_copy(M[bitbuf-8]->y, R->y)) != CRYPT_OK)                     { goto done; }
-          if ((err = mp_copy(M[bitbuf-8]->z, R->z)) != CRYPT_OK)                     { goto done; }
+          if ((err = ltc_ecc_copy_point(M[bitbuf-8], R)) != CRYPT_OK)                { goto done; }
           first = 0;
        } else {
          /* normal window */
@@ -180,9 +174,7 @@ int ltc_ecc_mulmod(void *k, const ecc_point *G, ecc_point *R, void *a, void *mod
        if ((bitbuf & (1 << WINSIZE)) != 0) {
          if (first == 1){
             /* first add, so copy */
-            if ((err = mp_copy(tG->x, R->x)) != CRYPT_OK)                           { goto done; }
-            if ((err = mp_copy(tG->y, R->y)) != CRYPT_OK)                           { goto done; }
-            if ((err = mp_copy(tG->z, R->z)) != CRYPT_OK)                           { goto done; }
+            if ((err = ltc_ecc_copy_point(tG, R)) != CRYPT_OK)                      { goto done; }
             first = 0;
          } else {
             /* then add */

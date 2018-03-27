@@ -26,7 +26,7 @@ int ecc_ansi_x963_import(const unsigned char *in, unsigned long inlen, ecc_key *
    return ecc_ansi_x963_import_ex(in, inlen, key, NULL);
 }
 
-int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_set_type *dp)
+int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_curve *cu)
 {
    int err;
 
@@ -39,13 +39,13 @@ int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_ke
    }
 
    /* initialize key->dp */
-   if (dp == NULL) {
+   if (cu == NULL) {
       /* this case works only for uncompressed public keys  */
-      if ((err = ecc_set_dp_size((inlen-1)>>1, key)) != CRYPT_OK)                   { return err; }
+      if ((err = ecc_set_dp_by_size((inlen-1)>>1, key)) != CRYPT_OK)                { return err; }
    }
    else {
       /* this one works for both compressed / uncompressed pubkeys */
-      if ((err = ecc_set_dp(dp, key)) != CRYPT_OK)                                  { return err; }
+      if ((err = ecc_set_dp(cu, key)) != CRYPT_OK)                                  { return err; }
    }
 
    /* load public key */

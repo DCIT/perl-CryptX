@@ -21,7 +21,7 @@
 
 int ltc_ecc_verify_key(ecc_key *key)
 {
-   int err;
+   int err, inf;
    void *prime = NULL;
    void *order = NULL;
    void *a = NULL;
@@ -52,7 +52,8 @@ int ltc_ecc_verify_key(ecc_key *key)
    point = ltc_ecc_new_point();
    if ((err = ltc_ecc_mulmod(order, &(key->pubkey), point, a, prime, 1)) != CRYPT_OK)     { goto done1; }
 
-   if (ltc_ecc_is_point_at_infinity(point, prime)) {
+   err = ltc_ecc_is_point_at_infinity(point, prime, &inf);
+   if (err != CRYPT_OK || inf) {
       err = CRYPT_ERROR;
    }
    else {

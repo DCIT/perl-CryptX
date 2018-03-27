@@ -262,30 +262,30 @@ void _ecc_oid_lookup(ecc_key *key)
    int err;
    unsigned i;
    void *tmp;
-   const ltc_ecc_set_type *set;
+   const ltc_ecc_curve *cu;
 
    key->dp.oidlen = 0;
    if ((err = ltc_mp.init(&tmp)) != CRYPT_OK) return;
-   for (set = ltc_ecc_sets; set->name != NULL; set++) {
-      if ((err = mp_read_radix(tmp, set->prime, 16)) != CRYPT_OK) continue;
+   for (cu = ltc_ecc_curves; cu->prime != NULL; cu++) {
+      if ((err = mp_read_radix(tmp, cu->prime, 16)) != CRYPT_OK) continue;
       if ((mp_cmp(tmp, key->dp.prime) != LTC_MP_EQ))              continue;
-      if ((err = mp_read_radix(tmp, set->order, 16)) != CRYPT_OK) continue;
+      if ((err = mp_read_radix(tmp, cu->order, 16)) != CRYPT_OK) continue;
       if ((mp_cmp(tmp, key->dp.order) != LTC_MP_EQ))              continue;
-      if ((err = mp_read_radix(tmp, set->A,     16)) != CRYPT_OK) continue;
+      if ((err = mp_read_radix(tmp, cu->A,     16)) != CRYPT_OK) continue;
       if ((mp_cmp(tmp, key->dp.A) != LTC_MP_EQ))                  continue;
-      if ((err = mp_read_radix(tmp, set->B,     16)) != CRYPT_OK) continue;
+      if ((err = mp_read_radix(tmp, cu->B,     16)) != CRYPT_OK) continue;
       if ((mp_cmp(tmp, key->dp.B) != LTC_MP_EQ))                  continue;
-      if ((err = mp_read_radix(tmp, set->Gx,    16)) != CRYPT_OK) continue;
+      if ((err = mp_read_radix(tmp, cu->Gx,    16)) != CRYPT_OK) continue;
       if ((mp_cmp(tmp, key->dp.base.x) != LTC_MP_EQ))             continue;
-      if ((err = mp_read_radix(tmp, set->Gy,    16)) != CRYPT_OK) continue;
+      if ((err = mp_read_radix(tmp, cu->Gy,    16)) != CRYPT_OK) continue;
       if ((mp_cmp(tmp, key->dp.base.y) != LTC_MP_EQ))             continue;
-      if (key->dp.cofactor != set->cofactor)                      continue;
+      if (key->dp.cofactor != cu->cofactor)                      continue;
       break; /* found */
    }
    ltc_mp.deinit(tmp);
-   if (set->name != NULL) {
-     key->dp.oidlen = set->oidlen;
-     for(i = 0; i < set->oidlen; i++) key->dp.oid[i] = set->oid[i];
+   if (cu->prime != NULL) {
+     key->dp.oidlen = cu->oidlen;
+     for(i = 0; i < cu->oidlen; i++) key->dp.oid[i] = cu->oid[i];
    }
 }
 
@@ -330,14 +330,14 @@ int _ecc_set_dp_from_SV(ecc_key *key, SV *curve)
 
   if (SvPOK(sv_crv)) {
     /* string - curve name */
-    const ltc_ecc_set_type *dp;
+    const ltc_ecc_curve *cu;
     ch_name = SvPV(sv_crv, l_name);
-    if (ecc_get_set_by_name(ch_name, &dp) != CRYPT_OK) croak("FATAL: ecparams: unknown curve '%s'", ch_name);
-    return ecc_set_dp(dp, key);
+    if (ecc_get_curve_by_name(ch_name, &cu) != CRYPT_OK) croak("FATAL: ecparams: unknown curve '%s'", ch_name);
+    return ecc_set_dp(cu, key);
   }
   else {
     /* hashref */
-    ltc_ecc_set_type set = { 0 };
+    ltc_ecc_curve cu = { 0 };
 
     if ((h = (HV*)(SvRV(sv_crv))) == NULL) croak("FATAL: ecparams: param is not valid hashref");
 
@@ -357,15 +357,14 @@ int _ecc_set_dp_from_SV(ecc_key *key, SV *curve)
     if (!SvOK(*sv_Gy      )) croak("FATAL: ecparams: undefined param Gy");
     if (!SvOK(*sv_cofactor)) croak("FATAL: ecparams: undefined param cofactor");
 
-    set.prime    = SvPV_nolen(*sv_prime);
-    set.A        = SvPV_nolen(*sv_A);
-    set.B        = SvPV_nolen(*sv_B);
-    set.order    = SvPV_nolen(*sv_order);
-    set.Gx       = SvPV_nolen(*sv_Gx);
-    set.Gy       = SvPV_nolen(*sv_Gy);
-    set.cofactor = (unsigned long)SvUV(*sv_cofactor),
-    set.name     = NULL;
-    set.oidlen   = 0;
+    cu.prime    = SvPV_nolen(*sv_prime);
+    cu.A        = SvPV_nolen(*sv_A);
+    cu.B        = SvPV_nolen(*sv_B);
+    cu.order    = SvPV_nolen(*sv_order);
+    cu.Gx       = SvPV_nolen(*sv_Gx);
+    cu.Gy       = SvPV_nolen(*sv_Gy);
+    cu.cofactor = (unsigned long)SvUV(*sv_cofactor),
+    cu.oidlen   = 0;
 
     sv_oid = hv_fetchs(h, "oid", 0);
     if (sv_oid && SvPOK(*sv_oid)) {
@@ -375,17 +374,17 @@ int _ecc_set_dp_from_SV(ecc_key *key, SV *curve)
           if (++j >= 16) return CRYPT_ERROR;
         }
         else if(ch_name[i] >= '0' && ch_name[i] <= '9') {
-          set.oid[j] = set.oid[j] * 10 + (ch_name[i] - '0');
+          cu.oid[j] = cu.oid[j] * 10 + (ch_name[i] - '0');
         }
         else {
           return CRYPT_ERROR;
         }
       }
       if (j == 0) return CRYPT_ERROR;
-      set.oidlen = j + 1;
+      cu.oidlen = j + 1;
     }
 
-    if ((err = ecc_set_dp(&set, key)) != CRYPT_OK) return err;
+    if ((err = ecc_set_dp(&cu, key)) != CRYPT_OK) return err;
     if (key->dp.oidlen == 0) _ecc_oid_lookup(key);
     return CRYPT_OK;
   }
@@ -533,7 +532,7 @@ encode_b64(SV * in)
             SvREFCNT_dec(RETVAL);
             XSRETURN_UNDEF;
           }
-          SvCUR_set(RETVAL, out_len);
+          SvCUR_set(RETVAL, strlen(out_data));
         }
     }
     OUTPUT:
@@ -561,9 +560,9 @@ decode_b64(SV * in)
           SvPOK_only(RETVAL);
           out_data = (unsigned char *)SvPVX(RETVAL);
           if (ix == 1)
-            rv = base64url_decode(in_data, (unsigned long)in_len, out_data, &out_len);
+            rv = base64url_sane_decode(in_data, (unsigned long)in_len, out_data, &out_len);
           else
-            rv = base64_decode(in_data, (unsigned long)in_len, out_data, &out_len);
+            rv = base64_sane_decode(in_data, (unsigned long)in_len, out_data, &out_len);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             XSRETURN_UNDEF;
@@ -586,7 +585,7 @@ encode_b32r(SV *in)
         unsigned long out_len;
         unsigned char *in_data;
         char *out_data;
-        int id = -1;
+        int id = -1, err;
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
         if (ix == 0) id = BASE32_RFC4648;
@@ -599,15 +598,16 @@ encode_b32r(SV *in)
           RETVAL = newSVpvn("", 0);
         }
         else {
-          out_len = (unsigned long)((8 * in_len + 4) / 5);
+          out_len = (unsigned long)((8 * in_len + 4) / 5 + 1);
           RETVAL = NEWSV(0, out_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           out_data = SvPVX(RETVAL);
-          if (base32_encode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
+          err = base32_encode(in_data, (unsigned long)in_len, out_data, &out_len, id);
+          if (err != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             XSRETURN_UNDEF;
           }
-          SvCUR_set(RETVAL, out_len);
+          SvCUR_set(RETVAL, strlen(out_data));
         }
     }
     OUTPUT:
@@ -625,7 +625,7 @@ decode_b32r(SV *in)
         unsigned long out_len;
         unsigned char *out_data;
         char *in_data;
-        int id = -1;
+        int id = -1, err;
 
         if (!SvPOK(in)) XSRETURN_UNDEF;
         if (ix == 0) id = BASE32_RFC4648;
@@ -642,7 +642,8 @@ decode_b32r(SV *in)
           RETVAL = NEWSV(0, out_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base32_decode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
+          err = base32_decode(in_data, (unsigned long)in_len, out_data, &out_len, id);
+          if (err != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             XSRETURN_UNDEF;
           }
