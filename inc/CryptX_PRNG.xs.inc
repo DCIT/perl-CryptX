@@ -124,12 +124,13 @@ bytes(Crypt::PRNG self, unsigned long output_len)
             if (tmp == NULL) croak("FATAL: Newz failed");
             rv_len = (self->desc->read)(tmp, (unsigned long)output_len, &self->state);
             if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
-            RETVAL = NEWSV(0, output_len * 2); /* avoid zero! */
+            RETVAL = NEWSV(0, output_len * 2 + 1); /* avoid zero! */
             SvPOK_only(RETVAL);
-            SvCUR_set(RETVAL, output_len * 2);
+            SvCUR_set(RETVAL, output_len * 2 + 1);
             rdata = (unsigned char *)SvPVX(RETVAL);
-            len = output_len * 2;
-            rv = _base16_encode(tmp, output_len, rdata, &len);
+            len = output_len * 2 + 1;
+            rv = base16_encode(tmp, output_len, rdata, &len, 0);
+            SvCUR_set(RETVAL, len);
             Safefree(tmp);
             if (rv != CRYPT_OK) {
               SvREFCNT_dec(RETVAL);

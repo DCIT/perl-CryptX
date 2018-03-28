@@ -177,25 +177,6 @@ int mp_tohex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
   return MP_OKAY;
 }
 
-int _base16_encode(const unsigned char *in, unsigned long inlen, unsigned char *out, unsigned long *outlen)
-{
-   unsigned long i;
-   const char alphabet[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
-
-   if (*outlen < inlen * 2) {
-      *outlen = inlen * 2;
-      return CRYPT_BUFFER_OVERFLOW;
-   }
-
-   for (i = 0; i < inlen; i++) {
-     out[i*2]   = (unsigned char)alphabet[in[i] >> 4];
-     out[i*2+1] = (unsigned char)alphabet[in[i] & 0xF];
-   }
-
-   *outlen = inlen * 2;
-   return CRYPT_OK;
-}
-
 size_t _find_start(const char *name, char *ltcname, size_t ltclen)
 {
    size_t i, start = 0;
@@ -268,17 +249,17 @@ void _ecc_oid_lookup(ecc_key *key)
    if ((err = ltc_mp.init(&tmp)) != CRYPT_OK) return;
    for (cu = ltc_ecc_curves; cu->prime != NULL; cu++) {
       if ((err = mp_read_radix(tmp, cu->prime, 16)) != CRYPT_OK) continue;
-      if ((mp_cmp(tmp, key->dp.prime) != LTC_MP_EQ))              continue;
+      if ((mp_cmp(tmp, key->dp.prime) != LTC_MP_EQ))             continue;
       if ((err = mp_read_radix(tmp, cu->order, 16)) != CRYPT_OK) continue;
-      if ((mp_cmp(tmp, key->dp.order) != LTC_MP_EQ))              continue;
+      if ((mp_cmp(tmp, key->dp.order) != LTC_MP_EQ))             continue;
       if ((err = mp_read_radix(tmp, cu->A,     16)) != CRYPT_OK) continue;
-      if ((mp_cmp(tmp, key->dp.A) != LTC_MP_EQ))                  continue;
+      if ((mp_cmp(tmp, key->dp.A) != LTC_MP_EQ))                 continue;
       if ((err = mp_read_radix(tmp, cu->B,     16)) != CRYPT_OK) continue;
-      if ((mp_cmp(tmp, key->dp.B) != LTC_MP_EQ))                  continue;
+      if ((mp_cmp(tmp, key->dp.B) != LTC_MP_EQ))                 continue;
       if ((err = mp_read_radix(tmp, cu->Gx,    16)) != CRYPT_OK) continue;
-      if ((mp_cmp(tmp, key->dp.base.x) != LTC_MP_EQ))             continue;
+      if ((mp_cmp(tmp, key->dp.base.x) != LTC_MP_EQ))            continue;
       if ((err = mp_read_radix(tmp, cu->Gy,    16)) != CRYPT_OK) continue;
-      if ((mp_cmp(tmp, key->dp.base.y) != LTC_MP_EQ))             continue;
+      if ((mp_cmp(tmp, key->dp.base.y) != LTC_MP_EQ))            continue;
       if (key->dp.cofactor != cu->cofactor)                      continue;
       break; /* found */
    }
@@ -532,7 +513,7 @@ encode_b64(SV * in)
             SvREFCNT_dec(RETVAL);
             XSRETURN_UNDEF;
           }
-          SvCUR_set(RETVAL, strlen(out_data));
+          SvCUR_set(RETVAL, out_len);
         }
     }
     OUTPUT:
@@ -607,7 +588,7 @@ encode_b32r(SV *in)
             SvREFCNT_dec(RETVAL);
             XSRETURN_UNDEF;
           }
-          SvCUR_set(RETVAL, strlen(out_data));
+          SvCUR_set(RETVAL, out_len);
         }
     }
     OUTPUT:

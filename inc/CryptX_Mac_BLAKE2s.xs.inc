@@ -70,7 +70,7 @@ mac(Crypt::Mac::BLAKE2s self)
         unsigned char mac[MAXBLOCKSIZE];
         unsigned long maclen, outlen;
         int rv;
-        char out[MAXBLOCKSIZE*2];
+        char out[MAXBLOCKSIZE*2+1];
 
         maclen = sizeof(mac);
         rv = blake2smac_done(self, mac, &maclen);
@@ -87,7 +87,7 @@ mac(Crypt::Mac::BLAKE2s self)
           RETVAL = newSVpvn(out, outlen);
         }
         if (ix == 1) {
-          rv = _base16_encode(mac, maclen, (unsigned char *)out, &outlen);
+          rv = base16_encode(mac, maclen, (unsigned char *)out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
@@ -140,7 +140,7 @@ blake2s(unsigned long size, SV * key, ...)
           RETVAL = newSVpvn((char *) out, outlen);
         }
         else if (ix == 1) {
-          rv = _base16_encode(mac, len, (unsigned char *)out, &outlen);
+          rv = base16_encode(mac, len, (unsigned char *)out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char *) out, outlen);
         }

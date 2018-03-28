@@ -79,7 +79,7 @@ digest(Crypt::Digest self)
         int rv;
         unsigned long outlen;
         unsigned char hash[MAXBLOCKSIZE];
-        char out[MAXBLOCKSIZE*2];
+        char out[MAXBLOCKSIZE*2+1];
 
         rv = self->desc->done(&self->state, hash);
         if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
@@ -96,7 +96,7 @@ digest(Crypt::Digest self)
           RETVAL = newSVpvn(out, outlen);
         }
         else if (ix == 1) {
-          rv = _base16_encode(hash, self->desc->hashsize, (unsigned char *)out, &outlen);
+          rv = base16_encode(hash, self->desc->hashsize, (unsigned char *)out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
@@ -119,7 +119,7 @@ digest_data(char * digest_name, ...)
         int rv, id, i;
         unsigned char *in, hash[MAXBLOCKSIZE];
         unsigned long len = sizeof(hash), outlen;
-        char out[MAXBLOCKSIZE*2];
+        char out[MAXBLOCKSIZE*2+1];
         hash_state md;
 
         id = _find_hash(digest_name);
@@ -151,7 +151,7 @@ digest_data(char * digest_name, ...)
           RETVAL = newSVpvn((char *) out, outlen);
         }
         else if (ix == 1) {
-          rv = _base16_encode(hash, len, (unsigned char *)out, &outlen);
+          rv = base16_encode(hash, len, (unsigned char *)out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char *) out, outlen);
         }
