@@ -86,17 +86,17 @@ digest(Crypt::Digest self)
 
         outlen = sizeof(out);
         if (ix == 3) {
-          rv = base64url_encode(hash, self->desc->hashsize, (unsigned char *)out, &outlen);
+          rv = base64url_encode(hash, self->desc->hashsize, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
         else if (ix == 2) {
-          rv = base64_encode(hash, self->desc->hashsize, (unsigned char *)out, &outlen);
+          rv = base64_encode(hash, self->desc->hashsize, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
         else if (ix == 1) {
-          rv = base16_encode(hash, self->desc->hashsize, (unsigned char *)out, &outlen, 0);
+          rv = base16_encode(hash, self->desc->hashsize, out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
@@ -141,19 +141,19 @@ digest_data(char * digest_name, ...)
 
         outlen = sizeof(out);
         if (ix == 3) {
-          rv = base64url_encode(hash, len, (unsigned char *)out, &outlen);
+          rv = base64url_encode(hash, len, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char *) out, outlen);
+          RETVAL = newSVpvn(out, outlen);
         }
         else if (ix == 2) {
-          rv = base64_encode(hash, len, (unsigned char *)out, &outlen);
+          rv = base64_encode(hash, len, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char *) out, outlen);
+          RETVAL = newSVpvn(out, outlen);
         }
         else if (ix == 1) {
-          rv = base16_encode(hash, len, (unsigned char *)out, &outlen, 0);
+          rv = base16_encode(hash, len, out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char *) out, outlen);
+          RETVAL = newSVpvn(out, outlen);
         }
         else {
           RETVAL = newSVpvn((char *) hash, len);

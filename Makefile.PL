@@ -50,8 +50,13 @@ else {
     my ($maj, $min) = $arver =~ /^GNU ar [^\d]*(\d)\.(\d+)\.\d+/s;
     $myarflags = 'rcD' if ($maj && $min && $maj >= 2 && $min >= 20) || $arver=~ /^BSD ar /;
   }
+
+  # turn on extra warnings in AUTHOR_MODE (it is gcc only!!)
+  $mycflags = "$mycflags -Wall -Werror -Wextra" if $ENV{AUTHOR_MODE};
+
   @EUMM_INC_LIB = (
-    INC      => '-DLTM_DESC -Isrc/ltc/headers -Isrc/ltm',
+    INC      => $ENV{AUTHOR_MODE} ? '-DLTM_DESC -Isrc/ltc/headers -Isrc/ltm -Wall -Werror -Wextra' #gcc only!!
+                                  : '-DLTM_DESC -Isrc/ltc/headers -Isrc/ltm',
     MYEXTLIB => "src/liballinone$Config{lib_ext}",
     clean    => { 'FILES' => join(' ', @myobjs, "src/liballinone$Config{lib_ext}") },
   );

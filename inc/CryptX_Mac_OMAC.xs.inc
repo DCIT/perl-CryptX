@@ -81,17 +81,17 @@ mac(Crypt::Mac::OMAC self)
         if (rv != CRYPT_OK) croak("FATAL: omac_done failed: %s", error_to_string(rv));
         outlen = sizeof(out);
         if (ix == 3) {
-          rv = base64url_encode(mac, maclen, (unsigned char*)out, &outlen);
+          rv = base64url_encode(mac, maclen, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
         if (ix == 2) {
-          rv = base64_encode(mac, maclen, (unsigned char*)out, &outlen);
+          rv = base64_encode(mac, maclen, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
         if (ix == 1) {
-          rv = base16_encode(mac, maclen, (unsigned char *)out, &outlen, 0);
+          rv = base16_encode(mac, maclen, out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
@@ -135,19 +135,19 @@ omac(char * cipher_name, SV * key, ...)
 
         outlen = sizeof(out);
         if (ix == 3) {
-          rv = base64url_encode(mac, len, (unsigned char *)out, &outlen);
+          rv = base64url_encode(mac, len, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char *) out, outlen);
         }
         else if (ix == 2) {
-          rv = base64_encode(mac, len, (unsigned char *)out, &outlen);
+          rv = base64_encode(mac, len, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char *) out, outlen);
+          RETVAL = newSVpvn(out, outlen);
         }
         else if (ix == 1) {
-          rv = base16_encode(mac, len, (unsigned char *)out, &outlen, 0);
+          rv = base16_encode(mac, len, out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char *) out, outlen);
+          RETVAL = newSVpvn(out, outlen);
         }
         else {
           RETVAL = newSVpvn((char *) mac, len);
