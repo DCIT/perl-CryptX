@@ -42,7 +42,7 @@ ltc/mac/xcbc/xcbc_process.o ltc/math/ltm_desc.o ltc/math/multi.o ltc/math/radix_
 ltc/math/rand_bn.o ltc/math/rand_prime.o ltc/math/tfm_desc.o ltc/math/fp/ltc_ecc_fp_mulmod.o \
 ltc/misc/adler32.o ltc/misc/burn_stack.o ltc/misc/compare_testvector.o ltc/misc/copy_or_zeromem.o \
 ltc/misc/crc32.o ltc/misc/error_to_string.o ltc/misc/mem_neq.o ltc/misc/pk_get_oid.o \
-ltc/misc/zeromem.o ltc/misc/base16/base16_decode.o ltc/misc/base16/base16_encode.o \
+ltc/misc/pk_oid_str.o ltc/misc/zeromem.o ltc/misc/base16/base16_decode.o ltc/misc/base16/base16_encode.o \
 ltc/misc/base32/base32_decode.o ltc/misc/base32/base32_encode.o ltc/misc/base64/base64_decode.o \
 ltc/misc/base64/base64_encode.o ltc/misc/crypt/crypt.o ltc/misc/crypt/crypt_argchk.o \
 ltc/misc/crypt/crypt_cipher_descriptor.o ltc/misc/crypt/crypt_cipher_is_valid.o ltc/misc/crypt/crypt_constants.o \
@@ -102,7 +102,7 @@ ltc/pk/dsa/dsa_generate_pqg.o ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_make_key.o 
 ltc/pk/dsa/dsa_set_pqg_dsaparam.o ltc/pk/dsa/dsa_shared_secret.o ltc/pk/dsa/dsa_sign_hash.o \
 ltc/pk/dsa/dsa_verify_hash.o ltc/pk/dsa/dsa_verify_key.o ltc/pk/ecc/ecc.o ltc/pk/ecc/ecc_ansi_x963_export.o \
 ltc/pk/ecc/ecc_ansi_x963_import.o ltc/pk/ecc/ecc_decrypt_key.o ltc/pk/ecc/ecc_encrypt_key.o \
-ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_curve_by_name.o \
+ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_curve.o \
 ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o ltc/pk/ecc/ecc_import_openssl.o \
 ltc/pk/ecc/ecc_import_pkcs8.o ltc/pk/ecc/ecc_import_x509.o ltc/pk/ecc/ecc_make_key.o \
 ltc/pk/ecc/ecc_set_dp.o ltc/pk/ecc/ecc_set_dp_internal.o ltc/pk/ecc/ecc_set_key.o \

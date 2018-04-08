@@ -460,6 +460,8 @@ int ecc_import_pkcs8(const unsigned char *in, unsigned long inlen,
    unsigned long len, cofactor;
    oid_st        ecoid;
    int           err;
+   char          OID[256];
+   const ltc_ecc_curve *curve;
    ltc_asn1_list *p = NULL, *l = NULL;
 
    LTC_ARGCHK(in          != NULL);
@@ -500,9 +502,10 @@ int ecc_import_pkcs8(const unsigned char *in, unsigned long inlen,
              * 23:d=1  hl=2 l=  77 prim:   OCTET STRING   :bytes (== privatekey)
              */
             ltc_asn1_list *loid = lseq->child->next;
-            if ((err = ecc_set_dp_by_oid(loid->data, loid->size, key)) != CRYPT_OK) {
-               goto LBL_DONE;
-            }
+            len = sizeof(OID);
+            if ((err = pk_oid_num_to_str(loid->data, loid->size, OID, &len)) != CRYPT_OK) { goto LBL_DONE; }
+            if ((err = ecc_get_curve(OID, &curve)) != CRYPT_OK)                           { goto LBL_DONE; }
+            if ((err = ecc_set_dp(curve, key)) != CRYPT_OK)                               { goto LBL_DONE; }
          }
          else if (lseq->child->next && lseq->child->next->type == LTC_ASN1_SEQUENCE) {
             /* CASE 2: explicit curve parameters (AKA long variant):

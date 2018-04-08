@@ -44,6 +44,8 @@ typedef struct Oid {
 } oid_st;
 
 int pk_get_oid(int pk, oid_st *st);
+int pk_oid_str_to_num(const char *OID, unsigned long *oid, unsigned long *oidlen);
+int pk_oid_num_to_str(unsigned long *oid, unsigned long oidlen, char *OID, unsigned long *outlen);
 #endif /* LTC_SOURCE */
 
 /* ---- RSA ---- */
@@ -258,9 +260,6 @@ int dh_check_pubkey(dh_key *key);
 
 /** Structure defines a GF(p) curve */
 typedef struct {
-   /** name of curve */
-   const char *names[6];
-
    /** The prime that defines the field the curve is in (encoded in hex) */
    const char *prime;
 
@@ -283,8 +282,7 @@ typedef struct {
    unsigned long cofactor;
 
    /** The OID */
-   unsigned long oid[16];
-   unsigned long oidlen;
+   const char *OID;
 } ltc_ecc_curve;
 
 /** A point on a ECC curve, stored in Jacbobian format such that (x,y,z) => (x/z^2, y/z^3, 1) when interpretted as affine */
@@ -342,7 +340,7 @@ int  ecc_test(void);
 void ecc_sizes(int *low, int *high);
 int  ecc_get_size(ecc_key *key);
 
-int  ecc_get_curve_by_name(const char* name, const ltc_ecc_curve** cu);
+int  ecc_get_curve(const char* name_or_oid, const ltc_ecc_curve** cu);
 int  ecc_set_dp(const ltc_ecc_curve *cu, ecc_key *key);
 int  ecc_generate_key(prng_state *prng, int wprng, ecc_key *key);
 int  ecc_set_key(const unsigned char *in, unsigned long inlen, int type, ecc_key *key);
@@ -398,7 +396,6 @@ int  ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
 /* INTERNAL ONLY - it should be later moved to src/headers/tomcrypt_internal.h */
 
 int ecc_set_dp_from_mpis(void *a, void *b, void *prime, void *order, void *gx, void *gy, unsigned long cofactor, ecc_key *key);
-int ecc_set_dp_by_oid(unsigned long *oid, unsigned long oidsize, ecc_key *key);
 int ecc_copy_dp(const ecc_key *srckey, ecc_key *key);
 int ecc_set_dp_by_size(int size, ecc_key *key);
 

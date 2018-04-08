@@ -13,7 +13,6 @@
 
 int ecc_set_dp(const ltc_ecc_curve *curve, ecc_key *key)
 {
-   unsigned long i;
    int err;
 
    LTC_ARGCHK(key != NULL);
@@ -37,9 +36,9 @@ int ecc_set_dp(const ltc_ecc_curve *curve, ecc_key *key)
    /* cofactor & size */
    key->dp.cofactor = curve->cofactor;
    key->dp.size = mp_unsigned_bin_size(key->dp.prime);
-   /* OID */
-   key->dp.oidlen = curve->oidlen;
-   for (i = 0; i < key->dp.oidlen; i++) key->dp.oid[i] = curve->oid[i];
+   /* OID string >> unsigned long oid[16] + oidlen */
+   key->dp.oidlen = 16;
+   if ((err = pk_oid_str_to_num(curve->OID, key->dp.oid, &key->dp.oidlen)) != CRYPT_OK) { goto error; }
    /* success */
    return CRYPT_OK;
 
@@ -55,28 +54,28 @@ int ecc_set_dp_by_size(int size, ecc_key *key)
 
    /* for compatibility with libtomcrypt-1.17 the sizes below must match the specific curves */
    if (size <= 14) {
-      err = ecc_get_curve_by_name("SECP112R1", &cu);
+      err = ecc_get_curve("SECP112R1", &cu);
    }
    else if (size <= 16) {
-      err = ecc_get_curve_by_name("SECP128R1", &cu);
+      err = ecc_get_curve("SECP128R1", &cu);
    }
    else if (size <= 20) {
-      err = ecc_get_curve_by_name("SECP160R1", &cu);
+      err = ecc_get_curve("SECP160R1", &cu);
    }
    else if (size <= 24) {
-      err = ecc_get_curve_by_name("SECP192R1", &cu);
+      err = ecc_get_curve("SECP192R1", &cu);
    }
    else if (size <= 28) {
-      err = ecc_get_curve_by_name("SECP224R1", &cu);
+      err = ecc_get_curve("SECP224R1", &cu);
    }
    else if (size <= 32) {
-      err = ecc_get_curve_by_name("SECP256R1", &cu);
+      err = ecc_get_curve("SECP256R1", &cu);
    }
    else if (size <= 48) {
-      err = ecc_get_curve_by_name("SECP384R1", &cu);
+      err = ecc_get_curve("SECP384R1", &cu);
    }
    else if (size <= 66) {
-      err = ecc_get_curve_by_name("SECP521R1", &cu);
+      err = ecc_get_curve("SECP521R1", &cu);
    }
 
    if (err == CRYPT_OK && cu != NULL) return ecc_set_dp(cu, key);
