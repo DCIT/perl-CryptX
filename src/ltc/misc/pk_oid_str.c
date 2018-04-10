@@ -38,7 +38,7 @@ int pk_oid_str_to_num(const char *OID, unsigned long *oid, unsigned long *oidlen
    return CRYPT_OK;
 }
 
-int pk_oid_num_to_str(unsigned long *oid, unsigned long oidlen, char *OID, unsigned long *outlen)
+int pk_oid_num_to_str(const unsigned long *oid, unsigned long oidlen, char *OID, unsigned long *outlen)
 {
    int i;
    unsigned long j, k;

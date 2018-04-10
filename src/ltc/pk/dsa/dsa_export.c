@@ -23,7 +23,7 @@
   @param key    The key to export
   @return CRYPT_OK if successful
 */
-int dsa_export(unsigned char *out, unsigned long *outlen, int type, dsa_key *key)
+int dsa_export(unsigned char *out, unsigned long *outlen, int type, const dsa_key *key)
 {
    unsigned long zero=0;
    int err, std;
@@ -69,7 +69,7 @@ int dsa_export(unsigned char *out, unsigned long *outlen, int type, dsa_key *key
       }
    } else {
       if (std) {
-          unsigned long tmplen = (mp_count_bits(key->y) / 8) + 8;
+          unsigned long tmplen = (unsigned long)(mp_count_bits(key->y) / 8) + 8;
           unsigned char* tmp = XMALLOC(tmplen);
           ltc_asn1_list int_list[3];
 
