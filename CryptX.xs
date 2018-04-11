@@ -284,7 +284,7 @@ void _ecc_oid_lookup(ecc_key *key)
 int _ecc_set_dp_from_SV(ecc_key *key, SV *curve)
 {
   dTHX; /* fetch context */
-  HV *hc, *hl, *h;
+  HV *hc, *h;
   SV *sv_crv, **pref;
   SV **sv_cofactor, **sv_prime, **sv_A, **sv_B, **sv_order, **sv_Gx, **sv_Gy, **sv_oid;
   char *ptr_crv;
@@ -296,20 +296,13 @@ int _ecc_set_dp_from_SV(ecc_key *key, SV *curve)
   if (SvPOK(curve)) {
     /* string */
     ptr_crv = SvPV(curve, len_crv);
-    if ((hl = get_hv("Crypt::PK::ECC::curve2ltc", 0)) == NULL) croak("FATAL: no curve2ltc register");
-    pref = hv_fetch(hl, ptr_crv, (U32)len_crv, 0);
+    if ((hc = get_hv("Crypt::PK::ECC::curve", 0)) == NULL) croak("FATAL: no curve register");
+    pref = hv_fetch(hc, ptr_crv, (U32)len_crv, 0);
     if (pref && SvOK(*pref)) {
-      sv_crv = *pref; /* found in %cutve2ltc */
+      sv_crv = *pref; /* found in %curve */
     }
     else {
-      if ((hc = get_hv("Crypt::PK::ECC::curve", 0)) == NULL) croak("FATAL: no curve register");
-      pref = hv_fetch(hc, ptr_crv, (U32)len_crv, 0);
-      if (pref && SvOK(*pref)) {
-        sv_crv = *pref; /* found in %curve */
-      }
-      else {
-        sv_crv = curve;
-      }
+      sv_crv = curve;
     }
   }
   else if (SvROK(curve)) {

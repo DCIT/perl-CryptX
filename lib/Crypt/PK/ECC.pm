@@ -16,39 +16,74 @@ use Crypt::Digest qw(digest_data digest_data_b64u);
 use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pem_to_der der_to_pem);
 use Crypt::PK;
 
-our %curve = (
-        # extra curves not recognized by libtomcrypt
-        'wap-wsg-idm-ecid-wtls8' => {
-                prime      => "FFFFFFFFFFFFFFFFFFFFFFFFFDE7",
-                A          => "0000000000000000000000000000",
-                B          => "0000000000000000000000000003",
-                order      => "0100000000000001ECEA551AD837E9",
-                Gx         => "0000000000000000000000000001",
-                Gy         => "0000000000000000000000000002",
-                cofactor   => 1,
-                oid        => '2.23.43.1.4.8',
-        },
-        'wap-wsg-idm-ecid-wtls9' => {
-                prime      => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC808F",
-                A          => "0000000000000000000000000000000000000000",
-                B          => "0000000000000000000000000000000000000003",
-                order      => "0100000000000000000001CDC98AE0E2DE574ABF33",
-                Gx         => "0000000000000000000000000000000000000001",
-                Gy         => "0000000000000000000000000000000000000002",
-                cofactor   => 1,
-                oid        => '2.23.43.1.4.9',
-        },
+our %curve = ( # must be "our" as we use it from XS code
+  # extra curves not recognized by libtomcrypt
+  'wap-wsg-idm-ecid-wtls8' => {
+        prime      => "FFFFFFFFFFFFFFFFFFFFFFFFFDE7",
+        A          => "0000000000000000000000000000",
+        B          => "0000000000000000000000000003",
+        order      => "0100000000000001ECEA551AD837E9",
+        Gx         => "0000000000000000000000000001",
+        Gy         => "0000000000000000000000000002",
+        cofactor   => 1,
+        oid        => '2.23.43.1.4.8',
+  },
+  'wap-wsg-idm-ecid-wtls9' => {
+        prime      => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC808F",
+        A          => "0000000000000000000000000000000000000000",
+        B          => "0000000000000000000000000000000000000003",
+        order      => "0100000000000000000001CDC98AE0E2DE574ABF33",
+        Gx         => "0000000000000000000000000000000000000001",
+        Gy         => "0000000000000000000000000000000000000002",
+        cofactor   => 1,
+        oid        => '2.23.43.1.4.9',
+  },
+  # some unusual openssl names
+  "wap-wsg-idm-ecid-wtls6"  => 'secp112r1',
+  "wap-wsg-idm-ecid-wtls7"  => 'secp160r2',
+  "wap-wsg-idm-ecid-wtls12" => 'secp224r1',
 );
 
-my %jwk2curve = (
-  'P-192' => 'secp192r1',
-  'P-224' => 'secp224r1',
-  'P-256' => 'secp256r1',
-  'P-384' => 'secp384r1',
-  'P-521' => 'secp521r1',
+our %curve_oid2name = ( # must be "our" as we use it from XS code
+  # the following are used to derive curve_name from OID in key2hash()
+  "1.2.840.10045.3.1.1"   => "secp192r1",
+  "1.2.840.10045.3.1.2"   => "prime192v2",
+  "1.2.840.10045.3.1.3"   => "prime192v3",
+  "1.2.840.10045.3.1.4"   => "prime239v1",
+  "1.2.840.10045.3.1.5"   => "prime239v2",
+  "1.2.840.10045.3.1.6"   => "prime239v3",
+  "1.2.840.10045.3.1.7"   => "secp256r1",
+  "1.3.132.0.6"           => "secp112r1",
+  "1.3.132.0.7"           => "secp112r2",
+  "1.3.132.0.8"           => "secp160r1",
+  "1.3.132.0.9"           => "secp160k1",
+  "1.3.132.0.10"          => "secp256k1",
+  "1.3.132.0.28"          => "secp128r1",
+  "1.3.132.0.29"          => "secp128r2",
+  "1.3.132.0.30"          => "secp160r2",
+  "1.3.132.0.31"          => "secp192k1",
+  "1.3.132.0.32"          => "secp224k1",
+  "1.3.132.0.33"          => "secp224r1",
+  "1.3.132.0.34"          => "secp384r1",
+  "1.3.132.0.35"          => "secp521r1",
+  "1.3.36.3.3.2.8.1.1.1"  => "brainpoolp160r1",
+  "1.3.36.3.3.2.8.1.1.2"  => "brainpoolp160t1",
+  "1.3.36.3.3.2.8.1.1.3"  => "brainpoolp192r1",
+  "1.3.36.3.3.2.8.1.1.4"  => "brainpoolp192t1",
+  "1.3.36.3.3.2.8.1.1.5"  => "brainpoolp224r1",
+  "1.3.36.3.3.2.8.1.1.6"  => "brainpoolp224t1",
+  "1.3.36.3.3.2.8.1.1.7"  => "brainpoolp256r1",
+  "1.3.36.3.3.2.8.1.1.8"  => "brainpoolp256t1",
+  "1.3.36.3.3.2.8.1.1.9"  => "brainpoolp320r1",
+  "1.3.36.3.3.2.8.1.1.10" => "brainpoolp320t1",
+  "1.3.36.3.3.2.8.1.1.11" => "brainpoolp384r1",
+  "1.3.36.3.3.2.8.1.1.12" => "brainpoolp384t1",
+  "1.3.36.3.3.2.8.1.1.13" => "brainpoolp512r1",
+  "1.3.36.3.3.2.8.1.1.14" => "brainpoolp512t1",
 );
 
 my %curve2jwk = (
+  # necessary for conversion of curve_name_or_OID >> P-NNN
   '1.2.840.10045.3.1.1' => 'P-192', # secp192r1
   '1.3.132.0.33'        => 'P-224', # secp224r1
   '1.2.840.10045.3.1.7' => 'P-256', # secp256r1
@@ -66,95 +101,6 @@ my %curve2jwk = (
   'secp256r1'           => 'P-256',
   'secp384r1'           => 'P-384',
   'secp521r1'           => 'P-521',
-);
-
-our %curve2ltc = ( # must be "our" as we use it from XS code
-  # OIDs
-  "1.2.840.10045.3.1.1"     => "SECP192R1",
-  "1.2.840.10045.3.1.2"     => "PRIME192V2",
-  "1.2.840.10045.3.1.3"     => "PRIME192V3",
-  "1.2.840.10045.3.1.4"     => "PRIME239V1",
-  "1.2.840.10045.3.1.5"     => "PRIME239V2",
-  "1.2.840.10045.3.1.6"     => "PRIME239V3",
-  "1.2.840.10045.3.1.7"     => "SECP256R1",
-  "1.3.132.0.10"            => "SECP256K1",
-  "1.3.132.0.28"            => "SECP128R1",
-  "1.3.132.0.29"            => "SECP128R2",
-  "1.3.132.0.30"            => "SECP160R2",
-  "1.3.132.0.31"            => "SECP192K1",
-  "1.3.132.0.32"            => "SECP224K1",
-  "1.3.132.0.33"            => "SECP224R1",
-  "1.3.132.0.34"            => "SECP384R1",
-  "1.3.132.0.35"            => "SECP521R1",
-  "1.3.132.0.6"             => "SECP112R1",
-  "1.3.132.0.7"             => "SECP112R2",
-  "1.3.132.0.8"             => "SECP160R1",
-  "1.3.132.0.9"             => "SECP160K1",
-  "1.3.36.3.3.2.8.1.1.1"    => "BRAINPOOLP160R1",
-  "1.3.36.3.3.2.8.1.1.11"   => "BRAINPOOLP384R1",
-  "1.3.36.3.3.2.8.1.1.13"   => "BRAINPOOLP512R1",
-  "1.3.36.3.3.2.8.1.1.3"    => "BRAINPOOLP192R1",
-  "1.3.36.3.3.2.8.1.1.5"    => "BRAINPOOLP224R1",
-  "1.3.36.3.3.2.8.1.1.7"    => "BRAINPOOLP256R1",
-  "1.3.36.3.3.2.8.1.1.9"    => "BRAINPOOLP320R1",
-  "1.3.36.3.3.2.8.1.1.10"   => "BRAINPOOLP320T1",
-  "1.3.36.3.3.2.8.1.1.12"   => "BRAINPOOLP384T1",
-  "1.3.36.3.3.2.8.1.1.14"   => "BRAINPOOLP512T1",
-  "1.3.36.3.3.2.8.1.1.2"    => "BRAINPOOLP160T1",
-  "1.3.36.3.3.2.8.1.1.4"    => "BRAINPOOLP192T1",
-  "1.3.36.3.3.2.8.1.1.6"    => "BRAINPOOLP224T1",
-  "1.3.36.3.3.2.8.1.1.8"    => "BRAINPOOLP256T1",
-  # JWT names
-  "P-192"                   => "SECP192R1",
-  "P-224"                   => "SECP224R1",
-  "P-256"                   => "SECP256R1",
-  "P-384"                   => "SECP384R1",
-  "P-521"                   => "SECP521R1",
-  # openssl names
-  "brainpoolp160r1"         => "BRAINPOOLP160R1",
-  "brainpoolp192r1"         => "BRAINPOOLP192R1",
-  "brainpoolp224r1"         => "BRAINPOOLP224R1",
-  "brainpoolp256r1"         => "BRAINPOOLP256R1",
-  "brainpoolp320r1"         => "BRAINPOOLP320R1",
-  "brainpoolp384r1"         => "BRAINPOOLP384R1",
-  "brainpoolp512r1"         => "BRAINPOOLP512R1",
-  "brainpoolp160t1"         => "BRAINPOOLP160T1",
-  "brainpoolp192t1"         => "BRAINPOOLP192T1",
-  "brainpoolp224t1"         => "BRAINPOOLP224T1",
-  "brainpoolp256t1"         => "BRAINPOOLP256T1",
-  "brainpoolp320t1"         => "BRAINPOOLP320T1",
-  "brainpoolp384t1"         => "BRAINPOOLP384T1",
-  "brainpoolp512t1"         => "BRAINPOOLP512T1",
-  "nistp192"                => "SECP192R1",
-  "nistp224"                => "SECP224R1",
-  "nistp256"                => "SECP256R1",
-  "nistp384"                => "SECP384R1",
-  "nistp521"                => "SECP521R1",
-  "prime192v1"              => "SECP192R1",
-  "prime192v2"              => "PRIME192V2",
-  "prime192v3"              => "PRIME192V3",
-  "prime239v1"              => "PRIME239V1",
-  "prime239v2"              => "PRIME239V2",
-  "prime239v3"              => "PRIME239V3",
-  "prime256v1"              => "SECP256R1",
-  "secp112r1"               => "SECP112R1",
-  "secp112r2"               => "SECP112R2",
-  "secp128r1"               => "SECP128R1",
-  "secp128r2"               => "SECP128R2",
-  "secp160k1"               => "SECP160K1",
-  "secp160r1"               => "SECP160R1",
-  "secp160r2"               => "SECP160R2",
-  "secp192k1"               => "SECP192K1",
-  "secp192r1"               => "SECP192R1",
-  "secp224k1"               => "SECP224K1",
-  "secp224r1"               => "SECP224R1",
-  "secp256k1"               => "SECP256K1",
-  "secp256r1"               => "SECP256R1",
-  "secp384r1"               => "SECP384R1",
-  "secp521r1"               => "SECP521R1",
-  "wap-wsg-idm-ecid-wtls6"  => 'SECP112R1',
-  "wap-wsg-idm-ecid-wtls7"  => 'SECP160R2',
-  "wap-wsg-idm-ecid-wtls12" => 'SECP224R1',
 );
 
 sub _import_hex {
@@ -250,10 +196,7 @@ sub import_key {
       for (qw/x y d/) {
         $key->{$_} = eval { unpack("H*", decode_b64u($key->{$_})) } if exists $key->{$_};
       }
-      if (my $curve_name = $jwk2curve{$key->{crv}}) {
-        return $self->_import_hex($key->{x}, $key->{y}, $key->{d}, $curve_name);
-      }
-      # curve is not JWK compliant e.g. P-192 P-224 P-256 P-384 P-521 (we'll try to import anyway)
+      # names P-192 P-224 P-256 P-384 P-521 are recognized by libtomcrypt
       return $self->_import_hex($key->{x}, $key->{y}, $key->{d}, $key->{crv});
     }
     croak "FATAL: unexpected ECC key hash";
@@ -291,10 +234,7 @@ sub import_key {
       for (qw/x y d/) {
         $h->{$_} = eval { unpack("H*", decode_b64u($h->{$_})) } if exists $h->{$_};
       }
-      if (my $curve_name = $jwk2curve{$h->{crv}}) {
-        return $self->_import_hex($h->{x}, $h->{y}, $h->{d}, $curve_name);
-      }
-      # curve is not JWK compliant e.g. P-192 P-224 P-256 P-384 P-521 (we'll try to import anyway)
+      # names P-192 P-224 P-256 P-384 P-521 are recognized by libtomcrypt
       return $self->_import_hex($h->{x}, $h->{y}, $h->{d}, $h->{crv});
     }
   }

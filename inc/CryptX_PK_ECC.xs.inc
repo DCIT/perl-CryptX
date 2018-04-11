@@ -202,13 +202,12 @@ key2hash(Crypt::PK::ECC self)
             not_used = hv_store(rv_hash, "curve_oid", 9, oid, 0);
 
             /* curve name -> "curve_name" */
-            if ((h = get_hv("Crypt::PK::ECC::curve2ltc", 0)) != NULL) {
+            if ((h = get_hv("Crypt::PK::ECC::curve_oid2name", 0)) != NULL) {
               pref = hv_fetch(h, oid_ptr, (U32)strlen(oid_ptr), 0);
               if (pref) {
                 cname_ptr = SvPV(*pref, cname_len);
                 cname = newSVpv(cname_ptr, cname_len);
                 cname_ptr = SvPVX(cname);
-                for (i=0; i<cname_len && cname_ptr[i]>0; i++) cname_ptr[i] = toLOWER(cname_ptr[i]);
                 not_used = hv_store(rv_hash, "curve_name", 10, cname, 0);
               }
             }
