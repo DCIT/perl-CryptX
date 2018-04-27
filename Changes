@@ -1,5 +1,9 @@
 Changes for CryptX
 
+0.060   2018-04-XX
+        - bundled libtomcrypt update
+        - Math::BigInt::LTM - remove buggy tests failing with the latest Math::BigInt
+
 0.059   2018-03-25
         - new Crypt::Digest::Keccak(224|256|384|512)
         - new methods sign_hash_rfc7518 + verify_hash_rfc7518 (Crypt::PK::ECC)
