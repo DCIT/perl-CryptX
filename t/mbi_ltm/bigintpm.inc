@@ -2651,26 +2651,21 @@ abc:12:NaN
 +inf:1234500012:inf
 -inf:1234500012:inf
 -inf:1234500013:-inf
-+inf:-12345000123:inf
--inf:-12345000123:-inf
 #  -inf * -inf = inf
 -inf:2:inf
 -inf:0:NaN
 -inf:-1:0
--inf:inf:NaN
 2:inf:inf
 2:-inf:0
 0:inf:0
 0:-inf:inf
 -1:-inf:NaN
 -1:inf:NaN
--2:inf:NaN
 -2:-inf:0
 NaN:inf:NaN
 NaN:-inf:NaN
 -inf:NaN:NaN
 inf:NaN:NaN
-inf:-inf:NaN
 1:inf:1
 1:-inf:1
 # 1 ** -x => 1 / (1 ** x)
