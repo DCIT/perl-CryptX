@@ -31,7 +31,7 @@
 int ecc_encrypt_key(const unsigned char *in,   unsigned long inlen,
                           unsigned char *out,  unsigned long *outlen,
                           prng_state *prng, int wprng, int hash,
-                          ecc_key *key)
+                          const ecc_key *key)
 {
     unsigned char *pub_expt, *ecc_shared, *skey;
     ecc_key        pubkey;

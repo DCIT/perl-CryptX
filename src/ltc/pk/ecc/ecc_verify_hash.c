@@ -18,7 +18,7 @@
 
 static int _ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
                             const unsigned char *hash, unsigned long hashlen,
-                            int *stat, ecc_key *key, int sigformat)
+                            int *stat, const ecc_key *key, int sigformat)
 {
    ecc_point    *mG = NULL, *mQ = NULL;
    void          *r, *s, *v, *w, *u1, *u2, *e, *p, *m, *a, *a_plus3 = NULL, *mu = NULL, *ma = NULL;
@@ -37,7 +37,7 @@ static int _ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
 
    /* allocate ints */
    if ((err = mp_init_multi(&r, &s, &v, &w, &u1, &u2, &e, &a_plus3, NULL)) != CRYPT_OK) {
-      return CRYPT_MEM;
+      return err;
    }
 
    p = key->dp.order;
@@ -171,7 +171,7 @@ error:
 */
 int ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
                     const unsigned char *hash, unsigned long hashlen,
-                    int *stat, ecc_key *key)
+                    int *stat, const ecc_key *key)
 {
    return _ecc_verify_hash(sig, siglen, hash, hashlen, stat, key, 0);
 }
@@ -188,7 +188,7 @@ int ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
 */
 int ecc_verify_hash_rfc7518(const unsigned char *sig,  unsigned long siglen,
                             const unsigned char *hash, unsigned long hashlen,
-                            int *stat, ecc_key *key)
+                            int *stat, const ecc_key *key)
 {
    return _ecc_verify_hash(sig, siglen, hash, hashlen, stat, key, 1);
 }

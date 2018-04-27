@@ -24,7 +24,7 @@
   @param key     The key to export
   @return CRYPT_OK if successful
 */
-int ecc_export(unsigned char *out, unsigned long *outlen, int type, ecc_key *key)
+int ecc_export(unsigned char *out, unsigned long *outlen, int type, const ecc_key *key)
 {
    int           err;
    unsigned char flags[1];

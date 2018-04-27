@@ -24,7 +24,7 @@
  *   - http://www.ecc-brainpool.org/download/Domain-parameters.pdf (named: BRAINPOOLP*)
  */
 const ltc_ecc_curve ltc_ecc_curves[] = {
-#if defined(LTC_ECC_SECP112R1) || defined(LTC_ECC112)
+#ifdef LTC_ECC_SECP112R1
 {
    /* prime    */ "DB7C2ABF62E35E668076BEAD208B",
    /* A        */ "DB7C2ABF62E35E668076BEAD2088",
@@ -48,7 +48,7 @@ const ltc_ecc_curve ltc_ecc_curves[] = {
    /* OID      */ "1.3.132.0.7"
 },
 #endif
-#if defined(LTC_ECC_SECP128R1) || defined(LTC_ECC128)
+#ifdef LTC_ECC_SECP128R1
 {
    /* prime    */ "FFFFFFFDFFFFFFFFFFFFFFFFFFFFFFFF",
    /* A        */ "FFFFFFFDFFFFFFFFFFFFFFFFFFFFFFFC",
@@ -72,7 +72,7 @@ const ltc_ecc_curve ltc_ecc_curves[] = {
    /* OID      */ "1.3.132.0.29"
 },
 #endif
-#if defined(LTC_ECC_SECP160R1) || defined(LTC_ECC160)
+#ifdef LTC_ECC_SECP160R1
 {
    /* prime    */ "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF",
    /* A        */ "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFC",
@@ -108,7 +108,7 @@ const ltc_ecc_curve ltc_ecc_curves[] = {
    /* OID      */ "1.3.132.0.9"
 },
 #endif
-#if defined(LTC_ECC_SECP192R1) || defined(LTC_ECC192)
+#ifdef LTC_ECC_SECP192R1
 {
    /* prime    */ "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF",
    /* A        */ "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC",
@@ -156,7 +156,7 @@ const ltc_ecc_curve ltc_ecc_curves[] = {
    /* OID      */ "1.3.132.0.31"
 },
 #endif
-#if defined(LTC_ECC_SECP224R1) || defined(LTC_ECC224)
+#ifdef LTC_ECC_SECP224R1
 {
    /* prime    */ "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001",
    /* A        */ "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFE",
@@ -180,7 +180,7 @@ const ltc_ecc_curve ltc_ecc_curves[] = {
    /* OID      */ "1.3.132.0.32"
 },
 #endif
-#if defined(LTC_ECC_SECP256R1) || defined(LTC_ECC256)
+#ifdef LTC_ECC_SECP256R1
 {
    /* prime    */ "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF",
    /* A        */ "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC",
@@ -204,7 +204,7 @@ const ltc_ecc_curve ltc_ecc_curves[] = {
    /* OID      */ "1.3.132.0.10"
 },
 #endif
-#if defined(LTC_ECC_SECP384R1) || defined(LTC_ECC384)
+#ifdef LTC_ECC_SECP384R1
 {
    /* prime    */ "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF",
    /* A        */ "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFC",
@@ -216,7 +216,7 @@ const ltc_ecc_curve ltc_ecc_curves[] = {
    /* OID      */ "1.3.132.0.34"
 },
 #endif
-#if defined(LTC_ECC_SECP521R1) || defined(LTC_ECC521)
+#ifdef LTC_ECC_SECP521R1
 {
    /* prime    */ "01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
    /* A        */ "01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC",

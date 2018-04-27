@@ -528,16 +528,14 @@
    #define LTC_ECC_SECP256R1
    #define LTC_ECC_SECP384R1
    #define LTC_ECC_SECP521R1
-   /* OLD deprecated (but still working) defines */
-   #define LTC_ECC112
-   #define LTC_ECC128
-   #define LTC_ECC160
-   #define LTC_ECC192
-   #define LTC_ECC224
-   #define LTC_ECC256
-   #define LTC_ECC384
-   #define LTC_ECC521
 #endif
+#endif
+
+#if defined(LTC_DER)
+   #ifndef LTC_DER_MAX_RECURSION
+      /* Maximum recursion limit when processing nested ASN.1 types. */
+      #define LTC_DER_MAX_RECURSION 30
+   #endif
 #endif
 
 #if defined(LTC_MECC) || defined(LTC_MRSA) || defined(LTC_MDSA) || defined(LTC_MKAT)
@@ -644,6 +642,40 @@
    #ifndef LTC_FILE_READ_BUFSIZE
    #define LTC_FILE_READ_BUFSIZE 8192
    #endif
+#endif
+
+/* ECC backwards compatibility */
+#if !defined(LTC_ECC_SECP112R1) && defined(LTC_ECC112)
+#define LTC_ECC_SECP112R1
+#undef LTC_ECC112
+#endif
+#if !defined(LTC_ECC_SECP128R1) && defined(LTC_ECC128)
+#define LTC_ECC_SECP128R1
+#undef LTC_ECC128
+#endif
+#if !defined(LTC_ECC_SECP160R1) && defined(LTC_ECC160)
+#define LTC_ECC_SECP160R1
+#undef LTC_ECC160
+#endif
+#if !defined(LTC_ECC_SECP192R1) && defined(LTC_ECC192)
+#define LTC_ECC_SECP192R1
+#undef LTC_ECC192
+#endif
+#if !defined(LTC_ECC_SECP224R1) && defined(LTC_ECC224)
+#define LTC_ECC_SECP224R1
+#undef LTC_ECC224
+#endif
+#if !defined(LTC_ECC_SECP256R1) && defined(LTC_ECC256)
+#define LTC_ECC_SECP256R1
+#undef LTC_ECC256
+#endif
+#if !defined(LTC_ECC_SECP384R1) && defined(LTC_ECC384)
+#define LTC_ECC_SECP384R1
+#undef LTC_ECC384
+#endif
+#if !defined(LTC_ECC_SECP512R1) && defined(LTC_ECC521)
+#define LTC_ECC_SECP521R1
+#undef LTC_ECC521
 #endif
 
 /* ref:         $Format:%D$ */

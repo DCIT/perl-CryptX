@@ -340,58 +340,58 @@ extern const ltc_ecc_curve ltc_ecc_curves[];
 
 int  ecc_test(void);
 void ecc_sizes(int *low, int *high);
-int  ecc_get_size(ecc_key *key);
+int  ecc_get_size(const ecc_key *key);
 
 int  ecc_get_curve(const char* name_or_oid, const ltc_ecc_curve** cu);
 int  ecc_set_dp(const ltc_ecc_curve *cu, ecc_key *key);
 int  ecc_generate_key(prng_state *prng, int wprng, ecc_key *key);
 int  ecc_set_key(const unsigned char *in, unsigned long inlen, int type, ecc_key *key);
-int  ecc_get_key(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
+int  ecc_get_key(unsigned char *out, unsigned long *outlen, int type, const ecc_key *key);
 
 int  ecc_make_key(prng_state *prng, int wprng, int keysize, ecc_key *key);
 int  ecc_make_key_ex(prng_state *prng, int wprng, ecc_key *key, const ltc_ecc_curve *cu);
 void ecc_free(ecc_key *key);
 
-int  ecc_export(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
+int  ecc_export(unsigned char *out, unsigned long *outlen, int type, const ecc_key *key);
 int  ecc_import(const unsigned char *in, unsigned long inlen, ecc_key *key);
 int  ecc_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_curve *cu);
 
-int ecc_ansi_x963_export(ecc_key *key, unsigned char *out, unsigned long *outlen);
+int ecc_ansi_x963_export(const ecc_key *key, unsigned char *out, unsigned long *outlen);
 int ecc_ansi_x963_import(const unsigned char *in, unsigned long inlen, ecc_key *key);
 int ecc_ansi_x963_import_ex(const unsigned char *in, unsigned long inlen, ecc_key *key, const ltc_ecc_curve *cu);
 
-int ecc_export_openssl(unsigned char *out, unsigned long *outlen, int type, ecc_key *key);
+int ecc_export_openssl(unsigned char *out, unsigned long *outlen, int type, const ecc_key *key);
 int ecc_import_openssl(const unsigned char *in, unsigned long inlen, ecc_key *key);
 int ecc_import_pkcs8(const unsigned char *in, unsigned long inlen, const void *pwd, unsigned long pwdlen, ecc_key *key);
 int ecc_import_x509(const unsigned char *in, unsigned long inlen, ecc_key *key);
 
-int  ecc_shared_secret(ecc_key *private_key, ecc_key *public_key,
+int  ecc_shared_secret(const ecc_key *private_key, const ecc_key *public_key,
                        unsigned char *out, unsigned long *outlen);
 
 int  ecc_encrypt_key(const unsigned char *in,   unsigned long inlen,
                            unsigned char *out,  unsigned long *outlen,
                            prng_state *prng, int wprng, int hash,
-                           ecc_key *key);
+                           const ecc_key *key);
 
 int  ecc_decrypt_key(const unsigned char *in,  unsigned long  inlen,
                            unsigned char *out, unsigned long *outlen,
-                           ecc_key *key);
+                           const ecc_key *key);
 
 int ecc_sign_hash_rfc7518(const unsigned char *in,  unsigned long inlen,
                                 unsigned char *out, unsigned long *outlen,
-                                prng_state *prng, int wprng, ecc_key *key);
+                                prng_state *prng, int wprng, const ecc_key *key);
 
 int  ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
                          unsigned char *out, unsigned long *outlen,
-                         prng_state *prng, int wprng, ecc_key *key);
+                         prng_state *prng, int wprng, const ecc_key *key);
 
 int ecc_verify_hash_rfc7518(const unsigned char *sig,  unsigned long siglen,
                             const unsigned char *hash, unsigned long hashlen,
-                            int *stat, ecc_key *key);
+                            int *stat, const ecc_key *key);
 
 int  ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
                      const unsigned char *hash, unsigned long hashlen,
-                     int *stat, ecc_key *key);
+                     int *stat, const ecc_key *key);
 
 
 #ifdef LTC_SOURCE
@@ -410,7 +410,7 @@ int        ltc_ecc_is_point(const ltc_ecc_dp *dp, void *x, void *y);
 int        ltc_ecc_is_point_at_infinity(const ecc_point *P, void *modulus, int *retval);
 int        ltc_ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y);
 int        ltc_ecc_export_point(unsigned char *out, unsigned long *outlen, void *x, void *y, unsigned long size, int compressed);
-int        ltc_ecc_verify_key(ecc_key *key);
+int        ltc_ecc_verify_key(const ecc_key *key);
 
 /* point ops (mp == montgomery digit) */
 #if !defined(LTC_MECC_ACCEL) || defined(LTM_DESC) || defined(GMP_DESC)

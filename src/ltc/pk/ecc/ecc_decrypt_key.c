@@ -27,7 +27,7 @@
 */
 int ecc_decrypt_key(const unsigned char *in,  unsigned long  inlen,
                           unsigned char *out, unsigned long *outlen,
-                          ecc_key *key)
+                          const ecc_key *key)
 {
    unsigned char *ecc_shared, *skey, *pub_expt;
    unsigned long  x, y;

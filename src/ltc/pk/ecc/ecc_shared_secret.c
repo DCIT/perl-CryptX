@@ -24,7 +24,7 @@
   @param outlen           [in/out] The max size and resulting size of the shared secret
   @return CRYPT_OK if successful
 */
-int ecc_shared_secret(ecc_key *private_key, ecc_key *public_key,
+int ecc_shared_secret(const ecc_key *private_key, const ecc_key *public_key,
                       unsigned char *out, unsigned long *outlen)
 {
    unsigned long  x;

@@ -19,7 +19,7 @@
   Return        CRYPT_OK on success
 */
 
-int ecc_get_key(unsigned char *out, unsigned long *outlen, int type, ecc_key *key)
+int ecc_get_key(unsigned char *out, unsigned long *outlen, int type, const ecc_key *key)
 {
    unsigned long size, ksize;
    int err, compressed;

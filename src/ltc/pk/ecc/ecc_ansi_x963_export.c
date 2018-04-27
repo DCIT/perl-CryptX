@@ -22,7 +22,7 @@
   @param outlen  [in/out]  Length of destination and final output size
   Return CRYPT_OK on success
 */
-int ecc_ansi_x963_export(ecc_key *key, unsigned char *out, unsigned long *outlen)
+int ecc_ansi_x963_export(const ecc_key *key, unsigned char *out, unsigned long *outlen)
 {
    unsigned char buf[ECC_BUF_SIZE];
    unsigned long numlen, xlen, ylen;

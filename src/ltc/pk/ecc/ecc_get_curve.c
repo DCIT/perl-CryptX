@@ -11,11 +11,11 @@
 
 #ifdef LTC_MECC
 
-const struct {
+static const struct {
    const char *OID;
    const char *names[6];
 } _curve_names[] = {
-#if defined(LTC_ECC_SECP112R1) || defined(LTC_ECC112)
+#ifdef LTC_ECC_SECP112R1
    {
       "1.3.132.0.6", { "SECP112R1", "ECC-112", NULL }
    },
@@ -25,7 +25,7 @@ const struct {
       "1.3.132.0.7", { "SECP112R2", NULL }
    },
 #endif
-#if defined(LTC_ECC_SECP128R1) || defined(LTC_ECC128)
+#ifdef LTC_ECC_SECP128R1
    {
       "1.3.132.0.28", { "SECP128R1", "ECC-128", NULL }
    },
@@ -35,7 +35,7 @@ const struct {
       "1.3.132.0.29", { "SECP128R2", NULL }
    },
 #endif
-#if defined(LTC_ECC_SECP160R1) || defined(LTC_ECC160)
+#ifdef LTC_ECC_SECP160R1
    {
       "1.3.132.0.8", { "SECP160R1", "ECC-160", NULL }
    },
@@ -50,7 +50,7 @@ const struct {
       "1.3.132.0.9", { "SECP160K1", NULL }
    },
 #endif
-#if defined(LTC_ECC_SECP192R1) || defined(LTC_ECC192)
+#ifdef LTC_ECC_SECP192R1
    {
       "1.2.840.10045.3.1.1", { "SECP192R1", "NISTP192", "PRIME192V1", "ECC-192", "P-192", NULL }
    },
@@ -70,7 +70,7 @@ const struct {
       "1.3.132.0.31", { "SECP192K1", NULL }
    },
 #endif
-#if defined(LTC_ECC_SECP224R1) || defined(LTC_ECC224)
+#ifdef LTC_ECC_SECP224R1
    {
       "1.3.132.0.33", { "SECP224R1", "NISTP224", "ECC-224", "P-224", NULL }
    },
@@ -80,7 +80,7 @@ const struct {
       "1.3.132.0.32", { "SECP224K1", NULL }
    },
 #endif
-#if defined(LTC_ECC_SECP256R1) || defined(LTC_ECC256)
+#ifdef LTC_ECC_SECP256R1
    {
       "1.2.840.10045.3.1.7", { "SECP256R1", "NISTP256", "PRIME256V1", "ECC-256", "P-256", NULL }
    },
@@ -90,12 +90,12 @@ const struct {
       "1.3.132.0.10", { "SECP256K1", NULL }
    },
 #endif
-#if defined(LTC_ECC_SECP384R1) || defined(LTC_ECC384)
+#ifdef LTC_ECC_SECP384R1
    {
       "1.3.132.0.34", { "SECP384R1", "NISTP384", "ECC-384", "P-384", NULL }
    },
 #endif
-#if defined(LTC_ECC_SECP521R1) || defined(LTC_ECC521)
+#ifdef LTC_ECC_SECP521R1
    {
       "1.3.132.0.35", { "SECP521R1", "NISTP521", "ECC-521", "P-521", NULL }
    },
