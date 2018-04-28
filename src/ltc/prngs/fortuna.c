@@ -8,6 +8,12 @@
  */
 #include "tomcrypt.h"
 
+#if defined(_WIN32)
+  #include <windows.h>
+#else
+  #include <sys/time.h>
+#endif
+
 /**
   @file fortuna.c
   Fortuna PRNG, Tom St Denis
@@ -76,9 +82,9 @@ static ulong64 _fortuna_current_time(void)
    GetSystemTimeAsFileTime(&CurrentTime);
    ul.LowPart  = CurrentTime.dwLowDateTime;
    ul.HighPart = CurrentTime.dwHighDateTime;
-   cur_time = ul.QuadPart;
-   cur_time -= CONST64(116444736000000000); /* subtract epoch in microseconds */
-   cur_time /= 1000; /* nanoseconds -> microseconds */
+   cur_time = ul.QuadPart; /* now we have 100ns intervals since 1 January 1601 */
+   cur_time -= CONST64(116444736000000000); /* subtract 100ns intervals between 1601-1970 */
+   cur_time /= 10; /* 100ns intervals > microseconds */
 #endif
    return cur_time / 100;
 }
