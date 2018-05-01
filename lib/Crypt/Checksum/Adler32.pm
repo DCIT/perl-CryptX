@@ -2,7 +2,7 @@ package Crypt::Checksum::Adler32;
 
 use strict;
 use warnings;
-our $VERSION = '0.059_003';
+our $VERSION = '0.060';
 
 use base qw(Crypt::Checksum Exporter);
 our %EXPORT_TAGS = ( all => [qw( adler32_data adler32_data_hex adler32_data_int adler32_file adler32_file_hex adler32_file_int )] );
