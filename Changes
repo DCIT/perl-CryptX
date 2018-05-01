@@ -1,8 +1,9 @@
 Changes for CryptX
 
-0.060   2018-04-XX
+0.060   2018-05-01
         - bundled libtomcrypt update
         - Math::BigInt::LTM - remove buggy tests failing with the latest Math::BigInt
+        - basically no changes to the perl modules
 
 0.059   2018-03-25
         - new Crypt::Digest::Keccak(224|256|384|512)
