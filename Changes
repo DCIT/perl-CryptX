@@ -1,5 +1,8 @@
 Changes for CryptX
 
+0.061   2018-XX-XX
+        - bundled libtommath update (should help on HP-UX and other unusual platforms)
+
 0.060   2018-05-01
         - bundled libtomcrypt update
         - Math::BigInt::LTM - remove buggy tests failing with the latest Math::BigInt
