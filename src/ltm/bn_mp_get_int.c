@@ -1,4 +1,4 @@
-#include <tommath_private.h>
+#include "tommath_private.h"
 #ifdef BN_MP_GET_INT_C
 /* LibTomMath, multiple-precision integer library -- Tom St Denis
  *
@@ -11,15 +11,13 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tstdenis82@gmail.com, http://libtom.org
  */
 
 /* get the lower 32-bits of an mp_int */
 unsigned long mp_get_int(const mp_int *a)
 {
    int i;
-   mp_min_u32 res;
+   unsigned long res;
 
    if (a->used == 0) {
       return 0;

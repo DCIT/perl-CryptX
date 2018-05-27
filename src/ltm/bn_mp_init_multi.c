@@ -1,4 +1,4 @@
-#include <tommath_private.h>
+#include "tommath_private.h"
 #ifdef BN_MP_INIT_MULTI_C
 /* LibTomMath, multiple-precision integer library -- Tom St Denis
  *
@@ -11,9 +11,8 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tstdenis82@gmail.com, http://libtom.org
  */
+
 #include <stdarg.h>
 
 int mp_init_multi(mp_int *mp, ...)
