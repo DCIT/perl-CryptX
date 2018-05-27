@@ -23,6 +23,8 @@ Crypt::KeyDerivation - PBKDF1, PBKDF2 and HKDF key derivation functions
 
 =head1 SYNOPSIS
 
+  use Crypt::KeyDerivation ':all';
+
   ### PBKDF1/2
   $derived_key1 = pbkdf1($password, $salt, $iteration_count, $hash_name, $len);
   $derived_key2 = pbkdf2($password, $salt, $iteration_count, $hash_name, $len);
