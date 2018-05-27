@@ -4,7 +4,7 @@ package Crypt::Digest::SHA256;
 
 use strict;
 use warnings;
-our $VERSION = '0.060';
+our $VERSION = '0.060_001';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( sha256 sha256_hex sha256_b64 sha256_b64u sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u )] );
