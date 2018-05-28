@@ -13,12 +13,16 @@ struct yarrow_prng {
     int                   cipher, hash;
     unsigned char         pool[MAXBLOCKSIZE];
     symmetric_CTR         ctr;
+    short ready;           /* ready flag 0-1 */
+    LTC_MUTEX_TYPE(lock)   /* lock */
 };
 #endif
 
 #ifdef LTC_RC4
 struct rc4_prng {
     rc4_state s;
+    short ready;           /* ready flag 0-1 */
+    LTC_MUTEX_TYPE(lock)   /* lock */
 };
 #endif
 
@@ -27,6 +31,8 @@ struct chacha20_prng {
     chacha_state s;        /* chacha state */
     unsigned char ent[40]; /* entropy buffer */
     unsigned long idx;     /* entropy counter */
+    short ready;           /* ready flag 0-1 */
+    LTC_MUTEX_TYPE(lock)   /* lock */
 };
 #endif
 
@@ -44,6 +50,8 @@ struct fortuna_prng {
                   wd;
 
     ulong64       reset_cnt;  /* number of times we have reseeded */
+    short ready;              /* ready flag 0-1 */
+    LTC_MUTEX_TYPE(lock)      /* lock */
 };
 #endif
 
@@ -52,30 +60,28 @@ struct sober128_prng {
     sober128_state s;      /* sober128 state */
     unsigned char ent[40]; /* entropy buffer */
     unsigned long idx;     /* entropy counter */
+    short ready;           /* ready flag 0-1 */
+    LTC_MUTEX_TYPE(lock)   /* lock */
 };
 #endif
 
-typedef struct {
-   union {
-      char dummy[1];
+typedef union Prng_state {
+    char dummy[1];
 #ifdef LTC_YARROW
-      struct yarrow_prng    yarrow;
+    struct yarrow_prng    yarrow;
 #endif
 #ifdef LTC_RC4
-      struct rc4_prng       rc4;
+    struct rc4_prng       rc4;
 #endif
 #ifdef LTC_CHACHA20_PRNG
-      struct chacha20_prng  chacha;
+    struct chacha20_prng  chacha;
 #endif
 #ifdef LTC_FORTUNA
-      struct fortuna_prng   fortuna;
+    struct fortuna_prng   fortuna;
 #endif
 #ifdef LTC_SOBER128
-      struct sober128_prng  sober128;
+    struct sober128_prng  sober128;
 #endif
-   };
-   short ready;            /* ready flag 0-1 */
-   LTC_MUTEX_TYPE(lock)    /* lock */
 } prng_state;
 
 /** PRNG descriptor */

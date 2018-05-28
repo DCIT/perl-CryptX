@@ -37,10 +37,10 @@ const struct ltc_prng_descriptor chacha20_prng_desc =
 int chacha20_prng_start(prng_state *prng)
 {
    LTC_ARGCHK(prng != NULL);
-   prng->ready = 0;
+   prng->chacha.ready = 0;
    XMEMSET(&prng->chacha.ent, 0, sizeof(prng->chacha.ent));
    prng->chacha.idx = 0;
-   LTC_MUTEX_INIT(&prng->lock)
+   LTC_MUTEX_INIT(&prng->chacha.lock)
    return CRYPT_OK;
 }
 
@@ -61,8 +61,8 @@ int chacha20_prng_add_entropy(const unsigned char *in, unsigned long inlen, prng
    LTC_ARGCHK(in != NULL);
    LTC_ARGCHK(inlen > 0);
 
-   LTC_MUTEX_LOCK(&prng->lock);
-   if (prng->ready) {
+   LTC_MUTEX_LOCK(&prng->chacha.lock);
+   if (prng->chacha.ready) {
       /* chacha20_prng_ready() was already called, do "rekey" operation */
       if ((err = chacha_keystream(&prng->chacha.s, buf, sizeof(buf))) != CRYPT_OK) goto LBL_UNLOCK;
       for(i = 0; i < inlen; i++) buf[i % sizeof(buf)] ^= in[i];
@@ -79,7 +79,7 @@ int chacha20_prng_add_entropy(const unsigned char *in, unsigned long inlen, prng
    }
    err = CRYPT_OK;
 LBL_UNLOCK:
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->chacha.lock);
    return err;
 }
 
@@ -94,17 +94,17 @@ int chacha20_prng_ready(prng_state *prng)
 
    LTC_ARGCHK(prng != NULL);
 
-   LTC_MUTEX_LOCK(&prng->lock);
-   if (prng->ready)                                                    { err = CRYPT_OK; goto LBL_UNLOCK; }
+   LTC_MUTEX_LOCK(&prng->chacha.lock);
+   if (prng->chacha.ready)                                             { err = CRYPT_OK; goto LBL_UNLOCK; }
    /* key 32 bytes, 20 rounds */
    if ((err = chacha_setup(&prng->chacha.s, prng->chacha.ent, 32, 20)) != CRYPT_OK)      goto LBL_UNLOCK;
    /* iv 8 bytes */
    if ((err = chacha_ivctr64(&prng->chacha.s, prng->chacha.ent + 32, 8, 0)) != CRYPT_OK) goto LBL_UNLOCK;
    XMEMSET(&prng->chacha.ent, 0, sizeof(prng->chacha.ent));
    prng->chacha.idx = 0;
-   prng->ready = 1;
+   prng->chacha.ready = 1;
 LBL_UNLOCK:
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->chacha.lock);
    return err;
 }
 
@@ -118,11 +118,11 @@ LBL_UNLOCK:
 unsigned long chacha20_prng_read(unsigned char *out, unsigned long outlen, prng_state *prng)
 {
    if (outlen == 0 || prng == NULL || out == NULL) return 0;
-   LTC_MUTEX_LOCK(&prng->lock);
-   if (!prng->ready) { outlen = 0; goto LBL_UNLOCK; }
+   LTC_MUTEX_LOCK(&prng->chacha.lock);
+   if (!prng->chacha.ready) { outlen = 0; goto LBL_UNLOCK; }
    if (chacha_keystream(&prng->chacha.s, out, outlen) != CRYPT_OK) outlen = 0;
 LBL_UNLOCK:
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->chacha.lock);
    return outlen;
 }
 
@@ -135,11 +135,11 @@ int chacha20_prng_done(prng_state *prng)
 {
    int err;
    LTC_ARGCHK(prng != NULL);
-   LTC_MUTEX_LOCK(&prng->lock);
-   prng->ready = 0;
+   LTC_MUTEX_LOCK(&prng->chacha.lock);
+   prng->chacha.ready = 0;
    err = chacha_done(&prng->chacha.s);
-   LTC_MUTEX_UNLOCK(&prng->lock);
-   LTC_MUTEX_DESTROY(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->chacha.lock);
+   LTC_MUTEX_DESTROY(&prng->chacha.lock);
    return err;
 }
 

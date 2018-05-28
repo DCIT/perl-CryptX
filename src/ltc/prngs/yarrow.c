@@ -38,7 +38,7 @@ int yarrow_start(prng_state *prng)
    int err;
 
    LTC_ARGCHK(prng != NULL);
-   prng->ready = 0;
+   prng->yarrow.ready = 0;
 
    /* these are the default hash/cipher combo used */
 #ifdef LTC_RIJNDAEL
@@ -119,7 +119,7 @@ int yarrow_start(prng_state *prng)
 
    /* zero the memory used */
    zeromem(prng->yarrow.pool, sizeof(prng->yarrow.pool));
-   LTC_MUTEX_INIT(&prng->lock)
+   LTC_MUTEX_INIT(&prng->yarrow.lock)
 
    return CRYPT_OK;
 }
@@ -140,7 +140,7 @@ int yarrow_add_entropy(const unsigned char *in, unsigned long inlen, prng_state 
    LTC_ARGCHK(in != NULL);
    LTC_ARGCHK(inlen > 0);
 
-   LTC_MUTEX_LOCK(&prng->lock);
+   LTC_MUTEX_LOCK(&prng->yarrow.lock);
 
    if ((err = hash_is_valid(prng->yarrow.hash)) != CRYPT_OK) {
       goto LBL_UNLOCK;
@@ -166,7 +166,7 @@ int yarrow_add_entropy(const unsigned char *in, unsigned long inlen, prng_state 
    err = hash_descriptor[prng->yarrow.hash].done(&md, prng->yarrow.pool);
 
 LBL_UNLOCK:
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->yarrow.lock);
    return err;
 }
 
@@ -181,7 +181,7 @@ int yarrow_ready(prng_state *prng)
 
    LTC_ARGCHK(prng != NULL);
 
-   LTC_MUTEX_LOCK(&prng->lock);
+   LTC_MUTEX_LOCK(&prng->yarrow.lock);
 
    if ((err = hash_is_valid(prng->yarrow.hash)) != CRYPT_OK) {
       goto LBL_UNLOCK;
@@ -205,10 +205,10 @@ int yarrow_ready(prng_state *prng)
                         &prng->yarrow.ctr)) != CRYPT_OK) {
       goto LBL_UNLOCK;
    }
-   prng->ready = 1;
+   prng->yarrow.ready = 1;
 
 LBL_UNLOCK:
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->yarrow.lock);
    return err;
 }
 
@@ -223,9 +223,9 @@ unsigned long yarrow_read(unsigned char *out, unsigned long outlen, prng_state *
 {
    if (outlen == 0 || prng == NULL || out == NULL) return 0;
 
-   LTC_MUTEX_LOCK(&prng->lock);
+   LTC_MUTEX_LOCK(&prng->yarrow.lock);
 
-   if (!prng->ready) {
+   if (!prng->yarrow.ready) {
       outlen = 0;
       goto LBL_UNLOCK;
    }
@@ -239,7 +239,7 @@ unsigned long yarrow_read(unsigned char *out, unsigned long outlen, prng_state *
    }
 
 LBL_UNLOCK:
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->yarrow.lock);
    return outlen;
 }
 
@@ -253,16 +253,16 @@ int yarrow_done(prng_state *prng)
    int err;
    LTC_ARGCHK(prng != NULL);
 
-   LTC_MUTEX_LOCK(&prng->lock);
-   prng->ready = 0;
+   LTC_MUTEX_LOCK(&prng->yarrow.lock);
+   prng->yarrow.ready = 0;
 
    /* call cipher done when we invent one ;-) */
 
    /* we invented one */
    err = ctr_done(&prng->yarrow.ctr);
 
-   LTC_MUTEX_UNLOCK(&prng->lock);
-   LTC_MUTEX_DESTROY(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->yarrow.lock);
+   LTC_MUTEX_DESTROY(&prng->yarrow.lock);
    return err;
 }
 

@@ -183,7 +183,7 @@ int fortuna_update_seed(const unsigned char *in, unsigned long inlen, prng_state
    unsigned char tmp[MAXBLOCKSIZE];
    hash_state    md;
 
-   LTC_MUTEX_LOCK(&prng->lock);
+   LTC_MUTEX_LOCK(&prng->fortuna.lock);
    /* new K = LTC_SHA256(K || in) */
    sha256_init(&md);
    if ((err = sha256_process(&md, prng->fortuna.K, 32)) != CRYPT_OK) {
@@ -201,7 +201,7 @@ int fortuna_update_seed(const unsigned char *in, unsigned long inlen, prng_state
    _fortuna_update_iv(prng);
 
 LBL_UNLOCK:
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->fortuna.lock);
 #ifdef LTC_CLEAN_STACK
    zeromem(&md, sizeof(md));
 #endif
@@ -220,7 +220,7 @@ int fortuna_start(prng_state *prng)
    unsigned char tmp[MAXBLOCKSIZE];
 
    LTC_ARGCHK(prng != NULL);
-   prng->ready = 0;
+   prng->fortuna.ready = 0;
 
    /* initialize the pools */
    for (x = 0; x < LTC_FORTUNA_POOLS; x++) {
@@ -244,7 +244,7 @@ int fortuna_start(prng_state *prng)
    }
    zeromem(prng->fortuna.IV, 16);
 
-   LTC_MUTEX_INIT(&prng->lock)
+   LTC_MUTEX_INIT(&prng->fortuna.lock)
 
    return CRYPT_OK;
 }
@@ -294,11 +294,11 @@ int fortuna_add_random_event(unsigned long source, unsigned long pool, const uns
    LTC_ARGCHK(source <= 255);
    LTC_ARGCHK(pool < LTC_FORTUNA_POOLS);
 
-   LTC_MUTEX_LOCK(&prng->lock);
+   LTC_MUTEX_LOCK(&prng->fortuna.lock);
 
    err = _fortuna_add(source, pool, in, inlen, prng);
 
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->fortuna.lock);
 
    return err;
 }
@@ -318,7 +318,7 @@ int fortuna_add_entropy(const unsigned char *in, unsigned long inlen, prng_state
    LTC_ARGCHK(in != NULL);
    LTC_ARGCHK(inlen > 0);
 
-   LTC_MUTEX_LOCK(&prng->lock);
+   LTC_MUTEX_LOCK(&prng->fortuna.lock);
 
    err = _fortuna_add(0, prng->fortuna.pool_idx, in, inlen, prng);
 
@@ -327,7 +327,7 @@ int fortuna_add_entropy(const unsigned char *in, unsigned long inlen, prng_state
       prng->fortuna.pool_idx %= LTC_FORTUNA_POOLS;
    }
 
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->fortuna.lock);
 
    return err;
 }
@@ -342,7 +342,7 @@ int fortuna_ready(prng_state *prng)
    int err;
    LTC_ARGCHK(prng != NULL);
 
-   LTC_MUTEX_LOCK(&prng->lock);
+   LTC_MUTEX_LOCK(&prng->fortuna.lock);
    /* make sure the reseed doesn't fail because
     * of the chosen rate limit */
 #ifdef LTC_FORTUNA_RESEED_RATELIMIT_TIMED
@@ -351,9 +351,9 @@ int fortuna_ready(prng_state *prng)
    prng->fortuna.wd = LTC_FORTUNA_WD;
 #endif
    err = _fortuna_reseed(prng);
-   prng->ready = (err == CRYPT_OK) ? 1 : 0;
+   prng->fortuna.ready = (err == CRYPT_OK) ? 1 : 0;
 
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->fortuna.lock);
    return err;
 }
 
@@ -371,9 +371,9 @@ unsigned long fortuna_read(unsigned char *out, unsigned long outlen, prng_state 
 
    if (outlen == 0 || prng == NULL || out == NULL) return 0;
 
-   LTC_MUTEX_LOCK(&prng->lock);
+   LTC_MUTEX_LOCK(&prng->fortuna.lock);
 
-   if (!prng->ready) {
+   if (!prng->fortuna.ready) {
       goto LBL_UNLOCK;
    }
 
@@ -423,7 +423,7 @@ LBL_UNLOCK:
 #ifdef LTC_CLEAN_STACK
    zeromem(tmp, sizeof(tmp));
 #endif
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->fortuna.lock);
    return tlen;
 }
 
@@ -439,8 +439,8 @@ int fortuna_done(prng_state *prng)
 
    LTC_ARGCHK(prng != NULL);
 
-   LTC_MUTEX_LOCK(&prng->lock);
-   prng->ready = 0;
+   LTC_MUTEX_LOCK(&prng->fortuna.lock);
+   prng->fortuna.ready = 0;
 
    /* terminate all the hashes */
    for (x = 0; x < LTC_FORTUNA_POOLS; x++) {
@@ -455,8 +455,8 @@ LBL_UNLOCK:
 #ifdef LTC_CLEAN_STACK
    zeromem(tmp, sizeof(tmp));
 #endif
-   LTC_MUTEX_UNLOCK(&prng->lock);
-   LTC_MUTEX_DESTROY(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->fortuna.lock);
+   LTC_MUTEX_DESTROY(&prng->fortuna.lock);
    return err;
 }
 

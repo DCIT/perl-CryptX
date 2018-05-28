@@ -37,12 +37,12 @@ const struct ltc_prng_descriptor rc4_desc =
 int rc4_start(prng_state *prng)
 {
    LTC_ARGCHK(prng != NULL);
-   prng->ready = 0;
+   prng->rc4.ready = 0;
    /* set entropy (key) size to zero */
    prng->rc4.s.x = 0;
    /* clear entropy (key) buffer */
    XMEMSET(&prng->rc4.s.buf, 0, sizeof(prng->rc4.s.buf));
-   LTC_MUTEX_INIT(&prng->lock)
+   LTC_MUTEX_INIT(&prng->rc4.lock)
    return CRYPT_OK;
 }
 
@@ -63,8 +63,8 @@ int rc4_add_entropy(const unsigned char *in, unsigned long inlen, prng_state *pr
    LTC_ARGCHK(in != NULL);
    LTC_ARGCHK(inlen > 0);
 
-   LTC_MUTEX_LOCK(&prng->lock);
-   if (prng->ready) {
+   LTC_MUTEX_LOCK(&prng->rc4.lock);
+   if (prng->rc4.ready) {
       /* rc4_ready() was already called, do "rekey" operation */
       if ((err = rc4_stream_keystream(&prng->rc4.s, buf, sizeof(buf))) != CRYPT_OK) goto LBL_UNLOCK;
       for(i = 0; i < inlen; i++) buf[i % sizeof(buf)] ^= in[i];
@@ -80,7 +80,7 @@ int rc4_add_entropy(const unsigned char *in, unsigned long inlen, prng_state *pr
    }
    err = CRYPT_OK;
 LBL_UNLOCK:
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->rc4.lock);
    return err;
 }
 
@@ -97,17 +97,17 @@ int rc4_ready(prng_state *prng)
 
    LTC_ARGCHK(prng != NULL);
 
-   LTC_MUTEX_LOCK(&prng->lock);
-   if (prng->ready) { err = CRYPT_OK; goto LBL_UNLOCK; }
+   LTC_MUTEX_LOCK(&prng->rc4.lock);
+   if (prng->rc4.ready) { err = CRYPT_OK; goto LBL_UNLOCK; }
    XMEMCPY(buf, prng->rc4.s.buf, sizeof(buf));
    /* initialize RC4 */
    len = MIN(prng->rc4.s.x, 256); /* TODO: we can perhaps always use all 256 bytes */
    if ((err = rc4_stream_setup(&prng->rc4.s, buf, len)) != CRYPT_OK) goto LBL_UNLOCK;
    /* drop first 3072 bytes - https://en.wikipedia.org/wiki/RC4#Fluhrer.2C_Mantin_and_Shamir_attack */
    for (i = 0; i < 12; i++) rc4_stream_keystream(&prng->rc4.s, buf, sizeof(buf));
-   prng->ready = 1;
+   prng->rc4.ready = 1;
 LBL_UNLOCK:
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->rc4.lock);
    return err;
 }
 
@@ -121,11 +121,11 @@ LBL_UNLOCK:
 unsigned long rc4_read(unsigned char *out, unsigned long outlen, prng_state *prng)
 {
    if (outlen == 0 || prng == NULL || out == NULL) return 0;
-   LTC_MUTEX_LOCK(&prng->lock);
-   if (!prng->ready) { outlen = 0; goto LBL_UNLOCK; }
+   LTC_MUTEX_LOCK(&prng->rc4.lock);
+   if (!prng->rc4.ready) { outlen = 0; goto LBL_UNLOCK; }
    if (rc4_stream_keystream(&prng->rc4.s, out, outlen) != CRYPT_OK) outlen = 0;
 LBL_UNLOCK:
-   LTC_MUTEX_UNLOCK(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->rc4.lock);
    return outlen;
 }
 
@@ -138,11 +138,11 @@ int rc4_done(prng_state *prng)
 {
    int err;
    LTC_ARGCHK(prng != NULL);
-   LTC_MUTEX_LOCK(&prng->lock);
-   prng->ready = 0;
+   LTC_MUTEX_LOCK(&prng->rc4.lock);
+   prng->rc4.ready = 0;
    err = rc4_stream_done(&prng->rc4.s);
-   LTC_MUTEX_UNLOCK(&prng->lock);
-   LTC_MUTEX_DESTROY(&prng->lock);
+   LTC_MUTEX_UNLOCK(&prng->rc4.lock);
+   LTC_MUTEX_DESTROY(&prng->rc4.lock);
    return err;
 }
 
