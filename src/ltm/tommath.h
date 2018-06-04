@@ -79,7 +79,7 @@ typedef unsigned long        mp_word __attribute__((mode(TI)));
 /* this is to make porting into LibTomCrypt easier :-) */
 typedef unsigned int         mp_digit;
 #ifdef _MSC_VER
-typedef unsigned __int64 mp_word
+typedef unsigned __int64 mp_word;
 #else
 typedef unsigned long long   mp_word; /* PATCHED */
 #endif

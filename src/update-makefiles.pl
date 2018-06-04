@@ -25,7 +25,7 @@ system 'sed', '-i', 's,^\(unsigned *long *long *mp_get_long_long.*\),/* \1 */,',
 #  #else
 #  typedef unsigned long long mp_word;
 #  #endif
-system 'sed', '-i', 's,^\(typedef *unsigned *long *long *mp_word;\)$,#ifdef _MSC_VER\ntypedef unsigned __int64 mp_word\n#else\n\1 /* PATCHED */\n#endif,', 'src//ltm/tommath.h';
+system 'sed', '-i', 's,^\(typedef *unsigned *long *long *mp_word;\)$,#ifdef _MSC_VER\ntypedef unsigned __int64 mp_word;\n#else\n\1 /* PATCHED */\n#endif,', 'src//ltm/tommath.h';
 
 find({ wanted=>sub { unlink $_ if -f $_ && $_ =~ /test\.c$/ && $_ !~ /sha3_test.c$/ }, no_chdir=>1 }, "$FindBin::Bin/ltc");
 find({ wanted=>sub { unlink $_ if -f $_ && $_ =~ /\.o$/ }, no_chdir=>1 }, "$FindBin::Bin/ltm", "$FindBin::Bin/ltc");
