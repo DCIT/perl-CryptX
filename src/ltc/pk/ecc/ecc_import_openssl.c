@@ -7,7 +7,7 @@
  * guarantee it works.
  */
 
-#include "tomcrypt.h"
+#include "tomcrypt_private.h"
 
 #ifdef LTC_MECC
 
@@ -149,9 +149,8 @@ int ecc_import_openssl(const unsigned char *in, unsigned long inlen, ecc_key *ke
       goto success;
    }
 
-   /* ### 5. backward compatibility - try to load old-DER format */
-
-   if ((err = ecc_import(in, inlen, key)) != CRYPT_OK)                                         { goto error; }
+   /* ### 5. all attempts failed */
+   goto error;
 
 success:
    err = CRYPT_OK;

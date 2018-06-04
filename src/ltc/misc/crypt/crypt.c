@@ -6,7 +6,7 @@
  * The library is free for all purposes without any express
  * guarantee it works.
  */
-#include "tomcrypt.h"
+#include "tomcrypt_private.h"
 
 /**
   @file crypt.c
@@ -134,6 +134,9 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_SALSA20)
    "   Salsa20\n"
+#endif
+#if defined(LTC_XSALSA20)
+   "   XSalsa20\n"
 #endif
 #if defined(LTC_SOSEMANUK)
    "   Sosemanuk\n"
@@ -350,9 +353,6 @@ const char *crypt_build_settings =
 #if defined(LTC_MDSA)
     "   DSA\n"
 #endif
-#if defined(LTC_MKAT)
-    "   Katja\n"
-#endif
 #if defined(LTC_PK_MAX_RETRIES)
     "   "NAME_VALUE(LTC_PK_MAX_RETRIES)"\n"
 #endif
@@ -515,10 +515,13 @@ const char *crypt_build_settings =
     " LTC_MECC_ACCEL "
 #endif
 #if defined(LTC_MECC_FP)
-   " LTC_MECC_FP "
+    " LTC_MECC_FP "
 #endif
 #if defined(LTC_ECC_SHAMIR)
-   " LTC_ECC_SHAMIR "
+    " LTC_ECC_SHAMIR "
+#endif
+#if defined(LTC_CLOCK_GETTIME)
+    " LTC_CLOCK_GETTIME "
 #endif
     "\n"
     ;

@@ -7,7 +7,7 @@
  * guarantee it works.
  */
 
-#include "tomcrypt.h"
+#include "tomcrypt_private.h"
 
 /**
   @file ecc_make_key.c
@@ -48,11 +48,6 @@ int ecc_generate_key(prng_state *prng, int wprng, ecc_key *key)
    LTC_ARGCHK(ltc_mp.name != NULL);
    LTC_ARGCHK(key         != NULL);
    LTC_ARGCHK(key->dp.size > 0);
-
-   /* good prng? */
-   if ((err = prng_is_valid(wprng)) != CRYPT_OK) {
-      return err;
-   }
 
    /* ECC key pair generation according to FIPS-186-4 (B.4.2 Key Pair Generation by Testing Candidates):
     * the generated private key k should be the range [1, order-1]

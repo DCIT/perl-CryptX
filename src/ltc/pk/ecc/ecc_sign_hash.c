@@ -7,7 +7,7 @@
  * guarantee it works.
  */
 
-#include "tomcrypt.h"
+#include "tomcrypt_private.h"
 
 #ifdef LTC_MECC
 
@@ -34,10 +34,6 @@ static int _ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
    /* is this a private key? */
    if (key->type != PK_PRIVATE) {
       return CRYPT_PK_NOT_PRIVATE;
-   }
-
-   if ((err = prng_is_valid(wprng)) != CRYPT_OK) {
-      return err;
    }
 
    /* init the bignums */

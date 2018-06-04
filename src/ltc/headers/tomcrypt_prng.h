@@ -13,16 +13,12 @@ struct yarrow_prng {
     int                   cipher, hash;
     unsigned char         pool[MAXBLOCKSIZE];
     symmetric_CTR         ctr;
-    short ready;           /* ready flag 0-1 */
-    LTC_MUTEX_TYPE(lock)   /* lock */
 };
 #endif
 
 #ifdef LTC_RC4
 struct rc4_prng {
     rc4_state s;
-    short ready;           /* ready flag 0-1 */
-    LTC_MUTEX_TYPE(lock)   /* lock */
 };
 #endif
 
@@ -31,8 +27,6 @@ struct chacha20_prng {
     chacha_state s;        /* chacha state */
     unsigned char ent[40]; /* entropy buffer */
     unsigned long idx;     /* entropy counter */
-    short ready;           /* ready flag 0-1 */
-    LTC_MUTEX_TYPE(lock)   /* lock */
 };
 #endif
 
@@ -46,12 +40,9 @@ struct fortuna_prng {
                   IV[16];     /* IV for CTR mode */
 
     unsigned long pool_idx,   /* current pool we will add to */
-                  pool0_len,  /* length of 0'th pool */
-                  wd;
-
+                  pool0_len;  /* length of 0'th pool */
+    ulong64       wd;
     ulong64       reset_cnt;  /* number of times we have reseeded */
-    short ready;              /* ready flag 0-1 */
-    LTC_MUTEX_TYPE(lock)      /* lock */
 };
 #endif
 
@@ -60,28 +51,30 @@ struct sober128_prng {
     sober128_state s;      /* sober128 state */
     unsigned char ent[40]; /* entropy buffer */
     unsigned long idx;     /* entropy counter */
-    short ready;           /* ready flag 0-1 */
-    LTC_MUTEX_TYPE(lock)   /* lock */
 };
 #endif
 
-typedef union Prng_state {
-    char dummy[1];
+typedef struct {
+   union {
+      char dummy[1];
 #ifdef LTC_YARROW
-    struct yarrow_prng    yarrow;
+      struct yarrow_prng    yarrow;
 #endif
 #ifdef LTC_RC4
-    struct rc4_prng       rc4;
+      struct rc4_prng       rc4;
 #endif
 #ifdef LTC_CHACHA20_PRNG
-    struct chacha20_prng  chacha;
+      struct chacha20_prng  chacha;
 #endif
 #ifdef LTC_FORTUNA
-    struct fortuna_prng   fortuna;
+      struct fortuna_prng   fortuna;
 #endif
 #ifdef LTC_SOBER128
-    struct sober128_prng  sober128;
+      struct sober128_prng  sober128;
 #endif
+   } u;
+   short ready;            /* ready flag 0-1 */
+   LTC_MUTEX_TYPE(lock)    /* lock */
 } prng_state;
 
 /** PRNG descriptor */
@@ -219,31 +212,6 @@ int unregister_prng(const struct ltc_prng_descriptor *prng);
 int register_all_prngs(void);
 int prng_is_valid(int idx);
 LTC_MUTEX_PROTO(ltc_prng_mutex)
-
-#ifdef LTC_SOURCE
-/* internal helper functions */
-#define _LTC_PRNG_EXPORT(which) \
-int which ## _export(unsigned char *out, unsigned long *outlen, prng_state *prng)      \
-{                                                                                      \
-   unsigned long len = which ## _desc.export_size;                                     \
-                                                                                       \
-   LTC_ARGCHK(prng   != NULL);                                                         \
-   LTC_ARGCHK(out    != NULL);                                                         \
-   LTC_ARGCHK(outlen != NULL);                                                         \
-                                                                                       \
-   if (*outlen < len) {                                                                \
-      *outlen = len;                                                                   \
-      return CRYPT_BUFFER_OVERFLOW;                                                    \
-   }                                                                                   \
-                                                                                       \
-   if (which ## _read(out, len, prng) != len) {                                        \
-      return CRYPT_ERROR_READPRNG;                                                     \
-   }                                                                                   \
-                                                                                       \
-   *outlen = len;                                                                      \
-   return CRYPT_OK;                                                                    \
-}
-#endif
 
 /* Slow RNG you **might** be able to use to seed a PRNG with.  Be careful as this
  * might not work on all platforms as planned

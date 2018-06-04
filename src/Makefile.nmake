@@ -110,15 +110,15 @@ ltc/pk/dsa/dsa_shared_secret.obj ltc/pk/dsa/dsa_sign_hash.obj ltc/pk/dsa/dsa_ver
 ltc/pk/dsa/dsa_verify_key.obj ltc/pk/ecc/ecc.obj ltc/pk/ecc/ecc_ansi_x963_export.obj \
 ltc/pk/ecc/ecc_ansi_x963_import.obj ltc/pk/ecc/ecc_decrypt_key.obj ltc/pk/ecc/ecc_encrypt_key.obj \
 ltc/pk/ecc/ecc_export.obj ltc/pk/ecc/ecc_export_openssl.obj ltc/pk/ecc/ecc_free.obj \
-ltc/pk/ecc/ecc_get_curve.obj ltc/pk/ecc/ecc_get_key.obj ltc/pk/ecc/ecc_get_size.obj \
-ltc/pk/ecc/ecc_import.obj ltc/pk/ecc/ecc_import_openssl.obj ltc/pk/ecc/ecc_import_pkcs8.obj \
-ltc/pk/ecc/ecc_import_x509.obj ltc/pk/ecc/ecc_make_key.obj ltc/pk/ecc/ecc_set_dp.obj \
-ltc/pk/ecc/ecc_set_dp_internal.obj ltc/pk/ecc/ecc_set_key.obj ltc/pk/ecc/ecc_shared_secret.obj \
-ltc/pk/ecc/ecc_sign_hash.obj ltc/pk/ecc/ecc_sizes.obj ltc/pk/ecc/ecc_verify_hash.obj \
-ltc/pk/ecc/ltc_ecc_export_point.obj ltc/pk/ecc/ltc_ecc_import_point.obj ltc/pk/ecc/ltc_ecc_is_point.obj \
-ltc/pk/ecc/ltc_ecc_is_point_at_infinity.obj ltc/pk/ecc/ltc_ecc_map.obj ltc/pk/ecc/ltc_ecc_mul2add.obj \
-ltc/pk/ecc/ltc_ecc_mulmod.obj ltc/pk/ecc/ltc_ecc_mulmod_timing.obj ltc/pk/ecc/ltc_ecc_points.obj \
-ltc/pk/ecc/ltc_ecc_projective_add_point.obj ltc/pk/ecc/ltc_ecc_projective_dbl_point.obj \
+ltc/pk/ecc/ecc_get_curve.obj ltc/pk/ecc/ecc_get_key.obj ltc/pk/ecc/ecc_get_oid_str.obj \
+ltc/pk/ecc/ecc_get_size.obj ltc/pk/ecc/ecc_import.obj ltc/pk/ecc/ecc_import_openssl.obj \
+ltc/pk/ecc/ecc_import_pkcs8.obj ltc/pk/ecc/ecc_import_x509.obj ltc/pk/ecc/ecc_make_key.obj \
+ltc/pk/ecc/ecc_set_dp.obj ltc/pk/ecc/ecc_set_dp_internal.obj ltc/pk/ecc/ecc_set_key.obj \
+ltc/pk/ecc/ecc_shared_secret.obj ltc/pk/ecc/ecc_sign_hash.obj ltc/pk/ecc/ecc_sizes.obj \
+ltc/pk/ecc/ecc_verify_hash.obj ltc/pk/ecc/ltc_ecc_export_point.obj ltc/pk/ecc/ltc_ecc_import_point.obj \
+ltc/pk/ecc/ltc_ecc_is_point.obj ltc/pk/ecc/ltc_ecc_is_point_at_infinity.obj ltc/pk/ecc/ltc_ecc_map.obj \
+ltc/pk/ecc/ltc_ecc_mul2add.obj ltc/pk/ecc/ltc_ecc_mulmod.obj ltc/pk/ecc/ltc_ecc_mulmod_timing.obj \
+ltc/pk/ecc/ltc_ecc_points.obj ltc/pk/ecc/ltc_ecc_projective_add_point.obj ltc/pk/ecc/ltc_ecc_projective_dbl_point.obj \
 ltc/pk/ecc/ltc_ecc_verify_key.obj ltc/pk/pkcs1/pkcs_1_i2osp.obj ltc/pk/pkcs1/pkcs_1_mgf1.obj \
 ltc/pk/pkcs1/pkcs_1_oaep_decode.obj ltc/pk/pkcs1/pkcs_1_oaep_encode.obj ltc/pk/pkcs1/pkcs_1_os2ip.obj \
 ltc/pk/pkcs1/pkcs_1_pss_decode.obj ltc/pk/pkcs1/pkcs_1_pss_encode.obj ltc/pk/pkcs1/pkcs_1_v1_5_decode.obj \
@@ -132,14 +132,14 @@ ltc/prngs/yarrow.obj ltc/stream/chacha/chacha_crypt.obj ltc/stream/chacha/chacha
 ltc/stream/chacha/chacha_ivctr32.obj ltc/stream/chacha/chacha_ivctr64.obj ltc/stream/chacha/chacha_keystream.obj \
 ltc/stream/chacha/chacha_setup.obj ltc/stream/rabbit/rabbit.obj ltc/stream/rc4/rc4_stream.obj \
 ltc/stream/salsa20/salsa20_crypt.obj ltc/stream/salsa20/salsa20_done.obj ltc/stream/salsa20/salsa20_ivctr64.obj \
-ltc/stream/salsa20/salsa20_keystream.obj ltc/stream/salsa20/salsa20_setup.obj ltc/stream/sober128/sober128_stream.obj \
-ltc/stream/sosemanuk/sosemanuk.obj ltm/bncore.obj ltm/bn_error.obj ltm/bn_fast_mp_invmod.obj \
-ltm/bn_fast_mp_montgomery_reduce.obj ltm/bn_fast_s_mp_mul_digs.obj ltm/bn_fast_s_mp_mul_high_digs.obj \
-ltm/bn_fast_s_mp_sqr.obj ltm/bn_mp_2expt.obj ltm/bn_mp_abs.obj ltm/bn_mp_add.obj \
-ltm/bn_mp_addmod.obj ltm/bn_mp_add_d.obj ltm/bn_mp_and.obj ltm/bn_mp_clamp.obj ltm/bn_mp_clear.obj \
-ltm/bn_mp_clear_multi.obj ltm/bn_mp_cmp.obj ltm/bn_mp_cmp_d.obj ltm/bn_mp_cmp_mag.obj \
-ltm/bn_mp_cnt_lsb.obj ltm/bn_mp_copy.obj ltm/bn_mp_count_bits.obj ltm/bn_mp_div.obj \
-ltm/bn_mp_div_2.obj ltm/bn_mp_div_2d.obj ltm/bn_mp_div_3.obj ltm/bn_mp_div_d.obj \
+ltc/stream/salsa20/salsa20_keystream.obj ltc/stream/salsa20/salsa20_setup.obj ltc/stream/salsa20/xsalsa20_setup.obj \
+ltc/stream/sober128/sober128_stream.obj ltc/stream/sosemanuk/sosemanuk.obj ltm/bncore.obj \
+ltm/bn_error.obj ltm/bn_fast_mp_invmod.obj ltm/bn_fast_mp_montgomery_reduce.obj ltm/bn_fast_s_mp_mul_digs.obj \
+ltm/bn_fast_s_mp_mul_high_digs.obj ltm/bn_fast_s_mp_sqr.obj ltm/bn_mp_2expt.obj ltm/bn_mp_abs.obj \
+ltm/bn_mp_add.obj ltm/bn_mp_addmod.obj ltm/bn_mp_add_d.obj ltm/bn_mp_and.obj ltm/bn_mp_clamp.obj \
+ltm/bn_mp_clear.obj ltm/bn_mp_clear_multi.obj ltm/bn_mp_cmp.obj ltm/bn_mp_cmp_d.obj \
+ltm/bn_mp_cmp_mag.obj ltm/bn_mp_cnt_lsb.obj ltm/bn_mp_copy.obj ltm/bn_mp_count_bits.obj \
+ltm/bn_mp_div.obj ltm/bn_mp_div_2.obj ltm/bn_mp_div_2d.obj ltm/bn_mp_div_3.obj ltm/bn_mp_div_d.obj \
 ltm/bn_mp_dr_is_modulus.obj ltm/bn_mp_dr_reduce.obj ltm/bn_mp_dr_setup.obj ltm/bn_mp_exch.obj \
 ltm/bn_mp_export.obj ltm/bn_mp_exptmod.obj ltm/bn_mp_exptmod_fast.obj ltm/bn_mp_expt_d.obj \
 ltm/bn_mp_expt_d_ex.obj ltm/bn_mp_exteuclid.obj ltm/bn_mp_fread.obj ltm/bn_mp_fwrite.obj \

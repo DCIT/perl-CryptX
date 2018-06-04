@@ -7,7 +7,7 @@
  * guarantee it works.
  */
 
-#include "tomcrypt.h"
+#include "tomcrypt_private.h"
 
 /**
   @file ecc_encrypt_key.c
@@ -42,11 +42,6 @@ int ecc_encrypt_key(const unsigned char *in,   unsigned long inlen,
     LTC_ARGCHK(out     != NULL);
     LTC_ARGCHK(outlen  != NULL);
     LTC_ARGCHK(key     != NULL);
-
-    /* check that wprng/cipher/hash are not invalid */
-    if ((err = prng_is_valid(wprng)) != CRYPT_OK) {
-       return err;
-    }
 
     if ((err = hash_is_valid(hash)) != CRYPT_OK) {
        return err;

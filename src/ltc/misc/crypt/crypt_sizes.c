@@ -6,7 +6,7 @@
  * The library is free for all purposes without any express
  * guarantee it works.
  */
-#include "tomcrypt.h"
+#include "tomcrypt_private.h"
 
 /**
   @file crypt_sizes.c
@@ -248,9 +248,6 @@ static const crypt_size _crypt_sizes[] = {
     _SZ_STRINGIFY_T(ltc_ecc_curve),
     _SZ_STRINGIFY_T(ecc_point),
     _SZ_STRINGIFY_T(ecc_key),
-#endif
-#ifdef LTC_MKAT
-    _SZ_STRINGIFY_T(katja_key),
 #endif
 
     /* DER handling */

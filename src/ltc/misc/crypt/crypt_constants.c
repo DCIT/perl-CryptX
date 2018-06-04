@@ -6,7 +6,7 @@
  * The library is free for all purposes without any express
  * guarantee it works.
  */
-#include "tomcrypt.h"
+#include "tomcrypt_private.h"
 
 /**
   @file crypt_constants.c
@@ -94,14 +94,6 @@ static const crypt_constant _crypt_constants[] = {
     {"LTC_MRSA", 1},
 #else
     {"LTC_MRSA", 0},
-#endif
-
-#ifdef LTC_MKAT
-    {"LTC_MKAT", 1},
-    _C_STRINGIFY(MIN_KAT_SIZE),
-    _C_STRINGIFY(MAX_KAT_SIZE),
-#else
-    {"LTC_MKAT", 0},
 #endif
 
 #ifdef LTC_MECC

@@ -208,6 +208,7 @@
 /* stream ciphers */
 #define LTC_CHACHA
 #define LTC_SALSA20
+#define LTC_XSALSA20
 #define LTC_SOSEMANUK
 #define LTC_RABBIT
 #define LTC_RC4_STREAM
@@ -364,6 +365,15 @@
 /* time-based rate limit of the reseeding */
 #define LTC_FORTUNA_RESEED_RATELIMIT_TIMED
 
+/* with non-glibc or glibc 2.17+ prefer clock_gettime over gettimeofday */
+#if defined(__GLIBC__) && defined(__GLIBC_PREREQ)
+#if __GLIBC_PREREQ(2, 17)
+  #define LTC_CLOCK_GETTIME
+#endif
+#elif defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L
+  #define LTC_CLOCK_GETTIME
+#endif
+
 #else
 
 #ifndef LTC_FORTUNA_WD
@@ -414,9 +424,6 @@
 #define LTC_DH6144
 #define LTC_DH8192
 #endif
-
-/* Include Katja (a Rabin variant like RSA) */
-/* #define LTC_MKAT */
 
 /* Digital Signature Algorithm */
 #define LTC_MDSA
@@ -538,7 +545,7 @@
    #endif
 #endif
 
-#if defined(LTC_MECC) || defined(LTC_MRSA) || defined(LTC_MDSA) || defined(LTC_MKAT)
+#if defined(LTC_MECC) || defined(LTC_MRSA) || defined(LTC_MDSA)
    /* Include the MPI functionality?  (required by the PK algorithms) */
    #define LTC_MPI
 
@@ -568,7 +575,7 @@
    #error ASN.1 DER requires MPI functionality
 #endif
 
-#if (defined(LTC_MDSA) || defined(LTC_MRSA) || defined(LTC_MECC) || defined(LTC_MKAT)) && !defined(LTC_DER)
+#if (defined(LTC_MDSA) || defined(LTC_MRSA) || defined(LTC_MECC)) && !defined(LTC_DER)
    #error PK requires ASN.1 DER functionality, make sure LTC_DER is enabled
 #endif
 
@@ -578,6 +585,10 @@
 
 #if defined(LTC_CHACHA20_PRNG) && !defined(LTC_CHACHA)
    #error LTC_CHACHA20_PRNG requires LTC_CHACHA
+#endif
+
+#if defined(LTC_XSALSA20) && !defined(LTC_SALSA20)
+   #error LTC_XSALSA20 requires LTC_SALSA20
 #endif
 
 #if defined(LTC_RC4) && !defined(LTC_RC4_STREAM)
