@@ -78,7 +78,11 @@ typedef unsigned long        mp_word __attribute__((mode(TI)));
 
 /* this is to make porting into LibTomCrypt easier :-) */
 typedef unsigned int         mp_digit;
-typedef unsigned long long   mp_word;
+#ifdef _MSC_VER
+typedef unsigned __int64 mp_word
+#else
+typedef unsigned long long   mp_word; /* PATCHED */
+#endif
 
 #   ifdef MP_31BIT
 /* this is an extension that uses 31-bit digits */
@@ -207,7 +211,7 @@ int mp_set_int(mp_int *a, unsigned long b);
 int mp_set_long(mp_int *a, unsigned long b);
 
 /* set a platform dependent unsigned long long value */
-int mp_set_long_long(mp_int *a, unsigned long long b);
+/* int mp_set_long_long(mp_int *a, unsigned long long b); */
 
 /* get a 32-bit value */
 unsigned long mp_get_int(const mp_int *a);
@@ -216,7 +220,7 @@ unsigned long mp_get_int(const mp_int *a);
 unsigned long mp_get_long(const mp_int *a);
 
 /* get a platform dependent unsigned long long value */
-unsigned long long mp_get_long_long(const mp_int *a);
+/* unsigned long long mp_get_long_long(const mp_int *a); */
 
 /* initialize and set a digit */
 int mp_init_set(mp_int *a, mp_digit b);
