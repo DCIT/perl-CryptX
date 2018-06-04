@@ -2,7 +2,7 @@ package Crypt::Stream::Sosemanuk;
 
 use strict;
 use warnings;
-our $VERSION = '0.060_002';
+our $VERSION = '0.060_003';
 
 use CryptX;
 
