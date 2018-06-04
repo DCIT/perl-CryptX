@@ -54,6 +54,21 @@ _import(Crypt::PK::ECC self, SV * key_data)
     }
 
 void
+_import_old(Crypt::PK::ECC self, SV * key_data)
+    PPCODE:
+    {
+        int rv;
+        unsigned char *data=NULL;
+        STRLEN data_len=0;
+
+        data = (unsigned char *)SvPVbyte(key_data, data_len);
+        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
+        rv = ecc_import(data, (unsigned long)data_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: ecc_import failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
+    }
+
+void
 _import_pkcs8(Crypt::PK::ECC self, SV * key_data, SV * passwd)
     PPCODE:
     {

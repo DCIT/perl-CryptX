@@ -11,13 +11,13 @@ use Crypt::Cipher::DES_EDE;
 is( Crypt::Cipher::DES_EDE::blocksize, 8, '::blocksize');
 is( Crypt::Cipher::DES_EDE::keysize, 24, '::keysize');
 is( Crypt::Cipher::DES_EDE::max_keysize, 24, '::max_keysize');
-is( Crypt::Cipher::DES_EDE::min_keysize, 24, '::min_keysize');
+is( Crypt::Cipher::DES_EDE::min_keysize, 16, '::min_keysize');
 is( Crypt::Cipher::DES_EDE::default_rounds, 16, '::default_rounds');
 
 is( Crypt::Cipher::DES_EDE->blocksize, 8, '->blocksize');
 is( Crypt::Cipher::DES_EDE->keysize, 24, '->keysize');
 is( Crypt::Cipher::DES_EDE->max_keysize, 24, '->max_keysize');
-is( Crypt::Cipher::DES_EDE->min_keysize, 24, '->min_keysize');
+is( Crypt::Cipher::DES_EDE->min_keysize, 16, '->min_keysize');
 is( Crypt::Cipher::DES_EDE->default_rounds, 16, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkkkkkkkkkkkkkkkk';
@@ -26,25 +26,25 @@ my $max_key = 'KKKKKKKKKKKKKKKKKKKKKKKK';
 is( Crypt::Cipher::blocksize('DES_EDE'), 8, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('DES_EDE'), 24, 'Cipher->keysize');
 is( Crypt::Cipher::max_keysize('DES_EDE'), 24, 'Cipher->max_keysize');
-is( Crypt::Cipher::min_keysize('DES_EDE'), 24, 'Cipher->min_keysize');
+is( Crypt::Cipher::min_keysize('DES_EDE'), 16, 'Cipher->min_keysize');
 is( Crypt::Cipher::default_rounds('DES_EDE'), 16, 'Cipher->default_rounds');
 
 is( Crypt::Cipher->blocksize('DES_EDE'), 8, 'Cipher->blocksize');
 is( Crypt::Cipher->keysize('DES_EDE'), 24, 'Cipher->keysize');
 is( Crypt::Cipher->max_keysize('DES_EDE'), 24, 'Cipher->max_keysize');
-is( Crypt::Cipher->min_keysize('DES_EDE'), 24, 'Cipher->min_keysize');
+is( Crypt::Cipher->min_keysize('DES_EDE'), 16, 'Cipher->min_keysize');
 is( Crypt::Cipher->default_rounds('DES_EDE'), 16, 'Cipher->default_rounds');
 
 is( Crypt::Cipher::DES_EDE->new($min_key)->blocksize, 8, 'DES_EDE->new()->blocksize');
 is( Crypt::Cipher::DES_EDE->new($min_key)->keysize, 24, 'DES_EDE->new()->keysize');
 is( Crypt::Cipher::DES_EDE->new($min_key)->max_keysize, 24, 'DES_EDE->new()->max_keysize');
-is( Crypt::Cipher::DES_EDE->new($min_key)->min_keysize, 24, 'DES_EDE->new()->min_keysize');
+is( Crypt::Cipher::DES_EDE->new($min_key)->min_keysize, 16, 'DES_EDE->new()->min_keysize');
 is( Crypt::Cipher::DES_EDE->new($min_key)->default_rounds, 16, 'DES_EDE->new()->default_rounds');
 
 is( Crypt::Cipher->new('DES_EDE', $min_key)->blocksize, 8, 'Cipher->new()->blocksize');
 is( Crypt::Cipher->new('DES_EDE', $min_key)->keysize, 24, 'Cipher->new()->keysize');
 is( Crypt::Cipher->new('DES_EDE', $min_key)->max_keysize, 24, 'Cipher->new()->max_keysize');
-is( Crypt::Cipher->new('DES_EDE', $min_key)->min_keysize, 24, 'Cipher->new()->min_keysize');
+is( Crypt::Cipher->new('DES_EDE', $min_key)->min_keysize, 16, 'Cipher->new()->min_keysize');
 is( Crypt::Cipher->new('DES_EDE', $min_key)->default_rounds, 16, 'Cipher->new()->default_rounds');
 
 my $block_plain = 'BBBBBBBB';
