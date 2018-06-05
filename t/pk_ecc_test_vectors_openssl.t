@@ -108,5 +108,5 @@ for my $h (@$data) {
                        "39995a5ee76b55f9c2f098020f00db7c2abf62e35e7628dfac6561c5020101a11203100003a63510".
                        "5c5717812580408a3fd5ac");
   my $pk = Crypt::PK::ECC->new(\$der);
-  ok($pk->is_private, "ecc_set_key bug");
+  ok($pk->is_private, "der_length_custom_type bug");
 }
