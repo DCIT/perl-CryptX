@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 662;
+use Test::More tests => 663;
 use Crypt::PK::ECC;
 
 my $data = [
@@ -109,4 +109,14 @@ for my $h (@$data) {
                        "5c5717812580408a3fd5ac");
   my $pk = Crypt::PK::ECC->new(\$der);
   ok($pk->is_private, "der_length_custom_type bug");
+}
+
+### ecc_import_pkcs8 bug
+{
+  my $der = pack("H*", "308193020100301306072a8648ce3d020106082a8648ce3d030107047930770201010420052f2b26".
+                       "1d38522126f6a49cbdb958d5af85ed2c9e8cfebff85c44f20fe89a0fa00a06082a8648ce3d030107".
+                       "a144034200043998011b129539269423f531808ed0854bef5b93d00aad8438742c1d272c24ca8649".
+                       "e07f17da47c07453183fe35b68d069b700c38cc61dd5d98eb92dc474b573");
+  my $pk = Crypt::PK::ECC->new(\$der);
+  ok($pk->is_private, "ecc_import_pkcs8 bug");
 }
