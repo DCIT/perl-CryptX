@@ -29,7 +29,7 @@ int ecc_set_key(const unsigned char *in, unsigned long inlen, int type, ecc_key 
       if ((err = mp_read_unsigned_bin(key->k, (unsigned char *)in, inlen)) != CRYPT_OK) {
          goto error;
       }
-      if (mp_iszero(key->k)) {
+      if (mp_iszero(key->k) || (mp_cmp(key->k, key->dp.order) != LTC_MP_LT)) {
          err = CRYPT_INVALID_PACKET;
          goto error;
       }
