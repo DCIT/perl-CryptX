@@ -119,13 +119,13 @@ MARKER
    use Crypt::PK::ECC;
 
    my $pkec = Crypt::PK::ECC->new;
-   $pkec->import_key("test_eckey.pub.der");
-   $pkec->import_key("test_eckey.pubc.der");
-   $pkec->import_key("test_eckey.priv.der");
-   $pkec->import_key("test_eckey.privc.der");
-   $pkec->import_key("test_eckey.pub.pem");
-   $pkec->import_key("test_eckey.priv.pem");
-   $pkec->import_key("test_eckey-passwd.priv.pem", "secret");
+   warn("> gonna import: test_eckey.pub.der\n");                  $pkec->import_key("test_eckey.pub.der");
+   warn("> gonna import: test_eckey.pubc.der\n");                 $pkec->import_key("test_eckey.pubc.der");
+   warn("> gonna import: test_eckey.priv.der\n");                 $pkec->import_key("test_eckey.priv.der");
+   warn("> gonna import: test_eckey.privc.der\n");                $pkec->import_key("test_eckey.privc.der");
+   warn("> gonna import: test_eckey.pub.pem\n");                  $pkec->import_key("test_eckey.pub.pem");
+   warn("> gonna import: test_eckey.priv.pem\n");                 $pkec->import_key("test_eckey.priv.pem");
+   warn("> gonna import: test_eckey-passwd.priv.pem + secret\n"); $pkec->import_key("test_eckey-passwd.priv.pem", "secret");
   }
 
   doit("$curve/B");

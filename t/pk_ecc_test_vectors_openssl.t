@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 661;
+use Test::More tests => 662;
 use Crypt::PK::ECC;
 
 my $data = [
@@ -90,10 +90,23 @@ for my $h (@$data) {
 }
 
 ### ecc_set_key bug
-my $der = pack("H*", "3081be020101041500c78b055db0706fd86b5a15e14b9e51f0043d18f9a074307202010130200607".
-                     "2a8648ce3d0101021500fffffffffffffffffffffffffffffffeffffac7330060401000401070429".
-                     "043b4c382ce37aa192a4019e763036f4f5dd4d7ebb938cf935318fdced6bc28286531733c3f03c4f".
-                     "ee02150100000000000000000001b8fa16dfab9aca16b6b3020101a12c032a00040ca9f03d79907c".
-                     "97538177a3027970abefa351073a73120e1b5d2dab02dde37c118a44f8cb267b56");
-my $pk = Crypt::PK::ECC->new(\$der);
-ok($pk->is_private, "ecc_set_key bug");
+{
+  my $der = pack("H*", "3081be020101041500c78b055db0706fd86b5a15e14b9e51f0043d18f9a074307202010130200607".
+                       "2a8648ce3d0101021500fffffffffffffffffffffffffffffffeffffac7330060401000401070429".
+                       "043b4c382ce37aa192a4019e763036f4f5dd4d7ebb938cf935318fdced6bc28286531733c3f03c4f".
+                       "ee02150100000000000000000001b8fa16dfab9aca16b6b3020101a12c032a00040ca9f03d79907c".
+                       "97538177a3027970abefa351073a73120e1b5d2dab02dde37c118a44f8cb267b56");
+  my $pk = Crypt::PK::ECC->new(\$der);
+  ok($pk->is_private, "ecc_set_key bug");
+}
+
+### der_length_custom_type bug:
+{
+  my $der = pack("H*", "3081a8020101040e20df177a6f7e4bb9fecbd2d75b57a07f307d020101301a06072a8648ce3d0101".
+                       "020f00db7c2abf62e35e668076bead208b3037040edb7c2abf62e35e668076bead2088040e659ef8".
+                       "ba043916eede8911702b2203150000f50b028e4d696e676875615175290472783fb1040f02094872".
+                       "39995a5ee76b55f9c2f098020f00db7c2abf62e35e7628dfac6561c5020101a11203100003a63510".
+                       "5c5717812580408a3fd5ac");
+  my $pk = Crypt::PK::ECC->new(\$der);
+  ok($pk->is_private, "ecc_set_key bug");
+}
