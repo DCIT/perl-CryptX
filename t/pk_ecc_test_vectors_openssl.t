@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 660;
+use Test::More tests => 661;
 use Crypt::PK::ECC;
 
 my $data = [
@@ -88,3 +88,12 @@ for my $h (@$data) {
   ok( $ec_pub->verify_message(pack("H*", $h->{ECDSA_SHA1}), 'test-data', 'SHA1'), "$h->{PRI_FILE}/ECDSA_SHA1");
   ok( $ec_pub->verify_message(pack("H*", $h->{ECDSA_SHA256}), 'test-data', 'SHA256'), "$h->{PRI_FILE}/ECDSA_SHA256");
 }
+
+### ecc_set_key bug
+my $der = pack("H*", "3081be020101041500c78b055db0706fd86b5a15e14b9e51f0043d18f9a074307202010130200607".
+                     "2a8648ce3d0101021500fffffffffffffffffffffffffffffffeffffac7330060401000401070429".
+                     "043b4c382ce37aa192a4019e763036f4f5dd4d7ebb938cf935318fdced6bc28286531733c3f03c4f".
+                     "ee02150100000000000000000001b8fa16dfab9aca16b6b3020101a12c032a00040ca9f03d79907c".
+                     "97538177a3027970abefa351073a73120e1b5d2dab02dde37c118a44f8cb267b56");
+my $pk = Crypt::PK::ECC->new(\$der);
+ok($pk->is_private, "ecc_set_key bug");

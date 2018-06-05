@@ -28,10 +28,10 @@ int ecc_import_x509(const unsigned char *in, unsigned long inlen, ecc_key *key)
 
    len = inlen;
    if ((err = der_decode_sequence_flexi(in, &len, &decoded_list)) == CRYPT_OK) {
+      err = CRYPT_ERROR;
       l = decoded_list;
       if (l->type == LTC_ASN1_SEQUENCE &&
           l->child && l->child->type == LTC_ASN1_SEQUENCE) {
-         err = CRYPT_ERROR;
          l = l->child->child;
          while (l) {
             if (l->type == LTC_ASN1_SEQUENCE && l->data &&
