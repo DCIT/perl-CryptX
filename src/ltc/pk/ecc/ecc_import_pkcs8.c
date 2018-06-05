@@ -115,6 +115,7 @@ static int _kdf_pkcs12(int hash_id, const unsigned char *pw, unsigned long pwlen
    key = XMALLOC(u * c);
    I   = XMALLOC(Plen + Slen);
    if (key == NULL || I == NULL) goto DONE;
+   zeromem(key, u * c);
 
    for (i = 0; i < v;    i++) D[i] = purpose;              /* D - diversifier */
    for (i = 0; i < Slen; i++) I[i] = salt[i % saltlen];
@@ -229,13 +230,16 @@ static int _pbes1_decrypt(const unsigned char *enc_data, unsigned long enc_size,
       pad = dec_data[enc_size-1];
       if (pad < 1 || pad > blklen) goto LBL_ERROR;
       *dec_size = enc_size - pad;
-      return CRYPT_OK;
+      err = CRYPT_OK;
+      goto LBL_DONE;
    }
 
 LBL_ERROR:
+   err = CRYPT_INVALID_ARG;
+LBL_DONE:
    zeromem(key_iv, sizeof(key_iv));
    if (pw) { zeromem(pw, pwlen); XFREE(pw); }
-   return CRYPT_INVALID_ARG;
+   return err;
 }
 
 static int _pbes2_pbkdf2_decrypt(const unsigned char *enc_data, unsigned long enc_size,
@@ -570,7 +574,6 @@ int ecc_import_pkcs8(const unsigned char *in, unsigned long inlen,
          /* load private key value 'k' */
          len = lpri->size;
          if ((err = der_decode_sequence_flexi(lpri->data, &len, &p)) == CRYPT_OK) {
-            err = CRYPT_INVALID_PACKET;
             if (p->type == LTC_ASN1_SEQUENCE &&
                 p->child && p->child->type == LTC_ASN1_INTEGER &&
                 p->child->next && p->child->next->type == LTC_ASN1_OCTET_STRING) {
