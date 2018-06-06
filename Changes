@@ -1,10 +1,10 @@
 Changes for CryptX
 
 0.061   2018-06-XX
-        - bundled libtommath update
+        - bundled libtommath update (+stdint.h workaround)
         - bundled libtomcrypt update (+necessary adaptation)
         - fix #43 HP-UX 11.11 C-ANSI-C has no stdint.h
-        - fix #44 Anonymous unions are GNU and C11 (HP C/aC++, HP-UX 11.31/IA64)
+        - fix #44 Anonymous unions are GNU and C11 (troubles with HP C/aC++, HP-UX 11.31/IA64)
 
 0.060   2018-05-01
         - bundled libtomcrypt update
