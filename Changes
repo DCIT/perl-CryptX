@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.061   2018-06-XX
+0.061   2018-06-07
         - bundled libtommath update (+stdint.h workaround)
         - bundled libtomcrypt update (+necessary adaptation)
         - fix #43 HP-UX 11.11 C-ANSI-C has no stdint.h
