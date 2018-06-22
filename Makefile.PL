@@ -101,6 +101,8 @@ sub MY::postamble {
 } if $^O eq 'MSWin32' && $Config{cc} =~ /gcc/;
 
   $extra_targets .= q{
+update-libtom:
+	$(NOECHO) perl src/update-libtom.pl
 versionsync:
 	$(NOECHO) perl _generators/version_patch.pl sync
 versioninc:

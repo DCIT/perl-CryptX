@@ -5,6 +5,23 @@ use File::Find qw(find);
 use File::Slurper qw(read_text write_text);
 use FindBin;
 
+my $ltc_branch = "pr/pkcs8-improved";
+my $ltm_branch = "no-stdint-h";
+my $tmpdir = "/tmp/libtom.git.checkout.$$";
+
+warn "update libtommath from github (branch: $ltm_branch)..\n";
+system "rm -rf $tmpdir; mkdir $tmpdir";
+system "git clone -b $ltm_branch https://github.com/libtom/libtommath.git $tmpdir && cp -R $tmpdir/bn*.c $tmpdir/tom*.h $FindBin::Bin/ltm/ && echo ok";
+
+warn "update libtomcrypt from github (branch: $ltc_branch)..\n";
+system "rm -rf $tmpdir; mkdir $tmpdir";
+system "git clone -b $ltc_branch https://github.com/libtom/libtomcrypt.git $tmpdir && cp -R $tmpdir/src/* $FindBin::Bin/ltc/ && echo ok";
+system "rm -rf $tmpdir";
+
+### another style
+#system "wget https://github.com/libtom/libtomcrypt/tarball/$ltc_branch -q -O - | tar xz --wildcards --transform 's,^libtom.*/src/,,' -C '$FindBin::Bin/ltc' 'libtom*/src/*'";
+#system "wget https://github.com/libtom/libtommath/tarball/$ltm_branch -q -O - | tar xz --wildcards --transform 's,^libtom.*/,,' -C '$FindBin::Bin/ltm' 'libtom*/bn*.c' 'libtom*/tom*.h'";
+
 warn "gonna remove unwanted..\n";
 system 'rm', '-rf', "$FindBin::Bin/ltc/encauth/ocb/";
 system 'rm', '-rf', "$FindBin::Bin/ltc/modes/f8/";
