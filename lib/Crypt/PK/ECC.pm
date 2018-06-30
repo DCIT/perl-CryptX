@@ -828,6 +828,10 @@ I<Since: CryptX-0.024>
 Same as L<sign_message|/sign_message> only the signature format is as defined by L<https://tools.ietf.org/html/rfc7518>
 (JWA - JSON Web Algorithms).
 
+B<BEWARE:> This creates signatures according to the structure that RFC 7518 describes but does not apply
+the RFC logic for the hashing algorithm selection. You'll still need to specify, e.g., SHA256 for a P-256 key
+to get a fully RFC-7518-compliant signature.
+
 =head2 verify_message
 
  my $pk = Crypt::PK::ECC->new($pub_key_filename);
@@ -843,6 +847,10 @@ I<Since: CryptX-0.024>
 
 Same as L<verify_message|/verify_message> only the signature format is as defined by L<https://tools.ietf.org/html/rfc7518>
 (JWA - JSON Web Algorithms).
+
+B<BEWARE:> This verifies signatures according to the structure that RFC 7518 describes but does not apply
+the RFC logic for the hashing algorithm selection. You'll still need to specify, e.g., SHA256 for a P-256 key
+to get a fully RFC-7518-compliant signature.
 
 =head2 sign_hash
 
