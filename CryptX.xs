@@ -281,7 +281,7 @@ void _ecc_oid_lookup(ecc_key *key)
    }
 }
 
-int _ecc_set_dp_from_SV(ecc_key *key, SV *curve)
+int _ecc_set_curve_from_SV(ecc_key *key, SV *curve)
 {
   dTHX; /* fetch context */
   HV *hc, *h;
@@ -317,8 +317,8 @@ int _ecc_set_dp_from_SV(ecc_key *key, SV *curve)
     /* string - curve name */
     const ltc_ecc_curve *cu;
     ptr_crv = SvPV(sv_crv, len_crv);
-    if (ecc_get_curve(ptr_crv, &cu) != CRYPT_OK) croak("FATAL: ecparams: unknown curve '%s'", ptr_crv);
-    return ecc_set_dp(cu, key);
+    if (ecc_find_curve(ptr_crv, &cu) != CRYPT_OK) croak("FATAL: ecparams: unknown curve '%s'", ptr_crv);
+    return ecc_set_curve(cu, key);
   }
   else {
     /* hashref */
@@ -353,7 +353,7 @@ int _ecc_set_dp_from_SV(ecc_key *key, SV *curve)
     cu.Gy       = SvPV_nolen(*sv_Gy);
     cu.cofactor = (unsigned long)SvUV(*sv_cofactor);
 
-    if ((err = ecc_set_dp(&cu, key)) != CRYPT_OK) return err;
+    if ((err = ecc_set_curve(&cu, key)) != CRYPT_OK) return err;
     if (key->dp.oidlen == 0) _ecc_oid_lookup(key);
     return CRYPT_OK;
   }

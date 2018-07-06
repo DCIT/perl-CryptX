@@ -30,8 +30,8 @@ generate_key(Crypt::PK::ECC self, SV *curve)
     {
         int rv;
         /* setup dp structure */
-        rv = _ecc_set_dp_from_SV(&self->key, curve); /* croaks on error */
-        if (rv != CRYPT_OK) croak("FATAL: ecc_set_dp failed: %s", error_to_string(rv));
+        rv = _ecc_set_curve_from_SV(&self->key, curve); /* croaks on error */
+        if (rv != CRYPT_OK) croak("FATAL: ecc_set_curve failed: %s", error_to_string(rv));
         /* gen the key */
         rv = ecc_generate_key(&self->pstate, self->pindex, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_generate_key failed: %s", error_to_string(rv));
@@ -112,8 +112,8 @@ import_key_raw(Crypt::PK::ECC self, SV * key_data, SV * curve)
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
         /* setup dp structure */
-        rv = _ecc_set_dp_from_SV(&self->key, curve); /* croaks on error */
-        if (rv != CRYPT_OK) croak("FATAL: ecc_set_dp failed: %s", error_to_string(rv));
+        rv = _ecc_set_curve_from_SV(&self->key, curve); /* croaks on error */
+        if (rv != CRYPT_OK) croak("FATAL: ecc_set_curve failed: %s", error_to_string(rv));
         /* import key */
         type = (data_len == (STRLEN)ecc_get_size(&self->key)) ? PK_PRIVATE : PK_PUBLIC;
         rv = ecc_set_key(data, (unsigned long)data_len, type, &self->key);
