@@ -56,38 +56,38 @@ ltc/misc/crypt/crypt_register_all_hashes.o ltc/misc/crypt/crypt_register_all_prn
 ltc/misc/crypt/crypt_register_cipher.o ltc/misc/crypt/crypt_register_hash.o ltc/misc/crypt/crypt_register_prng.o \
 ltc/misc/crypt/crypt_sizes.o ltc/misc/crypt/crypt_unregister_cipher.o ltc/misc/crypt/crypt_unregister_hash.o \
 ltc/misc/crypt/crypt_unregister_prng.o ltc/misc/hkdf/hkdf.o ltc/misc/padding/padding_depad.o \
-ltc/misc/padding/padding_pad.o ltc/misc/pkcs5/pkcs_5_1.o ltc/misc/pkcs5/pkcs_5_2.o \
-ltc/modes/cbc/cbc_decrypt.o ltc/modes/cbc/cbc_done.o ltc/modes/cbc/cbc_encrypt.o \
-ltc/modes/cbc/cbc_getiv.o ltc/modes/cbc/cbc_setiv.o ltc/modes/cbc/cbc_start.o ltc/modes/cfb/cfb_decrypt.o \
-ltc/modes/cfb/cfb_done.o ltc/modes/cfb/cfb_encrypt.o ltc/modes/cfb/cfb_getiv.o ltc/modes/cfb/cfb_setiv.o \
-ltc/modes/cfb/cfb_start.o ltc/modes/ctr/ctr_decrypt.o ltc/modes/ctr/ctr_done.o ltc/modes/ctr/ctr_encrypt.o \
-ltc/modes/ctr/ctr_getiv.o ltc/modes/ctr/ctr_setiv.o ltc/modes/ctr/ctr_start.o ltc/modes/ecb/ecb_decrypt.o \
-ltc/modes/ecb/ecb_done.o ltc/modes/ecb/ecb_encrypt.o ltc/modes/ecb/ecb_start.o ltc/modes/ofb/ofb_decrypt.o \
-ltc/modes/ofb/ofb_done.o ltc/modes/ofb/ofb_encrypt.o ltc/modes/ofb/ofb_getiv.o ltc/modes/ofb/ofb_setiv.o \
-ltc/modes/ofb/ofb_start.o ltc/pk/asn1/der/bit/der_decode_bit_string.o ltc/pk/asn1/der/bit/der_decode_raw_bit_string.o \
-ltc/pk/asn1/der/bit/der_encode_bit_string.o ltc/pk/asn1/der/bit/der_encode_raw_bit_string.o \
-ltc/pk/asn1/der/bit/der_length_bit_string.o ltc/pk/asn1/der/boolean/der_decode_boolean.o \
-ltc/pk/asn1/der/boolean/der_encode_boolean.o ltc/pk/asn1/der/boolean/der_length_boolean.o \
-ltc/pk/asn1/der/choice/der_decode_choice.o ltc/pk/asn1/der/custom_type/der_decode_custom_type.o \
-ltc/pk/asn1/der/custom_type/der_encode_custom_type.o ltc/pk/asn1/der/custom_type/der_length_custom_type.o \
-ltc/pk/asn1/der/general/der_asn1_maps.o ltc/pk/asn1/der/general/der_decode_asn1_identifier.o \
-ltc/pk/asn1/der/general/der_decode_asn1_length.o ltc/pk/asn1/der/general/der_encode_asn1_identifier.o \
-ltc/pk/asn1/der/general/der_encode_asn1_length.o ltc/pk/asn1/der/general/der_length_asn1_identifier.o \
-ltc/pk/asn1/der/general/der_length_asn1_length.o ltc/pk/asn1/der/generalizedtime/der_decode_generalizedtime.o \
-ltc/pk/asn1/der/generalizedtime/der_encode_generalizedtime.o ltc/pk/asn1/der/generalizedtime/der_length_generalizedtime.o \
-ltc/pk/asn1/der/ia5/der_decode_ia5_string.o ltc/pk/asn1/der/ia5/der_encode_ia5_string.o \
-ltc/pk/asn1/der/ia5/der_length_ia5_string.o ltc/pk/asn1/der/integer/der_decode_integer.o \
-ltc/pk/asn1/der/integer/der_encode_integer.o ltc/pk/asn1/der/integer/der_length_integer.o \
-ltc/pk/asn1/der/object_identifier/der_decode_object_identifier.o ltc/pk/asn1/der/object_identifier/der_encode_object_identifier.o \
-ltc/pk/asn1/der/object_identifier/der_length_object_identifier.o ltc/pk/asn1/der/octet/der_decode_octet_string.o \
-ltc/pk/asn1/der/octet/der_encode_octet_string.o ltc/pk/asn1/der/octet/der_length_octet_string.o \
-ltc/pk/asn1/der/printable_string/der_decode_printable_string.o ltc/pk/asn1/der/printable_string/der_encode_printable_string.o \
-ltc/pk/asn1/der/printable_string/der_length_printable_string.o ltc/pk/asn1/der/sequence/der_decode_sequence_ex.o \
-ltc/pk/asn1/der/sequence/der_decode_sequence_flexi.o ltc/pk/asn1/der/sequence/der_decode_sequence_multi.o \
-ltc/pk/asn1/der/sequence/der_encode_sequence_ex.o ltc/pk/asn1/der/sequence/der_encode_sequence_multi.o \
-ltc/pk/asn1/der/sequence/der_length_sequence.o ltc/pk/asn1/der/sequence/der_sequence_free.o \
-ltc/pk/asn1/der/sequence/der_sequence_shrink.o ltc/pk/asn1/der/set/der_encode_set.o \
-ltc/pk/asn1/der/set/der_encode_setof.o ltc/pk/asn1/der/short_integer/der_decode_short_integer.o \
+ltc/misc/padding/padding_pad.o ltc/misc/pkcs12/pkcs12_kdf.o ltc/misc/pkcs12/pkcs12_utf8_to_utf16.o \
+ltc/misc/pkcs5/pkcs_5_1.o ltc/misc/pkcs5/pkcs_5_2.o ltc/modes/cbc/cbc_decrypt.o ltc/modes/cbc/cbc_done.o \
+ltc/modes/cbc/cbc_encrypt.o ltc/modes/cbc/cbc_getiv.o ltc/modes/cbc/cbc_setiv.o ltc/modes/cbc/cbc_start.o \
+ltc/modes/cfb/cfb_decrypt.o ltc/modes/cfb/cfb_done.o ltc/modes/cfb/cfb_encrypt.o \
+ltc/modes/cfb/cfb_getiv.o ltc/modes/cfb/cfb_setiv.o ltc/modes/cfb/cfb_start.o ltc/modes/ctr/ctr_decrypt.o \
+ltc/modes/ctr/ctr_done.o ltc/modes/ctr/ctr_encrypt.o ltc/modes/ctr/ctr_getiv.o ltc/modes/ctr/ctr_setiv.o \
+ltc/modes/ctr/ctr_start.o ltc/modes/ecb/ecb_decrypt.o ltc/modes/ecb/ecb_done.o ltc/modes/ecb/ecb_encrypt.o \
+ltc/modes/ecb/ecb_start.o ltc/modes/ofb/ofb_decrypt.o ltc/modes/ofb/ofb_done.o ltc/modes/ofb/ofb_encrypt.o \
+ltc/modes/ofb/ofb_getiv.o ltc/modes/ofb/ofb_setiv.o ltc/modes/ofb/ofb_start.o ltc/pk/asn1/der/bit/der_decode_bit_string.o \
+ltc/pk/asn1/der/bit/der_decode_raw_bit_string.o ltc/pk/asn1/der/bit/der_encode_bit_string.o \
+ltc/pk/asn1/der/bit/der_encode_raw_bit_string.o ltc/pk/asn1/der/bit/der_length_bit_string.o \
+ltc/pk/asn1/der/boolean/der_decode_boolean.o ltc/pk/asn1/der/boolean/der_encode_boolean.o \
+ltc/pk/asn1/der/boolean/der_length_boolean.o ltc/pk/asn1/der/choice/der_decode_choice.o \
+ltc/pk/asn1/der/custom_type/der_decode_custom_type.o ltc/pk/asn1/der/custom_type/der_encode_custom_type.o \
+ltc/pk/asn1/der/custom_type/der_length_custom_type.o ltc/pk/asn1/der/general/der_asn1_maps.o \
+ltc/pk/asn1/der/general/der_decode_asn1_identifier.o ltc/pk/asn1/der/general/der_decode_asn1_length.o \
+ltc/pk/asn1/der/general/der_encode_asn1_identifier.o ltc/pk/asn1/der/general/der_encode_asn1_length.o \
+ltc/pk/asn1/der/general/der_length_asn1_identifier.o ltc/pk/asn1/der/general/der_length_asn1_length.o \
+ltc/pk/asn1/der/generalizedtime/der_decode_generalizedtime.o ltc/pk/asn1/der/generalizedtime/der_encode_generalizedtime.o \
+ltc/pk/asn1/der/generalizedtime/der_length_generalizedtime.o ltc/pk/asn1/der/ia5/der_decode_ia5_string.o \
+ltc/pk/asn1/der/ia5/der_encode_ia5_string.o ltc/pk/asn1/der/ia5/der_length_ia5_string.o \
+ltc/pk/asn1/der/integer/der_decode_integer.o ltc/pk/asn1/der/integer/der_encode_integer.o \
+ltc/pk/asn1/der/integer/der_length_integer.o ltc/pk/asn1/der/object_identifier/der_decode_object_identifier.o \
+ltc/pk/asn1/der/object_identifier/der_encode_object_identifier.o ltc/pk/asn1/der/object_identifier/der_length_object_identifier.o \
+ltc/pk/asn1/der/octet/der_decode_octet_string.o ltc/pk/asn1/der/octet/der_encode_octet_string.o \
+ltc/pk/asn1/der/octet/der_length_octet_string.o ltc/pk/asn1/der/printable_string/der_decode_printable_string.o \
+ltc/pk/asn1/der/printable_string/der_encode_printable_string.o ltc/pk/asn1/der/printable_string/der_length_printable_string.o \
+ltc/pk/asn1/der/sequence/der_decode_sequence_ex.o ltc/pk/asn1/der/sequence/der_decode_sequence_flexi.o \
+ltc/pk/asn1/der/sequence/der_decode_sequence_multi.o ltc/pk/asn1/der/sequence/der_encode_sequence_ex.o \
+ltc/pk/asn1/der/sequence/der_encode_sequence_multi.o ltc/pk/asn1/der/sequence/der_length_sequence.o \
+ltc/pk/asn1/der/sequence/der_sequence_free.o ltc/pk/asn1/der/sequence/der_sequence_shrink.o \
+ltc/pk/asn1/der/set/der_encode_set.o ltc/pk/asn1/der/set/der_encode_setof.o ltc/pk/asn1/der/short_integer/der_decode_short_integer.o \
 ltc/pk/asn1/der/short_integer/der_encode_short_integer.o ltc/pk/asn1/der/short_integer/der_length_short_integer.o \
 ltc/pk/asn1/der/teletex_string/der_decode_teletex_string.o ltc/pk/asn1/der/teletex_string/der_length_teletex_string.o \
 ltc/pk/asn1/der/utctime/der_decode_utctime.o ltc/pk/asn1/der/utctime/der_encode_utctime.o \
@@ -102,12 +102,12 @@ ltc/pk/dsa/dsa_generate_pqg.o ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_make_key.o 
 ltc/pk/dsa/dsa_set_pqg_dsaparam.o ltc/pk/dsa/dsa_shared_secret.o ltc/pk/dsa/dsa_sign_hash.o \
 ltc/pk/dsa/dsa_verify_hash.o ltc/pk/dsa/dsa_verify_key.o ltc/pk/ecc/ecc.o ltc/pk/ecc/ecc_ansi_x963_export.o \
 ltc/pk/ecc/ecc_ansi_x963_import.o ltc/pk/ecc/ecc_decrypt_key.o ltc/pk/ecc/ecc_encrypt_key.o \
-ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_curve.o \
-ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_oid_str.o ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o \
-ltc/pk/ecc/ecc_import_openssl.o ltc/pk/ecc/ecc_import_pkcs8.o ltc/pk/ecc/ecc_import_x509.o \
-ltc/pk/ecc/ecc_make_key.o ltc/pk/ecc/ecc_set_dp.o ltc/pk/ecc/ecc_set_dp_internal.o \
-ltc/pk/ecc/ecc_set_key.o ltc/pk/ecc/ecc_shared_secret.o ltc/pk/ecc/ecc_sign_hash.o \
-ltc/pk/ecc/ecc_sizes.o ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ltc_ecc_export_point.o \
+ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_find_curve.o \
+ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_oid_str.o ltc/pk/ecc/ecc_get_size.o \
+ltc/pk/ecc/ecc_import.o ltc/pk/ecc/ecc_import_openssl.o ltc/pk/ecc/ecc_import_pkcs8.o \
+ltc/pk/ecc/ecc_import_x509.o ltc/pk/ecc/ecc_make_key.o ltc/pk/ecc/ecc_set_curve.o \
+ltc/pk/ecc/ecc_set_curve_internal.o ltc/pk/ecc/ecc_set_key.o ltc/pk/ecc/ecc_shared_secret.o \
+ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sizes.o ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ltc_ecc_export_point.o \
 ltc/pk/ecc/ltc_ecc_import_point.o ltc/pk/ecc/ltc_ecc_is_point.o ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o \
 ltc/pk/ecc/ltc_ecc_map.o ltc/pk/ecc/ltc_ecc_mul2add.o ltc/pk/ecc/ltc_ecc_mulmod.o \
 ltc/pk/ecc/ltc_ecc_mulmod_timing.o ltc/pk/ecc/ltc_ecc_points.o ltc/pk/ecc/ltc_ecc_projective_add_point.o \

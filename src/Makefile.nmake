@@ -60,17 +60,18 @@ ltc/misc/crypt/crypt_register_all_prngs.obj ltc/misc/crypt/crypt_register_cipher
 ltc/misc/crypt/crypt_register_hash.obj ltc/misc/crypt/crypt_register_prng.obj ltc/misc/crypt/crypt_sizes.obj \
 ltc/misc/crypt/crypt_unregister_cipher.obj ltc/misc/crypt/crypt_unregister_hash.obj \
 ltc/misc/crypt/crypt_unregister_prng.obj ltc/misc/hkdf/hkdf.obj ltc/misc/padding/padding_depad.obj \
-ltc/misc/padding/padding_pad.obj ltc/misc/pkcs5/pkcs_5_1.obj ltc/misc/pkcs5/pkcs_5_2.obj \
-ltc/modes/cbc/cbc_decrypt.obj ltc/modes/cbc/cbc_done.obj ltc/modes/cbc/cbc_encrypt.obj \
-ltc/modes/cbc/cbc_getiv.obj ltc/modes/cbc/cbc_setiv.obj ltc/modes/cbc/cbc_start.obj \
-ltc/modes/cfb/cfb_decrypt.obj ltc/modes/cfb/cfb_done.obj ltc/modes/cfb/cfb_encrypt.obj \
-ltc/modes/cfb/cfb_getiv.obj ltc/modes/cfb/cfb_setiv.obj ltc/modes/cfb/cfb_start.obj \
-ltc/modes/ctr/ctr_decrypt.obj ltc/modes/ctr/ctr_done.obj ltc/modes/ctr/ctr_encrypt.obj \
-ltc/modes/ctr/ctr_getiv.obj ltc/modes/ctr/ctr_setiv.obj ltc/modes/ctr/ctr_start.obj \
-ltc/modes/ecb/ecb_decrypt.obj ltc/modes/ecb/ecb_done.obj ltc/modes/ecb/ecb_encrypt.obj \
-ltc/modes/ecb/ecb_start.obj ltc/modes/ofb/ofb_decrypt.obj ltc/modes/ofb/ofb_done.obj \
-ltc/modes/ofb/ofb_encrypt.obj ltc/modes/ofb/ofb_getiv.obj ltc/modes/ofb/ofb_setiv.obj \
-ltc/modes/ofb/ofb_start.obj ltc/pk/asn1/der/bit/der_decode_bit_string.obj ltc/pk/asn1/der/bit/der_decode_raw_bit_string.obj \
+ltc/misc/padding/padding_pad.obj ltc/misc/pkcs12/pkcs12_kdf.obj ltc/misc/pkcs12/pkcs12_utf8_to_utf16.obj \
+ltc/misc/pkcs5/pkcs_5_1.obj ltc/misc/pkcs5/pkcs_5_2.obj ltc/modes/cbc/cbc_decrypt.obj \
+ltc/modes/cbc/cbc_done.obj ltc/modes/cbc/cbc_encrypt.obj ltc/modes/cbc/cbc_getiv.obj \
+ltc/modes/cbc/cbc_setiv.obj ltc/modes/cbc/cbc_start.obj ltc/modes/cfb/cfb_decrypt.obj \
+ltc/modes/cfb/cfb_done.obj ltc/modes/cfb/cfb_encrypt.obj ltc/modes/cfb/cfb_getiv.obj \
+ltc/modes/cfb/cfb_setiv.obj ltc/modes/cfb/cfb_start.obj ltc/modes/ctr/ctr_decrypt.obj \
+ltc/modes/ctr/ctr_done.obj ltc/modes/ctr/ctr_encrypt.obj ltc/modes/ctr/ctr_getiv.obj \
+ltc/modes/ctr/ctr_setiv.obj ltc/modes/ctr/ctr_start.obj ltc/modes/ecb/ecb_decrypt.obj \
+ltc/modes/ecb/ecb_done.obj ltc/modes/ecb/ecb_encrypt.obj ltc/modes/ecb/ecb_start.obj \
+ltc/modes/ofb/ofb_decrypt.obj ltc/modes/ofb/ofb_done.obj ltc/modes/ofb/ofb_encrypt.obj \
+ltc/modes/ofb/ofb_getiv.obj ltc/modes/ofb/ofb_setiv.obj ltc/modes/ofb/ofb_start.obj \
+ltc/pk/asn1/der/bit/der_decode_bit_string.obj ltc/pk/asn1/der/bit/der_decode_raw_bit_string.obj \
 ltc/pk/asn1/der/bit/der_encode_bit_string.obj ltc/pk/asn1/der/bit/der_encode_raw_bit_string.obj \
 ltc/pk/asn1/der/bit/der_length_bit_string.obj ltc/pk/asn1/der/boolean/der_decode_boolean.obj \
 ltc/pk/asn1/der/boolean/der_encode_boolean.obj ltc/pk/asn1/der/boolean/der_length_boolean.obj \
@@ -109,11 +110,11 @@ ltc/pk/dsa/dsa_make_key.obj ltc/pk/dsa/dsa_set.obj ltc/pk/dsa/dsa_set_pqg_dsapar
 ltc/pk/dsa/dsa_shared_secret.obj ltc/pk/dsa/dsa_sign_hash.obj ltc/pk/dsa/dsa_verify_hash.obj \
 ltc/pk/dsa/dsa_verify_key.obj ltc/pk/ecc/ecc.obj ltc/pk/ecc/ecc_ansi_x963_export.obj \
 ltc/pk/ecc/ecc_ansi_x963_import.obj ltc/pk/ecc/ecc_decrypt_key.obj ltc/pk/ecc/ecc_encrypt_key.obj \
-ltc/pk/ecc/ecc_export.obj ltc/pk/ecc/ecc_export_openssl.obj ltc/pk/ecc/ecc_free.obj \
-ltc/pk/ecc/ecc_get_curve.obj ltc/pk/ecc/ecc_get_key.obj ltc/pk/ecc/ecc_get_oid_str.obj \
+ltc/pk/ecc/ecc_export.obj ltc/pk/ecc/ecc_export_openssl.obj ltc/pk/ecc/ecc_find_curve.obj \
+ltc/pk/ecc/ecc_free.obj ltc/pk/ecc/ecc_get_key.obj ltc/pk/ecc/ecc_get_oid_str.obj \
 ltc/pk/ecc/ecc_get_size.obj ltc/pk/ecc/ecc_import.obj ltc/pk/ecc/ecc_import_openssl.obj \
 ltc/pk/ecc/ecc_import_pkcs8.obj ltc/pk/ecc/ecc_import_x509.obj ltc/pk/ecc/ecc_make_key.obj \
-ltc/pk/ecc/ecc_set_dp.obj ltc/pk/ecc/ecc_set_dp_internal.obj ltc/pk/ecc/ecc_set_key.obj \
+ltc/pk/ecc/ecc_set_curve.obj ltc/pk/ecc/ecc_set_curve_internal.obj ltc/pk/ecc/ecc_set_key.obj \
 ltc/pk/ecc/ecc_shared_secret.obj ltc/pk/ecc/ecc_sign_hash.obj ltc/pk/ecc/ecc_sizes.obj \
 ltc/pk/ecc/ecc_verify_hash.obj ltc/pk/ecc/ltc_ecc_export_point.obj ltc/pk/ecc/ltc_ecc_import_point.obj \
 ltc/pk/ecc/ltc_ecc_is_point.obj ltc/pk/ecc/ltc_ecc_is_point_at_infinity.obj ltc/pk/ecc/ltc_ecc_map.obj \
