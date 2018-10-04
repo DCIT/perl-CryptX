@@ -128,11 +128,12 @@ sub import_key {
   elsif ($data =~ /-----BEGIN PRIVATE KEY-----(.*?)-----END/sg) {
     # PKCS#8 PrivateKeyInfo      (PEM header: BEGIN PRIVATE KEY)
     $data = pem_to_der($data, $password);
-    return $self->_import_pkcs8($data, $password) if $data;
+    return $self->_import_pkcs8($data, $password);
   }
   elsif ($data =~ /-----BEGIN ENCRYPTED PRIVATE KEY-----(.*?)-----END/sg) {
-    # XXX-TODO: PKCS#8 EncryptedPrivateKeyInfo (PEM header: BEGIN ENCRYPTED PRIVATE KEY)
-    croak "FATAL: encrypted pkcs8 RSA private keys are not supported";
+    # PKCS#8 PrivateKeyInfo      (PEM header: BEGIN ENCRYPTED PRIVATE KEY)
+    $data = pem_to_der($data, $password);
+    return $self->_import_pkcs8($data, $password);
   }
   elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
     # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
@@ -418,7 +419,7 @@ Supported key formats:
  fyoy4t3yHT+/nw==
  -----END PRIVATE KEY-----
 
-=item * PKCS#8 encrypted private keys ARE NOT SUPPORTED YET!
+=item * PKCS#8 encrypted private keys - password protected keys (supported since: CryptX-0.062)
 
  -----BEGIN ENCRYPTED PRIVATE KEY-----
  MIICojAcBgoqhkiG9w0BDAEDMA4ECCQk+Rr1yzzcAgIIAASCAoD/mgpUFjxxM/Ty
