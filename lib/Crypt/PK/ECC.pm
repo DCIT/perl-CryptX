@@ -42,6 +42,8 @@ our %curve = ( # must be "our" as we use it from XS code
   "wap-wsg-idm-ecid-wtls6"  => 'secp112r1',
   "wap-wsg-idm-ecid-wtls7"  => 'secp160r2',
   "wap-wsg-idm-ecid-wtls12" => 'secp224r1',
+  # extra aliases
+  'P-256K'                  => 'secp256k1',
 );
 
 our %curve_oid2name = ( # must be "our" as we use it from XS code
@@ -87,6 +89,7 @@ my %curve2jwk = (
   '1.2.840.10045.3.1.1' => 'P-192', # secp192r1
   '1.3.132.0.33'        => 'P-224', # secp224r1
   '1.2.840.10045.3.1.7' => 'P-256', # secp256r1
+  '1.3.132.0.10'        => 'P-256K',# secp256k1
   '1.3.132.0.34'        => 'P-384', # secp384r1
   '1.3.132.0.35'        => 'P-521', # secp521r1
   'nistp192'            => 'P-192',
@@ -99,6 +102,7 @@ my %curve2jwk = (
   'secp192r1'           => 'P-192',
   'secp224r1'           => 'P-224',
   'secp256r1'           => 'P-256',
+  'secp256k1'           => 'P-256K',
   'secp384r1'           => 'P-384',
   'secp521r1'           => 'P-521',
 );
