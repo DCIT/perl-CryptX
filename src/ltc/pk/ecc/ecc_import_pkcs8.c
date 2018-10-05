@@ -26,12 +26,14 @@ typedef struct {
 static int _der_flexi_sequence_cmp(const ltc_asn1_list *flexi, der_flexi_check *check)
 {
    const ltc_asn1_list *cur;
-   if (flexi->type != LTC_ASN1_SEQUENCE)
+   if (flexi->type != LTC_ASN1_SEQUENCE) {
       return CRYPT_INVALID_PACKET;
+   }
    cur = flexi->child;
    while(check->t != LTC_ASN1_EOL) {
-      if (!LTC_ASN1_IS_TYPE(cur, check->t))
+      if (!LTC_ASN1_IS_TYPE(cur, check->t)) {
          return CRYPT_INVALID_PACKET;
+      }
       if (check->pp != NULL) *check->pp = (ltc_asn1_list*)cur;
       cur = cur->next;
       check++;
