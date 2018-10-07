@@ -5,7 +5,7 @@ use File::Find qw(find);
 use File::Slurper qw(read_text write_text);
 use FindBin;
 
-my $ltc_branch = "pr/pkcs8-improved";
+my $ltc_branch = "develop";
 my $ltm_branch = "no-stdint-h";
 my $tmpdir = "/tmp/libtom.git.checkout.$$";
 
