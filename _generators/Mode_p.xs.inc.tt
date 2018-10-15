@@ -254,11 +254,11 @@ finish(Crypt::Mode::[%orig_name%] self)
             rv = [%lc_name%]_decrypt(self->pad, tmp_block, blen, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: [%lc_name%]_decrypt failed: %s", error_to_string(rv));
             if (self->padding_mode != 0) {
-              if      (self->padding_mode == 1) { padmode = LTC_PAD_PKCS7;        }
-              else if (self->padding_mode == 2) { padmode = LTC_PAD_ONE_AND_ZERO; }
-              else if (self->padding_mode == 3) { padmode = LTC_PAD_ANSI_X923;    }
-              else if (self->padding_mode == 4) { padmode = LTC_PAD_ZERO;         }
-              else if (self->padding_mode == 5) { padmode = LTC_PAD_ZERO_ALWAYS;  }
+              if      (self->padding_mode == 1) { padmode = LTC_PAD_PKCS7        | (&self->state)->blocklen; }
+              else if (self->padding_mode == 2) { padmode = LTC_PAD_ONE_AND_ZERO | (&self->state)->blocklen; }
+              else if (self->padding_mode == 3) { padmode = LTC_PAD_ANSI_X923    | (&self->state)->blocklen; }
+              else if (self->padding_mode == 4) { padmode = LTC_PAD_ZERO         | (&self->state)->blocklen; }
+              else if (self->padding_mode == 5) { padmode = LTC_PAD_ZERO_ALWAYS  | (&self->state)->blocklen; }
               else { croak("FATAL: unknown padding"); }
               rv = padding_depad(tmp_block, &blen, padmode);
               if (rv != CRYPT_OK) croak("FATAL: padding_depad failed: %s", error_to_string(rv));
