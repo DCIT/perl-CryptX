@@ -204,26 +204,28 @@ SV *
 finish(Crypt::Mode::ECB self)
     CODE:
     {
-        unsigned char tmp_block[MAXBLOCKSIZE], ch;
-        int i, j, rv, blen = (&self->state)->blocklen;
+        unsigned char tmp_block[MAXBLOCKSIZE];
+        int rv;
+        unsigned long blen = (&self->state)->blocklen;
+        unsigned long padmode;
 
         if (self->direction == 1) {
-          if (self->padlen<0 || self->padlen>=blen) croak("FATAL: invalid padlen");
-          if (self->padding_mode == 1) { /* pkcs5|7 padding */
-            i = blen - self->padlen;
-            if (i == 0) i = blen;
-            for(j=self->padlen; j<blen; j++) self->pad[j] = (unsigned char)i;
-            rv = ecb_encrypt(self->pad, tmp_block, blen, &self->state);
-            if (rv != CRYPT_OK) croak("FATAL: ecb_encrypt failed: %s", error_to_string(rv));
-          }
-          else if (self->padding_mode == 2) { /* oneandzeroes padding */
-            self->pad[self->padlen] = 0x80;
-            for(j=self->padlen+1; j<blen; j++) self->pad[j] = 0;
+          if (self->padlen < 0 || self->padlen >= blen) croak("FATAL: invalid padlen");
+          if (self->padding_mode != 0) {
+            if      (self->padding_mode == 1) { padmode = LTC_PAD_PKCS7        | (&self->state)->blocklen; }
+            else if (self->padding_mode == 2) { padmode = LTC_PAD_ONE_AND_ZERO | (&self->state)->blocklen; }
+            else if (self->padding_mode == 3) { padmode = LTC_PAD_ANSI_X923    | (&self->state)->blocklen; }
+            else if (self->padding_mode == 4) { padmode = LTC_PAD_ZERO         | (&self->state)->blocklen; }
+            else if (self->padding_mode == 5) { padmode = LTC_PAD_ZERO_ALWAYS  | (&self->state)->blocklen; }
+            else { croak("FATAL: unknown padding"); }
+            blen = sizeof(self->pad);
+            rv = padding_pad(self->pad, self->padlen, &blen, padmode);
+            if (rv != CRYPT_OK) croak("FATAL: padding_pad failed: %s", error_to_string(rv));
             rv = ecb_encrypt(self->pad, tmp_block, blen, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: ecb_encrypt failed: %s", error_to_string(rv));
           }
           else {
-            if (self->padlen>0) croak("FATAL: ecb_encrypt, input data length not multiple of %d", blen);
+            if (self->padlen > 0) croak("FATAL: ecb_encrypt, input data length not multiple of %d", blen);
             blen = 0;
           }
         }
@@ -232,17 +234,18 @@ finish(Crypt::Mode::ECB self)
             if (self->padlen != blen) croak("FATAL: cipher text length has to be multiple of %d (%d)", blen, self->padlen);
             rv = ecb_decrypt(self->pad, tmp_block, blen, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: ecb_decrypt failed: %s", error_to_string(rv));
-            if (self->padding_mode == 0) {         /* no padding */
-              /* we already have blen */
+            if (self->padding_mode != 0) {
+              if      (self->padding_mode == 1) { padmode = LTC_PAD_PKCS7;        }
+              else if (self->padding_mode == 2) { padmode = LTC_PAD_ONE_AND_ZERO; }
+              else if (self->padding_mode == 3) { padmode = LTC_PAD_ANSI_X923;    }
+              else if (self->padding_mode == 4) { padmode = LTC_PAD_ZERO;         }
+              else if (self->padding_mode == 5) { padmode = LTC_PAD_ZERO_ALWAYS;  }
+              else { croak("FATAL: unknown padding"); }
+              rv = padding_depad(tmp_block, &blen, padmode);
+              if (rv != CRYPT_OK) croak("FATAL: padding_depad failed: %s", error_to_string(rv));
             }
-            else if (self->padding_mode == 1) {    /* pkcs5|7 padding */
-              ch = tmp_block[blen-1];
-              blen = blen - (ch > blen ? blen : ch);
-            }
-            else if (self->padding_mode == 2) {    /* oneandzeroes padding */
-              while ((unsigned char)tmp_block[blen - 1] == 0x00) blen--;
-              if ((unsigned char)tmp_block[blen - 1] == 0x80) blen--;
-              if (blen < 0) blen = 0;
+            else {
+              /* "no padding" == there is no need to do anything */
             }
           }
           else {
@@ -250,7 +253,7 @@ finish(Crypt::Mode::ECB self)
           }
         }
         else {
-           XSRETURN_UNDEF;
+           croak("FATAL: invalid direction");
         }
 
         self->direction = 0;

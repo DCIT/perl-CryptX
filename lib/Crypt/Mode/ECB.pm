@@ -71,9 +71,12 @@ B<BEWARE: ECB is inherently insecure>, if you are not sure go for L<Crypt::Mode:
  #               'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
  #               'SEED', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
  #               simply any <NAME> for which there exists Crypt::Cipher::<NAME>
- # $padding .... 0 no padding (plaintext size has to be myltiple of block length)
+ # $padding .... 0 no padding (plaintext size has to be multiple of block length)
  #               1 PKCS5 padding, Crypt::CBC's "standard" - DEFAULT
  #               2 Crypt::CBC's "oneandzeroes"
+ #               3 ANSI X.923 padding
+ #               4 zero padding
+ #               5 zero padding (+a block of zeros if the output length is divisible by the blocksize)
  # $cipher_rounds ... optional num of rounds for given cipher
 
 =head2 encrypt

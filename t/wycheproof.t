@@ -7,11 +7,48 @@ use warnings;
 use Test::More;
 
 plan skip_all => "No JSON::* module installed" unless eval { require JSON::PP } || eval { require JSON::XS } || eval { require Cpanel::JSON::XS };
+plan skip_all => "Temporarily disabled";
 plan tests => 1298;
 
 use CryptX;
 use Crypt::Misc 'read_rawfile';
 use Crypt::Digest 'digest_data';
+
+if (0) {
+  use Crypt::Mode::CBC;
+
+  my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/aes_cbc_pkcs5_test.json';
+  for my $g (@{$tests->{testGroups}}) {
+    my $type    = $g->{type};
+    for my $t (@{$g->{tests}}) {
+      my $tcId    = $t->{tcId};           # 1
+      my $comment = $t->{comment};        # ""
+      my $result  = $t->{result};         # "valid"
+      my $ct      = pack "H*", $t->{ct};  # "5d349ead175ef6b1def6fd"
+      my $iv      = pack "H*", $t->{iv};  # "752abad3e0afb5f434dc4310"
+      my $key     = pack "H*", $t->{key}; # "ee8e1ed9ff2540ae8f2ba9f50bc2f27c"
+      my $msg     = pack "H*", $t->{msg}; # "48656c6c6f20776f726c64"
+      # do the test
+      my $enc = Crypt::Mode::CBC->new('AES', 1); #  1 = PKCS5 padding
+      my $ct2 = eval { $enc->encrypt($msg, $key, $iv) };
+      my $dec = Crypt::Mode::CBC->new('AES', 1); #  1 = PKCS5 padding
+      my $pt2 = eval { $dec->decrypt($ct, $key, $iv) };
+      my $testname = "type=$type tcId=$tcId comment='$comment' expected-result=$result";
+      if ($result eq 'valid' || $result eq 'acceptable') {
+        is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-v");
+        is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-v");
+      }
+      elsif ($result eq 'invalid') {
+        #isnt(unpack("H*", $ct2),  $t->{ct},  "$testname CT-i");
+        #isnt(unpack("H*", $tag2), $t->{tag}, "$testname TAG-i");
+        is($pt2, undef, "$testname PT-i");
+      }
+      else {
+        ok(0, "UNEXPECTED result=$result");
+      }
+    }
+  }
+}
 
 if (0) {
   use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate gcm_decrypt_verify);
@@ -32,6 +69,44 @@ if (0) {
       # do the test
       my ($ct2, $tag2) = eval { gcm_encrypt_authenticate('AES', $key, $iv, $aad, $msg) };
       my $pt2 = eval { gcm_decrypt_verify('AES', $key, $iv, $aad, $ct, $tag) };
+      my $testname = "type=$type tcId=$tcId comment='$comment' expected-result=$result";
+      if ($result eq 'valid' || $result eq 'acceptable') {
+        is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-v");
+        is(unpack("H*", $tag2), $t->{tag}, "$testname TAG-v");
+        is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-v");
+      }
+      elsif ($result eq 'invalid') {
+        #isnt(unpack("H*", $ct2),  $t->{ct},  "$testname CT-i");
+        #isnt(unpack("H*", $tag2), $t->{tag}, "$testname TAG-i");
+        is($pt2, undef, "$testname PT-i");
+      }
+      else {
+        ok(0, "UNEXPECTED result=$result");
+      }
+    }
+  }
+}
+
+if (0) {
+  use Crypt::AuthEnc::CCM qw(ccm_encrypt_authenticate ccm_decrypt_verify);
+
+  my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/aes_ccm_test.json';
+  for my $g (@{$tests->{testGroups}}) {
+    my $type    = $g->{type};
+    my $tlen    = $g->{tagSize};
+    for my $t (@{$g->{tests}}) {
+      my $tcId    = $t->{tcId};           # 1
+      my $comment = $t->{comment};        # ""
+      my $result  = $t->{result};         # "valid"
+      my $aad     = pack "H*", $t->{aad}; # "6578616d706c65"
+      my $ct      = pack "H*", $t->{ct};  # "5d349ead175ef6b1def6fd"
+      my $iv      = pack "H*", $t->{iv};  # "752abad3e0afb5f434dc4310"
+      my $key     = pack "H*", $t->{key}; # "ee8e1ed9ff2540ae8f2ba9f50bc2f27c"
+      my $msg     = pack "H*", $t->{msg}; # "48656c6c6f20776f726c64"
+      my $tag     = pack "H*", $t->{tag}; # "4fbcdeb7e4793f4a1d7e4faa70100af1"
+      # do the test
+      my ($ct2, $tag2) = eval { ccm_encrypt_authenticate('AES', $key, $iv, $aad, $tlen/8, $msg) };
+      my $pt2 = eval { ccm_decrypt_verify('AES', $key, $iv, $aad, $ct, $tag) };
       my $testname = "type=$type tcId=$tcId comment='$comment' expected-result=$result";
       if ($result eq 'valid' || $result eq 'acceptable') {
         is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-v");
@@ -147,7 +222,7 @@ if (0) {
   }
 }
 
-if (1) {
+if (0) {
   use Crypt::PK::ECC;
   my @files = ( "t/wycheproof/ecdsa_test.json" );
   #push @files, glob("t/wycheproof/ecdsa_secp*.json");
