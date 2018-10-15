@@ -14,6 +14,43 @@ use CryptX;
 use Crypt::Misc 'read_rawfile';
 use Crypt::Digest 'digest_data';
 
+if (1) {
+  use Crypt::Mac::OMAC;
+
+  my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/aes_cmac_test.json';
+  for my $g (@{$tests->{testGroups}}) {
+    my $type    = $g->{type};
+    my $tsize   = $g->{tagSize} / 8;
+    my $ksize   = $g->{keySize} / 8;
+    for my $t (@{$g->{tests}}) {
+      my $tcId    = $t->{tcId};           # 1
+      my $comment = $t->{comment};        # ""
+      my $result  = $t->{result};         # "valid"
+      my $key     = pack "H*", $t->{key}; # "ee8e1ed9ff2540ae8f2ba9f50bc2f27c"
+      my $msg     = pack "H*", $t->{msg}; # "48656c6c6f20776f726c64"
+      my $tag     = pack "H*", $t->{tag}; # "4fbcdeb7e4793f4a1d7e4faa70100af1"
+      # do the test
+      #my $tag2 = substr($m->add($msg)->mac, 0, $tsize);
+      my $tag2 = eval { Crypt::Mac::OMAC->new("AES", $key)->add($msg)->mac };
+      my $testname = "type=$type tcId=$tcId comment='$comment' expected-result=$result";
+      if ($result eq 'valid' || $result eq 'acceptable') {
+        is(unpack("H*", substr($tag2, 0, $tsize)), $t->{tag}, "$testname TAG-v");
+      }
+      elsif ($result eq 'invalid') {
+        if (defined $tag2) {
+          isnt(unpack("H*", substr($tag2, 0, $tsize)), $t->{tag}, "$testname TAG-i");
+        }
+        else {
+          is($tag2, undef, "$testname PT-i");
+        }
+      }
+      else {
+        ok(0, "UNEXPECTED result=$result");
+      }
+    }
+  }
+}
+
 if (0) {
   use Crypt::Mode::CBC;
 
