@@ -30,7 +30,6 @@ if (1) {
       my $msg     = pack "H*", $t->{msg}; # "48656c6c6f20776f726c64"
       my $tag     = pack "H*", $t->{tag}; # "4fbcdeb7e4793f4a1d7e4faa70100af1"
       # do the test
-      #my $tag2 = substr($m->add($msg)->mac, 0, $tsize);
       my $tag2 = eval { Crypt::Mac::OMAC->new("AES", $key)->add($msg)->mac };
       my $testname = "type=$type tcId=$tcId comment='$comment' expected-result=$result";
       if ($result eq 'valid' || $result eq 'acceptable') {
