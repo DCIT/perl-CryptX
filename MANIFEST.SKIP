@@ -41,3 +41,4 @@ tmp.*
 t/openssl/.*$
 ^src/liballinone*
 ^src/update-libtom.pl$
+^t/wycheproof.*$

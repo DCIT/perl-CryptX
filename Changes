@@ -7,6 +7,7 @@ Changes for CryptX
         - fix $46 tests only - t/mbi_ltm_bigintpm.t etc. started to fail with latest Math::BigInt
         - improved CBC/ECB padding (using libtomcrypt's functions: padding_depad + padding_pad)
         - enable pkcs#8 encrypted RSA keys (supported by the latest libtomcrypt)
+        - exclude wycheproof tests (too big) from dist tarball (via MANIFEST.SKIP)
 
 0.061   2018-06-07
         - bundled libtommath update (+stdint.h workaround)
