@@ -1,5 +1,13 @@
 Changes for CryptX
 
+0.062   2018-XX-XX
+        - bundled libtommath update branch:no-stdint-h
+        - bundled libtomcrypt update branch:develop
+        - fix #45 doc only - sign_message_rfc7518 / sign_message_rfc7518
+        - fix $46 tests only - t/mbi_ltm_bigintpm.t etc. started to fail with latest Math::BigInt
+        - improved CBC/ECB padding (using libtomcrypt's functions: padding_depad + padding_pad)
+        - enable pkcs#8 encrypted RSA keys (supported by the latest libtomcrypt)
+
 0.061   2018-06-07
         - bundled libtommath update (+stdint.h workaround)
         - bundled libtomcrypt update (+necessary adaptation)
