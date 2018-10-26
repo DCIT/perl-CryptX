@@ -117,11 +117,7 @@ if (1) {
         is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-v");
       }
       elsif ($result eq 'invalid') {
-        SKIP: {
-          skip "ltc bug CBC/PAD", 1 if $comment eq "bit padding";  #XXX-FIXME
-          skip "ltc bug CBC/PAD", 1 if $comment eq "zero padding"; #XXX-FIXME
-          is($pt2, undef, "$testname PT-i");
-        }
+        is($pt2, undef, "$testname PT-i");
       }
       else {
         ok(0, "UNEXPECTED result=$result");

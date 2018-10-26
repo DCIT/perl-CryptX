@@ -29,7 +29,8 @@ void copy_or_zeromem(const unsigned char* src, unsigned char* dest, unsigned lon
 #endif
    unsigned char mask = 0xff; /* initialize mask at all ones */
 
-   if (src == NULL || dest == NULL) return;
+   LTC_ARGCHKVD(src  != NULL);
+   LTC_ARGCHKVD(dest != NULL);
 
    if (coz != 0) coz = 1;
    y = 0;
