@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 use Crypt::AuthEnc::GCM qw( gcm_encrypt_authenticate gcm_decrypt_verify );
 
@@ -47,6 +47,9 @@ my $key   = "12345678901234561234567890123456";
   is(unpack('H*', $tag), "1685ba0eda059ace4aab6539980c30c0", "gcm_encrypt_authenticate: tag (no header)");
   my $pt = gcm_decrypt_verify('AES', $key, "123456789012", "", $ct, $tag);
   is($pt, "plain_halfplain_half", "gcm_decrypt_verify: plaintext (no header)");
+  substr($tag, 0, 1) = pack("H2", "AA");
+  $pt = gcm_decrypt_verify('AES', $key, "123456789012", "", $ct, $tag);
+  is($pt, undef, "gcm_decrypt_verify: plaintext (no header) / bad tag");
 }
 
 {
@@ -55,4 +58,7 @@ my $key   = "12345678901234561234567890123456";
   is(unpack('H*', $tag), "d225e849d4d076cf9e85d5303450e793", "gcm_encrypt_authenticate: tag (no header)");
   my $pt = gcm_decrypt_verify('AES', $key, "123456789012", "adata-123456789012", $ct, $tag);
   is($pt, "plain_halfplain_half", "gcm_decrypt_verify: plaintext (no header)");
+  substr($tag, 0, 1) = pack("H2", "AA");
+  $pt = gcm_decrypt_verify('AES', $key, "123456789012", "adata-123456789012", $ct, $tag);
+  is($pt, undef, "gcm_decrypt_verify: plaintext (no header) / bad tag");
 }

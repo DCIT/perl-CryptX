@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 use Crypt::AuthEnc::OCB qw( ocb_encrypt_authenticate ocb_decrypt_verify );
 
@@ -35,6 +35,9 @@ my $key   = "12345678901234561234567890123456";
   is(unpack('H*', $tag), "dfdfab80aca060268c0cc467040af4f9", "ocb_encrypt_authenticate: tag (no header)");
   my $pt = ocb_decrypt_verify('AES', $key, "123456789012", "", $ct, $tag);
   is($pt, "plain_half_12345plain_half_12345", "ocb_decrypt_verify: plaintext (no header)");
+  substr($tag, 0, 1) = pack("H2", "AA");
+  $pt = ocb_decrypt_verify('AES', $key, "123456789012", "", $ct, $tag);
+  is($pt, undef, "ocb_decrypt_verify: plaintext (no header) / bad tag");
 }
 
 {
@@ -43,4 +46,7 @@ my $key   = "12345678901234561234567890123456";
   is(unpack('H*', $tag), "bd7a6a0aaf24420f97bf239ea5740a40", "ocb_encrypt_authenticate: tag (no header)");
   my $pt = ocb_decrypt_verify('AES', $key, "123456789012", "adata-123456789012", $ct, $tag);
   is($pt, "plain_half_12345plain_half_12345", "ocb_decrypt_verify: plaintext (no header)");
+  substr($tag, 0, 1) = pack("H2", "AA");
+  $pt = ocb_decrypt_verify('AES', $key, "123456789012", "adata-123456789012", $ct, $tag);
+  is($pt, undef, "ocb_decrypt_verify: plaintext (no header) / bad tag");
 }

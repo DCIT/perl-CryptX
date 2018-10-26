@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 use Crypt::AuthEnc::EAX qw( eax_encrypt_authenticate eax_decrypt_verify );
 
@@ -49,6 +49,9 @@ my $key   = "12345678901234561234567890123456";
   is(unpack('H*', $tag), "f83d77e5cf20979b3325266ff2fe342c", "eax_encrypt_authenticate: tag");
   my $pt = eax_decrypt_verify('AES', $key, $nonce, "abc", $ct, $tag);
   is($pt, "plain_halfplain_half", "eax_decrypt_verify: plaintext");
+  substr($tag, 0, 1) = pack("H2", "AA");
+  $pt = eax_decrypt_verify('AES', $key, $nonce, "abc", $ct, $tag);
+  is($pt, undef, "eax_decrypt_verify: plaintext / bad tag");
 }
 
 {
@@ -57,4 +60,7 @@ my $key   = "12345678901234561234567890123456";
   is(unpack('H*', $tag), "e5ad22aa2ba3b30cd50eb59593364f1b", "eax_encrypt_authenticate: tag (no header)");
   my $pt = eax_decrypt_verify('AES', $key, $nonce, "", $ct, $tag);
   is($pt, "plain_halfplain_half", "eax_decrypt_verify: plaintext (no header)");
+  substr($tag, 0, 1) = pack("H2", "AA");
+  $pt = eax_decrypt_verify('AES', $key, $nonce, "", $ct, $tag);
+  is($pt, undef, "eax_decrypt_verify: plaintext (no header) / bad tag");
 }
