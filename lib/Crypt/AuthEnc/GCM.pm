@@ -2,7 +2,7 @@ package Crypt::AuthEnc::GCM;
 
 use strict;
 use warnings;
-our $VERSION = '0.061_001';
+our $VERSION = '0.061_002';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( gcm_encrypt_authenticate gcm_decrypt_verify )] );
