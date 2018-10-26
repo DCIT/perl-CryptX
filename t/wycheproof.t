@@ -8,13 +8,13 @@ use Test::More;
 
 plan skip_all => "No JSON::* module installed" unless eval { require JSON::PP } || eval { require JSON::XS } || eval { require Cpanel::JSON::XS };
 #plan skip_all => "Temporarily disabled";
-plan tests => 13299;
+plan tests => 14139;
 
 use CryptX;
 use Crypt::Misc 'read_rawfile';
 use Crypt::Digest 'digest_data';
 
-if (0) {
+if (1) {
   use Crypt::AuthEnc::ChaCha20Poly1305 qw(chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify);
 
   my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/chacha20_poly1305_test.json';
@@ -118,8 +118,8 @@ if (1) {
       }
       elsif ($result eq 'invalid') {
         SKIP: {
-          skip "ltc bug", 1 if $comment eq "bit padding";  #XXX-FIXME
-          skip "ltc bug", 1 if $comment eq "zero padding"; #XXX-FIXME
+          skip "ltc bug CBC/PAD", 1 if $comment eq "bit padding";  #XXX-FIXME
+          skip "ltc bug CBC/PAD", 1 if $comment eq "zero padding"; #XXX-FIXME
           is($pt2, undef, "$testname PT-i");
         }
       }
@@ -130,7 +130,7 @@ if (1) {
   }
 }
 
-if (0) {
+if (1) {
   use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate gcm_decrypt_verify);
 
   my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/aes_gcm_test.json';
@@ -244,10 +244,7 @@ if (1) {
         is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-a");
       }
       elsif ($result eq 'invalid') {
-        SKIP: {
-          skip "ltc bug", 1 if $comment eq "Invalid tag size"; #XXX-FIXME
-          is($pt2, undef, "$testname PT-i");
-        }
+        is($pt2, undef, "$testname PT-i");
       }
       else {
         ok(0, "UNEXPECTED result=$result");
@@ -258,7 +255,6 @@ if (1) {
 
 if (1) {
   use Crypt::PK::RSA;
-  use Crypt::PK::ECC;
   my @files = ( "t/wycheproof/rsa_signature_test.json" );
   push @files, glob("t/wycheproof/rsa_signature_*_test.json");
   push @files, glob("t/wycheproof/rsa_pss_*.json ");
@@ -299,7 +295,7 @@ if (1) {
         }
         elsif ($result eq 'invalid') {
           SKIP: {
-            skip "ltc bug", 1 if $comment eq "changing tag value of sequence"; #XXX-FIXME
+            skip "ltc bug RSA", 1 if $comment eq "changing tag value of sequence"; #XXX-FIXME
             ok(!$valid, $testname);
           }
         }
@@ -348,7 +344,7 @@ if (1) {
       }
       elsif ($result eq 'invalid') {
         SKIP: {
-          skip "ltc bug", 1 if $comment eq "changing tag value of sequence"; #XXX-FIXME
+          skip "ltc bug DSA", 1 if $comment eq "changing tag value of sequence"; #XXX-FIXME
           ok(!$valid, $testname);
         }
       }
@@ -389,17 +385,17 @@ if (1) {
         my $valid = $pk->verify_message($sig, $message, $sha);
         if ($result eq 'valid') {
           SKIP: {
-            skip "ltc bug", 1 if $comment eq "Edge case for Shamir multiplication";     #XXX-FIXME
-            skip "ltc bug", 1 if $comment eq "extreme value for k and edgecase s";      #XXX-FIXME
-            skip "ltc bug", 1 if $comment eq "extreme value for k";                     #XXX-FIXME
-            skip "ltc bug", 1 if $comment eq "extreme value for k and s^-1";            #XXX-FIXME
-            skip "ltc bug", 1 if $comment eq "extreme value for k and edgecase s";      #XXX-FIXME
+            skip "ltc bug ECC", 1 if $comment eq "Edge case for Shamir multiplication";     #XXX-FIXME
+            skip "ltc bug ECC", 1 if $comment eq "extreme value for k and edgecase s";      #XXX-FIXME
+            skip "ltc bug ECC", 1 if $comment eq "extreme value for k";                     #XXX-FIXME
+            skip "ltc bug ECC", 1 if $comment eq "extreme value for k and s^-1";            #XXX-FIXME
+            skip "ltc bug ECC", 1 if $comment eq "extreme value for k and edgecase s";      #XXX-FIXME
             ok($valid, "$testname verify_message=$valid");
           }
         }
         elsif ($result eq 'acceptable') {
           SKIP: {
-            skip "ltc bug", 1 if $comment eq "Hash weaker than DL-group";               #XXX-FIXME
+            skip "ltc bug ECC", 1 if $comment eq "Hash weaker than DL-group";               #XXX-FIXME
            #ok($valid, "$testname verify_message=$valid");  ## treat "acceptable" as "valid"
             ok(!$valid, "$testname verify_message=$valid"); ## treat "acceptable" as "invalid"
            #ok(1, "do not care about 'acceptable'");        ## ignore acceptable
@@ -407,9 +403,9 @@ if (1) {
         }
         elsif ($result eq 'invalid') {
           SKIP: {
-            skip "ltc bug", 1 if $comment eq "changing tag value of sequence";          #XXX-FIXME
-            skip "ltc bug", 1 if $comment eq "long form encoding of length";            #XXX-FIXME
-            skip "ltc bug", 1 if $comment eq "length contains leading 0";               #XXX-FIXME
+            skip "ltc bug ECC", 1 if $comment eq "changing tag value of sequence";          #XXX-FIXME
+            skip "ltc bug ECC", 1 if $comment eq "long form encoding of length";            #XXX-FIXME
+            skip "ltc bug ECC", 1 if $comment eq "length contains leading 0";               #XXX-FIXME
             ok(!$valid, "$testname verify_message=$valid");
           }
 
@@ -448,13 +444,13 @@ if (1) {
       my $valid = $pk->verify_message_rfc7518($sig, $message, $sha);
       if ($result eq 'valid') {
         SKIP: {
-          skip "ltc bug", 1 if $comment eq "Edge case for Shamir multiplication";       #XXX-FIXME
+          skip "ltc bug ECC", 1 if $comment eq "Edge case for Shamir multiplication";       #XXX-FIXME
           ok($valid, "$testname verify_message=$valid");
         }
       }
       elsif ($result eq 'acceptable') {
         SKIP: {
-          skip "ltc bug", 1 if $comment eq "Hash weaker than DL-group";                 #XXX-FIXME
+          skip "ltc bug ECC", 1 if $comment eq "Hash weaker than DL-group";                 #XXX-FIXME
          #ok($valid, "$testname verify_message=$valid");  ## treat "acceptable" as "valid"
           ok(!$valid, "$testname verify_message=$valid"); ## treat "acceptable" as "invalid"
          #ok(1, "do not care about 'acceptable'");        ## ignore acceptable
