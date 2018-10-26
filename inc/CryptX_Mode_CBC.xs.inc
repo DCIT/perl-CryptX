@@ -217,7 +217,7 @@ finish(Crypt::Mode::CBC self)
         unsigned long padmode;
 
         if (self->direction == 1) {
-          if (self->padlen < 0 || self->padlen >= blen) croak("FATAL: invalid padlen");
+          if (self->padlen < 0 || self->padlen >= (int)blen) croak("FATAL: invalid padlen");
           if (self->padding_mode != 0) {
             if      (self->padding_mode == 1) { padmode = LTC_PAD_PKCS7        | (&self->state)->blocklen; }
             else if (self->padding_mode == 2) { padmode = LTC_PAD_ONE_AND_ZERO | (&self->state)->blocklen; }
@@ -232,13 +232,13 @@ finish(Crypt::Mode::CBC self)
             if (rv != CRYPT_OK) croak("FATAL: cbc_encrypt failed: %s", error_to_string(rv));
           }
           else {
-            if (self->padlen > 0) croak("FATAL: cbc_encrypt, input data length not multiple of %d", blen);
+            if (self->padlen > 0) croak("FATAL: cbc_encrypt, input data length not multiple of %d", (int)blen);
             blen = 0;
           }
         }
         else if (self->direction == -1) {
           if (self->padlen > 0) {
-            if (self->padlen != blen) croak("FATAL: cipher text length has to be multiple of %d (%d)", blen, self->padlen);
+            if (self->padlen != (int)blen) croak("FATAL: cipher text length has to be multiple of %d (%d)", (int)blen, self->padlen);
             rv = cbc_decrypt(self->pad, tmp_block, blen, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: cbc_decrypt failed: %s", error_to_string(rv));
             if (self->padding_mode != 0) {
