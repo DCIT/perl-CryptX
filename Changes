@@ -5,6 +5,7 @@ Changes for CryptX
         - bundled libtomcrypt update branch:develop
         - fix #45 doc only - sign_message_rfc7518 / sign_message_rfc7518
         - fix $46 tests only - t/mbi_ltm_bigintpm.t etc. started to fail with latest Math::BigInt
+        - fix #47 gcm_decrypt_verify + chacha20poly1305_decrypt_verify don't verify the tag - SERIOUS SECURITY BUG!
         - improved CBC/ECB padding (using libtomcrypt's functions: padding_depad + padding_pad)
         - enable pkcs#8 encrypted RSA keys (supported by the latest libtomcrypt)
         - exclude wycheproof tests (too big) from dist tarball (via MANIFEST.SKIP)
