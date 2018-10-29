@@ -20,7 +20,7 @@ is( Crypt::Cipher::DES_EDE->max_keysize, 24, '->max_keysize');
 is( Crypt::Cipher::DES_EDE->min_keysize, 16, '->min_keysize');
 is( Crypt::Cipher::DES_EDE->default_rounds, 16, '->default_rounds');
 
-my $min_key = 'kkkkkkkkkkkkkkkkkkkkkkkk';
+my $min_key = 'kkkkkkkkkkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKKKKKKKKKK';
 
 is( Crypt::Cipher::blocksize('DES_EDE'), 8, 'Cipher->blocksize');
