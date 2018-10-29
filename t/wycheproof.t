@@ -8,7 +8,7 @@ use Test::More;
 
 plan skip_all => "No JSON::* module installed" unless eval { require JSON::PP } || eval { require JSON::XS } || eval { require Cpanel::JSON::XS };
 #plan skip_all => "Temporarily disabled";
-plan tests => 14139;
+plan tests => 14141;
 
 use CryptX;
 use Crypt::Misc 'read_rawfile';
@@ -17,7 +17,8 @@ use Crypt::Digest 'digest_data';
 if (1) {
   use Crypt::AuthEnc::ChaCha20Poly1305 qw(chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify);
 
-  my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/chacha20_poly1305_test.json';
+  my $json = 't/wycheproof/chacha20_poly1305_test.json';
+  my $tests = CryptX::_decode_json read_rawfile $json;
   for my $g (@{$tests->{testGroups}}) {
     my $type    = $g->{type};
     my $tlen    = $g->{tagSize};
@@ -34,17 +35,15 @@ if (1) {
       # do the test
       my ($ct2, $tag2) = eval { chacha20poly1305_encrypt_authenticate($key, $iv, $aad, $msg) };
       my $pt2 = eval { chacha20poly1305_decrypt_verify($key, $iv, $aad, $ct, $tag) };
-      my $testname = "type=$type tcId=$tcId comment='$comment' expected-result=$result";
+      my $testname = "($json) type=$type tcId=$tcId comment='$comment' expected-result=$result";
       if ($result eq 'valid') {
         is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-v");
         is(unpack("H*", $tag2), $t->{tag}, "$testname TAG-v");
         is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-v");
       }
       elsif ($result eq 'acceptable') {
-        # consider: acceptable == valid
-        is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-a");
-        is(unpack("H*", $tag2), $t->{tag}, "$testname TAG-a");
-        is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-a");
+        # consider: acceptable == invalid
+        is($pt2, undef, "$testname PT-a");
       }
       elsif ($result eq 'invalid') {
         is($pt2, undef, "$testname PT-i");
@@ -59,7 +58,8 @@ if (1) {
 if (1) {
   use Crypt::Mac::OMAC;
 
-  my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/aes_cmac_test.json';
+  my $json = 't/wycheproof/aes_cmac_test.json';
+  my $tests = CryptX::_decode_json read_rawfile $json;
   for my $g (@{$tests->{testGroups}}) {
     my $type    = $g->{type};
     my $tsize   = $g->{tagSize} / 8;
@@ -73,9 +73,18 @@ if (1) {
       my $tag     = pack "H*", $t->{tag}; # "4fbcdeb7e4793f4a1d7e4faa70100af1"
       # do the test
       my $tag2 = eval { Crypt::Mac::OMAC->new("AES", $key)->add($msg)->mac };
-      my $testname = "type=$type tcId=$tcId comment='$comment' expected-result=$result";
-      if ($result eq 'valid' || $result eq 'acceptable') {
+      my $testname = "($json) type=$type tcId=$tcId comment='$comment' expected-result=$result";
+      if ($result eq 'valid') {
         is(unpack("H*", substr($tag2, 0, $tsize)), $t->{tag}, "$testname TAG-v");
+      }
+      elsif ($result eq 'acceptable') {
+        # consider: acceptable == invalid
+        if (defined $tag2) {
+          isnt(unpack("H*", substr($tag2, 0, $tsize)), $t->{tag}, "$testname TAG-a");
+        }
+        else {
+          is($tag2, undef, "$testname PT-a");
+        }
       }
       elsif ($result eq 'invalid') {
         if (defined $tag2) {
@@ -95,7 +104,8 @@ if (1) {
 if (1) {
   use Crypt::Mode::CBC;
 
-  my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/aes_cbc_pkcs5_test.json';
+  my $json = 't/wycheproof/aes_cbc_pkcs5_test.json';
+  my $tests = CryptX::_decode_json read_rawfile $json;
   for my $g (@{$tests->{testGroups}}) {
     my $type    = $g->{type};
     for my $t (@{$g->{tests}}) {
@@ -111,10 +121,14 @@ if (1) {
       my $ct2 = eval { $enc->encrypt($msg, $key, $iv) };
       my $dec = Crypt::Mode::CBC->new('AES', 1); #  1 = PKCS5 padding
       my $pt2 = eval { $dec->decrypt($ct, $key, $iv) };
-      my $testname = "type=$type tcId=$tcId comment='$comment' expected-result=$result";
-      if ($result eq 'valid' || $result eq 'acceptable') {
+      my $testname = "($json) type=$type tcId=$tcId comment='$comment' expected-result=$result";
+      if ($result eq 'valid') {
         is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-v");
         is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-v");
+      }
+      elsif ($result eq 'acceptable') {
+        # consider: acceptable == invalid
+        is($pt2, undef, "$testname PT-a");
       }
       elsif ($result eq 'invalid') {
         is($pt2, undef, "$testname PT-i");
@@ -129,7 +143,8 @@ if (1) {
 if (1) {
   use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate gcm_decrypt_verify);
 
-  my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/aes_gcm_test.json';
+  my $json = 't/wycheproof/aes_gcm_test.json';
+  my $tests = CryptX::_decode_json read_rawfile $json;
   for my $g (@{$tests->{testGroups}}) {
     my $type    = $g->{type};
     for my $t (@{$g->{tests}}) {
@@ -145,15 +160,25 @@ if (1) {
       # do the test
       my ($ct2, $tag2) = eval { gcm_encrypt_authenticate('AES', $key, $iv, $aad, $msg) };
       my $pt2 = eval { gcm_decrypt_verify('AES', $key, $iv, $aad, $ct, $tag) };
-      my $testname = "type=$type tcId=$tcId comment='$comment' expected-result=$result";
-      if ($result eq 'valid' || $result eq 'acceptable') {
+      my $testname = "($json) type=$type tcId=$tcId comment='$comment' expected-result=$result";
+      if ($result eq 'valid') {
         is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-v");
         is(unpack("H*", $tag2), $t->{tag}, "$testname TAG-v");
         is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-v");
       }
+      elsif ($result eq 'acceptable') {
+        if ($comment eq 'small IV sizes') {
+          # consider: acceptable == valid
+          is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-a");
+          is(unpack("H*", $tag2), $t->{tag}, "$testname TAG-a");
+          is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-a");
+        }
+        else {
+          # consider: acceptable == invalid
+          is($pt2, undef, "$testname PT-a");
+        }
+      }
       elsif ($result eq 'invalid') {
-        #isnt(unpack("H*", $ct2),  $t->{ct},  "$testname CT-i");
-        #isnt(unpack("H*", $tag2), $t->{tag}, "$testname TAG-i");
         is($pt2, undef, "$testname PT-i");
       }
       else {
@@ -166,7 +191,8 @@ if (1) {
 if (1) {
   use Crypt::AuthEnc::EAX qw(eax_encrypt_authenticate eax_decrypt_verify);
 
-  my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/aes_eax_test.json';
+  my $json = 't/wycheproof/aes_eax_test.json';
+  my $tests = CryptX::_decode_json read_rawfile $json;
   for my $g (@{$tests->{testGroups}}) {
     my $type    = $g->{type};
     my $tlen    = $g->{tagSize};
@@ -183,17 +209,23 @@ if (1) {
       # do the test
       my ($ct2, $tag2) = eval { eax_encrypt_authenticate('AES', $key, $iv, $aad, $msg) };
       my $pt2 = eval { eax_decrypt_verify('AES', $key, $iv, $aad, $ct, $tag) };
-      my $testname = "type=$type tcId=$tcId comment='$comment' expected-result=$result";
+      my $testname = "($json) type=$type tcId=$tcId comment='$comment' expected-result=$result";
       if ($result eq 'valid') {
         is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-v");
         is(unpack("H*", $tag2), $t->{tag}, "$testname TAG-v");
         is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-v");
       }
       elsif ($result eq 'acceptable') {
-        # consider: acceptable == valid
-        is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-a");
-        is(unpack("H*", $tag2), $t->{tag}, "$testname TAG-a");
-        is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-a");
+        if ($comment eq 'small IV size' || $comment eq 'IV size = 0') {
+          # consider: acceptable == valid
+          is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-a");
+          is(unpack("H*", $tag2), $t->{tag}, "$testname TAG-a");
+          is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-a");
+        }
+        else {
+          # consider: acceptable == invalid
+          is($pt2, undef, "$testname PT-a");
+        }
       }
       elsif ($result eq 'invalid') {
         #isnt(unpack("H*", $ct2),  $t->{ct},  "$testname CT-i");
@@ -210,7 +242,8 @@ if (1) {
 if (1) {
   use Crypt::AuthEnc::CCM qw(ccm_encrypt_authenticate ccm_decrypt_verify);
 
-  my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/aes_ccm_test.json';
+  my $json = 't/wycheproof/aes_ccm_test.json';
+  my $tests = CryptX::_decode_json read_rawfile $json;
   for my $g (@{$tests->{testGroups}}) {
     my $type    = $g->{type};
     my $tlen    = $g->{tagSize};
@@ -227,17 +260,15 @@ if (1) {
       # do the test
       my ($ct2, $tag2) = eval { ccm_encrypt_authenticate('AES', $key, $iv, $aad, $tlen/8, $msg) };
       my $pt2 = eval { ccm_decrypt_verify('AES', $key, $iv, $aad, $ct, $tag) };
-      my $testname = "type=$type tcId=$tcId comment='$comment' expected-result=$result";
+      my $testname = "($json) type=$type tcId=$tcId comment='$comment' expected-result=$result";
       if ($result eq 'valid') {
         is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-v");
         is(unpack("H*", $tag2), $t->{tag}, "$testname TAG-v");
         is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-v");
       }
       elsif ($result eq 'acceptable') {
-        # consider: acceptable == valid
-        is(unpack("H*", $ct2),  $t->{ct},  "$testname CT-a");
-        is(unpack("H*", $tag2), $t->{tag}, "$testname TAG-a");
-        is(unpack("H*", $pt2),  $t->{msg}, "$testname PT-a");
+        # consider: acceptable == invalid
+        is($pt2, undef, "$testname PT-a");
       }
       elsif ($result eq 'invalid') {
         is($pt2, undef, "$testname PT-i");
@@ -286,8 +317,8 @@ if (1) {
           ok($valid, $testname);
         }
         elsif ($result eq 'acceptable') {
-          ok($valid, $testname);                   ## treat "acceptable" as "valid"
-         #ok(1, "do not care about 'acceptable'"); ## ignore acceptable
+          # consider: acceptable == valid
+          ok($valid, $testname);
         }
         elsif ($result eq 'invalid') {
           SKIP: {
@@ -306,7 +337,8 @@ if (1) {
 if (1) {
   use Crypt::PK::DSA;
 
-  my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/dsa_test.json';
+  my $json = 't/wycheproof/dsa_test.json';
+  my $tests = CryptX::_decode_json read_rawfile $json;
   for my $g (@{$tests->{testGroups}}) {
     my $type   = $g->{type};   # "DSAVer"
     my $keyDer = pack "H*", $g->{keyDer};
@@ -322,7 +354,7 @@ if (1) {
       my $message = pack "H*", $t->{msg};
       my $sig     = pack "H*", $t->{sig};
       # do the test
-      my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
+      my $testname = "($json) type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
       my $pk = Crypt::PK::DSA->new( \$keyPem );
       my $hash = digest_data($sha, $message);
       my $valid_h = $pk->verify_hash($sig, $hash);
@@ -331,12 +363,8 @@ if (1) {
         ok($valid, $testname);
       }
       elsif ($result eq 'acceptable') {
-        SKIP: {
-         #skip "ltc bug", 1 if $comment =~ /^Legacy:ASN encoding of [rs] misses leading 0$/;
-         #ok($valid, $testname);                   ## treat "acceptable" as "valid"
-          ok(!$valid, $testname);                  ## treat "acceptable" as "invalid"
-         #ok(1, "do not care about 'acceptable'"); ## ignore acceptable
-        }
+        # consider: acceptable == invalid
+        ok(!$valid, $testname);
       }
       elsif ($result eq 'invalid') {
         SKIP: {
@@ -373,8 +401,6 @@ if (1) {
         my $result  = $t->{result};
         my $message = pack "H*", $t->{msg};
         my $sig     = pack "H*", $t->{sig};
-        # skip unsupported tests:
-        next if $result eq 'acceptable' && $comment =~ /^Legacy:ASN encoding of [rs] misses leading 0$/;
         # do the test
         my $testname = "($json) type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
         my $pk = Crypt::PK::ECC->new( \$keyPem );
@@ -390,11 +416,10 @@ if (1) {
           }
         }
         elsif ($result eq 'acceptable') {
+          # consider: acceptable == invalid
           SKIP: {
             skip "ltc bug ECC", 1 if $comment eq "Hash weaker than DL-group";               #XXX-FIXME
-           #ok($valid, "$testname verify_message=$valid");  ## treat "acceptable" as "valid"
-            ok(!$valid, "$testname verify_message=$valid"); ## treat "acceptable" as "invalid"
-           #ok(1, "do not care about 'acceptable'");        ## ignore acceptable
+            ok(!$valid, "$testname verify_message=$valid");
           }
         }
         elsif ($result eq 'invalid') {
@@ -417,7 +442,8 @@ if (1) {
 if (1) {
   use Crypt::PK::ECC;
 
-  my $tests = CryptX::_decode_json read_rawfile 't/wycheproof/ecdsa_webcrypto_test.json';
+  my $json = 't/wycheproof/ecdsa_webcrypto_test.json';
+  my $tests = CryptX::_decode_json read_rawfile $json;
   for my $g (@{$tests->{testGroups}}) {
     my $type   = $g->{type};
     my $keyDer = pack "H*", $g->{keyDer};
@@ -435,7 +461,7 @@ if (1) {
       my $message = pack "H*", $t->{msg};
       my $sig     = pack "H*", $t->{sig};
       # do the test
-      my $testname = "type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
+      my $testname = "($json) type=$type/$sha tcId=$tcId comment='$comment' expected-result=$result";
       my $pk = Crypt::PK::ECC->new( \$keyPem );
       my $valid = $pk->verify_message_rfc7518($sig, $message, $sha);
       if ($result eq 'valid') {
@@ -445,11 +471,10 @@ if (1) {
         }
       }
       elsif ($result eq 'acceptable') {
+        # consider: acceptable == invalid
         SKIP: {
           skip "ltc bug ECC", 1 if $comment eq "Hash weaker than DL-group";                 #XXX-FIXME
-         #ok($valid, "$testname verify_message=$valid");  ## treat "acceptable" as "valid"
-          ok(!$valid, "$testname verify_message=$valid"); ## treat "acceptable" as "invalid"
-         #ok(1, "do not care about 'acceptable'");        ## ignore acceptable
+          ok(!$valid, "$testname verify_message=$valid");
         }
       }
       elsif ($result eq 'invalid') {
@@ -486,11 +511,8 @@ if (0) {
           is($shared_hex, $t->{shared}, $testname);
         }
         elsif ($result eq 'acceptable') {
-          SKIP: {
-           #is($shared_hex, $t->{shared}, $testname);   ## treat "acceptable" as "valid"
-            isnt($shared_hex, $t->{shared}, $testname); ## treat "acceptable" as "invalid"
-           #ok(1, "do not care about 'acceptable'");    ## ignore acceptable
-          }
+          # consider: acceptable == invalid
+          isnt($shared_hex, $t->{shared}, $testname);
         }
         elsif ($result eq 'invalid') {
           isnt($shared_hex, $t->{shared}, $testname);
