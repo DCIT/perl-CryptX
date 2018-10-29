@@ -3,6 +3,7 @@
 use Modern::Perl;
 use File::Find qw(find);
 use File::Slurper qw(read_text write_text);
+use File::Glob qw(bsd_glob);
 use FindBin;
 
 my $ltc_branch = "develop";
@@ -10,10 +11,12 @@ my $ltm_branch = "no-stdint-h";
 my $tmpdir = "/tmp/libtom.git.checkout.$$";
 
 warn "update libtommath from github (branch: $ltm_branch)..\n";
+system 'rm', '-rf', bsd_glob("$FindBin::Bin/ltm/*");
 system "rm -rf $tmpdir; mkdir $tmpdir";
 system "git clone -b $ltm_branch https://github.com/libtom/libtommath.git $tmpdir && cp -R $tmpdir/bn*.c $tmpdir/tom*.h $FindBin::Bin/ltm/ && echo ok";
 
 warn "update libtomcrypt from github (branch: $ltc_branch)..\n";
+system 'rm', '-rf', bsd_glob("$FindBin::Bin/ltc/*");
 system "rm -rf $tmpdir; mkdir $tmpdir";
 system "git clone -b $ltc_branch https://github.com/libtom/libtomcrypt.git $tmpdir && cp -R $tmpdir/src/* $FindBin::Bin/ltc/ && echo ok";
 system "rm -rf $tmpdir";
