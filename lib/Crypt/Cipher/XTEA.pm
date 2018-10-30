@@ -4,7 +4,7 @@ package Crypt::Cipher::XTEA;
 
 use strict;
 use warnings;
-our $VERSION = '0.062';
+our $VERSION = '0.062_001';
 
 use base qw(Crypt::Cipher);
 
