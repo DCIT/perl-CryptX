@@ -1,7 +1,7 @@
 Changes for CryptX
 
-0.062   2018-10-XX
-        - bundled libtommath update branch:no-stdint-h (commit:8b9f98b + no-stdint-h patch)
+0.062   2018-10-30
+        - bundled libtommath  update branch:develop (commit:8b9f98ba 2018-09-23) + stdint.h workaround
         - bundled libtomcrypt update branch:develop (commit:f413335b 2018-10-29)
         - fix #45 doc only - sign_message_rfc7518 / sign_message_rfc7518
         - fix $46 tests only - t/mbi_ltm_bigintpm.t etc. started to fail with latest Math::BigInt
