@@ -64,6 +64,34 @@ _from_oct(Class, SV *x)
     RETVAL
 
 ##############################################################################
+# _from_base()
+
+Math::BigInt::LTM
+_from_base(Class, SV *x, int base)
+  CODE:
+    Newz(0, RETVAL, 1, mp_int);
+    mp_init(RETVAL);
+    mp_read_radix(RETVAL, SvPV_nolen(x), base);
+  OUTPUT:
+    RETVAL
+
+##############################################################################
+# _from_bytes()
+
+Math::BigInt::LTM
+_from_bytes(Class, SV *x)
+  PREINIT:
+    STRLEN buf_len;
+    unsigned char *buf_ptr;
+  CODE:
+    Newz(0, RETVAL, 1, mp_int);
+    mp_init(RETVAL);
+    buf_ptr = (unsigned char *)SvPVbyte(x, buf_len);
+    mp_read_unsigned_bin(RETVAL, buf_ptr, buf_len);
+  OUTPUT:
+    RETVAL
+
+##############################################################################
 # _set() - set an already existing object to the given scalar value
 
 void
@@ -190,6 +218,7 @@ _len(Class, Math::BigInt::LTM n)
 ##############################################################################
 # _alen() - return the approx. length of the number in base 10 (fast)
 # _alen() might underestimate, but never overestimate the true value
+
 int
 _alen(Class, Math::BigInt::LTM n)
   PREINIT:
@@ -234,60 +263,109 @@ _zeros(Class, Math::BigInt::LTM n)
     RETVAL
 
 ##############################################################################
-# _as_hex() - return ref to hexadecimal string (prefixed with 0x)
+# _to_hex() - return ref to hexadecimal string (no prefix)
 
 SV *
-_as_hex(Class, Math::BigInt::LTM n)
+_to_hex(Class, Math::BigInt::LTM n)
   PREINIT:
     int i, len;
     char *buf;
   CODE:
-    len = mp_unsigned_bin_size(n) * 2 + 3;
-    RETVAL = newSV(len);
-    SvPOK_on(RETVAL);
-    buf = SvPVX(RETVAL);                /* get ptr to storage */
-    *buf++ = '0'; *buf++ = 'x';         /* prepend '0x' */
-    mp_tohex(n, buf);
-    for (i=0; i<len && buf[i]>0; i++) buf[i] = toLOWER(buf[i]);
-    SvCUR_set(RETVAL, strlen(buf)+2);   /* set real length */
-  OUTPUT:
-    RETVAL
-
-##############################################################################
-# _as_bin() - return ref to binary string (prefixed with 0b)
-
-SV *
-_as_bin(Class, Math::BigInt::LTM n)
-  PREINIT:
-    int len;
-    char *buf;
-  CODE:
-    len = mp_unsigned_bin_size(n) * 8 + 3;
-    RETVAL = newSV(len);
-    SvPOK_on(RETVAL);
-    buf = SvPVX(RETVAL);                /* get ptr to storage */
-    *buf++ = '0'; *buf++ = 'b';         /* prepend '0b' */
-    mp_tobinary(n, buf);
-    SvCUR_set(RETVAL, strlen(buf)+2);   /* set real length */
-  OUTPUT:
-    RETVAL
-
-##############################################################################
-# _as_oct() - return ref to octal string (prefixed with 0)
-
-SV *
-_as_oct(Class, Math::BigInt::LTM n)
-  PREINIT:
-    int len;
-    char *buf;
-  CODE:
-    len = mp_unsigned_bin_size(n) * 3 + 3;
+    len = mp_unsigned_bin_size(n) * 2 + 1;
     RETVAL = newSV(len);
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);
-    *buf++ = '0';                       /* prepend '0' */
+    mp_tohex(n, buf);
+    for (i=0; i<len && buf[i]>0; i++) buf[i] = toLOWER(buf[i]);
+    SvCUR_set(RETVAL, strlen(buf));
+  OUTPUT:
+    RETVAL
+
+##############################################################################
+# _to_bin() - return ref to binary string (no prefix)
+
+SV *
+_to_bin(Class, Math::BigInt::LTM n)
+  PREINIT:
+    int len;
+    char *buf;
+  CODE:
+    len = mp_unsigned_bin_size(n) * 8 + 1;
+    RETVAL = newSV(len);
+    SvPOK_on(RETVAL);
+    buf = SvPVX(RETVAL);
+    mp_tobinary(n, buf);
+    SvCUR_set(RETVAL, strlen(buf));
+  OUTPUT:
+    RETVAL
+
+##############################################################################
+# _to_oct() - return ref to octal string (no prefix)
+
+SV *
+_to_oct(Class, Math::BigInt::LTM n)
+  PREINIT:
+    int len;
+    char *buf;
+  CODE:
+    len = mp_unsigned_bin_size(n) * 3 + 1;
+    RETVAL = newSV(len);
+    SvPOK_on(RETVAL);
+    buf = SvPVX(RETVAL);
     mp_tooctal(n, buf);
-    SvCUR_set(RETVAL, strlen(buf)+1);   /* set real length */
+    SvCUR_set(RETVAL, strlen(buf));
+  OUTPUT:
+    RETVAL
+
+##############################################################################
+# _to_base() - raw bytes
+
+SV *
+_to_base(Class, Math::BigInt::LTM n, int base)
+  PREINIT:
+    int len;
+    char *buf;
+  CODE:
+    len = mp_unsigned_bin_size(n) * 8; /* the worst case for base == 2 */
+    RETVAL = newSV(len + 1);
+    SvPOK_on(RETVAL);
+    buf = SvPVX(RETVAL);
+    if (len > 0) {
+      mp_toradix_n(n, buf, base, len);
+      SvCUR_set(RETVAL, strlen(buf));
+    }
+    else {
+      buf[0] = '0';
+      SvCUR_set(RETVAL, 1);
+    }
+  OUTPUT:
+    RETVAL
+
+##############################################################################
+# _to_bytes() - raw bytes
+# _as_bytes() - raw bytes
+
+SV *
+_to_bytes(Class, Math::BigInt::LTM n)
+  ALIAS:
+    _as_bytes = 1
+  PREINIT:
+    int len;
+    unsigned char *buf;
+  CODE:
+    PERL_UNUSED_VAR(ix);
+    len = mp_unsigned_bin_size(n);
+    RETVAL = newSV(len + 1);
+    SvPOK_on(RETVAL);
+    buf = (unsigned char*)SvPVX(RETVAL);
+    if (len > 0) {
+      mp_to_unsigned_bin(n, buf);
+      SvCUR_set(RETVAL, len);
+    }
+    else {
+      buf[0] = 0;
+      SvCUR_set(RETVAL, 1);
+    }
   OUTPUT:
     RETVAL
 
