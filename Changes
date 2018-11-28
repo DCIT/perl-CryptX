@@ -1,7 +1,7 @@
 Changes for CryptX
 
-0.063   2018-NEXT
-        - proper patch for #46 (Math::BigInt::LTM)
+0.063   2018-11-28
+        - proper patch for #46 (related to Math::BigInt::LTM)
 
 0.062   2018-10-30
         - bundled libtommath  update branch:develop (commit:8b9f98ba 2018-09-23) + stdint.h workaround
