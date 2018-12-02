@@ -36,6 +36,8 @@ system 'rm', '-rf', "$FindBin::Bin/ltc/math/gmp_desc.c";
 ### get rid of bn_mp_set_long_long + bn_mp_get_long_long
 system 'rm', '-rf', "$FindBin::Bin/ltm/bn_mp_set_long_long.c";
 system 'rm', '-rf', "$FindBin::Bin/ltm/bn_mp_get_long_long.c";
+system 'rm', '-rf', "$FindBin::Bin/ltm/bn_mp_get_double.c";
+system 'rm', '-rf', "$FindBin::Bin/ltm/bn_mp_set_double.c";
 system 'sed', '-i', 's,^\(int *mp_set_long_long.*\),/* \1 */,', 'src//ltm/tommath.h';
 system 'sed', '-i', 's,^\(unsigned *long *long *mp_get_long_long.*\),/* \1 */,', 'src//ltm/tommath.h';
 
