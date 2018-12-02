@@ -2,7 +2,7 @@ package Crypt::PK;
 
 use strict;
 use warnings;
-our $VERSION = '0.063';
+our $VERSION = '0.063_001';
 
 use Carp;
 

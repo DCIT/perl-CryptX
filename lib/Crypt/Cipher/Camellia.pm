@@ -4,7 +4,7 @@ package Crypt::Cipher::Camellia;
 
 use strict;
 use warnings;
-our $VERSION = '0.063';
+our $VERSION = '0.063_001';
 
 use base qw(Crypt::Cipher);
 
