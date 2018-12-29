@@ -142,18 +142,19 @@ ltm/bn_mp_copy.o ltm/bn_mp_count_bits.o ltm/bn_mp_div.o ltm/bn_mp_div_2.o ltm/bn
 ltm/bn_mp_div_3.o ltm/bn_mp_div_d.o ltm/bn_mp_dr_is_modulus.o ltm/bn_mp_dr_reduce.o \
 ltm/bn_mp_dr_setup.o ltm/bn_mp_exch.o ltm/bn_mp_export.o ltm/bn_mp_exptmod.o ltm/bn_mp_exptmod_fast.o \
 ltm/bn_mp_expt_d.o ltm/bn_mp_expt_d_ex.o ltm/bn_mp_exteuclid.o ltm/bn_mp_fread.o \
-ltm/bn_mp_fwrite.o ltm/bn_mp_gcd.o ltm/bn_mp_get_int.o ltm/bn_mp_get_long.o ltm/bn_mp_grow.o \
-ltm/bn_mp_import.o ltm/bn_mp_init.o ltm/bn_mp_init_copy.o ltm/bn_mp_init_multi.o \
+ltm/bn_mp_fwrite.o ltm/bn_mp_gcd.o ltm/bn_mp_get_bit.o ltm/bn_mp_get_int.o ltm/bn_mp_get_long.o \
+ltm/bn_mp_grow.o ltm/bn_mp_import.o ltm/bn_mp_init.o ltm/bn_mp_init_copy.o ltm/bn_mp_init_multi.o \
 ltm/bn_mp_init_set.o ltm/bn_mp_init_set_int.o ltm/bn_mp_init_size.o ltm/bn_mp_invmod.o \
 ltm/bn_mp_invmod_slow.o ltm/bn_mp_is_square.o ltm/bn_mp_jacobi.o ltm/bn_mp_karatsuba_mul.o \
-ltm/bn_mp_karatsuba_sqr.o ltm/bn_mp_lcm.o ltm/bn_mp_lshd.o ltm/bn_mp_mod.o ltm/bn_mp_mod_2d.o \
-ltm/bn_mp_mod_d.o ltm/bn_mp_montgomery_calc_normalization.o ltm/bn_mp_montgomery_reduce.o \
-ltm/bn_mp_montgomery_setup.o ltm/bn_mp_mul.o ltm/bn_mp_mulmod.o ltm/bn_mp_mul_2.o \
-ltm/bn_mp_mul_2d.o ltm/bn_mp_mul_d.o ltm/bn_mp_neg.o ltm/bn_mp_n_root.o ltm/bn_mp_n_root_ex.o \
-ltm/bn_mp_or.o ltm/bn_mp_prime_fermat.o ltm/bn_mp_prime_is_divisible.o ltm/bn_mp_prime_is_prime.o \
-ltm/bn_mp_prime_miller_rabin.o ltm/bn_mp_prime_next_prime.o ltm/bn_mp_prime_rabin_miller_trials.o \
-ltm/bn_mp_prime_random_ex.o ltm/bn_mp_radix_size.o ltm/bn_mp_radix_smap.o ltm/bn_mp_rand.o \
-ltm/bn_mp_read_radix.o ltm/bn_mp_read_signed_bin.o ltm/bn_mp_read_unsigned_bin.o \
+ltm/bn_mp_karatsuba_sqr.o ltm/bn_mp_kronecker.o ltm/bn_mp_lcm.o ltm/bn_mp_lshd.o \
+ltm/bn_mp_mod.o ltm/bn_mp_mod_2d.o ltm/bn_mp_mod_d.o ltm/bn_mp_montgomery_calc_normalization.o \
+ltm/bn_mp_montgomery_reduce.o ltm/bn_mp_montgomery_setup.o ltm/bn_mp_mul.o ltm/bn_mp_mulmod.o \
+ltm/bn_mp_mul_2.o ltm/bn_mp_mul_2d.o ltm/bn_mp_mul_d.o ltm/bn_mp_neg.o ltm/bn_mp_n_root.o \
+ltm/bn_mp_n_root_ex.o ltm/bn_mp_or.o ltm/bn_mp_prime_fermat.o ltm/bn_mp_prime_frobenius_underwood.o \
+ltm/bn_mp_prime_is_divisible.o ltm/bn_mp_prime_is_prime.o ltm/bn_mp_prime_miller_rabin.o \
+ltm/bn_mp_prime_next_prime.o ltm/bn_mp_prime_rabin_miller_trials.o ltm/bn_mp_prime_random_ex.o \
+ltm/bn_mp_prime_strong_lucas_selfridge.o ltm/bn_mp_radix_size.o ltm/bn_mp_radix_smap.o \
+ltm/bn_mp_rand.o ltm/bn_mp_read_radix.o ltm/bn_mp_read_signed_bin.o ltm/bn_mp_read_unsigned_bin.o \
 ltm/bn_mp_reduce.o ltm/bn_mp_reduce_2k.o ltm/bn_mp_reduce_2k_l.o ltm/bn_mp_reduce_2k_setup.o \
 ltm/bn_mp_reduce_2k_setup_l.o ltm/bn_mp_reduce_is_2k.o ltm/bn_mp_reduce_is_2k_l.o \
 ltm/bn_mp_reduce_setup.o ltm/bn_mp_rshd.o ltm/bn_mp_set.o ltm/bn_mp_set_int.o ltm/bn_mp_set_long.o \
