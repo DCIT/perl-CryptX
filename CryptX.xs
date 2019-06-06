@@ -401,6 +401,9 @@ _radix_to_bin(char *in, int radix)
         STRLEN len;
         unsigned char *out_data;
         mp_int mpi;
+        mp_err merr;
+
+        LTC_UNUSED_PARAM(merr);
 
         if (in == NULL) XSRETURN_UNDEF;
         if (mp_init(&mpi) != CRYPT_OK) XSRETURN_UNDEF;
@@ -417,7 +420,7 @@ _radix_to_bin(char *in, int radix)
             SvPOK_only(RETVAL);
             SvCUR_set(RETVAL, len);
             out_data = (unsigned char *)SvPVX(RETVAL);
-            mp_to_unsigned_bin(&mpi, out_data);
+            merr = mp_to_unsigned_bin(&mpi, out_data);
           }
         }
         else {
@@ -437,19 +440,22 @@ _bin_to_radix(SV *in, int radix)
         char *out_data;
         mp_int mpi, tmp;
         mp_digit d;
+        mp_err merr;
         int digits = 0;
+
+        LTC_UNUSED_PARAM(merr);
 
         if (!SvPOK(in) || radix < 2 || radix > 64) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, len);
-        mp_init_multi(&mpi, &tmp, NULL);
+        merr = mp_init_multi(&mpi, &tmp, NULL);
         if (len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
           if (mp_read_unsigned_bin(&mpi, in_data, (unsigned long)len) == CRYPT_OK) {
-            mp_copy(&mpi, &tmp);
+            merr = mp_copy(&mpi, &tmp);
             while (mp_iszero(&tmp) == MP_NO) {
-              mp_div_d(&tmp, (mp_digit)radix, &tmp, &d);
+              merr = mp_div_d(&tmp, (mp_digit)radix, &tmp, &d);
               digits++;
             }
             if (digits == 0) {
@@ -459,7 +465,7 @@ _bin_to_radix(SV *in, int radix)
               RETVAL = NEWSV(0, digits + 2); /* +2 for sign and NUL byte */
               SvPOK_only(RETVAL);
               out_data = SvPVX(RETVAL);
-              mp_toradix(&mpi, out_data, radix);
+              merr = mp_toradix(&mpi, out_data, radix);
               SvCUR_set(RETVAL, strlen(out_data));
             }
           }

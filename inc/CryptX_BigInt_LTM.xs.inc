@@ -275,7 +275,7 @@ _to_hex(Class, Math::BigInt::LTM n)
     RETVAL = newSV(len);
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);
-    mp_tohex(n, buf);
+    mp_toradix(n, buf, 16); /* to hex */
     for (i=0; i<len && buf[i]>0; i++) buf[i] = toLOWER(buf[i]);
     SvCUR_set(RETVAL, strlen(buf));
   OUTPUT:
@@ -294,7 +294,7 @@ _to_bin(Class, Math::BigInt::LTM n)
     RETVAL = newSV(len);
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);
-    mp_tobinary(n, buf);
+    mp_toradix(n, buf, 2); /* to binary */
     SvCUR_set(RETVAL, strlen(buf));
   OUTPUT:
     RETVAL
@@ -312,7 +312,7 @@ _to_oct(Class, Math::BigInt::LTM n)
     RETVAL = newSV(len);
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);
-    mp_tooctal(n, buf);
+    mp_toradix(n, buf, 8); /* to octal */
     SvCUR_set(RETVAL, strlen(buf));
   OUTPUT:
     RETVAL
