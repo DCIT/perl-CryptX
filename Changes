@@ -1,5 +1,9 @@
 Changes for CryptX
 
+0.064   2019-NEXT
+        - fix #50 libtommath patch - building on HP-UX 11.11 / PA-RISC
+        - bundled libtomcrypt update branch:develop (commit:4ed50d8d 2019-06-05)
+
 0.063   2018-11-28
         - proper patch for #46 (related to Math::BigInt::LTM)
 
