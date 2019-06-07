@@ -7,15 +7,35 @@ PROTOTYPES: DISABLE
 
 Math::BigInt::LTM
 _new(Class, SV *x)
+  PREINIT:
+    mp_err merr;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
+    merr = mp_init(RETVAL);
+#ifdef BN_MP_SET_INT_C
     if ((SvUOK(x) || SvIOK(x)) && (sizeof(UV) <= sizeof(unsigned long) || SvUV(x) == (unsigned long)SvUV(x))) {
       mp_set_int(RETVAL, (unsigned long)SvUV(x));
     }
-    else {
-      mp_read_radix(RETVAL, SvPV_nolen(x), 10);
+#elif IVSIZE == 8
+    if (SvUOK(x)) {
+      mp_set_u64(RETVAL, (unsigned long long)SvUV(x));
     }
+    else if (SvIOK(x)) {
+      mp_set_i64(RETVAL, (long long)SvIV(x));
+    }
+#else
+    if (SvUOK(x)) {
+      mp_set_u32(RETVAL, (unsigned int)SvUV(x));
+    }
+    else if (SvIOK(x)) {
+      mp_set_i32(RETVAL, (int)SvIV(x));
+    }
+#endif
+    else {
+      /* fallback - read the decimal number from string */
+      merr = mp_read_radix(RETVAL, SvPV_nolen(x), 10);
+    }
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -25,13 +45,15 @@ _new(Class, SV *x)
 Math::BigInt::LTM
 _from_bin(Class, SV *x)
   PREINIT:
+    mp_err merr;
     char *str, *start;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
+    merr = mp_init(RETVAL);
     str = SvPV_nolen(x);
     start = (strlen(str)>2 && str[0] == '0' && str[1] == 'b') ? str+2 : str;
-    mp_read_radix(RETVAL, start, 2);
+    merr = mp_read_radix(RETVAL, start, 2);
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -41,13 +63,15 @@ _from_bin(Class, SV *x)
 Math::BigInt::LTM
 _from_hex(Class, SV *x)
   PREINIT:
+    mp_err merr;
     char *str, *start;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
+    merr = mp_init(RETVAL);
     str = SvPV_nolen(x);
     start = (strlen(str)>2 && str[0] == '0' && str[1] == 'x') ? str+2 : str;
-    mp_read_radix(RETVAL, start, 16);
+    merr = mp_read_radix(RETVAL, start, 16);
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -56,10 +80,13 @@ _from_hex(Class, SV *x)
 
 Math::BigInt::LTM
 _from_oct(Class, SV *x)
+  PREINIT:
+    mp_err merr;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
-    mp_read_radix(RETVAL, SvPV_nolen(x), 8);
+    merr = mp_init(RETVAL);
+    merr = mp_read_radix(RETVAL, SvPV_nolen(x), 8);
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -68,10 +95,13 @@ _from_oct(Class, SV *x)
 
 Math::BigInt::LTM
 _from_base(Class, SV *x, int base)
+  PREINIT:
+    mp_err merr;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
-    mp_read_radix(RETVAL, SvPV_nolen(x), base);
+    merr = mp_init(RETVAL);
+    merr = mp_read_radix(RETVAL, SvPV_nolen(x), base);
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -81,13 +111,15 @@ _from_base(Class, SV *x, int base)
 Math::BigInt::LTM
 _from_bytes(Class, SV *x)
   PREINIT:
+    mp_err merr;
     STRLEN buf_len;
     unsigned char *buf_ptr;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
+    merr = mp_init(RETVAL);
     buf_ptr = (unsigned char *)SvPVbyte(x, buf_len);
-    mp_read_unsigned_bin(RETVAL, buf_ptr, buf_len);
+    merr = mp_read_unsigned_bin(RETVAL, buf_ptr, buf_len);
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -96,18 +128,46 @@ _from_bytes(Class, SV *x)
 
 void
 _set(Class, Math::BigInt::LTM n, SV *x)
+  PREINIT:
+    mp_err merr;
   CODE:
-    mp_set_int(n, (unsigned long)SvIV(x));
+#ifdef BN_MP_SET_INT_C
+    if ((SvUOK(x) || SvIOK(x)) && (sizeof(UV) <= sizeof(unsigned long) || SvUV(x) == (unsigned long)SvUV(x))) {
+      mp_set_int(n, (unsigned long)SvIV(x));
+    }
+#elif IVSIZE == 8
+    if (SvUOK(x)) {
+      mp_set_u64(n, (unsigned long long)SvUV(x));
+    }
+    else if (SvIOK(x)) {
+      mp_set_i64(n, (long long)SvIV(x));
+    }
+#else
+    if (SvUOK(x)) {
+      mp_set_u32(n, (unsigned int)SvUV(x));
+    }
+    else if (SvIOK(x)) {
+      mp_set_i32(n, (int)SvIV(x));
+    }
+#endif
+    else {
+      /* fallback - read the decimal number from string */
+      merr = mp_read_radix(n, SvPV_nolen(x), 10);
+      PERL_UNUSED_VAR(merr);
+    }
 
 ##############################################################################
 # _zero()
 
 Math::BigInt::LTM
 _zero(Class)
+  PREINIT:
+    mp_err merr;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
-    mp_set_int(RETVAL, 0);
+    merr = mp_init(RETVAL);
+    mp_zero(RETVAL);
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -116,10 +176,17 @@ _zero(Class)
 
 Math::BigInt::LTM
 _one(Class)
+  PREINIT:
+    mp_err merr;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
+    merr = mp_init(RETVAL);
+#ifdef BN_MP_SET_INT_C
     mp_set_int(RETVAL, 1);
+#else
+    mp_set_u32(RETVAL, 1);
+#endif
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -128,10 +195,17 @@ _one(Class)
 
 Math::BigInt::LTM
 _two(Class)
+  PREINIT:
+    mp_err merr;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
+    merr = mp_init(RETVAL);
+#ifdef BN_MP_SET_INT_C
     mp_set_int(RETVAL, 2);
+#else
+    mp_set_u32(RETVAL, 2);
+#endif
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -140,10 +214,17 @@ _two(Class)
 
 Math::BigInt::LTM
 _ten(Class)
+  PREINIT:
+    mp_err merr;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
+    merr = mp_init(RETVAL);
+#ifdef BN_MP_SET_INT_C
     mp_set_int(RETVAL, 10);
+#else
+    mp_set_u32(RETVAL, 10);
+#endif
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -152,11 +233,18 @@ _ten(Class)
 
 Math::BigInt::LTM
 _1ex(Class, int x)
+  PREINIT:
+    mp_err merr;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
+    merr = mp_init(RETVAL);
+#ifdef BN_MP_SET_INT_C
     mp_set_int(RETVAL, 10);
-    mp_expt_d(RETVAL, x, RETVAL);
+#else
+    mp_set_u32(RETVAL, 10);
+#endif
+    merr = mp_expt_d(RETVAL, x, RETVAL);
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -177,6 +265,7 @@ DESTROY(Math::BigInt::LTM n)
 SV *
 _str(Class, Math::BigInt::LTM n)
   PREINIT:
+    mp_err merr;
     int len;
     char *buf;
   CODE:
@@ -186,10 +275,11 @@ _str(Class, Math::BigInt::LTM n)
     else {
       len = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
-      mp_toradix_n(n, buf, 10, len);
+      merr = mp_toradix_n(n, buf, 10, len);
       RETVAL = newSVpv(buf, 0);
       Safefree(buf);
     }
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -199,6 +289,7 @@ _str(Class, Math::BigInt::LTM n)
 int
 _len(Class, Math::BigInt::LTM n)
   PREINIT:
+    mp_err merr;
     int len;
     char *buf;
   CODE:
@@ -208,10 +299,11 @@ _len(Class, Math::BigInt::LTM n)
     else {
       len = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
-      mp_toradix_n(n, buf, 10, len);
+      merr = mp_toradix_n(n, buf, 10, len);
       RETVAL = (int)strlen(buf);
       Safefree(buf);
     }
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -240,6 +332,7 @@ _alen(Class, Math::BigInt::LTM n)
 int
 _zeros(Class, Math::BigInt::LTM n)
   PREINIT:
+    mp_err merr;
     int len;
     char *buf;
   CODE:
@@ -249,7 +342,7 @@ _zeros(Class, Math::BigInt::LTM n)
     else {
       len = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
-      mp_toradix_n(n, buf, 10, len);
+      merr = mp_toradix_n(n, buf, 10, len);
       len = (int)strlen(buf);
       RETVAL = 0;
       while (len > 0) {
@@ -259,6 +352,7 @@ _zeros(Class, Math::BigInt::LTM n)
       }
       Safefree(buf);
     }
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -268,6 +362,7 @@ _zeros(Class, Math::BigInt::LTM n)
 SV *
 _to_hex(Class, Math::BigInt::LTM n)
   PREINIT:
+    mp_err merr;
     int i, len;
     char *buf;
   CODE:
@@ -275,9 +370,10 @@ _to_hex(Class, Math::BigInt::LTM n)
     RETVAL = newSV(len);
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);
-    mp_toradix(n, buf, 16); /* to hex */
+    merr = mp_toradix(n, buf, 16); /* to hex */
     for (i=0; i<len && buf[i]>0; i++) buf[i] = toLOWER(buf[i]);
     SvCUR_set(RETVAL, strlen(buf));
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -287,6 +383,7 @@ _to_hex(Class, Math::BigInt::LTM n)
 SV *
 _to_bin(Class, Math::BigInt::LTM n)
   PREINIT:
+    mp_err merr;
     int len;
     char *buf;
   CODE:
@@ -294,8 +391,9 @@ _to_bin(Class, Math::BigInt::LTM n)
     RETVAL = newSV(len);
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);
-    mp_toradix(n, buf, 2); /* to binary */
+    merr = mp_toradix(n, buf, 2); /* to binary */
     SvCUR_set(RETVAL, strlen(buf));
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -305,6 +403,7 @@ _to_bin(Class, Math::BigInt::LTM n)
 SV *
 _to_oct(Class, Math::BigInt::LTM n)
   PREINIT:
+    mp_err merr;
     int len;
     char *buf;
   CODE:
@@ -312,8 +411,9 @@ _to_oct(Class, Math::BigInt::LTM n)
     RETVAL = newSV(len);
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);
-    mp_toradix(n, buf, 8); /* to octal */
+    merr = mp_toradix(n, buf, 8); /* to octal */
     SvCUR_set(RETVAL, strlen(buf));
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -323,6 +423,7 @@ _to_oct(Class, Math::BigInt::LTM n)
 SV *
 _to_base(Class, Math::BigInt::LTM n, int base)
   PREINIT:
+    mp_err merr;
     int len;
     char *buf;
   CODE:
@@ -331,13 +432,14 @@ _to_base(Class, Math::BigInt::LTM n, int base)
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);
     if (len > 0) {
-      mp_toradix_n(n, buf, base, len);
+      merr = mp_toradix_n(n, buf, base, len);
       SvCUR_set(RETVAL, strlen(buf));
     }
     else {
       buf[0] = '0';
       SvCUR_set(RETVAL, 1);
     }
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -350,6 +452,7 @@ _to_bytes(Class, Math::BigInt::LTM n)
   ALIAS:
     _as_bytes = 1
   PREINIT:
+    mp_err merr;
     int len;
     unsigned char *buf;
   CODE:
@@ -359,13 +462,14 @@ _to_bytes(Class, Math::BigInt::LTM n)
     SvPOK_on(RETVAL);
     buf = (unsigned char*)SvPVX(RETVAL);
     if (len > 0) {
-      mp_to_unsigned_bin(n, buf);
+      merr = mp_to_unsigned_bin(n, buf);
       SvCUR_set(RETVAL, len);
     }
     else {
       buf[0] = 0;
       SvCUR_set(RETVAL, 1);
     }
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -374,15 +478,18 @@ _to_bytes(Class, Math::BigInt::LTM n)
 
 Math::BigInt::LTM
 _modpow(Class, Math::BigInt::LTM n, Math::BigInt::LTM exp, Math::BigInt::LTM mod)
+  PREINIT:
+    mp_err merr;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
+    merr = mp_init(RETVAL);
     if (mp_cmp_d(mod, 1) == MP_EQ) {
-      mp_set_int(RETVAL, 0);
+      mp_zero(RETVAL);
     }
     else {
-      mp_exptmod(n, exp, mod, RETVAL);
+      merr = mp_exptmod(n, exp, mod, RETVAL);
     }
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -392,12 +499,13 @@ _modpow(Class, Math::BigInt::LTM n, Math::BigInt::LTM exp, Math::BigInt::LTM mod
 void
 _modinv(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
   PREINIT:
+    mp_err merr;
     int rc;
     SV* s;
     mp_int* RETVAL;
   PPCODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
+    merr = mp_init(RETVAL);
     rc = mp_invmod(x, y, RETVAL);
     EXTEND(SP, 2);      /* we return two values */
     if (rc != MP_OKAY) {
@@ -413,14 +521,18 @@ _modinv(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
       sv_setpvn(s, "+", 1);
       PUSHs(s);
     }
+    PERL_UNUSED_VAR(merr);
 
 ##############################################################################
 # _add() - add $y to $x in place
 
 void
 _add(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
+  PREINIT:
+    mp_err merr;
   PPCODE:
-    mp_add(x, y, x);
+    merr = mp_add(x, y, x);
+    PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
@@ -428,8 +540,11 @@ _add(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
 
 void
 _inc(Class, Math::BigInt::LTM x)
+  PREINIT:
+    mp_err merr;
   PPCODE:
-    mp_add_d(x, 1, x);
+    merr = mp_add_d(x, 1, x);
+    PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
@@ -437,8 +552,11 @@ _inc(Class, Math::BigInt::LTM x)
 
 void
 _dec(Class, Math::BigInt::LTM x)
+  PREINIT:
+    mp_err merr;
   PPCODE:
-    mp_sub_d(x, 1, x);
+    merr = mp_sub_d(x, 1, x);
+    PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
@@ -447,17 +565,20 @@ _dec(Class, Math::BigInt::LTM x)
 
 void
 _sub(Class, Math::BigInt::LTM x, Math::BigInt::LTM y, ...)
+  PREINIT:
+    mp_err merr;
   PPCODE:
     if ( items == 4 && SvTRUE(ST(3)) ) {
       /* y -= x */
-      mp_sub(x, y, y);
+      merr = mp_sub(x, y, y);
       XPUSHs(ST(2)); /* y */
     }
     else {
       /* x -= y */
-      mp_sub(x, y, x);
+      merr = mp_sub(x, y, x);
       XPUSHs(ST(1)); /* x */
     }
+    PERL_UNUSED_VAR(merr);
 
 ##############################################################################
 # _rsft()
@@ -465,12 +586,23 @@ _sub(Class, Math::BigInt::LTM x, Math::BigInt::LTM y, ...)
 void
 _rsft(Class, Math::BigInt::LTM x, Math::BigInt::LTM y, unsigned long base_int)
   PREINIT:
+    mp_err merr;
     mp_int*  BASE;
   PPCODE:
     Newz(0, BASE, 1, mp_int);
-    mp_init_set_int(BASE, base_int);
-    mp_expt_d(BASE, mp_get_long(y), BASE);
-    mp_div(x, BASE, x, NULL);
+    merr = mp_init(BASE);
+#ifdef BN_MP_SET_INT_C
+    mp_set_int(BASE, base_int);
+#else
+    mp_set_ul(BASE, base_int);
+#endif
+#ifdef BN_MP_GET_LONG_C
+    merr = mp_expt_d(BASE, mp_get_long(y), BASE);
+#else
+    merr = mp_expt_d(BASE, mp_get_ul(y), BASE);
+#endif
+    merr = mp_div(x, BASE, x, NULL);
+    PERL_UNUSED_VAR(merr);
     mp_clear(BASE);
     Safefree(BASE);
     XPUSHs(ST(1)); /* x */
@@ -481,12 +613,23 @@ _rsft(Class, Math::BigInt::LTM x, Math::BigInt::LTM y, unsigned long base_int)
 void
 _lsft(Class, Math::BigInt::LTM x, Math::BigInt::LTM y, unsigned long base_int)
   PREINIT:
+    mp_err merr;
     mp_int*  BASE;
   PPCODE:
     Newz(0, BASE, 1, mp_int);
-    mp_init_set_int(BASE, base_int);
-    mp_expt_d(BASE, mp_get_long(y), BASE);
-    mp_mul(x, BASE, x);
+    merr = mp_init(BASE);
+#ifdef BN_MP_SET_INT_C
+    mp_set_int(BASE, base_int);
+#else
+    mp_set_ul(BASE, base_int);
+#endif
+#ifdef BN_MP_GET_LONG_C
+    merr = mp_expt_d(BASE, mp_get_long(y), BASE);
+#else
+    merr = mp_expt_d(BASE, mp_get_ul(y), BASE);
+#endif
+    merr = mp_mul(x, BASE, x);
+    PERL_UNUSED_VAR(merr);
     mp_clear(BASE);
     Safefree(BASE);
     XPUSHs(ST(1)); /* x */
@@ -496,8 +639,11 @@ _lsft(Class, Math::BigInt::LTM x, Math::BigInt::LTM y, unsigned long base_int)
 
 void
 _mul(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
+  PREINIT:
+    mp_err merr;
   PPCODE:
-    mp_mul(x, y, x);
+    merr = mp_mul(x, y, x);
+    PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
@@ -506,28 +652,33 @@ _mul(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
 void
 _div(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
   PREINIT:
+    mp_err merr;
     mp_int * rem;
   PPCODE:
     if (GIMME_V == G_ARRAY) {
       Newz(0, rem, 1, mp_int);
-      mp_init(rem);
-      mp_div(x, y, x, rem);
+      merr = mp_init(rem);
+      merr = mp_div(x, y, x, rem);
       EXTEND(SP, 2);
       PUSHs(ST(1)); /* x */
       PUSHs(sv_2mortal(sv_from_mpi(rem)));
     }
     else {
-      mp_div(x, y, x, NULL);
+      merr = mp_div(x, y, x, NULL);
       XPUSHs(ST(1)); /* x */
     }
+    PERL_UNUSED_VAR(merr);
 
 ##############################################################################
 # _mod() - x %= y
 
 void
 _mod(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
+  PREINIT:
+    mp_err merr;
   PPCODE:
-    mp_mod(x, y, x);
+    merr = mp_mod(x, y, x);
+    PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
@@ -587,8 +738,15 @@ _is_ten(Class, Math::BigInt::LTM x)
 
 void
 _pow(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
+  PREINIT:
+    mp_err merr;
   PPCODE:
-    mp_expt_d(x, mp_get_long(y), x);
+#ifdef BN_MP_GET_LONG_C
+    merr = mp_expt_d(x, mp_get_long(y), x);
+#else
+    merr = mp_expt_d(x, mp_get_ul(y), x);
+#endif
+    PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
@@ -596,10 +754,13 @@ _pow(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
 
 Math::BigInt::LTM
 _gcd(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
+  PREINIT:
+    mp_err merr;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
-    mp_gcd(x, y, RETVAL);
+    merr = mp_init(RETVAL);
+    merr = mp_gcd(x, y, RETVAL);
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -608,8 +769,11 @@ _gcd(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
 
 void
 _and(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
+  PREINIT:
+    mp_err merr;
   PPCODE:
-    mp_and(x, y, x);
+    merr = mp_and(x, y, x);
+    PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
@@ -617,8 +781,11 @@ _and(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
 
 void
 _xor(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
+  PREINIT:
+    mp_err merr;
   PPCODE:
-    mp_xor(x, y, x);
+    merr = mp_xor(x, y, x);
+    PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
@@ -626,8 +793,11 @@ _xor(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
 
 void
 _or(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
+  PREINIT:
+    mp_err merr;
   PPCODE:
-    mp_or(x, y, x);
+    merr = mp_or(x, y, x);
+    PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
@@ -635,10 +805,13 @@ _or(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
 
 Math::BigInt::LTM
 _copy(Class, Math::BigInt::LTM m)
+  PREINIT:
+    mp_err merr;
   CODE:
     Newz(0, RETVAL, 1, mp_int);
-    mp_init(RETVAL);
-    mp_copy(m, RETVAL);
+    merr = mp_init(RETVAL);
+    merr = mp_copy(m, RETVAL);
+    PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
 
@@ -667,8 +840,11 @@ _is_even(Class, Math::BigInt::LTM n)
 
 void
 _sqrt(Class, Math::BigInt::LTM x)
+  PREINIT:
+    mp_err merr;
   PPCODE:
-    mp_sqrt(x, x);
+    merr = mp_sqrt(x, x);
+    PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
@@ -676,16 +852,26 @@ _sqrt(Class, Math::BigInt::LTM x)
 
 void
 _root(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
+  PREINIT:
+    mp_err merr;
   PPCODE:
-    mp_n_root(x, mp_get_long(y), x);
+#ifdef BN_MP_GET_LONG_C
+    merr = mp_n_root(x, mp_get_long(y), x);
+#else
+    merr = mp_n_root(x, mp_get_ul(y), x);
+#endif
+    PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
 # _lcm() - least common multiple
 void
 _lcm(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
+  PREINIT:
+    mp_err merr;
   PPCODE:
-    mp_lcm(x, y, x) ;
+    merr = mp_lcm(x, y, x) ;
+    PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
 ##############################################################################
@@ -697,14 +883,16 @@ STORABLE_thaw(blank_obj, cloning, serialized, ...)
     SV *cloning = NO_INIT
     SV *serialized
   PREINIT:
+    mp_err merr;
     SV *target;
     mp_int *mpi;
   PPCODE:
     PERL_UNUSED_VAR(cloning);
     if (SvROK(blank_obj) && sv_isa(blank_obj, "Math::BigInt::LTM")) {
         Newz(0, mpi, 1, mp_int);
-        mp_init(mpi);
-        mp_read_radix(mpi, SvPV_nolen(serialized), 10);
+        merr = mp_init(mpi);
+        merr = mp_read_radix(mpi, SvPV_nolen(serialized), 10);
+        PERL_UNUSED_VAR(merr);
         target = SvRV(blank_obj);
         SvIV_set(target, PTR2IV(mpi));
         SvIOK_on(target);
@@ -719,6 +907,7 @@ STORABLE_freeze(self, cloning = NULL)
     Math::BigInt::LTM self
     SV *cloning = NO_INIT
   PREINIT:
+    mp_err merr;
     unsigned long len;
     char *buf;
   CODE:
@@ -729,7 +918,8 @@ STORABLE_freeze(self, cloning = NULL)
     else {
       len = mp_count_bits(self) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
-      mp_toradix_n(self, buf, 10, len);
+      merr = mp_toradix_n(self, buf, 10, len);
+      PERL_UNUSED_VAR(merr);
       RETVAL = newSVpv(buf, 0);
       Safefree(buf);
     }
