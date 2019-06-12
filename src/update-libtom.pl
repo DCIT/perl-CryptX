@@ -10,22 +10,22 @@ my $ltc_branch = "develop";
 my $ltm_branch = "develop";
 my $tmpdir = "/tmp/libtom.git.checkout.$$";
 
-warn "update libtommath from github (branch: $ltm_branch)..\n";
-system 'rm', '-rf', bsd_glob("$FindBin::Bin/ltm/*");
-system "rm -rf $tmpdir; mkdir $tmpdir";
-system "git clone -b $ltm_branch https://github.com/libtom/libtommath.git $tmpdir && cp $tmpdir/bn*.c $tmpdir/tom*.h $FindBin::Bin/ltm/ && echo ok";
-system "(cd $tmpdir && git log  --pretty='%h %ai %s') | head -1";
-# avoid stdint.h hack
-system "find '$FindBin::Bin/ltm/' -name '*.c' -o -name '*.h' | xargs sed -i"
-     . " -e 's/uint8_t/unsigned char/g'"
-     . " -e 's/uint16_t/unsigned short/g'"
-     . " -e 's/uint32_t/unsigned int/g'"
-     . " -e 's/uint64_t/unsigned long long/g'"
-     . " -e 's/int8_t/char/g'"
-     . " -e 's/int16_t/short/g'"
-     . " -e 's/int32_t/int/g'"
-     . " -e 's/int64_t/long long/g'"
-     . " -e 's/# *include *<stdint.h>//'";
+#warn "update libtommath from github (branch: $ltm_branch)..\n";
+#system 'rm', '-rf', bsd_glob("$FindBin::Bin/ltm/*");
+#system "rm -rf $tmpdir; mkdir $tmpdir";
+#system "git clone -b $ltm_branch https://github.com/libtom/libtommath.git $tmpdir && cp $tmpdir/bn*.c $tmpdir/tom*.h $FindBin::Bin/ltm/ && echo ok";
+#system "(cd $tmpdir && git log  --pretty='%h %ai %s') | head -1";
+## avoid stdint.h hack
+#system "find '$FindBin::Bin/ltm/' -name '*.c' -o -name '*.h' | xargs sed -i"
+#     . " -e 's/uint8_t/unsigned char/g'"
+#     . " -e 's/uint16_t/unsigned short/g'"
+#     . " -e 's/uint32_t/unsigned int/g'"
+#     . " -e 's/uint64_t/unsigned long long/g'"
+#     . " -e 's/int8_t/char/g'"
+#     . " -e 's/int16_t/short/g'"
+#     . " -e 's/int32_t/int/g'"
+#     . " -e 's/int64_t/long long/g'"
+#     . " -e 's/# *include *<stdint.h>//'";
 
 warn "update libtomcrypt from github (branch: $ltc_branch)..\n";
 system 'rm', '-rf', bsd_glob("$FindBin::Bin/ltc/*");

@@ -1,14 +1,22 @@
 #include "tommath_private.h"
 #ifdef BN_MP_RADIX_SIZE_C
-/* LibTomMath, multiple-precision integer library -- Tom St Denis */
-/* SPDX-License-Identifier: Unlicense */
+/* LibTomMath, multiple-precision integer library -- Tom St Denis
+ *
+ * LibTomMath is a library that provides multiple-precision
+ * integer arithmetic as well as number theoretic functionality.
+ *
+ * The library was designed directly after the MPI library by
+ * Michael Fromberger but has been written from scratch with
+ * additional optimizations in place.
+ *
+ * SPDX-License-Identifier: Unlicense
+ */
 
 /* returns size of ASCII reprensentation */
-mp_err mp_radix_size(const mp_int *a, int radix, int *size)
+int mp_radix_size(const mp_int *a, int radix, int *size)
 {
-   mp_err  err;
-   int     digs;
-   mp_int   t;
+   int     res, digs;
+   mp_int  t;
    mp_digit d;
 
    *size = 0;
@@ -18,7 +26,7 @@ mp_err mp_radix_size(const mp_int *a, int radix, int *size)
       return MP_VAL;
    }
 
-   if (MP_IS_ZERO(a)) {
+   if (mp_iszero(a) == MP_YES) {
       *size = 2;
       return MP_OKAY;
    }
@@ -38,18 +46,18 @@ mp_err mp_radix_size(const mp_int *a, int radix, int *size)
    }
 
    /* init a copy of the input */
-   if ((err = mp_init_copy(&t, a)) != MP_OKAY) {
-      return err;
+   if ((res = mp_init_copy(&t, a)) != MP_OKAY) {
+      return res;
    }
 
    /* force temp to positive */
    t.sign = MP_ZPOS;
 
    /* fetch out all of the digits */
-   while (!MP_IS_ZERO(&t)) {
-      if ((err = mp_div_d(&t, (mp_digit)radix, &t, &d)) != MP_OKAY) {
+   while (mp_iszero(&t) == MP_NO) {
+      if ((res = mp_div_d(&t, (mp_digit)radix, &t, &d)) != MP_OKAY) {
          mp_clear(&t);
-         return err;
+         return res;
       }
       ++digs;
    }
@@ -61,3 +69,7 @@ mp_err mp_radix_size(const mp_int *a, int radix, int *size)
 }
 
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

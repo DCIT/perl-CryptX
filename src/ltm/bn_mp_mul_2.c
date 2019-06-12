@@ -1,18 +1,26 @@
 #include "tommath_private.h"
 #ifdef BN_MP_MUL_2_C
-/* LibTomMath, multiple-precision integer library -- Tom St Denis */
-/* SPDX-License-Identifier: Unlicense */
+/* LibTomMath, multiple-precision integer library -- Tom St Denis
+ *
+ * LibTomMath is a library that provides multiple-precision
+ * integer arithmetic as well as number theoretic functionality.
+ *
+ * The library was designed directly after the MPI library by
+ * Michael Fromberger but has been written from scratch with
+ * additional optimizations in place.
+ *
+ * SPDX-License-Identifier: Unlicense
+ */
 
 /* b = a*2 */
-mp_err mp_mul_2(const mp_int *a, mp_int *b)
+int mp_mul_2(const mp_int *a, mp_int *b)
 {
-   int     x, oldused;
-   mp_err err;
+   int     x, res, oldused;
 
    /* grow to accomodate result */
    if (b->alloc < (a->used + 1)) {
-      if ((err = mp_grow(b, a->used + 1)) != MP_OKAY) {
-         return err;
+      if ((res = mp_grow(b, a->used + 1)) != MP_OKAY) {
+         return res;
       }
    }
 
@@ -35,7 +43,7 @@ mp_err mp_mul_2(const mp_int *a, mp_int *b)
          /* get what will be the *next* carry bit from the
           * MSB of the current digit
           */
-         rr = *tmpa >> (mp_digit)(MP_DIGIT_BIT - 1);
+         rr = *tmpa >> (mp_digit)(DIGIT_BIT - 1);
 
          /* now shift up this digit, add in the carry [from the previous] */
          *tmpb++ = ((*tmpa++ << 1uL) | r) & MP_MASK;
@@ -56,9 +64,16 @@ mp_err mp_mul_2(const mp_int *a, mp_int *b)
       /* now zero any excess digits on the destination
        * that we didn't write to
        */
-      MP_ZERO_DIGITS(b->dp + b->used, oldused - b->used);
+      tmpb = b->dp + b->used;
+      for (x = b->used; x < oldused; x++) {
+         *tmpb++ = 0;
+      }
    }
    b->sign = a->sign;
    return MP_OKAY;
 }
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

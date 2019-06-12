@@ -1,13 +1,22 @@
 #include "tommath_private.h"
 #ifdef BN_MP_INIT_MULTI_C
-/* LibTomMath, multiple-precision integer library -- Tom St Denis */
-/* SPDX-License-Identifier: Unlicense */
+/* LibTomMath, multiple-precision integer library -- Tom St Denis
+ *
+ * LibTomMath is a library that provides multiple-precision
+ * integer arithmetic as well as number theoretic functionality.
+ *
+ * The library was designed directly after the MPI library by
+ * Michael Fromberger but has been written from scratch with
+ * additional optimizations in place.
+ *
+ * SPDX-License-Identifier: Unlicense
+ */
 
 #include <stdarg.h>
 
-mp_err mp_init_multi(mp_int *mp, ...)
+int mp_init_multi(mp_int *mp, ...)
 {
-   mp_err err = MP_OKAY;      /* Assume ok until proven otherwise */
+   mp_err res = MP_OKAY;      /* Assume ok until proven otherwise */
    int n = 0;                 /* Number of ok inits */
    mp_int *cur_arg = mp;
    va_list args;
@@ -28,14 +37,18 @@ mp_err mp_init_multi(mp_int *mp, ...)
             cur_arg = va_arg(clean_args, mp_int *);
          }
          va_end(clean_args);
-         err = MP_MEM;
+         res = MP_MEM;
          break;
       }
       n++;
       cur_arg = va_arg(args, mp_int *);
    }
    va_end(args);
-   return err;                /* Assumed ok, if error flagged above. */
+   return res;                /* Assumed ok, if error flagged above. */
 }
 
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

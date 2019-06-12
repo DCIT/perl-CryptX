@@ -1,13 +1,21 @@
 #include "tommath_private.h"
 #ifdef BN_MP_TORADIX_C
-/* LibTomMath, multiple-precision integer library -- Tom St Denis */
-/* SPDX-License-Identifier: Unlicense */
+/* LibTomMath, multiple-precision integer library -- Tom St Denis
+ *
+ * LibTomMath is a library that provides multiple-precision
+ * integer arithmetic as well as number theoretic functionality.
+ *
+ * The library was designed directly after the MPI library by
+ * Michael Fromberger but has been written from scratch with
+ * additional optimizations in place.
+ *
+ * SPDX-License-Identifier: Unlicense
+ */
 
 /* stores a bignum as a ASCII string in a given radix (2..64) */
-mp_err mp_toradix(const mp_int *a, char *str, int radix)
+int mp_toradix(const mp_int *a, char *str, int radix)
 {
-   mp_err  err;
-   int digs;
+   int     res, digs;
    mp_int  t;
    mp_digit d;
    char   *_s = str;
@@ -18,14 +26,14 @@ mp_err mp_toradix(const mp_int *a, char *str, int radix)
    }
 
    /* quick out if its zero */
-   if (MP_IS_ZERO(a)) {
+   if (mp_iszero(a) == MP_YES) {
       *str++ = '0';
       *str = '\0';
       return MP_OKAY;
    }
 
-   if ((err = mp_init_copy(&t, a)) != MP_OKAY) {
-      return err;
+   if ((res = mp_init_copy(&t, a)) != MP_OKAY) {
+      return res;
    }
 
    /* if it is negative output a - */
@@ -36,10 +44,10 @@ mp_err mp_toradix(const mp_int *a, char *str, int radix)
    }
 
    digs = 0;
-   while (!MP_IS_ZERO(&t)) {
-      if ((err = mp_div_d(&t, (mp_digit)radix, &t, &d)) != MP_OKAY) {
+   while (mp_iszero(&t) == MP_NO) {
+      if ((res = mp_div_d(&t, (mp_digit)radix, &t, &d)) != MP_OKAY) {
          mp_clear(&t);
-         return err;
+         return res;
       }
       *str++ = mp_s_rmap[d];
       ++digs;
@@ -48,7 +56,7 @@ mp_err mp_toradix(const mp_int *a, char *str, int radix)
    /* reverse the digits of the string.  In this case _s points
     * to the first digit [exluding the sign] of the number]
     */
-   s_mp_reverse((unsigned char *)_s, digs);
+   bn_reverse((unsigned char *)_s, digs);
 
    /* append a NULL so the string is properly terminated */
    *str = '\0';
@@ -58,3 +66,7 @@ mp_err mp_toradix(const mp_int *a, char *str, int radix)
 }
 
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

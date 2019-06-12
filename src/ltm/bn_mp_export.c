@@ -1,22 +1,31 @@
 #include "tommath_private.h"
 #ifdef BN_MP_EXPORT_C
-/* LibTomMath, multiple-precision integer library -- Tom St Denis */
-/* SPDX-License-Identifier: Unlicense */
+/* LibTomMath, multiple-precision integer library -- Tom St Denis
+ *
+ * LibTomMath is a library that provides multiple-precision
+ * integer arithmetic as well as number theoretic functionality.
+ *
+ * The library was designed directly after the MPI library by
+ * Michael Fromberger but has been written from scratch with
+ * additional optimizations in place.
+ *
+ * SPDX-License-Identifier: Unlicense
+ */
 
 /* based on gmp's mpz_export.
  * see http://gmplib.org/manual/Integer-Import-and-Export.html
  */
-mp_err mp_export(void *rop, size_t *countp, int order, size_t size,
-                 int endian, size_t nails, const mp_int *op)
+int mp_export(void *rop, size_t *countp, int order, size_t size,
+              int endian, size_t nails, const mp_int *op)
 {
-   mp_err err;
+   int result;
    size_t odd_nails, nail_bytes, i, j, bits, count;
    unsigned char odd_nail_mask;
 
    mp_int t;
 
-   if ((err = mp_init_copy(&t, op)) != MP_OKAY) {
-      return err;
+   if ((result = mp_init_copy(&t, op)) != MP_OKAY) {
+      return result;
    }
 
    if (endian == 0) {
@@ -52,9 +61,9 @@ mp_err mp_export(void *rop, size_t *countp, int order, size_t size,
 
          *byte = (unsigned char)((j == ((size - nail_bytes) - 1u)) ? (t.dp[0] & odd_nail_mask) : (t.dp[0] & 0xFFuL));
 
-         if ((err = mp_div_2d(&t, (j == ((size - nail_bytes) - 1u)) ? (int)(8u - odd_nails) : 8, &t, NULL)) != MP_OKAY) {
+         if ((result = mp_div_2d(&t, (j == ((size - nail_bytes) - 1u)) ? (int)(8u - odd_nails) : 8, &t, NULL)) != MP_OKAY) {
             mp_clear(&t);
-            return err;
+            return result;
          }
       }
    }
@@ -69,3 +78,7 @@ mp_err mp_export(void *rop, size_t *countp, int order, size_t size,
 }
 
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

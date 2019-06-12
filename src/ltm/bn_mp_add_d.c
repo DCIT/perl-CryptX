@@ -1,19 +1,27 @@
 #include "tommath_private.h"
 #ifdef BN_MP_ADD_D_C
-/* LibTomMath, multiple-precision integer library -- Tom St Denis */
-/* SPDX-License-Identifier: Unlicense */
+/* LibTomMath, multiple-precision integer library -- Tom St Denis
+ *
+ * LibTomMath is a library that provides multiple-precision
+ * integer arithmetic as well as number theoretic functionality.
+ *
+ * The library was designed directly after the MPI library by
+ * Michael Fromberger but has been written from scratch with
+ * additional optimizations in place.
+ *
+ * SPDX-License-Identifier: Unlicense
+ */
 
 /* single digit addition */
-mp_err mp_add_d(const mp_int *a, mp_digit b, mp_int *c)
+int mp_add_d(const mp_int *a, mp_digit b, mp_int *c)
 {
-   mp_err     err;
-   int ix, oldused;
-   mp_digit *tmpa, *tmpc;
+   int     res, ix, oldused;
+   mp_digit *tmpa, *tmpc, mu;
 
    /* grow c as required */
    if (c->alloc < (a->used + 1)) {
-      if ((err = mp_grow(c, a->used + 1)) != MP_OKAY) {
-         return err;
+      if ((res = mp_grow(c, a->used + 1)) != MP_OKAY) {
+         return res;
       }
    }
 
@@ -24,7 +32,7 @@ mp_err mp_add_d(const mp_int *a, mp_digit b, mp_int *c)
       a_.sign = MP_ZPOS;
 
       /* c = |a| - b */
-      err = mp_sub_d(&a_, b, c);
+      res = mp_sub_d(&a_, b, c);
 
       /* fix sign  */
       c->sign = MP_NEG;
@@ -32,7 +40,7 @@ mp_err mp_add_d(const mp_int *a, mp_digit b, mp_int *c)
       /* clamp */
       mp_clamp(c);
 
-      return err;
+      return res;
    }
 
    /* old number of used digits in c */
@@ -46,11 +54,17 @@ mp_err mp_add_d(const mp_int *a, mp_digit b, mp_int *c)
 
    /* if a is positive */
    if (a->sign == MP_ZPOS) {
-      /* add digits, mu is carry */
-      mp_digit mu = b;
-      for (ix = 0; ix < a->used; ix++) {
+      /* add digit, after this we're propagating
+       * the carry.
+       */
+      *tmpc   = *tmpa++ + b;
+      mu      = *tmpc >> DIGIT_BIT;
+      *tmpc++ &= MP_MASK;
+
+      /* now handle rest of the digits */
+      for (ix = 1; ix < a->used; ix++) {
          *tmpc   = *tmpa++ + mu;
-         mu      = *tmpc >> MP_DIGIT_BIT;
+         mu      = *tmpc >> DIGIT_BIT;
          *tmpc++ &= MP_MASK;
       }
       /* set final carry */
@@ -80,10 +94,16 @@ mp_err mp_add_d(const mp_int *a, mp_digit b, mp_int *c)
    c->sign = MP_ZPOS;
 
    /* now zero to oldused */
-   MP_ZERO_DIGITS(tmpc, oldused - ix);
+   while (ix++ < oldused) {
+      *tmpc++ = 0;
+   }
    mp_clamp(c);
 
    return MP_OKAY;
 }
 
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

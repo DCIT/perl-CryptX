@@ -1,8 +1,17 @@
 #include "tommath_private.h"
 #ifdef BN_MP_PRIME_FROBENIUS_UNDERWOOD_C
 
-/* LibTomMath, multiple-precision integer library -- Tom St Denis */
-/* SPDX-License-Identifier: Unlicense */
+/* LibTomMath, multiple-precision integer library -- Tom St Denis
+ *
+ * LibTomMath is a library that provides multiple-precision
+ * integer arithmetic as well as number theoretic functionality.
+ *
+ * The library was designed directly after the MPI library by
+ * Michael Fromberger but has been written from scratch with
+ * additional optimizations in place.
+ *
+ * SPDX-License-Identifier: Unlicense
+ */
 
 /*
  *  See file bn_mp_prime_is_prime.c or the documentation in doc/bn.tex for the details
@@ -23,17 +32,17 @@
 #else
 #define LTM_FROBENIUS_UNDERWOOD_A 32764
 #endif
-mp_err mp_prime_frobenius_underwood(const mp_int *N, mp_bool *result)
+int mp_prime_frobenius_underwood(const mp_int *N, int *result)
 {
    mp_int T1z, T2z, Np1z, sz, tz;
 
-   int a, ap2, length, i, j;
-   mp_err err;
+   int a, ap2, length, i, j, isset;
+   int e;
 
    *result = MP_NO;
 
-   if ((err = mp_init_multi(&T1z, &T2z, &Np1z, &sz, &tz, NULL)) != MP_OKAY) {
-      return err;
+   if ((e = mp_init_multi(&T1z, &T2z, &Np1z, &sz, &tz, NULL)) != MP_OKAY) {
+      return e;
    }
 
    for (a = 0; a < LTM_FROBENIUS_UNDERWOOD_A; a++) {
@@ -43,17 +52,19 @@ mp_err mp_prime_frobenius_underwood(const mp_int *N, mp_bool *result)
          continue;
       }
       /* (32764^2 - 4) < 2^31, no bigint for >MP_8BIT needed) */
-      mp_set_u32(&T1z, (unsigned int)a);
-
-      if ((err = mp_sqr(&T1z, &T1z)) != MP_OKAY) {
+      if ((e = mp_set_long(&T1z, (unsigned long)a)) != MP_OKAY) {
          goto LBL_FU_ERR;
       }
 
-      if ((err = mp_sub_d(&T1z, 4uL, &T1z)) != MP_OKAY) {
+      if ((e = mp_sqr(&T1z, &T1z)) != MP_OKAY) {
          goto LBL_FU_ERR;
       }
 
-      if ((err = mp_kronecker(&T1z, N, &j)) != MP_OKAY) {
+      if ((e = mp_sub_d(&T1z, 4uL, &T1z)) != MP_OKAY) {
+         goto LBL_FU_ERR;
+      }
+
+      if ((e = mp_kronecker(&T1z, N, &j)) != MP_OKAY) {
          goto LBL_FU_ERR;
       }
 
@@ -68,13 +79,15 @@ mp_err mp_prime_frobenius_underwood(const mp_int *N, mp_bool *result)
    }
    /* Tell it a composite and set return value accordingly */
    if (a >= LTM_FROBENIUS_UNDERWOOD_A) {
-      err = MP_ITER;
+      e = MP_ITER;
       goto LBL_FU_ERR;
    }
    /* Composite if N and (a+4)*(2*a+5) are not coprime */
-   mp_set_u32(&T1z, (unsigned int)((a+4)*((2*a)+5)));
+   if ((e = mp_set_long(&T1z, (unsigned long)((a+4)*((2*a)+5)))) != MP_OKAY) {
+      goto LBL_FU_ERR;
+   }
 
-   if ((err = mp_gcd(N, &T1z, &T1z)) != MP_OKAY) {
+   if ((e = mp_gcd(N, &T1z, &T1z)) != MP_OKAY) {
       goto LBL_FU_ERR;
    }
 
@@ -83,7 +96,7 @@ mp_err mp_prime_frobenius_underwood(const mp_int *N, mp_bool *result)
    }
 
    ap2 = a + 2;
-   if ((err = mp_add_d(N, 1uL, &Np1z)) != MP_OKAY) {
+   if ((e = mp_add_d(N, 1uL, &Np1z)) != MP_OKAY) {
       goto LBL_FU_ERR;
    }
 
@@ -97,79 +110,89 @@ mp_err mp_prime_frobenius_underwood(const mp_int *N, mp_bool *result)
        * tz   = ((tz-sz)*(tz+sz))%N;
        * sz   = temp;
        */
-      if ((err = mp_mul_2(&tz, &T2z)) != MP_OKAY) {
+      if ((e = mp_mul_2(&tz, &T2z)) != MP_OKAY) {
          goto LBL_FU_ERR;
       }
 
       /* a = 0 at about 50% of the cases (non-square and odd input) */
       if (a != 0) {
-         if ((err = mp_mul_d(&sz, (mp_digit)a, &T1z)) != MP_OKAY) {
+         if ((e = mp_mul_d(&sz, (mp_digit)a, &T1z)) != MP_OKAY) {
             goto LBL_FU_ERR;
          }
-         if ((err = mp_add(&T1z, &T2z, &T2z)) != MP_OKAY) {
+         if ((e = mp_add(&T1z, &T2z, &T2z)) != MP_OKAY) {
             goto LBL_FU_ERR;
          }
       }
 
-      if ((err = mp_mul(&T2z, &sz, &T1z)) != MP_OKAY) {
+      if ((e = mp_mul(&T2z, &sz, &T1z)) != MP_OKAY) {
          goto LBL_FU_ERR;
       }
-      if ((err = mp_sub(&tz, &sz, &T2z)) != MP_OKAY) {
+      if ((e = mp_sub(&tz, &sz, &T2z)) != MP_OKAY) {
          goto LBL_FU_ERR;
       }
-      if ((err = mp_add(&sz, &tz, &sz)) != MP_OKAY) {
+      if ((e = mp_add(&sz, &tz, &sz)) != MP_OKAY) {
          goto LBL_FU_ERR;
       }
-      if ((err = mp_mul(&sz, &T2z, &tz)) != MP_OKAY) {
+      if ((e = mp_mul(&sz, &T2z, &tz)) != MP_OKAY) {
          goto LBL_FU_ERR;
       }
-      if ((err = mp_mod(&tz, N, &tz)) != MP_OKAY) {
+      if ((e = mp_mod(&tz, N, &tz)) != MP_OKAY) {
          goto LBL_FU_ERR;
       }
-      if ((err = mp_mod(&T1z, N, &sz)) != MP_OKAY) {
+      if ((e = mp_mod(&T1z, N, &sz)) != MP_OKAY) {
          goto LBL_FU_ERR;
       }
-      if (s_mp_get_bit(&Np1z, (unsigned int)i) == MP_YES) {
+      if ((isset = mp_get_bit(&Np1z, i)) == MP_VAL) {
+         e = isset;
+         goto LBL_FU_ERR;
+      }
+      if (isset == MP_YES) {
          /*
           *  temp = (a+2) * sz + tz
           *  tz   = 2 * tz - sz
           *  sz   = temp
           */
          if (a == 0) {
-            if ((err = mp_mul_2(&sz, &T1z)) != MP_OKAY) {
+            if ((e = mp_mul_2(&sz, &T1z)) != MP_OKAY) {
                goto LBL_FU_ERR;
             }
          } else {
-            if ((err = mp_mul_d(&sz, (mp_digit)ap2, &T1z)) != MP_OKAY) {
+            if ((e = mp_mul_d(&sz, (mp_digit)ap2, &T1z)) != MP_OKAY) {
                goto LBL_FU_ERR;
             }
          }
-         if ((err = mp_add(&T1z, &tz, &T1z)) != MP_OKAY) {
+         if ((e = mp_add(&T1z, &tz, &T1z)) != MP_OKAY) {
             goto LBL_FU_ERR;
          }
-         if ((err = mp_mul_2(&tz, &T2z)) != MP_OKAY) {
+         if ((e = mp_mul_2(&tz, &T2z)) != MP_OKAY) {
             goto LBL_FU_ERR;
          }
-         if ((err = mp_sub(&T2z, &sz, &tz)) != MP_OKAY) {
+         if ((e = mp_sub(&T2z, &sz, &tz)) != MP_OKAY) {
             goto LBL_FU_ERR;
          }
          mp_exch(&sz, &T1z);
       }
    }
 
-   mp_set_u32(&T1z, (unsigned int)((2 * a) + 5));
-   if ((err = mp_mod(&T1z, N, &T1z)) != MP_OKAY) {
+   if ((e = mp_set_long(&T1z, (unsigned long)((2 * a) + 5))) != MP_OKAY) {
       goto LBL_FU_ERR;
    }
-   if (MP_IS_ZERO(&sz) && (mp_cmp(&tz, &T1z) == MP_EQ)) {
+   if ((e = mp_mod(&T1z, N, &T1z)) != MP_OKAY) {
+      goto LBL_FU_ERR;
+   }
+   if ((mp_iszero(&sz) != MP_NO) && (mp_cmp(&tz, &T1z) == MP_EQ)) {
       *result = MP_YES;
       goto LBL_FU_ERR;
    }
 
 LBL_FU_ERR:
    mp_clear_multi(&tz, &sz, &Np1z, &T2z, &T1z, NULL);
-   return err;
+   return e;
 }
 
 #endif
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

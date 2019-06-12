@@ -1,7 +1,16 @@
 #include "tommath_private.h"
 #ifdef BN_S_MP_EXPTMOD_C
-/* LibTomMath, multiple-precision integer library -- Tom St Denis */
-/* SPDX-License-Identifier: Unlicense */
+/* LibTomMath, multiple-precision integer library -- Tom St Denis
+ *
+ * LibTomMath is a library that provides multiple-precision
+ * integer arithmetic as well as number theoretic functionality.
+ *
+ * The library was designed directly after the MPI library by
+ * Michael Fromberger but has been written from scratch with
+ * additional optimizations in place.
+ *
+ * SPDX-License-Identifier: Unlicense
+ */
 
 #ifdef MP_LOW_MEM
 #   define TAB_SIZE 32
@@ -9,13 +18,12 @@
 #   define TAB_SIZE 256
 #endif
 
-mp_err s_mp_exptmod(const mp_int *G, const mp_int *X, const mp_int *P, mp_int *Y, int redmode)
+int s_mp_exptmod(const mp_int *G, const mp_int *X, const mp_int *P, mp_int *Y, int redmode)
 {
    mp_int  M[TAB_SIZE], res, mu;
    mp_digit buf;
-   mp_err   err;
-   int      bitbuf, bitcpy, bitcnt, mode, digidx, x, y, winsize;
-   mp_err(*redux)(mp_int *x, const mp_int *m, const mp_int *mu);
+   int     err, bitbuf, bitcpy, bitcnt, mode, digidx, x, y, winsize;
+   int (*redux)(mp_int *x, const mp_int *m, const mp_int *mu);
 
    /* find window size */
    x = mp_count_bits(X);
@@ -142,11 +150,11 @@ mp_err s_mp_exptmod(const mp_int *G, const mp_int *X, const mp_int *P, mp_int *Y
          }
          /* read next digit and reset the bitcnt */
          buf    = X->dp[digidx--];
-         bitcnt = (int)MP_DIGIT_BIT;
+         bitcnt = (int)DIGIT_BIT;
       }
 
       /* grab the next msb from the exponent */
-      y     = (buf >> (mp_digit)(MP_DIGIT_BIT - 1)) & 1uL;
+      y     = (buf >> (mp_digit)(DIGIT_BIT - 1)) & 1;
       buf <<= (mp_digit)1;
 
       /* if the bit is zero and mode == 0 then we ignore it
@@ -238,3 +246,7 @@ LBL_M:
    return err;
 }
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

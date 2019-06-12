@@ -1,29 +1,38 @@
 #include "tommath_private.h"
 #ifdef BN_S_MP_MUL_DIGS_C
-/* LibTomMath, multiple-precision integer library -- Tom St Denis */
-/* SPDX-License-Identifier: Unlicense */
+/* LibTomMath, multiple-precision integer library -- Tom St Denis
+ *
+ * LibTomMath is a library that provides multiple-precision
+ * integer arithmetic as well as number theoretic functionality.
+ *
+ * The library was designed directly after the MPI library by
+ * Michael Fromberger but has been written from scratch with
+ * additional optimizations in place.
+ *
+ * SPDX-License-Identifier: Unlicense
+ */
 
 /* multiplies |a| * |b| and only computes upto digs digits of result
  * HAC pp. 595, Algorithm 14.12  Modified so you can control how
  * many digits of output are created.
  */
-mp_err s_mp_mul_digs(const mp_int *a, const mp_int *b, mp_int *c, int digs)
+int s_mp_mul_digs(const mp_int *a, const mp_int *b, mp_int *c, int digs)
 {
    mp_int  t;
-   mp_err  err;
-   int     pa, pb, ix, iy;
+   int     res, pa, pb, ix, iy;
    mp_digit u;
    mp_word r;
    mp_digit tmpx, *tmpt, *tmpy;
 
    /* can we use the fast multiplier? */
-   if ((digs < MP_WARRAY) &&
-       (MP_MIN(a->used, b->used) < MP_MAXFAST)) {
-      return s_mp_mul_digs_fast(a, b, c, digs);
+   if ((digs < (int)MP_WARRAY) &&
+       (MIN(a->used, b->used) <
+        (int)(1u << (((size_t)CHAR_BIT * sizeof(mp_word)) - (2u * (size_t)DIGIT_BIT))))) {
+      return fast_s_mp_mul_digs(a, b, c, digs);
    }
 
-   if ((err = mp_init_size(&t, digs)) != MP_OKAY) {
-      return err;
+   if ((res = mp_init_size(&t, digs)) != MP_OKAY) {
+      return res;
    }
    t.used = digs;
 
@@ -34,7 +43,7 @@ mp_err s_mp_mul_digs(const mp_int *a, const mp_int *b, mp_int *c, int digs)
       u = 0;
 
       /* limit ourselves to making digs digits of output */
-      pb = MP_MIN(b->used, digs - ix);
+      pb = MIN(b->used, digs - ix);
 
       /* setup some aliases */
       /* copy of the digit from a used within the nested loop */
@@ -57,7 +66,7 @@ mp_err s_mp_mul_digs(const mp_int *a, const mp_int *b, mp_int *c, int digs)
          *tmpt++ = (mp_digit)(r & (mp_word)MP_MASK);
 
          /* get the carry word from the result */
-         u       = (mp_digit)(r >> (mp_word)MP_DIGIT_BIT);
+         u       = (mp_digit)(r >> (mp_word)DIGIT_BIT);
       }
       /* set carry if it is placed below digs */
       if ((ix + iy) < digs) {
@@ -72,3 +81,7 @@ mp_err s_mp_mul_digs(const mp_int *a, const mp_int *b, mp_int *c, int digs)
    return MP_OKAY;
 }
 #endif
+
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */
