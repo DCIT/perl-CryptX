@@ -1,12 +1,10 @@
 Changes for CryptX
 
-TODO:
-https://github.com/libtom/libtommath/pull/313   fix conversions + update no-stdint-h
-
 0.064   2019-NEXT
         - fix #50 building on HP-UX 11.11 / PA-RISC
         - bundled libtomcrypt update branch:develop (commit:c600d81e 2019-06-09)
         - bundled libtommath  update branch:develop (commit:e009d400 2019-06-12) + stdint.h workaround
+        - necessary XS adaptation to the latest libtommath
 
 0.063   2018-11-28
         - proper patch for #46 (related to Math::BigInt::LTM)
