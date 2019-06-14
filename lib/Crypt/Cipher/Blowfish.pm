@@ -4,7 +4,7 @@ package Crypt::Cipher::Blowfish;
 
 use strict;
 use warnings;
-our $VERSION = '0.063_005';
+our $VERSION = '0.064';
 
 use base qw(Crypt::Cipher);
 
