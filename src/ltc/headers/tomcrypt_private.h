@@ -23,7 +23,9 @@ enum ltc_oid_id {
    PKA_RSA,
    PKA_DSA,
    PKA_EC,
-   PKA_EC_PRIMEF
+   PKA_EC_PRIMEF,
+   PKA_X25519,
+   PKA_ED25519,
 };
 
 /*
@@ -296,6 +298,33 @@ int dsa_int_validate_xy(const dsa_key *key, int *stat);
 int dsa_int_validate_pqg(const dsa_key *key, int *stat);
 int dsa_int_validate_primes(const dsa_key *key, int *stat);
 #endif /* LTC_MDSA */
+
+
+#ifdef LTC_CURVE25519
+
+int tweetnacl_crypto_sign(
+  unsigned char *sm,unsigned long long *smlen,
+  const unsigned char *m,unsigned long long mlen,
+  const unsigned char *sk, const unsigned char *pk);
+int tweetnacl_crypto_sign_open(
+  int *stat,
+  unsigned char *m,unsigned long long *mlen,
+  const unsigned char *sm,unsigned long long smlen,
+  const unsigned char *pk);
+int tweetnacl_crypto_sign_keypair(prng_state *prng, int wprng, unsigned char *pk,unsigned char *sk);
+int tweetnacl_crypto_sk_to_pk(unsigned char *pk, const unsigned char *sk);
+int tweetnacl_crypto_scalarmult(unsigned char *q, const unsigned char *n, const unsigned char *p);
+int tweetnacl_crypto_scalarmult_base(unsigned char *q,const unsigned char *n);
+
+typedef int (*sk_to_pk)(unsigned char *pk ,const unsigned char *sk);
+int ec25519_import_pkcs8(const unsigned char *in, unsigned long inlen,
+                       const void *pwd, unsigned long pwdlen,
+                       enum ltc_oid_id id, sk_to_pk fp,
+                       curve25519_key *key);
+int ec25519_export(       unsigned char *out, unsigned long *outlen,
+                                    int  which,
+                   const curve25519_key *key);
+#endif /* LTC_CURVE25519 */
 
 #ifdef LTC_DER
 
