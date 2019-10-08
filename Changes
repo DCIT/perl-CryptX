@@ -1,8 +1,5 @@
 Changes for CryptX
 
-0.065   2019-NEXT
-        - #54 added ISO 10126 padding to ECB/CBC
-
 0.064   2019-06-14
         - fix #50 libtommath patch - building on HP-UX 11.11 / PA-RISC
         - necessary XS adaptation to the latest libtommath
