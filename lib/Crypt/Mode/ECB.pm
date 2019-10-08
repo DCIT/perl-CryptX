@@ -77,6 +77,7 @@ B<BEWARE: ECB is inherently insecure>, if you are not sure go for L<Crypt::Mode:
  #               3 ANSI X.923 padding
  #               4 zero padding
  #               5 zero padding (+a block of zeros if the output length is divisible by the blocksize)
+ #               6 ISO 10126 padding
  # $cipher_rounds ... optional num of rounds for given cipher
 
 =head2 encrypt

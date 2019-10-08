@@ -217,6 +217,7 @@ finish(Crypt::Mode::ECB self)
             else if (self->padding_mode == 3) { padmode = LTC_PAD_ANSI_X923    | (&self->state)->blocklen; }
             else if (self->padding_mode == 4) { padmode = LTC_PAD_ZERO         | (&self->state)->blocklen; }
             else if (self->padding_mode == 5) { padmode = LTC_PAD_ZERO_ALWAYS  | (&self->state)->blocklen; }
+            else if (self->padding_mode == 6) { padmode = LTC_PAD_ISO_10126    | (&self->state)->blocklen; }
             else { croak("FATAL: unknown padding"); }
             blen = sizeof(self->pad);
             rv = padding_pad(self->pad, self->padlen, &blen, padmode);
@@ -240,6 +241,7 @@ finish(Crypt::Mode::ECB self)
               else if (self->padding_mode == 3) { padmode = LTC_PAD_ANSI_X923    | (&self->state)->blocklen; }
               else if (self->padding_mode == 4) { padmode = LTC_PAD_ZERO         | (&self->state)->blocklen; }
               else if (self->padding_mode == 5) { padmode = LTC_PAD_ZERO_ALWAYS  | (&self->state)->blocklen; }
+              else if (self->padding_mode == 6) { padmode = LTC_PAD_ISO_10126    | (&self->state)->blocklen; }
               else { croak("FATAL: unknown padding"); }
               rv = padding_depad(tmp_block, &blen, padmode);
               if (rv != CRYPT_OK) croak("FATAL: padding_depad failed: %s", error_to_string(rv));
