@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 266;
+use Test::More tests => 269;
 use Crypt::Mode::ECB;
 
 my @tests;
@@ -83,3 +83,20 @@ for (@tests) {
     }
   }
 }
+
+{
+  my @t = (
+    { padding=>6, key=>'14756d6d9a0f1478ce734088d22f484c7de77f81b76773f4e2b07a23daaeec16', pt=>'f63f2ce5eec4963276826265fb6f695f78551e98cf6ae4375d0da5970e55b2e194c2f2d6062438e2d7e6a120c67f8de8b19ae9d6c12a6287ca6e2f0bd87096f7c63f033f8aa2f8f467b874d99862fbb6cc693dfb13a1eed8271e7923c1e844e4ae20ffc0ed21538de19b48c0a0bf29dc6a30580d09b1ddf6edb088', ct=>'f63f2ce5eec4963276826265fb6f695f78551e98cf6ae4375d0da5970e55b2e194c2f2d6062438e2d7e6a120c67f8de8b19ae9d6c12a6287ca6e2f0bd87096f7c63f033f8aa2f8f467b874d99862fbb6cc693dfb13a1eed8271e7923c1e844e4ae20ffc0ed21538de19b48c0a0bf29dc6a30580d09b1ddf6edb088deadbeef05' },
+  );
+  for (@t) {
+    my $m = Crypt::Mode::ECB->new('AES', $_->{padding});
+    my $ct = $m->encrypt(pack("H*",$_->{pt}), pack("H*",$_->{key}));
+    my $pt = $m->decrypt($ct, pack("H*",$_->{key}));
+    ok($ct, "cipher text");
+    ok($pt, "plain text");
+    is(unpack("H*",$pt), $_->{pt}, 'plain text match from generated cipher text');
+    my $pt2 = $m->decrypt(pack("H*",$_->{ct}), pack("H*",$_->{key}));
+    is(unpack("H*",$pt2), $_->{pt}, 'plain text match from stored cipher text');
+  }
+}
+
