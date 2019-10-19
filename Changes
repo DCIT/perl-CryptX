@@ -1,5 +1,9 @@
 Changes for CryptX
 
+0.065   2019-10-19
+        - fix #56 Math::BigInt 1.999817 breaks the tests of CryptX
+        - no code change, just tests
+
 0.064   2019-06-14
         - fix #50 libtommath patch - building on HP-UX 11.11 / PA-RISC
         - necessary XS adaptation to the latest libtommath
