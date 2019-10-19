@@ -59,6 +59,13 @@ int base16_decode(const          char *in,  unsigned long  inlen,
                         unsigned char *out, unsigned long *outlen);
 #endif
 
+#ifdef LTC_BCRYPT
+int bcrypt_pbkdf_openbsd(const          void *secret, unsigned long secret_len,
+                         const unsigned char *salt,   unsigned long salt_len,
+                               unsigned int  rounds,            int hash_idx,
+                               unsigned char *out,    unsigned long *outlen);
+#endif
+
 /* ===> LTC_HKDF -- RFC5869 HMAC-based Key Derivation Function <=== */
 #ifdef LTC_HKDF
 
@@ -102,13 +109,13 @@ int crypt_get_size(const char* namein, unsigned int *sizeout);
 int crypt_list_all_sizes(char *names_list, unsigned int *names_list_size);
 
 #ifdef LTM_DESC
-LTC_DEPRECATED void init_LTM(void);
+LTC_DEPRECATED(crypt_mp_init) void init_LTM(void);
 #endif
 #ifdef TFM_DESC
-LTC_DEPRECATED void init_TFM(void);
+LTC_DEPRECATED(crypt_mp_init) void init_TFM(void);
 #endif
 #ifdef GMP_DESC
-LTC_DEPRECATED void init_GMP(void);
+LTC_DEPRECATED(crypt_mp_init) void init_GMP(void);
 #endif
 int crypt_mp_init(const char* mpi);
 
@@ -156,6 +163,7 @@ int padding_depad(const unsigned char *data, unsigned long *length, unsigned lon
 
 #ifdef LTC_SSH
 typedef enum ssh_data_type_ {
+   LTC_SSHDATA_EOL,
    LTC_SSHDATA_BYTE,
    LTC_SSHDATA_BOOLEAN,
    LTC_SSHDATA_UINT32,
@@ -163,12 +171,11 @@ typedef enum ssh_data_type_ {
    LTC_SSHDATA_STRING,
    LTC_SSHDATA_MPINT,
    LTC_SSHDATA_NAMELIST,
-   LTC_SSHDATA_EOL
 } ssh_data_type;
 
 /* VA list handy helpers with tuples of <type, data> */
 int ssh_encode_sequence_multi(unsigned char *out, unsigned long *outlen, ...);
-int ssh_decode_sequence_multi(const unsigned char *in, unsigned long inlen, ...);
+int ssh_decode_sequence_multi(const unsigned char *in, unsigned long *inlen, ...);
 #endif /* LTC_SSH */
 
 int compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);

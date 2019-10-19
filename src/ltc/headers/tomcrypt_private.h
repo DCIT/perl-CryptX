@@ -72,6 +72,17 @@ typedef struct
  * Internal functions
  */
 
+
+/* tomcrypt_cipher.h */
+
+void blowfish_enc(ulong32 *data, unsigned long blocks, const symmetric_key *skey);
+int blowfish_expand(const unsigned char *key, int keylen,
+                    const unsigned char *data, int datalen,
+                    symmetric_key *skey);
+int blowfish_setup_with_data(const unsigned char *key, int keylen,
+                             const unsigned char *data, int datalen,
+                             symmetric_key *skey);
+
 /* tomcrypt_hash.h */
 
 /* a simple macro for making hash "process" functions */
@@ -213,6 +224,12 @@ int rand_bn_upto(void *N, void *limit, prng_state *prng, int wprng);
 int pk_get_oid(enum ltc_oid_id id, const char **st);
 int pk_oid_str_to_num(const char *OID, unsigned long *oid, unsigned long *oidlen);
 int pk_oid_num_to_str(const unsigned long *oid, unsigned long oidlen, char *OID, unsigned long *outlen);
+
+/* ---- DH Routines ---- */
+#ifdef LTC_MRSA
+int rsa_init(rsa_key *key);
+void rsa_shrink_key(rsa_key *key);
+#endif /* LTC_MRSA */
 
 /* ---- DH Routines ---- */
 #ifdef LTC_MDH

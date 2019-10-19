@@ -2,16 +2,16 @@ OBJS=ltc/ciphers/anubis.obj ltc/ciphers/blowfish.obj ltc/ciphers/camellia.obj lt
 ltc/ciphers/des.obj ltc/ciphers/idea.obj ltc/ciphers/kasumi.obj ltc/ciphers/khazad.obj \
 ltc/ciphers/kseed.obj ltc/ciphers/multi2.obj ltc/ciphers/noekeon.obj ltc/ciphers/rc2.obj \
 ltc/ciphers/rc5.obj ltc/ciphers/rc6.obj ltc/ciphers/serpent.obj ltc/ciphers/skipjack.obj \
-ltc/ciphers/xtea.obj ltc/ciphers/aes/aes.obj ltc/ciphers/safer/safer.obj ltc/ciphers/safer/saferp.obj \
-ltc/ciphers/twofish/twofish.obj ltc/encauth/ccm/ccm_add_aad.obj ltc/encauth/ccm/ccm_add_nonce.obj \
-ltc/encauth/ccm/ccm_done.obj ltc/encauth/ccm/ccm_init.obj ltc/encauth/ccm/ccm_memory.obj \
-ltc/encauth/ccm/ccm_process.obj ltc/encauth/ccm/ccm_reset.obj ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj \
-ltc/encauth/chachapoly/chacha20poly1305_decrypt.obj ltc/encauth/chachapoly/chacha20poly1305_done.obj \
-ltc/encauth/chachapoly/chacha20poly1305_encrypt.obj ltc/encauth/chachapoly/chacha20poly1305_init.obj \
-ltc/encauth/chachapoly/chacha20poly1305_memory.obj ltc/encauth/chachapoly/chacha20poly1305_setiv.obj \
-ltc/encauth/chachapoly/chacha20poly1305_setiv_rfc7905.obj ltc/encauth/eax/eax_addheader.obj \
-ltc/encauth/eax/eax_decrypt.obj ltc/encauth/eax/eax_decrypt_verify_memory.obj ltc/encauth/eax/eax_done.obj \
-ltc/encauth/eax/eax_encrypt.obj ltc/encauth/eax/eax_encrypt_authenticate_memory.obj \
+ltc/ciphers/tea.obj ltc/ciphers/xtea.obj ltc/ciphers/aes/aes.obj ltc/ciphers/safer/safer.obj \
+ltc/ciphers/safer/saferp.obj ltc/ciphers/twofish/twofish.obj ltc/encauth/ccm/ccm_add_aad.obj \
+ltc/encauth/ccm/ccm_add_nonce.obj ltc/encauth/ccm/ccm_done.obj ltc/encauth/ccm/ccm_init.obj \
+ltc/encauth/ccm/ccm_memory.obj ltc/encauth/ccm/ccm_process.obj ltc/encauth/ccm/ccm_reset.obj \
+ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj ltc/encauth/chachapoly/chacha20poly1305_decrypt.obj \
+ltc/encauth/chachapoly/chacha20poly1305_done.obj ltc/encauth/chachapoly/chacha20poly1305_encrypt.obj \
+ltc/encauth/chachapoly/chacha20poly1305_init.obj ltc/encauth/chachapoly/chacha20poly1305_memory.obj \
+ltc/encauth/chachapoly/chacha20poly1305_setiv.obj ltc/encauth/chachapoly/chacha20poly1305_setiv_rfc7905.obj \
+ltc/encauth/eax/eax_addheader.obj ltc/encauth/eax/eax_decrypt.obj ltc/encauth/eax/eax_decrypt_verify_memory.obj \
+ltc/encauth/eax/eax_done.obj ltc/encauth/eax/eax_encrypt.obj ltc/encauth/eax/eax_encrypt_authenticate_memory.obj \
 ltc/encauth/eax/eax_init.obj ltc/encauth/gcm/gcm_add_aad.obj ltc/encauth/gcm/gcm_add_iv.obj \
 ltc/encauth/gcm/gcm_done.obj ltc/encauth/gcm/gcm_gf_mult.obj ltc/encauth/gcm/gcm_init.obj \
 ltc/encauth/gcm/gcm_memory.obj ltc/encauth/gcm/gcm_mult_h.obj ltc/encauth/gcm/gcm_process.obj \
@@ -47,13 +47,13 @@ ltc/misc/adler32.obj ltc/misc/burn_stack.obj ltc/misc/compare_testvector.obj ltc
 ltc/misc/crc32.obj ltc/misc/error_to_string.obj ltc/misc/mem_neq.obj ltc/misc/zeromem.obj \
 ltc/misc/base16/base16_decode.obj ltc/misc/base16/base16_encode.obj ltc/misc/base32/base32_decode.obj \
 ltc/misc/base32/base32_encode.obj ltc/misc/base64/base64_decode.obj ltc/misc/base64/base64_encode.obj \
-ltc/misc/crypt/crypt.obj ltc/misc/crypt/crypt_argchk.obj ltc/misc/crypt/crypt_cipher_descriptor.obj \
-ltc/misc/crypt/crypt_cipher_is_valid.obj ltc/misc/crypt/crypt_constants.obj ltc/misc/crypt/crypt_find_cipher.obj \
-ltc/misc/crypt/crypt_find_cipher_any.obj ltc/misc/crypt/crypt_find_cipher_id.obj \
-ltc/misc/crypt/crypt_find_hash.obj ltc/misc/crypt/crypt_find_hash_any.obj ltc/misc/crypt/crypt_find_hash_id.obj \
-ltc/misc/crypt/crypt_find_hash_oid.obj ltc/misc/crypt/crypt_find_prng.obj ltc/misc/crypt/crypt_fsa.obj \
-ltc/misc/crypt/crypt_hash_descriptor.obj ltc/misc/crypt/crypt_hash_is_valid.obj ltc/misc/crypt/crypt_inits.obj \
-ltc/misc/crypt/crypt_ltc_mp_descriptor.obj ltc/misc/crypt/crypt_prng_descriptor.obj \
+ltc/misc/bcrypt/bcrypt.obj ltc/misc/crypt/crypt.obj ltc/misc/crypt/crypt_argchk.obj \
+ltc/misc/crypt/crypt_cipher_descriptor.obj ltc/misc/crypt/crypt_cipher_is_valid.obj \
+ltc/misc/crypt/crypt_constants.obj ltc/misc/crypt/crypt_find_cipher.obj ltc/misc/crypt/crypt_find_cipher_any.obj \
+ltc/misc/crypt/crypt_find_cipher_id.obj ltc/misc/crypt/crypt_find_hash.obj ltc/misc/crypt/crypt_find_hash_any.obj \
+ltc/misc/crypt/crypt_find_hash_id.obj ltc/misc/crypt/crypt_find_hash_oid.obj ltc/misc/crypt/crypt_find_prng.obj \
+ltc/misc/crypt/crypt_fsa.obj ltc/misc/crypt/crypt_hash_descriptor.obj ltc/misc/crypt/crypt_hash_is_valid.obj \
+ltc/misc/crypt/crypt_inits.obj ltc/misc/crypt/crypt_ltc_mp_descriptor.obj ltc/misc/crypt/crypt_prng_descriptor.obj \
 ltc/misc/crypt/crypt_prng_is_valid.obj ltc/misc/crypt/crypt_prng_rng_descriptor.obj \
 ltc/misc/crypt/crypt_register_all_ciphers.obj ltc/misc/crypt/crypt_register_all_hashes.obj \
 ltc/misc/crypt/crypt_register_all_prngs.obj ltc/misc/crypt/crypt_register_cipher.obj \
@@ -132,9 +132,9 @@ ltc/pk/pkcs1/pkcs_1_i2osp.obj ltc/pk/pkcs1/pkcs_1_mgf1.obj ltc/pk/pkcs1/pkcs_1_o
 ltc/pk/pkcs1/pkcs_1_oaep_encode.obj ltc/pk/pkcs1/pkcs_1_os2ip.obj ltc/pk/pkcs1/pkcs_1_pss_decode.obj \
 ltc/pk/pkcs1/pkcs_1_pss_encode.obj ltc/pk/pkcs1/pkcs_1_v1_5_decode.obj ltc/pk/pkcs1/pkcs_1_v1_5_encode.obj \
 ltc/pk/rsa/rsa_decrypt_key.obj ltc/pk/rsa/rsa_encrypt_key.obj ltc/pk/rsa/rsa_export.obj \
-ltc/pk/rsa/rsa_exptmod.obj ltc/pk/rsa/rsa_free.obj ltc/pk/rsa/rsa_get_size.obj ltc/pk/rsa/rsa_import.obj \
-ltc/pk/rsa/rsa_import_pkcs8.obj ltc/pk/rsa/rsa_import_x509.obj ltc/pk/rsa/rsa_make_key.obj \
-ltc/pk/rsa/rsa_set.obj ltc/pk/rsa/rsa_sign_hash.obj ltc/pk/rsa/rsa_sign_saltlen_get.obj \
+ltc/pk/rsa/rsa_exptmod.obj ltc/pk/rsa/rsa_get_size.obj ltc/pk/rsa/rsa_import.obj \
+ltc/pk/rsa/rsa_import_pkcs8.obj ltc/pk/rsa/rsa_import_x509.obj ltc/pk/rsa/rsa_key.obj \
+ltc/pk/rsa/rsa_make_key.obj ltc/pk/rsa/rsa_set.obj ltc/pk/rsa/rsa_sign_hash.obj ltc/pk/rsa/rsa_sign_saltlen_get.obj \
 ltc/pk/rsa/rsa_verify_hash.obj ltc/pk/x25519/x25519_export.obj ltc/pk/x25519/x25519_import.obj \
 ltc/pk/x25519/x25519_import_pkcs8.obj ltc/pk/x25519/x25519_import_x509.obj ltc/pk/x25519/x25519_make_key.obj \
 ltc/pk/x25519/x25519_set_key.obj ltc/pk/x25519/x25519_shared_secret.obj ltc/prngs/chacha20.obj \
