@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 
 BEGIN {
-  plan skip_all => "requires Math::BigInt 1.999712+" unless eval { require Math::BigInt && eval($Math::BigInt::VERSION) >= 1.999712 };
+  plan skip_all => "requires Math::BigInt 1.999817+" unless eval { require Math::BigInt && eval($Math::BigInt::VERSION) >= 1.999817 };
   plan tests => 3712            # tests in require'd file
                  + 6;           # tests in this file
 }
