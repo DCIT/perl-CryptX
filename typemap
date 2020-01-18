@@ -48,6 +48,8 @@ Crypt::PK::RSA          T_PTROBJ
 Crypt::PK::DSA          T_PTROBJ
 Crypt::PK::ECC          T_PTROBJ
 Crypt::PK::DH           T_PTROBJ
+Crypt::PK::ED25519      T_PTROBJ
+Crypt::PK::X25519       T_PTROBJ
 
 Math::BigInt::LTM       T_PTROBJ
 
