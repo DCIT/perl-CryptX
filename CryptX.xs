@@ -153,7 +153,7 @@ struct curve25519_struct {
   int pindex;
   curve25519_key key;
 } ;
-typedef struct curve25519_struct *Crypt__PK__ED25519; /* used by Crypt::PK::ED25519 */
+typedef struct curve25519_struct *Crypt__PK__Ed25519; /* used by Crypt::PK::Ed25519 */
 typedef struct curve25519_struct *Crypt__PK__X25519;  /* used by Crypt::PK::X25519 */
 
 int mp_tohex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
@@ -755,7 +755,7 @@ INCLUDE: inc/CryptX_PK_RSA.xs.inc
 INCLUDE: inc/CryptX_PK_DSA.xs.inc
 INCLUDE: inc/CryptX_PK_DH.xs.inc
 INCLUDE: inc/CryptX_PK_ECC.xs.inc
-INCLUDE: inc/CryptX_PK_ED25519.xs.inc
+INCLUDE: inc/CryptX_PK_Ed25519.xs.inc
 INCLUDE: inc/CryptX_PK_X25519.xs.inc
 
 INCLUDE: inc/CryptX_KeyDerivation.xs.inc

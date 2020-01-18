@@ -1,8 +1,8 @@
-MODULE = CryptX         PACKAGE = Crypt::PK::ED25519
+MODULE = CryptX         PACKAGE = Crypt::PK::Ed25519
 
 PROTOTYPES: DISABLE
 
-Crypt::PK::ED25519
+Crypt::PK::Ed25519
 _new(Class)
     CODE:
     {
@@ -25,7 +25,7 @@ _new(Class)
         RETVAL
 
 void
-generate_key(Crypt::PK::ED25519 self)
+generate_key(Crypt::PK::Ed25519 self)
     PPCODE:
     {
         int rv;
@@ -36,7 +36,7 @@ generate_key(Crypt::PK::ED25519 self)
     }
 
 void
-_import(Crypt::PK::ED25519 self, SV * key_data)
+_import(Crypt::PK::Ed25519 self, SV * key_data)
     PPCODE:
     {
         int rv;
@@ -51,7 +51,7 @@ _import(Crypt::PK::ED25519 self, SV * key_data)
     }
 
 void
-_import_pkcs8(Crypt::PK::ED25519 self, SV * key_data, SV * passwd)
+_import_pkcs8(Crypt::PK::Ed25519 self, SV * key_data, SV * passwd)
     PPCODE:
     {
         int rv;
@@ -69,7 +69,7 @@ _import_pkcs8(Crypt::PK::ED25519 self, SV * key_data, SV * passwd)
     }
 
 void
-_import_x509(Crypt::PK::ED25519 self, SV * key_data)
+_import_x509(Crypt::PK::Ed25519 self, SV * key_data)
     PPCODE:
     {
         int rv;
@@ -84,7 +84,7 @@ _import_x509(Crypt::PK::ED25519 self, SV * key_data)
     }
 
 void
-_import_key_data(Crypt::PK::ED25519 self, SV * priv, SV * pub)
+_import_key_data(Crypt::PK::Ed25519 self, SV * priv, SV * pub)
     PPCODE:
     {
         int rv, type;
@@ -104,7 +104,7 @@ _import_key_data(Crypt::PK::ED25519 self, SV * priv, SV * pub)
     }
 
 int
-is_private(Crypt::PK::ED25519 self)
+is_private(Crypt::PK::Ed25519 self)
     CODE:
         if (self->key.type == -1) XSRETURN_UNDEF;
         RETVAL = (self->key.type == PK_PRIVATE) ? 1 : 0;
@@ -112,7 +112,7 @@ is_private(Crypt::PK::ED25519 self)
         RETVAL
 
 SV*
-key2hash(Crypt::PK::ED25519 self)
+key2hash(Crypt::PK::Ed25519 self)
     PREINIT:
         HV *rv_hash;
         char buf[20001];
@@ -137,7 +137,7 @@ key2hash(Crypt::PK::ED25519 self)
         RETVAL
 
 SV*
-export_key_der(Crypt::PK::ED25519 self, char * type)
+export_key_der(Crypt::PK::Ed25519 self, char * type)
     CODE:
     {
         int rv;
@@ -163,7 +163,7 @@ export_key_der(Crypt::PK::ED25519 self, char * type)
         RETVAL
 
 SV *
-sign_hash(Crypt::PK::ED25519 self, SV * data, const char * hash_name = "SHA1")
+sign_hash(Crypt::PK::Ed25519 self, SV * data, const char * hash_name = "SHA1")
     ALIAS:
         sign_message = 1
     CODE:
@@ -190,7 +190,7 @@ sign_hash(Crypt::PK::ED25519 self, SV * data, const char * hash_name = "SHA1")
         RETVAL
 
 int
-verify_hash(Crypt::PK::ED25519 self, SV * sig, SV * data, const char * hash_name = "SHA1")
+verify_hash(Crypt::PK::Ed25519 self, SV * sig, SV * data, const char * hash_name = "SHA1")
     ALIAS:
         verify_message = 1
     CODE:
@@ -219,7 +219,7 @@ verify_hash(Crypt::PK::ED25519 self, SV * sig, SV * data, const char * hash_name
         RETVAL
 
 void
-DESTROY(Crypt::PK::ED25519 self)
+DESTROY(Crypt::PK::Ed25519 self)
     CODE:
         Safefree(self);
 
