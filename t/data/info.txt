@@ -1,0 +1,27 @@
+openssl genpkey -algorithm x25519 -out openssl_x25519_sk.pem
+openssl pkey -in openssl_x25519_sk.pem -text
+openssl pkey -in openssl_x25519_sk.pem -inform PEM -out openssl_x25519_sk.der -outform DER
+openssl pkey -in openssl_x25519_sk.pem -inform PEM -out openssl_x25519_sk_t.pem -traditional -outform PEM
+openssl pkey -in openssl_x25519_sk.pem -inform PEM -out openssl_x25519_sk_pw.pem -outform PEM -des -passout pass:secret
+openssl pkey -in openssl_x25519_sk.pem -inform PEM -out openssl_x25519_sk_pw_t.pem -traditional -outform PEM -des -passout pass:secret
+openssl pkey -in openssl_x25519_sk.pem -inform PEM -out openssl_x25519_pk.der -pubout -outform DER
+openssl pkey -in openssl_x25519_sk.pem -inform PEM -out openssl_x25519_pk.pem -pubout -outform PEM
+openssl pkcs8 -topk8 -inform PEM -outform DER -in openssl_x25519_sk.pem -out openssl_x25519_sk.pkcs8 -nocrypt
+openssl pkcs8 -topk8 -inform PEM -outform DER -in openssl_x25519_sk.pem -out openssl_x25519_sk_pbes1.pkcs8 -passout pass:secret -v1 PBE-SHA1-3DES
+openssl pkcs8 -topk8 -inform PEM -outform DER -in openssl_x25519_sk.pem -out openssl_x25519_sk_pbes2.pkcs8 -passout pass:secret -v2 aes256 -v2prf hmacWithSHA512
+
+
+openssl genpkey -algorithm Ed25519 -out openssl_ed25519_sk.pem
+openssl pkey -in openssl_ed25519_sk.pem -text
+openssl pkey -in openssl_ed25519_sk.pem -inform PEM -out openssl_ed25519_sk.der -outform DER
+openssl pkey -in openssl_ed25519_sk.pem -inform PEM -out openssl_ed25519_sk_t.pem -traditional -outform PEM
+openssl pkey -in openssl_ed25519_sk.pem -inform PEM -out openssl_ed25519_sk_pw.pem -outform PEM -des -passout pass:secret
+openssl pkey -in openssl_ed25519_sk.pem -inform PEM -out openssl_ed25519_sk_pw_t.pem -traditional -outform PEM -des -passout pass:secret
+openssl pkey -in openssl_ed25519_sk.pem -inform PEM -out openssl_ed25519_pk.der -pubout -outform DER
+openssl pkey -in openssl_ed25519_sk.pem -inform PEM -out openssl_ed25519_pk.pem -pubout -outform PEM
+openssl pkcs8 -topk8 -inform PEM -outform DER -in openssl_ed25519_sk.pem -out openssl_ed25519_sk.pkcs8 -nocrypt
+openssl pkcs8 -topk8 -inform PEM -outform DER -in openssl_ed25519_sk.pem -out openssl_ed25519_sk_pbes1.pkcs8 -passout pass:secret -v1 PBE-SHA1-3DES
+openssl pkcs8 -topk8 -inform PEM -outform DER -in openssl_ed25519_sk.pem -out openssl_ed25519_sk_pbes2.pkcs8 -passout pass:secret -v2 aes256 -v2prf hmacWithSHA512
+openssl req -x509 -days 99999 -nodes -subj /CN=CryptX -key openssl_ed25519_sk.pem -out openssl_ed25519_x509.pem
+openssl x509 -in openssl_ed25519_x509.pem -outform der -out openssl_ed25519_x509.der
+openssl x509 -in openssl_ed25519_x509.pem -text
