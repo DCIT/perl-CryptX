@@ -6,7 +6,7 @@ use Test::More;
 plan skip_all => "set AUTHOR_MODE to enable this test (developer only!)" unless $ENV{AUTHOR_MODE};
 plan skip_all => "Pod::Coverage not installed" unless eval { require Pod::Coverage };
 plan skip_all => "File::Find not installed" unless eval { require File::Find };
-plan tests => 107;
+plan tests => 109;
 
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');

@@ -148,13 +148,19 @@ typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
   ecc_key key;
 } *Crypt__PK__ECC;
 
-struct curve25519_struct {
+typedef struct ed25519_struct {         /* used by Crypt::PK::Ed25519 */
   prng_state pstate;
   int pindex;
   curve25519_key key;
-} ;
-typedef struct curve25519_struct *Crypt__PK__Ed25519; /* used by Crypt::PK::Ed25519 */
-typedef struct curve25519_struct *Crypt__PK__X25519;  /* used by Crypt::PK::X25519 */
+  int initialized;
+} *Crypt__PK__Ed25519;
+
+typedef struct x25519_struct {          /* used by Crypt::PK::X25519 */
+  prng_state pstate;
+  int pindex;
+  curve25519_key key;
+  int initialized;
+} *Crypt__PK__X25519;
 
 int mp_tohex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
   int len, rv;

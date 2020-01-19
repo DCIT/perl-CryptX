@@ -7,8 +7,9 @@ _new(Class)
     CODE:
     {
         int rv;
-        Newz(0, RETVAL, 1, struct curve25519_struct);
+        Newz(0, RETVAL, 1, struct ed25519_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
+        RETVAL->initialized = 0;
         RETVAL->pindex = find_prng("chacha20");
         RETVAL->key.type = -1;
         if (RETVAL->pindex == -1) {
@@ -32,6 +33,7 @@ generate_key(Crypt::PK::Ed25519 self)
         /* gen the key */
         rv = ed25519_make_key(&self->pstate, self->pindex, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ed25519_make_key failed: %s", error_to_string(rv));
+        self->initialized = 1;
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -47,6 +49,7 @@ _import(Crypt::PK::Ed25519 self, SV * key_data)
         self->key.type = -1;
         rv = ed25519_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ed25519_import failed: %s", error_to_string(rv));
+        self->initialized = 1;
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -65,6 +68,7 @@ _import_pkcs8(Crypt::PK::Ed25519 self, SV * key_data, SV * passwd)
         self->key.type = -1;
         rv = ed25519_import_pkcs8(data, (unsigned long)data_len, pwd, (unsigned long)pwd_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ed25519_import_pkcs8 failed: %s", error_to_string(rv));
+        self->initialized = 1;
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -80,33 +84,39 @@ _import_x509(Crypt::PK::Ed25519 self, SV * key_data)
         self->key.type = -1;
         rv = ed25519_import_x509(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ed25519_import_x509 failed: %s", error_to_string(rv));
+        self->initialized = 1;
         XPUSHs(ST(0)); /* return self */
     }
 
 void
-_import_key_data(Crypt::PK::Ed25519 self, SV * priv, SV * pub)
+_import_raw(Crypt::PK::Ed25519 self, SV * key, int which)
     PPCODE:
     {
-        int rv, type;
-        unsigned char *priv_data=NULL, *pub_data=NULL;
-        STRLEN priv_len=0, pub_len=0;
+        int rv;
+        unsigned char *key_data=NULL;
+        STRLEN key_len=0;
 
-        if (SvOK(priv)) {
-          priv_data = (unsigned char *)SvPVbyte(priv, priv_len);
+        if (SvOK(key)) {
+          key_data = (unsigned char *)SvPVbyte(key, key_len);
         }
-        if (SvOK(pub)) {
-          pub_data = (unsigned char *)SvPVbyte(pub, pub_len);
+        if (which == 0) {
+          rv = ed25519_import_raw(key_data, (unsigned long)key_len, PK_PUBLIC, &self->key);
         }
-        self->key.type = -1;
-        rv = ed25519_set_key(priv_data, (unsigned long)priv_len, pub_data, (unsigned long)pub_len, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: ed25519_set_key failed: %s", error_to_string(rv));
+        else if (which == 1) {
+          rv = ed25519_import_raw(key_data, (unsigned long)key_len, PK_PRIVATE, &self->key);
+        }
+        else {
+          croak("FATAL: import_raw invalid type '%d'", which);
+        }
+        if (rv != CRYPT_OK) croak("FATAL: ed25519_import_raw failed: %s", error_to_string(rv));
+        self->initialized = 1;
         XPUSHs(ST(0)); /* return self */
     }
 
 int
 is_private(Crypt::PK::Ed25519 self)
     CODE:
-        if (self->key.type == -1) XSRETURN_UNDEF;
+        if (self->initialized == 0 || self->key.type == -1) XSRETURN_UNDEF;
         RETVAL = (self->key.type == PK_PRIVATE) ? 1 : 0;
     OUTPUT:
         RETVAL
@@ -115,22 +125,30 @@ SV*
 key2hash(Crypt::PK::Ed25519 self)
     PREINIT:
         HV *rv_hash;
-        char buf[20001];
+        char buf[256];
+        unsigned long blen;
         SV **not_used;
+        int rv;
     CODE:
-        if (self->key.type == -1) XSRETURN_UNDEF;
+        if (self->initialized == 0) XSRETURN_UNDEF;
         rv_hash = newHV();
         /* priv */
         if (self->key.type == PK_PRIVATE) {
-          not_used = hv_store(rv_hash, "priv", 4, newSVpv(self->key.priv, sizeof(self->key.priv)), 0);
+          blen = sizeof(buf);
+          rv = base16_encode(self->key.priv, sizeof(self->key.priv), buf, &blen, 0);
+          if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+          not_used = hv_store(rv_hash, "priv", 4, newSVpv(buf, blen), 0);
         }
         else {
           not_used = hv_store(rv_hash, "priv", 4, &PL_sv_undef, 0);
         }
         /* pub */
-        not_used = hv_store(rv_hash, "pub", 3, newSVpv(self->key.pub, sizeof(self->key.pub)), 0);
-        /* algo */
-        not_used = hv_store(rv_hash, "algo", 4, newSVpv("ed25519", 0), 0);
+        blen = sizeof(buf);
+        rv = base16_encode(self->key.pub, sizeof(self->key.pub), buf, &blen, 0);
+        if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
+        not_used = hv_store(rv_hash, "pub", 3, newSVpv(buf, blen), 0);
+        /* curve */
+        not_used = hv_store(rv_hash, "curve", 5, newSVpv("ed25519", 0), 0);
         LTC_UNUSED_PARAM(not_used);
         RETVAL = newRV_noinc((SV*)rv_hash);
     OUTPUT:
@@ -151,8 +169,8 @@ export_key_der(Crypt::PK::Ed25519 self, char * type)
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "public", 6)) {
-          rv = ed25519_export(out, &out_len, PK_PUBLIC|PK_STD, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: ed25519_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
+          rv = ed25519_export(out, &out_len, PK_PUBLIC, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ed25519_export(PK_PUBLIC) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else {
@@ -222,4 +240,3 @@ void
 DESTROY(Crypt::PK::Ed25519 self)
     CODE:
         Safefree(self);
-

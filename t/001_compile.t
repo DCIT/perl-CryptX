@@ -101,6 +101,8 @@ use Crypt::PK::DH;
 use Crypt::PK::DSA;
 use Crypt::PK::ECC;
 use Crypt::PK::RSA;
+use Crypt::PK::X25519;
+use Crypt::PK::Ed25519;
 use Crypt::PK;
 use Crypt::PRNG::ChaCha20;
 use Crypt::PRNG::Fortuna;

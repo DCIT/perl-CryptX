@@ -110,7 +110,7 @@ L<Crypt::Mac::Pelican>, L<Crypt::Mac::PMAC>, L<Crypt::Mac::XCBC>, L<Crypt::Mac::
 
 =item * Public key cryptography
 
-L<Crypt::PK::RSA>, L<Crypt::PK::DSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DH>
+L<Crypt::PK::RSA>, L<Crypt::PK::DSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DH>, L<Crypt::PK::Ed25519>, L<Crypt::PK::X25519>
 
 =item * Cryptographically secure random number generators - see L<Crypt::PRNG> and related modules
 
