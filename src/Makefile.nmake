@@ -126,8 +126,8 @@ ltc/pk/ecc/ltc_ecc_is_point_at_infinity.obj ltc/pk/ecc/ltc_ecc_map.obj ltc/pk/ec
 ltc/pk/ecc/ltc_ecc_mulmod.obj ltc/pk/ecc/ltc_ecc_mulmod_timing.obj ltc/pk/ecc/ltc_ecc_points.obj \
 ltc/pk/ecc/ltc_ecc_projective_add_point.obj ltc/pk/ecc/ltc_ecc_projective_dbl_point.obj \
 ltc/pk/ecc/ltc_ecc_verify_key.obj ltc/pk/ed25519/ed25519_export.obj ltc/pk/ed25519/ed25519_import.obj \
-ltc/pk/ed25519/ed25519_import_pkcs8.obj ltc/pk/ed25519/ed25519_import_x509.obj ltc/pk/ed25519/ed25519_make_key.obj \
-ltc/pk/ed25519/ed25519_set_key.obj ltc/pk/ed25519/ed25519_sign.obj ltc/pk/ed25519/ed25519_verify.obj \
+ltc/pk/ed25519/ed25519_import_pkcs8.obj ltc/pk/ed25519/ed25519_import_raw.obj ltc/pk/ed25519/ed25519_import_x509.obj \
+ltc/pk/ed25519/ed25519_make_key.obj ltc/pk/ed25519/ed25519_sign.obj ltc/pk/ed25519/ed25519_verify.obj \
 ltc/pk/pkcs1/pkcs_1_i2osp.obj ltc/pk/pkcs1/pkcs_1_mgf1.obj ltc/pk/pkcs1/pkcs_1_oaep_decode.obj \
 ltc/pk/pkcs1/pkcs_1_oaep_encode.obj ltc/pk/pkcs1/pkcs_1_os2ip.obj ltc/pk/pkcs1/pkcs_1_pss_decode.obj \
 ltc/pk/pkcs1/pkcs_1_pss_encode.obj ltc/pk/pkcs1/pkcs_1_v1_5_decode.obj ltc/pk/pkcs1/pkcs_1_v1_5_encode.obj \
@@ -136,8 +136,8 @@ ltc/pk/rsa/rsa_exptmod.obj ltc/pk/rsa/rsa_get_size.obj ltc/pk/rsa/rsa_import.obj
 ltc/pk/rsa/rsa_import_pkcs8.obj ltc/pk/rsa/rsa_import_x509.obj ltc/pk/rsa/rsa_key.obj \
 ltc/pk/rsa/rsa_make_key.obj ltc/pk/rsa/rsa_set.obj ltc/pk/rsa/rsa_sign_hash.obj ltc/pk/rsa/rsa_sign_saltlen_get.obj \
 ltc/pk/rsa/rsa_verify_hash.obj ltc/pk/x25519/x25519_export.obj ltc/pk/x25519/x25519_import.obj \
-ltc/pk/x25519/x25519_import_pkcs8.obj ltc/pk/x25519/x25519_import_x509.obj ltc/pk/x25519/x25519_make_key.obj \
-ltc/pk/x25519/x25519_set_key.obj ltc/pk/x25519/x25519_shared_secret.obj ltc/prngs/chacha20.obj \
+ltc/pk/x25519/x25519_import_pkcs8.obj ltc/pk/x25519/x25519_import_raw.obj ltc/pk/x25519/x25519_import_x509.obj \
+ltc/pk/x25519/x25519_make_key.obj ltc/pk/x25519/x25519_shared_secret.obj ltc/prngs/chacha20.obj \
 ltc/prngs/fortuna.obj ltc/prngs/rc4.obj ltc/prngs/rng_get_bytes.obj ltc/prngs/rng_make_prng.obj \
 ltc/prngs/sober128.obj ltc/prngs/sprng.obj ltc/prngs/yarrow.obj ltc/stream/chacha/chacha_crypt.obj \
 ltc/stream/chacha/chacha_done.obj ltc/stream/chacha/chacha_ivctr32.obj ltc/stream/chacha/chacha_ivctr64.obj \

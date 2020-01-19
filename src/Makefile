@@ -119,8 +119,8 @@ ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_map.o ltc/pk/ecc/lt
 ltc/pk/ecc/ltc_ecc_mulmod.o ltc/pk/ecc/ltc_ecc_mulmod_timing.o ltc/pk/ecc/ltc_ecc_points.o \
 ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc/ltc_ecc_projective_dbl_point.o \
 ltc/pk/ecc/ltc_ecc_verify_key.o ltc/pk/ed25519/ed25519_export.o ltc/pk/ed25519/ed25519_import.o \
-ltc/pk/ed25519/ed25519_import_pkcs8.o ltc/pk/ed25519/ed25519_import_x509.o ltc/pk/ed25519/ed25519_make_key.o \
-ltc/pk/ed25519/ed25519_set_key.o ltc/pk/ed25519/ed25519_sign.o ltc/pk/ed25519/ed25519_verify.o \
+ltc/pk/ed25519/ed25519_import_pkcs8.o ltc/pk/ed25519/ed25519_import_raw.o ltc/pk/ed25519/ed25519_import_x509.o \
+ltc/pk/ed25519/ed25519_make_key.o ltc/pk/ed25519/ed25519_sign.o ltc/pk/ed25519/ed25519_verify.o \
 ltc/pk/pkcs1/pkcs_1_i2osp.o ltc/pk/pkcs1/pkcs_1_mgf1.o ltc/pk/pkcs1/pkcs_1_oaep_decode.o \
 ltc/pk/pkcs1/pkcs_1_oaep_encode.o ltc/pk/pkcs1/pkcs_1_os2ip.o ltc/pk/pkcs1/pkcs_1_pss_decode.o \
 ltc/pk/pkcs1/pkcs_1_pss_encode.o ltc/pk/pkcs1/pkcs_1_v1_5_decode.o ltc/pk/pkcs1/pkcs_1_v1_5_encode.o \
@@ -129,7 +129,7 @@ ltc/pk/rsa/rsa_exptmod.o ltc/pk/rsa/rsa_get_size.o ltc/pk/rsa/rsa_import.o ltc/p
 ltc/pk/rsa/rsa_import_x509.o ltc/pk/rsa/rsa_key.o ltc/pk/rsa/rsa_make_key.o ltc/pk/rsa/rsa_set.o \
 ltc/pk/rsa/rsa_sign_hash.o ltc/pk/rsa/rsa_sign_saltlen_get.o ltc/pk/rsa/rsa_verify_hash.o \
 ltc/pk/x25519/x25519_export.o ltc/pk/x25519/x25519_import.o ltc/pk/x25519/x25519_import_pkcs8.o \
-ltc/pk/x25519/x25519_import_x509.o ltc/pk/x25519/x25519_make_key.o ltc/pk/x25519/x25519_set_key.o \
+ltc/pk/x25519/x25519_import_raw.o ltc/pk/x25519/x25519_import_x509.o ltc/pk/x25519/x25519_make_key.o \
 ltc/pk/x25519/x25519_shared_secret.o ltc/prngs/chacha20.o ltc/prngs/fortuna.o ltc/prngs/rc4.o \
 ltc/prngs/rng_get_bytes.o ltc/prngs/rng_make_prng.o ltc/prngs/sober128.o ltc/prngs/sprng.o \
 ltc/prngs/yarrow.o ltc/stream/chacha/chacha_crypt.o ltc/stream/chacha/chacha_done.o \
