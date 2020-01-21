@@ -125,7 +125,7 @@ SV*
 key2hash(Crypt::PK::X25519 self)
     PREINIT:
         HV *rv_hash;
-        char buf[256];
+        char buf[32 * 2 + 1];
         unsigned long blen;
         SV **not_used;
         int rv;
@@ -169,8 +169,8 @@ export_key_der(Crypt::PK::X25519 self, char * type)
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "public", 6)) {
-          rv = x25519_export(out, &out_len, PK_PUBLIC, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: x25519_export(PK_PUBLIC) failed: %s", error_to_string(rv));
+          rv = x25519_export(out, &out_len, PK_PUBLIC|PK_STD, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: x25519_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else {

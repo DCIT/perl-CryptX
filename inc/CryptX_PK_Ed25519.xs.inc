@@ -125,7 +125,7 @@ SV*
 key2hash(Crypt::PK::Ed25519 self)
     PREINIT:
         HV *rv_hash;
-        char buf[256];
+        char buf[32 * 2 + 1];
         unsigned long blen;
         SV **not_used;
         int rv;
@@ -164,6 +164,32 @@ export_key_der(Crypt::PK::Ed25519 self, char * type)
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(type, "private", 7)) {
+          rv = ed25519_export(out, &out_len, PK_PRIVATE|PK_STD, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ed25519_export(PK_PRIVATE|PK_STD) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
+        }
+        else if (strnEQ(type, "public", 6)) {
+          rv = ed25519_export(out, &out_len, PK_PUBLIC|PK_STD, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: ed25519_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
+        }
+        else {
+          croak("FATAL: export_key_der invalid type '%s'", type);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV*
+export_key_raw(Crypt::PK::Ed25519 self, char * type)
+    CODE:
+    {
+        int rv;
+        unsigned char out[4096];
+        unsigned long int out_len = sizeof(out);
+
+        RETVAL = newSVpvn(NULL, 0); /* undef */
+        if (strnEQ(type, "private", 7)) {
           rv = ed25519_export(out, &out_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ed25519_export(PK_PRIVATE) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
@@ -174,7 +200,7 @@ export_key_der(Crypt::PK::Ed25519 self, char * type)
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else {
-          croak("FATAL: export_key_der invalid type '%s'", type);
+          croak("FATAL: export_key_raw invalid type '%s'", type);
         }
     }
     OUTPUT:
