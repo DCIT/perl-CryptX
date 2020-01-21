@@ -163,7 +163,128 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 =head2 import_key
 
-TODO
+Loads private or public key in DER or PEM format.
+
+ $pk->import_key($filename);
+ #or
+ $pk->import_key(\$buffer_containing_key);
+
+Support for password protected PEM keys:
+
+ $pk->import_key($filename, $password);
+ #or
+ $pk->import_key(\$buffer_containing_key, $password);
+
+Loading private or public keys form perl hash:
+
+ $pk->import_key($hashref);
+
+ # the $hashref is either a key exported via key2hash
+ $pk->import_key({
+      curve => "ed25519",
+      pub   => "A05D1AEA5830AC9A65CDFB384660D497E3697C46B419CF2CEC85DE8BD245459D",
+      priv  => "45C109BA6FD24E8B67D23EFB6B92D99CD457E2137172C0D749FE2B5A0C142DAD",
+ });
+
+ # or a hash with items corresponding to JWK (JSON Web Key)
+ $pk->import_key({
+       kty => "OKP",
+       crv => "Ed25519",
+       d   => "RcEJum_STotn0j77a5LZnNRX4hNxcsDXSf4rWgwULa0",
+       x   => "oF0a6lgwrJplzfs4RmDUl-NpfEa0Gc8s7IXei9JFRZ0",
+ });
+
+Supported key formats:
+
+ # all formats can be loaded from a file
+ my $pk = Crypt::PK::Ed25519->new($filename);
+
+ # or from a buffer containing the key
+ my $pk = Crypt::PK::Ed25519->new(\$buffer_with_key);
+
+=over
+
+=item * Ed25519 private keys in PEM format
+
+ -----BEGIN ED25519 PRIVATE KEY-----
+ MC4CAQAwBQYDK2VwBCIEIEXBCbpv0k6LZ9I++2uS2ZzUV+ITcXLA10n+K1oMFC2t
+ -----END ED25519 PRIVATE KEY-----
+
+=item * Ed25519 private keys in password protected PEM format
+
+ -----BEGIN ED25519 PRIVATE KEY-----
+ Proc-Type: 4,ENCRYPTED
+ DEK-Info: DES-CBC,6A64D756D49C1EFF
+
+ 8xQ7OyfQ10IITNEKcJGZA53Z1yk+NJQU7hrKqXwChZtgWNInhMBJRl9pozLKDSkH
+ v7u6EOve8NY=
+ -----END ED25519 PRIVATE KEY-----
+
+=item * PKCS#8 private keys
+
+ -----BEGIN PRIVATE KEY-----
+ MC4CAQAwBQYDK2VwBCIEIEXBCbpv0k6LZ9I++2uS2ZzUV+ITcXLA10n+K1oMFC2t
+ -----END PRIVATE KEY-----
+
+=item * PKCS#8 encrypted private keys
+
+ -----BEGIN ENCRYPTED PRIVATE KEY-----
+ MIGHMEsGCSqGSIb3DQEFDTA+MCkGCSqGSIb3DQEFDDAcBAjPx9JkdpRH2QICCAAw
+ DAYIKoZIhvcNAgkFADARBgUrDgMCBwQIWWieQojaWTcEOGj43SxqHUys4Eb2M27N
+ AkhqpmhosOxKrpGi0L3h8m8ipHE8EwI94NeOMsjfVw60aJuCrssY5vKN
+ -----END ENCRYPTED PRIVATE KEY-----
+
+=item * Ed25519 public keys in PEM format
+
+ -----BEGIN PUBLIC KEY-----
+ MCowBQYDK2VwAyEAoF0a6lgwrJplzfs4RmDUl+NpfEa0Gc8s7IXei9JFRZ0=
+ -----END PUBLIC KEY-----
+
+=item * Ed25519 public key from X509 certificate
+
+ -----BEGIN CERTIFICATE-----
+ MIIBODCB66ADAgECAhRWDU9FZBBUZ7KTdX8f7Bco8jsoaTAFBgMrZXAwETEPMA0G
+ A1UEAwwGQ3J5cHRYMCAXDTIwMDExOTEzMDIwMloYDzIyOTMxMTAyMTMwMjAyWjAR
+ MQ8wDQYDVQQDDAZDcnlwdFgwKjAFBgMrZXADIQCgXRrqWDCsmmXN+zhGYNSX42l8
+ RrQZzyzshd6L0kVFnaNTMFEwHQYDVR0OBBYEFHCGFtVibAxxWYyRt5wazMpqSZDV
+ MB8GA1UdIwQYMBaAFHCGFtVibAxxWYyRt5wazMpqSZDVMA8GA1UdEwEB/wQFMAMB
+ Af8wBQYDK2VwA0EAqG/+98smzqF/wmFX3zHXSaA67as202HnBJod1Tiurw1f+lr3
+ BX6OMtsDpgRq9O77IF1Qyx/MdJEwwErczOIbAA==
+ -----END CERTIFICATE-----
+
+=item * SSH public Ed25519 keys
+
+ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL0XsiFcRDp6Hpsoak8OdiiBMJhM2UKszNTxoGS7dJ++
+
+=item * SSH public Ed25519 keys (RFC-4716 format)
+
+ ---- BEGIN SSH2 PUBLIC KEY ----
+ Comment: "256-bit ED25519, converted from OpenSSH"
+ AAAAC3NzaC1lZDI1NTE5AAAAIL0XsiFcRDp6Hpsoak8OdiiBMJhM2UKszNTxoGS7dJ++
+ ---- END SSH2 PUBLIC KEY ----
+
+=item * Ed25519 private keys in JSON Web Key (JWK) format
+
+See L<https://tools.ietf.org/html/rfc8037>
+
+ {
+  "kty":"OKP",
+  "crv":"Ed25519",
+  "x":"oF0a6lgwrJplzfs4RmDUl-NpfEa0Gc8s7IXei9JFRZ0",
+  "d":"RcEJum_STotn0j77a5LZnNRX4hNxcsDXSf4rWgwULa0",
+ }
+
+B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
+
+=item * Ed25519 public keys in JSON Web Key (JWK) format
+
+ {
+  "kty":"OKP",
+  "crv":"Ed25519",
+  "x":"oF0a6lgwrJplzfs4RmDUl-NpfEa0Gc8s7IXei9JFRZ0",
+ }
+
+B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
 
 =head2 import_key_raw
 

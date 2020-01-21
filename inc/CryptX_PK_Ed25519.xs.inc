@@ -185,7 +185,7 @@ export_key_raw(Crypt::PK::Ed25519 self, char * type)
     CODE:
     {
         int rv;
-        unsigned char out[4096];
+        unsigned char out[32];
         unsigned long int out_len = sizeof(out);
 
         RETVAL = newSVpvn(NULL, 0); /* undef */

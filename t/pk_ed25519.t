@@ -1,12 +1,12 @@
 use strict;
 use warnings;
-use Test::More tests => 74;
+use Test::More tests => 78;
 
 use Crypt::PK::Ed25519;
 use Crypt::Misc qw(read_rawfile);
 
 {
-  my $k;
+  my ($k, $k2);
 
   # t/data/openssl_ed25519_sk.pem
   # ED25519 Private-Key:
@@ -21,12 +21,20 @@ use Crypt::Misc qw(read_rawfile);
   is(uc($k->key2hash->{pub}),  'A05D1AEA5830AC9A65CDFB384660D497E3697C46B419CF2CEC85DE8BD245459D', 'key2hash->{pub} raw-priv');
   is($k->export_key_raw('private'), $sk_data, 'export_key_raw private');
 
+  $k2 = Crypt::PK::Ed25519->new->import_key($k->key2hash);
+  ok($k2->is_private, 'is_private raw-priv');
+  is($k->export_key_der('private'), $k2->export_key_der('private'), 'import_key hash');
+
   my $pk_data = pack("H*", "A05D1AEA5830AC9A65CDFB384660D497E3697C46B419CF2CEC85DE8BD245459D");
   $k = Crypt::PK::Ed25519->new->import_key_raw($pk_data, 'public');
   ok($k, 'new+import_key_raw raw-pub');
   ok(!$k->is_private, '!is_private raw-pub');
   is(uc($k->key2hash->{pub}),  'A05D1AEA5830AC9A65CDFB384660D497E3697C46B419CF2CEC85DE8BD245459D', 'key2hash->{pub} raw-pub');
   is($k->export_key_raw('public'), $pk_data, 'export_key_raw public');
+
+  $k2 = Crypt::PK::Ed25519->new->import_key($k->key2hash);
+  ok(!$k2->is_private, 'is_private raw-priv');
+  is($k->export_key_der('public'), $k2->export_key_der('public'), 'import_key hash');
 
   my $sk_jwk = { kty=>"OKP",crv=>"Ed25519",d=>"RcEJum_STotn0j77a5LZnNRX4hNxcsDXSf4rWgwULa0",x=>"oF0a6lgwrJplzfs4RmDUl-NpfEa0Gc8s7IXei9JFRZ0" };
   $k = Crypt::PK::Ed25519->new($sk_jwk);

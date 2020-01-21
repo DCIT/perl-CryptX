@@ -116,7 +116,7 @@ _import_raw(Crypt::PK::X25519 self, SV * key, int which)
 int
 is_private(Crypt::PK::X25519 self)
     CODE:
-        if (self->key.type == -1) XSRETURN_UNDEF;
+        if (self->initialized == 0 || self->key.type == -1) XSRETURN_UNDEF;
         RETVAL = (self->key.type == PK_PRIVATE) ? 1 : 0;
     OUTPUT:
         RETVAL
@@ -164,8 +164,8 @@ export_key_der(Crypt::PK::X25519 self, char * type)
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(type, "private", 7)) {
-          rv = x25519_export(out, &out_len, PK_PRIVATE, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: x25519_export(PK_PRIVATE) failed: %s", error_to_string(rv));
+          rv = x25519_export(out, &out_len, PK_PRIVATE|PK_STD, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: x25519_export(PK_PRIVATE|PK_STD) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "public", 6)) {
@@ -175,6 +175,32 @@ export_key_der(Crypt::PK::X25519 self, char * type)
         }
         else {
           croak("FATAL: export_key_der invalid type '%s'", type);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV*
+export_key_raw(Crypt::PK::X25519 self, char * type)
+    CODE:
+    {
+        int rv;
+        unsigned char out[32];
+        unsigned long int out_len = sizeof(out);
+
+        RETVAL = newSVpvn(NULL, 0); /* undef */
+        if (strnEQ(type, "private", 7)) {
+          rv = x25519_export(out, &out_len, PK_PRIVATE, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: x25519_export(PK_PRIVATE) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
+        }
+        else if (strnEQ(type, "public", 6)) {
+          rv = x25519_export(out, &out_len, PK_PUBLIC, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: x25519_export(PK_PUBLIC) failed: %s", error_to_string(rv));
+          RETVAL = newSVpvn((char*)out, out_len);
+        }
+        else {
+          croak("FATAL: export_key_raw invalid type '%s'", type);
         }
     }
     OUTPUT:
@@ -199,4 +225,3 @@ void
 DESTROY(Crypt::PK::X25519 self)
     CODE:
         Safefree(self);
-
