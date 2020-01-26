@@ -4,7 +4,7 @@ package Crypt::Cipher::Serpent;
 
 use strict;
 use warnings;
-our $VERSION = '0.066_001';
+our $VERSION = '0.066_002';
 
 use base qw(Crypt::Cipher);
 
