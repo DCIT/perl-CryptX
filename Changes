@@ -1,5 +1,10 @@
 Changes for CryptX
 
+0.067   NEXT
+        - new: Crypt::PK::Ed25519
+        - new: Crypt::PK::X25519
+        - bundled libtomcrypt update branch:develop (commit:1937f412 2019-11-22)
+
 0.066   2019-10-20
         - fix #57 Build fails on i686
         - bundled libtomcrypt update branch:develop (commit:354c9051 2019-10-20)
