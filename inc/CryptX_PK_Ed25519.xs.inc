@@ -206,25 +206,15 @@ export_key_raw(Crypt::PK::Ed25519 self, char * type)
         RETVAL
 
 SV *
-sign_hash(Crypt::PK::Ed25519 self, SV * data, const char * hash_name = "SHA1")
-    ALIAS:
-        sign_message = 1
+sign_message(Crypt::PK::Ed25519 self, SV * data)
     CODE:
     {
-        int rv, id;
-        unsigned char buffer[1024], tmp[MAXBLOCKSIZE], *data_ptr = NULL;
-        unsigned long tmp_len = MAXBLOCKSIZE, buffer_len = 1024;
+        int rv;
+        unsigned char buffer[64], *data_ptr = NULL;
+        unsigned long buffer_len = 64;
         STRLEN data_len = 0;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
-        if (ix == 1) {
-          id = _find_hash(hash_name);
-          if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
-          rv = hash_memory(id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
-          if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
-          data_ptr = tmp;
-          data_len = tmp_len;
-        }
         rv = ed25519_sign(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ed25519_sign failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
@@ -233,30 +223,19 @@ sign_hash(Crypt::PK::Ed25519 self, SV * data, const char * hash_name = "SHA1")
         RETVAL
 
 int
-verify_hash(Crypt::PK::Ed25519 self, SV * sig, SV * data, const char * hash_name = "SHA1")
-    ALIAS:
-        verify_message = 1
+verify_message(Crypt::PK::Ed25519 self, SV * sig, SV * data)
     CODE:
     {
-        int rv, stat, id;
-        unsigned char tmp[MAXBLOCKSIZE], *data_ptr = NULL, *sig_ptr = NULL;
-        unsigned long tmp_len = MAXBLOCKSIZE;
+        int rv, stat;
+        unsigned char *data_ptr = NULL, *sig_ptr = NULL;
         STRLEN data_len = 0, sig_len = 0;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
-        if (ix == 1) {
-          id = _find_hash(hash_name);
-          if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
-          rv = hash_memory(id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
-          if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
-          data_ptr = tmp;
-          data_len = tmp_len;
-        }
-        RETVAL = 1;
+        RETVAL = 0;
         stat = 0;
         rv = ed25519_verify(data_ptr, (unsigned long)data_len, sig_ptr, (unsigned long)sig_len, &stat, &self->key);
-        if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
+        if (rv == CRYPT_OK && stat == 1) RETVAL = 1;
     }
     OUTPUT:
         RETVAL

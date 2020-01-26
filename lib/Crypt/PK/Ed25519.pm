@@ -327,25 +327,17 @@ B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel
 
 Export raw public/private key
 
- my $private_pem = $pk->export_key_raw('private');
+ my $private_bytes = $pk->export_key_raw('private');
  #or
- my $public_pem = $pk->export_key_raw('public');
+ my $public_bytes = $pk->export_key_raw('public');
 
 =head2 sign_message
 
  my $signature = $priv->sign_message($message);
- #or
- my $signature = $priv->sign_message($message, $hash_name);
-
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 verify_message
 
  my $valid = $pub->verify_message($signature, $message)
- #or
- my $valid = $pub->verify_message($signature, $message, $hash_name);
-
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 is_private
 
