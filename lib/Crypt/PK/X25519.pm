@@ -243,6 +243,8 @@ B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel
 
 B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
 
+=back
+
 =head2 import_key_raw
 
 Import raw public/private key - can load raw key data exported by L</export_key_raw>.
