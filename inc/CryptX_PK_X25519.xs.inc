@@ -11,7 +11,6 @@ _new(Class)
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->initialized = 0;
         RETVAL->pindex = find_prng("chacha20");
-        RETVAL->key.type = -1;
         if (RETVAL->pindex == -1) {
           Safefree(RETVAL);
           croak("FATAL: find_prng('chacha20') failed");
@@ -46,7 +45,7 @@ _import(Crypt::PK::X25519 self, SV * key_data)
         STRLEN data_len=0;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        self->key.type = -1;
+        self->initialized = 0;
         rv = x25519_import(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: x25519_import failed: %s", error_to_string(rv));
         self->initialized = 1;
@@ -65,7 +64,7 @@ _import_pkcs8(Crypt::PK::X25519 self, SV * key_data, SV * passwd)
         if (SvOK(passwd)) {
           pwd = (unsigned char *)SvPVbyte(passwd, pwd_len);
         }
-        self->key.type = -1;
+        self->initialized = 0;
         rv = x25519_import_pkcs8(data, (unsigned long)data_len, pwd, (unsigned long)pwd_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: x25519_import_pkcs8 failed: %s", error_to_string(rv));
         self->initialized = 1;
@@ -81,7 +80,7 @@ _import_x509(Crypt::PK::X25519 self, SV * key_data)
         STRLEN data_len=0;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        self->key.type = -1;
+        self->initialized = 0;
         rv = x25519_import_x509(data, (unsigned long)data_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: x25519_import_x509 failed: %s", error_to_string(rv));
         self->initialized = 1;
@@ -116,7 +115,7 @@ _import_raw(Crypt::PK::X25519 self, SV * key, int which)
 int
 is_private(Crypt::PK::X25519 self)
     CODE:
-        if (self->initialized == 0 || self->key.type == -1) XSRETURN_UNDEF;
+        if (self->initialized == 0) XSRETURN_UNDEF;
         RETVAL = (self->key.type == PK_PRIVATE) ? 1 : 0;
     OUTPUT:
         RETVAL
