@@ -8,11 +8,78 @@ use Test::More;
 
 plan skip_all => "No JSON::* module installed" unless eval { require JSON::PP } || eval { require JSON::XS } || eval { require Cpanel::JSON::XS };
 #plan skip_all => "Temporarily disabled";
-plan tests => 14141;
+plan tests => 14339;
 
 use CryptX;
 use Crypt::Misc 'read_rawfile';
 use Crypt::Digest 'digest_data';
+
+if (1) {
+  use Crypt::PK::Ed25519;
+  my $json = 't/wycheproof/eddsa_test.json';
+  my $tests = CryptX::_decode_json read_rawfile $json;
+  for my $g (@{$tests->{testGroups}}) {
+    my $type   = $g->{type}; # EDDSAVer
+    my $keyDer = pack "H*", $g->{keyDer};
+    my $keyPem = $g->{keyPem};
+    my $pk     = pack "H*", $g->{key}{pk};
+    my $sk     = pack "H*", $g->{key}{sk};
+    for my $t (@{$g->{tests}}) {
+      my $tcId     = $t->{tcId};
+      my $comment  = $t->{comment};
+      my $result   = $t->{result};
+      my $message  = pack "H*", $t->{msg};
+      my $sig      = pack "H*", $t->{sig};
+      my $testname = "($json) type=$type tcId=$tcId comment='$comment' expected-result=$result";
+      my $pk = Crypt::PK::Ed25519->new( \$keyPem );
+      my $valid = $pk->verify_message($sig, $message);
+      if ($result eq 'valid') {
+        ok($valid, "$testname valid=$valid");
+      }
+      elsif ($result eq 'acceptable') {
+        ok($valid, "$testname valid=$valid"); # consider: acceptable == valid
+      }
+      elsif ($result eq 'invalid') {
+        SKIP: {
+          skip "ltc bug ed25519", 1 if $tcId =~ /^(63|64|65|66)$/; #XXX-FIXME
+          ok(!$valid, "$testname valid=$valid");
+        }
+      }
+      else {
+        ok(0, "UNEXPECTED result=$result");
+      }
+    }
+  }
+}
+
+if (1) {
+  use Crypt::PK::X25519;
+  my $json = 't/wycheproof/x25519_test.json';
+  my $tests = CryptX::_decode_json read_rawfile $json;
+  for my $g (@{$tests->{testGroups}}) {
+    my $curve = $g->{curve};
+    next if $curve ne 'curve25519';
+    for my $t (@{$g->{tests}}) {
+      my $pk      = pack "H*", $t->{public};
+      my $sk      = pack "H*", $t->{private};
+      my $sh      = pack "H*", $t->{shared};
+      my $result  = $t->{result};
+      my $comment = $t->{comment};
+      my $s = Crypt::PK::X25519->new->import_key_raw($sk, 'private');
+      my $p = Crypt::PK::X25519->new->import_key_raw($pk, 'public');
+      my $shared = $s->shared_secret($p);
+      if ($result eq 'valid') {
+        is(unpack("H*", $shared), $t->{shared}, "result=$result comment=$comment");
+      }
+      elsif ($result eq 'acceptable') {
+        is(unpack("H*", $shared), $t->{shared}, "result=$result comment=$comment");
+      }
+      else {
+        isnt(unpack("H*", $shared), $t->{shared}, "result=$result comment=$comment");
+      }
+    }
+  }
+}
 
 if (1) {
   use Crypt::AuthEnc::ChaCha20Poly1305 qw(chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify);
