@@ -307,6 +307,22 @@ Import raw public/private key - can load raw key data exported by L</export_key_
  #or
  my $public_pem = $pk->export_key_pem('public');
 
+Support for password protected PEM keys
+
+ my $private_pem = $pk->export_key_pem('private', $password);
+ #or
+ my $private_pem = $pk->export_key_pem('private', $password, $cipher);
+
+ # supported ciphers: 'DES-CBC'
+ #                    'DES-EDE3-CBC'
+ #                    'SEED-CBC'
+ #                    'CAMELLIA-128-CBC'
+ #                    'CAMELLIA-192-CBC'
+ #                    'CAMELLIA-256-CBC'
+ #                    'AES-128-CBC'
+ #                    'AES-192-CBC'
+ #                    'AES-256-CBC' (DEFAULT)
+
 =head2 export_key_jwk
 
 Exports public/private keys as a JSON Web Key (JWK).
