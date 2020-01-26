@@ -50,7 +50,7 @@ Available modules:
 
 - Public key cryptography
 
-    [Crypt::PK::RSA](https://metacpan.org/pod/Crypt::PK::RSA), [Crypt::PK::DSA](https://metacpan.org/pod/Crypt::PK::DSA), [Crypt::PK::ECC](https://metacpan.org/pod/Crypt::PK::ECC), [Crypt::PK::DH](https://metacpan.org/pod/Crypt::PK::DH)
+    [Crypt::PK::RSA](https://metacpan.org/pod/Crypt::PK::RSA), [Crypt::PK::DSA](https://metacpan.org/pod/Crypt::PK::DSA), [Crypt::PK::ECC](https://metacpan.org/pod/Crypt::PK::ECC), [Crypt::PK::DH](https://metacpan.org/pod/Crypt::PK::DH), [Crypt::PK::Ed25519](https://metacpan.org/pod/Crypt::PK::Ed25519), [Crypt::PK::X25519](https://metacpan.org/pod/Crypt::PK::X25519)
 
 - Cryptographically secure random number generators - see [Crypt::PRNG](https://metacpan.org/pod/Crypt::PRNG) and related modules
 
