@@ -29,7 +29,7 @@ generate_key(Crypt::PK::Ed25519 self)
     PPCODE:
     {
         int rv;
-        /* gen the key */
+        self->initialized = 0;
         rv = ed25519_make_key(&self->pstate, self->pindex, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ed25519_make_key failed: %s", error_to_string(rv));
         self->initialized = 1;
@@ -98,6 +98,7 @@ _import_raw(Crypt::PK::Ed25519 self, SV * key, int which)
         if (SvOK(key)) {
           key_data = (unsigned char *)SvPVbyte(key, key_len);
         }
+        self->initialized = 0;
         if (which == 0) {
           rv = ed25519_import_raw(key_data, (unsigned long)key_len, PK_PUBLIC, &self->key);
         }
@@ -139,7 +140,7 @@ key2hash(Crypt::PK::Ed25519 self)
           not_used = hv_store(rv_hash, "priv", 4, newSVpv(buf, blen), 0);
         }
         else {
-          not_used = hv_store(rv_hash, "priv", 4, &PL_sv_undef, 0);
+          not_used = hv_store(rv_hash, "priv", 4, newSVpvn(NULL, 0), 0); /* undef */
         }
         /* pub */
         blen = sizeof(buf);
