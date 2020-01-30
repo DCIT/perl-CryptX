@@ -4,7 +4,7 @@ use strict;
 use warnings;
 our $VERSION = '0.066_002';
 
-require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
+require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_message rsa_sign_hash rsa_verify_hash)] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();

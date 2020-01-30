@@ -4,7 +4,7 @@ use strict;
 use warnings;
 our $VERSION = '0.066_002';
 
-require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
+require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 our $VERSION = '0.066_002';
 
-require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
+require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw/ adler32_data adler32_data_hex adler32_data_int adler32_file adler32_file_hex adler32_file_int
                                  crc32_data crc32_data_hex crc32_data_int crc32_file crc32_file_hex crc32_file_int /] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
