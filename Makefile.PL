@@ -66,7 +66,7 @@ my %eumm_args = (
   NAME             => 'CryptX',
   VERSION_FROM     => 'lib/CryptX.pm',
   AUTHOR           => 'Karel Miko',
-  ABSTRACT         => 'Crypto toolkit',
+  ABSTRACT         => 'Cryptographic toolkit',
   MIN_PERL_VERSION => '5.006',
   LICENSE          => 'perl_5',
   META_MERGE       => { resources  => { repository => 'https://github.com/DCIT/perl-CryptX', bugtracker => 'https://github.com/DCIT/perl-CryptX/issues' } },

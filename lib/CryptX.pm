@@ -58,13 +58,11 @@ sub _encode_json {
 
 =head1 NAME
 
-CryptX - Cryptographic toolkit (self-contained, no external libraries needed)
+CryptX - Cryptographic toolkit
 
 =head1 DESCRIPTION
 
-Cryptography in CryptX is based on L<https://github.com/libtom/libtomcrypt>
-
-Available modules:
+Perl modules providing a cryptography based on L<LibTomCrypt|https://github.com/libtom/libtomcrypt> library.
 
 =over
 
@@ -132,6 +130,6 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013+ DCIT, a.s. L<https://www.dcit.cz> / Karel Miko
+Copyright (c) 2013-2020 DCIT, a.s. L<https://www.dcit.cz> / Karel Miko
 
 =cut
