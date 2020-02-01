@@ -30,3 +30,4 @@ build_script:
 
 test_script:
   - '%make% test TEST_VERBOSE=1'
+
