@@ -70,7 +70,7 @@ my %eumm_args = (
   MIN_PERL_VERSION => '5.006',
   LICENSE          => 'perl_5',
   META_MERGE       => { resources  => { repository => 'https://github.com/DCIT/perl-CryptX', bugtracker => 'https://github.com/DCIT/perl-CryptX/issues' } },
-  dist             => { 'PREOP' => 'perldoc -u lib/CryptX.pm | pod2markdown > README.md' },
+  dist             => { PREOP => 'perldoc -u lib/CryptX.pm | pod2markdown > README.md', TAR => 'ptar', TARFLAGS => '-c -C -f' },
   @EUMM_INC_LIB
 );
 

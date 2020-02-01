@@ -38,6 +38,7 @@ tmp.*
 ^poznamky*
 \.stackdump$
 ^.travis*
+^.appveyor*
 t/openssl/.*$
 ^src/liballinone*
 ^src/update-libtom.pl$
