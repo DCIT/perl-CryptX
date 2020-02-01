@@ -1,19 +1,32 @@
 language: perl
-dist: trusty
 matrix:
   include:
   - perl: "5.30"
+    dist: bionic
   - perl: "5.28"
+    dist: xenial
   - perl: "5.26"
+    dist: trusty
   - perl: "5.24"
+    dist: trusty
   - perl: "5.22"
+    dist: trusty
   - perl: "5.20"
+    dist: trusty
   - perl: "5.18"
+    dist: trusty
   - perl: "5.16"
+    dist: trusty
   - perl: "5.14"
+    dist: trusty
   - perl: "5.12"
+    dist: trusty
   - perl: "5.10"
+    dist: trusty
   - perl: "5.8"
+    dist: trusty
+  - perl: "5.6"
+    dist: precise
 env:
   global:
     - MAKEFLAGS=-j4
