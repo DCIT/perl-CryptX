@@ -1,13 +1,6 @@
 language: perl
 matrix:
   include:
-  - perl: "5.8"
-  - perl: "5.10"
-  - perl: "5.12"
-  - perl: "5.14"
-  - perl: "5.16"
-  - perl: "5.18"
-  - perl: "5.20"
   - perl: "5.22"
   - perl: "5.24"
   - perl: "5.26"
@@ -21,6 +14,6 @@ env:
     - MAKEFLAGS=-j4
     - AUTHOR_MODE=1
 install:
-  - cpanm -n Cpanel::JSON::XS
+  - cpanm -n Cpanel::JSON::XS Math::BigInt Test::Pod Pod::Coverage
   - cpanm -n --installdeps .
 sudo: false
