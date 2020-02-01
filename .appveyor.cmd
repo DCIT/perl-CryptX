@@ -3,11 +3,6 @@ call :%*
 goto :eof
 
 :perl_setup
-echo perl_type=%perl_type%
-echo perl_version=%perl_version%
-echo perl_bits=%perl_bits%
-dir c:\cygwin\
-dir c:\
 
 if "%perl_type%" == "cygwin" (
   start /wait c:\cygwin\setup-x86.exe -q -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel
@@ -29,7 +24,7 @@ if "%perl_type%" == "cygwin" (
 for /f "usebackq delims=" %%d in (`perl -MConfig -e"print $Config{make}"`) do set make=%%d
 
 if "%make%" == "gmake" (
-  make=gmake -j4
+  set make=gmake -j4
 )
 
 :eof
