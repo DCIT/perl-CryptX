@@ -1,5 +1,6 @@
 version: '{build}'
 shallow_clone: true
+build: off
 
 environment:
   matrix:
