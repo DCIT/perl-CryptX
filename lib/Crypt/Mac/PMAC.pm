@@ -4,7 +4,7 @@ package Crypt::Mac::PMAC;
 
 use strict;
 use warnings;
-our $VERSION = '0.066_002';
+our $VERSION = '0.067';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( pmac pmac_hex pmac_b64 pmac_b64u )] );
