@@ -28,7 +28,7 @@ environment:
 init:
   - reg add "HKLM\SYSTEM\CurrentControlSet\Control\Windows" /f /v ErrorMode /d 2
   - reg add "HKLM\Software\Microsoft\Windows\Windows Error Reporting" /f /v DontShowUI /d 1  
-  - cinst -y wget unzip
+  - cinst -y wget
 
 install:
   - 'call .appveyor.cmd perl_setup'
