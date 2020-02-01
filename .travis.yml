@@ -2,13 +2,13 @@ language: perl
 matrix:
   include:
   - perl: "5.30"
-    dist: bionic
+    dist: xenial
   - perl: "5.28"
-    dist: bionic
+    dist: xenial
   - perl: "5.26"
-    dist: xenial
+    dist: trusty
   - perl: "5.24"
-    dist: xenial
+    dist: trusty
   - perl: "5.22"
     dist: trusty
   - perl: "5.20"
@@ -25,11 +25,13 @@ matrix:
     dist: trusty
   - perl: "5.8"
     dist: precise
+  - perl: "5.14"
+    dist: precise
 env:
   global:
     - MAKEFLAGS=-j4
     - AUTHOR_MODE=1
 install:
-  - cpanm -n Cpanel::JSON::XS Math::BigInt Test::Pod Pod::Coverage
-  - cpanm -n --installdeps .
+  - cpanm --notest Cpanel::JSON::XS Math::BigInt Test::Pod Pod::Coverage
+  - cpanm --notest --installdeps .
 sudo: false
