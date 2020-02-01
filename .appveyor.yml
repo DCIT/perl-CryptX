@@ -4,7 +4,7 @@ build: off
 
 environment:
   matrix:
-    - perl_type: cygwin
+    - perl_type: cygwin32
     - perl_type: cygwin64
     - perl_type: strawberry
       perl_version: 5.30.1.1

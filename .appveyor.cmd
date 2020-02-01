@@ -2,14 +2,17 @@
 call :%*
 goto :eof
 
+rem cygwin setup.exe params
+rem -q --quiet-mode     Unattended setup mode
+rem -g --upgrade-also   also upgrade installed packages
+
 :perl_setup
 cinst -y wget
-if "%perl_type%" == "cygwin" (
+
+if "%perl_type%" == "cygwin32" (
   start /wait c:\cygwin\setup-x86.exe -q -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel
   set "PATH=C:\cygwin\usr\local\bin;C:\cygwin\bin;%PATH%"
 ) else if "%perl_type%" == "cygwin64" (
-  rem -q --quiet-mode     Unattended setup mode
-  rem -g --upgrade-also   also upgrade installed packages
   start /wait c:\cygwin\setup-x64.exe -q -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel
   set "PATH=C:\cygwin64\usr\local\bin;C:\cygwin64\bin;%PATH%"
 ) else if "%perl_type%" == "strawberry" (
@@ -30,7 +33,11 @@ set cpanm=perl downloaded-cpanm
 
 for /f "usebackq delims=" %%d in (`perl -MConfig -e"print $Config{make}"`) do set make=%%d
 
-if "%make%" == "gmake" (
+if "%perl_type%" == "cygwin32" (
+  set make=make -j4
+) else if "%perl_type%" == "cygwin64" (
+  set make=make -j4
+) else if "%make%" == "gmake" (
   set make=gmake -j4
 )
 
