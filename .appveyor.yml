@@ -5,6 +5,7 @@ build: off
 environment:
   matrix:
     - perl_type: strawberry
+      perl_bits: 32
       perl_version: 5.30.1.1
 #    - perl_type: strawberry
 #      perl_version: 5.28.2.1
@@ -24,24 +25,18 @@ environment:
 #      perl_version: 5.14.4.1
 #    - perl_type: cygwin
 
-
-platform:
-  - x64
-#  - x86
-
 init:
   - reg add "HKLM\SYSTEM\CurrentControlSet\Control\Windows" /f /v ErrorMode /d 2
   - reg add "HKLM\Software\Microsoft\Windows\Windows Error Reporting" /f /v DontShowUI /d 1  
-  - cinst -y wget
-  - cinst -y unzip
+  - cinst -y wget unzip
 
 install:
   - 'call .appveyor.cmd perl_setup'
-  - '%perl% -V'
-  - '%cpanm% --installdeps --notest --with-develop --with-recommends .'
+  - 'perl -V'
+  - 'cpanm --installdeps --notest --with-develop --with-recommends .'
 
 build_script:
-  - '%perl% Makefile.PL'
+  - 'perl Makefile.PL'
   - '%make%'
 
 test_script:
