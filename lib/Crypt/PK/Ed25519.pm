@@ -150,9 +150,54 @@ Crypt::PK::Ed25519 - Digital signature based on Ed25519
 
 =head1 SYNOPSIS
 
+ use Crypt::PK::Ed25519;
+
+ #Signature: Alice
+ my $priv = Crypt::PK::Ed25519->new('Alice_priv_ed25519.der');
+ my $sig = $priv->sign_message($message);
+
+ #Signature: Bob (received $message + $sig)
+ my $pub = Crypt::PK::Ed25519->new('Alice_pub_ed25519.der');
+ $pub->verify_message($sig, $message) or die "ERROR";
+
+ #Load key
+ my $pk = Crypt::PK::Ed25519->new;
+ my $pk_hex = "A05D1AEA5830AC9A65CDFB384660D497E3697C46B419CF2CEC85DE8BD245459D";
+ $pk->import_key_raw(pack("H*", $pk_hex), "public");
+ my $sk = Crypt::PK::Ed25519->new;
+ my $sk_hex = "45C109BA6FD24E8B67D23EFB6B92D99CD457E2137172C0D749FE2B5A0C142DAD";
+ $sk->import_key_raw(pack("H*", $sk_hex), "private");
+
+ #Key generation
+ my $pk = Crypt::PK::Ed25519->new->generate_key;
+ my $private_der = $pk->export_key_der('private');
+ my $public_der  = $pk->export_key_der('public');
+ my $private_pem = $pk->export_key_pem('private');
+ my $public_pem  = $pk->export_key_pem('public');
+ my $private_raw = $pk->export_key_raw('private');
+ my $public_raw  = $pk->export_key_raw('public');
+ my $private_jwk = $pk->export_key_jwk('private');
+ my $public_jwk  = $pk->export_key_jwk('public');
+
+=head1 DESCRIPTION
+
+I<Since: CryptX-0.067>
+
 =head1 METHODS
 
 =head2 new
+
+ my $pk = Crypt::PK::Ed25519->new();
+ #or
+ my $pk = Crypt::PK::Ed25519->new($priv_or_pub_key_filename);
+ #or
+ my $pk = Crypt::PK::Ed25519->new(\$buffer_containing_priv_or_pub_key);
+
+Support for password protected PEM keys
+
+ my $pk = Crypt::PK::Ed25519->new($priv_pem_key_filename, $password);
+ #or
+ my $pk = Crypt::PK::Ed25519->new(\$buffer_containing_priv_pem_key, $password);
 
 =head2 generate_key
 

@@ -130,9 +130,51 @@ Crypt::PK::X25519 - Asymmetric cryptography based on X25519
 
 =head1 SYNOPSIS
 
+ use Crypt::PK::X25519;
+
+ #Shared secret
+ my $priv = Crypt::PK::X25519->new('Alice_priv_x25519.der');
+ my $pub = Crypt::PK::X25519->new('Bob_pub_x25519.der');
+ my $shared_secret = $priv->shared_secret($pub);
+
+ #Load key
+ my $pk = Crypt::PK::X25519->new;
+ my $pk_hex = "EA7806F721A8570512C8F6EFB4E8D620C49A529E4DF5EAA77DEC646FB1E87E41";
+ $pk->import_key_raw(pack("H*", $pk_hex), "public");
+ my $sk = Crypt::PK::X25519->new;
+ my $sk_hex = "002F93D10BA5728D8DD8E9527721DABA3261C0BB1BEFDE7B4BBDAC631D454651";
+ $sk->import_key_raw(pack("H*", $sk_hex), "private");
+
+ #Key generation
+ my $pk = Crypt::PK::X25519->new->generate_key;
+ my $private_der = $pk->export_key_der('private');
+ my $public_der  = $pk->export_key_der('public');
+ my $private_pem = $pk->export_key_pem('private');
+ my $public_pem  = $pk->export_key_pem('public');
+ my $private_raw = $pk->export_key_raw('private');
+ my $public_raw  = $pk->export_key_raw('public');
+ my $private_jwk = $pk->export_key_jwk('private');
+ my $public_jwk  = $pk->export_key_jwk('public');
+
+=head1 DESCRIPTION
+
+I<Since: CryptX-0.067>
+
 =head1 METHODS
 
 =head2 new
+
+ my $pk = Crypt::PK::X25519->new();
+ #or
+ my $pk = Crypt::PK::X25519->new($priv_or_pub_key_filename);
+ #or
+ my $pk = Crypt::PK::X25519->new(\$buffer_containing_priv_or_pub_key);
+
+Support for password protected PEM keys
+
+ my $pk = Crypt::PK::X25519->new($priv_pem_key_filename, $password);
+ #or
+ my $pk = Crypt::PK::X25519->new(\$buffer_containing_priv_pem_key, $password);
 
 =head2 generate_key
 
