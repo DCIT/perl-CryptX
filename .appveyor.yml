@@ -9,6 +9,8 @@ image:
 
 environment:
   matrix:
+    - perl_type: strawberry_old
+      perl_version: 5.10.1.2    #gcc 3.4.5
     - perl_type: cygwin64
     - perl_type: cygwin32
     - perl_type: strawberry
@@ -67,8 +69,6 @@ environment:
       perl_bits: 64
 #    - perl_type: strawberry_old
 #      perl_version: 5.12.3.0    #gcc 4.4.3
-    - perl_type: strawberry_old
-      perl_version: 5.10.1.2    #gcc 3.4.5
 
 init:
   - reg add "HKLM\SYSTEM\CurrentControlSet\Control\Windows" /f /v ErrorMode /d 2
@@ -80,7 +80,7 @@ install:
   - set MAKEFLAGS=-j4
   - set AUTHOR_MODE=0
   - '%perl% -V'
-  - '%cpanm% --notest Cpanel::JSON::XS Math::BigInt Test::Pod Pod::Coverage'
+  - '%cpanm% --notest -v Cpanel::JSON::XS Math::BigInt Test::Pod Pod::Coverage'
   - '%cpanm% --notest --installdeps --with-recommends .'
 
 build_script:
