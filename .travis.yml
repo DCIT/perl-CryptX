@@ -6,9 +6,9 @@ matrix:
   - perl: "5.28"
     dist: xenial
   - perl: "5.26"
-    dist: trusty
+    dist: xenial
   - perl: "5.24"
-    dist: trusty
+    dist: xenial
   - perl: "5.22"
     dist: trusty
   - perl: "5.20"
@@ -23,10 +23,8 @@ matrix:
     dist: trusty
   - perl: "5.10"
     dist: trusty
-#  - perl: "5.8"
-#    dist: precise
-  - perl: "5.6.2"
-    dist: precise
+  - perl: "5.8"
+    dist: trusty
 env:
   global:
     - MAKEFLAGS=-j4
