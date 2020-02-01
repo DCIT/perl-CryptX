@@ -73,7 +73,7 @@ install:
   - 'call .appveyor.cmd perl_setup'
   - 'perl -V'
   - 'gcc -v'
-  - 'cpanm --notest Cpanel::JSON::XS Math::BigInt Test::Pod Pod::Coverage
+  - 'cpanm --notest Cpanel::JSON::XS Math::BigInt Test::Pod Pod::Coverage'
   - 'cpanm --notest --installdeps --with-recommends .'
 
 build_script:
