@@ -1,0 +1,32 @@
+version: '{build}'
+shallow_clone: true
+
+environment:
+  matrix:
+    - perl_type: strawberry
+      perl_version: 5.12.3.1
+    - perl_type: strawberry
+      perl_version: 5.16.3.3
+    - perl_type: strawberry
+      perl_version: 5.20.1.1
+    - perl_type: cygwin
+
+platform:
+  - x64
+  - x86
+
+init:
+  - reg add "HKLM\SYSTEM\CurrentControlSet\Control\Windows" /f /v ErrorMode /d 2
+  - reg add "HKLM\Software\Microsoft\Windows\Windows Error Reporting" /f /v DontShowUI /d 1  
+
+install:
+  - 'call .appveyor.cmd perl_setup'
+  - '%perl% -V'
+  - '%cpanm% --installdeps -n --with-develop --with-recommends .'
+
+build_script:
+  - '%perl% Makefile.PL'
+  - '%make%'
+
+test_script:
+  - '%make% test TEST_VERBOSE=1'
