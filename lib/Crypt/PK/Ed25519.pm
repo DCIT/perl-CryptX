@@ -2,7 +2,7 @@ package Crypt::PK::Ed25519;
 
 use strict;
 use warnings;
-our $VERSION = '0.067';
+our $VERSION = '0.067_001';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( )] );
