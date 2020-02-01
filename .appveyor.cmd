@@ -7,13 +7,12 @@ rem -q --quiet-mode     Unattended setup mode
 rem -g --upgrade-also   also upgrade installed packages
 
 :perl_setup
-cinst -y wget
 
 if "%perl_type%" == "cygwin32" (
-  start /wait c:\cygwin\setup-x86.exe -q -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel
+  start /wait c:\cygwin\setup-x86.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel
   set "PATH=C:\cygwin\usr\local\bin;C:\cygwin\bin;%PATH%"
 ) else if "%perl_type%" == "cygwin64" (
-  start /wait c:\cygwin\setup-x64.exe -q -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel
+  start /wait c:\cygwin\setup-x64.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel
   set "PATH=C:\cygwin64\usr\local\bin;C:\cygwin64\bin;%PATH%"
 ) else if "%perl_type%" == "strawberry" (
   wget -q http://strawberryperl.com/download/%perl_version%/strawberry-perl-%perl_version%-%perl_bits%bit-portable.zip -O downloaded-strawberry.zip
@@ -30,9 +29,8 @@ if "%perl_type%" == "cygwin32" (
 
 wget -q --no-check-certificate https://cpanmin.us/ -O downloaded-cpanm
 set cpanm=perl downloaded-cpanm
+set perl=perl
 
 for /f "usebackq delims=" %%d in (`perl -MConfig -e"print $Config{make}"`) do set make=%%d
-
-set MAKEFLAGS=-j4
 
 :eof
