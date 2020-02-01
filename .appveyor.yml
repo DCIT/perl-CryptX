@@ -5,7 +5,7 @@ shallow_clone: true
 build: off
 
 image:
-  - Visual Studio 2015
+  - Visual Studio 2019
 
 environment:
   matrix:
