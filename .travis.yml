@@ -31,5 +31,5 @@ env:
     - AUTHOR_MODE=1
 install:
   - cpanm --notest Cpanel::JSON::XS Math::BigInt Test::Pod Pod::Coverage
-  - cpanm --notest --installdeps .
+  - cpanm --notest --installdeps --with-recommends .
 sudo: false
