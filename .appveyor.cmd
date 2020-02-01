@@ -33,12 +33,6 @@ set cpanm=perl downloaded-cpanm
 
 for /f "usebackq delims=" %%d in (`perl -MConfig -e"print $Config{make}"`) do set make=%%d
 
-if "%perl_type%" == "cygwin32" (
-  set make=make -j4
-) else if "%perl_type%" == "cygwin64" (
-  set make=make -j4
-) else if "%make%" == "gmake" (
-  set make=gmake -j4
-)
+set MAKEFLAGS=-j4
 
 :eof
