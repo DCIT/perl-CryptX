@@ -69,16 +69,21 @@ my %eumm_args = (
   ABSTRACT         => 'Cryptographic toolkit',
   MIN_PERL_VERSION => '5.006',
   LICENSE          => 'perl_5',
+  PREREQ_PM        => { },
+  TEST_REQUIRES    => { 'Test::More' => 0 },
   META_MERGE       => { resources  => { repository => 'https://github.com/DCIT/perl-CryptX', bugtracker => 'https://github.com/DCIT/perl-CryptX/issues' } },
   dist             => { PREOP => 'perldoc -u lib/CryptX.pm | pod2markdown > README.md', TAR => 'ptar', TARFLAGS => '-c -C -f' },
   @EUMM_INC_LIB
 );
 
 my $eumm_ver = eval $ExtUtils::MakeMaker::VERSION;
-delete $eumm_args{MIN_PERL_VERSION} if $eumm_ver < 6.48;
-delete $eumm_args{META_ADD}         if $eumm_ver < 6.46;
-delete $eumm_args{META_MERGE}       if $eumm_ver < 6.46;
-delete $eumm_args{LICENSE}          if $eumm_ver < 6.31;
+delete $eumm_args{MIN_PERL_VERSION}   if $eumm_ver < 6.48;
+delete $eumm_args{META_ADD}           if $eumm_ver < 6.46;
+delete $eumm_args{META_MERGE}         if $eumm_ver < 6.46;
+delete $eumm_args{LICENSE}            if $eumm_ver < 6.31;
+delete $eumm_args{CONFIGURE_REQUIRES} if $eumm_ver < 6.52;
+delete $eumm_args{BUILD_REQUIRES}     if $eumm_ver < 6.56;
+delete $eumm_args{TEST_REQUIRES}      if $eumm_ver < 6.64;
 
 WriteMakefile(%eumm_args);
 
