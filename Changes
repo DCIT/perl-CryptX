@@ -1,5 +1,8 @@
 Changes for CryptX
 
+0.068   2020-NEXT
+        - fix #60 Test failues on macOS Catalina
+
 0.067   2020-02-01
         - new: Crypt::PK::Ed25519
         - new: Crypt::PK::X25519
