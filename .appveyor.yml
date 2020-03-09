@@ -80,8 +80,8 @@ install:
   - set MAKEFLAGS=-j4
   - set AUTHOR_MODE=0
   - '%perl% -V'
-  - '%cpanm% --notest Cpanel::JSON::XS Math::BigInt Test::Pod Pod::Coverage'
-  - '%cpanm% --notest --installdeps --with-recommends .'
+  - '%cpanm% --verbose --notest Cpanel::JSON::XS Math::BigInt Test::Pod Pod::Coverage'
+  - '%cpanm% --verbose --notest --installdeps --with-recommends .'
 
 build_script:
   - '%perl% Makefile.PL'
