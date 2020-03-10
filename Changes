@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.068   2020-NEXT
+0.068   2020-03-10
         - fix #60 Test failues on macOS Catalina
 
 0.067   2020-02-01
