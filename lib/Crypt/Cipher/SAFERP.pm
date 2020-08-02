@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('SAFERP') }
 
 =head1 NAME
 
-Crypt::Cipher::SAFERP - Symmetric cipher SAFER+, key size: 128/192/256 bits (Crypt::CBC compliant)
+Crypt::Cipher::SAFERP - Symmetric cipher SAFER+, key size: 128/192/256 bits
 
 =head1 SYNOPSIS
 

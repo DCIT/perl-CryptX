@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('Noekeon') }
 
 =head1 NAME
 
-Crypt::Cipher::Noekeon - Symmetric cipher Noekeon, key size: 128 bits (Crypt::CBC compliant)
+Crypt::Cipher::Noekeon - Symmetric cipher Noekeon, key size: 128 bits
 
 =head1 SYNOPSIS
 

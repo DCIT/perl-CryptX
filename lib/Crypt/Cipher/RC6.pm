@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('RC6') }
 
 =head1 NAME
 
-Crypt::Cipher::RC6 - Symmetric cipher RC6, key size: 64-1024 bits (Crypt::CBC compliant)
+Crypt::Cipher::RC6 - Symmetric cipher RC6, key size: 64-1024 bits
 
 =head1 SYNOPSIS
 

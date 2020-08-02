@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('CAST5') }
 
 =head1 NAME
 
-Crypt::Cipher::CAST5 - Symmetric cipher CAST5 (aka CAST-128), key size: 40-128 bits (Crypt::CBC compliant)
+Crypt::Cipher::CAST5 - Symmetric cipher CAST5 (aka CAST-128), key size: 40-128 bits
 
 =head1 SYNOPSIS
 

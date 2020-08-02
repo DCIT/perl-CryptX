@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('MULTI2') }
 
 =head1 NAME
 
-Crypt::Cipher::MULTI2 - Symmetric cipher MULTI2, key size: 320 bits (Crypt::CBC compliant)
+Crypt::Cipher::MULTI2 - Symmetric cipher MULTI2, key size: 320 bits
 
 =head1 SYNOPSIS
 

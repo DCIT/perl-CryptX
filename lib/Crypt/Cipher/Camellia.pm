@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('Camellia') }
 
 =head1 NAME
 
-Crypt::Cipher::Camellia - Symmetric cipher Camellia, key size: 128/192/256 bits (Crypt::CBC compliant)
+Crypt::Cipher::Camellia - Symmetric cipher Camellia, key size: 128/192/256 bits
 
 =head1 SYNOPSIS
 

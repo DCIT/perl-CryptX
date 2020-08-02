@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('Anubis') }
 
 =head1 NAME
 
-Crypt::Cipher::Anubis - Symmetric cipher Anubis, key size: 128-320 bits (Crypt::CBC compliant)
+Crypt::Cipher::Anubis - Symmetric cipher Anubis, key size: 128-320 bits
 
 =head1 SYNOPSIS
 

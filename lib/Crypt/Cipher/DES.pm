@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('DES') }
 
 =head1 NAME
 
-Crypt::Cipher::DES - Symmetric cipher DES, key size: 64[56] bits (Crypt::CBC compliant)
+Crypt::Cipher::DES - Symmetric cipher DES, key size: 64[56] bits
 
 =head1 SYNOPSIS
 
