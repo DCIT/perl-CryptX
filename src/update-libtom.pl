@@ -30,7 +30,7 @@ my $tmpdir = "/tmp/libtom.git.checkout.$$";
 warn "update libtomcrypt from github (branch: $ltc_branch)..\n";
 system 'rm', '-rf', bsd_glob("$FindBin::Bin/ltc/*");
 system "rm -rf $tmpdir; mkdir $tmpdir";
-system "git clone -b $ltc_branch https://github.com/libtom/libtomcrypt.git $tmpdir && cp -R $tmpdir/src/* $FindBin::Bin/ltc/ && echo ok";
+system "git clone -b $ltc_branch https://github.com/libtom/libtomcrypt.git $tmpdir && cp -R $tmpdir/LICENSE $tmpdir/src/* $FindBin::Bin/ltc/ && echo ok";
 system "(cd $tmpdir && git log  --pretty='%h %ai %s') | head -1";
 
 system "rm -rf $tmpdir";

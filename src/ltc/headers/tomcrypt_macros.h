@@ -1,11 +1,5 @@
-/* LibTomCrypt, modular cryptographic library -- Tom St Denis
- *
- * LibTomCrypt is a library that provides various cryptographic
- * algorithms in a highly modular and flexible manner.
- *
- * The library is free for all purposes without any express
- * guarantee it works.
- */
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis */
+/* SPDX-License-Identifier: Unlicense */
 
 /* ---- HELPER MACROS ---- */
 #ifdef ENDIAN_NEUTRAL
@@ -74,13 +68,13 @@ asm __volatile__ (               \
    "bswapl %0     \n\t"          \
    "movl   %0,(%1)\n\t"          \
    "bswapl %0     \n\t"          \
-      ::"r"(x), "r"(y));
+      ::"r"(x), "r"(y): "memory");
 
 #define LOAD32H(x, y)          \
 asm __volatile__ (             \
    "movl (%1),%0\n\t"          \
    "bswapl %0\n\t"             \
-   :"=r"(x): "r"(y));
+   :"=r"(x): "r"(y): "memory");
 
 #else
 
@@ -458,7 +452,3 @@ static inline ulong64 ROR64(ulong64 word, int i)
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
 #endif
-
-/* ref:         $Format:%D$ */
-/* git commit:  $Format:%H$ */
-/* commit time: $Format:%ai$ */
