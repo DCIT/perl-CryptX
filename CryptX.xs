@@ -319,7 +319,7 @@ int _ecc_set_curve_from_SV(ecc_key *key, SV *curve)
       sv_crv = curve;
     }
   }
-  else if (SvROK(curve)) {
+  else if (SvROK(curve) && SvTYPE(SvRV(curve)) == SVt_PVHV) {
     /* hashref */
     sv_crv = curve;
   }
