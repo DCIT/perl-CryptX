@@ -1,6 +1,7 @@
 Changes for CryptX
 
-0.069   2020-NEXT
+0.069   2020-08-25
+        - fix #64 ECC: segfault on invalid input
         - fix #63 ltc Licensing could be clearer (added src/{ltc,ltm}/LICENSE)
         - fix #62 documentation only (Crypt::CBC related)
         - bundled libtomcrypt update branch:develop (commit:d8d7a83b 2020-07-14)
