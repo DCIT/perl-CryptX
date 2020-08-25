@@ -4,7 +4,7 @@ package Crypt::Mac::OMAC;
 
 use strict;
 use warnings;
-our $VERSION = '0.068_001';
+our $VERSION = '0.069';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( omac omac_hex omac_b64 omac_b64u )] );

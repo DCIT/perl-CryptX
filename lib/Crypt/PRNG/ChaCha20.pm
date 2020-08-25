@@ -2,7 +2,7 @@ package Crypt::PRNG::ChaCha20;
 
 use strict;
 use warnings;
-our $VERSION = '0.068_001';
+our $VERSION = '0.069';
 
 use base qw(Crypt::PRNG Exporter);
 our %EXPORT_TAGS = ( all => [qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand)] );
