@@ -96,7 +96,7 @@ Encrypts $plaintext and returns the $ciphertext where $plaintext and $ciphertext
 
 Decrypts $ciphertext and returns the $plaintext where $plaintext and $ciphertext should be of B<blocksize> bytes.
 
- $plaintext = $d->encrypt($ciphertext);
+ $plaintext = $d->decrypt($ciphertext);
 
 =head2 keysize
 
