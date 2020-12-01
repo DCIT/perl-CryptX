@@ -1,5 +1,9 @@
 Changes for CryptX
 
+0.070   2020-12-XX
+        - fix #66 remove -flto=auto (Makefile.PL)
+        - fix #65 typo in docs (lib/Crypt/Cipher.pm)
+
 0.069   2020-08-25
         - fix #64 ECC: segfault on invalid input
         - fix #63 ltc Licensing could be clearer (added src/{ltc,ltm}/LICENSE)
