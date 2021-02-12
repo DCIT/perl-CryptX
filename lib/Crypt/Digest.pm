@@ -2,7 +2,7 @@ package Crypt::Digest;
 
 use strict;
 use warnings;
-our $VERSION = '0.070';
+our $VERSION = '0.070_001';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u )] );
