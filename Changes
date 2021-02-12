@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.070   2020-12-XX
+0.070   2021-02-12
         - fix #66 remove -flto=auto (Makefile.PL)
         - fix #65 typo in docs (lib/Crypt/Cipher.pm)
         - bundled libtomcrypt update branch:develop (commit:910d6252 2021-01-19)
