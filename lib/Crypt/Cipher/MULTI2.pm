@@ -4,7 +4,7 @@ package Crypt::Cipher::MULTI2;
 
 use strict;
 use warnings;
-our $VERSION = '0.069_001';
+our $VERSION = '0.070';
 
 use base qw(Crypt::Cipher);
 
