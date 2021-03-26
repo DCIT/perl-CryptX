@@ -219,16 +219,16 @@ sub import_key {
   croak "FATAL: invalid key data" unless $data;
 
   if ($data =~ /-----BEGIN (EC PRIVATE|EC PUBLIC|PUBLIC) KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password);
+    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
     my $rv = eval { $self->_import($data) } || eval { $self->_import_old($data) };
     return $rv if $rv;
   }
   elsif ($data =~ /-----BEGIN PRIVATE KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password);
+    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
     return $self->_import_pkcs8($data, $password);
   }
   elsif ($data =~ /-----BEGIN ENCRYPTED PRIVATE KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password);
+    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
     return $self->_import_pkcs8($data, $password);
   }
   elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
@@ -244,11 +244,11 @@ sub import_key {
     }
   }
   elsif ($data =~ /-----BEGIN CERTIFICATE-----(.*?)-----END CERTIFICATE-----/sg) {
-    $data = pem_to_der($data);
+    $data = pem_to_der($data) or croak "FATAL: PEM/cert decode failed";
     return $self->_import_x509($data);
   }
   elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
-    $data = pem_to_der($data);
+    $data = pem_to_der($data) or croak "FATAL: PEM/key decode failed";
     my ($typ, $skip, $pubkey) = Crypt::PK::_ssh_parse($data);
     return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
   }
