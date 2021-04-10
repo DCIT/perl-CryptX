@@ -2,6 +2,7 @@ Changes for CryptX
 
 0.072   2021-XX-XX
         - fix #69 Identifier Octet's Leniency in RSA PKCS#1 Signature Verification
+        - bundled libtomcrypt update branch:develop (commit:ddf1b63a 2021-04-10)
 
 0.071   2021-03-30
         - fix #67 (better handling of PEM decoding failures)
