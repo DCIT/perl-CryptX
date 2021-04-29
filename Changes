@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.072   2021-XX-XX
+0.072   2021-04-29
         - fix #69 Identifier Octet's Leniency in RSA PKCS#1 Signature Verification
         - bundled libtomcrypt update branch:develop (commit:165c795b 2021-04-14)
 
