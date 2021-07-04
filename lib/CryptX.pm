@@ -11,21 +11,7 @@ use Carp;
 my $has_json;
 
 BEGIN {
-  if (eval { require Cpanel::JSON::XS }) {
-    Cpanel::JSON::XS->import(qw(encode_json decode_json));
-    $has_json = 1;
-  }
-  elsif (eval { require JSON::XS }) {
-    JSON::XS->import(qw(encode_json decode_json));
-    $has_json = 2;
-  }
-  elsif (eval { require JSON::PP }) {
-    JSON::PP->import(qw(encode_json decode_json));
-    $has_json = 3;
-  }
-  else {
-    $has_json = 0;
-  }
+  $has_json = 1 if eval { require JSON; 1 };
 }
 
 sub _croak {
@@ -38,18 +24,13 @@ sub _croak {
 }
 
 sub _decode_json {
-  croak "FATAL: cannot find JSON::PP or JSON::XS or Cpanel::JSON::XS" if !$has_json;
-  decode_json(shift);
+  croak "FATAL: cannot find JSON module" if !$has_json;
+  return JSON->new->utf8->decode(shift);
 }
 
 sub _encode_json {
-  croak "FATAL: cannot find JSON::PP or JSON::XS or Cpanel::JSON::XS" if !$has_json;
-  my $data = shift;
-  my $rv = encode_json($data); # non-canonical fallback
-  return(eval { Cpanel::JSON::XS->new->canonical->encode($data) } || $rv) if $has_json == 1;
-  return(eval { JSON::XS->new->canonical->encode($data)         } || $rv) if $has_json == 2;
-  return(eval { JSON::PP->new->canonical->encode($data)         } || $rv) if $has_json == 3;
-  return($rv);
+  croak "FATAL: cannot find JSON module" if !$has_json;
+  return JSON->new->utf8->canonical->encode(shift);
 }
 
 1;
