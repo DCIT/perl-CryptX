@@ -17,7 +17,7 @@ BEGIN {
 }
 
 use Math::BigFloat only => 'LTM';
-use Math::BigInt;
+use Math::BigInt only => 'LTM';
 
 is (Math::BigInt->config()->{lib}, 'Math::BigInt::LTM', 'LTM loaded');
 

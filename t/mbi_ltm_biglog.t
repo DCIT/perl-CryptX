@@ -20,7 +20,7 @@ BEGIN {
 }
 
 use Math::BigFloat only => 'LTM';
-use Math::BigInt;
+use Math::BigInt only => 'LTM';
 
 my $cl = "Math::BigInt";
 
