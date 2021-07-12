@@ -25,25 +25,24 @@ else {
       glob('src/ltc/*/*/*/*.c'),
       glob('src/ltc/*/*/*/*/*.c'),
   );
-  $mycflags = "$Config{ccflags} $Config{cccdlflags} $Config{optimize}";
+  $mycflags = " $Config{ccflags} $Config{cccdlflags} $Config{optimize} "; # keep leading + trailing spaces
 
   #FIX: this is particularly useful for Debian https://github.com/DCIT/perl-CryptX/pull/39
-  $mycflags .= " $ENV{CFLAGS}"   if $ENV{CFLAGS};
-  $mycflags .= " $ENV{CPPFLAGS}" if $ENV{CPPFLAGS};
+  $mycflags .= " $ENV{CFLAGS} "   if $ENV{CFLAGS};
+  $mycflags .= " $ENV{CPPFLAGS} " if $ENV{CPPFLAGS};
 
   #### remove all lto hacks - https://github.com/DCIT/perl-CryptX/issues/70
   ## #FIX: gcc with -flto is a trouble maker see https://github.com/DCIT/perl-CryptX/issues/32
   ## #FIX: another issue with "-flto=auto" see https://github.com/DCIT/perl-CryptX/pull/66
-  ## $mycflags =~ s/-flto=[a-zA-Z0-9]+//g; # -flto=auto -flto=jobserver -flto=N ...
-  ## $mycflags =~ s/-flto\b//g;
+  ## $mycflags =~ s/\s-flto\S+\s/ /g; # -flto -flto=auto -flto=jobserver -flto=N ...
 
   #FIX: avoid -Wwrite-strings -Wcast-qual -pedantic -pedantic-errors -ansi -std=c89
-  $mycflags =~ s/-pedantic-errors\b//g;
-  $mycflags =~ s/-pedantic\b//g;
-  $mycflags =~ s/-std=c89\b//g;
-  $mycflags =~ s/-ansi\b//g;
-  $mycflags =~ s/-Wwrite-strings\b//g;
-  $mycflags =~ s/-Wcast-qual\b//g;
+  $mycflags =~ s/\s-pedantic-errors\s/ /g;
+  $mycflags =~ s/\s-pedantic\s/ /g;
+  $mycflags =~ s/\s-std=c89\s/ /g;
+  $mycflags =~ s/\s-ansi\s/ /g;
+  $mycflags =~ s/\s-Wwrite-strings\s/ /g;
+  $mycflags =~ s/\s-Wcast-qual\s/ /g;
 
   #FIX: avoid "ar: fatal: Numeric group ID too large" see https://github.com/DCIT/perl-CryptX/issues/33
   $myarflags = '$(AR_STATIC_ARGS)';
