@@ -1,5 +1,10 @@
 Changes for CryptX
 
+0.073   2021-XX-XX
+        fix #73 CPAN testers failure with Math::BigInt 1.99982
+        fix #70 remove lto related hacks from Makefile.PL
+        fix #72 drop optional prereqs JSON::XS + Cpanel::JSON::XS, use optionally only JSON
+
 0.072   2021-04-29
         - fix #69 Identifier Octet's Leniency in RSA PKCS#1 Signature Verification
         - bundled libtomcrypt update branch:develop (commit:165c795b 2021-04-14)
