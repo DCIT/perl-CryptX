@@ -2,7 +2,7 @@ package Crypt::Stream::Sober128;
 
 use strict;
 use warnings;
-our $VERSION = '0.072_001';
+our $VERSION = '0.072_002';
 
 use CryptX;
 
