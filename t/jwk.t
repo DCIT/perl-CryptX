@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan skip_all => "No JSON::* module installed" unless eval { require JSON::PP } || eval { require JSON::XS } || eval { require Cpanel::JSON::XS };
+plan skip_all => "JSON module not installed" unless eval { require JSON };
 plan tests => 97;
 
 use Crypt::PK::RSA;

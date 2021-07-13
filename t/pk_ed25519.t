@@ -1,6 +1,10 @@
 use strict;
 use warnings;
-use Test::More tests => 91;
+
+use Test::More;
+
+plan skip_all => "JSON module not installed" unless eval { require JSON };
+plan tests => 91;
 
 use Crypt::PK::Ed25519;
 use Crypt::Misc qw(read_rawfile);
