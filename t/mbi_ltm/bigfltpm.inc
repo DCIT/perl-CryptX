@@ -726,9 +726,9 @@ bnormNaN:NaN
 123:123
 -123.4567:-123.4567
 # invalid inputs
-1__2:NaN
-1E1__2:NaN
-11__2E2:NaN
+1__2:12
+1E1__2:1000000000000
+11__2E2:11200
 .2E-3.:NaN
 1e3e4:NaN
 # strange, but valid
