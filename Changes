@@ -1,5 +1,9 @@
 Changes for CryptX
 
+0.077   2021-10-XX
+        - fix #75 Missing methods _sadd + _ssub in Math::BigInt::LTM
+        - fix #76 Tests failing for numbers with multiple underscore characters (Math::BigInt::LTM)
+
 0.073   2021-07-18
         - fix #73 CPAN testers failure with Math::BigInt 1.99982
         - fix #70 remove lto related hacks from Makefile.PL
