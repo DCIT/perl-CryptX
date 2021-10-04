@@ -430,6 +430,56 @@ sub _nok {
     return $n;
 }
 
+### same as _sadd() in Math::BigInt::Lib
+# Signed addition. If the flag is false, $xa might be modified, but not $ya. If
+# the false is true, $ya might be modified, but not $xa.
+sub _sadd {
+    my $class = shift;
+    my ($xa, $xs, $ya, $ys, $flag) = @_;
+    my ($za, $zs);
+
+    # If the signs are equal we can add them (-5 + -3 => -(5 + 3) => -8)
+
+    if ($xs eq $ys) {
+        if ($flag) {
+            $za = $class -> _add($ya, $xa);
+        } else {
+            $za = $class -> _add($xa, $ya);
+        }
+        $zs = $class -> _is_zero($za) ? '+' : $xs;
+        return $za, $zs;
+    }
+
+    my $acmp = $class -> _acmp($xa, $ya);       # abs(x) = abs(y)
+
+    if ($acmp == 0) {                           # x = -y or -x = y
+        $za = $class -> _zero();
+        $zs = '+';
+        return $za, $zs;
+    }
+
+    if ($acmp > 0) {                            # abs(x) > abs(y)
+        $za = $class -> _sub($xa, $ya, $flag);
+        $zs = $xs;
+    } else {                                    # abs(x) < abs(y)
+        $za = $class -> _sub($ya, $xa, !$flag);
+        $zs = $ys;
+    }
+    return $za, $zs;
+}
+
+### same as _ssub() in Math::BigInt::Lib
+# Signed subtraction. If the flag is false, $xa might be modified, but not $ya.
+# If the false is true, $ya might be modified, but not $xa.
+sub _ssub {
+    my $class = shift;
+    my ($xa, $xs, $ya, $ys, $flag) = @_;
+
+    # Swap sign of second operand and let _sadd() do the job.
+    $ys = $ys eq '+' ? '-' : '+';
+    $class -> _sadd($xa, $xs, $ya, $ys, $flag);
+}
+
 ### same as _log_int() in Math::BigInt::Lib
 sub _log_int {
     # calculate integer log of $x to base $base
