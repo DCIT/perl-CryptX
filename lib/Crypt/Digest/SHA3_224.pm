@@ -4,7 +4,7 @@ package Crypt::Digest::SHA3_224;
 
 use strict;
 use warnings;
-our $VERSION = '0.073_001';
+our $VERSION = '0.073_002';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( sha3_224 sha3_224_hex sha3_224_b64 sha3_224_b64u sha3_224_file sha3_224_file_hex sha3_224_file_b64 sha3_224_file_b64u )] );
