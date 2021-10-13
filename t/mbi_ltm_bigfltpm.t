@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    plan skip_all => "requires Math::BigFloat 1.999715+" unless eval { require Math::BigFloat && eval($Math::BigFloat::VERSION) >= 1.999715 };
+    plan skip_all => "requires Math::BigFloat 1.999827+" unless eval { require Math::BigFloat && eval($Math::BigFloat::VERSION) >= 1.999827 };
     plan tests => 2403            # tests in require'd file
                   + 5;            # tests in this file
 }
