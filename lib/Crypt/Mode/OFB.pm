@@ -4,7 +4,7 @@ package Crypt::Mode::OFB;
 
 use strict;
 use warnings;
-our $VERSION = '0.073_002';
+our $VERSION = '0.073_003';
 
 use Crypt::Cipher;
 
