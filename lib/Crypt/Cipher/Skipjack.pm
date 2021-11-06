@@ -4,7 +4,7 @@ package Crypt::Cipher::Skipjack;
 
 use strict;
 use warnings;
-our $VERSION = '0.074';
+our $VERSION = '0.074_001';
 
 use base qw(Crypt::Cipher);
 
