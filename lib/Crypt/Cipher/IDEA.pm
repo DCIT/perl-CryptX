@@ -4,7 +4,7 @@ package Crypt::Cipher::IDEA;
 
 use strict;
 use warnings;
-our $VERSION = '0.074_001';
+our $VERSION = '0.075';
 
 use base qw(Crypt::Cipher);
 

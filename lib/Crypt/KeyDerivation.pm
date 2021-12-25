@@ -2,7 +2,7 @@ package Crypt::KeyDerivation;
 
 use strict;
 use warnings;
-our $VERSION = '0.074_001';
+our $VERSION = '0.075';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw(pbkdf1 pbkdf2 hkdf hkdf_expand hkdf_extract)] );
