@@ -1,186 +1,189 @@
-OBJS=ltc/misc/compare_testvector.obj ltc/misc/error_to_string.obj ltc/misc/copy_or_zeromem.obj \
-ltc/misc/crc32.obj ltc/misc/burn_stack.obj ltc/misc/zeromem.obj ltc/misc/mem_neq.obj \
-ltc/misc/adler32.obj ltc/misc/pkcs12/pkcs12_utf8_to_utf16.obj ltc/misc/pkcs12/pkcs12_kdf.obj \
-ltc/misc/pbes/pbes1.obj ltc/misc/pbes/pbes2.obj ltc/misc/pbes/pbes.obj ltc/misc/crypt/crypt_unregister_prng.obj \
-ltc/misc/crypt/crypt_unregister_cipher.obj ltc/misc/crypt/crypt.obj ltc/misc/crypt/crypt_find_cipher_any.obj \
-ltc/misc/crypt/crypt_prng_descriptor.obj ltc/misc/crypt/crypt_constants.obj ltc/misc/crypt/crypt_prng_is_valid.obj \
-ltc/misc/crypt/crypt_prng_rng_descriptor.obj ltc/misc/crypt/crypt_cipher_is_valid.obj \
-ltc/misc/crypt/crypt_find_hash_oid.obj ltc/misc/crypt/crypt_hash_descriptor.obj ltc/misc/crypt/crypt_register_all_ciphers.obj \
-ltc/misc/crypt/crypt_register_prng.obj ltc/misc/crypt/crypt_register_cipher.obj ltc/misc/crypt/crypt_find_hash.obj \
-ltc/misc/crypt/crypt_inits.obj ltc/misc/crypt/crypt_cipher_descriptor.obj ltc/misc/crypt/crypt_register_all_hashes.obj \
-ltc/misc/crypt/crypt_find_cipher.obj ltc/misc/crypt/crypt_find_hash_id.obj ltc/misc/crypt/crypt_ltc_mp_descriptor.obj \
-ltc/misc/crypt/crypt_find_cipher_id.obj ltc/misc/crypt/crypt_register_hash.obj ltc/misc/crypt/crypt_hash_is_valid.obj \
-ltc/misc/crypt/crypt_find_prng.obj ltc/misc/crypt/crypt_argchk.obj ltc/misc/crypt/crypt_sizes.obj \
-ltc/misc/crypt/crypt_find_hash_any.obj ltc/misc/crypt/crypt_register_all_prngs.obj \
-ltc/misc/crypt/crypt_fsa.obj ltc/misc/crypt/crypt_unregister_hash.obj ltc/misc/bcrypt/bcrypt.obj \
-ltc/misc/base64/base64_decode.obj ltc/misc/base64/base64_encode.obj ltc/misc/pkcs5/pkcs_5_1.obj \
-ltc/misc/pkcs5/pkcs_5_2.obj ltc/misc/hkdf/hkdf.obj ltc/misc/ssh/ssh_decode_sequence_multi.obj \
-ltc/misc/ssh/ssh_encode_sequence_multi.obj ltc/misc/base16/base16_encode.obj ltc/misc/base16/base16_decode.obj \
-ltc/misc/padding/padding_pad.obj ltc/misc/padding/padding_depad.obj ltc/misc/base32/base32_decode.obj \
-ltc/misc/base32/base32_encode.obj ltc/pk/asn1/der/octet/der_decode_octet_string.obj \
-ltc/pk/asn1/der/octet/der_encode_octet_string.obj ltc/pk/asn1/der/octet/der_length_octet_string.obj \
-ltc/pk/asn1/der/bit/der_length_bit_string.obj ltc/pk/asn1/der/bit/der_encode_raw_bit_string.obj \
-ltc/pk/asn1/der/bit/der_decode_raw_bit_string.obj ltc/pk/asn1/der/bit/der_encode_bit_string.obj \
-ltc/pk/asn1/der/bit/der_decode_bit_string.obj ltc/pk/asn1/der/object_identifier/der_encode_object_identifier.obj \
-ltc/pk/asn1/der/object_identifier/der_decode_object_identifier.obj ltc/pk/asn1/der/object_identifier/der_length_object_identifier.obj \
-ltc/pk/asn1/der/utf8/der_encode_utf8_string.obj ltc/pk/asn1/der/utf8/der_decode_utf8_string.obj \
-ltc/pk/asn1/der/utf8/der_length_utf8_string.obj ltc/pk/asn1/der/general/der_encode_asn1_identifier.obj \
-ltc/pk/asn1/der/general/der_length_asn1_identifier.obj ltc/pk/asn1/der/general/der_encode_asn1_length.obj \
-ltc/pk/asn1/der/general/der_decode_asn1_identifier.obj ltc/pk/asn1/der/general/der_length_asn1_length.obj \
-ltc/pk/asn1/der/general/der_decode_asn1_length.obj ltc/pk/asn1/der/general/der_asn1_maps.obj \
-ltc/pk/asn1/der/generalizedtime/der_decode_generalizedtime.obj ltc/pk/asn1/der/generalizedtime/der_encode_generalizedtime.obj \
-ltc/pk/asn1/der/generalizedtime/der_length_generalizedtime.obj ltc/pk/asn1/der/short_integer/der_length_short_integer.obj \
-ltc/pk/asn1/der/short_integer/der_encode_short_integer.obj ltc/pk/asn1/der/short_integer/der_decode_short_integer.obj \
-ltc/pk/asn1/der/choice/der_decode_choice.obj ltc/pk/asn1/der/ia5/der_length_ia5_string.obj \
-ltc/pk/asn1/der/ia5/der_encode_ia5_string.obj ltc/pk/asn1/der/ia5/der_decode_ia5_string.obj \
-ltc/pk/asn1/der/teletex_string/der_decode_teletex_string.obj ltc/pk/asn1/der/teletex_string/der_length_teletex_string.obj \
-ltc/pk/asn1/der/boolean/der_decode_boolean.obj ltc/pk/asn1/der/boolean/der_length_boolean.obj \
-ltc/pk/asn1/der/boolean/der_encode_boolean.obj ltc/pk/asn1/der/integer/der_length_integer.obj \
-ltc/pk/asn1/der/integer/der_decode_integer.obj ltc/pk/asn1/der/integer/der_encode_integer.obj \
-ltc/pk/asn1/der/custom_type/der_encode_custom_type.obj ltc/pk/asn1/der/custom_type/der_decode_custom_type.obj \
-ltc/pk/asn1/der/custom_type/der_length_custom_type.obj ltc/pk/asn1/der/set/der_encode_setof.obj \
-ltc/pk/asn1/der/set/der_encode_set.obj ltc/pk/asn1/der/sequence/der_encode_sequence_ex.obj \
-ltc/pk/asn1/der/sequence/der_sequence_shrink.obj ltc/pk/asn1/der/sequence/der_length_sequence.obj \
-ltc/pk/asn1/der/sequence/der_decode_sequence_ex.obj ltc/pk/asn1/der/sequence/der_decode_sequence_multi.obj \
-ltc/pk/asn1/der/sequence/der_decode_sequence_flexi.obj ltc/pk/asn1/der/sequence/der_encode_sequence_multi.obj \
-ltc/pk/asn1/der/sequence/der_sequence_free.obj ltc/pk/asn1/der/printable_string/der_encode_printable_string.obj \
-ltc/pk/asn1/der/printable_string/der_length_printable_string.obj ltc/pk/asn1/der/printable_string/der_decode_printable_string.obj \
-ltc/pk/asn1/der/utctime/der_encode_utctime.obj ltc/pk/asn1/der/utctime/der_length_utctime.obj \
-ltc/pk/asn1/der/utctime/der_decode_utctime.obj ltc/pk/asn1/x509/x509_encode_subject_public_key_info.obj \
-ltc/pk/asn1/x509/x509_decode_public_key_from_certificate.obj ltc/pk/asn1/x509/x509_decode_subject_public_key_info.obj \
-ltc/pk/asn1/oid/pk_get_oid.obj ltc/pk/asn1/oid/pk_oid_str.obj ltc/pk/asn1/oid/pk_oid_cmp.obj \
-ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.obj ltc/pk/dh/dh_import.obj ltc/pk/dh/dh_set.obj \
-ltc/pk/dh/dh_shared_secret.obj ltc/pk/dh/dh_export_key.obj ltc/pk/dh/dh_set_pg_dhparam.obj \
-ltc/pk/dh/dh_check_pubkey.obj ltc/pk/dh/dh_free.obj ltc/pk/dh/dh_generate_key.obj \
-ltc/pk/dh/dh.obj ltc/pk/dh/dh_export.obj ltc/pk/rsa/rsa_verify_hash.obj ltc/pk/rsa/rsa_import_pkcs8.obj \
-ltc/pk/rsa/rsa_exptmod.obj ltc/pk/rsa/rsa_decrypt_key.obj ltc/pk/rsa/rsa_encrypt_key.obj \
-ltc/pk/rsa/rsa_import.obj ltc/pk/rsa/rsa_sign_hash.obj ltc/pk/rsa/rsa_set.obj ltc/pk/rsa/rsa_import_x509.obj \
-ltc/pk/rsa/rsa_make_key.obj ltc/pk/rsa/rsa_export.obj ltc/pk/rsa/rsa_sign_saltlen_get.obj \
-ltc/pk/rsa/rsa_key.obj ltc/pk/rsa/rsa_get_size.obj ltc/pk/dsa/dsa_make_key.obj ltc/pk/dsa/dsa_verify_key.obj \
-ltc/pk/dsa/dsa_set.obj ltc/pk/dsa/dsa_sign_hash.obj ltc/pk/dsa/dsa_shared_secret.obj \
-ltc/pk/dsa/dsa_generate_pqg.obj ltc/pk/dsa/dsa_import.obj ltc/pk/dsa/dsa_decrypt_key.obj \
-ltc/pk/dsa/dsa_set_pqg_dsaparam.obj ltc/pk/dsa/dsa_export.obj ltc/pk/dsa/dsa_verify_hash.obj \
-ltc/pk/dsa/dsa_generate_key.obj ltc/pk/dsa/dsa_free.obj ltc/pk/dsa/dsa_encrypt_key.obj \
-ltc/pk/ec25519/ec25519_export.obj ltc/pk/ec25519/ec25519_import_pkcs8.obj ltc/pk/ec25519/tweetnacl.obj \
-ltc/pk/ed25519/ed25519_export.obj ltc/pk/ed25519/ed25519_import_pkcs8.obj ltc/pk/ed25519/ed25519_import_raw.obj \
-ltc/pk/ed25519/ed25519_import_x509.obj ltc/pk/ed25519/ed25519_sign.obj ltc/pk/ed25519/ed25519_make_key.obj \
-ltc/pk/ed25519/ed25519_verify.obj ltc/pk/ed25519/ed25519_import.obj ltc/pk/ecc/ecc_import_x509.obj \
-ltc/pk/ecc/ecc_set_curve.obj ltc/pk/ecc/ecc_recover_key.obj ltc/pk/ecc/ecc_export_openssl.obj \
-ltc/pk/ecc/ltc_ecc_projective_add_point.obj ltc/pk/ecc/ecc_make_key.obj ltc/pk/ecc/ecc_ansi_x963_import.obj \
-ltc/pk/ecc/ltc_ecc_map.obj ltc/pk/ecc/ecc_get_size.obj ltc/pk/ecc/ecc_import_pkcs8.obj \
-ltc/pk/ecc/ecc_set_key.obj ltc/pk/ecc/ecc.obj ltc/pk/ecc/ecc_get_key.obj ltc/pk/ecc/ecc_export.obj \
-ltc/pk/ecc/ecc_import_openssl.obj ltc/pk/ecc/ecc_free.obj ltc/pk/ecc/ecc_find_curve.obj \
-ltc/pk/ecc/ecc_import.obj ltc/pk/ecc/ecc_get_oid_str.obj ltc/pk/ecc/ecc_decrypt_key.obj \
-ltc/pk/ecc/ltc_ecc_is_point.obj ltc/pk/ecc/ecc_shared_secret.obj ltc/pk/ecc/ltc_ecc_projective_dbl_point.obj \
-ltc/pk/ecc/ecc_sizes.obj ltc/pk/ecc/ltc_ecc_mul2add.obj ltc/pk/ecc/ltc_ecc_points.obj \
-ltc/pk/ecc/ltc_ecc_mulmod.obj ltc/pk/ecc/ecc_verify_hash.obj ltc/pk/ecc/ltc_ecc_is_point_at_infinity.obj \
-ltc/pk/ecc/ltc_ecc_import_point.obj ltc/pk/ecc/ltc_ecc_mulmod_timing.obj ltc/pk/ecc/ecc_ansi_x963_export.obj \
-ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.obj ltc/pk/ecc/ecc_sign_hash.obj ltc/pk/ecc/ecc_encrypt_key.obj \
-ltc/pk/ecc/ecc_set_curve_internal.obj ltc/pk/ecc/ltc_ecc_verify_key.obj ltc/pk/ecc/ltc_ecc_export_point.obj \
-ltc/pk/pkcs1/pkcs_1_os2ip.obj ltc/pk/pkcs1/pkcs_1_pss_decode.obj ltc/pk/pkcs1/pkcs_1_pss_encode.obj \
-ltc/pk/pkcs1/pkcs_1_mgf1.obj ltc/pk/pkcs1/pkcs_1_oaep_decode.obj ltc/pk/pkcs1/pkcs_1_v1_5_decode.obj \
-ltc/pk/pkcs1/pkcs_1_v1_5_encode.obj ltc/pk/pkcs1/pkcs_1_oaep_encode.obj ltc/pk/pkcs1/pkcs_1_i2osp.obj \
-ltc/pk/x25519/x25519_make_key.obj ltc/pk/x25519/x25519_import_pkcs8.obj ltc/pk/x25519/x25519_export.obj \
-ltc/pk/x25519/x25519_shared_secret.obj ltc/pk/x25519/x25519_import.obj ltc/pk/x25519/x25519_import_raw.obj \
-ltc/pk/x25519/x25519_import_x509.obj ltc/hashes/md4.obj ltc/hashes/sha1.obj ltc/hashes/rmd128.obj \
-ltc/hashes/sha3_test.obj ltc/hashes/rmd256.obj ltc/hashes/md2.obj ltc/hashes/blake2b.obj \
-ltc/hashes/md5.obj ltc/hashes/tiger.obj ltc/hashes/blake2s.obj ltc/hashes/sha3.obj \
-ltc/hashes/rmd160.obj ltc/hashes/rmd320.obj ltc/hashes/sha2/sha512_224.obj ltc/hashes/sha2/sha512_256.obj \
-ltc/hashes/sha2/sha224.obj ltc/hashes/sha2/sha256.obj ltc/hashes/sha2/sha512.obj \
-ltc/hashes/sha2/sha384.obj ltc/hashes/whirl/whirl.obj ltc/hashes/chc/chc.obj ltc/hashes/helper/hash_memory_multi.obj \
-ltc/hashes/helper/hash_file.obj ltc/hashes/helper/hash_filehandle.obj ltc/hashes/helper/hash_memory.obj \
-ltc/modes/ctr/ctr_encrypt.obj ltc/modes/ctr/ctr_setiv.obj ltc/modes/ctr/ctr_start.obj \
-ltc/modes/ctr/ctr_decrypt.obj ltc/modes/ctr/ctr_getiv.obj ltc/modes/ctr/ctr_done.obj \
-ltc/modes/ofb/ofb_getiv.obj ltc/modes/ofb/ofb_encrypt.obj ltc/modes/ofb/ofb_done.obj \
-ltc/modes/ofb/ofb_start.obj ltc/modes/ofb/ofb_setiv.obj ltc/modes/ofb/ofb_decrypt.obj \
-ltc/modes/cbc/cbc_setiv.obj ltc/modes/cbc/cbc_decrypt.obj ltc/modes/cbc/cbc_done.obj \
-ltc/modes/cbc/cbc_getiv.obj ltc/modes/cbc/cbc_start.obj ltc/modes/cbc/cbc_encrypt.obj \
-ltc/modes/cfb/cfb_done.obj ltc/modes/cfb/cfb_encrypt.obj ltc/modes/cfb/cfb_start.obj \
-ltc/modes/cfb/cfb_getiv.obj ltc/modes/cfb/cfb_setiv.obj ltc/modes/cfb/cfb_decrypt.obj \
-ltc/modes/ecb/ecb_encrypt.obj ltc/modes/ecb/ecb_done.obj ltc/modes/ecb/ecb_decrypt.obj \
-ltc/modes/ecb/ecb_start.obj ltc/prngs/chacha20.obj ltc/prngs/rc4.obj ltc/prngs/rng_get_bytes.obj \
-ltc/prngs/fortuna.obj ltc/prngs/rng_make_prng.obj ltc/prngs/sober128.obj ltc/prngs/sprng.obj \
-ltc/prngs/yarrow.obj ltc/encauth/eax/eax_decrypt.obj ltc/encauth/eax/eax_decrypt_verify_memory.obj \
-ltc/encauth/eax/eax_init.obj ltc/encauth/eax/eax_encrypt_authenticate_memory.obj \
-ltc/encauth/eax/eax_addheader.obj ltc/encauth/eax/eax_encrypt.obj ltc/encauth/eax/eax_done.obj \
-ltc/encauth/gcm/gcm_init.obj ltc/encauth/gcm/gcm_process.obj ltc/encauth/gcm/gcm_memory.obj \
-ltc/encauth/gcm/gcm_reset.obj ltc/encauth/gcm/gcm_done.obj ltc/encauth/gcm/gcm_mult_h.obj \
-ltc/encauth/gcm/gcm_add_iv.obj ltc/encauth/gcm/gcm_add_aad.obj ltc/encauth/gcm/gcm_gf_mult.obj \
-ltc/encauth/ccm/ccm_done.obj ltc/encauth/ccm/ccm_add_aad.obj ltc/encauth/ccm/ccm_add_nonce.obj \
-ltc/encauth/ccm/ccm_process.obj ltc/encauth/ccm/ccm_reset.obj ltc/encauth/ccm/ccm_memory.obj \
-ltc/encauth/ccm/ccm_init.obj ltc/encauth/chachapoly/chacha20poly1305_done.obj ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj \
-ltc/encauth/chachapoly/chacha20poly1305_setiv_rfc7905.obj ltc/encauth/chachapoly/chacha20poly1305_decrypt.obj \
-ltc/encauth/chachapoly/chacha20poly1305_encrypt.obj ltc/encauth/chachapoly/chacha20poly1305_setiv.obj \
+OBJS=ltc/ciphers/aes/aes.obj ltc/ciphers/anubis.obj ltc/ciphers/blowfish.obj ltc/ciphers/camellia.obj \
+ltc/ciphers/cast5.obj ltc/ciphers/des.obj ltc/ciphers/idea.obj ltc/ciphers/kasumi.obj \
+ltc/ciphers/khazad.obj ltc/ciphers/kseed.obj ltc/ciphers/multi2.obj ltc/ciphers/noekeon.obj \
+ltc/ciphers/rc2.obj ltc/ciphers/rc5.obj ltc/ciphers/rc6.obj ltc/ciphers/safer/safer.obj \
+ltc/ciphers/safer/saferp.obj ltc/ciphers/serpent.obj ltc/ciphers/skipjack.obj ltc/ciphers/tea.obj \
+ltc/ciphers/twofish/twofish.obj ltc/ciphers/xtea.obj ltc/encauth/ccm/ccm_add_aad.obj \
+ltc/encauth/ccm/ccm_add_nonce.obj ltc/encauth/ccm/ccm_done.obj ltc/encauth/ccm/ccm_init.obj \
+ltc/encauth/ccm/ccm_memory.obj ltc/encauth/ccm/ccm_process.obj ltc/encauth/ccm/ccm_reset.obj \
+ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj ltc/encauth/chachapoly/chacha20poly1305_decrypt.obj \
+ltc/encauth/chachapoly/chacha20poly1305_done.obj ltc/encauth/chachapoly/chacha20poly1305_encrypt.obj \
 ltc/encauth/chachapoly/chacha20poly1305_init.obj ltc/encauth/chachapoly/chacha20poly1305_memory.obj \
-ltc/encauth/ocb3/ocb3_int_ntz.obj ltc/encauth/ocb3/ocb3_encrypt_authenticate_memory.obj \
-ltc/encauth/ocb3/ocb3_add_aad.obj ltc/encauth/ocb3/ocb3_encrypt_last.obj ltc/encauth/ocb3/ocb3_int_xor_blocks.obj \
-ltc/encauth/ocb3/ocb3_decrypt.obj ltc/encauth/ocb3/ocb3_done.obj ltc/encauth/ocb3/ocb3_decrypt_verify_memory.obj \
-ltc/encauth/ocb3/ocb3_encrypt.obj ltc/encauth/ocb3/ocb3_decrypt_last.obj ltc/encauth/ocb3/ocb3_init.obj \
-ltc/stream/rc4/rc4_stream.obj ltc/stream/rc4/rc4_stream_memory.obj ltc/stream/chacha/chacha_ivctr32.obj \
-ltc/stream/chacha/chacha_memory.obj ltc/stream/chacha/chacha_crypt.obj ltc/stream/chacha/chacha_keystream.obj \
-ltc/stream/chacha/chacha_done.obj ltc/stream/chacha/chacha_ivctr64.obj ltc/stream/chacha/chacha_setup.obj \
-ltc/stream/sober128/sober128_stream_memory.obj ltc/stream/sober128/sober128_stream.obj \
-ltc/stream/salsa20/salsa20_setup.obj ltc/stream/salsa20/xsalsa20_memory.obj ltc/stream/salsa20/salsa20_done.obj \
-ltc/stream/salsa20/salsa20_memory.obj ltc/stream/salsa20/salsa20_keystream.obj ltc/stream/salsa20/salsa20_crypt.obj \
-ltc/stream/salsa20/salsa20_ivctr64.obj ltc/stream/salsa20/xsalsa20_setup.obj ltc/stream/rabbit/rabbit_memory.obj \
-ltc/stream/rabbit/rabbit.obj ltc/stream/sosemanuk/sosemanuk_memory.obj ltc/stream/sosemanuk/sosemanuk.obj \
-ltc/math/radix_to_bin.obj ltc/math/tfm_desc.obj ltc/math/rand_bn.obj ltc/math/multi.obj \
-ltc/math/ltm_desc.obj ltc/math/rand_prime.obj ltc/math/fp/ltc_ecc_fp_mulmod.obj ltc/mac/pmac/pmac_init.obj \
-ltc/mac/pmac/pmac_shift_xor.obj ltc/mac/pmac/pmac_ntz.obj ltc/mac/pmac/pmac_done.obj \
-ltc/mac/pmac/pmac_file.obj ltc/mac/pmac/pmac_memory_multi.obj ltc/mac/pmac/pmac_memory.obj \
-ltc/mac/pmac/pmac_process.obj ltc/mac/hmac/hmac_memory.obj ltc/mac/hmac/hmac_init.obj \
-ltc/mac/hmac/hmac_done.obj ltc/mac/hmac/hmac_file.obj ltc/mac/hmac/hmac_memory_multi.obj \
-ltc/mac/hmac/hmac_process.obj ltc/mac/blake2/blake2bmac_file.obj ltc/mac/blake2/blake2smac_memory.obj \
-ltc/mac/blake2/blake2bmac_memory_multi.obj ltc/mac/blake2/blake2smac.obj ltc/mac/blake2/blake2smac_file.obj \
-ltc/mac/blake2/blake2smac_memory_multi.obj ltc/mac/blake2/blake2bmac_memory.obj ltc/mac/blake2/blake2bmac.obj \
-ltc/mac/poly1305/poly1305_memory.obj ltc/mac/poly1305/poly1305_file.obj ltc/mac/poly1305/poly1305.obj \
-ltc/mac/poly1305/poly1305_memory_multi.obj ltc/mac/xcbc/xcbc_init.obj ltc/mac/xcbc/xcbc_memory.obj \
-ltc/mac/xcbc/xcbc_process.obj ltc/mac/xcbc/xcbc_file.obj ltc/mac/xcbc/xcbc_memory_multi.obj \
-ltc/mac/xcbc/xcbc_done.obj ltc/mac/f9/f9_memory_multi.obj ltc/mac/f9/f9_memory.obj \
-ltc/mac/f9/f9_init.obj ltc/mac/f9/f9_process.obj ltc/mac/f9/f9_done.obj ltc/mac/f9/f9_file.obj \
-ltc/mac/pelican/pelican.obj ltc/mac/pelican/pelican_memory.obj ltc/mac/omac/omac_init.obj \
-ltc/mac/omac/omac_file.obj ltc/mac/omac/omac_process.obj ltc/mac/omac/omac_memory_multi.obj \
-ltc/mac/omac/omac_memory.obj ltc/mac/omac/omac_done.obj ltc/ciphers/noekeon.obj ltc/ciphers/camellia.obj \
-ltc/ciphers/tea.obj ltc/ciphers/kseed.obj ltc/ciphers/des.obj ltc/ciphers/khazad.obj \
-ltc/ciphers/idea.obj ltc/ciphers/blowfish.obj ltc/ciphers/kasumi.obj ltc/ciphers/anubis.obj \
-ltc/ciphers/rc2.obj ltc/ciphers/rc6.obj ltc/ciphers/skipjack.obj ltc/ciphers/cast5.obj \
-ltc/ciphers/serpent.obj ltc/ciphers/xtea.obj ltc/ciphers/multi2.obj ltc/ciphers/rc5.obj \
-ltc/ciphers/safer/safer.obj ltc/ciphers/safer/saferp.obj ltc/ciphers/twofish/twofish.obj \
-ltc/ciphers/aes/aes.obj ltm/bn_s_mp_sqr.obj ltm/bn_prime_tab.obj ltm/bn_mp_radix_size.obj \
-ltm/bn_mp_cmp_mag.obj ltm/bn_mp_get_bit.obj ltm/bn_fast_s_mp_sqr.obj ltm/bn_mp_cnt_lsb.obj \
-ltm/bn_mp_2expt.obj ltm/bn_mp_mod_2d.obj ltm/bn_mp_sub.obj ltm/bn_mp_reduce_2k_l.obj \
-ltm/bn_mp_kronecker.obj ltm/bn_mp_invmod_slow.obj ltm/bn_mp_prime_is_divisible.obj \
-ltm/bn_mp_count_bits.obj ltm/bn_mp_clear_multi.obj ltm/bn_mp_set_int.obj ltm/bn_error.obj \
-ltm/bn_mp_export.obj ltm/bn_mp_cmp.obj ltm/bn_mp_add.obj ltm/bn_mp_grow.obj ltm/bn_mp_n_root_ex.obj \
-ltm/bn_mp_prime_fermat.obj ltm/bn_mp_shrink.obj ltm/bn_mp_get_int.obj ltm/bn_mp_abs.obj \
-ltm/bn_s_mp_mul_high_digs.obj ltm/bn_fast_mp_invmod.obj ltm/bn_mp_reduce_2k_setup_l.obj \
-ltm/bn_mp_div_2.obj ltm/bn_mp_rshd.obj ltm/bn_s_mp_mul_digs.obj ltm/bn_mp_to_unsigned_bin.obj \
-ltm/bn_mp_tc_div_2d.obj ltm/bn_mp_mul_d.obj ltm/bn_mp_fwrite.obj ltm/bn_fast_s_mp_mul_digs.obj \
-ltm/bn_mp_lshd.obj ltm/bn_mp_reduce_is_2k_l.obj ltm/bn_mp_prime_rabin_miller_trials.obj \
-ltm/bn_mp_n_root.obj ltm/bn_mp_tc_xor.obj ltm/bn_mp_tc_or.obj ltm/bn_mp_and.obj ltm/bn_mp_cmp_d.obj \
-ltm/bn_mp_exptmod_fast.obj ltm/bn_mp_to_signed_bin.obj ltm/bn_mp_get_long.obj ltm/bn_mp_lcm.obj \
-ltm/bn_mp_is_square.obj ltm/bn_mp_sqrt.obj ltm/bn_mp_signed_bin_size.obj ltm/bn_mp_mod_d.obj \
-ltm/bn_mp_sqrtmod_prime.obj ltm/bn_mp_init_multi.obj ltm/bn_mp_init_set_int.obj ltm/bn_mp_reduce_is_2k.obj \
-ltm/bn_mp_set_long.obj ltm/bn_mp_init_set.obj ltm/bn_mp_invmod.obj ltm/bn_mp_dr_reduce.obj \
-ltm/bn_mp_init_size.obj ltm/bn_mp_submod.obj ltm/bn_reverse.obj ltm/bn_mp_montgomery_reduce.obj \
-ltm/bn_mp_exteuclid.obj ltm/bn_mp_neg.obj ltm/bn_mp_clamp.obj ltm/bn_mp_dr_setup.obj \
-ltm/bn_mp_copy.obj ltm/bn_mp_karatsuba_mul.obj ltm/bn_mp_to_unsigned_bin_n.obj ltm/bn_mp_to_signed_bin_n.obj \
-ltm/bn_mp_init_copy.obj ltm/bn_fast_s_mp_mul_high_digs.obj ltm/bn_mp_div_d.obj ltm/bn_mp_toom_sqr.obj \
-ltm/bn_mp_toradix_n.obj ltm/bn_mp_fread.obj ltm/bn_mp_reduce.obj ltm/bn_mp_jacobi.obj \
-ltm/bn_mp_mod.obj ltm/bn_mp_montgomery_calc_normalization.obj ltm/bn_mp_prime_miller_rabin.obj \
-ltm/bn_mp_zero.obj ltm/bn_mp_sqr.obj ltm/bn_mp_addmod.obj ltm/bn_mp_init.obj ltm/bn_mp_prime_is_prime.obj \
-ltm/bn_mp_radix_smap.obj ltm/bn_mp_div.obj ltm/bn_mp_clear.obj ltm/bn_mp_xor.obj \
-ltm/bn_mp_exptmod.obj ltm/bn_mp_reduce_setup.obj ltm/bn_mp_or.obj ltm/bn_mp_read_radix.obj \
-ltm/bn_s_mp_sub.obj ltm/bn_mp_prime_frobenius_underwood.obj ltm/bn_mp_set.obj ltm/bn_mp_div_2d.obj \
-ltm/bn_mp_tc_and.obj ltm/bn_mp_reduce_2k_setup.obj ltm/bn_s_mp_add.obj ltm/bn_mp_exch.obj \
-ltm/bn_mp_prime_next_prime.obj ltm/bn_mp_sub_d.obj ltm/bn_fast_mp_montgomery_reduce.obj \
-ltm/bn_mp_gcd.obj ltm/bn_mp_mul.obj ltm/bn_mp_expt_d.obj ltm/bn_mp_rand.obj ltm/bn_mp_expt_d_ex.obj \
-ltm/bn_mp_mul_2d.obj ltm/bn_s_mp_exptmod.obj ltm/bn_mp_read_unsigned_bin.obj ltm/bn_mp_prime_strong_lucas_selfridge.obj \
-ltm/bn_mp_montgomery_setup.obj ltm/bn_mp_reduce_2k.obj ltm/bn_mp_add_d.obj ltm/bn_mp_karatsuba_sqr.obj \
-ltm/bn_mp_sqrmod.obj ltm/bn_mp_dr_is_modulus.obj ltm/bn_mp_complement.obj ltm/bncore.obj \
-ltm/bn_mp_mul_2.obj ltm/bn_mp_mulmod.obj ltm/bn_mp_toom_mul.obj ltm/bn_mp_import.obj \
-ltm/bn_mp_div_3.obj ltm/bn_mp_toradix.obj ltm/bn_mp_unsigned_bin_size.obj ltm/bn_mp_prime_random_ex.obj \
-ltm/bn_mp_read_signed_bin.obj
+ltc/encauth/chachapoly/chacha20poly1305_setiv.obj ltc/encauth/chachapoly/chacha20poly1305_setiv_rfc7905.obj \
+ltc/encauth/eax/eax_addheader.obj ltc/encauth/eax/eax_decrypt.obj ltc/encauth/eax/eax_decrypt_verify_memory.obj \
+ltc/encauth/eax/eax_done.obj ltc/encauth/eax/eax_encrypt.obj ltc/encauth/eax/eax_encrypt_authenticate_memory.obj \
+ltc/encauth/eax/eax_init.obj ltc/encauth/gcm/gcm_add_aad.obj ltc/encauth/gcm/gcm_add_iv.obj \
+ltc/encauth/gcm/gcm_done.obj ltc/encauth/gcm/gcm_gf_mult.obj ltc/encauth/gcm/gcm_init.obj \
+ltc/encauth/gcm/gcm_memory.obj ltc/encauth/gcm/gcm_mult_h.obj ltc/encauth/gcm/gcm_process.obj \
+ltc/encauth/gcm/gcm_reset.obj ltc/encauth/ocb3/ocb3_add_aad.obj ltc/encauth/ocb3/ocb3_decrypt.obj \
+ltc/encauth/ocb3/ocb3_decrypt_last.obj ltc/encauth/ocb3/ocb3_decrypt_verify_memory.obj \
+ltc/encauth/ocb3/ocb3_done.obj ltc/encauth/ocb3/ocb3_encrypt.obj ltc/encauth/ocb3/ocb3_encrypt_authenticate_memory.obj \
+ltc/encauth/ocb3/ocb3_encrypt_last.obj ltc/encauth/ocb3/ocb3_init.obj ltc/encauth/ocb3/ocb3_int_ntz.obj \
+ltc/encauth/ocb3/ocb3_int_xor_blocks.obj ltc/hashes/blake2b.obj ltc/hashes/blake2s.obj \
+ltc/hashes/chc/chc.obj ltc/hashes/helper/hash_file.obj ltc/hashes/helper/hash_filehandle.obj \
+ltc/hashes/helper/hash_memory.obj ltc/hashes/helper/hash_memory_multi.obj ltc/hashes/md2.obj \
+ltc/hashes/md4.obj ltc/hashes/md5.obj ltc/hashes/rmd128.obj ltc/hashes/rmd160.obj \
+ltc/hashes/rmd256.obj ltc/hashes/rmd320.obj ltc/hashes/sha1.obj ltc/hashes/sha2/sha224.obj \
+ltc/hashes/sha2/sha256.obj ltc/hashes/sha2/sha384.obj ltc/hashes/sha2/sha512.obj \
+ltc/hashes/sha2/sha512_224.obj ltc/hashes/sha2/sha512_256.obj ltc/hashes/sha3.obj \
+ltc/hashes/sha3_test.obj ltc/hashes/tiger.obj ltc/hashes/whirl/whirl.obj ltc/mac/blake2/blake2bmac.obj \
+ltc/mac/blake2/blake2bmac_file.obj ltc/mac/blake2/blake2bmac_memory.obj ltc/mac/blake2/blake2bmac_memory_multi.obj \
+ltc/mac/blake2/blake2smac.obj ltc/mac/blake2/blake2smac_file.obj ltc/mac/blake2/blake2smac_memory.obj \
+ltc/mac/blake2/blake2smac_memory_multi.obj ltc/mac/f9/f9_done.obj ltc/mac/f9/f9_file.obj \
+ltc/mac/f9/f9_init.obj ltc/mac/f9/f9_memory.obj ltc/mac/f9/f9_memory_multi.obj ltc/mac/f9/f9_process.obj \
+ltc/mac/hmac/hmac_done.obj ltc/mac/hmac/hmac_file.obj ltc/mac/hmac/hmac_init.obj \
+ltc/mac/hmac/hmac_memory.obj ltc/mac/hmac/hmac_memory_multi.obj ltc/mac/hmac/hmac_process.obj \
+ltc/mac/omac/omac_done.obj ltc/mac/omac/omac_file.obj ltc/mac/omac/omac_init.obj \
+ltc/mac/omac/omac_memory.obj ltc/mac/omac/omac_memory_multi.obj ltc/mac/omac/omac_process.obj \
+ltc/mac/pelican/pelican.obj ltc/mac/pelican/pelican_memory.obj ltc/mac/pmac/pmac_done.obj \
+ltc/mac/pmac/pmac_file.obj ltc/mac/pmac/pmac_init.obj ltc/mac/pmac/pmac_memory.obj \
+ltc/mac/pmac/pmac_memory_multi.obj ltc/mac/pmac/pmac_ntz.obj ltc/mac/pmac/pmac_process.obj \
+ltc/mac/pmac/pmac_shift_xor.obj ltc/mac/poly1305/poly1305.obj ltc/mac/poly1305/poly1305_file.obj \
+ltc/mac/poly1305/poly1305_memory.obj ltc/mac/poly1305/poly1305_memory_multi.obj ltc/mac/xcbc/xcbc_done.obj \
+ltc/mac/xcbc/xcbc_file.obj ltc/mac/xcbc/xcbc_init.obj ltc/mac/xcbc/xcbc_memory.obj \
+ltc/mac/xcbc/xcbc_memory_multi.obj ltc/mac/xcbc/xcbc_process.obj ltc/math/fp/ltc_ecc_fp_mulmod.obj \
+ltc/math/ltm_desc.obj ltc/math/multi.obj ltc/math/radix_to_bin.obj ltc/math/rand_bn.obj \
+ltc/math/rand_prime.obj ltc/math/tfm_desc.obj ltc/misc/adler32.obj ltc/misc/base16/base16_decode.obj \
+ltc/misc/base16/base16_encode.obj ltc/misc/base32/base32_decode.obj ltc/misc/base32/base32_encode.obj \
+ltc/misc/base64/base64_decode.obj ltc/misc/base64/base64_encode.obj ltc/misc/bcrypt/bcrypt.obj \
+ltc/misc/burn_stack.obj ltc/misc/compare_testvector.obj ltc/misc/copy_or_zeromem.obj \
+ltc/misc/crc32.obj ltc/misc/crypt/crypt.obj ltc/misc/crypt/crypt_argchk.obj ltc/misc/crypt/crypt_cipher_descriptor.obj \
+ltc/misc/crypt/crypt_cipher_is_valid.obj ltc/misc/crypt/crypt_constants.obj ltc/misc/crypt/crypt_find_cipher.obj \
+ltc/misc/crypt/crypt_find_cipher_any.obj ltc/misc/crypt/crypt_find_cipher_id.obj \
+ltc/misc/crypt/crypt_find_hash.obj ltc/misc/crypt/crypt_find_hash_any.obj ltc/misc/crypt/crypt_find_hash_id.obj \
+ltc/misc/crypt/crypt_find_hash_oid.obj ltc/misc/crypt/crypt_find_prng.obj ltc/misc/crypt/crypt_fsa.obj \
+ltc/misc/crypt/crypt_hash_descriptor.obj ltc/misc/crypt/crypt_hash_is_valid.obj ltc/misc/crypt/crypt_inits.obj \
+ltc/misc/crypt/crypt_ltc_mp_descriptor.obj ltc/misc/crypt/crypt_prng_descriptor.obj \
+ltc/misc/crypt/crypt_prng_is_valid.obj ltc/misc/crypt/crypt_prng_rng_descriptor.obj \
+ltc/misc/crypt/crypt_register_all_ciphers.obj ltc/misc/crypt/crypt_register_all_hashes.obj \
+ltc/misc/crypt/crypt_register_all_prngs.obj ltc/misc/crypt/crypt_register_cipher.obj \
+ltc/misc/crypt/crypt_register_hash.obj ltc/misc/crypt/crypt_register_prng.obj ltc/misc/crypt/crypt_sizes.obj \
+ltc/misc/crypt/crypt_unregister_cipher.obj ltc/misc/crypt/crypt_unregister_hash.obj \
+ltc/misc/crypt/crypt_unregister_prng.obj ltc/misc/error_to_string.obj ltc/misc/hkdf/hkdf.obj \
+ltc/misc/mem_neq.obj ltc/misc/padding/padding_depad.obj ltc/misc/padding/padding_pad.obj \
+ltc/misc/pbes/pbes.obj ltc/misc/pbes/pbes1.obj ltc/misc/pbes/pbes2.obj ltc/misc/pkcs12/pkcs12_kdf.obj \
+ltc/misc/pkcs12/pkcs12_utf8_to_utf16.obj ltc/misc/pkcs5/pkcs_5_1.obj ltc/misc/pkcs5/pkcs_5_2.obj \
+ltc/misc/ssh/ssh_decode_sequence_multi.obj ltc/misc/ssh/ssh_encode_sequence_multi.obj \
+ltc/misc/zeromem.obj ltc/modes/cbc/cbc_decrypt.obj ltc/modes/cbc/cbc_done.obj ltc/modes/cbc/cbc_encrypt.obj \
+ltc/modes/cbc/cbc_getiv.obj ltc/modes/cbc/cbc_setiv.obj ltc/modes/cbc/cbc_start.obj \
+ltc/modes/cfb/cfb_decrypt.obj ltc/modes/cfb/cfb_done.obj ltc/modes/cfb/cfb_encrypt.obj \
+ltc/modes/cfb/cfb_getiv.obj ltc/modes/cfb/cfb_setiv.obj ltc/modes/cfb/cfb_start.obj \
+ltc/modes/ctr/ctr_decrypt.obj ltc/modes/ctr/ctr_done.obj ltc/modes/ctr/ctr_encrypt.obj \
+ltc/modes/ctr/ctr_getiv.obj ltc/modes/ctr/ctr_setiv.obj ltc/modes/ctr/ctr_start.obj \
+ltc/modes/ecb/ecb_decrypt.obj ltc/modes/ecb/ecb_done.obj ltc/modes/ecb/ecb_encrypt.obj \
+ltc/modes/ecb/ecb_start.obj ltc/modes/ofb/ofb_decrypt.obj ltc/modes/ofb/ofb_done.obj \
+ltc/modes/ofb/ofb_encrypt.obj ltc/modes/ofb/ofb_getiv.obj ltc/modes/ofb/ofb_setiv.obj \
+ltc/modes/ofb/ofb_start.obj ltc/pk/asn1/der/bit/der_decode_bit_string.obj ltc/pk/asn1/der/bit/der_decode_raw_bit_string.obj \
+ltc/pk/asn1/der/bit/der_encode_bit_string.obj ltc/pk/asn1/der/bit/der_encode_raw_bit_string.obj \
+ltc/pk/asn1/der/bit/der_length_bit_string.obj ltc/pk/asn1/der/boolean/der_decode_boolean.obj \
+ltc/pk/asn1/der/boolean/der_encode_boolean.obj ltc/pk/asn1/der/boolean/der_length_boolean.obj \
+ltc/pk/asn1/der/choice/der_decode_choice.obj ltc/pk/asn1/der/custom_type/der_decode_custom_type.obj \
+ltc/pk/asn1/der/custom_type/der_encode_custom_type.obj ltc/pk/asn1/der/custom_type/der_length_custom_type.obj \
+ltc/pk/asn1/der/general/der_asn1_maps.obj ltc/pk/asn1/der/general/der_decode_asn1_identifier.obj \
+ltc/pk/asn1/der/general/der_decode_asn1_length.obj ltc/pk/asn1/der/general/der_encode_asn1_identifier.obj \
+ltc/pk/asn1/der/general/der_encode_asn1_length.obj ltc/pk/asn1/der/general/der_length_asn1_identifier.obj \
+ltc/pk/asn1/der/general/der_length_asn1_length.obj ltc/pk/asn1/der/generalizedtime/der_decode_generalizedtime.obj \
+ltc/pk/asn1/der/generalizedtime/der_encode_generalizedtime.obj ltc/pk/asn1/der/generalizedtime/der_length_generalizedtime.obj \
+ltc/pk/asn1/der/ia5/der_decode_ia5_string.obj ltc/pk/asn1/der/ia5/der_encode_ia5_string.obj \
+ltc/pk/asn1/der/ia5/der_length_ia5_string.obj ltc/pk/asn1/der/integer/der_decode_integer.obj \
+ltc/pk/asn1/der/integer/der_encode_integer.obj ltc/pk/asn1/der/integer/der_length_integer.obj \
+ltc/pk/asn1/der/object_identifier/der_decode_object_identifier.obj ltc/pk/asn1/der/object_identifier/der_encode_object_identifier.obj \
+ltc/pk/asn1/der/object_identifier/der_length_object_identifier.obj ltc/pk/asn1/der/octet/der_decode_octet_string.obj \
+ltc/pk/asn1/der/octet/der_encode_octet_string.obj ltc/pk/asn1/der/octet/der_length_octet_string.obj \
+ltc/pk/asn1/der/printable_string/der_decode_printable_string.obj ltc/pk/asn1/der/printable_string/der_encode_printable_string.obj \
+ltc/pk/asn1/der/printable_string/der_length_printable_string.obj ltc/pk/asn1/der/sequence/der_decode_sequence_ex.obj \
+ltc/pk/asn1/der/sequence/der_decode_sequence_flexi.obj ltc/pk/asn1/der/sequence/der_decode_sequence_multi.obj \
+ltc/pk/asn1/der/sequence/der_encode_sequence_ex.obj ltc/pk/asn1/der/sequence/der_encode_sequence_multi.obj \
+ltc/pk/asn1/der/sequence/der_length_sequence.obj ltc/pk/asn1/der/sequence/der_sequence_free.obj \
+ltc/pk/asn1/der/sequence/der_sequence_shrink.obj ltc/pk/asn1/der/set/der_encode_set.obj \
+ltc/pk/asn1/der/set/der_encode_setof.obj ltc/pk/asn1/der/short_integer/der_decode_short_integer.obj \
+ltc/pk/asn1/der/short_integer/der_encode_short_integer.obj ltc/pk/asn1/der/short_integer/der_length_short_integer.obj \
+ltc/pk/asn1/der/teletex_string/der_decode_teletex_string.obj ltc/pk/asn1/der/teletex_string/der_length_teletex_string.obj \
+ltc/pk/asn1/der/utctime/der_decode_utctime.obj ltc/pk/asn1/der/utctime/der_encode_utctime.obj \
+ltc/pk/asn1/der/utctime/der_length_utctime.obj ltc/pk/asn1/der/utf8/der_decode_utf8_string.obj \
+ltc/pk/asn1/der/utf8/der_encode_utf8_string.obj ltc/pk/asn1/der/utf8/der_length_utf8_string.obj \
+ltc/pk/asn1/oid/pk_get_oid.obj ltc/pk/asn1/oid/pk_oid_cmp.obj ltc/pk/asn1/oid/pk_oid_str.obj \
+ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.obj ltc/pk/asn1/x509/x509_decode_public_key_from_certificate.obj \
+ltc/pk/asn1/x509/x509_decode_subject_public_key_info.obj ltc/pk/asn1/x509/x509_encode_subject_public_key_info.obj \
+ltc/pk/dh/dh.obj ltc/pk/dh/dh_check_pubkey.obj ltc/pk/dh/dh_export.obj ltc/pk/dh/dh_export_key.obj \
+ltc/pk/dh/dh_free.obj ltc/pk/dh/dh_generate_key.obj ltc/pk/dh/dh_import.obj ltc/pk/dh/dh_set.obj \
+ltc/pk/dh/dh_set_pg_dhparam.obj ltc/pk/dh/dh_shared_secret.obj ltc/pk/dsa/dsa_decrypt_key.obj \
+ltc/pk/dsa/dsa_encrypt_key.obj ltc/pk/dsa/dsa_export.obj ltc/pk/dsa/dsa_free.obj \
+ltc/pk/dsa/dsa_generate_key.obj ltc/pk/dsa/dsa_generate_pqg.obj ltc/pk/dsa/dsa_import.obj \
+ltc/pk/dsa/dsa_make_key.obj ltc/pk/dsa/dsa_set.obj ltc/pk/dsa/dsa_set_pqg_dsaparam.obj \
+ltc/pk/dsa/dsa_shared_secret.obj ltc/pk/dsa/dsa_sign_hash.obj ltc/pk/dsa/dsa_verify_hash.obj \
+ltc/pk/dsa/dsa_verify_key.obj ltc/pk/ec25519/ec25519_export.obj ltc/pk/ec25519/ec25519_import_pkcs8.obj \
+ltc/pk/ec25519/tweetnacl.obj ltc/pk/ecc/ecc.obj ltc/pk/ecc/ecc_ansi_x963_export.obj \
+ltc/pk/ecc/ecc_ansi_x963_import.obj ltc/pk/ecc/ecc_decrypt_key.obj ltc/pk/ecc/ecc_encrypt_key.obj \
+ltc/pk/ecc/ecc_export.obj ltc/pk/ecc/ecc_export_openssl.obj ltc/pk/ecc/ecc_find_curve.obj \
+ltc/pk/ecc/ecc_free.obj ltc/pk/ecc/ecc_get_key.obj ltc/pk/ecc/ecc_get_oid_str.obj \
+ltc/pk/ecc/ecc_get_size.obj ltc/pk/ecc/ecc_import.obj ltc/pk/ecc/ecc_import_openssl.obj \
+ltc/pk/ecc/ecc_import_pkcs8.obj ltc/pk/ecc/ecc_import_x509.obj ltc/pk/ecc/ecc_make_key.obj \
+ltc/pk/ecc/ecc_recover_key.obj ltc/pk/ecc/ecc_set_curve.obj ltc/pk/ecc/ecc_set_curve_internal.obj \
+ltc/pk/ecc/ecc_set_key.obj ltc/pk/ecc/ecc_shared_secret.obj ltc/pk/ecc/ecc_sign_hash.obj \
+ltc/pk/ecc/ecc_sizes.obj ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.obj ltc/pk/ecc/ecc_verify_hash.obj \
+ltc/pk/ecc/ltc_ecc_export_point.obj ltc/pk/ecc/ltc_ecc_import_point.obj ltc/pk/ecc/ltc_ecc_is_point.obj \
+ltc/pk/ecc/ltc_ecc_is_point_at_infinity.obj ltc/pk/ecc/ltc_ecc_map.obj ltc/pk/ecc/ltc_ecc_mul2add.obj \
+ltc/pk/ecc/ltc_ecc_mulmod.obj ltc/pk/ecc/ltc_ecc_mulmod_timing.obj ltc/pk/ecc/ltc_ecc_points.obj \
+ltc/pk/ecc/ltc_ecc_projective_add_point.obj ltc/pk/ecc/ltc_ecc_projective_dbl_point.obj \
+ltc/pk/ecc/ltc_ecc_verify_key.obj ltc/pk/ed25519/ed25519_export.obj ltc/pk/ed25519/ed25519_import.obj \
+ltc/pk/ed25519/ed25519_import_pkcs8.obj ltc/pk/ed25519/ed25519_import_raw.obj ltc/pk/ed25519/ed25519_import_x509.obj \
+ltc/pk/ed25519/ed25519_make_key.obj ltc/pk/ed25519/ed25519_sign.obj ltc/pk/ed25519/ed25519_verify.obj \
+ltc/pk/pkcs1/pkcs_1_i2osp.obj ltc/pk/pkcs1/pkcs_1_mgf1.obj ltc/pk/pkcs1/pkcs_1_oaep_decode.obj \
+ltc/pk/pkcs1/pkcs_1_oaep_encode.obj ltc/pk/pkcs1/pkcs_1_os2ip.obj ltc/pk/pkcs1/pkcs_1_pss_decode.obj \
+ltc/pk/pkcs1/pkcs_1_pss_encode.obj ltc/pk/pkcs1/pkcs_1_v1_5_decode.obj ltc/pk/pkcs1/pkcs_1_v1_5_encode.obj \
+ltc/pk/rsa/rsa_decrypt_key.obj ltc/pk/rsa/rsa_encrypt_key.obj ltc/pk/rsa/rsa_export.obj \
+ltc/pk/rsa/rsa_exptmod.obj ltc/pk/rsa/rsa_get_size.obj ltc/pk/rsa/rsa_import.obj \
+ltc/pk/rsa/rsa_import_pkcs8.obj ltc/pk/rsa/rsa_import_x509.obj ltc/pk/rsa/rsa_key.obj \
+ltc/pk/rsa/rsa_make_key.obj ltc/pk/rsa/rsa_set.obj ltc/pk/rsa/rsa_sign_hash.obj ltc/pk/rsa/rsa_sign_saltlen_get.obj \
+ltc/pk/rsa/rsa_verify_hash.obj ltc/pk/x25519/x25519_export.obj ltc/pk/x25519/x25519_import.obj \
+ltc/pk/x25519/x25519_import_pkcs8.obj ltc/pk/x25519/x25519_import_raw.obj ltc/pk/x25519/x25519_import_x509.obj \
+ltc/pk/x25519/x25519_make_key.obj ltc/pk/x25519/x25519_shared_secret.obj ltc/prngs/chacha20.obj \
+ltc/prngs/fortuna.obj ltc/prngs/rc4.obj ltc/prngs/rng_get_bytes.obj ltc/prngs/rng_make_prng.obj \
+ltc/prngs/sober128.obj ltc/prngs/sprng.obj ltc/prngs/yarrow.obj ltc/stream/chacha/chacha_crypt.obj \
+ltc/stream/chacha/chacha_done.obj ltc/stream/chacha/chacha_ivctr32.obj ltc/stream/chacha/chacha_ivctr64.obj \
+ltc/stream/chacha/chacha_keystream.obj ltc/stream/chacha/chacha_memory.obj ltc/stream/chacha/chacha_setup.obj \
+ltc/stream/rabbit/rabbit.obj ltc/stream/rabbit/rabbit_memory.obj ltc/stream/rc4/rc4_stream.obj \
+ltc/stream/rc4/rc4_stream_memory.obj ltc/stream/salsa20/salsa20_crypt.obj ltc/stream/salsa20/salsa20_done.obj \
+ltc/stream/salsa20/salsa20_ivctr64.obj ltc/stream/salsa20/salsa20_keystream.obj ltc/stream/salsa20/salsa20_memory.obj \
+ltc/stream/salsa20/salsa20_setup.obj ltc/stream/salsa20/xsalsa20_memory.obj ltc/stream/salsa20/xsalsa20_setup.obj \
+ltc/stream/sober128/sober128_stream.obj ltc/stream/sober128/sober128_stream_memory.obj \
+ltc/stream/sosemanuk/sosemanuk.obj ltc/stream/sosemanuk/sosemanuk_memory.obj ltm/bn_error.obj \
+ltm/bn_fast_mp_invmod.obj ltm/bn_fast_mp_montgomery_reduce.obj ltm/bn_fast_s_mp_mul_digs.obj \
+ltm/bn_fast_s_mp_mul_high_digs.obj ltm/bn_fast_s_mp_sqr.obj ltm/bn_mp_2expt.obj ltm/bn_mp_abs.obj \
+ltm/bn_mp_add.obj ltm/bn_mp_add_d.obj ltm/bn_mp_addmod.obj ltm/bn_mp_and.obj ltm/bn_mp_clamp.obj \
+ltm/bn_mp_clear.obj ltm/bn_mp_clear_multi.obj ltm/bn_mp_cmp.obj ltm/bn_mp_cmp_d.obj \
+ltm/bn_mp_cmp_mag.obj ltm/bn_mp_cnt_lsb.obj ltm/bn_mp_complement.obj ltm/bn_mp_copy.obj \
+ltm/bn_mp_count_bits.obj ltm/bn_mp_div.obj ltm/bn_mp_div_2.obj ltm/bn_mp_div_2d.obj \
+ltm/bn_mp_div_3.obj ltm/bn_mp_div_d.obj ltm/bn_mp_dr_is_modulus.obj ltm/bn_mp_dr_reduce.obj \
+ltm/bn_mp_dr_setup.obj ltm/bn_mp_exch.obj ltm/bn_mp_export.obj ltm/bn_mp_expt_d.obj \
+ltm/bn_mp_expt_d_ex.obj ltm/bn_mp_exptmod.obj ltm/bn_mp_exptmod_fast.obj ltm/bn_mp_exteuclid.obj \
+ltm/bn_mp_fread.obj ltm/bn_mp_fwrite.obj ltm/bn_mp_gcd.obj ltm/bn_mp_get_bit.obj \
+ltm/bn_mp_get_int.obj ltm/bn_mp_get_long.obj ltm/bn_mp_grow.obj ltm/bn_mp_import.obj \
+ltm/bn_mp_init.obj ltm/bn_mp_init_copy.obj ltm/bn_mp_init_multi.obj ltm/bn_mp_init_set.obj \
+ltm/bn_mp_init_set_int.obj ltm/bn_mp_init_size.obj ltm/bn_mp_invmod.obj ltm/bn_mp_invmod_slow.obj \
+ltm/bn_mp_is_square.obj ltm/bn_mp_jacobi.obj ltm/bn_mp_karatsuba_mul.obj ltm/bn_mp_karatsuba_sqr.obj \
+ltm/bn_mp_kronecker.obj ltm/bn_mp_lcm.obj ltm/bn_mp_lshd.obj ltm/bn_mp_mod.obj ltm/bn_mp_mod_2d.obj \
+ltm/bn_mp_mod_d.obj ltm/bn_mp_montgomery_calc_normalization.obj ltm/bn_mp_montgomery_reduce.obj \
+ltm/bn_mp_montgomery_setup.obj ltm/bn_mp_mul.obj ltm/bn_mp_mul_2.obj ltm/bn_mp_mul_2d.obj \
+ltm/bn_mp_mul_d.obj ltm/bn_mp_mulmod.obj ltm/bn_mp_n_root.obj ltm/bn_mp_n_root_ex.obj \
+ltm/bn_mp_neg.obj ltm/bn_mp_or.obj ltm/bn_mp_prime_fermat.obj ltm/bn_mp_prime_frobenius_underwood.obj \
+ltm/bn_mp_prime_is_divisible.obj ltm/bn_mp_prime_is_prime.obj ltm/bn_mp_prime_miller_rabin.obj \
+ltm/bn_mp_prime_next_prime.obj ltm/bn_mp_prime_rabin_miller_trials.obj ltm/bn_mp_prime_random_ex.obj \
+ltm/bn_mp_prime_strong_lucas_selfridge.obj ltm/bn_mp_radix_size.obj ltm/bn_mp_radix_smap.obj \
+ltm/bn_mp_rand.obj ltm/bn_mp_read_radix.obj ltm/bn_mp_read_signed_bin.obj ltm/bn_mp_read_unsigned_bin.obj \
+ltm/bn_mp_reduce.obj ltm/bn_mp_reduce_2k.obj ltm/bn_mp_reduce_2k_l.obj ltm/bn_mp_reduce_2k_setup.obj \
+ltm/bn_mp_reduce_2k_setup_l.obj ltm/bn_mp_reduce_is_2k.obj ltm/bn_mp_reduce_is_2k_l.obj \
+ltm/bn_mp_reduce_setup.obj ltm/bn_mp_rshd.obj ltm/bn_mp_set.obj ltm/bn_mp_set_int.obj \
+ltm/bn_mp_set_long.obj ltm/bn_mp_shrink.obj ltm/bn_mp_signed_bin_size.obj ltm/bn_mp_sqr.obj \
+ltm/bn_mp_sqrmod.obj ltm/bn_mp_sqrt.obj ltm/bn_mp_sqrtmod_prime.obj ltm/bn_mp_sub.obj \
+ltm/bn_mp_sub_d.obj ltm/bn_mp_submod.obj ltm/bn_mp_tc_and.obj ltm/bn_mp_tc_div_2d.obj \
+ltm/bn_mp_tc_or.obj ltm/bn_mp_tc_xor.obj ltm/bn_mp_to_signed_bin.obj ltm/bn_mp_to_signed_bin_n.obj \
+ltm/bn_mp_to_unsigned_bin.obj ltm/bn_mp_to_unsigned_bin_n.obj ltm/bn_mp_toom_mul.obj \
+ltm/bn_mp_toom_sqr.obj ltm/bn_mp_toradix.obj ltm/bn_mp_toradix_n.obj ltm/bn_mp_unsigned_bin_size.obj \
+ltm/bn_mp_xor.obj ltm/bn_mp_zero.obj ltm/bn_prime_tab.obj ltm/bn_reverse.obj ltm/bn_s_mp_add.obj \
+ltm/bn_s_mp_exptmod.obj ltm/bn_s_mp_mul_digs.obj ltm/bn_s_mp_mul_high_digs.obj ltm/bn_s_mp_sqr.obj \
+ltm/bn_s_mp_sub.obj ltm/bncore.obj
 
 PERL       =perl
 RM_F       =$(PERL) -MExtUtils::Command -e rm_f --
