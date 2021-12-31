@@ -1,0 +1,40 @@
+name: linux
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  perl:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        perl-version:
+          - '5.16'
+          - '5.18'
+          - '5.20'
+          - '5.22'
+          - '5.30'
+          - '5.32'
+    container:
+      image: perl:${{ matrix.perl-version }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: perl -V
+        run: perl -V
+      - name: Install dependencies
+        run: |
+          cpanm -n --installdeps .
+          cpanm -n JSON
+      - name: Run build
+        run: |
+          perl Makefile.PL
+          make -j4
+        env:
+          AUTHOR_MODE: 1
+      - name: Run tests
+        run: prove -l t
+        env:
+          AUTHOR_MODE: 1
