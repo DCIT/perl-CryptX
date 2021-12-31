@@ -27,7 +27,6 @@ jobs:
       - name: Install dependencies
         run: |
           cpanm -n --installdeps .
-          cpanm -n JSON
       - name: Run build
         run: |
           perl Makefile.PL
