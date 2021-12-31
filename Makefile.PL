@@ -62,6 +62,10 @@ else {
     MYEXTLIB => "src/liballinone$Config{lib_ext}",
     clean    => { 'FILES' => join(' ', @myobjs, "src/liballinone$Config{lib_ext}") },
   );
+
+  if ($^O ne 'MSWin32' && $Config{ld} =~ /gcc|g\+\+/) {
+     push @EUMM_INC_LIB, (LDDLFLAGS => "$Config{lddlflags} -Wl,--exclude-libs,ALL");
+  }
 }
 
 my %eumm_args = (
