@@ -63,6 +63,7 @@ else {
     clean    => { 'FILES' => join(' ', @myobjs, "src/liballinone$Config{lib_ext}") },
   );
 
+  #FIX: https://github.com/DCIT/perl-CryptX/pull/79
   if ($^O ne 'MSWin32' && $Config{ld} =~ /gcc|g\+\+/) {
      push @EUMM_INC_LIB, (LDDLFLAGS => "$Config{lddlflags} -Wl,--exclude-libs,ALL");
   }
