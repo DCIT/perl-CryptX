@@ -163,7 +163,7 @@ key2hash(Crypt::PK::DH self)
           croak("FATAL: key2hash failed - 'x' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.x, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.x, buf, 20000, 0);
           not_used = hv_store(rv_hash, "x", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -175,7 +175,7 @@ key2hash(Crypt::PK::DH self)
           croak("FATAL: key2hash failed - 'y' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.y, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.y, buf, 20000, 0);
           not_used = hv_store(rv_hash, "y", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -187,7 +187,7 @@ key2hash(Crypt::PK::DH self)
           croak("FATAL: key2hash failed - 'p' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.prime, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.prime, buf, 20000, 0);
           not_used = hv_store(rv_hash, "p", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else {
@@ -200,7 +200,7 @@ key2hash(Crypt::PK::DH self)
           croak("FATAL: key2hash failed - 'g' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.base, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.base, buf, 20000, 0);
           not_used = hv_store(rv_hash, "g", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else {
@@ -231,7 +231,7 @@ params2hash(Crypt::PK::DH self)
           croak("FATAL: key2hash failed - 'p' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.prime, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.prime, buf, 20000, 0);
           not_used = hv_store(rv_hash, "p", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else {
@@ -244,7 +244,7 @@ params2hash(Crypt::PK::DH self)
           croak("FATAL: key2hash failed - 'g' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.base, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.base, buf, 20000, 0);
           not_used = hv_store(rv_hash, "g", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else {

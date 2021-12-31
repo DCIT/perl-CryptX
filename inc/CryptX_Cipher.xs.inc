@@ -25,7 +25,7 @@ new(char * class, ...)
         if (!SvPOK (key)) croak("FATAL: key must be string scalar");
         key_data = (unsigned char *)SvPVbyte(key, key_len);
 
-        id = _find_cipher(cipher_name);
+        id = cryptx_internal_find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         Newz(0, RETVAL, 1, struct cipher_struct);
@@ -113,7 +113,7 @@ blocksize(SV * param, char * extra = NULL)
         }
         else {
           char *name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Cipher") ? SvPVX(param) : extra;
-          int rv, id = _find_cipher(name);
+          int rv, id = cryptx_internal_find_cipher(name);
           if (id == -1) croak("FATAL: find_cipher failed for '%s'", name);
           rv = cipher_descriptor[id].block_length;
           if (!rv) croak("FATAL: invalid block_length for '%s'", name);
@@ -134,7 +134,7 @@ max_keysize(SV * param, char * extra = NULL)
         }
         else {
           char *name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Cipher") ? SvPVX(param) : extra;
-          int rv, id = _find_cipher(name);
+          int rv, id = cryptx_internal_find_cipher(name);
           if (id == -1) croak("FATAL: find_cipher failed for '%s'", name);
           rv = cipher_descriptor[id].max_key_length;
           if (!rv) croak("FATAL: invalid max_key_length for '%s'", name);
@@ -155,7 +155,7 @@ min_keysize(SV * param, char * extra = NULL)
         }
         else {
           char *name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Cipher") ? SvPVX(param) : extra;
-          int rv, id = _find_cipher(name);
+          int rv, id = cryptx_internal_find_cipher(name);
           if (id == -1) croak("FATAL: find_cipher failed for '%s'", name);
           rv = cipher_descriptor[id].min_key_length;
           if (!rv) croak("FATAL: invalid min_key_length for '%s'", name);
@@ -176,7 +176,7 @@ default_rounds(SV * param, char * extra = NULL)
         }
         else {
           char *name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Cipher") ? SvPVX(param) : extra;
-          int rv, id = _find_cipher(name);
+          int rv, id = cryptx_internal_find_cipher(name);
           if (id == -1) croak("FATAL: find_cipher failed for '%s'", name);
           rv = cipher_descriptor[id].default_rounds;
           if (!rv) XSRETURN_UNDEF;

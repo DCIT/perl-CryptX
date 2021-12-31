@@ -30,7 +30,7 @@ generate_key(Crypt::PK::ECC self, SV *curve)
     {
         int rv;
         /* setup dp structure */
-        rv = _ecc_set_curve_from_SV(&self->key, curve); /* croaks on error */
+        rv = cryptx_internal_ecc_set_curve_from_SV(&self->key, curve); /* croaks on error */
         if (rv != CRYPT_OK) croak("FATAL: ecc_set_curve failed: %s", error_to_string(rv));
         /* gen the key */
         rv = ecc_generate_key(&self->pstate, self->pindex, &self->key);
@@ -112,7 +112,7 @@ import_key_raw(Crypt::PK::ECC self, SV * key_data, SV * curve)
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
         /* setup dp structure */
-        rv = _ecc_set_curve_from_SV(&self->key, curve); /* croaks on error */
+        rv = cryptx_internal_ecc_set_curve_from_SV(&self->key, curve); /* croaks on error */
         if (rv != CRYPT_OK) croak("FATAL: ecc_set_curve failed: %s", error_to_string(rv));
         /* import key */
         type = (data_len == (STRLEN)ecc_get_size(&self->key)) ? PK_PRIVATE : PK_PUBLIC;
@@ -154,7 +154,7 @@ key2hash(Crypt::PK::ECC self)
           croak("FATAL: key2hash failed - 'k' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.k, buf, 20000, esize*2);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.k, buf, 20000, esize*2);
           not_used = hv_store(rv_hash, "k", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -166,7 +166,7 @@ key2hash(Crypt::PK::ECC self)
           croak("FATAL: key2hash failed - 'pub_x' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.pubkey.x, buf, 20000, esize*2);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.pubkey.x, buf, 20000, esize*2);
           not_used = hv_store(rv_hash, "pub_x", 5, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -178,7 +178,7 @@ key2hash(Crypt::PK::ECC self)
           croak("FATAL: key2hash failed - 'pub_y' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.pubkey.y, buf, 20000, esize*2);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.pubkey.y, buf, 20000, esize*2);
           not_used = hv_store(rv_hash, "pub_y", 5, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -187,17 +187,17 @@ key2hash(Crypt::PK::ECC self)
         /* curve_... */
         {
           not_used = hv_store(rv_hash, "curve_cofactor",                14, newSViv(self->key.dp.cofactor), 0);
-          mp_tohex_with_leading_zero(self->key.dp.prime, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.dp.prime, buf, 20000, 0);
           not_used = hv_store(rv_hash, "curve_prime",                   11, newSVpv(buf, strlen(buf)), 0);
-          mp_tohex_with_leading_zero(self->key.dp.A, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.dp.A, buf, 20000, 0);
           not_used = hv_store(rv_hash, "curve_A",                        7, newSVpv(buf, strlen(buf)), 0);
-          mp_tohex_with_leading_zero(self->key.dp.B, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.dp.B, buf, 20000, 0);
           not_used = hv_store(rv_hash, "curve_B",                        7, newSVpv(buf, strlen(buf)), 0);
-          mp_tohex_with_leading_zero(self->key.dp.order, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.dp.order, buf, 20000, 0);
           not_used = hv_store(rv_hash, "curve_order",                   11, newSVpv(buf, strlen(buf)), 0);
-          mp_tohex_with_leading_zero(self->key.dp.base.x, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.dp.base.x, buf, 20000, 0);
           not_used = hv_store(rv_hash, "curve_Gx",                       8, newSVpv(buf, strlen(buf)), 0);
-          mp_tohex_with_leading_zero(self->key.dp.base.y, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.dp.base.y, buf, 20000, 0);
           not_used = hv_store(rv_hash, "curve_Gy",                       8, newSVpv(buf, strlen(buf)), 0);
           not_used = hv_store(rv_hash, "curve_bytes",                   11, newSViv(mp_unsigned_bin_size(self->key.dp.prime)), 0);
           not_used = hv_store(rv_hash, "curve_bits",                    10, newSViv(mp_count_bits(self->key.dp.prime)), 0);
@@ -326,7 +326,7 @@ encrypt(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
-        hash_id = _find_hash(hash_name);
+        hash_id = cryptx_internal_find_hash(hash_name);
         if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
         rv = ecc_encrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                              &self->pstate, self->pindex,
@@ -371,7 +371,7 @@ sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         if (ix == 1 || ix == 2) {
-          id = _find_hash(hash_name);
+          id = cryptx_internal_find_hash(hash_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = hash_memory(id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
           if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
@@ -410,7 +410,7 @@ verify_hash(Crypt::PK::ECC self, SV * sig, SV * data, const char * hash_name = "
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
         if (ix == 1 || ix == 2) {
-          id = _find_hash(hash_name);
+          id = cryptx_internal_find_hash(hash_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = hash_memory(id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
           if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));

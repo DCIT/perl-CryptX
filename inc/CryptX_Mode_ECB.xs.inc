@@ -14,7 +14,7 @@ new(Class, char * cipher_name, int padding=1, int rounds=0)
         RETVAL->padlen = 0;
         RETVAL->direction = 0;
         RETVAL->cipher_rounds = rounds;
-        RETVAL->cipher_id = _find_cipher(cipher_name);
+        RETVAL->cipher_id = cryptx_internal_find_cipher(cipher_name);
         if (RETVAL->cipher_id == -1) {
           Safefree(RETVAL);
           croak("FATAL: find_cipfer failed for '%s'", cipher_name);

@@ -25,7 +25,7 @@ new(char * class, ...)
         Newz(0, RETVAL, 1, struct prng_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        id = _find_prng(prng_name);
+        id = cryptx_internal_find_prng(prng_name);
         if (id == -1) {
           Safefree(RETVAL);
           croak("FATAL: find_prng failed for '%s'", prng_name);

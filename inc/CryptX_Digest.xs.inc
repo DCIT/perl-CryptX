@@ -10,7 +10,7 @@ new(char * cname, char * pname = NULL)
         int id;
         char *digest_name = strcmp(cname, "Crypt::Digest") == 0 ? pname : cname;
 
-        id = _find_hash(digest_name);
+        id = cryptx_internal_find_hash(digest_name);
         if (id == -1) croak("FATAL: find_hash failed for '%s'", digest_name);
 
         Newz(0, RETVAL, 1, struct digest_struct);
@@ -122,7 +122,7 @@ digest_data(char * digest_name, ...)
         char out[MAXBLOCKSIZE*2+1];
         hash_state md;
 
-        id = _find_hash(digest_name);
+        id = cryptx_internal_find_hash(digest_name);
         if (id == -1) croak("FATAL: find_digest failed for '%s'", digest_name);
 
         /* digest_data("SHA1", $data1, $data2, $data3); */
@@ -175,7 +175,7 @@ hashsize(SV * param, char * extra = NULL)
           char *digest_name;
           int rv, id;
           digest_name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Digest") ? SvPVX(param) : extra;
-          id = _find_hash(digest_name);
+          id = cryptx_internal_find_hash(digest_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", digest_name);
           rv = hash_descriptor[id].hashsize;
           if (!rv) croak("FATAL: invalid hashsize for '%s'", digest_name);;

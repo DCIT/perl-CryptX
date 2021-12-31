@@ -13,7 +13,7 @@ new(Class, char * cipher_name, SV * key)
         int rv;
         int id;
 
-        id = _find_cipher(cipher_name);
+        id = cryptx_internal_find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
@@ -119,7 +119,7 @@ f9(char * cipher_name, SV * key, ...)
         char out[MAXBLOCKSIZE*2];
         f9_state st;
 
-        int id = _find_cipher(cipher_name);
+        int id = cryptx_internal_find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
         rv = f9_init(&st, id, k, (unsigned long)klen);
         if (rv != CRYPT_OK) croak("FATAL: f9_init failed: %s", error_to_string(rv));

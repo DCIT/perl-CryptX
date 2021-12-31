@@ -13,7 +13,7 @@ new(Class, char * hash_name, SV * key)
         int rv;
         int id;
 
-        id = _find_hash(hash_name);
+        id = cryptx_internal_find_hash(hash_name);
         if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
@@ -119,7 +119,7 @@ hmac(char * hash_name, SV * key, ...)
         char out[MAXBLOCKSIZE*2];
         hmac_state st;
 
-        int id = _find_hash(hash_name);
+        int id = cryptx_internal_find_hash(hash_name);
         if (id == -1) croak("FATAL: find_digest failed for '%s'", hash_name);
         rv = hmac_init(&st, id, k, (unsigned long)klen);
         if (rv != CRYPT_OK) croak("FATAL: hmac_init failed: %s", error_to_string(rv));

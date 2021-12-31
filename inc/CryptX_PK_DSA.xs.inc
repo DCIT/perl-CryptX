@@ -173,7 +173,7 @@ key2hash(Crypt::PK::DSA self)
           croak("FATAL: key2hash failed - 'g' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.g, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.g, buf, 20000, 0);
           not_used = hv_store(rv_hash, "g", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -185,7 +185,7 @@ key2hash(Crypt::PK::DSA self)
           croak("FATAL: key2hash failed - 'q' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.q, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.q, buf, 20000, 0);
           not_used = hv_store(rv_hash, "q", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -197,7 +197,7 @@ key2hash(Crypt::PK::DSA self)
           croak("FATAL: key2hash failed - 'p' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.p, buf, 20000, 0);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.p, buf, 20000, 0);
           not_used = hv_store(rv_hash, "p", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -209,7 +209,7 @@ key2hash(Crypt::PK::DSA self)
           croak("FATAL: key2hash failed - 'x' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.x, buf, 20000, qsize*2);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.x, buf, 20000, qsize*2);
           not_used = hv_store(rv_hash, "x", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -221,7 +221,7 @@ key2hash(Crypt::PK::DSA self)
           croak("FATAL: key2hash failed - 'y' too big number");
         }
         if (siz>0) {
-          mp_tohex_with_leading_zero(self->key.y, buf, 20000, psize*2);
+          cryptx_internal_mp2hex_with_leading_zero(self->key.y, buf, 20000, psize*2);
           not_used = hv_store(rv_hash, "y", 1, newSVpv(buf, strlen(buf)), 0);
         }
         else{
@@ -274,7 +274,7 @@ encrypt(Crypt::PK::DSA self, SV * data, const char * hash_name = "SHA1")
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
-        hash_id = _find_hash(hash_name);
+        hash_id = cryptx_internal_find_hash(hash_name);
         if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
         rv = dsa_encrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                              &self->pstate, self->pindex,
@@ -317,7 +317,7 @@ sign_hash(Crypt::PK::DSA self, SV * data, const char * hash_name = "SHA1")
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         if (ix == 1) {
-          id = _find_hash(hash_name);
+          id = cryptx_internal_find_hash(hash_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = hash_memory(id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
           if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
@@ -347,7 +347,7 @@ verify_hash(Crypt::PK::DSA self, SV * sig, SV * data, const char * hash_name = "
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
         if (ix == 1) {
-          id = _find_hash(hash_name);
+          id = cryptx_internal_find_hash(hash_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = hash_memory(id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
           if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));

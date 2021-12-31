@@ -162,7 +162,7 @@ typedef struct x25519_struct {          /* used by Crypt::PK::X25519 */
   int initialized;
 } *Crypt__PK__X25519;
 
-int mp_tohex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
+int cryptx_internal_mp2hex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
   int len, rv;
 
   if (mp_isneg(a) == MP_YES) {
@@ -191,7 +191,7 @@ int mp_tohex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
   return MP_OKAY;
 }
 
-size_t _find_start(const char *name, char *ltcname, size_t ltclen)
+size_t cryptx_internal_find_start(const char *name, char *ltcname, size_t ltclen)
 {
    size_t i, start = 0;
    if (name == NULL || strlen(name) + 1 > ltclen) croak("FATAL: invalid name") ;
@@ -211,10 +211,10 @@ size_t _find_start(const char *name, char *ltcname, size_t ltclen)
    return start;
 }
 
-int _find_hash(const char *name)
+int cryptx_internal_find_hash(const char *name)
 {
    char ltcname[100] = { 0 };
-   size_t start = _find_start(name, ltcname, sizeof(ltcname) - 1);
+   size_t start = cryptx_internal_find_start(name, ltcname, sizeof(ltcname) - 1);
    /* special cases */
    if (strcmp(ltcname + start, "ripemd128") == 0) return find_hash("rmd128");
    if (strcmp(ltcname + start, "ripemd160") == 0) return find_hash("rmd160");
@@ -226,20 +226,20 @@ int _find_hash(const char *name)
    return find_hash(ltcname + start);
 }
 
-int _find_cipher(const char *name)
+int cryptx_internal_find_cipher(const char *name)
 {
    char ltcname[100] = { 0 };
-   size_t start = _find_start(name, ltcname, sizeof(ltcname) - 1);
+   size_t start = cryptx_internal_find_start(name, ltcname, sizeof(ltcname) - 1);
    /* special cases */
    if (strcmp(ltcname + start, "des-ede") == 0) return find_cipher("3des");
    if (strcmp(ltcname + start, "saferp")  == 0) return find_cipher("safer+");
    return find_cipher(ltcname + start);
 }
 
-int _find_prng(const char *name)
+int cryptx_internal_find_prng(const char *name)
 {
   char ltcname[100] = { 0 };
-  size_t start = _find_start(name, ltcname, sizeof(ltcname) - 1);
+  size_t start = cryptx_internal_find_start(name, ltcname, sizeof(ltcname) - 1);
   return find_prng(ltcname + start);
 }
 
@@ -252,7 +252,7 @@ STATIC SV * sv_from_mpi(mp_int *mpi) {
   return obj;
 }
 
-void _ecc_oid_lookup(ecc_key *key)
+void cryptx_internal_ecc_oid_lookup(ecc_key *key)
 {
    int err;
    unsigned i, j;
@@ -295,7 +295,7 @@ void _ecc_oid_lookup(ecc_key *key)
    }
 }
 
-int _ecc_set_curve_from_SV(ecc_key *key, SV *curve)
+int cryptx_internal_ecc_set_curve_from_SV(ecc_key *key, SV *curve)
 {
   dTHX; /* fetch context */
   HV *hc, *h;
@@ -368,7 +368,7 @@ int _ecc_set_curve_from_SV(ecc_key *key, SV *curve)
     cu.cofactor = (unsigned long)SvUV(*sv_cofactor);
 
     if ((err = ecc_set_curve(&cu, key)) != CRYPT_OK) return err;
-    if (key->dp.oidlen == 0) _ecc_oid_lookup(key);
+    if (key->dp.oidlen == 0) cryptx_internal_ecc_oid_lookup(key);
     return CRYPT_OK;
   }
 }

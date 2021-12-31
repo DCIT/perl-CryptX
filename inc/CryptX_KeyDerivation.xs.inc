@@ -17,7 +17,7 @@ pbkdf1(SV * password, SV * salt, int iteration_count = 5000, const char * hash_n
           RETVAL = newSVpvn("", 0);
         }
         else {
-          id = _find_hash(hash_name);
+          id = cryptx_internal_find_hash(hash_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
           password_ptr = (unsigned char *)SvPVbyte(password, password_len);
@@ -55,7 +55,7 @@ pbkdf2(SV * password, SV * salt, int iteration_count = 5000, const char * hash_n
           RETVAL = newSVpvn("", 0);
         }
         else {
-          id = _find_hash(hash_name);
+          id = cryptx_internal_find_hash(hash_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
           password_ptr = (unsigned char *)SvPVbyte(password, password_len);
@@ -87,7 +87,7 @@ hkdf_extract(SV * in, SV * salt = &PL_sv_undef, const char * hash_name = "SHA256
         unsigned char *in_ptr = NULL, *salt_ptr = NULL;
         STRLEN in_len = 0, salt_len = 0;
 
-        id = _find_hash(hash_name);
+        id = cryptx_internal_find_hash(hash_name);
         if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
         if (SvPOK(in))   in_ptr = (unsigned char *)SvPVbyte(in, in_len);
@@ -115,7 +115,7 @@ hkdf_expand(SV * in, const char * hash_name = "SHA256", unsigned long output_len
           RETVAL = newSVpvn("", 0);
         }
         else {
-          id = _find_hash(hash_name);
+          id = cryptx_internal_find_hash(hash_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
           if (SvPOK(in))   in_ptr = (unsigned char *)SvPVbyte(in, in_len);
@@ -150,7 +150,7 @@ hkdf(SV * in, SV * salt, const char * hash_name = "SHA256", unsigned long output
           RETVAL = newSVpvn("", 0);
         }
         else {
-          id = _find_hash(hash_name);
+          id = cryptx_internal_find_hash(hash_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
           if (SvPOK(in))   in_ptr   = (unsigned char *)SvPVbyte(in, in_len);

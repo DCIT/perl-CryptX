@@ -23,7 +23,7 @@ new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, in
         if (!SvPOK(adata)) croak("FATAL: adata must be string/buffer scalar");
         h = (unsigned char *) SvPVbyte(adata, h_len);
 
-        id = _find_cipher(cipher_name);
+        id = cryptx_internal_find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
         Newz(0, RETVAL, 1, ccm_state);
@@ -174,7 +174,7 @@ ccm_encrypt_authenticate(char *cipher_name, SV *key, SV *nonce, SV *header, unsi
         if (SvPOK(plaintext)) pt = (unsigned char *) SvPVbyte(plaintext, pt_len);
         if (SvPOK(header))    h  = (unsigned char *) SvPVbyte(header, h_len);
 
-        id = _find_cipher(cipher_name);
+        id = cryptx_internal_find_cipher(cipher_name);
         if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
         output = NEWSV(0, pt_len > 0 ? pt_len : 1); /* avoid zero! */
         SvPOK_only(output);
@@ -209,7 +209,7 @@ ccm_decrypt_verify(char *cipher_name, SV *key, SV *nonce, SV *header, SV *cipher
         if (SvPOK(tagsv))      t  = (unsigned char *) SvPVbyte(tagsv, t_len);
         if (SvPOK(header))     h  = (unsigned char *) SvPVbyte(header, h_len);
 
-        id = _find_cipher(cipher_name);
+        id = cryptx_internal_find_cipher(cipher_name);
         if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
         output = NEWSV(0, ct_len > 0 ? ct_len : 1); /* avoid zero! */
         SvPOK_only(output);
