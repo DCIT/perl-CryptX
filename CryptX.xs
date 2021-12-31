@@ -162,7 +162,7 @@ typedef struct x25519_struct {          /* used by Crypt::PK::X25519 */
   int initialized;
 } *Crypt__PK__X25519;
 
-int cryptx_internal_mp2hex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
+STATIC int cryptx_internal_mp2hex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
   int len, rv;
 
   if (mp_isneg(a) == MP_YES) {
@@ -191,7 +191,7 @@ int cryptx_internal_mp2hex_with_leading_zero(mp_int * a, char *str, int maxlen, 
   return MP_OKAY;
 }
 
-size_t cryptx_internal_find_start(const char *name, char *ltcname, size_t ltclen)
+STATIC size_t cryptx_internal_find_start(const char *name, char *ltcname, size_t ltclen)
 {
    size_t i, start = 0;
    if (name == NULL || strlen(name) + 1 > ltclen) croak("FATAL: invalid name") ;
@@ -211,7 +211,7 @@ size_t cryptx_internal_find_start(const char *name, char *ltcname, size_t ltclen
    return start;
 }
 
-int cryptx_internal_find_hash(const char *name)
+STATIC int cryptx_internal_find_hash(const char *name)
 {
    char ltcname[100] = { 0 };
    size_t start = cryptx_internal_find_start(name, ltcname, sizeof(ltcname) - 1);
@@ -226,7 +226,7 @@ int cryptx_internal_find_hash(const char *name)
    return find_hash(ltcname + start);
 }
 
-int cryptx_internal_find_cipher(const char *name)
+STATIC int cryptx_internal_find_cipher(const char *name)
 {
    char ltcname[100] = { 0 };
    size_t start = cryptx_internal_find_start(name, ltcname, sizeof(ltcname) - 1);
@@ -236,7 +236,7 @@ int cryptx_internal_find_cipher(const char *name)
    return find_cipher(ltcname + start);
 }
 
-int cryptx_internal_find_prng(const char *name)
+STATIC int cryptx_internal_find_prng(const char *name)
 {
   char ltcname[100] = { 0 };
   size_t start = cryptx_internal_find_start(name, ltcname, sizeof(ltcname) - 1);
@@ -252,7 +252,7 @@ STATIC SV * sv_from_mpi(mp_int *mpi) {
   return obj;
 }
 
-void cryptx_internal_ecc_oid_lookup(ecc_key *key)
+STATIC void cryptx_internal_ecc_oid_lookup(ecc_key *key)
 {
    int err;
    unsigned i, j;
@@ -295,7 +295,7 @@ void cryptx_internal_ecc_oid_lookup(ecc_key *key)
    }
 }
 
-int cryptx_internal_ecc_set_curve_from_SV(ecc_key *key, SV *curve)
+STATIC int cryptx_internal_ecc_set_curve_from_SV(ecc_key *key, SV *curve)
 {
   dTHX; /* fetch context */
   HV *hc, *h;
