@@ -4,7 +4,7 @@ package Crypt::Digest::Keccak512;
 
 use strict;
 use warnings;
-our $VERSION = '0.075_001';
+our $VERSION = '0.075_002';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( keccak512 keccak512_hex keccak512_b64 keccak512_b64u keccak512_file keccak512_file_hex keccak512_file_b64 keccak512_file_b64u )] );
