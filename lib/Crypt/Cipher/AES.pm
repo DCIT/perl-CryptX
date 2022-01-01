@@ -4,7 +4,7 @@ package Crypt::Cipher::AES;
 
 use strict;
 use warnings;
-our $VERSION = '0.075';
+our $VERSION = '0.075_001';
 
 use base qw(Crypt::Cipher);
 
