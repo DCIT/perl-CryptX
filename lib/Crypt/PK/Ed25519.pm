@@ -319,7 +319,7 @@ See L<https://tools.ietf.org/html/rfc8037>
   "d":"RcEJum_STotn0j77a5LZnNRX4hNxcsDXSf4rWgwULa0",
  }
 
-B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
+B<BEWARE:> For JWK support you need to have L<JSON> module installed.
 
 =item * Ed25519 public keys in JSON Web Key (JWK) format
 
@@ -329,7 +329,7 @@ B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel
   "x":"oF0a6lgwrJplzfs4RmDUl-NpfEa0Gc8s7IXei9JFRZ0",
  }
 
-B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
+B<BEWARE:> For JWK support you need to have L<JSON> module installed.
 
 =back
 
@@ -382,7 +382,7 @@ Also exports public/private keys as a perl HASH with JWK structure.
  #or
  my $jwk_hash = $pk->export_key_jwk('public', 1);
 
-B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
+B<BEWARE:> For JWK support you need to have L<JSON> module installed.
 
 =head2 export_key_raw
 
