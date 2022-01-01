@@ -59,11 +59,11 @@ jobs:
           perl Makefile.PL
           make -j4
         env:
-          AUTHOR_MODE: 1
+          AUTHOR_MODE: 0
       - name: Run tests
         run: prove -bv t
         env:
-          AUTHOR_MODE: 1
+          AUTHOR_MODE: 0
 
   windows:
     runs-on: windows-latest
@@ -85,11 +85,11 @@ jobs:
           perl Makefile.PL
           make -j4
         env:
-          AUTHOR_MODE: 1
+          AUTHOR_MODE: 0
       - name: Run tests
         run: prove -bv t
         env:
-          AUTHOR_MODE: 1
+          AUTHOR_MODE: 0
 
   cygwin:
     runs-on: windows-latest
@@ -118,4 +118,4 @@ jobs:
         run: cd $GITHUB_WORKSPACE; prove -bv t
         shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
         env:
-          AUTHOR_MODE: 1
+          AUTHOR_MODE: 0
