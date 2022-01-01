@@ -64,7 +64,7 @@ else {
   );
 
   #FIX: https://github.com/DCIT/perl-CryptX/pull/79
-  if ($^O ne 'MSWin32' && $Config{ld} =~ /gcc|g\+\+/) {
+  if ($^O ne 'MSWin32' && ($Config{ld} =~ /gcc|g\+\+/ || $Config{gccversion})) {
      push @EUMM_INC_LIB, (LDDLFLAGS => "$Config{lddlflags} -Wl,--exclude-libs,ALL");
   }
 }
