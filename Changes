@@ -1,5 +1,10 @@
 Changes for CryptX
 
+0.076   2022-01-XX
+        - fix #80 github actions (mac, windows, cygwin)
+        - fix #79 isolate ltc functions (via -Wl,--exclude-libs,ALL)
+        - fix #68 Segmentation fault on Apache due to symbol clash with libasn1
+
 0.075   2021-12-25
         - fix #78 bundled libtomcrypt update branch:develop (commit:673f5ce2 2021-06-04)
 
