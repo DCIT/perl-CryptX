@@ -1,4 +1,5 @@
-name: linux
+name: combined
+
 on:
   push:
     branches:
@@ -6,8 +7,9 @@ on:
     tags-ignore:
       - '*'
   pull_request:
+
 jobs:
-  perl:
+  ubuntu:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,6 +32,28 @@ jobs:
       - name: Install dependencies
         run: |
           cpanm -n --installdeps .
+      - name: Run build
+        run: |
+          perl Makefile.PL
+          make -j4
+        env:
+          AUTHOR_MODE: 1
+      - name: Run tests
+        run: prove -bv t
+        env:
+          AUTHOR_MODE: 1
+
+  mac:
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Perl
+        run: brew install perl
+      - name: perl -V
+        run: perl -V
+      - name: Install Dependencies
+        run: curl -L https://cpanmin.us | perl - --notest --installdeps .
       - name: Run build
         run: |
           perl Makefile.PL
