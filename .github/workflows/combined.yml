@@ -99,7 +99,7 @@ jobs:
         uses: egor-tensin/setup-cygwin@v3
         with:
             platform: x64
-            packages: perl_base perl-ExtUtils-MakeMaker make gcc-g++ bash
+            packages: perl_base perl-ExtUtils-MakeMaker make gcc-g++ bash libcrypt-devel
       - uses: actions/checkout@v2
       - run: perl -V
         shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
