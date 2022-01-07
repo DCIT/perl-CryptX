@@ -64,8 +64,10 @@ else {
   );
 
   #FIX: https://github.com/DCIT/perl-CryptX/pull/79
+  # not needed on MS Windows
   # does not work on macos - Apple LLVM 12.0.5 (clang-1205.0.22.9) ld: unknown option: --exclude-libs
-  if ($^O ne 'MSWin32' && $^O ne 'darwin' && ($Config{ld} =~ /gcc|g\+\+/ || $Config{gccversion})) {
+  # does not work on solaris - gcc 9.3.0 - ld: fatal: unrecognized option '--exclude-libs'
+  if ($^O !~ /^(MSWin32|darwin|solaris)$/ && ($Config{ld} =~ /gcc|g\+\+/ || $Config{gccversion})) {
      push @EUMM_INC_LIB, (LDDLFLAGS => "$Config{lddlflags} -Wl,--exclude-libs,ALL");
   }
 }
