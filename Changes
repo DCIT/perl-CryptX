@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.076   2022-01-XX
+0.076   2022-01-07
         - fix #80 github actions (mac, windows, cygwin)
         - fix #79 isolate ltc functions (via -Wl,--exclude-libs,ALL)
         - fix #68 Segmentation fault on Apache due to symbol clash with libasn1
