@@ -4,7 +4,7 @@ package Crypt::Mac::Pelican;
 
 use strict;
 use warnings;
-our $VERSION = '0.075_003';
+our $VERSION = '0.076';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( pelican pelican_hex pelican_b64 pelican_b64u )] );

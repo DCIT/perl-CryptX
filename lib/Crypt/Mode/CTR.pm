@@ -4,7 +4,7 @@ package Crypt::Mode::CTR;
 
 use strict;
 use warnings;
-our $VERSION = '0.075_003';
+our $VERSION = '0.076';
 
 use Crypt::Cipher;
 
