@@ -120,7 +120,7 @@ is ($cl->new('1.2')->bpow('0.3',10),  '1.056219968');
 is ($cl->new('10')->bpow('0.6',10),   '3.981071706');
 
 # blog should handle bigint input
-is (Math::BigFloat::blog(Math::BigInt->new(100),10), 2, "blog(100)");
+is (Math::BigFloat->blog(Math::BigInt->new(100),10), 2, "blog(100)");
 
 #############################################################################
 # some integer results

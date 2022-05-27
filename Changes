@@ -1,5 +1,8 @@
 Changes for CryptX
 
+0.077
+        - fix #82 issues in tests by Math::BigInt 1.999831
+
 0.076   2022-01-07
         - fix #80 github actions (mac, windows, cygwin)
         - fix #79 isolate ltc functions (via -Wl,--exclude-libs,ALL)
