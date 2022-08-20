@@ -2,7 +2,7 @@ package Crypt::PRNG::Yarrow;
 
 use strict;
 use warnings;
-our $VERSION = '0.076_001';
+our $VERSION = '0.076_002';
 
 use base qw(Crypt::PRNG Exporter);
 our %EXPORT_TAGS = ( all => [qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand)] );

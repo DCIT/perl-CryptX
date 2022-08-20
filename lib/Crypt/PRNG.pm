@@ -2,7 +2,7 @@ package Crypt::PRNG;
 
 use strict;
 use warnings;
-our $VERSION = '0.076_001';
+our $VERSION = '0.076_002';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand)] );
