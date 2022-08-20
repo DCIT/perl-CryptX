@@ -16,7 +16,7 @@ use Test::More;
 
 BEGIN {
   plan skip_all => "requires Math::BigInt 1.9997+" unless eval { require Math::BigInt && eval($Math::BigInt::VERSION) >= 1.9997 };
-  plan tests => 71;
+  plan tests => 70;
 }
 
 use Math::BigFloat only => 'LTM';
@@ -118,9 +118,6 @@ is ($cl->new('16')->blog(2,10), '4.000000000');         # 2 ** 4 == 16
 
 is ($cl->new('1.2')->bpow('0.3',10),  '1.056219968');
 is ($cl->new('10')->bpow('0.6',10),   '3.981071706');
-
-# blog should handle bigint input
-is (Math::BigFloat::blog(Math::BigInt->new(100),10), 2, "blog(100)");
 
 #############################################################################
 # some integer results
