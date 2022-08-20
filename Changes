@@ -1,5 +1,8 @@
 Changes for CryptX
 
+0.077   2022-NEXT
+        - fix #82 new t/mbi_ltm_big*.t failures
+
 0.076   2022-01-07
         - fix #80 github actions (mac, windows, cygwin)
         - fix #79 isolate ltc functions (via -Wl,--exclude-libs,ALL)
