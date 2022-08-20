@@ -15,7 +15,7 @@ my ($x, $y);
 ### https://github.com/DCIT/perl-CryptX/issues/82
 
 $x = Math::BigFloat->new("0");
-$y = Math::BigFloat->new("20"); 
+$y = Math::BigFloat->new("20");
 $x->bcos($y);
 is($x, "1.0000000000000000000");
 $x = Math::BigFloat->new("0");
