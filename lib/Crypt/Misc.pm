@@ -2,7 +2,7 @@ package Crypt::Misc;
 
 use strict;
 use warnings;
-our $VERSION = '0.076_003';
+our $VERSION = '0.077';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 use Carp 'croak';
