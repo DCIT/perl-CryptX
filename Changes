@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.077   2022-NEXT
+0.077   2022-08-21
         - fix #82 + #84 new t/mbi_ltm_big*.t failures
         - fix #85 wrong linker options for aix
 
