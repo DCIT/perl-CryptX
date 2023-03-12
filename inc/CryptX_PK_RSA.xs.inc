@@ -295,10 +295,10 @@ export_key_der(Crypt::PK::RSA self, char * type)
         RETVAL
 
 SV *
-encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * oaep_hash = "SHA1", SV * oaep_lparam = NULL)
+encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * mgf_hash = "SHA1", SV * oaep_lparam = NULL, const char * lparam_hash = "SHA1")
     CODE:
     {
-        int rv, hash_id;
+        int rv, mgf_hash_id, lparam_hash_id;
         unsigned char *lparam_ptr=NULL;
         STRLEN lparam_len=0;
         unsigned char *data_ptr=NULL;
@@ -310,19 +310,21 @@ encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "oaep", 4)) {
-          hash_id = cryptx_internal_find_hash(oaep_hash);
-          if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
+          mgf_hash_id = cryptx_internal_find_hash(mgf_hash);
+          if (mgf_hash_id == -1) croak("FATAL: find_hash failed for '%s'", mgf_hash);
+          lparam_hash_id = cryptx_internal_find_hash(lparam_hash);
+          if (lparam_hash_id == -1) croak("FATAL: find_hash failed for '%s'", lparam_hash);
           if (oaep_lparam) lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_encrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
                                   &self->pstate, self->pindex,
-                                  hash_id, LTC_PKCS_1_OAEP, &self->key);
+                                  mgf_hash_id, lparam_hash_id, LTC_PKCS_1_OAEP, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_encrypt_key_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
           rv = rsa_encrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, NULL, 0,
                                   &self->pstate, self->pindex,
-                                  0, LTC_PKCS_1_V1_5, &self->key);
+                                  0, -1, LTC_PKCS_1_V1_5, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_encrypt_key_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
@@ -340,10 +342,10 @@ encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
         RETVAL
 
 SV *
-decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * oaep_hash = "SHA1", SV * oaep_lparam = NULL)
+decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * mgf_hash = "SHA1", SV * oaep_lparam = NULL, const char * lparam_hash = "SHA1")
     CODE:
     {
-        int rv, hash_id, stat;
+        int rv, lparam_hash_id, mgf_hash_id, stat;
         unsigned char *lparam_ptr=NULL;
         STRLEN lparam_len=0;
         unsigned char *data_ptr=NULL;
@@ -355,18 +357,20 @@ decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(padding, "oaep", 4)) {
-          hash_id = cryptx_internal_find_hash(oaep_hash);
-          if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", oaep_hash);
+          mgf_hash_id = cryptx_internal_find_hash(mgf_hash);
+          if (mgf_hash_id == -1) croak("FATAL: find_hash failed for '%s'", mgf_hash);
+          lparam_hash_id = cryptx_internal_find_hash(lparam_hash);
+          if (lparam_hash_id == -1) croak("FATAL: find_hash failed for '%s'", lparam_hash);
           if (oaep_lparam) lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_decrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
-                                  hash_id, LTC_PKCS_1_OAEP, &stat, &self->key);
+                                    mgf_hash_id, lparam_hash_id, LTC_PKCS_1_OAEP, &stat, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_decrypt_key_ex failed: %s", error_to_string(rv));
           if (stat != 1) croak("FATAL: rsa_decrypt - not valid OAEP packet");
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
           rv = rsa_decrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, NULL, 0,
-                                  0, LTC_PKCS_1_V1_5, &stat, &self->key);
+                                  0, -1, LTC_PKCS_1_V1_5, &stat, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_decrypt_key_ex failed: %s", error_to_string(rv));
           if (stat != 1) croak("FATAL: rsa_decrypt - invalid");
           RETVAL = newSVpvn((char*)buffer, buffer_len);
