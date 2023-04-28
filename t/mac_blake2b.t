@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 36 + 8;
+use Test::More tests => 36 + 10;
 
 use Crypt::Mac::BLAKE2b qw( blake2b blake2b_hex blake2b_b64 blake2b_b64u );
 
@@ -46,7 +46,9 @@ is( blake2b_b64u(32,'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',"test\0test\0test\n"), '3
 
 is( unpack('H*', Crypt::Mac::BLAKE2b->new(32, '12345678901234561234567890123456')->add("A","A","A")->mac), '794a20cc22c1f9f278aa1219ded10105cc9cfd264e66a327f32fbc309b2d404f', 'BLAKE2b/oo+raw/tripple_A');
 is( unpack('H*', Crypt::Mac::BLAKE2b->new(32, '12345678901234561234567890123456')->add("A")->add("A")->add("A")->mac), '794a20cc22c1f9f278aa1219ded10105cc9cfd264e66a327f32fbc309b2d404f', 'BLAKE2b/oo3+raw/tripple_A');
-is( Crypt::Mac::BLAKE2b->new(32, '12345678901234561234567890123456')->add("A","A","A")->hexmac, '794a20cc22c1f9f278aa1219ded10105cc9cfd264e66a327f32fbc309b2d404f', 'BLAKE2b/oo+hex/tripple_A');
+is( Crypt::Mac::BLAKE2b->new(32, '12345678901234561234567890123456')->add("A","A","A")->b64mac,  'eUogzCLB+fJ4qhIZ3tEBBcyc/SZOZqMn8y+8MJstQE8=',  'BLAKE2b/oo+b64/tripple_A');
+is( Crypt::Mac::BLAKE2b->new(32, '12345678901234561234567890123456')->add("A","A","A")->b64umac, 'eUogzCLB-fJ4qhIZ3tEBBcyc_SZOZqMn8y-8MJstQE8', 'BLAKE2b/oo+b64u/tripple_A');
+is( Crypt::Mac::BLAKE2b->new(32, '12345678901234561234567890123456')->add("A","A","A")->hexmac,  '794a20cc22c1f9f278aa1219ded10105cc9cfd264e66a327f32fbc309b2d404f',  'BLAKE2b/oo+hex/tripple_A');
 is( Crypt::Mac::BLAKE2b->new(32, '12345678901234561234567890123456')->add("A")->add("A")->add("A")->hexmac, '794a20cc22c1f9f278aa1219ded10105cc9cfd264e66a327f32fbc309b2d404f', 'BLAKE2b/oo3+hex/tripple_A');
 is( unpack('H*', blake2b(32, '12345678901234561234567890123456',"A","A","A")), '794a20cc22c1f9f278aa1219ded10105cc9cfd264e66a327f32fbc309b2d404f', 'BLAKE2b/func+raw/tripple_A');
 is( blake2b_hex (32, '12345678901234561234567890123456',"A","A","A"), '794a20cc22c1f9f278aa1219ded10105cc9cfd264e66a327f32fbc309b2d404f',  'BLAKE2b/func+hex/tripple_A');

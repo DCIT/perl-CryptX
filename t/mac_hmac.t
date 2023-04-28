@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 72 + 8;
+use Test::More tests => 72 + 10;
 
 use Crypt::Mac::HMAC qw( hmac hmac_hex hmac_b64 hmac_b64u );
 
@@ -82,7 +82,9 @@ is( hmac_b64u('Whirlpool','secretkey',"test\0test\0test\n"), '2raiLgW0bOZB4CLm6i
 
 is( unpack('H*', Crypt::Mac::HMAC->new('SHA1', 'secretkey')->add("A","A","A")->mac), '99070fd56a6595bbb458747d63808344fed0b9c1', 'HMAC/oo+raw/tripple_A');
 is( unpack('H*', Crypt::Mac::HMAC->new('SHA1', 'secretkey')->add("A")->add("A")->add("A")->mac), '99070fd56a6595bbb458747d63808344fed0b9c1', 'HMAC/oo3+raw/tripple_A');
-is( Crypt::Mac::HMAC->new('SHA1', 'secretkey')->add("A","A","A")->hexmac, '99070fd56a6595bbb458747d63808344fed0b9c1', 'HMAC/oo+hex/tripple_A');
+is( Crypt::Mac::HMAC->new('SHA1', 'secretkey')->add("A","A","A")->b64mac,  'mQcP1Wpllbu0WHR9Y4CDRP7QucE=',  'HMAC/oo+b64/tripple_A');
+is( Crypt::Mac::HMAC->new('SHA1', 'secretkey')->add("A","A","A")->b64umac, 'mQcP1Wpllbu0WHR9Y4CDRP7QucE', 'HMAC/oo+b64u/tripple_A');
+is( Crypt::Mac::HMAC->new('SHA1', 'secretkey')->add("A","A","A")->hexmac,  '99070fd56a6595bbb458747d63808344fed0b9c1',  'HMAC/oo+hex/tripple_A');
 is( Crypt::Mac::HMAC->new('SHA1', 'secretkey')->add("A")->add("A")->add("A")->hexmac, '99070fd56a6595bbb458747d63808344fed0b9c1', 'HMAC/oo3+hex/tripple_A');
 is( unpack('H*', hmac('SHA1', 'secretkey',"A","A","A")), '99070fd56a6595bbb458747d63808344fed0b9c1', 'HMAC/func+raw/tripple_A');
 is( hmac_hex ('SHA1', 'secretkey',"A","A","A"), '99070fd56a6595bbb458747d63808344fed0b9c1',  'HMAC/func+hex/tripple_A');

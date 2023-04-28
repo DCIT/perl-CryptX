@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 36 + 8;
+use Test::More tests => 36 + 10;
 
 use Crypt::Mac::Poly1305 qw( poly1305 poly1305_hex poly1305_b64 poly1305_b64u );
 
@@ -46,7 +46,9 @@ is( poly1305_b64u('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',"test\0test\0test\n"), 'TAL
 
 is( unpack('H*', Crypt::Mac::Poly1305->new('12345678901234561234567890123456')->add("A","A","A")->mac), '7c1e6c34ad72384ac4f52eb49f642abc', 'Poly1305/oo+raw/tripple_A');
 is( unpack('H*', Crypt::Mac::Poly1305->new('12345678901234561234567890123456')->add("A")->add("A")->add("A")->mac), '7c1e6c34ad72384ac4f52eb49f642abc', 'Poly1305/oo3+raw/tripple_A');
-is( Crypt::Mac::Poly1305->new('12345678901234561234567890123456')->add("A","A","A")->hexmac, '7c1e6c34ad72384ac4f52eb49f642abc', 'Poly1305/oo+hex/tripple_A');
+is( Crypt::Mac::Poly1305->new('12345678901234561234567890123456')->add("A","A","A")->b64mac,  'fB5sNK1yOErE9S60n2QqvA==',  'Poly1305/oo+b64/tripple_A');
+is( Crypt::Mac::Poly1305->new('12345678901234561234567890123456')->add("A","A","A")->b64umac, 'fB5sNK1yOErE9S60n2QqvA', 'Poly1305/oo+b64u/tripple_A');
+is( Crypt::Mac::Poly1305->new('12345678901234561234567890123456')->add("A","A","A")->hexmac,  '7c1e6c34ad72384ac4f52eb49f642abc',  'Poly1305/oo+hex/tripple_A');
 is( Crypt::Mac::Poly1305->new('12345678901234561234567890123456')->add("A")->add("A")->add("A")->hexmac, '7c1e6c34ad72384ac4f52eb49f642abc', 'Poly1305/oo3+hex/tripple_A');
 is( unpack('H*', poly1305('12345678901234561234567890123456',"A","A","A")), '7c1e6c34ad72384ac4f52eb49f642abc', 'Poly1305/func+raw/tripple_A');
 is( poly1305_hex ('12345678901234561234567890123456',"A","A","A"), '7c1e6c34ad72384ac4f52eb49f642abc',  'Poly1305/func+hex/tripple_A');

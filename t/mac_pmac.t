@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 72 + 8;
+use Test::More tests => 72 + 10;
 
 use Crypt::Mac::PMAC qw( pmac pmac_hex pmac_b64 pmac_b64u );
 
@@ -82,7 +82,9 @@ is( pmac_b64u('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"
 
 is( unpack('H*', Crypt::Mac::PMAC->new('AES', '1234567890123456')->add("A","A","A")->mac), 'c46c52ff026e4e24837bc51a7e21f8cb', 'PMAC/oo+raw/tripple_A');
 is( unpack('H*', Crypt::Mac::PMAC->new('AES', '1234567890123456')->add("A")->add("A")->add("A")->mac), 'c46c52ff026e4e24837bc51a7e21f8cb', 'PMAC/oo3+raw/tripple_A');
-is( Crypt::Mac::PMAC->new('AES', '1234567890123456')->add("A","A","A")->hexmac, 'c46c52ff026e4e24837bc51a7e21f8cb', 'PMAC/oo+hex/tripple_A');
+is( Crypt::Mac::PMAC->new('AES', '1234567890123456')->add("A","A","A")->b64mac,  'xGxS/wJuTiSDe8UafiH4yw==',  'PMAC/oo+b64/tripple_A');
+is( Crypt::Mac::PMAC->new('AES', '1234567890123456')->add("A","A","A")->b64umac, 'xGxS_wJuTiSDe8UafiH4yw', 'PMAC/oo+b64u/tripple_A');
+is( Crypt::Mac::PMAC->new('AES', '1234567890123456')->add("A","A","A")->hexmac,  'c46c52ff026e4e24837bc51a7e21f8cb',  'PMAC/oo+hex/tripple_A');
 is( Crypt::Mac::PMAC->new('AES', '1234567890123456')->add("A")->add("A")->add("A")->hexmac, 'c46c52ff026e4e24837bc51a7e21f8cb', 'PMAC/oo3+hex/tripple_A');
 is( unpack('H*', pmac('AES', '1234567890123456',"A","A","A")), 'c46c52ff026e4e24837bc51a7e21f8cb', 'PMAC/func+raw/tripple_A');
 is( pmac_hex ('AES', '1234567890123456',"A","A","A"), 'c46c52ff026e4e24837bc51a7e21f8cb',  'PMAC/func+hex/tripple_A');

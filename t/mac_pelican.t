@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 72 + 8;
+use Test::More tests => 72 + 10;
 
 use Crypt::Mac::Pelican qw( pelican pelican_hex pelican_b64 pelican_b64u );
 
@@ -82,7 +82,9 @@ is( pelican_b64u('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',"test\0test\0test\n"), 'inmP
 
 is( unpack('H*', Crypt::Mac::Pelican->new('1234567890123456')->add("A","A","A")->mac), '6f7dda998b3fdfeaa80737e5127532a5', 'Pelican/oo+raw/tripple_A');
 is( unpack('H*', Crypt::Mac::Pelican->new('1234567890123456')->add("A")->add("A")->add("A")->mac), '6f7dda998b3fdfeaa80737e5127532a5', 'Pelican/oo3+raw/tripple_A');
-is( Crypt::Mac::Pelican->new('1234567890123456')->add("A","A","A")->hexmac, '6f7dda998b3fdfeaa80737e5127532a5', 'Pelican/oo+hex/tripple_A');
+is( Crypt::Mac::Pelican->new('1234567890123456')->add("A","A","A")->b64mac,  'b33amYs/3+qoBzflEnUypQ==',  'Pelican/oo+b64/tripple_A');
+is( Crypt::Mac::Pelican->new('1234567890123456')->add("A","A","A")->b64umac, 'b33amYs_3-qoBzflEnUypQ', 'Pelican/oo+b64u/tripple_A');
+is( Crypt::Mac::Pelican->new('1234567890123456')->add("A","A","A")->hexmac,  '6f7dda998b3fdfeaa80737e5127532a5',  'Pelican/oo+hex/tripple_A');
 is( Crypt::Mac::Pelican->new('1234567890123456')->add("A")->add("A")->add("A")->hexmac, '6f7dda998b3fdfeaa80737e5127532a5', 'Pelican/oo3+hex/tripple_A');
 is( unpack('H*', pelican('1234567890123456',"A","A","A")), '6f7dda998b3fdfeaa80737e5127532a5', 'Pelican/func+raw/tripple_A');
 is( pelican_hex ('1234567890123456',"A","A","A"), '6f7dda998b3fdfeaa80737e5127532a5',  'Pelican/func+hex/tripple_A');

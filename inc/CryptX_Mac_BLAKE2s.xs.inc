@@ -81,12 +81,12 @@ mac(Crypt::Mac::BLAKE2s self)
           if (rv != CRYPT_OK) croak("FATAL: base64url_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
-        if (ix == 2) {
+        else if (ix == 2) {
           rv = base64_encode(mac, maclen, out, &outlen);
           if (rv != CRYPT_OK) croak("FATAL: base64_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);
         }
-        if (ix == 1) {
+        else if (ix == 1) {
           rv = base16_encode(mac, maclen, out, &outlen, 0);
           if (rv != CRYPT_OK) croak("FATAL: base16_encode failed: %s", error_to_string(rv));
           RETVAL = newSVpvn(out, outlen);

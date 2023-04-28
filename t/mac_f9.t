@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 72 + 8;
+use Test::More tests => 72 + 10;
 
 use Crypt::Mac::F9 qw( f9 f9_hex f9_b64 f9_b64u );
 
@@ -82,7 +82,9 @@ is( f9_b64u('Blowfish','12345678901234561234567890123456',"test\0test\0test\n"),
 
 is( unpack('H*', Crypt::Mac::F9->new('AES', '1234567890123456')->add("A","A","A")->mac), 'a30e9e0ee8cd9d7401f9a9967e82b5a1', 'F9/oo+raw/tripple_A');
 is( unpack('H*', Crypt::Mac::F9->new('AES', '1234567890123456')->add("A")->add("A")->add("A")->mac), 'a30e9e0ee8cd9d7401f9a9967e82b5a1', 'F9/oo3+raw/tripple_A');
-is( Crypt::Mac::F9->new('AES', '1234567890123456')->add("A","A","A")->hexmac, 'a30e9e0ee8cd9d7401f9a9967e82b5a1', 'F9/oo+hex/tripple_A');
+is( Crypt::Mac::F9->new('AES', '1234567890123456')->add("A","A","A")->b64mac,  'ow6eDujNnXQB+amWfoK1oQ==',  'F9/oo+b64/tripple_A');
+is( Crypt::Mac::F9->new('AES', '1234567890123456')->add("A","A","A")->b64umac, 'ow6eDujNnXQB-amWfoK1oQ', 'F9/oo+b64u/tripple_A');
+is( Crypt::Mac::F9->new('AES', '1234567890123456')->add("A","A","A")->hexmac,  'a30e9e0ee8cd9d7401f9a9967e82b5a1',  'F9/oo+hex/tripple_A');
 is( Crypt::Mac::F9->new('AES', '1234567890123456')->add("A")->add("A")->add("A")->hexmac, 'a30e9e0ee8cd9d7401f9a9967e82b5a1', 'F9/oo3+hex/tripple_A');
 is( unpack('H*', f9('AES', '1234567890123456',"A","A","A")), 'a30e9e0ee8cd9d7401f9a9967e82b5a1', 'F9/func+raw/tripple_A');
 is( f9_hex ('AES', '1234567890123456',"A","A","A"), 'a30e9e0ee8cd9d7401f9a9967e82b5a1',  'F9/func+hex/tripple_A');
