@@ -1,5 +1,8 @@
 Changes for CryptX
 
+0.078   2023-04-28
+        - fix #89 Crypt::Mac::HMAC b64mac and b64umac object methods do not work
+
 0.077   2022-08-21
         - fix #82 + #84 new t/mbi_ltm_big*.t failures
         - fix #85 wrong linker options for aix
