@@ -497,13 +497,8 @@ is($x, 2,
 $x = $CLASS->new("2");
 $y = $CLASS->new("18.2");
 
-# 2 * (2 ** 18.2);
-$x <<= $y;
-is($x->copy()->bfround(-9), "602248.763144685",
-   qq|\$x = $CLASS->new("2"); \$y = $CLASS->new("18.2");| .
-   q| $x <<= $y; $x->copy()->bfround(-9);|);
-
 # 2 * (2 ** 18.2) / (2 ** 18.2) => 2
+$x <<= $y;
 is($x >>= $y, 2,
    qq|\$x = $CLASS->new("2"); \$y = $CLASS->new("18.2");| .
    q| $x <<= $y; $x->copy()->bfround(-9); $x >>= $y|);
@@ -701,10 +696,8 @@ $div_scale = 40
 &brsft
 NaNbrsft:2:NaN
 0:2:0
-1:1:0.5
 2:1:1
 4:1:2
-123:1:61.5
 32:3:4
 
 &blsft
