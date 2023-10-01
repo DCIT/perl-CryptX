@@ -1,5 +1,8 @@
 Changes for CryptX
 
+0.079_003   2023-01-10
+        - Disable AES-NI
+
 0.079_002   2023-01-10
         - Enable AES-NI on gcc/clang/llvm
 
