@@ -28,10 +28,12 @@ jobs:
           - '5.30'
           - '5.32'
           - '5.34'
+          - '5.36'
+          - '5.38'
     container:
       image: perl:${{ matrix.perl-version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: perl -V
         run: perl -V
       - name: Install dependencies
@@ -52,7 +54,7 @@ jobs:
     runs-on: macOS-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Perl
         run: brew install perl
       - name: perl -V
@@ -78,7 +80,7 @@ jobs:
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Perl
         run: |
           choco install strawberryperl
@@ -113,7 +115,7 @@ jobs:
         with:
             platform: x64
             packages: perl_base perl-ExtUtils-MakeMaker make gcc-g++ bash libcrypt-devel libnsl-devel
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: perl -V
         shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
       - run: cpan App::cpanminus
