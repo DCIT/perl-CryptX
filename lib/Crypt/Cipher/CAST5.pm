@@ -4,7 +4,7 @@ package Crypt::Cipher::CAST5;
 
 use strict;
 use warnings;
-our $VERSION = '0.078_001';
+our $VERSION = '0.079';
 
 use base qw(Crypt::Cipher);
 
