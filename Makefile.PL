@@ -27,6 +27,14 @@ else {
   );
   $mycflags = " $Config{ccflags} $Config{cccdlflags} $Config{optimize} "; # keep leading + trailing spaces
 
+  if ($Config{gccversion}) {
+    my $ver1;
+    $ver1 ||= $1 if $Config{gccversion} =~ /^([0-9]+)\./; # gccversion='10.2.0'
+    $ver1 ||= $1 if $Config{gccversion} =~ /LLVM ([0-9]+)\./i; # gccversion='Apple LLVM 14.0.0 (clang-1400.0.29.202)'
+    $ver1 ||= $1 if $Config{gccversion} =~ /Clang ([0-9]+)\./i; # gccversion='FreeBSD Clang 13.0.0 (git@github.com:llvm/llvm-project.git llvmorg-13.0.0-0-gd7b669b3a303)' or 'OpenBSD Clang 13.0.0'
+    $mycflags .= " -msse4.1 -maes" if $ver1 > 5; # supported since gcc-4.4
+  }
+
   #FIX: this is particularly useful for Debian https://github.com/DCIT/perl-CryptX/pull/39
   $mycflags .= " $ENV{CFLAGS} "   if $ENV{CFLAGS};
   $mycflags .= " $ENV{CPPFLAGS} " if $ENV{CPPFLAGS};
