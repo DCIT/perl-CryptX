@@ -1,7 +1,8 @@
 Changes for CryptX
 
-0.078_001
-        - bundled libtomcrypt update branch:develop (commit:1e629e6f 2023-06-22)
+0.079   2023-01-10
+         - fix #92 update libtomcrypt
+         - bundled libtomcrypt update branch:develop (commit:1e629e6f 2023-06-22)
 
 0.078   2023-04-28
         - fix #89 Crypt::Mac::HMAC b64mac and b64umac object methods do not work
