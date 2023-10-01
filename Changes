@@ -1,5 +1,8 @@
 Changes for CryptX
 
+0.079_002   2023-01-10
+        - Enable AES-NI on gcc/clang/llvm
+
 0.079_001   2023-01-10
         - update Math::BigInt::LTM test suite to be compatible with Math::BigInt 1.999842+
 
