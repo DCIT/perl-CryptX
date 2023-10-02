@@ -15,12 +15,12 @@ new(Class, SV * key)
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        Newz(0, RETVAL, 1, pelican_state);
-        if (!RETVAL) croak("FATAL: Newz failed");
+        AlignedNewx(RETVAL, 1, pelican_state, 16);
+        if (!RETVAL) croak("FATAL: AlignedNewx failed");
 
         rv = pelican_init(RETVAL, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
-          Safefree(RETVAL);
+          AlignedSafefree(RETVAL);
           croak("FATAL: pelican_init failed: %s", error_to_string(rv));
         }
     }
@@ -30,13 +30,13 @@ new(Class, SV * key)
 void
 DESTROY(Crypt::Mac::Pelican self)
     CODE:
-        Safefree(self);
+        AlignedSafefree(self);
 
 Crypt::Mac::Pelican
 clone(Crypt::Mac::Pelican self)
     CODE:
-        Newz(0, RETVAL, 1, pelican_state);
-        if (!RETVAL) croak("FATAL: Newz failed");
+        AlignedNewx(RETVAL, 1, pelican_state, 16);
+        if (!RETVAL) croak("FATAL: AlignedNewx failed");
         Copy(self, RETVAL, 1, pelican_state);
     OUTPUT:
         RETVAL

@@ -20,12 +20,12 @@ new(Class, char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
         id = cryptx_internal_find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
-        Newz(0, RETVAL, 1, ocb3_state);
-        if (!RETVAL) croak("FATAL: Newz failed");
+        AlignedNewx(RETVAL, 1, ocb3_state, 16);
+        if (!RETVAL) croak("FATAL: AlignedNewx failed");
 
         rv = ocb3_init(RETVAL, id, k, (unsigned long)k_len, n, (unsigned long)n_len, taglen);
         if (rv != CRYPT_OK) {
-          Safefree(RETVAL);
+          AlignedSafefree(RETVAL);
           croak("FATAL: ocb setup failed: %s", error_to_string(rv));
         }
     }
@@ -35,13 +35,13 @@ new(Class, char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
 void
 DESTROY(Crypt::AuthEnc::OCB self)
     CODE:
-        Safefree(self);
+        AlignedSafefree(self);
 
 Crypt::AuthEnc::OCB
 clone(Crypt::AuthEnc::OCB self)
     CODE:
-        Newz(0, RETVAL, 1, ocb3_state);
-        if (!RETVAL) croak("FATAL: Newz failed");
+        AlignedNewx(RETVAL, 1, ocb3_state, 16);
+        if (!RETVAL) croak("FATAL: AlignedNewx failed");
         Copy(self, RETVAL, 1, ocb3_state);
     OUTPUT:
         RETVAL

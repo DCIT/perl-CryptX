@@ -22,6 +22,14 @@
 #include "tomcrypt.h"
 #include "tommath.h"
 
+#if defined(_WIN32)
+# define AlignedNewx(v,n,t,a)   (v = _aligned_malloc((MEM_SIZE)((n)*sizeof(t)),a))
+# define AlignedSafefree(v)     _aligned_free(v)
+#else
+# define AlignedNewx(v,n,t,a)   Newx(v,n,t)
+# define AlignedSafefree(v)     Safefree(v)
+#endif
+
 typedef adler32_state           *Crypt__Checksum__Adler32;
 typedef crc32_state             *Crypt__Checksum__CRC32;
 

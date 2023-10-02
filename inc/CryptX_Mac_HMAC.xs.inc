@@ -19,12 +19,12 @@ new(Class, char * hash_name, SV * key)
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        Newz(0, RETVAL, 1, hmac_state);
-        if (!RETVAL) croak("FATAL: Newz failed");
+        AlignedNewx(RETVAL, 1, hmac_state, 16);
+        if (!RETVAL) croak("FATAL: AlignedNewx failed");
 
         rv = hmac_init(RETVAL, id, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
-          Safefree(RETVAL);
+          AlignedSafefree(RETVAL);
           croak("FATAL: hmac_init failed: %s", error_to_string(rv));
         }
     }
@@ -34,13 +34,13 @@ new(Class, char * hash_name, SV * key)
 void
 DESTROY(Crypt::Mac::HMAC self)
     CODE:
-        Safefree(self);
+        AlignedSafefree(self);
 
 Crypt::Mac::HMAC
 clone(Crypt::Mac::HMAC self)
     CODE:
-        Newz(0, RETVAL, 1, hmac_state);
-        if (!RETVAL) croak("FATAL: Newz failed");
+        AlignedNewx(RETVAL, 1, hmac_state, 16);
+        if (!RETVAL) croak("FATAL: AlignedNewx failed");
         Copy(self, RETVAL, 1, hmac_state);
     OUTPUT:
         RETVAL

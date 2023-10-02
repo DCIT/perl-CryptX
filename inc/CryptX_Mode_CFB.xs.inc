@@ -8,13 +8,13 @@ Crypt::Mode::CFB
 new(Class, char * cipher_name, int rounds=0)
     CODE:
     {
-        Newz(0, RETVAL, 1, struct cfb_struct);
-        if (!RETVAL) croak("FATAL: Newz failed");
+        AlignedNewx(RETVAL, 1, struct cfb_struct, 16);
+        if (!RETVAL) croak("FATAL: AlignedNewx failed");
         RETVAL->direction = 0;
         RETVAL->cipher_rounds = rounds;
         RETVAL->cipher_id = cryptx_internal_find_cipher(cipher_name);
         if (RETVAL->cipher_id == -1) {
-          Safefree(RETVAL);
+          AlignedSafefree(RETVAL);
           croak("FATAL: find_cipfer failed for '%s'", cipher_name);
         }
     }
@@ -24,7 +24,7 @@ new(Class, char * cipher_name, int rounds=0)
 void
 DESTROY(Crypt::Mode::CFB self)
     CODE:
-        Safefree(self);
+        AlignedSafefree(self);
 
 void
 start_decrypt(Crypt::Mode::CFB self, SV * key, SV * iv)

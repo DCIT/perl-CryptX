@@ -26,22 +26,22 @@ new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, in
         id = cryptx_internal_find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
-        Newz(0, RETVAL, 1, ccm_state);
-        if (!RETVAL) croak("FATAL: Newz failed");
+        AlignedNewx(RETVAL, 1, ccm_state, 16);
+        if (!RETVAL) croak("FATAL: AlignedNewx failed");
 
         rv = ccm_init(RETVAL, id, k, (int)k_len, (int)pt_len, (int)tag_len, (int)h_len); /* XXX-TODO why int? */
         if (rv != CRYPT_OK) {
-          Safefree(RETVAL);
+          AlignedSafefree(RETVAL);
           croak("FATAL: ccm_init failed: %s", error_to_string(rv));
         }
         rv = ccm_add_nonce(RETVAL, n, (unsigned long)n_len);
         if (rv != CRYPT_OK) {
-          Safefree(RETVAL);
+          AlignedSafefree(RETVAL);
           croak("FATAL: ccm_add_nonce failed: %s", error_to_string(rv));
         }
         rv = ccm_add_aad(RETVAL, h, (unsigned long)h_len);
         if (rv != CRYPT_OK) {
-          Safefree(RETVAL);
+          AlignedSafefree(RETVAL);
           croak("FATAL: ccm_add_aad failed: %s", error_to_string(rv));
         }
     }
@@ -51,13 +51,13 @@ new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, in
 void
 DESTROY(Crypt::AuthEnc::CCM self)
     CODE:
-        Safefree(self);
+        AlignedSafefree(self);
 
 Crypt::AuthEnc::CCM
 clone(Crypt::AuthEnc::CCM self)
     CODE:
-        Newz(0, RETVAL, 1, ccm_state);
-        if (!RETVAL) croak("FATAL: Newz failed");
+        AlignedNewx(RETVAL, 1, ccm_state, 16);
+        if (!RETVAL) croak("FATAL: AlignedNewx failed");
         Copy(self, RETVAL, 1, ccm_state);
     OUTPUT:
         RETVAL

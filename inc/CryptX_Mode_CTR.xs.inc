@@ -8,13 +8,13 @@ Crypt::Mode::CTR
 new(Class, char * cipher_name, int ctr_mode=0, int ctr_width=0, int rounds=0)
     CODE:
     {
-        Newz(0, RETVAL, 1, struct ctr_struct);
-        if (!RETVAL) croak("FATAL: Newz failed");
+        AlignedNewx(RETVAL, 1, struct ctr_struct, 16);
+        if (!RETVAL) croak("FATAL: AlignedNewx failed");
         RETVAL->direction = 0;
         RETVAL->cipher_rounds = rounds;
         RETVAL->cipher_id = cryptx_internal_find_cipher(cipher_name);
         if (RETVAL->cipher_id == -1) {
-          Safefree(RETVAL);
+          AlignedSafefree(RETVAL);
           croak("FATAL: find_cipfer failed for '%s'", cipher_name);
         }
         if (ctr_mode == 0) RETVAL->ctr_mode_param = CTR_COUNTER_LITTLE_ENDIAN;
@@ -29,7 +29,7 @@ new(Class, char * cipher_name, int ctr_mode=0, int ctr_width=0, int rounds=0)
 void
 DESTROY(Crypt::Mode::CTR self)
     CODE:
-        Safefree(self);
+        AlignedSafefree(self);
 
 void
 start_decrypt(Crypt::Mode::CTR self, SV * key, SV * iv)

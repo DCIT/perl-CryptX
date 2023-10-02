@@ -20,19 +20,19 @@ new(Class, char * cipher_name, SV * key, SV * nonce = NULL)
         id = cryptx_internal_find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
-        Newz(0, RETVAL, 1, gcm_state);
-        if (!RETVAL) croak("FATAL: Newz failed");
+        AlignedNewx(RETVAL, 1, gcm_state, 16);
+        if (!RETVAL) croak("FATAL: AlignedNewx failed");
 
         rv = gcm_init(RETVAL, id, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
-          Safefree(RETVAL);
+          AlignedSafefree(RETVAL);
           croak("FATAL: gcm_init failed: %s", error_to_string(rv));
         }
 
         if (iv && iv_len > 0) {
           rv = gcm_add_iv(RETVAL, iv, (unsigned long)iv_len);
           if (rv != CRYPT_OK) {
-            Safefree(RETVAL);
+            AlignedSafefree(RETVAL);
             croak("FATAL: gcm_add_iv failed: %s", error_to_string(rv));
           }
         }
@@ -43,13 +43,13 @@ new(Class, char * cipher_name, SV * key, SV * nonce = NULL)
 void
 DESTROY(Crypt::AuthEnc::GCM self)
     CODE:
-        Safefree(self);
+        AlignedSafefree(self);
 
 Crypt::AuthEnc::GCM
 clone(Crypt::AuthEnc::GCM self)
     CODE:
-        Newz(0, RETVAL, 1, gcm_state);
-        if (!RETVAL) croak("FATAL: Newz failed");
+        AlignedNewx(RETVAL, 1, gcm_state, 16);
+        if (!RETVAL) croak("FATAL: AlignedNewx failed");
         Copy(self, RETVAL, 1, gcm_state);
     OUTPUT:
         RETVAL
