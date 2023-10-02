@@ -2,7 +2,7 @@ package Crypt::Mac;
 
 use strict;
 use warnings;
-our $VERSION = '0.079_005';
+our $VERSION = '0.079_006';
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;

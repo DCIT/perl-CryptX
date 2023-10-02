@@ -4,7 +4,7 @@ package Crypt::Cipher::SAFER_K64;
 
 use strict;
 use warnings;
-our $VERSION = '0.079_005';
+our $VERSION = '0.079_006';
 
 use base qw(Crypt::Cipher);
 

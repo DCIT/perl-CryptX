@@ -4,7 +4,7 @@ package Crypt::Digest::RIPEMD128;
 
 use strict;
 use warnings;
-our $VERSION = '0.079_005';
+our $VERSION = '0.079_006';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( ripemd128 ripemd128_hex ripemd128_b64 ripemd128_b64u ripemd128_file ripemd128_file_hex ripemd128_file_b64 ripemd128_file_b64u )] );
