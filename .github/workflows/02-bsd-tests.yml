@@ -11,7 +11,7 @@ on:
 jobs:
   BSDs:
     runs-on: macos-latest
-  
+
     strategy:
       fail-fast: false
       matrix:
@@ -29,11 +29,12 @@ jobs:
             version: '7.3'
             pkginstall: pkg_add p5-ExtUtils-MakeMaker p5-JSON
           - name: netbsd
-            version: '9.3'
+            version: '9.2'
             pkginstall: pkg_add p5-ExtUtils-MakeMaker p5-JSON
 
     steps:
-      - uses: actions/checkout@main
+      - name: Checkout
+        uses: actions/checkout@main
         with:
           submodules: recursive
       - name: Build+Test on ${{ matrix.os.name }}
