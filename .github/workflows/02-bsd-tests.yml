@@ -18,10 +18,10 @@ jobs:
         os:
           - name: freebsd
             version: '13.0'
-            pkginstall: pkg install -y p5-ExtUtils-MakeMaker
+            pkginstall: pkg install -y p5-ExtUtils-MakeMaker p5-JSON
           - name: openbsd
             version: '7.1'
-            pkginstall: pkg_add p5-ExtUtils-MakeMaker
+            pkginstall: pkg_add p5-ExtUtils-MakeMaker p5-JSON
 
     steps:
       - uses: actions/checkout@main
