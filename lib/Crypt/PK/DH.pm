@@ -2,7 +2,7 @@ package Crypt::PK::DH;
 
 use strict;
 use warnings;
-our $VERSION = '0.079_004';
+our $VERSION = '0.079_005';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( dh_shared_secret )] );
