@@ -2,7 +2,7 @@ package Crypt::Stream::RC4;
 
 use strict;
 use warnings;
-our $VERSION = '0.079_003';
+our $VERSION = '0.079_004';
 
 use CryptX;
 

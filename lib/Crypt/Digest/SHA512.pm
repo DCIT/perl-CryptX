@@ -4,7 +4,7 @@ package Crypt::Digest::SHA512;
 
 use strict;
 use warnings;
-our $VERSION = '0.079_003';
+our $VERSION = '0.079_004';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( sha512 sha512_hex sha512_b64 sha512_b64u sha512_file sha512_file_hex sha512_file_b64 sha512_file_b64u )] );
