@@ -36,6 +36,8 @@ jobs:
           run: |
             sudo ${{ matrix.os.pkginstall }}
             curl -L https://cpanmin.us | sudo perl - --verbose --notest --installdeps --with-configure --with-develop .
+            pwd
+            ls -l
             perl Makefile.PL
-            make
-            prove -wlvmb t
+            make -j4
+            prove -b t
