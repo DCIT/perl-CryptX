@@ -28,13 +28,13 @@ new(char * class, ...)
         id = cryptx_internal_find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
-        AlignedNewx(RETVAL, 1, struct cipher_struct, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, struct cipher_struct);
+        if (!RETVAL) croak("FATAL: Newz failed");
 
         RETVAL->desc = &cipher_descriptor[id];
         rv = RETVAL->desc->setup(key_data, (int)key_len, rounds, &RETVAL->skey);
         if (rv != CRYPT_OK) {
-          AlignedSafefree(RETVAL);
+          Safefree(RETVAL);
           croak("FATAL: cipher setup failed: %s", error_to_string(rv));
         }
     }
@@ -44,7 +44,7 @@ new(char * class, ...)
 void
 DESTROY(Crypt::Cipher self)
     CODE:
-        AlignedSafefree(self);
+        Safefree(self);
 
 SV *
 encrypt(Crypt::Cipher self, SV * data)

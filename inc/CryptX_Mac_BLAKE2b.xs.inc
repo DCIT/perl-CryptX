@@ -15,12 +15,12 @@ new(Class, unsigned long size, SV * key)
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        AlignedNewx(RETVAL, 1, blake2bmac_state, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, blake2bmac_state);
+        if (!RETVAL) croak("FATAL: Newz failed");
 
         rv = blake2bmac_init(RETVAL, size, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
-          AlignedSafefree(RETVAL);
+          Safefree(RETVAL);
           croak("FATAL: blake2b_init failed: %s", error_to_string(rv));
         }
     }
@@ -30,13 +30,13 @@ new(Class, unsigned long size, SV * key)
 void
 DESTROY(Crypt::Mac::BLAKE2b self)
     CODE:
-        AlignedSafefree(self);
+        Safefree(self);
 
 Crypt::Mac::BLAKE2b
 clone(Crypt::Mac::BLAKE2b self)
     CODE:
-        AlignedNewx(RETVAL, 1, blake2bmac_state, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, blake2bmac_state);
+        if (!RETVAL) croak("FATAL: Newz failed");
         Copy(self, RETVAL, 1, blake2bmac_state);
     OUTPUT:
         RETVAL

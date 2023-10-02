@@ -37,11 +37,11 @@ new(Class, char * cipher_name, SV * key)
         k = (unsigned char *) SvPVbyte(key, k_len);
 
 [%-IF lc_name == 'blake2s' || lc_name == 'blake2b' %]
-        AlignedNewx(RETVAL, 1, [%lc_name%]mac_state, 16);
+        Newz(0, RETVAL, 1, [%lc_name%]mac_state);
 [%-ELSE%]
-        AlignedNewx(RETVAL, 1, [%lc_name%]_state, 16);
+        Newz(0, RETVAL, 1, [%lc_name%]_state);
 [%-END%]
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        if (!RETVAL) croak("FATAL: Newz failed");
 
 [%-IF lc_name == 'pelican' || lc_name == 'poly1305' %]
         rv = [%lc_name%]_init(RETVAL, k, (unsigned long)k_len);
@@ -51,7 +51,7 @@ new(Class, char * cipher_name, SV * key)
         rv = [%lc_name%]_init(RETVAL, id, k, (unsigned long)k_len);
 [%-END%]
         if (rv != CRYPT_OK) {
-          AlignedSafefree(RETVAL);
+          Safefree(RETVAL);
           croak("FATAL: [%lc_name%]_init failed: %s", error_to_string(rv));
         }
     }
@@ -61,18 +61,18 @@ new(Class, char * cipher_name, SV * key)
 void
 DESTROY(Crypt::Mac::[%orig_name%] self)
     CODE:
-        AlignedSafefree(self);
+        Safefree(self);
 
 Crypt::Mac::[%orig_name%]
 clone(Crypt::Mac::[%orig_name%] self)
     CODE:
 [%-IF lc_name == 'blake2s' || lc_name == 'blake2b' %]
-        AlignedNewx(RETVAL, 1, [%lc_name%]mac_state, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, [%lc_name%]mac_state);
+        if (!RETVAL) croak("FATAL: Newz failed");
         Copy(self, RETVAL, 1, [%lc_name%]mac_state);
 [%-ELSE%]
-        AlignedNewx(RETVAL, 1, [%lc_name%]_state, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, [%lc_name%]_state);
+        if (!RETVAL) croak("FATAL: Newz failed");
         Copy(self, RETVAL, 1, [%lc_name%]_state);
 [%-END%]
     OUTPUT:

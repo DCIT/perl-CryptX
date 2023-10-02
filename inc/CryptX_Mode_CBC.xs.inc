@@ -8,15 +8,15 @@ Crypt::Mode::CBC
 new(Class, char * cipher_name, int padding=1, int rounds=0)
     CODE:
     {
-        AlignedNewx(RETVAL, 1, struct cbc_struct, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, struct cbc_struct);
+        if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->padding_mode = padding;
         RETVAL->padlen = 0;
         RETVAL->direction = 0;
         RETVAL->cipher_rounds = rounds;
         RETVAL->cipher_id = cryptx_internal_find_cipher(cipher_name);
         if (RETVAL->cipher_id == -1) {
-          AlignedSafefree(RETVAL);
+          Safefree(RETVAL);
           croak("FATAL: find_cipfer failed for '%s'", cipher_name);
         }
     }
@@ -26,7 +26,7 @@ new(Class, char * cipher_name, int padding=1, int rounds=0)
 void
 DESTROY(Crypt::Mode::CBC self)
     CODE:
-        AlignedSafefree(self);
+        Safefree(self);
 
 void
 start_decrypt(Crypt::Mode::CBC self, SV * key, SV * iv)

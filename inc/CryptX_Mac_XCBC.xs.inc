@@ -19,12 +19,12 @@ new(Class, char * cipher_name, SV * key)
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        AlignedNewx(RETVAL, 1, xcbc_state, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, xcbc_state);
+        if (!RETVAL) croak("FATAL: Newz failed");
 
         rv = xcbc_init(RETVAL, id, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
-          AlignedSafefree(RETVAL);
+          Safefree(RETVAL);
           croak("FATAL: xcbc_init failed: %s", error_to_string(rv));
         }
     }
@@ -34,13 +34,13 @@ new(Class, char * cipher_name, SV * key)
 void
 DESTROY(Crypt::Mac::XCBC self)
     CODE:
-        AlignedSafefree(self);
+        Safefree(self);
 
 Crypt::Mac::XCBC
 clone(Crypt::Mac::XCBC self)
     CODE:
-        AlignedNewx(RETVAL, 1, xcbc_state, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, xcbc_state);
+        if (!RETVAL) croak("FATAL: Newz failed");
         Copy(self, RETVAL, 1, xcbc_state);
     OUTPUT:
         RETVAL

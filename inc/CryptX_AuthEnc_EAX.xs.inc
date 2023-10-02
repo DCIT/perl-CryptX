@@ -26,12 +26,12 @@ new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata=&PL_sv_undef)
         id = cryptx_internal_find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
-        AlignedNewx(RETVAL, 1, eax_state, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, eax_state);
+        if (!RETVAL) croak("FATAL: Newz failed");
 
         rv = eax_init(RETVAL, id, k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len);
         if (rv != CRYPT_OK) {
-          AlignedSafefree(RETVAL);
+          Safefree(RETVAL);
           croak("FATAL: eax setup failed: %s", error_to_string(rv));
         }
     }
@@ -41,13 +41,13 @@ new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata=&PL_sv_undef)
 void
 DESTROY(Crypt::AuthEnc::EAX self)
     CODE:
-        AlignedSafefree(self);
+        Safefree(self);
 
 Crypt::AuthEnc::EAX
 clone(Crypt::AuthEnc::EAX self)
     CODE:
-        AlignedNewx(RETVAL, 1, eax_state, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, eax_state);
+        if (!RETVAL) croak("FATAL: Newz failed");
         Copy(self, RETVAL, 1, eax_state);
     OUTPUT:
         RETVAL

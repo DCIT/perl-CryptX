@@ -22,12 +22,12 @@ new(char * class, ...)
         if (idx + 1 <= items) prng_name = SvPVX(ST(idx));
         if (idx + 2 <= items) entropy = ST(idx + 1);
 
-        AlignedNewx(RETVAL, 1, struct prng_struct, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, struct prng_struct);
+        if (!RETVAL) croak("FATAL: Newz failed");
 
         id = cryptx_internal_find_prng(prng_name);
         if (id == -1) {
-          AlignedSafefree(RETVAL);
+          Safefree(RETVAL);
           croak("FATAL: find_prng failed for '%s'", prng_name);
         }
         RETVAL->last_pid = curpid;
@@ -35,7 +35,7 @@ new(char * class, ...)
 
         rv = RETVAL->desc->start(&RETVAL->state);
         if (rv != CRYPT_OK) {
-          AlignedSafefree(RETVAL);
+          Safefree(RETVAL);
           croak("FATAL: PRNG_start failed: %s", error_to_string(rv));
         }
 
@@ -43,24 +43,24 @@ new(char * class, ...)
           ent = (unsigned char *) SvPVbyte(entropy, ent_len);
           rv = RETVAL->desc->add_entropy(ent, (unsigned long)ent_len, &RETVAL->state);
           if (rv != CRYPT_OK) {
-            AlignedSafefree(RETVAL);
+            Safefree(RETVAL);
             croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
           }
         }
         else {
           if (rng_get_bytes(entropy_buf, 40, NULL) != 40) {
-            AlignedSafefree(RETVAL);
+            Safefree(RETVAL);
             croak("FATAL: rng_get_bytes failed: %s", error_to_string(rv));
           }
           rv = RETVAL->desc->add_entropy(entropy_buf, 40, &RETVAL->state);
           if (rv != CRYPT_OK) {
-            AlignedSafefree(RETVAL);
+            Safefree(RETVAL);
             croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
           }
         }
         rv = RETVAL->desc->ready(&RETVAL->state);
         if (rv != CRYPT_OK) {
-          AlignedSafefree(RETVAL);
+          Safefree(RETVAL);
           croak("FATAL: PRNG_ready failed: %s", error_to_string(rv));
         }
     }
@@ -70,7 +70,7 @@ new(char * class, ...)
 void
 DESTROY(Crypt::PRNG self)
     CODE:
-        AlignedSafefree(self);
+        Safefree(self);
 
 void
 add_entropy(Crypt::PRNG self, SV * entropy=&PL_sv_undef)

@@ -15,12 +15,12 @@ new(Class, SV * key)
         if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        AlignedNewx(RETVAL, 1, poly1305_state, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, poly1305_state);
+        if (!RETVAL) croak("FATAL: Newz failed");
 
         rv = poly1305_init(RETVAL, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
-          AlignedSafefree(RETVAL);
+          Safefree(RETVAL);
           croak("FATAL: poly1305_init failed: %s", error_to_string(rv));
         }
     }
@@ -30,13 +30,13 @@ new(Class, SV * key)
 void
 DESTROY(Crypt::Mac::Poly1305 self)
     CODE:
-        AlignedSafefree(self);
+        Safefree(self);
 
 Crypt::Mac::Poly1305
 clone(Crypt::Mac::Poly1305 self)
     CODE:
-        AlignedNewx(RETVAL, 1, poly1305_state, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, poly1305_state);
+        if (!RETVAL) croak("FATAL: Newz failed");
         Copy(self, RETVAL, 1, poly1305_state);
     OUTPUT:
         RETVAL

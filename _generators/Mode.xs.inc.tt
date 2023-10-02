@@ -12,13 +12,13 @@ new(Class, char * cipher_name, int rounds=0)
 [%-END%]
     CODE:
     {
-        AlignedNewx(RETVAL, 1, struct [%lc_name%]_struct, 16);
-        if (!RETVAL) croak("FATAL: AlignedNewx failed");
+        Newz(0, RETVAL, 1, struct [%lc_name%]_struct);
+        if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->direction = 0;
         RETVAL->cipher_rounds = rounds;
         RETVAL->cipher_id = cryptx_internal_find_cipher(cipher_name);
         if (RETVAL->cipher_id == -1) {
-          AlignedSafefree(RETVAL);
+          Safefree(RETVAL);
           croak("FATAL: find_cipfer failed for '%s'", cipher_name);
         }
 [%-IF lc_name == 'ctr' %]
@@ -35,7 +35,7 @@ new(Class, char * cipher_name, int rounds=0)
 void
 DESTROY(Crypt::Mode::[%orig_name%] self)
     CODE:
-        AlignedSafefree(self);
+        Safefree(self);
 
 void
 [%-IF lc_name == 'xts' %]
