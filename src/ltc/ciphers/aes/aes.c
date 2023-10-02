@@ -113,7 +113,7 @@ int SETUP(const unsigned char *key, int keylen, int num_rounds, symmetric_key *s
     }
 
     skey->rijndael.Nr = 10 + ((keylen/8)-2)*2;
-    K = (void*)((unsigned long)&skey->rijndael.K[15] & (~0xFuL));
+    K = (void*)((((ulong64)&skey->rijndael.K[15]) >> 4) << 4);
     skey->rijndael.eK = (ulong32*)K;
     K += (60 * sizeof(ulong32));
     skey->rijndael.dK = (ulong32*)K;
