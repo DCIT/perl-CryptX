@@ -17,19 +17,19 @@ jobs:
       matrix:
         os:
           - name: freebsd
-            version: '5.5'
-            pkginstall: pkg install -y p5-ExtUtils-MakeMaker p5-JSON
-          - name: freebsd
-            version: '8.4'
+            version: '12.4'
             pkginstall: pkg install -y p5-ExtUtils-MakeMaker p5-JSON
           - name: freebsd
             version: '13.2'
             pkginstall: pkg install -y p5-ExtUtils-MakeMaker p5-JSON
           - name: openbsd
-            version: '4.9'
+            version: '6.9'
             pkginstall: pkg_add p5-ExtUtils-MakeMaker p5-JSON
           - name: openbsd
             version: '7.3'
+            pkginstall: pkg_add p5-ExtUtils-MakeMaker p5-JSON
+          - name: netbsd
+            version: '9.3'
             pkginstall: pkg_add p5-ExtUtils-MakeMaker p5-JSON
 
     steps:
