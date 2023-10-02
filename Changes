@@ -1,11 +1,11 @@
 Changes for CryptX
 
-0.079_004   2023-02-10
+0.080   2023-10-XX
         - fix #95 AES-NI troubles on MS Windows (gcc compiler)
-        - Enable AES-NI on gcc/clang/llvm
-        - update Math::BigInt::LTM test suite to be compatible with Math::BigInt 1.999842+
+        - fix #96 Tests failure with Math::BigInt >= 1.999840
+        - Enabled AES-NI for platforms with gcc/clang/llvm
 
-0.079   2023-01-10
+0.079   2023-10-01
          - fix #92 update libtomcrypt
          - bundled libtomcrypt update branch:develop (commit:1e629e6f 2023-06-22)
 
