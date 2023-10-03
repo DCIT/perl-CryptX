@@ -120,8 +120,14 @@ use CryptX;
 use Math::BigInt::LTM;
 
 diag( "osname       = $Config{osname}" );
+diag( "osvers       = $Config{osvers}" );
+diag( "archname     = $Config{archname}" );
+diag( "uname        = $Config{uname}" );
 diag( "myarchname   = $Config{myarchname}" );
 diag( "myuname      = $Config{myuname}" );
+diag( "gccversion   = $Config{gccversion}" );
+diag( "ccversion    = $Config{ccversion}" );
+diag( "cc           = $Config{cc}" );
 diag( "intsize      = $Config{intsize}" );
 diag( "longsize     = $Config{longsize}" );
 diag( "longlongsize = $Config{longlongsize}" );

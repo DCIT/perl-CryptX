@@ -24,10 +24,10 @@ jobs:
             pkginstall: pkg install -y p5-ExtUtils-MakeMaker p5-JSON
           - name: openbsd
             version: '6.9'
-            pkginstall: pkg_add p5-ExtUtils-MakeMaker p5-JSON
+            pkginstall: pkg_add p5-JSON
           - name: openbsd
             version: '7.3'
-            pkginstall: pkg_add p5-ExtUtils-MakeMaker p5-JSON
+            pkginstall: pkg_add p5-JSON
 
     steps:
       - name: Checkout
@@ -42,8 +42,9 @@ jobs:
           shell: bash
           run: |
             sudo ${{ matrix.os.pkginstall }}
-            curl -L https://cpanmin.us | sudo perl - --verbose --notest --installdeps --with-configure --with-develop .
+            curl --silent -L https://cpanmin.us | sudo perl - --verbose --notest --installdeps --with-configure --with-develop .
             sudo make realclean
+            perl -V
             perl Makefile.PL
             make -j2
             prove -b t
