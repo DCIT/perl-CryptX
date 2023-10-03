@@ -58,7 +58,7 @@ jobs:
         run: brew install perl
       - run: perl -V
       - name: Install Dependencies
-        run: curl -L https://cpanmin.us | perl - --notest --installdeps .
+        run: curl --silent -L https://cpanmin.us | perl - --notest --installdeps .
       - name: Run build
         run: |
           perl Makefile.PL
@@ -85,7 +85,7 @@ jobs:
           echo "C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - run: perl -V
       - name: Install Dependencies
-        run: curl -L https://cpanmin.us | perl - --notest --installdeps .
+        run: curl --silent -L https://cpanmin.us | perl - --notest --installdeps .
       - name: Run build
         run: |
           perl Makefile.PL
@@ -109,7 +109,7 @@ jobs:
         uses: egor-tensin/setup-cygwin@v4
         with:
             platform: x64
-            packages: perl_base perl-ExtUtils-MakeMaker make gcc-g++ bash libcrypt-devel libnsl-devel
+            packages: perl_base perl-ExtUtils-MakeMaker perl-JSON make gcc-g++ bash libcrypt-devel libnsl-devel
       - uses: actions/checkout@v3
       - run: perl -V
         shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
