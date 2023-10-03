@@ -30,8 +30,8 @@ else {
   my $try_aes_ni = 0;
   $try_aes_ni = 1 if $Config{archname} =~ /x86_64/; # x86_64-cygwin-threads-multi / MSWin32-x64-multi-thread / x86_64-linux-thread-multi
   $try_aes_ni = 1 if $Config{archname} =~ /amd64/;  # OpenBSD.amd64-openbsd-thread-multi / amd64-freebsd
-  $try_aes_ni = 1 if $Config{archname} =~ /darwin(-.+)?-2level/; # darwin-thread-multi-2level / darwin-2level'
-  $try_aes_ni = 1 if $Config{archname} eq 'i86pc-solaris-thread-multi-64';
+  $try_aes_ni = 1 if $Config{archname} =~ /darwin/ && $Config{myuname} =~ /x86_64/; # darwin-thread-multi-2level / darwin-2level
+  $try_aes_ni = 1 if $Config{archname} =~ /i86pc-solaris(-.+)?-64/; # i86pc-solaris-thread-multi-64 / i86pc-solaris-64
   if ($try_aes_ni && $Config{gccversion}) {
     my $ver1;
     $ver1 ||= $1 if $Config{gccversion} =~ /^([0-9]+)\./; # gccversion='10.2.0'
