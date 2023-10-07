@@ -45,9 +45,8 @@ static const ulong32 rcon[] = {
 int aesni_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_key *skey)
 {
    int i;
-   unsigned char *K;
    __m128i temp;
-   ulong32 *rk;
+   ulong32 *rk, *K;
    ulong32 *rrk;
    LTC_ARGCHK(key != NULL);
    LTC_ARGCHK(skey != NULL);
@@ -61,10 +60,10 @@ int aesni_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_
    }
 
    skey->rijndael.Nr = keylen / 4 + 6;
-   K = (void*)((((size_t)&skey->rijndael.K[15]) >> 4) << 4);
-   skey->rijndael.eK = (ulong32*)K;
-   K += (60 * sizeof(ulong32));
-   skey->rijndael.dK = (ulong32*)K;
+   K = LTC_ALIGN_BUF(skey->rijndael.K, 16);
+   skey->rijndael.eK = K;
+   K += 60;
+   skey->rijndael.dK = K;
 
    /* setup the forward key */
    i = 0;
@@ -369,3 +368,4 @@ int aesni_keysize(int *keysize)
 }
 
 #endif
+
