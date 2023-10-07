@@ -2,7 +2,7 @@ package Crypt::Digest::SHAKE;
 
 use strict;
 use warnings;
-our $VERSION = '0.080';
+our $VERSION = '0.080_001';
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
