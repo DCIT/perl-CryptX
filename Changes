@@ -2,7 +2,7 @@ Changes for CryptX
 
 0.081   2023-10-XX
         - PR #87 add possibility to use different hash algorithms in RSAES-OAEP 
-        - bundled libtomcrypt update branch:develop (commit:91b7bbe4 2023-10-08) XXX-FIXME
+        - bundled libtomcrypt update branch:develop (commit:7e863d21 2023-10-09)
 
 0.080   2023-10-04
         - fix #95 AES-NI troubles on MS Windows (gcc compiler)
