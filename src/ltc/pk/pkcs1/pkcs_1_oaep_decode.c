@@ -32,7 +32,7 @@ int pkcs_1_oaep_decode(const unsigned char *msg,    unsigned long msglen,
 {
    unsigned char *DB, *seed, *mask;
    unsigned long hLen, x, y, modulus_len;
-   int           err, ret, lparam_hash_;
+   int           err, ret, lparam_hash_used;
 
    LTC_ARGCHK(msg    != NULL);
    LTC_ARGCHK(out    != NULL);
@@ -50,11 +50,11 @@ int pkcs_1_oaep_decode(const unsigned char *msg,    unsigned long msglen,
       if ((err = hash_is_valid(lparam_hash)) != CRYPT_OK) {
          return err;
       }
-      lparam_hash_ = lparam_hash;
+      lparam_hash_used = lparam_hash;
    } else {
-      lparam_hash_ = mgf_hash;
+      lparam_hash_used = mgf_hash;
    }
-   hLen        = hash_descriptor[lparam_hash_].hashsize;
+   hLen        = hash_descriptor[lparam_hash_used].hashsize;
    modulus_len = (modulus_bitlen >> 3) + (modulus_bitlen & 7 ? 1 : 0);
 
    /* test hash/message size */
@@ -128,12 +128,12 @@ int pkcs_1_oaep_decode(const unsigned char *msg,    unsigned long msglen,
    /* compute lhash and store it in seed [reuse temps!] */
    x = modulus_len;
    if (lparam != NULL) {
-      if ((err = hash_memory(lparam_hash_, lparam, lparamlen, seed, &x)) != CRYPT_OK) {
+      if ((err = hash_memory(lparam_hash_used, lparam, lparamlen, seed, &x)) != CRYPT_OK) {
          goto LBL_ERR;
       }
    } else {
       /* can't pass hash_memory a NULL so use DB with zero length */
-      if ((err = hash_memory(lparam_hash_, DB, 0, seed, &x)) != CRYPT_OK) {
+      if ((err = hash_memory(lparam_hash_used, DB, 0, seed, &x)) != CRYPT_OK) {
          goto LBL_ERR;
       }
    }
