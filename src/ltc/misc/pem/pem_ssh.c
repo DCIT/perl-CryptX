@@ -203,7 +203,7 @@ struct ssh_pka ssh_pkas[] = {
 #ifdef LTC_MRSA
                              { "ssh-rsa",     NULL,              ssh_decode_rsa },
 #endif
-#ifdef LTC_MRSA
+#ifdef LTC_MDSA
                              { "ssh-dss",     NULL,              ssh_decode_dsa },
 #endif
 #ifdef LTC_MECC
