@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 
 plan skip_all => "JSON module not installed" unless eval { require JSON };
-plan tests => 69;
+plan tests => 63;
 
 use Crypt::PK::X25519;
 use Crypt::Misc qw(read_rawfile);
@@ -74,10 +74,12 @@ use Crypt::Misc qw(read_rawfile);
   ok($k->is_private, 'is_private openssl_x25519_sk.pem');
   is(uc($k->key2hash->{priv}), '002F93D10BA5728D8DD8E9527721DABA3261C0BB1BEFDE7B4BBDAC631D454651', 'key2hash->{priv} openssl_x25519_sk.pem');
 
-  $k = Crypt::PK::X25519->new('t/data/openssl_x25519_sk_t.pem');
-  ok($k, 'new openssl_x25519_sk_t.pem');
-  ok($k->is_private, 'is_private openssl_x25519_sk_t.pem');
-  is(uc($k->key2hash->{priv}), '002F93D10BA5728D8DD8E9527721DABA3261C0BB1BEFDE7B4BBDAC631D454651', 'key2hash->{priv} openssl_x25519_sk_t.pem');
+### the latest openssl does not support -traditional export format for x25519 anymore
+# $k = Crypt::PK::X25519->new('t/data/openssl_x25519_sk_t.pem');
+# ok($k, 'new openssl_x25519_sk_t.pem');
+# ok($k->is_private, 'is_private openssl_x25519_sk_t.pem');
+# is(uc($k->key2hash->{priv}), '002F93D10BA5728D8DD8E9527721DABA3261C0BB1BEFDE7B4BBDAC631D454651', 'key2hash->{priv} openssl_x25519_sk_t.pem');
+
 
   $k = Crypt::PK::X25519->new('t/data/openssl_x25519_sk.pkcs8');
   ok($k, 'new openssl_x25519_sk.pkcs8');
@@ -99,10 +101,11 @@ use Crypt::Misc qw(read_rawfile);
   ok($k->is_private, 'is_private openssl_x25519_sk_pw.pem');
   is(uc($k->key2hash->{priv}), '002F93D10BA5728D8DD8E9527721DABA3261C0BB1BEFDE7B4BBDAC631D454651', 'key2hash->{priv} openssl_x25519_sk_pw.pem');
 
-  $k = Crypt::PK::X25519->new('t/data/openssl_x25519_sk_pw_t.pem', 'secret');
-  ok($k, 'new openssl_x25519_sk_pw_t.pem');
-  ok($k->is_private, 'is_private openssl_x25519_sk_pw_t.pem');
-  is(uc($k->key2hash->{priv}), '002F93D10BA5728D8DD8E9527721DABA3261C0BB1BEFDE7B4BBDAC631D454651', 'key2hash->{priv} openssl_x25519_sk_pw_t.pem');
+### the latest openssl does not support -traditional export format for x25519 anymore
+# $k = Crypt::PK::X25519->new('t/data/openssl_x25519_sk_pw_t.pem', 'secret');
+# ok($k, 'new openssl_x25519_sk_pw_t.pem');
+# ok($k->is_private, 'is_private openssl_x25519_sk_pw_t.pem');
+# is(uc($k->key2hash->{priv}), '002F93D10BA5728D8DD8E9527721DABA3261C0BB1BEFDE7B4BBDAC631D454651', 'key2hash->{priv} openssl_x25519_sk_pw_t.pem');
 
   $k = Crypt::PK::X25519->new('t/data/openssl_x25519_pk.pem');
   ok($k, 'new openssl_x25519_pk.pem');
@@ -126,7 +129,7 @@ use Crypt::Misc qw(read_rawfile);
     is($k->export_key_pem('public'), read_rawfile("t/data/$_"), 'export_key_pem public') if (substr($_, -3) eq "pem");
   }
 
-  for (qw( openssl_x25519_sk.der openssl_x25519_sk_t.pem )) {
+  for (qw( openssl_x25519_sk.der openssl_x25519_sk.pem )) {
     my $k = Crypt::PK::X25519->new("t/data/$_");
     is($k->export_key_der('private'), read_rawfile("t/data/$_"), 'export_key_der private') if (substr($_, -3) eq "der");
     is($k->export_key_pem('private'), read_rawfile("t/data/$_"), 'export_key_pem private') if (substr($_, -3) eq "pem");

@@ -118,22 +118,11 @@ sub import_key {
   }
   croak "FATAL: invalid key data" unless $data;
 
-  if ($data =~ /-----BEGIN (RSA PRIVATE|RSA PUBLIC|PUBLIC) KEY-----(.*?)-----END/sg) {
-    # PKCS#1 RSAPublicKey        (PEM header: BEGIN RSA PUBLIC KEY)
-    # PKCS#1 RSAPrivateKey       (PEM header: BEGIN RSA PRIVATE KEY)
-    # X.509 SubjectPublicKeyInfo (PEM header: BEGIN PUBLIC KEY)
-    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
-    return $self->_import($data) if $data;
+  if ($data =~ /-----BEGIN (RSA PUBLIC|RSA PRIVATE|PUBLIC|PRIVATE|ENCRYPTED PRIVATE) KEY-----(.+?)-----END (RSA PUBLIC|RSA PRIVATE|PUBLIC|PRIVATE|ENCRYPTED PRIVATE) KEY-----/s) {
+    return $self->_import_pem($data, $password);
   }
-  elsif ($data =~ /-----BEGIN PRIVATE KEY-----(.*?)-----END/sg) {
-    # PKCS#8 PrivateKeyInfo      (PEM header: BEGIN PRIVATE KEY)
-    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
-    return $self->_import_pkcs8($data, $password);
-  }
-  elsif ($data =~ /-----BEGIN ENCRYPTED PRIVATE KEY-----(.*?)-----END/sg) {
-    # PKCS#8 PrivateKeyInfo      (PEM header: BEGIN ENCRYPTED PRIVATE KEY)
-    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
-    return $self->_import_pkcs8($data, $password);
+  elsif ($data =~ /-----BEGIN OPENSSH PRIVATE KEY-----(.+?)-----END OPENSSH PRIVATE KEY-----/s) {
+    return $self->_import_openssh($data, $password);
   }
   elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
     # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
@@ -146,11 +135,11 @@ sub import_key {
       return $self->_import_hex($h->{n}, $h->{e}, $h->{d}, $h->{p}, $h->{q}, $h->{dp}, $h->{dq}, $h->{qi}) if $h->{n} && $h->{e};
     }
   }
-  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.*?)-----END CERTIFICATE-----/sg) {
+  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.+?)-----END CERTIFICATE-----/s) {
     $data = pem_to_der($data) or croak "FATAL: PEM/cert decode failed";
     return $self->_import_x509($data);
   }
-  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
+  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.+?)---- END SSH2 PUBLIC KEY ----/s) {
     $data = pem_to_der($data) or croak "FATAL: PEM/key decode failed";
     my ($typ, $N, $e) = Crypt::PK::_ssh_parse($data);
     return $self->_import_hex(unpack("H*", $e), unpack("H*", $N)) if $typ && $e && $N && $typ eq 'ssh-rsa';

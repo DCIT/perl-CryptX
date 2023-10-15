@@ -1,15 +1,18 @@
 use strict;
 use warnings;
-use Test::More tests => 341;
+use Test::More tests => 756;
 
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
 use Crypt::PK::DSA;
+use Crypt::PK::Ed25519;
 use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
 
 my $rsa = Crypt::PK::RSA->new;
 my $ec  = Crypt::PK::ECC->new;
 my $dsa = Crypt::PK::DSA->new;
+my $ed  = Crypt::PK::Ed25519->new;
 ok($rsa, "RSA new");
 ok($ec,  "ECC new");
 ok($dsa, "DSA new");
@@ -99,19 +102,38 @@ sub _check_rsa {
 };
 
 for my $f (qw/ssh_rsa_1024 ssh_rsa_1536 ssh_rsa_2048 ssh_rsa_4096 ssh_rsa_768 ssh_rsa_8192/) {
-  $rsa->import_key("$dir/$f");
-  ok($rsa->is_private, "RSA is_private $f");
-  _check_rsa($rsa, $f, "private", 1);
-  $rsa->import_key("$dir/$f\_passwd", "secret");
-  _check_rsa($rsa, $f, "private_pass", 1);
-  $rsa->import_key("$dir/$f.pub.pkcs8");
-  _check_rsa($rsa, $f, "pub.pkcs8", 0);
-  $rsa->import_key("$dir/$f.pub");
-  _check_rsa($rsa, $f, "pub", 0);
-  $rsa->import_key("$dir/$f.pub.pem");
-  _check_rsa($rsa, $f, "pub.pem", 0);
-  $rsa->import_key("$dir/$f.pub.rfc4716");
-  _check_rsa($rsa, $f, "pub.rfc4716", 0);
+  #diag "$dir/${f}_pkcs8";
+  $rsa->import_key("$dir/${f}_pkcs8");
+  _check_rsa($rsa, $f, "${f}_pkcs8", 1);
+  #diag "$dir/${f}_pkcs8_pw";
+  $rsa->import_key("$dir/${f}_pkcs8_pw", "secret");
+  _check_rsa($rsa, $f, "${f}_pkcs8_pw", 1);
+  #diag "$dir/${f}_pkcs8.pub";
+  $rsa->import_key("$dir/${f}_pkcs8.pub");
+  _check_rsa($rsa, $f, "${f}_pkcs8.pub", 0);
+  ##
+  #diag "$dir/${f}_pem";
+  $rsa->import_key("$dir/${f}_pem");
+  _check_rsa($rsa, $f, "${f}_pem", 1);
+  #diag "$dir/${f}_pem_pw";
+  $rsa->import_key("$dir/${f}_pem_pw", "secret");
+  _check_rsa($rsa, $f, "${f}_pem_pw", 1);
+  #diag "$dir/${f}_pem.pub";
+  $rsa->import_key("$dir/${f}_pem.pub");
+  _check_rsa($rsa, $f, "${f}_pem.pub", 0);
+  ##
+  #diag "$dir/${f}_openssh";
+  $rsa->import_key("$dir/${f}_openssh");
+  _check_rsa($rsa, $f, "${f}_openssh", 1);
+  #diag "$dir/${f}_openssh_pw";
+  $rsa->import_key("$dir/${f}_openssh_pw", "secret");
+  _check_rsa($rsa, $f, "${f}_openssh_pw", 1);
+  #diag "$dir/${f}_openssh.pub";
+  $rsa->import_key("$dir/${f}_openssh.pub");
+  _check_rsa($rsa, $f, "${f}_openssh.pub", 0);
+  ##
+  $rsa->import_key("$dir/${f}_rfc4716.pub");
+  _check_rsa($rsa, $f, "${f}_rfc4716.pub", 0);
 }
 
 sub _check_ecc {
@@ -175,14 +197,35 @@ sub _check_ecc {
 }
 
 for my $f (qw/ssh_ecdsa_256 ssh_ecdsa_384 ssh_ecdsa_521/) {
-  $ec->import_key("$dir/$f");
-  _check_ecc($ec, $f, "private", 1);
-  $ec->import_key("$dir/$f.pub.pkcs8");
-  _check_ecc($ec, $f, "pub.pkcs8", 0);
-  $ec->import_key("$dir/$f.pub");
-  _check_ecc($ec, $f, "pub", 0);
-  $ec->import_key("$dir/$f.pub.rfc4716");
-  _check_ecc($ec, $f, "pub.rfc4716", 0);
+  #diag "$dir/${f}_pkcs8";
+  $ec->import_key("$dir/${f}_pkcs8");
+  _check_ecc($ec, $f, "${f}_pkcs8", 1);
+  #diag "$dir/${f}_pkcs8_pw";
+  $ec->import_key("$dir/${f}_pkcs8_pw", "secret");
+  _check_ecc($ec, $f, "${f}_pkcs8_pw", 1);
+  #diag "$dir/${f}_pkcs8.pub";
+  $ec->import_key("$dir/${f}_pkcs8.pub");
+  _check_ecc($ec, $f, "${f}_pkcs8.pub", 0);
+  ##
+  #diag "$dir/${f}_pem";
+  $ec->import_key("$dir/${f}_pem");
+  _check_ecc($ec, $f, "${f}_pem", 1);
+  #diag "$dir/${f}_pem_pw";
+  $ec->import_key("$dir/${f}_pem_pw", "secret");
+  _check_ecc($ec, $f, "${f}_pem_pw", 1);
+  ##
+  #diag "$dir/${f}_openssh";
+  $ec->import_key("$dir/${f}_openssh");
+  _check_ecc($ec, $f, "${f}_openssh", 1);
+  #diag "$dir/${f}_openssh_pw";
+  $ec->import_key("$dir/${f}_openssh_pw", "secret");
+  _check_ecc($ec, $f, "${f}_openssh_pw", 1);
+  #diag "$dir/${f}_openssh.pub";
+  $ec->import_key("$dir/${f}_openssh.pub");
+  _check_ecc($ec, $f, "${f}_openssh.pub", 0);
+  ##
+  $ec->import_key("$dir/${f}_rfc4716.pub");
+  _check_ecc($ec, $f, "${f}_rfc4716.pub", 0);
 }
 
 sub _check_dsa {
@@ -213,19 +256,79 @@ sub _check_dsa {
 
 {
   my $f = "ssh_dsa_1024";
-  $dsa->import_key("$dir/$f");
-  ok($dsa->is_private, "DSA is_private $f");
-  _check_dsa($dsa, $f, "private", 1);
-  my $kh_priv = $dsa->key2hash;
-  $dsa->import_key("$dir/$f.pub.pkcs8");
-  _check_dsa($dsa, $f, "pub.pkcs8", 0);
-  my $kh_pub = $dsa->key2hash;
-  $dsa->import_key("$dir/$f.pub");
-  _check_dsa($dsa, $f, "pub", 0);
-  $dsa->import_key("$dir/$f.pub.rfc4716");
-  _check_dsa($dsa, $f, "pub.rfc4716", 0);
-  $dsa->import_key($kh_priv);
-  _check_dsa($dsa, $f, "keyhash.priv", 1);
-  $dsa->import_key($kh_pub);
-  _check_dsa($dsa, $f, "keyhash.pub", 0);
+  ##
+  #diag "$dir/${f}_pkcs8";
+  $dsa->import_key("$dir/${f}_pkcs8");
+  _check_dsa($dsa, $f, "${f}_pkcs8", 1);
+  #diag "$dir/${f}_pkcs8_pw";
+  $dsa->import_key("$dir/${f}_pkcs8_pw", "secret");
+  _check_dsa($dsa, $f, "${f}_pkcs8_pw", 1);
+  #diag "$dir/${f}_pkcs8.pub";
+  $dsa->import_key("$dir/${f}_pkcs8.pub");
+  _check_dsa($dsa, $f, "${f}_pkcs8.pub", 0);
+  ##
+  #diag "$dir/${f}_pem";
+  $dsa->import_key("$dir/${f}_pem");
+  _check_dsa($dsa, $f, "${f}_pem", 1);
+  #diag "$dir/${f}_pem_pw";
+  $dsa->import_key("$dir/${f}_pem_pw", "secret");
+  _check_dsa($dsa, $f, "${f}_pem_pw", 1);
+  ##
+  #diag "$dir/${f}_openssh";
+  $dsa->import_key("$dir/${f}_openssh");
+  _check_dsa($dsa, $f, "${f}_openssh", 1);
+  #diag "$dir/${f}_openssh_pw";
+  $dsa->import_key("$dir/${f}_openssh_pw", "secret");
+  _check_dsa($dsa, $f, "${f}_openssh_pw", 1);
+  #diag "$dir/${f}_openssh.pub";
+  $dsa->import_key("$dir/${f}_openssh.pub");
+  _check_dsa($dsa, $f, "${f}_openssh.pub", 0);
+  ##
+  $dsa->import_key("$dir/${f}_rfc4716.pub");
+  _check_dsa($dsa, $f, "${f}_rfc4716.pub", 0);
+}
+
+sub _check_ed {
+  my ($K, $name, $nick, $private) = @_;
+  my $E = {
+    ssh_ed25519 => {
+      'curve' => 'ed25519',
+      'priv' => 'd5bcfa901e39d1ce557f7b692af91e5e818d76c42230f66248b955819b4e5904',
+      'pub' => 'bd17b2215c443a7a1e9b286a4f0e76288130984cd942acccd4f1a064bb749fbe'
+    }
+  };
+  my $kh = $K->key2hash;
+  is($kh->{curve}, $E->{$name}{curve}, "$name/$nick/curve");
+  is($kh->{pub}, $E->{$name}{pub}, "$name/$nick/pub");
+  if ($private) {
+    ok($K->is_private, "$name/$nick/is_private");
+    is($kh->{priv}, $E->{$name}{priv}, "$name/$nick/priv");
+  }
+  else {
+    ok(!$K->is_private, "$name/$nick/is_not_private");
+  }
+}
+
+{
+  my $f = "ssh_ed25519";
+  ##
+  #diag "$dir/${f}_openssh";
+  $ed->import_key("$dir/${f}_openssh");
+  _check_ed($ed, $f, "${f}_openssh", 1);
+  #diag "$dir/${f}_openssh_pw";
+  $ed->import_key("$dir/${f}_openssh_pw", "secret");
+  my $kh_priv = $ed->key2hash;
+  _check_ed($ed, $f, "${f}_openssh_pw", 1);
+  #diag "$dir/${f}_openssh.pub";
+  $ed->import_key("$dir/${f}_openssh.pub");
+  my $kh_pub = $ed->key2hash;
+  _check_ed($ed, $f, "${f}_openssh.pub", 0);
+  ##
+  $ed->import_key("$dir/${f}_rfc4716.pub");
+  _check_ed($ed, $f, "${f}_rfc4716.pub", 0);
+  ##
+  $ed->import_key($kh_priv);
+  _check_ed($ed, $f, "keyhash.priv", 1);
+  $ed->import_key($kh_pub);
+  _check_ed($ed, $f, "keyhash.pub", 0);
 }

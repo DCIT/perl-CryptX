@@ -1,3 +1,48 @@
+ssh-keygen -t ed25519 -C key-comment -N "" -f ssh_ed25519_openssh
+ssh-keygen -t dsa     -C key-comment -N "" -f ssh_dsa_openssh
+ssh-keygen -t ecdsa   -C key-comment -N "" -f ssh_ecdsa_openssh
+
+ssh-keygen -t rsa     -C key-comment -N "" -f ssh_rsa_openssh
+cp ssh_rsa_openssh ssh_rsa_pem && ssh-keygen -p -N "" -m pem -f ssh_rsa_pem
+cp ssh_rsa_openssh ssh_rsa_pkcs8 && ssh-keygen -p -N "" -m pkcs8 -f ssh_rsa_pkcs8
+cp ssh_rsa_openssh ssh_rsa_openssh_pw && ssh-keygen -p -N secret -m pem -f ssh_rsa_openssh_pw
+cp ssh_rsa_openssh ssh_rsa_pem_pw && ssh-keygen -p -N secret -m pem -f ssh_rsa_pem_pw
+cp ssh_rsa_openssh ssh_rsa_pkcs8_pw && ssh-keygen -p -N secret -m pkcs8 -f ssh_rsa_pkcs8_pw
+ssh-keygen -e -f ssh_rsa_openssh -m pem     > ssh_rsa_pem.pub
+ssh-keygen -e -f ssh_rsa_openssh -m pkcs8   > ssh_rsa_pkcs8.pub
+ssh-keygen -e -f ssh_rsa_openssh -m rfc4716 > ssh_rsa_rfc4716.pub
+
+
+SRC=ssh_rsa_2048
+chmod go-rwx $SRC
+umask 077
+cp $SRC ${SRC}_openssh && ssh-keygen -p -N "" -f ${SRC}_openssh
+ssh-keygen -c -C "This is a test key!" -f ${SRC}_openssh
+cp ${SRC}_openssh ${SRC}_pem && ssh-keygen -p -N "" -m pem -f ${SRC}_pem
+cp ${SRC}_openssh ${SRC}_pkcs8 && ssh-keygen -p -N "" -m pkcs8 -f ${SRC}_pkcs8
+cp ${SRC}_openssh ${SRC}_rfc4716 && ssh-keygen -p -N "" -m rfc4716 -f ${SRC}_rfc4716
+cp ${SRC}_openssh ${SRC}_openssh_pw && ssh-keygen -p -N secret -f ${SRC}_openssh_pw
+cp ${SRC}_openssh ${SRC}_pem_pw && ssh-keygen -p -N secret -m pem -f ${SRC}_pem_pw
+cp ${SRC}_openssh ${SRC}_pkcs8_pw && ssh-keygen -p -N secret -m pkcs8 -f ${SRC}_pkcs8_pw
+cp ${SRC}_openssh ${SRC}_rfc4716_pw && ssh-keygen -p -N secret -m rfc4716 -f ${SRC}_rfc4716_pw
+ssh-keygen -y -f ${SRC}_openssh            > ${SRC}_openssh.pub
+ssh-keygen -e -f ${SRC}_openssh -m pem     > ${SRC}_pem.pub
+ssh-keygen -e -f ${SRC}_openssh -m pkcs8   > ${SRC}_pkcs8.pub
+ssh-keygen -e -f ${SRC}_openssh -m rfc4716 > ${SRC}_rfc4716.pub
+
+
+
+ssh-keygen -e -f ssh_rsa -P "" -N "xx"
+
+
+ssh-keygen -i -f ssh_rsa -m RFC4716
+
+
+ssh-keygen
+
+ssh-keygen -e -f t/data/ssh/ssh_rsa_1536
+
+
 openssl genpkey -algorithm x25519 -out openssl_x25519_sk.pem
 openssl pkey -in openssl_x25519_sk.pem -text
 openssl pkey -in openssl_x25519_sk.pem -inform PEM -out openssl_x25519_sk.der -outform DER

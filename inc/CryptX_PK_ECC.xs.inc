@@ -73,16 +73,67 @@ _import_pkcs8(Crypt::PK::ECC self, SV * key_data, SV * passwd)
     PPCODE:
     {
         int rv;
-        unsigned char *data=NULL, *pwd=NULL;
-        STRLEN data_len=0, pwd_len=0;
+        unsigned char *data = NULL;
+        STRLEN data_len = 0;
+        password_ctx pw_ctx = { cryptx_internal_password_cb_SV, passwd };
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
-        if (SvOK(passwd)) {
-          pwd = (unsigned char *)SvPVbyte(passwd, pwd_len);
-        }
         if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
-        rv = ecc_import_pkcs8(data, (unsigned long)data_len, pwd, (unsigned long)pwd_len, &self->key);
+        if (SvOK(passwd)) {
+          rv = ecc_import_pkcs8(data, (unsigned long)data_len, &pw_ctx, &self->key);
+        }
+        else {
+          rv = ecc_import_pkcs8(data, (unsigned long)data_len, NULL, &self->key);
+        }
         if (rv != CRYPT_OK) croak("FATAL: ecc_import_pkcs8 failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
+    }
+
+void
+_import_pem(Crypt::PK::ECC self, SV * key_data, SV * passwd)
+    PPCODE:
+    {
+        int rv;
+        unsigned char *data = NULL;
+        STRLEN data_len = 0;
+        password_ctx pw_ctx = { cryptx_internal_password_cb_SV, passwd };
+        ltc_pka_key key_from_pem;
+
+        data = (unsigned char *)SvPVbyte(key_data, data_len);
+        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
+        if (SvOK(passwd)) {
+          rv = pem_decode_pkcs(data, (unsigned long)data_len, &key_from_pem, &pw_ctx);
+        }
+        else {
+          rv = pem_decode_pkcs(data, (unsigned long)data_len, &key_from_pem, NULL);
+        }
+        if (rv != CRYPT_OK) croak("FATAL: pem_decode_pkcs failed: %s", error_to_string(rv));
+        if (key_from_pem.id != LTC_PKA_EC) croak("FATAL: pem_decode_pkcs decoded non-ECC key");
+        self->key = key_from_pem.u.ecc;
+        XPUSHs(ST(0)); /* return self */
+    }
+
+void
+_import_openssh(Crypt::PK::ECC self, SV * key_data, SV * passwd)
+    PPCODE:
+    {
+        int rv;
+        unsigned char *data = NULL;
+        STRLEN data_len = 0;
+        password_ctx pw_ctx = { cryptx_internal_password_cb_SV, passwd };
+        ltc_pka_key key_from_pem;
+
+        data = (unsigned char *)SvPVbyte(key_data, data_len);
+        if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
+        if (SvOK(passwd)) {
+          rv = pem_decode_openssh(data, (unsigned long)data_len, &key_from_pem, &pw_ctx);
+        }
+        else {
+          rv = pem_decode_openssh(data, (unsigned long)data_len, &key_from_pem, NULL);
+        }
+        if (rv != CRYPT_OK) croak("FATAL: pem_decode_openssh failed: %s", error_to_string(rv));
+        if (key_from_pem.id != LTC_PKA_EC) croak("FATAL: pem_decode_openssh decoded non-ECC key");
+        self->key = key_from_pem.u.ecc;
         XPUSHs(ST(0)); /* return self */
     }
 

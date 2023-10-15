@@ -218,36 +218,19 @@ sub import_key {
   }
   croak "FATAL: invalid key data" unless $data;
 
-  if ($data =~ /-----BEGIN (EC PRIVATE|EC PUBLIC|PUBLIC) KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
-    my $rv = eval { $self->_import($data) } || eval { $self->_import_old($data) };
+  if ($data =~ /(-----BEGIN (PUBLIC|EC PRIVATE|PRIVATE|ENCRYPTED PRIVATE) KEY-----(.+?)-----END (PUBLIC|EC PRIVATE|PRIVATE|ENCRYPTED PRIVATE) KEY-----)/s) {
+    my $pem = $1;
+    my $rv = eval { $self->_import_pem($pem, $password) } // eval { $self->_import_old(pem_to_der($pem, $password)) };
     return $rv if $rv;
   }
-  elsif ($data =~ /-----BEGIN PRIVATE KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
-    return $self->_import_pkcs8($data, $password);
-  }
-  elsif ($data =~ /-----BEGIN ENCRYPTED PRIVATE KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
-    return $self->_import_pkcs8($data, $password);
-  }
-  elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
-    # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
-    my $json = "$1";
-    my $h = CryptX::_decode_json($json);
-    if ($h && $h->{kty} eq "EC") {
-      for (qw/x y d/) {
-        $h->{$_} = eval { unpack("H*", decode_b64u($h->{$_})) } if exists $h->{$_};
-      }
-      # names P-192 P-224 P-256 P-384 P-521 are recognized by libtomcrypt
-      return $self->_import_hex($h->{x}, $h->{y}, $h->{d}, $h->{crv});
-    }
-  }
-  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.*?)-----END CERTIFICATE-----/sg) {
+  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.*?)-----END CERTIFICATE-----/s) {
     $data = pem_to_der($data) or croak "FATAL: PEM/cert decode failed";
     return $self->_import_x509($data);
   }
-  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
+  elsif ($data =~ /-----BEGIN OPENSSH PRIVATE KEY-----(.+?)-----END OPENSSH PRIVATE KEY-----/s) {
+    return $self->_import_openssh($data, $password);
+  }
+  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/s) {
     $data = pem_to_der($data) or croak "FATAL: PEM/key decode failed";
     my ($typ, $skip, $pubkey) = Crypt::PK::_ssh_parse($data);
     return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
@@ -256,6 +239,18 @@ sub import_key {
     $data = decode_b64("$2");
     my ($typ, $skip, $pubkey) = Crypt::PK::_ssh_parse($data);
     return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
+  }
+  elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
+    # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
+    my $json = "$1";
+    my $h = CryptX::_decode_json($json) // {};
+    if ($h->{kty} eq "EC") {
+      $h->{x} = eval { unpack("H*", decode_b64u($h->{x})) } if exists $h->{x};
+      $h->{y} = eval { unpack("H*", decode_b64u($h->{y})) } if exists $h->{y};
+      $h->{d} = eval { unpack("H*", decode_b64u($h->{d})) } if exists $h->{d};
+      # names P-192 P-224 P-256 P-384 P-521 are recognized by libtomcrypt
+      return $self->_import_hex($h->{x}, $h->{y}, $h->{d}, $h->{crv});
+    }
   }
   else {
     my $rv = eval { $self->_import($data) }                  ||

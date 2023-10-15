@@ -77,9 +77,11 @@ sub import_key {
   }
   croak "FATAL: invalid key data" unless $data;
 
-  if ($data =~ /-----BEGIN (DSA PRIVATE|DSA PUBLIC|PRIVATE|PUBLIC) KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
-    return $self->_import($data);
+  if ($data =~ /-----BEGIN (DSA PRIVATE|DSA PUBLIC|PRIVATE|ENCRYPTED PRIVATE|PUBLIC) KEY-----(.+?)-----END (DSA PRIVATE|DSA PUBLIC|PRIVATE|ENCRYPTED PRIVATE|PUBLIC) KEY-----/s) {
+    return $self->_import_pem($data, $password);
+  }
+  elsif ($data =~ /-----BEGIN OPENSSH PRIVATE KEY-----(.+?)-----END OPENSSH PRIVATE KEY-----/s) {
+    return $self->_import_openssh($data, $password);
   }
   elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
     $data = pem_to_der($data) or croak "FATAL: PEM/key decode failed";
@@ -92,7 +94,8 @@ sub import_key {
     return $self->_import_hex(unpack('H*',$p), unpack('H*',$q), unpack('H*',$g), undef, unpack('H*',$y)) if $typ && $p && $q && $g && $y && $typ eq 'ssh-dss';
   }
   else {
-    return $self->_import($data);
+    my $rv = eval { $self->_import($data) } || eval { $self->_import_pkcs8($data, $password) };
+    return $rv if $rv;
   }
   croak "FATAL: invalid or unsupported DSA key format";
 }

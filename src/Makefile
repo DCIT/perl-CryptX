@@ -58,7 +58,8 @@ ltc/misc/crypt/crypt_register_cipher.o ltc/misc/crypt/crypt_register_hash.o ltc/
 ltc/misc/crypt/crypt_sizes.o ltc/misc/crypt/crypt_unregister_cipher.o ltc/misc/crypt/crypt_unregister_hash.o \
 ltc/misc/crypt/crypt_unregister_prng.o ltc/misc/error_to_string.o ltc/misc/hkdf/hkdf.o \
 ltc/misc/mem_neq.o ltc/misc/padding/padding_depad.o ltc/misc/padding/padding_pad.o \
-ltc/misc/pbes/pbes.o ltc/misc/pbes/pbes1.o ltc/misc/pbes/pbes2.o ltc/misc/pkcs12/pkcs12_kdf.o \
+ltc/misc/pbes/pbes.o ltc/misc/pbes/pbes1.o ltc/misc/pbes/pbes2.o ltc/misc/pem/pem.o \
+ltc/misc/pem/pem_pkcs.o ltc/misc/pem/pem_read.o ltc/misc/pem/pem_ssh.o ltc/misc/pkcs12/pkcs12_kdf.o \
 ltc/misc/pkcs12/pkcs12_utf8_to_utf16.o ltc/misc/pkcs5/pkcs_5_1.o ltc/misc/pkcs5/pkcs_5_2.o \
 ltc/misc/ssh/ssh_decode_sequence_multi.o ltc/misc/ssh/ssh_encode_sequence_multi.o \
 ltc/misc/zeromem.o ltc/modes/cbc/cbc_decrypt.o ltc/modes/cbc/cbc_done.o ltc/modes/cbc/cbc_encrypt.o \
@@ -89,41 +90,42 @@ ltc/pk/asn1/der/printable_string/der_decode_printable_string.o ltc/pk/asn1/der/p
 ltc/pk/asn1/der/printable_string/der_length_printable_string.o ltc/pk/asn1/der/sequence/der_decode_sequence_ex.o \
 ltc/pk/asn1/der/sequence/der_decode_sequence_flexi.o ltc/pk/asn1/der/sequence/der_decode_sequence_multi.o \
 ltc/pk/asn1/der/sequence/der_encode_sequence_ex.o ltc/pk/asn1/der/sequence/der_encode_sequence_multi.o \
-ltc/pk/asn1/der/sequence/der_length_sequence.o ltc/pk/asn1/der/sequence/der_sequence_free.o \
-ltc/pk/asn1/der/sequence/der_sequence_shrink.o ltc/pk/asn1/der/set/der_encode_set.o \
-ltc/pk/asn1/der/set/der_encode_setof.o ltc/pk/asn1/der/short_integer/der_decode_short_integer.o \
+ltc/pk/asn1/der/sequence/der_flexi_sequence_cmp.o ltc/pk/asn1/der/sequence/der_length_sequence.o \
+ltc/pk/asn1/der/sequence/der_sequence_free.o ltc/pk/asn1/der/sequence/der_sequence_shrink.o \
+ltc/pk/asn1/der/set/der_encode_set.o ltc/pk/asn1/der/set/der_encode_setof.o ltc/pk/asn1/der/short_integer/der_decode_short_integer.o \
 ltc/pk/asn1/der/short_integer/der_encode_short_integer.o ltc/pk/asn1/der/short_integer/der_length_short_integer.o \
 ltc/pk/asn1/der/teletex_string/der_decode_teletex_string.o ltc/pk/asn1/der/teletex_string/der_length_teletex_string.o \
 ltc/pk/asn1/der/utctime/der_decode_utctime.o ltc/pk/asn1/der/utctime/der_encode_utctime.o \
 ltc/pk/asn1/der/utctime/der_length_utctime.o ltc/pk/asn1/der/utf8/der_decode_utf8_string.o \
 ltc/pk/asn1/der/utf8/der_encode_utf8_string.o ltc/pk/asn1/der/utf8/der_length_utf8_string.o \
-ltc/pk/asn1/oid/pk_get_oid.o ltc/pk/asn1/oid/pk_oid_cmp.o ltc/pk/asn1/oid/pk_oid_str.o \
-ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.o ltc/pk/asn1/x509/x509_decode_public_key_from_certificate.o \
+ltc/pk/asn1/oid/pk_get.o ltc/pk/asn1/oid/pk_oid_cmp.o ltc/pk/asn1/oid/pk_oid_str.o \
+ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.o ltc/pk/asn1/pkcs8/pkcs8_get.o ltc/pk/asn1/x509/x509_decode_public_key_from_certificate.o \
 ltc/pk/asn1/x509/x509_decode_subject_public_key_info.o ltc/pk/asn1/x509/x509_encode_subject_public_key_info.o \
 ltc/pk/dh/dh.o ltc/pk/dh/dh_check_pubkey.o ltc/pk/dh/dh_export.o ltc/pk/dh/dh_export_key.o \
-ltc/pk/dh/dh_free.o ltc/pk/dh/dh_generate_key.o ltc/pk/dh/dh_import.o ltc/pk/dh/dh_set.o \
-ltc/pk/dh/dh_set_pg_dhparam.o ltc/pk/dh/dh_shared_secret.o ltc/pk/dsa/dsa_decrypt_key.o \
+ltc/pk/dh/dh_free.o ltc/pk/dh/dh_generate_key.o ltc/pk/dh/dh_import.o ltc/pk/dh/dh_import_pkcs8.o \
+ltc/pk/dh/dh_set.o ltc/pk/dh/dh_set_pg_dhparam.o ltc/pk/dh/dh_shared_secret.o ltc/pk/dsa/dsa_decrypt_key.o \
 ltc/pk/dsa/dsa_encrypt_key.o ltc/pk/dsa/dsa_export.o ltc/pk/dsa/dsa_free.o ltc/pk/dsa/dsa_generate_key.o \
-ltc/pk/dsa/dsa_generate_pqg.o ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_make_key.o ltc/pk/dsa/dsa_set.o \
-ltc/pk/dsa/dsa_set_pqg_dsaparam.o ltc/pk/dsa/dsa_shared_secret.o ltc/pk/dsa/dsa_sign_hash.o \
-ltc/pk/dsa/dsa_verify_hash.o ltc/pk/dsa/dsa_verify_key.o ltc/pk/ec25519/ec25519_crypto_ctx.o \
-ltc/pk/ec25519/ec25519_export.o ltc/pk/ec25519/ec25519_import_pkcs8.o ltc/pk/ec25519/tweetnacl.o \
-ltc/pk/ecc/ecc.o ltc/pk/ecc/ecc_ansi_x963_export.o ltc/pk/ecc/ecc_ansi_x963_import.o \
-ltc/pk/ecc/ecc_decrypt_key.o ltc/pk/ecc/ecc_encrypt_key.o ltc/pk/ecc/ecc_export.o \
-ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_find_curve.o ltc/pk/ecc/ecc_free.o \
-ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_oid_str.o ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o \
-ltc/pk/ecc/ecc_import_openssl.o ltc/pk/ecc/ecc_import_pkcs8.o ltc/pk/ecc/ecc_import_x509.o \
-ltc/pk/ecc/ecc_make_key.o ltc/pk/ecc/ecc_recover_key.o ltc/pk/ecc/ecc_set_curve.o \
-ltc/pk/ecc/ecc_set_curve_internal.o ltc/pk/ecc/ecc_set_key.o ltc/pk/ecc/ecc_shared_secret.o \
-ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sizes.o ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.o \
-ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o \
-ltc/pk/ecc/ltc_ecc_is_point.o ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_map.o \
-ltc/pk/ecc/ltc_ecc_mul2add.o ltc/pk/ecc/ltc_ecc_mulmod.o ltc/pk/ecc/ltc_ecc_mulmod_timing.o \
-ltc/pk/ecc/ltc_ecc_points.o ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc/ltc_ecc_projective_dbl_point.o \
+ltc/pk/dsa/dsa_generate_pqg.o ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_import_pkcs8.o \
+ltc/pk/dsa/dsa_init.o ltc/pk/dsa/dsa_make_key.o ltc/pk/dsa/dsa_set.o ltc/pk/dsa/dsa_set_pqg_dsaparam.o \
+ltc/pk/dsa/dsa_shared_secret.o ltc/pk/dsa/dsa_sign_hash.o ltc/pk/dsa/dsa_verify_hash.o \
+ltc/pk/dsa/dsa_verify_key.o ltc/pk/ec25519/ec25519_crypto_ctx.o ltc/pk/ec25519/ec25519_export.o \
+ltc/pk/ec25519/ec25519_import_pkcs8.o ltc/pk/ec25519/tweetnacl.o ltc/pk/ecc/ecc.o \
+ltc/pk/ecc/ecc_ansi_x963_export.o ltc/pk/ecc/ecc_ansi_x963_import.o ltc/pk/ecc/ecc_decrypt_key.o \
+ltc/pk/ecc/ecc_encrypt_key.o ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o \
+ltc/pk/ecc/ecc_find_curve.o ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_oid_str.o \
+ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o ltc/pk/ecc/ecc_import_openssl.o \
+ltc/pk/ecc/ecc_import_pkcs8.o ltc/pk/ecc/ecc_import_x509.o ltc/pk/ecc/ecc_make_key.o \
+ltc/pk/ecc/ecc_recover_key.o ltc/pk/ecc/ecc_set_curve.o ltc/pk/ecc/ecc_set_curve_internal.o \
+ltc/pk/ecc/ecc_set_key.o ltc/pk/ecc/ecc_shared_secret.o ltc/pk/ecc/ecc_sign_hash.o \
+ltc/pk/ecc/ecc_sizes.o ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.o ltc/pk/ecc/ecc_verify_hash.o \
+ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o ltc/pk/ecc/ltc_ecc_is_point.o \
+ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_map.o ltc/pk/ecc/ltc_ecc_mul2add.o \
+ltc/pk/ecc/ltc_ecc_mulmod.o ltc/pk/ecc/ltc_ecc_mulmod_timing.o ltc/pk/ecc/ltc_ecc_points.o \
+ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc/ltc_ecc_projective_dbl_point.o \
 ltc/pk/ecc/ltc_ecc_verify_key.o ltc/pk/ed25519/ed25519_export.o ltc/pk/ed25519/ed25519_import.o \
 ltc/pk/ed25519/ed25519_import_pkcs8.o ltc/pk/ed25519/ed25519_import_raw.o ltc/pk/ed25519/ed25519_import_x509.o \
 ltc/pk/ed25519/ed25519_make_key.o ltc/pk/ed25519/ed25519_sign.o ltc/pk/ed25519/ed25519_verify.o \
-ltc/pk/pkcs1/pkcs_1_i2osp.o ltc/pk/pkcs1/pkcs_1_mgf1.o ltc/pk/pkcs1/pkcs_1_oaep_decode.o \
+ltc/pk/pka_key_free.o ltc/pk/pkcs1/pkcs_1_i2osp.o ltc/pk/pkcs1/pkcs_1_mgf1.o ltc/pk/pkcs1/pkcs_1_oaep_decode.o \
 ltc/pk/pkcs1/pkcs_1_oaep_encode.o ltc/pk/pkcs1/pkcs_1_os2ip.o ltc/pk/pkcs1/pkcs_1_pss_decode.o \
 ltc/pk/pkcs1/pkcs_1_pss_encode.o ltc/pk/pkcs1/pkcs_1_v1_5_decode.o ltc/pk/pkcs1/pkcs_1_v1_5_encode.o \
 ltc/pk/rsa/rsa_decrypt_key.o ltc/pk/rsa/rsa_encrypt_key.o ltc/pk/rsa/rsa_export.o \

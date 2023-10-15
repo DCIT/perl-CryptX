@@ -159,6 +159,17 @@ int padding_pad(unsigned char *data, unsigned long length, unsigned long* padded
 int padding_depad(const unsigned char *data, unsigned long *length, unsigned long mode);
 #endif  /* LTC_PADDING */
 
+#ifdef LTC_PEM
+int pem_decode_pkcs_filehandle(FILE *f, ltc_pka_key *k, const password_ctx *pw_ctx);
+int pem_decode_pkcs(const void *buf, unsigned long len, ltc_pka_key *k, const password_ctx *pw_ctx);
+
+#ifdef LTC_SSH
+int pem_decode_openssh_filehandle(FILE *f, ltc_pka_key *k, const password_ctx *pw_ctx);
+int pem_decode_openssh(const void *buf, unsigned long len, ltc_pka_key *k, const password_ctx *pw_ctx);
+#endif
+
+#endif /* LTC_PEM */
+
 #ifdef LTC_SSH
 typedef enum ssh_data_type_ {
    LTC_SSHDATA_EOL,
