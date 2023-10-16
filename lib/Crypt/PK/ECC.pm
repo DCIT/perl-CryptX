@@ -223,17 +223,14 @@ sub import_key {
     my $rv = eval { $self->_import_pem($pem, $password) } // eval { $self->_import_old(pem_to_der($pem, $password)) };
     return $rv if $rv;
   }
-  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.*?)-----END CERTIFICATE-----/s) {
-    $data = pem_to_der($data) or croak "FATAL: PEM/cert decode failed";
-    return $self->_import_x509($data);
+  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.+?)-----END CERTIFICATE-----/s) {
+    return $self->_import_pem($data, undef);
   }
   elsif ($data =~ /-----BEGIN OPENSSH PRIVATE KEY-----(.+?)-----END OPENSSH PRIVATE KEY-----/s) {
     return $self->_import_openssh($data, $password);
   }
-  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/s) {
-    $data = pem_to_der($data) or croak "FATAL: PEM/key decode failed";
-    my ($typ, $skip, $pubkey) = Crypt::PK::_ssh_parse($data);
-    return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
+  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.+?)---- END SSH2 PUBLIC KEY ----/s) {
+    return $self->_import_openssh($data, undef);
   }
   elsif ($data =~ /(ecdsa-\S+)\s+(\S+)/) {
     $data = decode_b64("$2");

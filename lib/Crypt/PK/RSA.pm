@@ -121,8 +121,14 @@ sub import_key {
   if ($data =~ /-----BEGIN (RSA PUBLIC|RSA PRIVATE|PUBLIC|PRIVATE|ENCRYPTED PRIVATE) KEY-----(.+?)-----END (RSA PUBLIC|RSA PRIVATE|PUBLIC|PRIVATE|ENCRYPTED PRIVATE) KEY-----/s) {
     return $self->_import_pem($data, $password);
   }
+  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.+?)-----END CERTIFICATE-----/s) {
+    return $self->_import_pem($data, undef);
+  }
   elsif ($data =~ /-----BEGIN OPENSSH PRIVATE KEY-----(.+?)-----END OPENSSH PRIVATE KEY-----/s) {
     return $self->_import_openssh($data, $password);
+  }
+  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.+?)---- END SSH2 PUBLIC KEY ----/s) {
+    return $self->_import_openssh($data, undef);
   }
   elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
     # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
@@ -134,15 +140,6 @@ sub import_key {
       }
       return $self->_import_hex($h->{n}, $h->{e}, $h->{d}, $h->{p}, $h->{q}, $h->{dp}, $h->{dq}, $h->{qi}) if $h->{n} && $h->{e};
     }
-  }
-  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.+?)-----END CERTIFICATE-----/s) {
-    $data = pem_to_der($data) or croak "FATAL: PEM/cert decode failed";
-    return $self->_import_x509($data);
-  }
-  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.+?)---- END SSH2 PUBLIC KEY ----/s) {
-    $data = pem_to_der($data) or croak "FATAL: PEM/key decode failed";
-    my ($typ, $N, $e) = Crypt::PK::_ssh_parse($data);
-    return $self->_import_hex(unpack("H*", $e), unpack("H*", $N)) if $typ && $e && $N && $typ eq 'ssh-rsa';
   }
   elsif ($data =~ /ssh-rsa\s+(\S+)/) {
   $data = decode_b64("$1");

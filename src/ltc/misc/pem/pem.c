@@ -25,6 +25,13 @@ const struct pem_header_id pem_std_headers[] = {
      .flags = pf_pkcs8,
    },
    {
+     /* X.509 Certificates */
+     SET_CSTR(.start, "-----BEGIN CERTIFICATE-----"),
+     SET_CSTR(.end, "-----END CERTIFICATE-----"),
+     .has_more_headers = no,
+     .flags = pf_x509,
+   },
+   {
      /* Regular (plain) public keys */
      SET_CSTR(.start, "-----BEGIN PUBLIC KEY-----"),
      SET_CSTR(.end, "-----END PUBLIC KEY-----"),
@@ -34,8 +41,9 @@ const struct pem_header_id pem_std_headers[] = {
    {
      SET_CSTR(.start, "-----BEGIN RSA PUBLIC KEY-----"),
      SET_CSTR(.end, "-----END RSA PUBLIC KEY-----"),
-     .has_more_headers = maybe,
+     .has_more_headers = no,
      .pka = LTC_PKA_RSA,
+     .flags = pf_public,
    },
    /* Regular plain or encrypted private keys */
    {
@@ -61,6 +69,9 @@ const unsigned long pem_std_headers_num = sizeof(pem_std_headers)/sizeof(pem_std
 
 /* Encrypted PEM files */
 const struct str pem_proc_type_encrypted = { SET_CSTR(, "Proc-Type: 4,ENCRYPTED") };
+#ifdef LTC_SSH
+const struct str pem_ssh_comment = { SET_CSTR(, "Comment: ") };
+#endif
 const struct str pem_dek_info_start = { SET_CSTR(, "DEK-Info: ") };
 const struct blockcipher_info pem_dek_infos[] =
    {
@@ -219,6 +230,29 @@ int pem_decrypt(unsigned char *data, unsigned long *datalen,
    }
 
 error_out:
+   return err;
+}
+
+int pem_decode_filehandle(FILE *f, ltc_pka_key *k, const password_ctx *pw_ctx)
+{
+   int err = pem_decode_pkcs_filehandle(f, k, pw_ctx);
+   if (err == CRYPT_OK || err != CRYPT_UNKNOWN_PEM)
+      return err;
+#if defined(LTC_SSH)
+   rewind(f);
+   err = pem_decode_openssh_filehandle(f, k, pw_ctx);
+#endif
+   return err;
+}
+
+int pem_decode(const void *buf, unsigned long len, ltc_pka_key *k, const password_ctx *pw_ctx)
+{
+   int err = pem_decode_pkcs(buf, len, k, pw_ctx);
+   if (err == CRYPT_OK || err != CRYPT_UNKNOWN_PEM)
+      return err;
+#if defined(LTC_SSH)
+   err = pem_decode_openssh(buf, len, k, pw_ctx);
+#endif
    return err;
 }
 

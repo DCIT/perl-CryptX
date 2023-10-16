@@ -80,13 +80,14 @@ sub import_key {
   if ($data =~ /-----BEGIN (DSA PRIVATE|DSA PUBLIC|PRIVATE|ENCRYPTED PRIVATE|PUBLIC) KEY-----(.+?)-----END (DSA PRIVATE|DSA PUBLIC|PRIVATE|ENCRYPTED PRIVATE|PUBLIC) KEY-----/s) {
     return $self->_import_pem($data, $password);
   }
+  elsif ($data =~ /-----BEGIN CERTIFICATE-----(.+?)-----END CERTIFICATE-----/s) {
+    return $self->_import_pem($data, undef);
+  }
   elsif ($data =~ /-----BEGIN OPENSSH PRIVATE KEY-----(.+?)-----END OPENSSH PRIVATE KEY-----/s) {
     return $self->_import_openssh($data, $password);
   }
-  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.*?)---- END SSH2 PUBLIC KEY ----/sg) {
-    $data = pem_to_der($data) or croak "FATAL: PEM/key decode failed";
-    my ($typ, $p, $q, $g, $y) = Crypt::PK::_ssh_parse($data);
-    return $self->_import_hex(unpack('H*',$p), unpack('H*',$q), unpack('H*',$g), undef, unpack('H*',$y)) if $typ && $p && $q && $g && $y && $typ eq 'ssh-dss';
+  elsif ($data =~ /---- BEGIN SSH2 PUBLIC KEY ----(.+?)---- END SSH2 PUBLIC KEY ----/s) {
+    return $self->_import_openssh($data, undef);
   }
   elsif ($data =~ /ssh-dss\s+(\S+)/) {
     $data = decode_b64("$1");

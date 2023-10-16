@@ -106,14 +106,14 @@ ltc/pk/asn1/der/utctime/der_length_utctime.obj ltc/pk/asn1/der/utf8/der_decode_u
 ltc/pk/asn1/der/utf8/der_encode_utf8_string.obj ltc/pk/asn1/der/utf8/der_length_utf8_string.obj \
 ltc/pk/asn1/oid/pk_get.obj ltc/pk/asn1/oid/pk_oid_cmp.obj ltc/pk/asn1/oid/pk_oid_str.obj \
 ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.obj ltc/pk/asn1/pkcs8/pkcs8_get.obj ltc/pk/asn1/x509/x509_decode_public_key_from_certificate.obj \
-ltc/pk/asn1/x509/x509_decode_subject_public_key_info.obj ltc/pk/asn1/x509/x509_encode_subject_public_key_info.obj \
-ltc/pk/dh/dh.obj ltc/pk/dh/dh_check_pubkey.obj ltc/pk/dh/dh_export.obj ltc/pk/dh/dh_export_key.obj \
-ltc/pk/dh/dh_free.obj ltc/pk/dh/dh_generate_key.obj ltc/pk/dh/dh_import.obj ltc/pk/dh/dh_import_pkcs8.obj \
-ltc/pk/dh/dh_set.obj ltc/pk/dh/dh_set_pg_dhparam.obj ltc/pk/dh/dh_shared_secret.obj \
-ltc/pk/dsa/dsa_decrypt_key.obj ltc/pk/dsa/dsa_encrypt_key.obj ltc/pk/dsa/dsa_export.obj \
-ltc/pk/dsa/dsa_free.obj ltc/pk/dsa/dsa_generate_key.obj ltc/pk/dsa/dsa_generate_pqg.obj \
-ltc/pk/dsa/dsa_import.obj ltc/pk/dsa/dsa_import_pkcs8.obj ltc/pk/dsa/dsa_init.obj \
-ltc/pk/dsa/dsa_make_key.obj ltc/pk/dsa/dsa_set.obj ltc/pk/dsa/dsa_set_pqg_dsaparam.obj \
+ltc/pk/asn1/x509/x509_decode_spki.obj ltc/pk/asn1/x509/x509_decode_subject_public_key_info.obj \
+ltc/pk/asn1/x509/x509_encode_subject_public_key_info.obj ltc/pk/dh/dh.obj ltc/pk/dh/dh_check_pubkey.obj \
+ltc/pk/dh/dh_export.obj ltc/pk/dh/dh_export_key.obj ltc/pk/dh/dh_free.obj ltc/pk/dh/dh_generate_key.obj \
+ltc/pk/dh/dh_import.obj ltc/pk/dh/dh_import_pkcs8.obj ltc/pk/dh/dh_set.obj ltc/pk/dh/dh_set_pg_dhparam.obj \
+ltc/pk/dh/dh_shared_secret.obj ltc/pk/dsa/dsa_decrypt_key.obj ltc/pk/dsa/dsa_encrypt_key.obj \
+ltc/pk/dsa/dsa_export.obj ltc/pk/dsa/dsa_free.obj ltc/pk/dsa/dsa_generate_key.obj \
+ltc/pk/dsa/dsa_generate_pqg.obj ltc/pk/dsa/dsa_import.obj ltc/pk/dsa/dsa_import_pkcs8.obj \
+ltc/pk/dsa/dsa_init.obj ltc/pk/dsa/dsa_make_key.obj ltc/pk/dsa/dsa_set.obj ltc/pk/dsa/dsa_set_pqg_dsaparam.obj \
 ltc/pk/dsa/dsa_shared_secret.obj ltc/pk/dsa/dsa_sign_hash.obj ltc/pk/dsa/dsa_verify_hash.obj \
 ltc/pk/dsa/dsa_verify_key.obj ltc/pk/ec25519/ec25519_crypto_ctx.obj ltc/pk/ec25519/ec25519_export.obj \
 ltc/pk/ec25519/ec25519_import_pkcs8.obj ltc/pk/ec25519/tweetnacl.obj ltc/pk/ecc/ecc.obj \
