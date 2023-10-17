@@ -83,11 +83,18 @@ typedef struct {
    unsigned long blocklen;
 } pbes_properties;
 
+struct password {
+   /* usually a `char*` but could also contain binary data
+    * so use a `void*` + length to be on the safe side.
+    */
+   unsigned char pw[LTC_MAX_PASSWORD_LEN];
+   unsigned long l;
+};
+
 typedef struct
 {
    pbes_properties type;
-   void *pwd;
-   unsigned long pwdlen;
+   struct password pwd;
    ltc_asn1_list *enc_data;
    ltc_asn1_list *salt;
    ltc_asn1_list *iv;
@@ -259,14 +266,6 @@ enum cipher_mode {
    cm_none, cm_cbc, cm_cfb, cm_ctr, cm_ofb, cm_stream, cm_gcm
 };
 
-struct password {
-   /* usually a `char*` but could also contain binary data
-    * so use a `void*` + length to be on the safe side.
-    */
-   void *pw;
-   unsigned long l;
-};
-
 struct blockcipher_info {
    const char *name;
    const char *algo;
@@ -283,7 +282,7 @@ struct str {
 };
 
 #define SET_STR(n, s) n.p = s, n.len = XSTRLEN(s)
-#define SET_CSTR(n, s) n.p = (char*)s, n.len = XSTRLEN(s)
+#define SET_CSTR(n, s) n.p = (char*)s, n.len = (sizeof s) - 1
 #define COPY_STR(n, s, l) do { XMEMCPY(n.p, s, l); n.len = l; } while(0)
 #define RESET_STR(n) do { n.p = NULL; n.len = 0; } while(0)
 

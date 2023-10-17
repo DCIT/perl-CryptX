@@ -619,6 +619,10 @@
    #define LTC_PBES
 #endif
 
+#if defined(LTC_PEM) || defined(LTC_PKCS_8) && !defined(LTC_MAX_PASSWORD_LEN)
+   #define LTC_MAX_PASSWORD_LEN 256
+#endif
+
 #if defined(LTC_CLEAN_STACK)
 /* if you're sure that you want to use it, remove the line below */
    #error LTC_CLEAN_STACK is considered as broken
@@ -763,13 +767,6 @@
 #if !defined(LTC_ECC_SECP512R1) && defined(LTC_ECC521)
 #define LTC_ECC_SECP521R1
 #undef LTC_ECC521
-#endif
-
-/* MSVC can't build PEM */
-#if defined(LTC_PEM) && defined(_MSC_VER)
-#undef LTC_PEM
-#undef LTC_PEM_DECODE_BUFSZ
-#undef LTC_PEM_READ_BUFSIZE
 #endif
 
 #endif /* TOMCRYPT_CUSTOM_H_ */
