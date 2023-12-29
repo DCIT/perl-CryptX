@@ -110,7 +110,7 @@ typedef struct
 
 /* tomcrypt_cipher.h */
 
-#if defined(LTC_AES_NI) && defined(LTC_AMD64_SSE4_1)
+#if defined(LTC_AES_NI) && defined(LTC_AMD64_AES_NI)
 #define LTC_HAS_AES_NI
 #endif
 
