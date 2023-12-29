@@ -96,6 +96,9 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
          #define LTC_AMD64_SSE4_1
       #endif
    #endif
+   #if defined(__AES__)
+       #define LTC_AMD64_AES_NI
+   #endif
 #endif
 
 /* detect PPC32 */
