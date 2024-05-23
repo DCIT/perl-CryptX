@@ -69,14 +69,14 @@ do { XMEMCPY (&(x), (y), 4);                    \
 #elif !defined(LTC_NO_BSWAP) && (defined(INTEL_CC) || (defined(__GNUC__) && (defined(__DJGPP__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__i386__) || defined(__x86_64__))))
 
 #define STORE32H(x, y)           \
-__asm__ __volatile__ (           \
+__asm__ volatile (               \
    "bswapl %0     \n\t"          \
    "movl   %0,(%1)\n\t"          \
    "bswapl %0     \n\t"          \
       ::"r"(x), "r"(y): "memory");
 
 #define LOAD32H(x, y)          \
-__asm__ __volatile__ (         \
+__asm__ volatile (             \
    "movl (%1),%0\n\t"          \
    "bswapl %0\n\t"             \
    :"=r"(x): "r"(y): "memory");
@@ -109,14 +109,14 @@ do { XMEMCPY (&(x), (y), 8);                    \
 #elif !defined(LTC_NO_BSWAP) && (defined(__GNUC__) && defined(__x86_64__))
 
 #define STORE64H(x, y)           \
-__asm__ __volatile__ (           \
+__asm__ volatile (               \
    "bswapq %0     \n\t"          \
    "movq   %0,(%1)\n\t"          \
    "bswapq %0     \n\t"          \
    ::"r"(x), "r"(y): "memory");
 
 #define LOAD64H(x, y)          \
-__asm__ __volatile__ (         \
+__asm__ volatile (             \
    "movq (%1),%0\n\t"          \
    "bswapq %0\n\t"             \
    :"=r"(x): "r"(y): "memory");
