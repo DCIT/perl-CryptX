@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 121;
+use Test::More tests => 123;
 
 use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret);
 use Crypt::Misc qw(read_rawfile);
@@ -106,6 +106,11 @@ use Crypt::Misc qw(read_rawfile);
   $sig = $pr1->sign_hash($hash, 'SHA1');
   ok(length $sig > 60, 'sign_hash ' . length($sig));
   ok($pu1->verify_hash($sig, $hash, 'SHA1'), 'verify_hash');
+
+  $hash = pack("H*", "04624fae618e9ad0c5e479f62e1420c71fff34dd");
+  $sig = $pr1->sign_hash_eth($hash, 'SHA1');
+  ok(length $sig == 65, 'sign_hash_eth ' . length($sig));
+  ok($pu1->verify_hash_eth($sig, $hash), 'verify_hash_eth');
 
   my $pr2 = Crypt::PK::ECC->new;
   $pr2->import_key('t/data/cryptx_priv_ecc2.der');
