@@ -506,6 +506,50 @@ shared_secret(Crypt::PK::ECC self, Crypt::PK::ECC pubkey)
     OUTPUT:
         RETVAL
 
+int
+recovery_pub(Crypt::PK::ECC self, SV * sig, SV* hash, SV* recid = NULL)
+    ALIAS:
+        recovery_pub_rfc8032 = 1
+        recovery_pub_eth     = 2
+    CODE:
+    {
+        int rv;
+        unsigned char *sig_ptr = NULL, *hash_ptr = NULL;
+        STRLEN hash_len = 0, sig_len = 0;
+        int recovery_id = -1;
+
+        if (recid != NULL) {
+          recovery_id = (int) SvIV(recid);
+        } else if (ix != 2) {
+          if (ix == 1) {
+            croak("FATAL: recovery_pub_rfc8032 requires recid argument");
+          } else {
+            croak("FATAL: recovery_pub requires recid argument");
+          }
+        }
+
+        sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
+        hash_ptr = (unsigned char *)SvPVbyte(hash, hash_len);
+        if (ix == 1) {
+          rv = ecc_recover_key(sig_ptr, (unsigned long)sig_len, hash_ptr, (unsigned long) hash_len,
+                               recovery_id, LTC_ECCSIG_RFC7518, &self->key);
+        }
+        else if (ix == 2) {
+          // Ethereum's signature contains the recovery id in the last byte of the signature
+          // don't need to pass it as a separate argument
+          rv = ecc_recover_key(sig_ptr, (unsigned long)sig_len, hash_ptr, (unsigned long) hash_len,
+                               recovery_id, LTC_ECCSIG_ETH27, &self->key);
+        }
+        else {
+          rv = ecc_recover_key(sig_ptr, (unsigned long)sig_len, hash_ptr, (unsigned long) hash_len,
+                               recovery_id, LTC_ECCSIG_ANSIX962, &self->key);
+        }
+        if (rv != CRYPT_OK) croak("FATAL: ecc_recover_key failed: %s", error_to_string(rv));
+        RETVAL = 1;
+    }
+    OUTPUT:
+        RETVAL
+
 void
 DESTROY(Crypt::PK::ECC self)
     CODE:
