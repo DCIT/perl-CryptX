@@ -15,12 +15,12 @@ environment:
     - perl_type: strawberry
       perl_version: 5.32.0.1    #gcc 8.3.0
       perl_bits: 64
-    - perl_type: strawberry
-      perl_version: 5.30.3.1    #gcc 8.3.0
-      perl_bits: 32
-    - perl_type: strawberry
-      perl_version: 5.30.3.1    #gcc 8.3.0
-      perl_bits: 64
+#    - perl_type: strawberry
+#      perl_version: 5.30.3.1    #gcc 8.3.0
+#      perl_bits: 32
+#    - perl_type: strawberry
+#      perl_version: 5.30.3.1    #gcc 8.3.0
+#      perl_bits: 64
     - perl_type: strawberry     #gcc 7.1.0
       perl_version: 5.28.2.1
       perl_bits: 32
