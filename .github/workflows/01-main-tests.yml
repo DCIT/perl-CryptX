@@ -32,11 +32,13 @@ jobs:
           - '5.34'
           - '5.36'
           - '5.38'
+          - '5.40'
     container:
       image: perl:${{ matrix.perl-version }}
     steps:
       - uses: actions/checkout@v3
-      - run: perl -V
+      - name: perl -V
+        run: perl -V
       - name: Install dependencies
         run: |
           cpanm -n --installdeps .
@@ -57,7 +59,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set up Perl
         run: brew install perl
-      - run: perl -V
+      - name: perl -V
+        run: perl -V
       - name: Install Dependencies
         run: curl --silent -L https://cpanmin.us | perl - --notest --installdeps .
       - name: Run build
