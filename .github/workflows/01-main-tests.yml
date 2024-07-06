@@ -114,9 +114,11 @@ jobs:
         with:
             packages: perl_base perl-ExtUtils-MakeMaker perl-JSON make gcc-g++ bash libcrypt-devel libnsl-devel
       - uses: actions/checkout@v3
-      - run: perl -V
+      - name: perl -V
+        run: perl -V
         shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
-      - run: cpan App::cpanminus
+      - name: Install cpanminus
+        run: cpan App::cpanminus
         shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
       - name: Install Dependencies
         run: cd $GITHUB_WORKSPACE; cpanm --verbose --notest --installdeps .
