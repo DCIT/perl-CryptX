@@ -81,7 +81,10 @@ init:
   - reg add "HKLM\Software\Microsoft\Windows\Windows Error Reporting" /f /v DontShowUI /d 1
 
 install:
-  - ps: choco list strawberryperl --all-versions
+  - ps: |
+      $versions = choco search strawberryperl -e
+      Write-Host "Available Strawberry Perl versions:"
+      $versions | ForEach-Object { Write-Host $_ }
   - ps: choco install wget
   - call .appveyor.cmd perl_setup
   - set MAKEFLAGS=-j4
