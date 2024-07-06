@@ -43,11 +43,11 @@ jobs:
           perl Makefile.PL
           make -j4
         env:
-          AUTHOR_MODE: 1
+          AUTHOR_MODE: 0
       - name: Run tests
         run: prove -b t
         env:
-          AUTHOR_MODE: 1
+          AUTHOR_MODE: 0
 
   mac:
     runs-on: macOS-latest
