@@ -509,7 +509,7 @@ shared_secret(Crypt::PK::ECC self, Crypt::PK::ECC pubkey)
 int
 recovery_pub(Crypt::PK::ECC self, SV * sig, SV* hash, SV* recid = NULL)
     ALIAS:
-        recovery_pub_rfc8032 = 1
+        recovery_pub_rfc7518 = 1
         recovery_pub_eth     = 2
     CODE:
     {
@@ -522,7 +522,7 @@ recovery_pub(Crypt::PK::ECC self, SV * sig, SV* hash, SV* recid = NULL)
           recovery_id = (int) SvIV(recid);
         } else if (ix != 2) {
           if (ix == 1) {
-            croak("FATAL: recovery_pub_rfc8032 requires recid argument");
+            croak("FATAL: recovery_pub_rfc7518 requires recid argument");
           } else {
             croak("FATAL: recovery_pub requires recid argument");
           }

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 127;
+use Test::More tests => 135;
 
 use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret);
 use Crypt::Misc qw(read_rawfile);
@@ -219,4 +219,34 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   my $recid = ord(substr($sig, -1)) - 27;
   ok($rk->recovery_pub_eth($sig, $hash, $recid), 'recovery eth pub ok with recid');
   is($rk->export_key_raw('public'), $pub, 'recovery eth pub key matched');
+}
+
+{
+  my $k = Crypt::PK::ECC->new;
+  ok($k->generate_key('secp256k1'), 'generate_key secp256k1');
+  my $pub = $k->export_key_raw('public');
+  my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
+  my $sig = $k->sign_hash($hash, 'SHA1');
+  my $rk = Crypt::PK::ECC->new;
+  $rk->generate_key('secp256k1');
+  ok($rk->recovery_pub($sig, $hash, 0), 'recovery pub with 0 bit ok');
+  my $pub0 = $rk->export_key_raw('public');
+  ok($rk->recovery_pub($sig, $hash, 1), 'recovery pub with 1 bit ok');
+  my $pub1 = $rk->export_key_raw('public');
+  ok($pub0 eq $pub || $pub1 eq $pub, 'recovery pub key matched');
+}
+
+{
+  my $k = Crypt::PK::ECC->new;
+  ok($k->generate_key('secp256k1'), 'generate_key secp256k1');
+  my $pub = $k->export_key_raw('public');
+  my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
+  my $sig = $k->sign_hash_rfc7518($hash, 'SHA1');
+  my $rk = Crypt::PK::ECC->new;
+  $rk->generate_key('secp256k1');
+  ok($rk->recovery_pub_rfc7518($sig, $hash, 0), 'recovery pub rfc7518 with 0 bit ok');
+  my $pub0 = $rk->export_key_raw('public');
+  ok($rk->recovery_pub_rfc7518($sig, $hash, 1), 'recovery pub rfc7518 with 1 bit ok');
+  my $pub1 = $rk->export_key_raw('public');
+  ok($pub0 eq $pub || $pub1 eq $pub, 'recovery rfc7518 pub key matched');
 }
