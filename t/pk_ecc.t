@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 123;
+use Test::More tests => 124;
 
 use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret);
 use Crypt::Misc qw(read_rawfile);
