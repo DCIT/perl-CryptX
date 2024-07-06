@@ -81,7 +81,8 @@ init:
   - reg add "HKLM\Software\Microsoft\Windows\Windows Error Reporting" /f /v DontShowUI /d 1
 
 install:
-  - cinst -y wget
+  - ps: Install-Product windows
+  - ps: choco install wget
   - call .appveyor.cmd perl_setup
   - set MAKEFLAGS=-j4
   - set AUTHOR_MODE=0
