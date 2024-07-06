@@ -85,7 +85,7 @@ install:
       $versions = choco search strawberryperl -e
       Write-Host "Available Strawberry Perl versions:"
       $versions | ForEach-Object { Write-Host $_ }
-  - ps: choco install wget
+  - ps: choco install wget -y --no-progress
   - call .appveyor.cmd perl_setup
   - set MAKEFLAGS=-j4
   - set AUTHOR_MODE=0
