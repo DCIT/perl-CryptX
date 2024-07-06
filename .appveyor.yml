@@ -81,7 +81,6 @@ init:
   - reg add "HKLM\Software\Microsoft\Windows\Windows Error Reporting" /f /v DontShowUI /d 1
 
 install:
-  - ps: Install-Product windows
   - ps: choco list strawberryperl --all-versions
   - ps: choco install wget
   - call .appveyor.cmd perl_setup
