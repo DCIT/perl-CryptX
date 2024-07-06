@@ -206,3 +206,17 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   eval { $k->export_key_der('private_short'); };
   ok($@, "export_key_der invalid auto oid");
 }
+
+{
+  my $k = Crypt::PK::ECC->new;
+  ok($k->generate_key('secp256k1'), 'generate_key secp256k1');
+  my $pub = $k->export_key_raw('public');
+  my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
+  my $sig = $k->sign_hash_eth($hash, 'SHA1');
+  my $rk = Crypt::PK::ECC->new;
+  $rk->generate_key('secp256k1');
+  ok($rk->recovery_pub_eth($sig, $hash), 'recovery eth pub ok');
+  my $recid = ord(substr($sig, -1)) - 27;
+  ok($rk->recovery_pub_eth($sig, $hash, $recid), 'recovery eth pub ok with recid');
+  is($rk->export_key_raw('public'), $pub, 'recovery eth pub key matched');
+}
