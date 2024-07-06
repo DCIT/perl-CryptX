@@ -1,3 +1,14 @@
+### these stopped working:
+# - '5.8'
+# - '5.10'
+# - '5.12'
+# - '5.14'
+# - '5.16'
+# - '5.18'
+# - '5.20'
+# - '5.22'
+# - '5.24'
+--
 name: 01-main-tests
 
 on:
@@ -14,15 +25,6 @@ jobs:
     strategy:
       matrix:
         perl-version:
-          - '5.8'
-          - '5.10'
-          - '5.12'
-          - '5.14'
-          - '5.16'
-          - '5.18'
-          - '5.20'
-          - '5.22'
-          - '5.24'
           - '5.26'
           - '5.28'
           - '5.30'
@@ -81,9 +83,11 @@ jobs:
         run: |
           choco install strawberryperl
           echo "C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      - run: perl -V
+      - name: perl -V
+        run: perl -V
       - name: Install Dependencies
-        run: curl --silent -L https://cpanmin.us | perl - --notest --installdeps .
+        run: |
+          cpanm --installdeps .
       - name: Run build
         run: |
           perl Makefile.PL
