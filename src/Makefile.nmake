@@ -198,5 +198,4 @@ clean:
 	$(RM_F) $(OBJS) liballinone.lib
 
 .c.obj:
-        cl /Iltm /Iltc/headers /DLTC_SOURCE /DLTC_NO_TEST /DLTC_NO_PROTOTYPES /DLTM_DESC /DARGTYPE=4 $(CFLAGS) /c $< /Fo$@
- 
+	cl /Iltm /Iltc/headers /DLTC_SOURCE /DLTC_NO_TEST /DLTC_NO_PROTOTYPES /DLTC_NO_WIN32_BCRYPT /DLTM_DESC /DARGTYPE=4 $(CFLAGS) /c $< /Fo$@
