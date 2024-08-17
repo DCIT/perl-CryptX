@@ -4,7 +4,7 @@ package Crypt::Cipher::RC6;
 
 use strict;
 use warnings;
-our $VERSION = '0.080_003';
+our $VERSION = '0.080_004';
 
 use base qw(Crypt::Cipher);
 
