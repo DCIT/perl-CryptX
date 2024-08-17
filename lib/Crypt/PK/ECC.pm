@@ -894,7 +894,7 @@ This method will recover public key from ECDSA signature in Ethereum format
 
 =head2 recovery_pub
 
-Same logic as recovery_pub_eth except, but compatible with L< sign_hash|/sign_hash>
+Same logic as recovery_pub_eth except, but compatible with L<sign_hash|/sign_hash>
 signature. The main difference that B<$recid> is required, because B<sign_hash> signature
 doesn't contain parity bit, so you need to specify it explicitly.
 
@@ -904,7 +904,7 @@ doesn't contain parity bit, so you need to specify it explicitly.
 
 =head2 recovery_pub_rfc7518
 
-Same logic as recovery_pub_eth except, but compatible with L< sign_hash_refc7518|/sign_hash_refc7518>
+Same logic as recovery_pub_eth except, but compatible with L<sign_hash_refc7518|/sign_hash_refc7518>
 signature. The main difference that B<$recid> is required, because rfc7518 signature
 doesn't contain parity bit, so you need to specify it explicitly.
 
