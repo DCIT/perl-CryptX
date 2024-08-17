@@ -186,19 +186,20 @@ STATIC int cryptx_internal_password_cb_getpw(void **p, unsigned long *l, void *u
     *l = 0;
     return 1;
   }
-  *p = XMALLOC(pwd_len);
+  Newz(0, *p, pwd_len, unsigned char);
   if (*p == NULL) {
     *l = 0;
     return 1;
   }
-  XMEMCPY(*p, pwd, pwd_len);
+  Copy(pwd, *p, pwd_len, unsigned char);
   *l = pwd_len;
 
   return 0;
 }
 
 STATIC void cryptx_internal_password_cb_free(void *p) {
-  XFREE(p);
+  dTHX; /* fetch context */
+  Safefree(p);
   return;
 }
 
