@@ -66,8 +66,16 @@ typedef struct {
 } ltc_dh_set_type;
 
 
-typedef int (*fn_kdf_t)(const unsigned char *password, unsigned long password_len,
-                              const unsigned char *salt,     unsigned long salt_len,
+struct password {
+   /* usually a `char*` but could also contain binary data
+    * so use a `void*` + length to be on the safe side.
+    */
+   void *pw;
+   unsigned long l;
+};
+
+typedef int (*fn_kdf_t)(const struct password *pwd,
+                        const unsigned char *salt,  unsigned long salt_len,
                               int iteration_count,  int hash_idx,
                               unsigned char *out,   unsigned long *outlen);
 
@@ -83,18 +91,10 @@ typedef struct {
    unsigned long blocklen;
 } pbes_properties;
 
-struct password {
-   /* usually a `char*` but could also contain binary data
-    * so use a `void*` + length to be on the safe side.
-    */
-   unsigned char pw[LTC_MAX_PASSWORD_LEN];
-   unsigned long l;
-};
-
 typedef struct
 {
    pbes_properties type;
-   struct password pwd;
+   struct password pw;
    ltc_asn1_list *enc_data;
    ltc_asn1_list *salt;
    ltc_asn1_list *iv;
@@ -263,7 +263,23 @@ int base64_encode_pem(const unsigned char *in,  unsigned long inlen,
 
 #ifdef LTC_PEM
 enum cipher_mode {
-   cm_none, cm_cbc, cm_cfb, cm_ctr, cm_ofb, cm_stream, cm_gcm
+   cm_modes =           0x00ff,
+   cm_flags =           0xff00,
+   /* Flags */
+   cm_openssh =         0x0100,
+   cm_1bit =            0x0200,
+   cm_8bit =            0x0400,
+   /* Modes */
+   cm_none =            0x0000,
+   cm_cbc =             0x0001,
+   cm_cfb =             0x0002,
+   cm_ctr =             0x0003,
+   cm_ofb =             0x0004,
+   cm_stream =          0x0005,
+   cm_gcm =             0x0006,
+   cm_cfb1 =            cm_cfb | cm_1bit,
+   cm_cfb8 =            cm_cfb | cm_8bit,
+   cm_stream_openssh =  cm_stream | cm_openssh,
 };
 
 struct blockcipher_info {
@@ -340,6 +356,7 @@ struct get_char {
 /* others */
 
 void copy_or_zeromem(const unsigned char* src, unsigned char* dest, unsigned long len, int coz);
+void password_free(struct password *pw, const struct password_ctx *ctx);
 
 int pbes_decrypt(const pbes_arg  *arg, unsigned char *dec_data, unsigned long *dec_size);
 
@@ -349,6 +366,7 @@ int pbes2_extract(const ltc_asn1_list *s, pbes_arg *res);
 int pem_decrypt(unsigned char *data, unsigned long *datalen,
                 unsigned char *key,  unsigned long keylen,
                 unsigned char *iv,   unsigned long ivlen,
+                unsigned char *tag,  unsigned long taglen,
                 const struct blockcipher_info *info,
                 enum padding_type padding);
 #ifndef LTC_NO_FILE

@@ -58,10 +58,10 @@ ltc/misc/crypt/crypt_register_cipher.o ltc/misc/crypt/crypt_register_hash.o ltc/
 ltc/misc/crypt/crypt_sizes.o ltc/misc/crypt/crypt_unregister_cipher.o ltc/misc/crypt/crypt_unregister_hash.o \
 ltc/misc/crypt/crypt_unregister_prng.o ltc/misc/error_to_string.o ltc/misc/hkdf/hkdf.o \
 ltc/misc/mem_neq.o ltc/misc/padding/padding_depad.o ltc/misc/padding/padding_pad.o \
-ltc/misc/pbes/pbes.o ltc/misc/pbes/pbes1.o ltc/misc/pbes/pbes2.o ltc/misc/pem/pem.o \
-ltc/misc/pem/pem_pkcs.o ltc/misc/pem/pem_read.o ltc/misc/pem/pem_ssh.o ltc/misc/pkcs12/pkcs12_kdf.o \
-ltc/misc/pkcs12/pkcs12_utf8_to_utf16.o ltc/misc/pkcs5/pkcs_5_1.o ltc/misc/pkcs5/pkcs_5_2.o \
-ltc/misc/ssh/ssh_decode_sequence_multi.o ltc/misc/ssh/ssh_encode_sequence_multi.o \
+ltc/misc/password_free.o ltc/misc/pbes/pbes.o ltc/misc/pbes/pbes1.o ltc/misc/pbes/pbes2.o \
+ltc/misc/pem/pem.o ltc/misc/pem/pem_pkcs.o ltc/misc/pem/pem_read.o ltc/misc/pem/pem_ssh.o \
+ltc/misc/pkcs12/pkcs12_kdf.o ltc/misc/pkcs12/pkcs12_utf8_to_utf16.o ltc/misc/pkcs5/pkcs_5_1.o \
+ltc/misc/pkcs5/pkcs_5_2.o ltc/misc/ssh/ssh_decode_sequence_multi.o ltc/misc/ssh/ssh_encode_sequence_multi.o \
 ltc/misc/zeromem.o ltc/modes/cbc/cbc_decrypt.o ltc/modes/cbc/cbc_done.o ltc/modes/cbc/cbc_encrypt.o \
 ltc/modes/cbc/cbc_getiv.o ltc/modes/cbc/cbc_setiv.o ltc/modes/cbc/cbc_start.o ltc/modes/cfb/cfb_decrypt.o \
 ltc/modes/cfb/cfb_done.o ltc/modes/cfb/cfb_encrypt.o ltc/modes/cfb/cfb_getiv.o ltc/modes/cfb/cfb_setiv.o \
@@ -125,7 +125,7 @@ ltc/pk/ecc/ltc_ecc_points.o ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc
 ltc/pk/ecc/ltc_ecc_verify_key.o ltc/pk/ed25519/ed25519_export.o ltc/pk/ed25519/ed25519_import.o \
 ltc/pk/ed25519/ed25519_import_pkcs8.o ltc/pk/ed25519/ed25519_import_raw.o ltc/pk/ed25519/ed25519_import_x509.o \
 ltc/pk/ed25519/ed25519_make_key.o ltc/pk/ed25519/ed25519_sign.o ltc/pk/ed25519/ed25519_verify.o \
-ltc/pk/pka_key_free.o ltc/pk/pkcs1/pkcs_1_i2osp.o ltc/pk/pkcs1/pkcs_1_mgf1.o ltc/pk/pkcs1/pkcs_1_oaep_decode.o \
+ltc/pk/pka_key.o ltc/pk/pkcs1/pkcs_1_i2osp.o ltc/pk/pkcs1/pkcs_1_mgf1.o ltc/pk/pkcs1/pkcs_1_oaep_decode.o \
 ltc/pk/pkcs1/pkcs_1_oaep_encode.o ltc/pk/pkcs1/pkcs_1_os2ip.o ltc/pk/pkcs1/pkcs_1_pss_decode.o \
 ltc/pk/pkcs1/pkcs_1_pss_encode.o ltc/pk/pkcs1/pkcs_1_v1_5_decode.o ltc/pk/pkcs1/pkcs_1_v1_5_encode.o \
 ltc/pk/rsa/rsa_decrypt_key.o ltc/pk/rsa/rsa_encrypt_key.o ltc/pk/rsa/rsa_export.o \

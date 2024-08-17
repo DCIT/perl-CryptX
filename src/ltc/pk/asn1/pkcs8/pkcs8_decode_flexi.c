@@ -23,10 +23,12 @@ int pkcs8_decode_flexi(const unsigned char  *in,  unsigned long inlen,
    unsigned char *dec_data = NULL;
    ltc_asn1_list *l = NULL;
    int err;
-   pbes_arg pbes = { 0 };
+   pbes_arg pbes;
 
    LTC_ARGCHK(in           != NULL);
    LTC_ARGCHK(decoded_list != NULL);
+
+   XMEMSET(&pbes, 0, sizeof(pbes));
 
    *decoded_list = NULL;
    if ((err = der_decode_sequence_flexi(in, &len, &l)) == CRYPT_OK) {
@@ -61,8 +63,7 @@ int pkcs8_decode_flexi(const unsigned char  *in,  unsigned long inlen,
             goto LBL_DONE;
          }
 
-         pbes.pwd.l = LTC_MAX_PASSWORD_LEN;
-         if (pw_ctx->callback(pbes.pwd.pw, &pbes.pwd.l, pw_ctx->userdata)) {
+         if (pw_ctx->callback(&pbes.pw.pw, &pbes.pw.l, pw_ctx->userdata)) {
             err = CRYPT_ERROR;
             goto LBL_DONE;
          }
@@ -93,14 +94,12 @@ int pkcs8_decode_flexi(const unsigned char  *in,  unsigned long inlen,
    }
 
 LBL_DONE:
-   if (l) der_free_sequence_flexi(l);
-   if (pbes.pwd.l) {
-      zeromem(&pbes.pwd, sizeof(pbes.pwd));
-   }
    if (dec_data) {
       zeromem(dec_data, dec_size);
       XFREE(dec_data);
    }
+   password_free(&pbes.pw, pw_ctx);
+   if (l) der_free_sequence_flexi(l);
    return err;
 }
 

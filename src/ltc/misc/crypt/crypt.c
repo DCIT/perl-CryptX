@@ -84,6 +84,8 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_DES)
    "   DES\n"
+   "   DES-X\n"
+   "   3DES\n"
 #endif
 #if defined(LTC_CAST5)
    "   CAST5\n"
@@ -315,9 +317,12 @@ const char *crypt_build_settings =
 #if defined(LTC_FORTUNA)
     "   Fortuna (" NAME_VALUE(LTC_FORTUNA_POOLS) ", "
 #if defined(LTC_FORTUNA_RESEED_RATELIMIT_TIMED)
-    "LTC_FORTUNA_RESEED_RATELIMIT_TIMED, "
+    "LTC_FORTUNA_RESEED_RATELIMIT_TIMED"
 #else
     "LTC_FORTUNA_RESEED_RATELIMIT_STATIC, " NAME_VALUE(LTC_FORTUNA_WD)
+#endif
+#if defined(LTC_FORTUNA_USE_ENCRYPT_ONLY)
+    ", LTC_FORTUNA_USE_ENCRYPT_ONLY"
 #endif
     ")\n"
 #endif
@@ -467,9 +472,6 @@ const char *crypt_build_settings =
     " PBES1 "
     " PBES2 "
 #endif
-#if defined(LTC_MAX_PASSWORD_LEN)
-    " " NAME_VALUE(LTC_MAX_PASSWORD_LEN) " "
-#endif
 #if defined(LTC_PEM)
     " PEM "
     " " NAME_VALUE(LTC_PEM_DECODE_BUFSZ) " "
@@ -477,6 +479,9 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_SSH)
     " SSH "
+#endif
+#if defined(LTC_PEM_SSH)
+    " OpenSSH-PEM "
 #endif
 #if defined(LTC_DEVRANDOM)
     " LTC_DEVRANDOM "

@@ -377,9 +377,9 @@
 
 /* with non-glibc or glibc 2.17+ prefer clock_gettime over gettimeofday */
 #if defined(__GLIBC__) && defined(__GLIBC_PREREQ)
-#if __GLIBC_PREREQ(2, 17)
-  #define LTC_CLOCK_GETTIME
-#endif
+   #if __GLIBC_PREREQ(2, 17)
+      #define LTC_CLOCK_GETTIME
+   #endif
 #elif defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L
   #define LTC_CLOCK_GETTIME
 #endif
@@ -408,6 +408,11 @@
 /* number of pools (4..32) can save a bit of ram by lowering the count */
 #define LTC_FORTUNA_POOLS 32
 #endif
+
+/* at compile time you can decide whether fortuna uses the regular AES APIs
+ * or whether it will use the 'encrypt_only' variants.
+ * This is useful for custom builds of libtomcrypt for size-constrained targets. */
+/* #define LTC_FORTUNA_USE_ENCRYPT_ONLY */
 
 #endif /* LTC_FORTUNA */
 
@@ -587,6 +592,9 @@
          #define LTC_PEM_READ_BUFSIZE 4096
       #endif
    #endif
+   #if defined(LTC_SSH)
+      #define LTC_PEM_SSH
+   #endif
 #endif
 
 #if defined(LTC_DER)
@@ -617,10 +625,6 @@
 #ifdef LTC_PKCS_8
    #define LTC_PADDING
    #define LTC_PBES
-#endif
-
-#if defined(LTC_PEM) || defined(LTC_PKCS_8) && !defined(LTC_MAX_PASSWORD_LEN)
-   #define LTC_MAX_PASSWORD_LEN 256
 #endif
 
 #if defined(LTC_CLEAN_STACK)

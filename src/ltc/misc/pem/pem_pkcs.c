@@ -16,14 +16,13 @@ static int s_decrypt_pem(unsigned char *pem, unsigned long *l, const struct pem_
 {
    unsigned char iv[MAXBLOCKSIZE], key[MAXBLOCKSIZE];
    unsigned long ivlen, klen;
-   int err, cipher;
+   int err;
 
-   cipher = find_cipher(hdr->info.algo);
-   if (cipher == -1) {
-      return CRYPT_INVALID_CIPHER;
-   }
    if (hdr->info.keylen > sizeof(key)) {
       return CRYPT_BUFFER_OVERFLOW;
+   }
+   if (!hdr->pw->pw) {
+      return CRYPT_INVALID_ARG;
    }
 
    ivlen = sizeof(iv);
@@ -35,7 +34,7 @@ static int s_decrypt_pem(unsigned char *pem, unsigned long *l, const struct pem_
       return err;
    }
 
-   err = pem_decrypt(pem, l, key, klen, iv, ivlen, &hdr->info, LTC_PAD_PKCS7);
+   err = pem_decrypt(pem, l, key, klen, iv, ivlen, NULL, 0, &hdr->info, LTC_PAD_PKCS7);
 
    zeromem(key, sizeof(key));
    zeromem(iv, sizeof(iv));
@@ -165,7 +164,7 @@ cleanup:
    return err;
 }
 
-int s_extract_pka(unsigned char *pem, unsigned long w, enum ltc_pka_id *pka)
+static int s_extract_pka(unsigned char *pem, unsigned long w, enum ltc_pka_id *pka)
 {
    ltc_asn1_list *pub;
    int err = CRYPT_ERROR;
@@ -238,8 +237,7 @@ retry:
       }
 
       hdr.pw = &pw;
-      hdr.pw->l = LTC_MAX_PASSWORD_LEN;
-      if (pw_ctx->callback(hdr.pw->pw, &hdr.pw->l, pw_ctx->userdata)) {
+      if (pw_ctx->callback(&hdr.pw->pw, &hdr.pw->l, pw_ctx->userdata)) {
          err = CRYPT_ERROR;
          goto cleanup;
       }
@@ -263,9 +261,7 @@ retry:
    }
 
 cleanup:
-   if (hdr.pw) {
-      zeromem(hdr.pw->pw, sizeof(hdr.pw->pw));
-   }
+   password_free(hdr.pw, pw_ctx);
    XFREE(pem);
    return err;
 }
