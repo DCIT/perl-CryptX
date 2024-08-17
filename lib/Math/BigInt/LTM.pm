@@ -2,7 +2,7 @@ package Math::BigInt::LTM;
 
 use strict;
 use warnings;
-our $VERSION = '0.080_004';
+our $VERSION = '0.080_005';
 
 use CryptX;
 use Carp;
