@@ -10,7 +10,7 @@ new(Class, SV * key, SV * nonce=&PL_sv_undef)
         STRLEN iv_len=0, k_len=0;
         unsigned char *iv=NULL, *k=NULL;
 
-        if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
+        if (!SvPOK_spec(key))   croak("FATAL: key must be string/buffer scalar");
         k  = (unsigned char *)SvPVbyte(key, k_len);
 
         Newz(0, RETVAL, 1, rabbit_state);
@@ -23,7 +23,7 @@ new(Class, SV * key, SV * nonce=&PL_sv_undef)
         }
 
         if (SvOK(nonce)) {
-          if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+          if (!SvPOK_spec(nonce)) croak("FATAL: nonce must be string/buffer scalar");
           iv = (unsigned char *)SvPVbyte(nonce, iv_len);
           rv = rabbit_setiv(RETVAL, iv, (unsigned long)iv_len);
           if (rv != CRYPT_OK) {

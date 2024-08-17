@@ -16,7 +16,7 @@ new(Class, char * hash_name, SV * key)
         id = cryptx_internal_find_hash(hash_name);
         if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
 
-        if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
         Newz(0, RETVAL, 1, hmac_state);

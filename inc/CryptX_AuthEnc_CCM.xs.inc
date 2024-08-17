@@ -16,11 +16,11 @@ new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, in
 
         if (tag_len < 1 || tag_len > MAXBLOCKSIZE) croak("FATAL: invalid tag_len %d", tag_len);
         if (pt_len < 0)    croak("FATAL: invalid pt_len");
-        if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
+        if (!SvPOK_spec(key))   croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
-        if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+        if (!SvPOK_spec(nonce)) croak("FATAL: nonce must be string/buffer scalar");
         n = (unsigned char *) SvPVbyte(nonce, n_len);
-        if (!SvPOK(adata)) croak("FATAL: adata must be string/buffer scalar");
+        if (!SvPOK_spec(adata)) croak("FATAL: adata must be string/buffer scalar");
         h = (unsigned char *) SvPVbyte(adata, h_len);
 
         id = cryptx_internal_find_cipher(cipher_name);
@@ -145,7 +145,7 @@ decrypt_done(Crypt::AuthEnc::CCM self, ...)
           XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
         }
         else {
-          if (!SvPOK(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
+          if (!SvPOK_spec(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
           expected_tag = (unsigned char *) SvPVbyte(ST(1), expected_tag_len);
           if (expected_tag_len!=tag_len) {
             XPUSHs(sv_2mortal(newSViv(0))); /* false */
@@ -169,10 +169,10 @@ ccm_encrypt_authenticate(char *cipher_name, SV *key, SV *nonce, SV *header, unsi
         unsigned char tag[MAXBLOCKSIZE];
         SV *output;
 
-        if (SvPOK(key))       k  = (unsigned char *) SvPVbyte(key, k_len);
-        if (SvPOK(nonce))     n  = (unsigned char *) SvPVbyte(nonce, n_len);
-        if (SvPOK(plaintext)) pt = (unsigned char *) SvPVbyte(plaintext, pt_len);
-        if (SvPOK(header))    h  = (unsigned char *) SvPVbyte(header, h_len);
+        if (SvPOK_spec(key))       k  = (unsigned char *) SvPVbyte(key, k_len);
+        if (SvPOK_spec(nonce))     n  = (unsigned char *) SvPVbyte(nonce, n_len);
+        if (SvPOK_spec(plaintext)) pt = (unsigned char *) SvPVbyte(plaintext, pt_len);
+        if (SvPOK_spec(header))    h  = (unsigned char *) SvPVbyte(header, h_len);
 
         id = cryptx_internal_find_cipher(cipher_name);
         if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);

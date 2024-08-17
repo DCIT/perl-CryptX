@@ -16,7 +16,7 @@ new(Class, char * cipher_name, SV * key)
         id = cryptx_internal_find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
-        if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
         Newz(0, RETVAL, 1, pmac_state);

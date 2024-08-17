@@ -10,10 +10,10 @@ new(Class, char * cipher_name, SV * key, SV * nonce = NULL)
         unsigned char *k = NULL, *iv = NULL;
         int id, rv;
 
-        if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
         if (nonce) {
-          if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+          if (!SvPOK_spec(nonce)) croak("FATAL: nonce must be string/buffer scalar");
           iv = (unsigned char *)SvPVbyte(nonce, iv_len);
         }
 
@@ -177,7 +177,7 @@ decrypt_done(Crypt::AuthEnc::GCM self, ...)
           XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
         }
         else {
-          if (!SvPOK(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
+          if (!SvPOK_spec(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
           expected_tag = (unsigned char *) SvPVbyte(ST(1), expected_tag_len);
           if (expected_tag_len!=tag_len) {
             XPUSHs(sv_2mortal(newSViv(0))); /* false */

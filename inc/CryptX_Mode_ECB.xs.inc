@@ -38,7 +38,7 @@ start_decrypt(Crypt::Mode::ECB self, SV * key)
         STRLEN k_len=0;
         unsigned char *k=NULL;
 
-        if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
+        if (!SvPOK_spec(key))   croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
         rv = ecb_start(self->cipher_id, k, (unsigned long)k_len, self->cipher_rounds, &self->state);

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 16;
 
 use Crypt::AuthEnc::CCM qw( ccm_encrypt_authenticate ccm_decrypt_verify );
 
@@ -58,4 +58,11 @@ my $key   = "12345678901234561234567890123456";
   substr($tag, 0, 1) = pack("H2", "AA");
   $pt = ccm_decrypt_verify('AES', $key, $nonce, "", $ct, $tag);
   is($pt, undef, "ccm_decrypt_verify: plaintext (no header) / bad tag");
+}
+
+# BUG: https://github.com/DCIT/perl-CryptX/issues/105
+{
+  my ($ct1, $tag1) = ccm_encrypt_authenticate('AES', $key, $nonce, undef, 16, 1234567890);
+  my ($ct2, $tag2) = ccm_encrypt_authenticate('AES', $key, $nonce, undef, 16, "1234567890");
+  ok($ct1 eq $ct2 && $tag1 eq $tag2, "GH issue 105");
 }

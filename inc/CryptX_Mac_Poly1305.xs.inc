@@ -12,7 +12,7 @@ new(Class, SV * key)
         unsigned char *k=NULL;
         int rv;
 
-        if (!SvPOK(key)) croak("FATAL: key must be string/buffer scalar");
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
         Newz(0, RETVAL, 1, poly1305_state);

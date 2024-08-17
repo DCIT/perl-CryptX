@@ -14,12 +14,12 @@ new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata=&PL_sv_undef)
         STRLEN h_len=0;
         int rv, id;
 
-        if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
+        if (!SvPOK_spec(key))   croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
-        if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+        if (!SvPOK_spec(nonce)) croak("FATAL: nonce must be string/buffer scalar");
         n = (unsigned char *) SvPVbyte(nonce, n_len);
         if (SvOK(adata)) { /* adata is optional param */
-          if (!SvPOK(adata)) croak("FATAL: adata must be string/buffer scalar");
+          if (!SvPOK_spec(adata)) croak("FATAL: adata must be string/buffer scalar");
           h = (unsigned char *) SvPVbyte(adata, h_len);
         }
 
@@ -135,7 +135,7 @@ decrypt_done(Crypt::AuthEnc::EAX self, ...)
           XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
         }
         else {
-          if (!SvPOK(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
+          if (!SvPOK_spec(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
           expected_tag = (unsigned char *) SvPVbyte(ST(1), expected_tag_len);
           if (expected_tag_len!=tag_len) {
             XPUSHs(sv_2mortal(newSViv(0))); /* false */

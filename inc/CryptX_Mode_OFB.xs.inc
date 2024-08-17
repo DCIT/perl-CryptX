@@ -38,10 +38,10 @@ start_decrypt(Crypt::Mode::OFB self, SV * key, SV * iv)
         unsigned char *i=NULL;
         int rv;
 
-        if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
+        if (!SvPOK_spec(key))   croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        if (!SvPOK(iv))    croak("FATAL: iv must be string/buffer scalar");
+        if (!SvPOK_spec(iv))    croak("FATAL: iv must be string/buffer scalar");
         i = (unsigned char *) SvPVbyte(iv, i_len);
         if (i_len != (STRLEN)cipher_descriptor[self->cipher_id].block_length) {
           croak ("FATAL: sizeof(iv) should be equal to blocksize (%d)", cipher_descriptor[self->cipher_id].block_length);

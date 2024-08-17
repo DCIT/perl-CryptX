@@ -10,8 +10,8 @@ new(Class, SV * key, SV * nonce, UV counter = 0, int rounds = 20)
         STRLEN iv_len=0, k_len=0;
         unsigned char *iv=NULL, *k=NULL;
 
-        if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
-        if (!SvPOK(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+        if (!SvPOK_spec(key))   croak("FATAL: key must be string/buffer scalar");
+        if (!SvPOK_spec(nonce)) croak("FATAL: nonce must be string/buffer scalar");
         k  = (unsigned char *)SvPVbyte(key, k_len);
         iv = (unsigned char *)SvPVbyte(nonce, iv_len);
 

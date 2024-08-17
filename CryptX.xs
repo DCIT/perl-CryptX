@@ -18,6 +18,9 @@
 # endif
 #endif
 
+/* HACK: https://github.com/DCIT/perl-CryptX/issues/105 (replacement for SvPOK(sv) suggestet by Leont) */
+#define SvPOK_spec(sv) (SvOK(sv) && (!SvROK(sv) || SvAMAGIC(sv)))
+
 #undef LTC_SOURCE
 #include "tomcrypt.h"
 #include "tommath.h"
