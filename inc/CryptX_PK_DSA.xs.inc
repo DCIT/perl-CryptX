@@ -99,7 +99,7 @@ _import_pkcs8(Crypt::PK::DSA self, SV * key_data, SV * passwd)
         int rv;
         unsigned char *data = NULL;
         STRLEN data_len = 0;
-        password_ctx pw_ctx = { cryptx_internal_password_cb_SV, passwd };
+        password_ctx pw_ctx = { cryptx_internal_password_cb_getpw, cryptx_internal_password_cb_free, passwd };
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         if (self->key.type != -1) { dsa_free(&self->key); self->key.type = -1; }
@@ -120,7 +120,7 @@ _import_pem(Crypt::PK::DSA self, SV * key_data, SV * passwd)
         int rv;
         unsigned char *data = NULL;
         STRLEN data_len = 0;
-        password_ctx pw_ctx = { cryptx_internal_password_cb_SV, passwd };
+        password_ctx pw_ctx = { cryptx_internal_password_cb_getpw, cryptx_internal_password_cb_free, passwd };
         ltc_pka_key key_from_pem;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
@@ -144,7 +144,7 @@ _import_openssh(Crypt::PK::DSA self, SV * key_data, SV * passwd)
         int rv;
         unsigned char *data = NULL;
         STRLEN data_len = 0;
-        password_ctx pw_ctx = { cryptx_internal_password_cb_SV, passwd };
+        password_ctx pw_ctx = { cryptx_internal_password_cb_getpw, cryptx_internal_password_cb_free, passwd };
         ltc_pka_key key_from_pem;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);

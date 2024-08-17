@@ -165,56 +165,41 @@ typedef struct x25519_struct {          /* used by Crypt::PK::X25519 */
   int initialized;
 } *Crypt__PK__X25519;
 
-//STATIC int cryptx_internal_password_cb_SVXX(void **p, unsigned long *l, void *u) {
-//  dTHX; /* fetch context */
-//  SV *passwd = u;
-//  void *pwd = NULL;
-//  STRLEN pwd_len = 0;
-//
-//  if (passwd == NULL || !SvOK(passwd)) {
-//    *p = NULL;
-//    *l = 0;
-//    return 1;
-//  }
-//  pwd = SvPVbyte(passwd, pwd_len);
-//  if (pwd == NULL || pwd_len == 0) {
-//    *p = NULL;
-//    *l = 0;
-//    return 1;
-//  }
-//  *p = XMALLOC(pwd_len);
-//  if (*p == NULL) {
-//    *l = 0;
-//    return 1;
-//  }
-//  XMEMCPY(*p, pwd, pwd_len);
-//  *l = pwd_len;
-//
-//  return 0;
-//}
-
-STATIC int cryptx_internal_password_cb_SV(void *p, unsigned long *l, void *u) {
+STATIC int cryptx_internal_password_cb_getpw(void **p, unsigned long *l, void *u) {
   dTHX; /* fetch context */
   SV *passwd = u;
   void *pwd = NULL;
   STRLEN pwd_len = 0;
 
+  if (p == NULL) {
+    *l = 0;
+    return 1;
+  }
   if (passwd == NULL || !SvOK(passwd)) {
+    *p = NULL;
     *l = 0;
     return 1;
   }
   pwd = SvPVbyte(passwd, pwd_len);
   if (pwd == NULL || pwd_len == 0) {
+    *p = NULL;
     *l = 0;
     return 1;
   }
-  if (p == NULL || *l < pwd_len) {
+  *p = XMALLOC(pwd_len);
+  if (*p == NULL) {
     *l = 0;
     return 1;
   }
-  XMEMCPY(p, pwd, pwd_len);
+  XMEMCPY(*p, pwd, pwd_len);
   *l = pwd_len;
+
   return 0;
+}
+
+STATIC void cryptx_internal_password_cb_free(void *p) {
+  XFREE(p);
+  return;
 }
 
 STATIC int cryptx_internal_mp2hex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {

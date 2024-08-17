@@ -59,7 +59,7 @@ _import_pkcs8(Crypt::PK::Ed25519 self, SV * key_data, SV * passwd)
         int rv;
         unsigned char *data = NULL;
         STRLEN data_len = 0;
-        password_ctx pw_ctx = { cryptx_internal_password_cb_SV, passwd };
+        password_ctx pw_ctx = { cryptx_internal_password_cb_getpw, cryptx_internal_password_cb_free, passwd };
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         self->initialized = 0;
@@ -81,7 +81,7 @@ _import_pem(Crypt::PK::Ed25519 self, SV * key_data, SV * passwd)
         int rv;
         unsigned char *data = NULL;
         STRLEN data_len = 0;
-        password_ctx pw_ctx = { cryptx_internal_password_cb_SV, passwd };
+        password_ctx pw_ctx = { cryptx_internal_password_cb_getpw, cryptx_internal_password_cb_free, passwd };
         ltc_pka_key key_from_pem;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
@@ -106,7 +106,7 @@ _import_openssh(Crypt::PK::Ed25519 self, SV * key_data, SV * passwd)
         int rv;
         unsigned char *data = NULL;
         STRLEN data_len = 0;
-        password_ctx pw_ctx = { cryptx_internal_password_cb_SV, passwd };
+        password_ctx pw_ctx = { cryptx_internal_password_cb_getpw, cryptx_internal_password_cb_free, passwd };
         ltc_pka_key key_from_pem;
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
