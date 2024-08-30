@@ -4,7 +4,7 @@ package Crypt::Cipher::SAFER_K128;
 
 use strict;
 use warnings;
-our $VERSION = '0.080_006';
+our $VERSION = '0.080_007';
 
 use base qw(Crypt::Cipher);
 
