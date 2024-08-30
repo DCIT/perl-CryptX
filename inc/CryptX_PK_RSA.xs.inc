@@ -347,7 +347,7 @@ export_key_der(Crypt::PK::RSA self, char * type)
         RETVAL
 
 SV *
-encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * mgf_hash = "SHA1", SV * oaep_lparam = NULL, const char * lparam_hash = "SHA1")
+encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * mgf_hash = "SHA1", SV * oaep_lparam = NULL, const char * lparam_hash = NULL)
     CODE:
     {
         int rv, mgf_hash_id, lparam_hash_id;
@@ -364,8 +364,13 @@ encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
         if (strnEQ(padding, "oaep", 4)) {
           mgf_hash_id = cryptx_internal_find_hash(mgf_hash);
           if (mgf_hash_id == -1) croak("FATAL: find_hash failed for '%s'", mgf_hash);
-          lparam_hash_id = cryptx_internal_find_hash(lparam_hash);
-          if (lparam_hash_id == -1) croak("FATAL: find_hash failed for '%s'", lparam_hash);
+          if (lparam_hash) {
+            lparam_hash_id = cryptx_internal_find_hash(lparam_hash);
+            if (lparam_hash_id == -1) croak("FATAL: find_hash failed for '%s'", lparam_hash);
+          }
+          else {
+            lparam_hash_id = mgf_hash_id;
+          }
           if (oaep_lparam) lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_encrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
                                   &self->pstate, self->pindex,
@@ -394,7 +399,7 @@ encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
         RETVAL
 
 SV *
-decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * mgf_hash = "SHA1", SV * oaep_lparam = NULL, const char * lparam_hash = "SHA1")
+decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const char * mgf_hash = "SHA1", SV * oaep_lparam = NULL, const char * lparam_hash = NULL)
     CODE:
     {
         int rv, lparam_hash_id, mgf_hash_id, stat;
@@ -411,8 +416,13 @@ decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
         if (strnEQ(padding, "oaep", 4)) {
           mgf_hash_id = cryptx_internal_find_hash(mgf_hash);
           if (mgf_hash_id == -1) croak("FATAL: find_hash failed for '%s'", mgf_hash);
-          lparam_hash_id = cryptx_internal_find_hash(lparam_hash);
-          if (lparam_hash_id == -1) croak("FATAL: find_hash failed for '%s'", lparam_hash);
+          if (lparam_hash) {
+            lparam_hash_id = cryptx_internal_find_hash(lparam_hash);
+            if (lparam_hash_id == -1) croak("FATAL: find_hash failed for '%s'", lparam_hash);
+          }
+          else {
+            lparam_hash_id = mgf_hash_id;
+          }
           if (oaep_lparam) lparam_ptr = (unsigned char *)SvPVbyte(oaep_lparam, lparam_len);
           rv = rsa_decrypt_key_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, lparam_ptr, (unsigned long)lparam_len,
                                     mgf_hash_id, lparam_hash_id, LTC_PKCS_1_OAEP, &stat, &self->key);
