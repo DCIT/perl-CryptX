@@ -312,13 +312,6 @@ typedef unsigned long ltc_mp_digit;
 #   endif
 #endif
 
-/* Define `LTC_NO_WIN32_BCRYPT` in the user code
- * before including `tomcrypt.h` to disable this functionality.
- */
-#if defined(_MSC_VER) && defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600 && !defined(LTC_NO_WIN32_BCRYPT)
-#   define LTC_WIN32_BCRYPT
-#endif
-
 /* Define `LTC_NO_NULL_TERMINATION_CHECK` in the user code
  * before including `tomcrypt.h` to disable this functionality.
  */

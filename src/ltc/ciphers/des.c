@@ -2082,7 +2082,7 @@ int desx_test(void)
     for (i = 0; i < 1000; i++) desx_ecb_encrypt(tmp, tmp, &skey);
     for (i = 0; i < 1000; i++) desx_ecb_decrypt(tmp, tmp, &skey);
 
-    if (compare_testvector(tmp, 8, pt, 8, "3DES", 0) != 0) {
+    if (compare_testvector(tmp, 8, pt, 8, "DES-X", 0) != 0) {
         return CRYPT_FAIL_TESTVECTOR;
     }
 
