@@ -44,44 +44,6 @@ jobs:
         env:
           AUTHOR_MODE: 1
 
-  linux-strech:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        codename:
-          - strech
-        perl-version:
-          - '5.24'
-          - '5.26'
-          - '5.28'
-          - '5.30'
-          - '5.32'
-          - '5.34'
-          - '5.36'
-          - '5.38'
-          - '5.40'
-    container:
-      image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: perl -V
-        run: perl -V
-      - name: gcc -v
-        run: gcc -v
-      - name: Install dependencies
-        run: |
-          cpanm -n --installdeps .
-      - name: Run build
-        run: |
-          perl Makefile.PL
-          make -j4
-        env:
-          AUTHOR_MODE: 1
-      - name: Run tests
-        run: prove -b t
-        env:
-          AUTHOR_MODE: 1
-
   linux-gcc8:
     runs-on: ubuntu-latest
     strategy:
@@ -131,7 +93,7 @@ jobs:
   mac:
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Perl
         run: brew install perl
       - name: perl -V
@@ -156,7 +118,7 @@ jobs:
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Perl
         run: |
           choco install strawberryperl
@@ -188,7 +150,7 @@ jobs:
         uses: egor-tensin/setup-cygwin@v4
         with:
             packages: perl_base perl-ExtUtils-MakeMaker perl-JSON make gcc-g++ bash libcrypt-devel libnsl-devel
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: perl -V
         run: perl -V
         shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
