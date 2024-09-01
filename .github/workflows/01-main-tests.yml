@@ -13,19 +13,21 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
+        codename:
+          - buster
         perl-version:
-#         - '5.8'     # stopped working
-#         - '5.10'    # stopped working
-#         - '5.12'    # stopped working
-#         - '5.14'    # stopped working
-#         - '5.16'    # stopped working
-#         - '5.18'    # stopped working
-#         - '5.20'    # stopped working
-#         - '5.22'    # stopped working
+          - '5.8'     # stopped working
+          - '5.10'    # stopped working
+          - '5.12'    # stopped working
+          - '5.14'    # stopped working
+          - '5.16'    # stopped working
+          - '5.18'    # stopped working
+          - '5.20'    # stopped working
+          - '5.22'    # stopped working
           - '5.24'    # stopped working
           - '5.40'
     container:
-      image: perl:${{ matrix.perl-version }}
+      image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
     steps:
       - uses: actions/checkout@v4
       - name: perl -V
