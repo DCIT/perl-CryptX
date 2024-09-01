@@ -14,9 +14,9 @@ jobs:
     strategy:
       fail-fast: false
     container:
-      image: i386/perl
+      image: i386/perl:5.40
     steps:
-      - uses: actions/checkout@v4
+#      - uses: actions/checkout@v4
       - name: perl -V
         run: perl -V
       - name: gcc -v
