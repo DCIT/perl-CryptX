@@ -18,7 +18,7 @@ jobs:
 #     image: perldocker/perl-tester:5.40
     steps:
       - name: install nodejs
-        run: apk add --no-cache nodejs
+        run: apt-get install nodejs
       - uses: actions/checkout@v4
       - name: perl -V
         run: perl -V
