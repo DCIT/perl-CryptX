@@ -15,8 +15,11 @@ jobs:
       fail-fast: false
     container:
       image: i386/perl:5.40
+#     image: perldocker/perl-tester:5.40
     steps:
-#      - uses: actions/checkout@v4
+      - name: install nodejs
+        run: apk add --no-cache nodejs
+      - uses: actions/checkout@v4
       - name: perl -V
         run: perl -V
       - name: gcc -v
