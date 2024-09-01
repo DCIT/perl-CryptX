@@ -9,26 +9,13 @@ on:
   pull_request:
 
 jobs:
-  ubuntu2004:
-    runs-on: ubuntu-20.04
+  linux-bullseye:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         codename:
           - bullseye
-          - buster
-#          - stretch
         perl-version:
-          - '5.8'
-          - '5.10'
-          - '5.12'
-          - '5.14'
-          - '5.16'
-          - '5.18'
-          - '5.20'
-          - '5.22'
-          - '5.24'
-          - '5.26'
-          - '5.28'
           - '5.30'
           - '5.32'
           - '5.34'
@@ -55,7 +42,7 @@ jobs:
         env:
           AUTHOR_MODE: 1
 
-  ubuntu:
+  linux-buster:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -93,11 +80,11 @@ jobs:
           perl Makefile.PL
           make -j4
         env:
-          AUTHOR_MODE: 0
+          AUTHOR_MODE: 1
       - name: Run tests
         run: prove -b t
         env:
-          AUTHOR_MODE: 0
+          AUTHOR_MODE: 1
 
   mac:
     runs-on: macOS-latest
