@@ -220,7 +220,7 @@ sub import_key {
 
   if ($data =~ /(-----BEGIN (PUBLIC|EC PRIVATE|PRIVATE|ENCRYPTED PRIVATE) KEY-----(.+?)-----END (PUBLIC|EC PRIVATE|PRIVATE|ENCRYPTED PRIVATE) KEY-----)/s) {
     my $pem = $1;
-    my $rv = eval { $self->_import_pem($pem, $password) } // eval { $self->_import_old(pem_to_der($pem, $password)) };
+    my $rv = eval { $self->_import_pem($pem, $password) } || eval { $self->_import_old(pem_to_der($pem, $password)) };
     return $rv if $rv;
   }
   elsif ($data =~ /-----BEGIN CERTIFICATE-----(.+?)-----END CERTIFICATE-----/s) {
@@ -240,7 +240,7 @@ sub import_key {
   elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
     # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
     my $json = "$1";
-    my $h = CryptX::_decode_json($json) // {};
+    my $h = CryptX::_decode_json($json) || {};
     if ($h->{kty} eq "EC") {
       $h->{x} = eval { unpack("H*", decode_b64u($h->{x})) } if exists $h->{x};
       $h->{y} = eval { unpack("H*", decode_b64u($h->{y})) } if exists $h->{y};

@@ -67,7 +67,7 @@ sub import_key {
     return $self->_import_pem($data, $password);
   }
   elsif ($data =~ /^\s*(\{.*?\})\s*$/s) { # JSON
-    my $h = CryptX::_decode_json("$1") // {};
+    my $h = CryptX::_decode_json("$1") || {};
     if ($h->{kty} && $h->{kty} eq "OKP" && $h->{crv} && $h->{crv} eq 'X25519') {
       return $self->_import_raw(decode_b64u($h->{d}), 1) if $h->{d}; # private
       return $self->_import_raw(decode_b64u($h->{x}), 0) if $h->{x}; # public
