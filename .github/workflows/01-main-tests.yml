@@ -14,7 +14,8 @@ jobs:
     strategy:
       matrix:
         codename:
-          - buster
+# bookworm bullseye buster stretch jessie
+          - jessie
         perl-version:
           - '5.40'
     container:
@@ -44,7 +45,6 @@ jobs:
         codename:
           - buster
         perl-version:
-          - '5.6'
           - '5.8'
           - '5.10'
           - '5.12'
