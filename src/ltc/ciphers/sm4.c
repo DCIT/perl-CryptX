@@ -67,7 +67,7 @@ static const sm4_u8_t sbox_table[16][16] = {
  * S-box
  * defined in section 2.6 S-box
  */
-LTC_INLINE static sm4_u8_t sbox(sm4_u8_t a)
+LTC_INLINE static sm4_u8_t s_sbox(sm4_u8_t a)
 {
     return sbox_table[(a >> 4) & 0x0f][a & 0x0f];
 }
@@ -80,17 +80,17 @@ LTC_INLINE static sm4_u8_t sbox(sm4_u8_t a)
  * But we just convert a 32bit word byte by byte.
  * So it's OK if we don't convert the endian order
  */
-LTC_INLINE static sm4_u32_t t(sm4_u32_t A)
+LTC_INLINE static sm4_u32_t s_trans(sm4_u32_t A)
 {
     sm4_u8_t  a[4];
     sm4_u8_t  b[4];
     sm4_u32_t B;
 
     STORE32H(A, a);
-    b[0] = sbox(a[0]);
-    b[1] = sbox(a[1]);
-    b[2] = sbox(a[2]);
-    b[3] = sbox(a[3]);
+    b[0] = s_sbox(a[0]);
+    b[1] = s_sbox(a[1]);
+    b[2] = s_sbox(a[2]);
+    b[3] = s_sbox(a[3]);
     LOAD32H(B, b);
     return B;
 }
@@ -98,7 +98,7 @@ LTC_INLINE static sm4_u32_t t(sm4_u32_t A)
 /*
  * defined in section 6.2 (2) Linear transformation L
  */
-LTC_INLINE static sm4_u32_t L(sm4_u32_t B)
+LTC_INLINE static sm4_u32_t s_L62(sm4_u32_t B)
 {
     return B ^ ROLc(B, 2) ^ ROLc(B, 10) ^ ROLc(B, 18) ^ ROLc(B, 24);
 }
@@ -106,9 +106,9 @@ LTC_INLINE static sm4_u32_t L(sm4_u32_t B)
 /*
  * defined in section 6.2 Permutation T
  */
-LTC_INLINE static sm4_u32_t T(sm4_u32_t Z)
+LTC_INLINE static sm4_u32_t s_T62(sm4_u32_t Z)
 {
-    return L(t(Z));
+    return s_L62(s_trans(Z));
 }
 
 /*
@@ -137,7 +137,7 @@ static const sm4_u32_t CK[32] =
 /*
  * defined in section 7.3 (1) L'
  */
-LTC_INLINE static sm4_u32_t _L(sm4_u32_t B)
+LTC_INLINE static sm4_u32_t s_L73(sm4_u32_t B)
 {
     return B ^ ROLc(B, 13) ^ ROLc(B, 23);
 }
@@ -145,9 +145,9 @@ LTC_INLINE static sm4_u32_t _L(sm4_u32_t B)
 /*
  * defined in section 7.3 (1) T'
  */
-LTC_INLINE static sm4_u32_t _T(sm4_u32_t Z)
+LTC_INLINE static sm4_u32_t s_T73(sm4_u32_t Z)
 {
-    return _L(t(Z));
+    return s_L73(s_trans(Z));
 }
 
 /*
@@ -167,7 +167,7 @@ LTC_INLINE static void mk2rk(sm4_u32_t rk[32], sm4_u8_t mk[16])
     for (i = 0; i < 4; ++i)
         K[i] = MK[i] ^ FK[i];
     for (i = 0; i < 32; ++i)
-        K[i+4] = K[i] ^ _T(K[i+1] ^ K[i+2] ^ K[i+3] ^ CK[i]);
+        K[i+4] = K[i] ^ s_T73(K[i+1] ^ K[i+2] ^ K[i+3] ^ CK[i]);
     for (i = 0; i < 32; ++i)
         rk[i] = K[i+4];
 }
@@ -177,7 +177,7 @@ LTC_INLINE static void mk2rk(sm4_u32_t rk[32], sm4_u8_t mk[16])
  */
 LTC_INLINE static sm4_u32_t F(sm4_u32_t X[4], sm4_u32_t rk)
 {
-    return X[0] ^ T(X[1] ^ X[2] ^ X[3] ^ rk);
+    return X[0] ^ s_T62(X[1] ^ X[2] ^ X[3] ^ rk);
 }
 
 /*
@@ -284,6 +284,7 @@ int sm4_keysize(int *keysize)
  * libtomcrypt interface is used
  */
 
+#ifdef LTC_TEST
 static int sm4_self_test_ltc(void)
 {
     int result;
@@ -348,6 +349,7 @@ static int sm4_self_test_ltc(void)
 
     return result;
 }
+#endif
 
 int sm4_test(void)
 {
