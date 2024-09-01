@@ -20,7 +20,8 @@ jobs:
     steps:
       - name: install nodejs
         run: |
-          curl -sL https://deb.nodesource.com/setup_20.x -o /tmp/nodesource_setup.sh
+          curl -sL https://cpanmin.us | perl - --sudo App::cpanminus
+          curl -sL https://deb.nodesource.com/setup_20.x | bash
           apt install nodejs
           node -v
       - uses: actions/checkout@v4
