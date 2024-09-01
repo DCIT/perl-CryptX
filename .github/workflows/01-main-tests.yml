@@ -18,10 +18,11 @@ jobs:
 #     image: perldocker/perl-tester:5.40
 #     image: perldocker/perl-tester:latest
     steps:
-      - name: uname
-        run: uname -a
       - name: install nodejs
-        run: apt-get install nodejs
+        run: |
+          curl -sL https://deb.nodesource.com/setup_20.x -o /tmp/nodesource_setup.sh
+          apt install nodejs
+          node -v
       - uses: actions/checkout@v4
       - name: perl -V
         run: perl -V
