@@ -36,6 +36,10 @@ jobs:
 #         cpanm -n -v --installdeps .
       - name: Run build
         run: |
+          pwd
+          cd $(basename ${{ github.repository }})
+          pwd
+          cpanm -n -v --installdeps .
           perl Makefile.PL
           make -j4
         env:
