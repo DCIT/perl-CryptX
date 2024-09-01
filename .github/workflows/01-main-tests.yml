@@ -18,9 +18,8 @@ jobs:
           - bullseye
           - buster
           - stretch
-          - jessie
         perl-version:
-          - '5.26'
+          - '5.30'
     container:
       image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
     steps:
