@@ -25,9 +25,11 @@ jobs:
     container:
       image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: perl -V
         run: perl -V
+      - name: gcc -v
+        run: gcc -v
       - name: Install dependencies
         run: |
           cpanm -n --installdeps .
@@ -48,6 +50,7 @@ jobs:
       matrix:
         codename:
           - buster
+          - strech
         perl-version:
           - '5.8'
           - '5.10'
@@ -69,9 +72,11 @@ jobs:
     container:
       image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: perl -V
         run: perl -V
+      - name: gcc -v
+        run: gcc -v
       - name: Install dependencies
         run: |
           cpanm -n --installdeps .
