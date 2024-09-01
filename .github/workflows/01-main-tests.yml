@@ -22,8 +22,9 @@ jobs:
 #         curl -sL https://cpanmin.us | perl - --sudo App::cpanminus
       - name: Checkout code using git
         run: |
-          git clone https://github.com/${{ github.repository }}.git
-          cd ${{ github.repository }}
+          git clone --single-branch --branch $(echo ${GITHUB_REF#refs/heads/}) https://github.com/${{ github.repository }}.git
+          cd $(basename ${{ github.repository }})
+          git branch
       - name: perl -V
         run: perl -V
       - name: gcc -v
