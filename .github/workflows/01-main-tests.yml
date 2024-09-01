@@ -14,10 +14,13 @@ jobs:
     strategy:
       matrix:
         codename:
-# bookworm bullseye buster stretch jessie
+          - bookworm
+          - bullseye
+          - buster
+          - stretch
           - jessie
         perl-version:
-          - '5.40'
+          - '5.26'
     container:
       image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
     steps:
