@@ -21,7 +21,9 @@ jobs:
 #         apt-get install -y git curl
 #         curl -sL https://cpanmin.us | perl - --sudo App::cpanminus
       - name: Checkout code using git
-        run: git clone https://github.com/${{ github.repository }}.git
+        run: |
+          git clone https://github.com/${{ github.repository }}.git
+          cd ${{ github.repository }}
       - name: perl -V
         run: perl -V
       - name: gcc -v
@@ -31,6 +33,7 @@ jobs:
 #         cpanm -n -v --installdeps .
       - name: Run build
         run: |
+          cpanm -n -v --installdeps .
           perl Makefile.PL
           make -j4
         env:
