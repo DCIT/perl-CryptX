@@ -16,10 +16,10 @@ jobs:
     container:
       image: i386/perl:5.40
     steps:
-      - name: install
-        run: |
-          apt-get install -y git curl
-          curl -sL https://cpanmin.us | perl - --sudo App::cpanminus
+#     - name: install tools
+#       run: |
+#         apt-get install -y git curl
+#         curl -sL https://cpanmin.us | perl - --sudo App::cpanminus
       - name: Checkout code using git
         run: git clone https://github.com/${{ github.repository }}.git
       - name: perl -V
@@ -28,7 +28,7 @@ jobs:
         run: gcc -v
       - name: Install dependencies
         run: |
-          cpanm -n --installdeps .
+          cpanm -n -v --installdeps .
       - name: Run build
         run: |
           perl Makefile.PL
