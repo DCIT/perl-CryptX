@@ -8,53 +8,65 @@ use Crypt::Misc 'decode_b64';
 {
   my $k;
 
-  $k = Crypt::PK::DSA->new('t/data/cryptx_priv_dsa1.der');
+  $k = eval { Crypt::PK::DSA->new('t/data/cryptx_priv_dsa1.der') };
+  diag("$@") if $@;
   ok($k, 'load cryptx_priv_dsa1.der');
   ok($k->is_private, 'is_private cryptx_priv_dsa1.der');
   is($k->size, 256, 'size');
   is(uc($k->key2hash->{x}), '6C801901AC74E2DC714D75A9F6969483CF0239D142AB7E3F329ED8D49E07', 'key2hash');
 
-  $k = Crypt::PK::DSA->new('t/data/cryptx_priv_dsa2.der');
+  $k = eval { Crypt::PK::DSA->new('t/data/cryptx_priv_dsa2.der') };
+  diag("$@") if $@;
   ok($k, 'load cryptx_priv_dsa2.der');
   ok($k->is_private, 'is_private cryptx_priv_dsa2.der');
 
-  $k = Crypt::PK::DSA->new('t/data/cryptx_pub_dsa1.der');
+  $k = eval { Crypt::PK::DSA->new('t/data/cryptx_pub_dsa1.der') };
+  diag("$@") if $@;
   ok($k, 'load cryptx_pub_dsa1.der');
   ok(!$k->is_private, 'is_private cryptx_pub_dsa1.der');
 
-  $k = Crypt::PK::DSA->new('t/data/cryptx_pub_dsa2.der');
+  $k = eval { Crypt::PK::DSA->new('t/data/cryptx_pub_dsa2.der') };
+  diag("$@") if $@;
   ok($k, 'load cryptx_pub_dsa2.der');
   ok(!$k->is_private, 'is_private cryptx_pub_dsa2.der');
 
-  $k = Crypt::PK::DSA->new('t/data/openssl_dsa1.der');
+  $k = eval { Crypt::PK::DSA->new('t/data/openssl_dsa1.der') };
+  diag("$@") if $@;
   ok($k, 'load openssl_dsa1.der');
   ok($k->is_private, 'is_private openssl_dsa1.der');
 
-  $k = Crypt::PK::DSA->new('t/data/openssl_dsa2.der');
+  $k = eval { Crypt::PK::DSA->new('t/data/openssl_dsa2.der') };
+  diag("$@") if $@;
   ok($k, 'load openssl_dsa2.der');
   ok($k->is_private, 'is_private openssl_dsa2.der');
 
-  $k = Crypt::PK::DSA->new('t/data/cryptx_priv_dsa1.pem');
+  $k = eval { Crypt::PK::DSA->new('t/data/cryptx_priv_dsa1.pem') };
+  diag("$@") if $@;
   ok($k, 'load cryptx_priv_dsa1.pem');
   ok($k->is_private, 'is_private cryptx_priv_dsa1.pem');
 
-  $k = Crypt::PK::DSA->new('t/data/cryptx_priv_dsa2.pem');
+  $k = eval { Crypt::PK::DSA->new('t/data/cryptx_priv_dsa2.pem') };
+  diag("$@") if $@;
   ok($k, 'load cryptx_priv_dsa2.pem');
   ok($k->is_private, 'is_private cryptx_priv_dsa2.pem');
 
-  $k = Crypt::PK::DSA->new('t/data/cryptx_pub_dsa1.pem');
+  $k = eval { Crypt::PK::DSA->new('t/data/cryptx_pub_dsa1.pem') };
+  diag("$@") if $@;
   ok($k, 'load cryptx_pub_dsa1.pem');
   ok(!$k->is_private, 'is_private cryptx_pub_dsa1.pem');
 
-  $k = Crypt::PK::DSA->new('t/data/cryptx_pub_dsa2.pem');
+  $k = eval { Crypt::PK::DSA->new('t/data/cryptx_pub_dsa2.pem') };
+  diag("$@") if $@;
   ok($k, 'load cryptx_pub_dsa2.pem');
   ok(!$k->is_private, 'is_private cryptx_pub_dsa2.pem');
 
-  $k = Crypt::PK::DSA->new('t/data/openssl_dsa1.pem');
+  $k = eval { Crypt::PK::DSA->new('t/data/openssl_dsa1.pem') };
+  diag("$@") if $@;
   ok($k, 'load openssl_dsa1.pem');
   ok($k->is_private, 'is_private openssl_dsa1.pem');
 
-  $k = Crypt::PK::DSA->new('t/data/openssl_dsa2.pem');
+  $k = eval { Crypt::PK::DSA->new('t/data/openssl_dsa2.pem') };
+  diag("$@") if $@;
   ok($k, 'load openssl_dsa2.pem');
   ok($k->is_private, 'is_private openssl_dsa2.pem');
 }
