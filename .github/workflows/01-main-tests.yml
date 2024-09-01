@@ -15,23 +15,20 @@ jobs:
       fail-fast: false
     container:
       image: i386/perl:5.40
-#     image: perldocker/perl-tester:5.40
-#     image: perldocker/perl-tester:latest
     steps:
-      - name: install nodejs
+      - name: install
         run: |
+          apt-get install -y git curl
           curl -sL https://cpanmin.us | perl - --sudo App::cpanminus
-          curl -sL https://deb.nodesource.com/setup_16.x | bash
-          apt install nodejs
-          node -v
-      - uses: actions/checkout@v4
+      - name: Checkout code using git
+        run: git clone https://github.com/${{ github.repository }}.git
       - name: perl -V
         run: perl -V
       - name: gcc -v
         run: gcc -v
-#     - name: Install dependencies
-#       run: |
-#         cpanm -n --installdeps .
+      - name: Install dependencies
+        run: |
+          cpanm -n --installdeps .
       - name: Run build
         run: |
           perl Makefile.PL
