@@ -44,7 +44,7 @@ jobs:
         env:
           AUTHOR_MODE: 1
 
-  linux-gcc10:
+  linux-strech:
     runs-on: ubuntu-latest
     strategy:
       matrix:
