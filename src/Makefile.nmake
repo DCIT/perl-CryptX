@@ -3,10 +3,10 @@ ltc/ciphers/blowfish.obj ltc/ciphers/camellia.obj ltc/ciphers/cast5.obj ltc/ciph
 ltc/ciphers/idea.obj ltc/ciphers/kasumi.obj ltc/ciphers/khazad.obj ltc/ciphers/kseed.obj \
 ltc/ciphers/multi2.obj ltc/ciphers/noekeon.obj ltc/ciphers/rc2.obj ltc/ciphers/rc5.obj \
 ltc/ciphers/rc6.obj ltc/ciphers/safer/safer.obj ltc/ciphers/safer/saferp.obj ltc/ciphers/serpent.obj \
-ltc/ciphers/skipjack.obj ltc/ciphers/tea.obj ltc/ciphers/twofish/twofish.obj ltc/ciphers/xtea.obj \
-ltc/encauth/ccm/ccm_add_aad.obj ltc/encauth/ccm/ccm_add_nonce.obj ltc/encauth/ccm/ccm_done.obj \
-ltc/encauth/ccm/ccm_init.obj ltc/encauth/ccm/ccm_memory.obj ltc/encauth/ccm/ccm_process.obj \
-ltc/encauth/ccm/ccm_reset.obj ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj \
+ltc/ciphers/skipjack.obj ltc/ciphers/sm4.obj ltc/ciphers/tea.obj ltc/ciphers/twofish/twofish.obj \
+ltc/ciphers/xtea.obj ltc/encauth/ccm/ccm_add_aad.obj ltc/encauth/ccm/ccm_add_nonce.obj \
+ltc/encauth/ccm/ccm_done.obj ltc/encauth/ccm/ccm_init.obj ltc/encauth/ccm/ccm_memory.obj \
+ltc/encauth/ccm/ccm_process.obj ltc/encauth/ccm/ccm_reset.obj ltc/encauth/chachapoly/chacha20poly1305_add_aad.obj \
 ltc/encauth/chachapoly/chacha20poly1305_decrypt.obj ltc/encauth/chachapoly/chacha20poly1305_done.obj \
 ltc/encauth/chachapoly/chacha20poly1305_encrypt.obj ltc/encauth/chachapoly/chacha20poly1305_init.obj \
 ltc/encauth/chachapoly/chacha20poly1305_memory.obj ltc/encauth/chachapoly/chacha20poly1305_setiv.obj \

@@ -3,10 +3,10 @@ ltc/ciphers/blowfish.o ltc/ciphers/camellia.o ltc/ciphers/cast5.o ltc/ciphers/de
 ltc/ciphers/idea.o ltc/ciphers/kasumi.o ltc/ciphers/khazad.o ltc/ciphers/kseed.o \
 ltc/ciphers/multi2.o ltc/ciphers/noekeon.o ltc/ciphers/rc2.o ltc/ciphers/rc5.o ltc/ciphers/rc6.o \
 ltc/ciphers/safer/safer.o ltc/ciphers/safer/saferp.o ltc/ciphers/serpent.o ltc/ciphers/skipjack.o \
-ltc/ciphers/tea.o ltc/ciphers/twofish/twofish.o ltc/ciphers/xtea.o ltc/encauth/ccm/ccm_add_aad.o \
-ltc/encauth/ccm/ccm_add_nonce.o ltc/encauth/ccm/ccm_done.o ltc/encauth/ccm/ccm_init.o \
-ltc/encauth/ccm/ccm_memory.o ltc/encauth/ccm/ccm_process.o ltc/encauth/ccm/ccm_reset.o \
-ltc/encauth/chachapoly/chacha20poly1305_add_aad.o ltc/encauth/chachapoly/chacha20poly1305_decrypt.o \
+ltc/ciphers/sm4.o ltc/ciphers/tea.o ltc/ciphers/twofish/twofish.o ltc/ciphers/xtea.o \
+ltc/encauth/ccm/ccm_add_aad.o ltc/encauth/ccm/ccm_add_nonce.o ltc/encauth/ccm/ccm_done.o \
+ltc/encauth/ccm/ccm_init.o ltc/encauth/ccm/ccm_memory.o ltc/encauth/ccm/ccm_process.o \
+ltc/encauth/ccm/ccm_reset.o ltc/encauth/chachapoly/chacha20poly1305_add_aad.o ltc/encauth/chachapoly/chacha20poly1305_decrypt.o \
 ltc/encauth/chachapoly/chacha20poly1305_done.o ltc/encauth/chachapoly/chacha20poly1305_encrypt.o \
 ltc/encauth/chachapoly/chacha20poly1305_init.o ltc/encauth/chachapoly/chacha20poly1305_memory.o \
 ltc/encauth/chachapoly/chacha20poly1305_setiv.o ltc/encauth/chachapoly/chacha20poly1305_setiv_rfc7905.o \
