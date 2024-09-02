@@ -4,7 +4,7 @@ Changes for CryptX
         - fix #105 Several functions in CryptX::AuthEnc deal weirdly with non-simple-string plaintext
         - fix #87 Add possibility to use different hash algorithms in RSAES-OAEP 
         - switch to PEM/SSH key loading via libtomcrypt
-        - bundled libtomcrypt update branch:develop (commit:7e863d21 2023-10-09)
+        - bundled libtomcrypt update branch:develop (commit:e8eb4a03 2024-09-02)
 
 0.080   2023-10-04
         - fix #95 AES-NI troubles on MS Windows (gcc compiler)
