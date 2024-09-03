@@ -9,22 +9,10 @@ on:
   pull_request:
 
 jobs:
-  linux-gcc10:
+  linux:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        codename:
-          - bullseye
-        perl-version:
-          - '5.30'
-          - '5.32'
-          - '5.34'
-          - '5.36'
-          - '5.38'
-          - '5.40'
     container:
-      image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
+      image: perl:latest
     steps:
       - uses: actions/checkout@v4
       - name: perl -V
@@ -41,54 +29,7 @@ jobs:
         env:
           AUTHOR_MODE: 1
       - name: Run tests
-        run: prove -b t
-        env:
-          AUTHOR_MODE: 1
-
-  linux-gcc8:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        codename:
-          - buster
-        perl-version:
-          - '5.8'
-          - '5.10'
-          - '5.12'
-          - '5.14'
-          - '5.16'
-          - '5.18'
-          - '5.20'
-          - '5.22'
-          - '5.24'
-          - '5.26'
-          - '5.28'
-          - '5.30'
-          - '5.32'
-          - '5.34'
-          - '5.36'
-          - '5.38'
-          - '5.40'
-    container:
-      image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: perl -V
-        run: perl -V
-      - name: gcc -v
-        run: gcc -v
-      - name: Install dependencies
-        run: |
-          cpanm -n --installdeps .
-      - name: Run build
-        run: |
-          perl Makefile.PL
-          make -j4
-        env:
-          AUTHOR_MODE: 1
-      - name: Run tests
-        run: prove -b t
+        run: prove -j4 -b t
         env:
           AUTHOR_MODE: 1
 
@@ -109,7 +50,7 @@ jobs:
         env:
           AUTHOR_MODE: 0
       - name: Run tests
-        run: prove -b t
+        run: prove -j4 -b t
         env:
           AUTHOR_MODE: 0
 
@@ -137,7 +78,7 @@ jobs:
         env:
           AUTHOR_MODE: 0
       - name: Run tests
-        run: prove -b t
+        run: prove -j4 -b t
         env:
           AUTHOR_MODE: 0
 
@@ -169,7 +110,5 @@ jobs:
         run: cd $GITHUB_WORKSPACE; make -j4
         shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
       - name: make test
-        run: cd $GITHUB_WORKSPACE; prove -b t
+        run: cd $GITHUB_WORKSPACE; prove -j4 -b t
         shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
-        env:
-          AUTHOR_MODE: 0
