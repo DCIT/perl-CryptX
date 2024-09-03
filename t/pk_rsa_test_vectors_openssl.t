@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 318;
+use Test::More tests => 390;
 use Crypt::PK::RSA;
 use Crypt::Misc qw(decode_b64);
 
@@ -52,16 +52,28 @@ sub test_rsa {
   my $rsa_pub = eval { Crypt::PK::RSA->new->import_key(\decode_b64($h->{PUBDER})) };
   diag("$h->{ID}: $@") if $@;
   ok($rsa_pub, "import_key $h->{ID}/PUB");
-  my $rsa_pri_h = $rsa_pri->key2hash;
-  my $rsa_pub_h = $rsa_pub->key2hash;
+  my $rsa_pri_h = eval { $rsa_pri->key2hash };
+  diag("$h->{ID}: $@") if $@;
+  ok($rsa_pri_h, "key2hash $h->{ID}/PRI");
   is($rsa_pri_h->{d}, $h->{PRI}, "$h->{ID}/PRI");
   is($rsa_pri_h->{N}, $h->{PUB}, "$h->{ID}/PUB");
+  my $rsa_pub_h = eval { $rsa_pub->key2hash };
+  diag("$h->{ID}: $@") if $@;
+  ok($rsa_pub_h, "key2hash $h->{ID}/PUB");
   is($rsa_pub_h->{N}, $h->{PUB}, "$h->{ID}/PUB");
-  is( $rsa_pri->decrypt(decode_b64($h->{ENC}), 'v1.5'), 'test-data', "$h->{ID}/ENC") || return 0;
-  ok( $rsa_pub->verify_message(decode_b64($h->{SIGSHA1}),   'test-data', 'SHA1',   'v1.5'), "$h->{ID}/SIGSHA1")   || return 0;
-  ok( $rsa_pub->verify_message(decode_b64($h->{SIGSHA256}), 'test-data', 'SHA256', 'v1.5'), "$h->{ID}/SIGSHA256") || return 0;
+  my $dec = eval { $rsa_pri->decrypt(decode_b64($h->{ENC}), 'v1.5') };
+  diag("$h->{ID}: $@") if $@;
+  is($dec, 'test-data', "$h->{ID}/ENC");
+  my $v1 = eval { $rsa_pub->verify_message(decode_b64($h->{SIGSHA1}), 'test-data', 'SHA1', 'v1.5') };
+  diag("$h->{ID}: $@") if $@;
+  ok($v1, "$h->{ID}/SIGSHA1");
+  my $v2 = eval { $rsa_pub->verify_message(decode_b64($h->{SIGSHA256}), 'test-data', 'SHA256', 'v1.5') };
+  diag("$h->{ID}: $@") if $@;
+  ok($v2, "$h->{ID}/SIGSHA256");
   return 1 if !$h->{SIGSHA512}; #SHA512 might be too big for short RSA keys
-  ok( $rsa_pub->verify_message(decode_b64($h->{SIGSHA512}), 'test-data', 'SHA512', 'v1.5'), "$h->{ID}/SIGSHA512") || return 0;
+  my $v3 = eval { $rsa_pub->verify_message(decode_b64($h->{SIGSHA512}), 'test-data', 'SHA512', 'v1.5') };
+  diag("$h->{ID}: $@") if $@;
+  ok($v3, "$h->{ID}/SIGSHA512");
   return 1;
 }
 
