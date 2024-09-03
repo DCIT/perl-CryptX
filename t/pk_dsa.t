@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 62;
+use Test::More tests => 66;
 
 use Crypt::PK::DSA qw(dsa_encrypt dsa_decrypt dsa_sign_message dsa_verify_message dsa_sign_hash dsa_verify_hash);
 use Crypt::Misc 'decode_b64';
@@ -73,28 +73,44 @@ use Crypt::Misc 'decode_b64';
 
 {
   my $pr1 = Crypt::PK::DSA->new;
-  $pr1->import_key('t/data/cryptx_priv_dsa1.der');
+  my $i_pr1 = eval { $pr1->import_key('t/data/cryptx_priv_dsa1.der') };
+  diag("$@") if $@;
+  ok($i_pr1, 'import_key cryptx_priv_dsa1.der');
   my $pu1 = Crypt::PK::DSA->new;
-  $pu1->import_key('t/data/cryptx_pub_dsa1.der');
+  my $i_pu1 = eval { $pu1->import_key('t/data/cryptx_pub_dsa1.der') };
+  diag("$@") if $@;
+  ok($i_pu1, 'import_key cryptx_pub_dsa1.der');
 
-  my $ct = $pu1->encrypt("secret message");
-  my $pt = $pr1->decrypt($ct);
+  my $ct = eval { $pu1->encrypt("secret message") };
+  diag("$@") if $@;
   ok(length $ct > 200, 'encrypt ' . length($ct));
+  my $pt = eval { $pr1->decrypt($ct) };
+  diag("$@") if $@;
   is($pt, "secret message", 'decrypt');
   #XXX-FIXME somwhere here a crash happens on solaris - http://ppm4.activestate.com/sun4-solaris/5.14/1400/M/MI/MIK/CryptX-0.017.d/log-20130924T103600.txt
-  my $sig = $pr1->sign_message("message");
+  my $sig = eval { $pr1->sign_message("message") };
+  diag("$@") if $@;
   ok(length $sig > 60, 'sign_message ' . length($sig));
-  ok($pu1->verify_message($sig, "message"), 'verify_message');
+  my $ver = eval { $pu1->verify_message($sig, "message") };
+  diag("$@") if $@;
+  ok($ver, 'verify_message');
 
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  $sig = $pr1->sign_hash($hash);
+  $sig = eval { $pr1->sign_hash($hash) };
+  diag("$@") if $@;
   ok(length $sig > 60, 'sign_hash ' . length($sig));
-  ok($pu1->verify_hash($sig, $hash), 'verify_hash');
+  $ver = eval { $pu1->verify_hash($sig, $hash) };
+  diag("$@") if $@;
+  ok($ver, 'verify_hash');
 
   my $pr2 = Crypt::PK::DSA->new;
-  $pr2->import_key('t/data/cryptx_priv_dsa2.der');
+  my $i_pr2 = eval { $pr2->import_key('t/data/cryptx_priv_dsa2.der') };
+  diag("$@") if $@;
+  ok($i_pr2, 'import cryptx_priv_dsa2.der');
   my $pu2 = Crypt::PK::DSA->new;
-  $pu2->import_key('t/data/cryptx_pub_dsa2.der');
+  my $i_pu2 = eval { $pu2->import_key('t/data/cryptx_pub_dsa2.der') };
+  diag("$@") if $@;
+  ok($i_pu2, 'import cryptx_pub_dsa2.der');
 
   #my $ss1 = $pr1->shared_secret($pu2);
   #my $ss2 = $pr2->shared_secret($pu1);
@@ -103,7 +119,7 @@ use Crypt::Misc 'decode_b64';
 
 {
   my $k = Crypt::PK::DSA->new;
-  $k->generate_key(\<<"MARKER");
+  my $gen = eval { $k->generate_key(\<<"MARKER") };
 -----BEGIN DSA PARAMETERS-----
 MIICLAKCAQEA3dZSaDnP5LgH44CDYc2wfGLtq4rbBgtOVvLkvh4j29CTiOUDRC1H
 ivkTdtGrI3DdrAFeKieFYDJ1RJFbru+8/RYE7YfaR5Y3OUI4Vdf26guMViLLVjSL
@@ -119,17 +135,27 @@ ZBG6vMBaANLx6Pv+lle4ltVvDVhwTK5APyfN1vVdEvVmU1/6zHZEnuiDAT8XI1rH
 S1+SGX11RIn6uPVL1c0RjgW8/JZ6EeM8NvLdBiYYBuI=
 -----END DSA PARAMETERS-----
 MARKER
-  ok($k, 'generate_key PEM');
+  diag("$@") if $@;
+  ok($gen, 'generate_key PEM');
   ok($k->is_private, 'is_private');
-  ok($k->export_key_pem('private'), 'export_key_pem pri');
-  ok($k->export_key_pem('public'), 'export_key_pem pub');
-  ok($k->export_key_der('private'), 'export_key_der pri');
-  ok($k->export_key_der('public'), 'export_key_der pub');
+  my $exp;
+  $exp = eval { $k->export_key_pem('private') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_pem pri');
+  $exp = eval { $k->export_key_pem('public') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_pem pub');
+  $exp = eval { $k->export_key_der('private') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_der pri');
+  $exp = eval { $k->export_key_der('public') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_der pub');
 }
 
 {
   my $k = Crypt::PK::DSA->new;
-  $k->generate_key(\decode_b64(<<"MARKER"));
+  my $gen = eval { $k->generate_key(\decode_b64(<<"MARKER")) };
 MIICLAKCAQEA3dZSaDnP5LgH44CDYc2wfGLtq4rbBgtOVvLkvh4j29CTiOUDRC1H
 ivkTdtGrI3DdrAFeKieFYDJ1RJFbru+8/RYE7YfaR5Y3OUI4Vdf26guMViLLVjSL
 W43Td50ZZziLmmYzn3cliokShe9f5/mtuLJ0uJRq7QxgHj7bgmvJvORvi4QXSCOn
@@ -143,17 +169,27 @@ AMjGMg+L6CpulfvdETYi9LQafY4jRkgGWTc9h/2RYGhQUti1PheY1AlDYpubO8am
 ZBG6vMBaANLx6Pv+lle4ltVvDVhwTK5APyfN1vVdEvVmU1/6zHZEnuiDAT8XI1rH
 S1+SGX11RIn6uPVL1c0RjgW8/JZ6EeM8NvLdBiYYBuI=
 MARKER
-  ok($k, 'generate_key DER');
+  diag("$@") if $@;
+  ok($gen, 'generate_key DER');
   ok($k->is_private, 'is_private');
-  ok($k->export_key_pem('private'), 'export_key_pem pri');
-  ok($k->export_key_pem('public'), 'export_key_pem pub');
-  ok($k->export_key_der('private'), 'export_key_der pri');
-  ok($k->export_key_der('public'), 'export_key_der pub');
+  my $exp;
+  $exp = eval { $k->export_key_pem('private') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_pem pri');
+  $exp = eval { $k->export_key_pem('public') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_pem pub');
+  $exp = eval { $k->export_key_der('private') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_der pri');
+  $exp = eval { $k->export_key_der('public') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_der pub');
 }
 
 {
   my $k = Crypt::PK::DSA->new;
-  $k->generate_key({
+  my $gen = eval { $k->generate_key({
    p => "A5903F7DF15D5C0769797820".
         "6CFEED0113CD1C15298198E9".
         "1F2231135A7BC42568BE8F8D".
@@ -178,36 +214,64 @@ MARKER
         "322173F34F98452B0D16DCE2".
         "23B15840F82B6AFCDFC6D848".
         "9C5859DA0E4BE8B9",
-  });
-  ok($k, 'generate_key HASH');
+  }) };
+  diag("$@") if $@;
+  ok($gen, 'generate_key HASH');
   ok($k->is_private, 'is_private');
-  ok($k->export_key_pem('private'), 'export_key_pem pri');
-  ok($k->export_key_pem('public'), 'export_key_pem pub');
-  ok($k->export_key_der('private'), 'export_key_der pri');
-  ok($k->export_key_der('public'), 'export_key_der pub');
+  my $exp;
+  $exp = eval { $k->export_key_pem('private') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_pem pri');
+  $exp = eval { $k->export_key_pem('public') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_pem pub');
+  $exp = eval { $k->export_key_der('private') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_der pri');
+  $exp = eval { $k->export_key_der('public') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_der pub');
 }
 
 {
   my $k = Crypt::PK::DSA->new;
-  $k->generate_key(20, 128);
-  ok($k, 'generate_key size');
+  my $gen = eval { $k->generate_key(20, 128) };
+  diag("$@") if $@;
+  ok($gen, 'generate_key size');
   ok($k->is_private, 'is_private');
+  my $exp;
+  $exp = eval { $k->export_key_pem('private') };
+  diag("$@") if $@;
   ok($k->export_key_pem('private'), 'export_key_pem pri');
+  $exp = eval { $k->export_key_pem('public') };
+  diag("$@") if $@;
   ok($k->export_key_pem('public'), 'export_key_pem pub');
+  $exp = eval { $k->export_key_der('private') };
+  diag("$@") if $@;
   ok($k->export_key_der('private'), 'export_key_der pri');
+  $exp = eval { $k->export_key_der('public') };
+  diag("$@") if $@;
   ok($k->export_key_der('public'), 'export_key_der pub');
 }
 
 {
-  my $ct = dsa_encrypt('t/data/cryptx_pub_dsa1.der', 'test string');
+  my $ct = eval { dsa_encrypt('t/data/cryptx_pub_dsa1.der', 'test string') };
+  diag("$@") if $@;
   ok($ct, 'dsa_encrypt');
-  my $pt = dsa_decrypt('t/data/cryptx_priv_dsa1.der', $ct);
+  my $pt = eval { dsa_decrypt('t/data/cryptx_priv_dsa1.der', $ct) };
+  diag("$@") if $@;
   ok($pt, 'dsa_decrypt');
-  my $sig = dsa_sign_message('t/data/cryptx_priv_dsa1.der', 'test string');
+  my $sig = eval { dsa_sign_message('t/data/cryptx_priv_dsa1.der', 'test string') };
+  diag("$@") if $@;
   ok($sig, 'dsa_sign_message');
-  ok(dsa_verify_message('t/data/cryptx_pub_dsa1.der', $sig, 'test string'), 'dsa_verify_message');
+  my $ver = eval { dsa_verify_message('t/data/cryptx_pub_dsa1.der', $sig, 'test string') };
+  diag("$@") if $@;
+  ok($ver, 'dsa_verify_message');
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  $sig = dsa_sign_hash('t/data/cryptx_priv_dsa1.der', $hash);
+  $sig = eval { dsa_sign_hash('t/data/cryptx_priv_dsa1.der', $hash) };
+  diag("$@") if $@;
   ok($sig, 'dsa_sign_hash');
-  ok(dsa_verify_hash('t/data/cryptx_pub_dsa1.der', $sig, $hash), 'dsa_verify_hash');
+  $ver = eval { dsa_verify_hash('t/data/cryptx_pub_dsa1.der', $sig, $hash) };
+  diag("$@") if $@;
+  ok($ver, 'dsa_verify_hash');
 }

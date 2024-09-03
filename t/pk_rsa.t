@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 52;
+use Test::More tests => 55;
 
 use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_message rsa_sign_hash rsa_verify_hash);
 
@@ -82,49 +82,81 @@ use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_messag
 
 {
   my $pr1 = Crypt::PK::RSA->new;
-  $pr1->import_key('t/data/cryptx_priv_rsa1.der');
+  my $i_pr1 = eval { $pr1->import_key('t/data/cryptx_priv_rsa1.der') };
+  diag("$@") if $@;
+  ok($i_pr1, 'import_key cryptx_priv_rsa1.der');
   my $pu1 = Crypt::PK::RSA->new;
-  $pu1->import_key('t/data/cryptx_pub_rsa1.der');
+  my $i_pu1 = eval { $pu1->import_key('t/data/cryptx_pub_rsa1.der') };
+  diag("$@") if $@;
+  ok($i_pu1, 'import_key cryptx_pub_rsa1.der');
 
-  my $ct = $pu1->encrypt("secret message");
-  my $pt = $pr1->decrypt($ct);
+  my $ct = eval { $pu1->encrypt("secret message") };
+  diag("$@") if $@;
   ok(length $ct > 200, 'encrypt ' . length($ct));
+  my $pt = eval { $pr1->decrypt($ct) };
+  diag("$@") if $@;
   is($pt, "secret message", 'decrypt');
 
-  my $sig = $pr1->sign_message("message");
+  my $sig = eval { $pr1->sign_message("message") };
+  diag("$@") if $@;
   ok(length $sig > 60, 'sign_message ' . length($sig));
-  ok($pu1->verify_message($sig, "message"), 'verify_message');
+  my $ver = eval { $pu1->verify_message($sig, "message") };
+  diag("$@") if $@;
+  ok($ver, 'verify_message');
 
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  $sig = $pr1->sign_hash($hash, 'SHA1');
+  $sig = eval { $pr1->sign_hash($hash, 'SHA1') };
+  diag("$@") if $@;
   ok(length $sig > 60, 'sign_hash ' . length($sig));
-  ok($pu1->verify_hash($sig, $hash, 'SHA1'), 'verify_hash');
+  $ver = eval { $pu1->verify_hash($sig, $hash, 'SHA1') };
+  diag("$@") if $@;
+  ok($ver, 'verify_hash');
 }
 #XXX-FIXME somwhere here a crash happens on solaris - http://ppm4.activestate.com/sun4-solaris/5.14/1400/M/MI/MIK/CryptX-0.017.d/log-20130924T103600.txt
 {
   my $k = Crypt::PK::RSA->new;
-  $k->generate_key(256, 65537);
+  eval { $k->generate_key(256, 65537) };
+  diag("$@") if $@;
   ok($k, 'generate_key');
   ok($k->is_private, 'is_private');
-  ok($k->export_key_pem('private'), 'export_key_pem pri');
-  ok($k->export_key_pem('public'), 'export_key_pem pub');
-  ok($k->export_key_pem('public_x509'), 'export_key_pem pub_x509');
-  ok($k->export_key_der('private'), 'export_key_der pri');
-  ok($k->export_key_der('public'), 'export_key_der pub');
+  my $exp;
+  $exp = eval { $k->export_key_pem('private') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_pem pri');
+  $exp = eval { $k->export_key_pem('public') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_pem pub');
+  $exp = eval { $k->export_key_pem('public_x509') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_pem pub_x509');
+  $exp = eval { $k->export_key_der('private') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_der pri');
+  $exp = eval { $k->export_key_der('public') };
+  diag("$@") if $@;
+  ok($exp, 'export_key_der pub');
 }
 
 {
-  my $ct = rsa_encrypt('t/data/cryptx_pub_rsa1.der', 'test string', 'none');
+  my $ct = eval { rsa_encrypt('t/data/cryptx_pub_rsa1.der', 'test string', 'none') };
+  diag("$@") if $@;
   ok($ct, 'rsa_encrypt');
-  my $pt = rsa_decrypt('t/data/cryptx_priv_rsa1.der', $ct, 'none');
+  my $pt = eval { rsa_decrypt('t/data/cryptx_priv_rsa1.der', $ct, 'none') };
+  diag("$@") if $@;
   ok($pt, 'rsa_decrypt');
-  my $sig = rsa_sign_message('t/data/cryptx_priv_rsa1.der', 'test string');
+  my $sig = eval { rsa_sign_message('t/data/cryptx_priv_rsa1.der', 'test string') };
+  diag("$@") if $@;
   ok($sig, 'rsa_sign_message');
-  ok(rsa_verify_message('t/data/cryptx_pub_rsa1.der', $sig, 'test string'), 'rsa_verify_message');
+  my $ver = eval { rsa_verify_message('t/data/cryptx_pub_rsa1.der', $sig, 'test string') };
+  diag("$@") if $@;
+  ok($ver, 'rsa_verify_message');
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  $sig = rsa_sign_hash('t/data/cryptx_priv_rsa1.der', $hash, 'SHA1');
+  $sig = eval { rsa_sign_hash('t/data/cryptx_priv_rsa1.der', $hash, 'SHA1') };
+  diag("$@") if $@;
   ok($sig, 'rsa_sign_hash');
-  ok(rsa_verify_hash('t/data/cryptx_pub_rsa1.der', $sig, $hash, 'SHA1'), 'rsa_verify_hash');
+  $ver = eval { rsa_verify_hash('t/data/cryptx_pub_rsa1.der', $sig, $hash, 'SHA1') };
+  diag("$@") if $@;
+  ok($ver, 'rsa_verify_hash');
 }
 
 {
@@ -145,14 +177,17 @@ use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_messag
   # });
   # my $sig_hex = unpack("H*", $priv->sign_message('hello world!', 'SHA256', 'v1.5'));
 
-  my $pub = Crypt::PK::RSA->new({
+  my $rsa_pub = {
     e => "03",
     N => "E932AC92252F585B3A80A4DD76A897C8B7652952FE788F6EC8DD640587A1EE5647670A8AD4C2BE0F9FA6E49C605ADF77B5174230".
          "AF7BD50E5D6D6D6D28CCF0A886A514CC72E51D209CC772A52EF419F6A953F3135929588EBE9B351FCA61CED78F346FE00DBB6306".
          "E5C2A4C6DFC3779AF85AB417371CF34D8387B9B30AE46D7A5FF5A655B8D8455F1B94AE736989D60A6F2FD5CADBFFBD504C5A756A".
          "2E6BB5CECC13BCA7503F6DF8B52ACE5C410997E98809DB4DC30D943DE4E812A47553DCE54844A78E36401D13F77DC650619FED88".
          "D8B3926E3D8E319C80C744779AC5D6ABE252896950917476ECE5E8FC27D5F053D6018D91B502C4787558A002B9283DA7",
-  });
+  };
+  my $pub = eval { Crypt::PK::RSA->new($rsa_pub) };
+  diag("$@") if $@;
+  ok($pub, 'github issue 69 (new/pub)');
 
   my $sig1 = pack("H*", "8df69d774c6ac8b5f8aa16576ca37a4f948706c5daecb3c15cfd247a7657616b2bbb786b50158cac8c23e3".
                         "289d300d3fbb82380b8746d929df36bdaf43a5fc5d1d04c61c98d47c22de02d051be3ba9e42b1c47aa5192".
@@ -175,7 +210,13 @@ use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_messag
                         "b4cd2745eb29f12a2aad86c05f04ebd3cca3a8c63c752ccad07d7fd4e6e2adab4f353efbda04a6b5b7f4a6".
                         "d540c085e7ddc90f1665adb048dfc707eac2db28246e1bffe53f115a02f7c74defccafa7213cb22245");
 
-  is($pub->verify_message($sig1, 'hello world!', 'SHA256', 'v1.5'), 0, "github issue 69 - invalid signature/1");
-  is($pub->verify_message($sig2, 'hello world!', 'SHA256', 'v1.5'), 0, "github issue 69 - invalid signature/2");
-  is($pub->verify_message($sig3, 'hello world!', 'SHA256', 'v1.5'), 1, "github issue 69 - valid signature/3");
+  my $ver1 = eval { $pub->verify_message($sig1, 'hello world!', 'SHA256', 'v1.5') };
+  diag("$@") if $@;
+  is($ver1, 0, "github issue 69 - invalid signature/1");
+  my $ver2 = eval { $pub->verify_message($sig2, 'hello world!', 'SHA256', 'v1.5') };
+  diag("$@") if $@;
+  is($ver2, 0, "github issue 69 - invalid signature/2");
+  my $ver3 = eval { $pub->verify_message($sig3, 'hello world!', 'SHA256', 'v1.5') };
+  diag("$@") if $@;
+  is($ver3, 1, "github issue 69 - valid signature/3");
 }
