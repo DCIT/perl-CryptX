@@ -9,6 +9,8 @@ image:
 
 environment:
   matrix:
+    - perl_type: strawberry_old
+      perl_version: 5.10.1.2    #gcc 3.4.5
     - perl_type: strawberry_gh
       perl_version: 5.40        #gcc 13.2.0 / http://strawberryperl.com/download/5.40.0.1/strawberry-perl-5.40.0.1-64bit-portable.zip
     - perl_type: strawberry_gh
