@@ -10,11 +10,11 @@ image:
 environment:
   matrix:
     - perl_type: strawberry_gh
-      perl_version: 5.36        #gcc ?
-    - perl_type: strawberry_gh
-      perl_version: 5.38        #gcc 13.1.0 
-    - perl_type: strawberry_gh
       perl_version: 5.40        #gcc 13.2.0
+    - perl_type: strawberry_gh
+      perl_version: 5.38        #gcc 13.1.0
+    - perl_type: strawberry_gh
+      perl_version: 5.36        #gcc 13.1.0
     - perl_type: strawberry
       perl_version: 5.32.1.1    #gcc 8.3.0
       perl_bits: 32
