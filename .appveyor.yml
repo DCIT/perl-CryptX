@@ -10,10 +10,19 @@ image:
 environment:
   matrix:
     - perl_type: strawberry
-      perl_version: 5.32.0.1    #gcc 8.3.0
+      perl_version: 5.40.0.1    #gcc 13.2.0
+      perl_bits: 64
+    - perl_type: strawberry
+      perl_version: 5.38.2.2    #gcc ?
+      perl_bits: 64
+    - perl_type: strawberry
+      perl_version: 5.36.3.1    #gcc ?
+      perl_bits: 64
+    - perl_type: strawberry
+      perl_version: 5.32.1.1    #gcc 8.3.0
       perl_bits: 32
     - perl_type: strawberry
-      perl_version: 5.32.0.1    #gcc 8.3.0
+      perl_version: 5.32.1.1    #gcc 8.3.0
       perl_bits: 64
 #    - perl_type: strawberry
 #      perl_version: 5.30.3.1    #gcc 8.3.0
@@ -89,6 +98,7 @@ install:
   - call .appveyor.cmd perl_setup
   - set MAKEFLAGS=-j4
   - set AUTHOR_MODE=0
+  - 'gcc -v'
   - '%perl% -V'
   - '%cpanm% --verbose --notest JSON Math::BigInt Test::Pod Pod::Coverage'
   - '%cpanm% --verbose --notest --installdeps --with-recommends .'
