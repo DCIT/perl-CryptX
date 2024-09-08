@@ -20,9 +20,8 @@ if "%perl_type%" == "cygwin32" (
     echo Going to download "%download_url%"
     wget -nv "%download_url%" -O downloaded-strawberry.zip
   ) else if "%perl_version%" == "5.38" (
-    set "download_url=https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_53822_64bit/strawberry-perl-5.38.2.2-64bit-portable.zip"
-    echo Going to download "%download_url%"
-    wget -nv "%download_url%" -O downloaded-strawberry.zip
+    echo Going to download "%perl_version%"
+    wget -nv https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_53822_64bit/strawberry-perl-5.38.2.2-64bit-portable.zip -O downloaded-strawberry.zip
   ) else if "%perl_version%" == "5.36" (
     set "download_url=https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_53631_64bit/strawberry-perl-5.36.3.1-64bit-portable.zip"
     echo Going to download "%download_url%"
