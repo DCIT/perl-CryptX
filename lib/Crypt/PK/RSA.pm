@@ -2,7 +2,7 @@ package Crypt::PK::RSA;
 
 use strict;
 use warnings;
-our $VERSION = '0.081';
+our $VERSION = '0.081_001';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_message rsa_sign_hash rsa_verify_hash)] );

@@ -4,7 +4,7 @@ package Crypt::Cipher::Twofish;
 
 use strict;
 use warnings;
-our $VERSION = '0.081';
+our $VERSION = '0.081_001';
 
 use base qw(Crypt::Cipher);
 
