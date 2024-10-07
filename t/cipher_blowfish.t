@@ -9,41 +9,41 @@ use Crypt::Cipher;
 use Crypt::Cipher::Blowfish;
 
 is( Crypt::Cipher::Blowfish::blocksize, 8, '::blocksize');
-is( Crypt::Cipher::Blowfish::keysize, 56, '::keysize');
-is( Crypt::Cipher::Blowfish::max_keysize, 56, '::max_keysize');
+is( Crypt::Cipher::Blowfish::keysize, 72, '::keysize');
+is( Crypt::Cipher::Blowfish::max_keysize, 72, '::max_keysize');
 is( Crypt::Cipher::Blowfish::min_keysize, 8, '::min_keysize');
 is( Crypt::Cipher::Blowfish::default_rounds, 16, '::default_rounds');
 
 is( Crypt::Cipher::Blowfish->blocksize, 8, '->blocksize');
-is( Crypt::Cipher::Blowfish->keysize, 56, '->keysize');
-is( Crypt::Cipher::Blowfish->max_keysize, 56, '->max_keysize');
+is( Crypt::Cipher::Blowfish->keysize, 72, '->keysize');
+is( Crypt::Cipher::Blowfish->max_keysize, 72, '->max_keysize');
 is( Crypt::Cipher::Blowfish->min_keysize, 8, '->min_keysize');
 is( Crypt::Cipher::Blowfish->default_rounds, 16, '->default_rounds');
 
 my $min_key = 'kkkkkkkk';
-my $max_key = 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK';
+my $max_key = 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK';
 
 is( Crypt::Cipher::blocksize('Blowfish'), 8, 'Cipher->blocksize');
-is( Crypt::Cipher::keysize('Blowfish'), 56, 'Cipher->keysize');
-is( Crypt::Cipher::max_keysize('Blowfish'), 56, 'Cipher->max_keysize');
+is( Crypt::Cipher::keysize('Blowfish'), 72, 'Cipher->keysize');
+is( Crypt::Cipher::max_keysize('Blowfish'), 72, 'Cipher->max_keysize');
 is( Crypt::Cipher::min_keysize('Blowfish'), 8, 'Cipher->min_keysize');
 is( Crypt::Cipher::default_rounds('Blowfish'), 16, 'Cipher->default_rounds');
 
 is( Crypt::Cipher->blocksize('Blowfish'), 8, 'Cipher->blocksize');
-is( Crypt::Cipher->keysize('Blowfish'), 56, 'Cipher->keysize');
-is( Crypt::Cipher->max_keysize('Blowfish'), 56, 'Cipher->max_keysize');
+is( Crypt::Cipher->keysize('Blowfish'), 72, 'Cipher->keysize');
+is( Crypt::Cipher->max_keysize('Blowfish'), 72, 'Cipher->max_keysize');
 is( Crypt::Cipher->min_keysize('Blowfish'), 8, 'Cipher->min_keysize');
 is( Crypt::Cipher->default_rounds('Blowfish'), 16, 'Cipher->default_rounds');
 
 is( Crypt::Cipher::Blowfish->new($min_key)->blocksize, 8, 'Blowfish->new()->blocksize');
-is( Crypt::Cipher::Blowfish->new($min_key)->keysize, 56, 'Blowfish->new()->keysize');
-is( Crypt::Cipher::Blowfish->new($min_key)->max_keysize, 56, 'Blowfish->new()->max_keysize');
+is( Crypt::Cipher::Blowfish->new($min_key)->keysize, 72, 'Blowfish->new()->keysize');
+is( Crypt::Cipher::Blowfish->new($min_key)->max_keysize, 72, 'Blowfish->new()->max_keysize');
 is( Crypt::Cipher::Blowfish->new($min_key)->min_keysize, 8, 'Blowfish->new()->min_keysize');
 is( Crypt::Cipher::Blowfish->new($min_key)->default_rounds, 16, 'Blowfish->new()->default_rounds');
 
 is( Crypt::Cipher->new('Blowfish', $min_key)->blocksize, 8, 'Cipher->new()->blocksize');
-is( Crypt::Cipher->new('Blowfish', $min_key)->keysize, 56, 'Cipher->new()->keysize');
-is( Crypt::Cipher->new('Blowfish', $min_key)->max_keysize, 56, 'Cipher->new()->max_keysize');
+is( Crypt::Cipher->new('Blowfish', $min_key)->keysize, 72, 'Cipher->new()->keysize');
+is( Crypt::Cipher->new('Blowfish', $min_key)->max_keysize, 72, 'Cipher->new()->max_keysize');
 is( Crypt::Cipher->new('Blowfish', $min_key)->min_keysize, 8, 'Cipher->new()->min_keysize');
 is( Crypt::Cipher->new('Blowfish', $min_key)->default_rounds, 16, 'Cipher->new()->default_rounds');
 
