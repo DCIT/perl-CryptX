@@ -2,7 +2,7 @@ package Crypt::AuthEnc;
 
 use strict;
 use warnings;
-our $VERSION = '0.081_001';
+our $VERSION = '0.082';
 
 ### not used
 
