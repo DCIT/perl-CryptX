@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('Blowfish') }
 
 =head1 NAME
 
-Crypt::Cipher::Blowfish - Symmetric cipher Blowfish, key size: 64-448 bits
+Crypt::Cipher::Blowfish - Symmetric cipher Blowfish, key size: 64-576 bits
 
 =head1 SYNOPSIS
 

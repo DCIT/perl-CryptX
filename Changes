@@ -1,7 +1,8 @@
 Changes for CryptX
 
-0.082   2024-XX-XX
+0.082   2024-10-XX
         - fix #111 libcryptx-perl: t/sshkey.t fails on some architectures
+        - CHANGE: Crypt::Cipher::Blowfish max key size increased to 72 bytes
         - bundled libtomcrypt update branch:develop (commit:29af8922 2024-10-07)
 
 0.081   2024-09-08

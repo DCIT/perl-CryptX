@@ -26,7 +26,7 @@ my %list = (
                          spec_rounds=>0, spec_key=>'XXX-DETERMINED-BY-KEYSIZE' },
         Anubis      => { info=>'Symmetric cipher Anubis, key size: 128-320 bits', urls=>['https://en.wikipedia.org/wiki/Anubis_(cipher)'],
                          spec_rounds=>0, spec_key=>'XXX-DETERMINED-BY-KEYSIZE' },
-        Blowfish    => { info=>'Symmetric cipher Blowfish, key size: 64-448 bits', urls=>['https://en.wikipedia.org/wiki/Blowfish_(cipher)'],
+        Blowfish    => { info=>'Symmetric cipher Blowfish, key size: 64-576 bits', urls=>['https://en.wikipedia.org/wiki/Blowfish_(cipher)'],
                          spec_rounds=>0, spec_key=>'XXX-ROUNDS-FIXED' },
         CAST5       => { info=>'Symmetric cipher CAST5 (aka CAST-128), key size: 40-128 bits', urls=>['https://en.wikipedia.org/wiki/CAST-128'],
                          spec_rounds=>0, spec_key=>'XXX-DETERMINED-BY-KEYSIZE' }, # 12 (<=80bits), 16 (>80bits)
