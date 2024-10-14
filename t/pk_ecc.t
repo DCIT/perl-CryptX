@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 144;
+use Test::More tests => 146;
 
 use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret);
 use Crypt::Misc qw(read_rawfile);
@@ -347,5 +347,15 @@ GzQTfzEBVB06oAoGCCqGSM49AwEHoUQDQgAE3VU0
 nT1p5W0zKHDknAgQpsOODuM2/AoZ/6wNqC9AoUCE
 pQempFg0aBqxleOP0uW0HG1YwCnOF8N0D8Q2RR2m
 lw==-----END PUBLIC KEY-----'
+  );
+  check_one(
+    1, # should PASS
+    'LF/public',
+    "\n-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3VU0nT1p5W0zKHDknAgQpsOODuM2\n/AoZ/6wNqC9AoUCEpQempFg0aBqxleOP0uW0HG1YwCnOF8N0D8Q2RR2mlw==\n-----END PUBLIC KEY-----\n"
+  );
+  check_one(
+    1, # should PASS
+    'CR+LF/public',
+    "\r\n-----BEGIN PUBLIC KEY-----\r\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3VU0nT1p5W0zKHDknAgQpsOODuM2\r\n/AoZ/6wNqC9AoUCEpQempFg0aBqxleOP0uW0HG1YwCnOF8N0D8Q2RR2mlw==\r\n-----END PUBLIC KEY-----\r\n"
   );
 }
