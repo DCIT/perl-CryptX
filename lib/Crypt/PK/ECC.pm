@@ -2,7 +2,7 @@ package Crypt::PK::ECC;
 
 use strict;
 use warnings;
-our $VERSION = '0.082';
+our $VERSION = '0.082_001';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret )] );
