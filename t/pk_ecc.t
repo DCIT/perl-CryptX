@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 135;
+use Test::More tests => 144;
 
 use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret);
 use Crypt::Misc qw(read_rawfile);
@@ -249,4 +249,103 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   ok($rk->recovery_pub_rfc7518($sig, $hash, 1), 'recovery pub rfc7518 with 1 bit ok');
   my $pub1 = $rk->export_key_raw('public');
   ok($pub0 eq $pub || $pub1 eq $pub, 'recovery rfc7518 pub key matched');
+}
+
+{
+  ## https://github.com/DCIT/perl-CryptX/issues/110
+  sub check_one {
+    my ($should_pass, $name, $key) = @_;
+    if ($should_pass) {
+      my $k = eval { Crypt::PK::ECC->new(\$key) };
+      diag($@) if $@;
+      ok($k, $name);
+    }
+    else {
+      my $k = eval { Crypt::PK::ECC->new(\$key) };
+      ok(!$k, $name);
+    }
+  }
+  check_one(
+    1, # should PASS
+    'normal multi-line/public',
+    '-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3VU0nT1p5W0zKHDknAgQpsOODuM2
+/AoZ/6wNqC9AoUCEpQempFg0aBqxleOP0uW0HG1YwCnOF8N0D8Q2RR2mlw==
+-----END PUBLIC KEY-----'
+  );
+  check_one(
+    1, # should PASS
+    'normal multi-line/private',
+    '-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIFF9oAGC6vxNLIU8D+nuvM8ms1QQlPtpGzQTfzEBVB06oAoGCCqGSM49
+AwEHoUQDQgAE3VU0nT1p5W0zKHDknAgQpsOODuM2/AoZ/6wNqC9AoUCEpQempFg0
+aBqxleOP0uW0HG1YwCnOF8N0D8Q2RR2mlw==
+-----END EC PRIVATE KEY-----',
+  );
+  check_one(
+    1, # should PASS
+    'narrow multi-line/public',
+    '-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD
+QgAE3VU0nT1p5W0zKHDknAgQpsOODuM2
+/AoZ/6wNqC9AoUCEpQempFg0aBqxleOP
+0uW0HG1YwCnOF8N0D8Q2RR2mlw==
+-----END PUBLIC KEY-----'
+  );
+  check_one(
+    1, # should PASS
+    'narrow multi-line/private',
+    '-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIFF9oAGC6vxNLIU8D+nuvM8m
+s1QQlPtpGzQTfzEBVB06oAoGCCqGSM49
+AwEHoUQDQgAE3VU0nT1p5W0zKHDknAgQ
+psOODuM2/AoZ/6wNqC9AoUCEpQempFg0
+aBqxleOP0uW0HG1YwCnOF8N0D8Q2RR2m
+lw==
+-----END EC PRIVATE KEY-----',
+  );
+  check_one(
+    0, # should FAIL
+    'single line/public',
+    '-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3VU0nT1p5W0zKHDknAgQpsOODuM2/AoZ/6wNqC9AoUCEpQempFg0aBqxleOP0uW0HG1YwCnOF8N0D8Q2RR2mlw==-----END PUBLIC KEY-----'
+  );
+  check_one(
+    0, # should FAIL
+    'single line/private',
+    '-----BEGIN EC PRIVATE KEY-----MHcCAQEEIFF9oAGC6vxNLIU8D+nuvM8ms1QQlPtpGzQTfzEBVB06oAoGCCqGSM49AwEHoUQDQgAE3VU0nT1p5W0zKHDknAgQpsOODuM2/AoZ/6wNqC9AoUCEpQempFg0aBqxleOP0uW0HG1YwCnOF8N0D8Q2RR2mlw==-----END EC PRIVATE KEY-----',
+  );
+  check_one(
+    0, # should FAIL
+    'tall multi-line/public',
+    '-----BEGIN PUBLIC KEY-----
+
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3VU0nT1p5W0zKHDknAgQpsOODuM2
+
+/AoZ/6wNqC9AoUCEpQempFg0aBqxleOP0uW0HG1YwCnOF8N0D8Q2RR2mlw==
+
+-----END PUBLIC KEY-----'
+  );
+  check_one(
+    0, # should FAIL
+    'tall multi-line/private',
+    '-----BEGIN EC PRIVATE KEY-----
+
+MHcCAQEEIFF9oAGC6vxNLIU8D+nuvM8ms1QQlPtpGzQTfzEBVB06oAoGCCqGSM49
+
+AwEHoUQDQgAE3VU0nT1p5W0zKHDknAgQpsOODuM2/AoZ/6wNqC9AoUCEpQempFg0
+
+aBqxleOP0uW0HG1YwCnOF8N0D8Q2RR2mlw==
+
+-----END EC PRIVATE KEY-----',
+  );
+  check_one( # this one *hangs* 0.081
+    0, # should FAIL
+    'weird multi-line',
+    '-----BEGIN PUBLIC KEY-----
+MHcCAQEEIFF9oAGC6vxNLIU8D+nuvM8ms1QQlPtp
+GzQTfzEBVB06oAoGCCqGSM49AwEHoUQDQgAE3VU0
+nT1p5W0zKHDknAgQpsOODuM2/AoZ/6wNqC9AoUCE
+pQempFg0aBqxleOP0uW0HG1YwCnOF8N0D8Q2RR2m
+lw==-----END PUBLIC KEY-----'
+  );
 }
