@@ -24,6 +24,10 @@
 static int s_read_arc4random(mp_digit *p)
 {
    mp_digit d = 0, msk = 0;
+   if (sizeof(mp_digit) <= 4) { /* UGLY HACK */
+      *p = ((mp_digit) arc4random());
+      return MP_OKAY;
+   }
    do {
       d <<= MP_GEN_RANDOM_SHIFT;
       d |= ((mp_digit) arc4random());
