@@ -1,5 +1,9 @@
 Changes for CryptX
 
+0.083   2024-10-15
+        - fix #110 regression: 0.081 fails to parse PEMs that 0.080 parsed fine
+        - bundled libtomcrypt update branch:develop (commit:cbb01b37 2024-10-14)
+
 0.082   2024-10-07
         - fix #111 libcryptx-perl: t/sshkey.t fails on some architectures
         - CHANGE: Crypt::Cipher::Blowfish max key size increased to 72 bytes
