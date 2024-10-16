@@ -4,7 +4,7 @@ package Crypt::Cipher::SEED;
 
 use strict;
 use warnings;
-our $VERSION = '0.083_001';
+our $VERSION = '0.084';
 
 use base qw(Crypt::Cipher);
 
