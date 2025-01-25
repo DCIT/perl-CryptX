@@ -68,4 +68,4 @@ This program is free software; you can redistribute it and/or modify it under th
 
 # COPYRIGHT
 
-Copyright (c) 2013-2024 DCIT, a.s. [https://www.dcit.cz](https://www.dcit.cz) / Karel Miko
+Copyright (c) 2013-2025 DCIT, a.s. [https://www.dcit.cz](https://www.dcit.cz) / Karel Miko
