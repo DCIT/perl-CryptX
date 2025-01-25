@@ -1,5 +1,9 @@
 Changes for CryptX
 
+0.085   2025-XX-XX
+        - fix #114 #113 #112 (improved detection of Apple+x86_64 / AESNI)
+        - fix #115 Crypt::PRNG - fix typo and specify ChaCha20 is the default
+
 0.084   2024-10-16
         - libtommath: fix cpantesters crash on freebsd/i386
         - updated ppport.h
