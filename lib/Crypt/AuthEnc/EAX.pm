@@ -2,7 +2,7 @@ package Crypt::AuthEnc::EAX;
 
 use strict;
 use warnings;
-our $VERSION = '0.084_001';
+our $VERSION = '0.085';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( eax_encrypt_authenticate eax_decrypt_verify )] );

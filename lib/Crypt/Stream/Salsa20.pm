@@ -2,7 +2,7 @@ package Crypt::Stream::Salsa20;
 
 use strict;
 use warnings;
-our $VERSION = '0.084_001';
+our $VERSION = '0.085';
 
 use CryptX;
 

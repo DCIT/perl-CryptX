@@ -93,7 +93,7 @@ my %eumm_args = (
   AUTHOR           => 'Karel Miko',
   ABSTRACT         => 'Cryptographic toolkit',
   MIN_PERL_VERSION => '5.006',
-  LICENSE          => 'perl_5',
+  LICENSE          => 'perl',
   PREREQ_PM        => { 'Math::BigInt' => 0 },
   TEST_REQUIRES    => { 'Test::More' => 0 },
   META_MERGE       => { resources  => { repository => 'https://github.com/DCIT/perl-CryptX', bugtracker => 'https://github.com/DCIT/perl-CryptX/issues' } },
