@@ -310,6 +310,7 @@ error_out:
    return err;
 }
 
+#ifndef LTC_NO_FILE
 int pem_decode_filehandle(FILE *f, ltc_pka_key *k, const password_ctx *pw_ctx)
 {
    int err = pem_decode_pkcs_filehandle(f, k, pw_ctx);
@@ -321,6 +322,7 @@ int pem_decode_filehandle(FILE *f, ltc_pka_key *k, const password_ctx *pw_ctx)
 #endif
    return err;
 }
+#endif
 
 int pem_decode(const void *buf, unsigned long len, ltc_pka_key *k, const password_ctx *pw_ctx)
 {

@@ -2,6 +2,7 @@
 /* SPDX-License-Identifier: Unlicense */
 
 #include "tomcrypt.h"
+#include <stdarg.h>
 
 /*
  * Internal Macros
@@ -11,7 +12,8 @@
 
 #define LTC_PAD_MASK       (0xF000U)
 
-#if defined(ENDIAN_64BITWORD)
+/* only real 64bit, not ILP32 */
+#if defined(ENDIAN_64BITWORD) && !defined(ENDIAN_64BITWORD_ILP32)
    #define CONSTPTR(n) CONST64(n)
 #else
    #define CONSTPTR(n) n ## uL
@@ -167,6 +169,7 @@ int func_name (hash_state * md, const unsigned char *in, unsigned long inlen)   
 int ocb3_int_ntz(unsigned long x);
 void ocb3_int_xor_blocks(unsigned char *out, const unsigned char *block_a, const unsigned char *block_b, unsigned long block_len);
 
+int omac_vprocess(omac_state *omac, const unsigned char *in,  unsigned long inlen, va_list args);
 
 /* tomcrypt_math.h */
 
@@ -422,7 +425,7 @@ void       ltc_ecc_del_point(ecc_point *p);
 int        ltc_ecc_set_point_xyz(ltc_mp_digit x, ltc_mp_digit y, ltc_mp_digit z, ecc_point *p);
 int        ltc_ecc_copy_point(const ecc_point *src, ecc_point *dst);
 int        ltc_ecc_is_point(const ltc_ecc_dp *dp, void *x, void *y);
-int        ltc_ecc_is_point_at_infinity(const ecc_point *P, void *modulus, int *retval);
+int        ltc_ecc_is_point_at_infinity(const ecc_point *P, const void *modulus, int *retval);
 int        ltc_ecc_import_point(const unsigned char *in, unsigned long inlen, void *prime, void *a, void *b, void *x, void *y);
 int        ltc_ecc_export_point(unsigned char *out, unsigned long *outlen, void *x, void *y, unsigned long size, int compressed);
 int        ltc_ecc_verify_key(const ecc_key *key);
@@ -430,10 +433,12 @@ int        ltc_ecc_verify_key(const ecc_key *key);
 /* point ops (mp == montgomery digit) */
 #if !defined(LTC_MECC_ACCEL) || defined(LTM_DESC) || defined(GMP_DESC)
 /* R = 2P */
-int ltc_ecc_projective_dbl_point(const ecc_point *P, ecc_point *R, void *ma, void *modulus, void *mp);
+int ltc_ecc_projective_dbl_point(const ecc_point *P, ecc_point *R,
+                                 const void *ma, const void *modulus, void *mp);
 
 /* R = P + Q */
-int ltc_ecc_projective_add_point(const ecc_point *P, const ecc_point *Q, ecc_point *R, void *ma, void *modulus, void *mp);
+int ltc_ecc_projective_add_point(const ecc_point *P, const ecc_point *Q, ecc_point *R,
+                                 const void *ma, const void *modulus, void *mp);
 #endif
 
 #if defined(LTC_MECC_FP)
@@ -451,30 +456,31 @@ void ltc_ecc_fp_tablelock(int lock);
 #endif
 
 /* R = kG */
-int ltc_ecc_mulmod(void *k, const ecc_point *G, ecc_point *R, void *a, void *modulus, int map);
+int ltc_ecc_mulmod(const void *k, const ecc_point *G, ecc_point *R,
+                   const void *a, const void *modulus, int map);
 
 #ifdef LTC_ECC_SHAMIR
 /* kA*A + kB*B = C */
 int ltc_ecc_mul2add(const ecc_point *A, void *kA,
                     const ecc_point *B, void *kB,
                           ecc_point *C,
-                               void *ma,
-                               void *modulus);
+                         const void *ma,
+                         const void *modulus);
 
 #ifdef LTC_MECC_FP
 /* Shamir's trick with optimized point multiplication using fixed point cache */
 int ltc_ecc_fp_mul2add(const ecc_point *A, void *kA,
                        const ecc_point *B, void *kB,
                              ecc_point *C,
-                                  void *ma,
-                                  void *modulus);
+                            const void *ma,
+                            const void *modulus);
 #endif
 
 #endif
 
 
 /* map P to affine from projective */
-int ltc_ecc_map(ecc_point *P, void *modulus, void *mp);
+int ltc_ecc_map(ecc_point *P, const void *modulus, void *mp);
 #endif /* LTC_MECC */
 
 #ifdef LTC_MDSA

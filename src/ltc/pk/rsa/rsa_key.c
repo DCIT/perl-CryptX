@@ -9,8 +9,6 @@
 */
 
 #ifdef LTC_MRSA
-#include <stdarg.h>
-
 static void s_mpi_shrink_multi(void **a, ...)
 {
    void **cur;

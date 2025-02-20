@@ -1,7 +1,6 @@
 /* LibTomCrypt, modular cryptographic library -- Tom St Denis */
 /* SPDX-License-Identifier: Unlicense */
 #include "tomcrypt_private.h"
-#include <stdarg.h>
 
 /**
    @file ssh_decode_sequence_multi.c
@@ -142,7 +141,7 @@ int ssh_decode_sequence_multi(const unsigned char *in, unsigned long *inlen, ...
                err = CRYPT_INVALID_PACKET;
                goto error;
             } else {
-               if ((err = mp_read_unsigned_bin(vdata, (unsigned char *)in, size)) != CRYPT_OK)          { goto error; }
+               if ((err = mp_read_unsigned_bin(vdata, in, size)) != CRYPT_OK)                           { goto error; }
             }
             in += size;
             break;

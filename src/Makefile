@@ -19,8 +19,8 @@ ltc/encauth/gcm/gcm_reset.o ltc/encauth/ocb3/ocb3_add_aad.o ltc/encauth/ocb3/ocb
 ltc/encauth/ocb3/ocb3_decrypt_last.o ltc/encauth/ocb3/ocb3_decrypt_verify_memory.o \
 ltc/encauth/ocb3/ocb3_done.o ltc/encauth/ocb3/ocb3_encrypt.o ltc/encauth/ocb3/ocb3_encrypt_authenticate_memory.o \
 ltc/encauth/ocb3/ocb3_encrypt_last.o ltc/encauth/ocb3/ocb3_init.o ltc/encauth/ocb3/ocb3_int_ntz.o \
-ltc/encauth/ocb3/ocb3_int_xor_blocks.o ltc/hashes/blake2b.o ltc/hashes/blake2s.o \
-ltc/hashes/chc/chc.o ltc/hashes/helper/hash_file.o ltc/hashes/helper/hash_filehandle.o \
+ltc/encauth/ocb3/ocb3_int_xor_blocks.o ltc/encauth/siv/siv.o ltc/hashes/blake2b.o \
+ltc/hashes/blake2s.o ltc/hashes/chc/chc.o ltc/hashes/helper/hash_file.o ltc/hashes/helper/hash_filehandle.o \
 ltc/hashes/helper/hash_memory.o ltc/hashes/helper/hash_memory_multi.o ltc/hashes/md2.o \
 ltc/hashes/md4.o ltc/hashes/md5.o ltc/hashes/rmd128.o ltc/hashes/rmd160.o ltc/hashes/rmd256.o \
 ltc/hashes/rmd320.o ltc/hashes/sha1.o ltc/hashes/sha2/sha224.o ltc/hashes/sha2/sha256.o \

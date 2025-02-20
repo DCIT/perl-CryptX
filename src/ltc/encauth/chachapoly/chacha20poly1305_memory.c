@@ -6,7 +6,7 @@
 #ifdef LTC_CHACHA20POLY1305_MODE
 
 /**
-  Process an entire GCM packet in one call.
+  Process an entire ChaCha20Poly1305 packet in one call.
   @param key               The secret key
   @param keylen            The length of the secret key
   @param iv                The initialization vector

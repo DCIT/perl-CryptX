@@ -75,6 +75,10 @@ enum {
    CRYPT_HASH_OVERFLOW,     /* Hash applied to too many bits */
    CRYPT_PW_CTX_MISSING,    /* Password context to decrypt key file is missing */
    CRYPT_UNKNOWN_PEM,       /* The PEM header was not recognized */
+
+   /* Here only follows the number of error codes.
+    * This will never be returned and shall always be at the end of the enum. */
+   CRYPT_ERR_NUM
 };
 
 #include "tomcrypt_cfg.h"

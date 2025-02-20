@@ -175,6 +175,11 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
    #define LTC_FAST
 #endif
 
+/* Detect ILP32, commonly known as x32 on Linux and also possible on AIX */
+#if defined(_ILP32) || defined(__ILP32__)
+   #define ENDIAN_64BITWORD_ILP32
+#endif
+
 /* endianness fallback */
 #if !defined(ENDIAN_BIG) && !defined(ENDIAN_LITTLE)
   #if defined(_BYTE_ORDER) && _BYTE_ORDER == _BIG_ENDIAN || \

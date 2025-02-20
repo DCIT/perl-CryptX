@@ -303,6 +303,9 @@ const char *crypt_build_settings =
 #if defined(LTC_CHACHA20POLY1305_MODE)
     "   CHACHA20POLY1305\n"
 #endif
+#if defined(LTC_SIV_MODE)
+    "   SIV\n"
+#endif
 
     "\nPRNG:\n"
 #if defined(LTC_YARROW)

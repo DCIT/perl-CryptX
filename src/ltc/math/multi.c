@@ -3,8 +3,6 @@
 #include "tomcrypt_private.h"
 
 #ifdef LTC_MPI
-#include <stdarg.h>
-
 int ltc_init_multi(void **a, ...)
 {
    void    **cur = a;
