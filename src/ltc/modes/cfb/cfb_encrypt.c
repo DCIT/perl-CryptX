@@ -9,6 +9,8 @@
 
 #ifdef LTC_CFB_MODE
 
+#ifndef LTC_CFB_SHIFT1LEFT
+#define LTC_CFB_SHIFT1LEFT
 static LTC_INLINE void s_shift1left_64(unsigned char *b, unsigned char v)
 {
    ulong64 bval;
@@ -30,6 +32,7 @@ static LTC_INLINE void s_shift1left_128(unsigned char *b, unsigned char v)
    STORE64H(bval[0], b);
    STORE64H(bval[1], b + 8);
 }
+#endif /* LTC_CFB_SHIFT1LEFT */
 
 /**
   CFB encrypt

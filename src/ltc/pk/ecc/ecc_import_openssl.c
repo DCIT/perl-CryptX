@@ -3,7 +3,7 @@
 
 #include "tomcrypt_private.h"
 
-#ifdef LTC_MECC
+#if defined(LTC_MECC) && defined(LTC_DER)
 
 static int s_ecc_import_private_with_oid(const unsigned char *in, unsigned long inlen, ecc_key *key)
 {
@@ -58,7 +58,7 @@ int ecc_import_with_curve(const unsigned char *in, unsigned long inlen, int type
    unsigned long cofactor = 0, ecver = 0, pkver = 0, tmpoid[16];
    int err;
 
-   if ((err = mp_init_multi(&prime, &order, &a, &b, &gx, &gy, LTC_NULL)) != CRYPT_OK) {
+   if ((err = ltc_mp_init_multi(&prime, &order, &a, &b, &gx, &gy, LTC_NULL)) != CRYPT_OK) {
       return err;
    }
 
@@ -101,8 +101,8 @@ int ecc_import_with_curve(const unsigned char *in, unsigned long inlen, int type
       len_b  = seq_curve[1].size;
       len_g  = seq_ecparams[3].size;
       /* create bignums */
-      if ((err = mp_read_unsigned_bin(a, bin_a, len_a)) != CRYPT_OK)                           { goto error; }
-      if ((err = mp_read_unsigned_bin(b, bin_b, len_b)) != CRYPT_OK)                           { goto error; }
+      if ((err = ltc_mp_read_unsigned_bin(a, bin_a, len_a)) != CRYPT_OK)                           { goto error; }
+      if ((err = ltc_mp_read_unsigned_bin(b, bin_b, len_b)) != CRYPT_OK)                           { goto error; }
       if ((err = ltc_ecc_import_point(bin_g, len_g, prime, a, b, gx, gy)) != CRYPT_OK)         { goto error; }
       /* load curve parameters */
       if ((err = ecc_set_curve_from_mpis(a, b, prime, order, gx, gy, cofactor, key)) != CRYPT_OK) { goto error; }
@@ -117,7 +117,7 @@ int ecc_import_with_curve(const unsigned char *in, unsigned long inlen, int type
       }
    }
 error:
-   mp_clear_multi(prime, order, a, b, gx, gy, LTC_NULL);
+   ltc_mp_deinit_multi(prime, order, a, b, gx, gy, LTC_NULL);
    return err;
 }
 

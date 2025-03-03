@@ -10,8 +10,10 @@
 
 #ifdef LTC_SOBER128
 
+#ifndef LTC_SOBER128TAB_C
 #define LTC_SOBER128TAB_C
 #include "sober128tab.c"
+#endif
 
 /* don't change these... */
 #define N                        17
@@ -329,5 +331,17 @@ int sober128_stream_done(sober128_state *st)
    zeromem(st, sizeof(sober128_state));
    return CRYPT_OK;
 }
+
+#undef N
+#undef INITKONST
+#undef KEYP
+#undef FOLDP
+#undef OFF
+#undef STEP
+#undef NLFUNC
+#undef ADDKEY
+#undef XORNL
+#undef DROUND
+#undef SROUND
 
 #endif

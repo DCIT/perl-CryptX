@@ -436,8 +436,8 @@ sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
                              &self->key);
         }
         else if (ix == 4) {
-          rv = ecc_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
-                             &self->pstate, self->pindex, LTC_ECCSIG_ETH27, NULL,
+          rv = ecc_sign_hash_eth27(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
+                             &self->pstate, self->pindex,
                              &self->key);
         }
         else {
@@ -481,7 +481,7 @@ verify_hash(Crypt::PK::ECC self, SV * sig, SV * data, const char * hash_name = "
           rv = ecc_verify_hash_rfc7518(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
         }
         else if (ix == 4) {
-          rv = ecc_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_ECCSIG_ETH27, &stat, &self->key);
+          rv = ecc_verify_hash_eth27(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
         }
         else {
           rv = ecc_verify_hash(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);

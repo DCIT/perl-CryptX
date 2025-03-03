@@ -93,7 +93,7 @@ static int s_ssh_decode_ecdsa(const unsigned char *in, unsigned long *inlen, ltc
                                      LTC_SSHDATA_STRING, groupname, &groupnamelen,
                                      LTC_SSHDATA_STRING, buf0, &buf0len,
                                      LTC_SSHDATA_STRING, buf1, &buf1len,
-                                     LTC_SSHDATA_EOL,    NULL);
+                                     LTC_SSHDATA_EOL,    LTC_NULL);
    if (err == CRYPT_OK) {
       key = buf1;
       keylen = buf1len;
@@ -137,7 +137,7 @@ static int s_ssh_decode_ed25519(const unsigned char *in, unsigned long *inlen, l
 
    if ((err = ssh_decode_sequence_multi(p, &cur_len,
                                         LTC_SSHDATA_STRING, pubkey, &pubkeylen,
-                                        LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
+                                        LTC_SSHDATA_EOL,    LTC_NULL)) != CRYPT_OK) {
       goto cleanup;
    }
 
@@ -155,7 +155,7 @@ static int s_ssh_decode_ed25519(const unsigned char *in, unsigned long *inlen, l
 
    if ((err = ssh_decode_sequence_multi(p, &cur_len,
                                         LTC_SSHDATA_STRING, privkey, &privkeylen,
-                                        LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
+                                        LTC_SSHDATA_EOL,    LTC_NULL)) != CRYPT_OK) {
       goto cleanup;
    }
    if ((err = ed25519_import_raw(privkey, privkeylen, PK_PRIVATE, &key->u.ed25519)) != CRYPT_OK) {
@@ -195,10 +195,10 @@ static int s_ssh_decode_dsa(const unsigned char *in, unsigned long *inlen, ltc_p
                                         LTC_SSHDATA_MPINT, key->u.dsa.q,
                                         LTC_SSHDATA_MPINT, key->u.dsa.g,
                                         LTC_SSHDATA_MPINT, key->u.dsa.y,
-                                        LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
+                                        LTC_SSHDATA_EOL,   LTC_NULL)) != CRYPT_OK) {
       goto cleanup;
    }
-   key->u.dsa.qord = mp_unsigned_bin_size(key->u.dsa.q);
+   key->u.dsa.qord = ltc_mp_unsigned_bin_size(key->u.dsa.q);
    if ((err = dsa_int_validate_pqg(&key->u.dsa, &stat)) != CRYPT_OK) {
       goto cleanup;
    }
@@ -219,7 +219,7 @@ static int s_ssh_decode_dsa(const unsigned char *in, unsigned long *inlen, ltc_p
 
    if ((err = ssh_decode_sequence_multi(p, &cur_len,
                                         LTC_SSHDATA_MPINT, key->u.dsa.x,
-                                        LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
+                                        LTC_SSHDATA_EOL,   LTC_NULL)) != CRYPT_OK) {
       goto cleanup;
    }
 
@@ -262,7 +262,7 @@ static int s_ssh_decode_rsa(const unsigned char *in, unsigned long *inlen, ltc_p
    if ((err = ssh_decode_sequence_multi(p, &cur_len,
                                         LTC_SSHDATA_MPINT, key->u.rsa.N,
                                         LTC_SSHDATA_MPINT, key->u.rsa.e,
-                                        LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
+                                        LTC_SSHDATA_EOL,   LTC_NULL)) != CRYPT_OK) {
       goto cleanup;
    }
 
@@ -281,7 +281,7 @@ static int s_ssh_decode_rsa(const unsigned char *in, unsigned long *inlen, ltc_p
       goto cleanup;
    }
 
-   if ((err = mp_init_multi(&tmp1, &tmp2, NULL)) != CRYPT_OK) {
+   if ((err = ltc_mp_init_multi(&tmp1, &tmp2, LTC_NULL)) != CRYPT_OK) {
       goto cleanup;
    }
 
@@ -290,20 +290,20 @@ static int s_ssh_decode_rsa(const unsigned char *in, unsigned long *inlen, ltc_p
                                         LTC_SSHDATA_MPINT, key->u.rsa.qP,
                                         LTC_SSHDATA_MPINT, key->u.rsa.p,
                                         LTC_SSHDATA_MPINT, key->u.rsa.q,
-                                        LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
+                                        LTC_SSHDATA_EOL,   LTC_NULL)) != CRYPT_OK) {
       goto cleanup_tmps;
    }
 
-   if ((err = mp_sub_d(key->u.rsa.p, 1, tmp1)) != CRYPT_OK)                   { goto cleanup_tmps; } /* tmp1 = q-1 */
-   if ((err = mp_sub_d(key->u.rsa.q, 1, tmp2)) != CRYPT_OK)                   { goto cleanup_tmps; } /* tmp2 = p-1 */
-   if ((err = mp_mod(key->u.rsa.d, tmp1, key->u.rsa.dP)) != CRYPT_OK)         { goto cleanup_tmps; } /* dP = d mod p-1 */
-   if ((err = mp_mod(key->u.rsa.d, tmp2, key->u.rsa.dQ)) != CRYPT_OK)         { goto cleanup_tmps; } /* dQ = d mod q-1 */
+   if ((err = ltc_mp_sub_d(key->u.rsa.p, 1, tmp1)) != CRYPT_OK)                   { goto cleanup_tmps; } /* tmp1 = q-1 */
+   if ((err = ltc_mp_sub_d(key->u.rsa.q, 1, tmp2)) != CRYPT_OK)                   { goto cleanup_tmps; } /* tmp2 = p-1 */
+   if ((err = ltc_mp_mod(key->u.rsa.d, tmp1, key->u.rsa.dP)) != CRYPT_OK)         { goto cleanup_tmps; } /* dP = d mod p-1 */
+   if ((err = ltc_mp_mod(key->u.rsa.d, tmp2, key->u.rsa.dQ)) != CRYPT_OK)         { goto cleanup_tmps; } /* dQ = d mod q-1 */
 
    key->id = LTC_PKA_RSA;
    key->u.rsa.type = PK_PRIVATE;
 
 cleanup_tmps:
-   mp_clear_multi(tmp2, tmp1, NULL);
+   ltc_mp_deinit_multi(tmp2, tmp1, LTC_NULL);
 cleanup:
    if (err != CRYPT_OK) {
       rsa_free(&key->u.rsa);
@@ -377,7 +377,7 @@ static int s_decode_key(const unsigned char *in, unsigned long *inlen, ltc_pka_k
       if ((err = ssh_decode_sequence_multi(p, &cur_len,
                                            LTC_SSHDATA_UINT32, &check1,
                                            LTC_SSHDATA_UINT32, &check2,
-                                           LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
+                                           LTC_SSHDATA_EOL,    LTC_NULL)) != CRYPT_OK) {
          return err;
       }
       if (check1 != check2) {
@@ -390,7 +390,7 @@ static int s_decode_key(const unsigned char *in, unsigned long *inlen, ltc_pka_k
    }
    if ((err = ssh_decode_sequence_multi(p, &cur_len,
                                         LTC_SSHDATA_STRING, pka, &pkalen,
-                                        LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
+                                        LTC_SSHDATA_EOL,    LTC_NULL)) != CRYPT_OK) {
       return err;
    }
 
@@ -427,7 +427,7 @@ static int s_decode_key(const unsigned char *in, unsigned long *inlen, ltc_pka_k
       }
       if ((err = ssh_decode_sequence_multi(p, &cur_len,
                                            LTC_SSHDATA_STRING, c, &commentlen,
-                                           LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
+                                           LTC_SSHDATA_EOL,    LTC_NULL)) != CRYPT_OK) {
          return err;
       }
       if (commentlen == 0) {
@@ -651,7 +651,7 @@ static int s_decode_header(unsigned char *in, unsigned long *inlen, struct kdf_o
                                         LTC_SSHDATA_STRING, kdfoptions, &kdfoptionslen,
                                         LTC_SSHDATA_UINT32, &num_keys,
                                         LTC_SSHDATA_STRING, pubkey1, &pubkey1len,
-                                        LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
+                                        LTC_SSHDATA_EOL,    LTC_NULL)) != CRYPT_OK) {
       return err;
    }
    if (num_keys != 1) {
@@ -680,7 +680,7 @@ static int s_decode_header(unsigned char *in, unsigned long *inlen, struct kdf_o
       if ((err = ssh_decode_sequence_multi(kdfoptions, &len,
                                            LTC_SSHDATA_STRING, opts->salt, &opts->saltlen,
                                            LTC_SSHDATA_UINT32, &opts->num_rounds,
-                                           LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
+                                           LTC_SSHDATA_EOL,    LTC_NULL)) != CRYPT_OK) {
          return err;
       }
       if (len != kdfoptionslen) {
@@ -754,7 +754,7 @@ retry:
 
       if ((err = ssh_decode_sequence_multi(p, &w,
                                            LTC_SSHDATA_STRING, privkey, &privkey_len,
-                                           LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
+                                           LTC_SSHDATA_EOL,    LTC_NULL)) != CRYPT_OK) {
          goto cleanup;
       }
 

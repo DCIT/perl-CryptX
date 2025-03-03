@@ -888,6 +888,11 @@ int tiger2_test(void)
    return s_tiger_test(1);
 }
 
+#undef t1
+#undef t2
+#undef t3
+#undef t4
+
 #endif
 
 /*

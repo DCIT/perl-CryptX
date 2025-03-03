@@ -4,6 +4,9 @@
 #include "tomcrypt.h"
 #include <stdarg.h>
 
+#ifndef TOMCRYPT_PRIVATE_H_
+#define TOMCRYPT_PRIVATE_H_
+
 /*
  * Internal Macros
  */
@@ -81,6 +84,7 @@ typedef int (*fn_kdf_t)(const struct password *pwd,
                               int iteration_count,  int hash_idx,
                               unsigned char *out,   unsigned long *outlen);
 
+#if defined(LTC_PBES)
 typedef struct {
    /* KDF */
    fn_kdf_t kdf;
@@ -104,6 +108,12 @@ typedef struct
    /* only used for RC2 */
    unsigned long key_bits;
 } pbes_arg;
+#endif
+
+typedef struct {
+   const pbes_properties *data;
+   const char *oid;
+} oid_to_pbes;
 
 /*
  * Internal functions
@@ -175,72 +185,69 @@ int omac_vprocess(omac_state *omac, const unsigned char *in,  unsigned long inle
 
 #if !defined(DESC_DEF_ONLY)
 
-#define MP_DIGIT_BIT                 ltc_mp.bits_per_digit
+#define LTC_MP_DIGIT_BIT                 ltc_mp.bits_per_digit
 
 /* some handy macros */
-#define mp_init(a)                   ltc_mp.init(a)
-#define mp_init_multi                ltc_init_multi
-#define mp_clear(a)                  ltc_mp.deinit(a)
-#define mp_clear_multi               ltc_deinit_multi
-#define mp_cleanup_multi             ltc_cleanup_multi
-#define mp_init_copy(a, b)           ltc_mp.init_copy(a, b)
+#define ltc_mp_init(a)                   ltc_mp.init(a)
+#define ltc_mp_clear(a)                  ltc_mp.deinit(a)
+#define ltc_mp_init_copy(a, b)           ltc_mp.init_copy(a, b)
 
-#define mp_neg(a, b)                 ltc_mp.neg(a, b)
-#define mp_copy(a, b)                ltc_mp.copy(a, b)
+#define ltc_mp_neg(a, b)                 ltc_mp.neg(a, b)
+#define ltc_mp_copy(a, b)                ltc_mp.copy(a, b)
 
-#define mp_set(a, b)                 ltc_mp.set_int(a, b)
-#define mp_set_int(a, b)             ltc_mp.set_int(a, b)
-#define mp_get_int(a)                ltc_mp.get_int(a)
-#define mp_get_digit(a, n)           ltc_mp.get_digit(a, n)
-#define mp_get_digit_count(a)        ltc_mp.get_digit_count(a)
-#define mp_cmp(a, b)                 ltc_mp.compare(a, b)
-#define mp_cmp_d(a, b)               ltc_mp.compare_d(a, b)
-#define mp_count_bits(a)             ltc_mp.count_bits(a)
-#define mp_cnt_lsb(a)                ltc_mp.count_lsb_bits(a)
-#define mp_2expt(a, b)               ltc_mp.twoexpt(a, b)
+#define ltc_mp_set(a, b)                 ltc_mp.set_int(a, b)
+#define ltc_mp_set_int(a, b)             ltc_mp.set_int(a, b)
+#define ltc_mp_get_int(a)                ltc_mp.get_int(a)
+#define ltc_mp_get_digit(a, n)           ltc_mp.get_digit(a, n)
+#define ltc_mp_get_digit_count(a)        ltc_mp.get_digit_count(a)
+#define ltc_mp_cmp(a, b)                 ltc_mp.compare(a, b)
+#define ltc_mp_cmp_d(a, b)               ltc_mp.compare_d(a, b)
+#define ltc_mp_count_bits(a)             ltc_mp.count_bits(a)
+#define ltc_mp_cnt_lsb(a)                ltc_mp.count_lsb_bits(a)
+#define ltc_mp_2expt(a, b)               ltc_mp.twoexpt(a, b)
 
-#define mp_read_radix(a, b, c)       ltc_mp.read_radix(a, b, c)
-#define mp_toradix(a, b, c)          ltc_mp.write_radix(a, b, c)
-#define mp_unsigned_bin_size(a)      ltc_mp.unsigned_size(a)
-#define mp_to_unsigned_bin(a, b)     ltc_mp.unsigned_write(a, b)
-#define mp_read_unsigned_bin(a, b, c) ltc_mp.unsigned_read(a, b, c)
+#define ltc_mp_read_radix(a, b, c)       ltc_mp.read_radix(a, b, c)
+#define ltc_mp_toradix(a, b, c)          ltc_mp.write_radix(a, b, c)
+#define ltc_mp_unsigned_bin_size(a)      ltc_mp.unsigned_size(a)
+#define ltc_mp_to_unsigned_bin(a, b)     ltc_mp.unsigned_write(a, b)
+#define ltc_mp_read_unsigned_bin(a, b, c) ltc_mp.unsigned_read(a, b, c)
 
-#define mp_add(a, b, c)              ltc_mp.add(a, b, c)
-#define mp_add_d(a, b, c)            ltc_mp.addi(a, b, c)
-#define mp_sub(a, b, c)              ltc_mp.sub(a, b, c)
-#define mp_sub_d(a, b, c)            ltc_mp.subi(a, b, c)
-#define mp_mul(a, b, c)              ltc_mp.mul(a, b, c)
-#define mp_mul_d(a, b, c)            ltc_mp.muli(a, b, c)
-#define mp_sqr(a, b)                 ltc_mp.sqr(a, b)
-#define mp_sqrtmod_prime(a, b, c)    ltc_mp.sqrtmod_prime(a, b, c)
-#define mp_div(a, b, c, d)           ltc_mp.mpdiv(a, b, c, d)
-#define mp_div_2(a, b)               ltc_mp.div_2(a, b)
-#define mp_mod(a, b, c)              ltc_mp.mpdiv(a, b, NULL, c)
-#define mp_mod_d(a, b, c)            ltc_mp.modi(a, b, c)
-#define mp_gcd(a, b, c)              ltc_mp.gcd(a, b, c)
-#define mp_lcm(a, b, c)              ltc_mp.lcm(a, b, c)
+#define ltc_mp_add(a, b, c)              ltc_mp.add(a, b, c)
+#define ltc_mp_add_d(a, b, c)            ltc_mp.addi(a, b, c)
+#define ltc_mp_sub(a, b, c)              ltc_mp.sub(a, b, c)
+#define ltc_mp_sub_d(a, b, c)            ltc_mp.subi(a, b, c)
+#define ltc_mp_mul(a, b, c)              ltc_mp.mul(a, b, c)
+#define ltc_mp_mul_d(a, b, c)            ltc_mp.muli(a, b, c)
+#define ltc_mp_sqr(a, b)                 ltc_mp.sqr(a, b)
+#define ltc_mp_sqrtmod_prime(a, b, c)    ltc_mp.sqrtmod_prime(a, b, c)
+#define ltc_mp_div(a, b, c, d)           ltc_mp.mpdiv(a, b, c, d)
+#define ltc_mp_div_2(a, b)               ltc_mp.div_2(a, b)
+#define ltc_mp_mod(a, b, c)              ltc_mp.mpdiv(a, b, NULL, c)
+#define ltc_mp_mod_d(a, b, c)            ltc_mp.modi(a, b, c)
+#define ltc_mp_gcd(a, b, c)              ltc_mp.gcd(a, b, c)
+#define ltc_mp_lcm(a, b, c)              ltc_mp.lcm(a, b, c)
 
-#define mp_addmod(a, b, c, d)        ltc_mp.addmod(a, b, c, d)
-#define mp_submod(a, b, c, d)        ltc_mp.submod(a, b, c, d)
-#define mp_mulmod(a, b, c, d)        ltc_mp.mulmod(a, b, c, d)
-#define mp_sqrmod(a, b, c)           ltc_mp.sqrmod(a, b, c)
-#define mp_invmod(a, b, c)           ltc_mp.invmod(a, b, c)
+#define ltc_mp_addmod(a, b, c, d)        ltc_mp.addmod(a, b, c, d)
+#define ltc_mp_submod(a, b, c, d)        ltc_mp.submod(a, b, c, d)
+#define ltc_mp_mulmod(a, b, c, d)        ltc_mp.mulmod(a, b, c, d)
+#define ltc_mp_sqrmod(a, b, c)           ltc_mp.sqrmod(a, b, c)
+#define ltc_mp_invmod(a, b, c)           ltc_mp.invmod(a, b, c)
 
-#define mp_montgomery_setup(a, b)    ltc_mp.montgomery_setup(a, b)
-#define mp_montgomery_normalization(a, b) ltc_mp.montgomery_normalization(a, b)
-#define mp_montgomery_reduce(a, b, c)   ltc_mp.montgomery_reduce(a, b, c)
-#define mp_montgomery_free(a)        ltc_mp.montgomery_deinit(a)
+#define ltc_mp_montgomery_setup(a, b)    ltc_mp.montgomery_setup(a, b)
+#define ltc_mp_montgomery_normalization(a, b) ltc_mp.montgomery_normalization(a, b)
+#define ltc_mp_montgomery_reduce(a, b, c)   ltc_mp.montgomery_reduce(a, b, c)
+#define ltc_mp_montgomery_free(a)        ltc_mp.montgomery_deinit(a)
 
-#define mp_exptmod(a,b,c,d)          ltc_mp.exptmod(a,b,c,d)
-#define mp_prime_is_prime(a, b, c)   ltc_mp.isprime(a, b, c)
+#define ltc_mp_exptmod(a,b,c,d)          ltc_mp.exptmod(a,b,c,d)
+#define ltc_mp_prime_is_prime(a, b, c)   ltc_mp.isprime(a, b, c)
 
-#define mp_iszero(a)                 (mp_cmp_d(a, 0) == LTC_MP_EQ ? LTC_MP_YES : LTC_MP_NO)
-#define mp_isodd(a)                  (mp_get_digit_count(a) > 0 ? (mp_get_digit(a, 0) & 1 ? LTC_MP_YES : LTC_MP_NO) : LTC_MP_NO)
-#define mp_exch(a, b)                do { void *ABC__tmp = a; a = b; b = ABC__tmp; } while(0)
+#define ltc_mp_iszero(a)                 (ltc_mp_cmp_d(a, 0) == LTC_MP_EQ ? LTC_MP_YES : LTC_MP_NO)
+#define ltc_mp_isodd(a)                  (ltc_mp_get_digit_count(a) > 0 ? (ltc_mp_get_digit(a, 0) & 1 ? LTC_MP_YES : LTC_MP_NO) : LTC_MP_NO)
+#define ltc_mp_exch(a, b)                do { void *ABC__tmp = a; a = b; b = ABC__tmp; } while(0)
 
-#define mp_tohex(a, b)               mp_toradix(a, b, 16)
+#define ltc_mp_tohex(a, b)               ltc_mp_toradix(a, b, 16)
 
-#define mp_rand(a, b)                ltc_mp.rand(a, b)
+#define ltc_mp_rand(a, b)                ltc_mp.rand(a, b)
 
 #endif
 
@@ -357,11 +364,14 @@ struct get_char {
 void copy_or_zeromem(const unsigned char* src, unsigned char* dest, unsigned long len, int coz);
 void password_free(struct password *pw, const struct password_ctx *ctx);
 
+#if defined(LTC_PBES)
 int pbes_decrypt(const pbes_arg  *arg, unsigned char *dec_data, unsigned long *dec_size);
 
 int pbes1_extract(const ltc_asn1_list *s, pbes_arg *res);
 int pbes2_extract(const ltc_asn1_list *s, pbes_arg *res);
+#endif
 
+#ifdef LTC_PEM
 int pem_decrypt(unsigned char *data, unsigned long *datalen,
                 unsigned char *key,  unsigned long keylen,
                 unsigned char *iv,   unsigned long ivlen,
@@ -373,6 +383,7 @@ int pem_get_char_from_file(struct get_char *g);
 #endif /* LTC_NO_FILE */
 int pem_get_char_from_buf(struct get_char *g);
 int pem_read(void *pem, unsigned long *w, struct pem_headers *hdr, struct get_char *g);
+#endif
 
 /* tomcrypt_pk.h */
 
@@ -382,9 +393,13 @@ int rand_bn_upto(void *N, void *limit, prng_state *prng, int wprng);
 int pk_get_oid(enum ltc_oid_id id, const char **st);
 int pk_get_pka_id(enum ltc_oid_id id, enum ltc_pka_id *pka);
 int pk_get_oid_id(enum ltc_pka_id pka, enum ltc_oid_id *oid);
+#ifdef LTC_DER
 int pk_get_oid_from_asn1(const ltc_asn1_list *oid, enum ltc_oid_id *id);
+#endif
 int pk_oid_str_to_num(const char *OID, unsigned long *oid, unsigned long *oidlen);
 int pk_oid_num_to_str(const unsigned long *oid, unsigned long oidlen, char *OID, unsigned long *outlen);
+
+int pk_oid_cmp_with_ulong(const char *o1, const unsigned long *o2, unsigned long o2size);
 
 /* ---- DH Routines ---- */
 #ifdef LTC_MRSA
@@ -411,9 +426,19 @@ int ecc_set_curve_from_mpis(void *a, void *b, void *prime, void *order, void *gx
 int ecc_copy_curve(const ecc_key *srckey, ecc_key *key);
 int ecc_set_curve_by_size(int size, ecc_key *key);
 int ecc_import_subject_public_key_info(const unsigned char *in, unsigned long inlen, ecc_key *key);
+#ifdef LTC_DER
 int ecc_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key, ecc_key *key);
+#endif
 int ecc_import_with_curve(const unsigned char *in, unsigned long inlen, int type, ecc_key *key);
 int ecc_import_with_oid(const unsigned char *in, unsigned long inlen, unsigned long *oid, unsigned long oid_len, int type, ecc_key *key);
+
+int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
+                           void *r, void *s, prng_state *prng, int wprng,
+                           int *recid, const ecc_key *key);
+
+int ecc_verify_hash_internal(void *r, void *s,
+                             const unsigned char *hash, unsigned long hashlen,
+                             int *stat, const ecc_key *key);
 
 #ifdef LTC_SSH
 int ecc_ssh_ecdsa_encode_name(char *buffer, unsigned long *buflen, const ecc_key *key);
@@ -599,7 +624,6 @@ int x509_decode_subject_public_key_info(const unsigned char *in, unsigned long i
         enum ltc_oid_id algorithm, void *public_key, unsigned long *public_key_len,
         ltc_asn1_type parameters_type, ltc_asn1_list* parameters, unsigned long *parameters_len);
 
-int pk_oid_cmp_with_ulong(const char *o1, const unsigned long *o2, unsigned long o2size);
 int pk_oid_cmp_with_asn1(const char *o1, const ltc_asn1_list *o2);
 
 #endif /* LTC_DER */
@@ -695,3 +719,5 @@ int which ## _export(unsigned char *out, unsigned long *outlen, prng_state *prng
       #define LTC_WIN32_BCRYPT
    #endif
 #endif
+
+#endif /* TOMCRYPT_PRIVATE_H_ */

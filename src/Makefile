@@ -117,11 +117,14 @@ ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_oid_str.o ltc/pk/ecc/ecc_get_size.o 
 ltc/pk/ecc/ecc_import_openssl.o ltc/pk/ecc/ecc_import_pkcs8.o ltc/pk/ecc/ecc_import_x509.o \
 ltc/pk/ecc/ecc_make_key.o ltc/pk/ecc/ecc_recover_key.o ltc/pk/ecc/ecc_set_curve.o \
 ltc/pk/ecc/ecc_set_curve_internal.o ltc/pk/ecc/ecc_set_key.o ltc/pk/ecc/ecc_shared_secret.o \
-ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sizes.o ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.o \
-ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o \
-ltc/pk/ecc/ltc_ecc_is_point.o ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_map.o \
-ltc/pk/ecc/ltc_ecc_mul2add.o ltc/pk/ecc/ltc_ecc_mulmod.o ltc/pk/ecc/ltc_ecc_mulmod_timing.o \
-ltc/pk/ecc/ltc_ecc_points.o ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc/ltc_ecc_projective_dbl_point.o \
+ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sign_hash_eth27.o ltc/pk/ecc/ecc_sign_hash_internal.o \
+ltc/pk/ecc/ecc_sign_hash_rfc5656.o ltc/pk/ecc/ecc_sign_hash_rfc7518.o ltc/pk/ecc/ecc_sizes.o \
+ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.o ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ecc_verify_hash_eth27.o \
+ltc/pk/ecc/ecc_verify_hash_internal.o ltc/pk/ecc/ecc_verify_hash_rfc5656.o ltc/pk/ecc/ecc_verify_hash_rfc7518.o \
+ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o ltc/pk/ecc/ltc_ecc_is_point.o \
+ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_map.o ltc/pk/ecc/ltc_ecc_mul2add.o \
+ltc/pk/ecc/ltc_ecc_mulmod.o ltc/pk/ecc/ltc_ecc_mulmod_timing.o ltc/pk/ecc/ltc_ecc_points.o \
+ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc/ltc_ecc_projective_dbl_point.o \
 ltc/pk/ecc/ltc_ecc_verify_key.o ltc/pk/ed25519/ed25519_export.o ltc/pk/ed25519/ed25519_import.o \
 ltc/pk/ed25519/ed25519_import_pkcs8.o ltc/pk/ed25519/ed25519_import_raw.o ltc/pk/ed25519/ed25519_import_x509.o \
 ltc/pk/ed25519/ed25519_make_key.o ltc/pk/ed25519/ed25519_sign.o ltc/pk/ed25519/ed25519_verify.o \
