@@ -77,8 +77,8 @@ environment:
       perl_bits: 64
 #    - perl_type: strawberry_old
 #      perl_version: 5.12.3.0    #gcc 4.4.3
-    - perl_type: strawberry_old
-      perl_version: 5.10.1.2    #gcc 3.4.5
+#    - perl_type: strawberry_old
+#      perl_version: 5.10.1.2    #gcc 3.4.5 (fails to install Math::BigInt 2.0+)
 #    - perl_type: cygwin64       #we already run cygwin tests via github actions
 #    - perl_type: cygwin32       #stopped working
 
