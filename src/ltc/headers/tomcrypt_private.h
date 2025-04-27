@@ -108,12 +108,12 @@ typedef struct
    /* only used for RC2 */
    unsigned long key_bits;
 } pbes_arg;
-#endif
 
 typedef struct {
    const pbes_properties *data;
    const char *oid;
 } oid_to_pbes;
+#endif
 
 /*
  * Internal functions
@@ -179,8 +179,9 @@ int func_name (hash_state * md, const unsigned char *in, unsigned long inlen)   
 int ocb3_int_ntz(unsigned long x);
 void ocb3_int_xor_blocks(unsigned char *out, const unsigned char *block_a, const unsigned char *block_b, unsigned long block_len);
 
+#ifdef LTC_OMAC
 int omac_vprocess(omac_state *omac, const unsigned char *in,  unsigned long inlen, va_list args);
-
+#endif
 /* tomcrypt_math.h */
 
 #if !defined(DESC_DEF_ONLY)
