@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 BEGIN {
-  plan skip_all => "requires Math::BigInt 2.000000+" unless eval { require Math::BigInt && eval($Math::BigInt::VERSION) >= 2.000000 };
+  plan skip_all => "requires Math::BigInt 2.005003+" unless eval { require Math::BigInt && eval($Math::BigInt::VERSION) >= 2.005003 };
   plan tests => 5;
 }
 
