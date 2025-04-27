@@ -7,7 +7,7 @@ use Test::More;
 
 BEGIN {
     plan skip_all => "requires Math::BigFloat 1.999827+" unless eval { require Math::BigFloat && eval($Math::BigFloat::VERSION) >= 1.999827 };
-    plan tests => 2386            # tests in require'd file
+    plan tests => 2380            # tests in require'd file
                   + 5;            # tests in this file
 }
 

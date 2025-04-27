@@ -540,7 +540,8 @@ abc:+0:NaN
 abc:abc:NaN
 abc:+0:NaN
 +0:abc:NaN
-+0:+0:NaN
+###### see mbi_ltm_since_2.000000.t
+###+0:+0:NaN
 +1:+0:0
 +0:+1:0
 +27:+90:270
@@ -1590,11 +1591,12 @@ NaNmul:-inf:NaN
 0:1:0,0
 9:4:2,1
 9:5:1,4
-# bug in v1.74 with bdiv in list context, when $y is 1 or -1
-2.1:-1:-2.1,0
-2.1:1:2.1,0
--2.1:-1:2.1,0
--2.1:1:-2.1,0
+###### see mbi_ltm_since_2.000000.t
+### # bug in v1.74 with bdiv in list context, when $y is 1 or -1
+### 2.1:-1:-2.1,0
+### 2.1:1:2.1,0
+### -2.1:-1:2.1,0
+### -2.1:1:-2.1,0
 
 &bdiv
 $div_scale = 40; $round_mode = "even"

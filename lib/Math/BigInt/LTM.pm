@@ -1002,6 +1002,24 @@ sub _as_hex {
     return '0x' . $class -> _to_hex($x);
 }
 
+sub _scmp {
+    # Compare two signed values. Return -1, 0, or 1.
+    my ($class, $xa, $xs, $ya, $ys) = @_;
+    if ($xs eq '+') {
+        if ($ys eq '+') {
+            return $class -> _acmp($xa, $ya);
+        } else {
+            return 1;
+        }
+    } else {
+        if ($ys eq '+') {
+            return -1;
+        } else {
+            return $class -> _acmp($ya, $xa);
+        }
+    }
+}
+
 1;
 
 =pod

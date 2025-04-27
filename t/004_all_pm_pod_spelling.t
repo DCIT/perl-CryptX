@@ -17,7 +17,7 @@ Test::Pod::Spelling->import(
                           params paramshash irand perl endian zbase bumac bmac budigest bdigest md de
                           blakes_ blakeb_
                           XOR'ing XOR'ed
-                          keccak
+                          keccak Ethereum recid
                         )]
                     },
 );
