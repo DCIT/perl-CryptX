@@ -212,7 +212,7 @@ int
 size(Crypt::PK::DSA self)
     CODE:
         if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
-        RETVAL = mp_unsigned_bin_size(self->key.p);
+        RETVAL = mp_ubin_size(self->key.p);
     OUTPUT:
         RETVAL
 
@@ -220,7 +220,7 @@ int
 size_q(Crypt::PK::DSA self)
     CODE:
         if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
-        RETVAL = mp_unsigned_bin_size(self->key.q);
+        RETVAL = mp_ubin_size(self->key.q);
     OUTPUT:
         RETVAL
 
@@ -233,11 +233,11 @@ key2hash(Crypt::PK::DSA self)
         SV **not_used;
     CODE:
         if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
-        qsize = mp_unsigned_bin_size(self->key.q);
-        psize = mp_unsigned_bin_size(self->key.p);
+        qsize = mp_ubin_size(self->key.q);
+        psize = mp_ubin_size(self->key.p);
         rv_hash = newHV();
         /* g */
-        siz = (self->key.g) ? mp_unsigned_bin_size(self->key.g) : 0;
+        siz = (self->key.g) ? mp_ubin_size(self->key.g) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'g' too big number");
         }
@@ -249,7 +249,7 @@ key2hash(Crypt::PK::DSA self)
           not_used = hv_store(rv_hash, "g", 1, newSVpv("", 0), 0);
         }
         /* q */
-        siz = (self->key.q) ? mp_unsigned_bin_size(self->key.q) : 0;
+        siz = (self->key.q) ? mp_ubin_size(self->key.q) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'q' too big number");
         }
@@ -261,7 +261,7 @@ key2hash(Crypt::PK::DSA self)
           not_used = hv_store(rv_hash, "q", 1, newSVpv("", 0), 0);
         }
         /* p */
-        siz = (self->key.p) ? mp_unsigned_bin_size(self->key.p) : 0;
+        siz = (self->key.p) ? mp_ubin_size(self->key.p) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'p' too big number");
         }
@@ -273,7 +273,7 @@ key2hash(Crypt::PK::DSA self)
           not_used = hv_store(rv_hash, "p", 1, newSVpv("", 0), 0);
         }
         /* x */
-        siz = (self->key.x) ? mp_unsigned_bin_size(self->key.x) : 0;
+        siz = (self->key.x) ? mp_ubin_size(self->key.x) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'x' too big number");
         }
@@ -285,7 +285,7 @@ key2hash(Crypt::PK::DSA self)
           not_used = hv_store(rv_hash, "x", 1, newSVpv("", 0), 0);
         }
         /* y */
-        siz = (self->key.y) ? mp_unsigned_bin_size(self->key.y) : 0;
+        siz = (self->key.y) ? mp_ubin_size(self->key.y) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'y' too big number");
         }

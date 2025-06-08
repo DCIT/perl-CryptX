@@ -158,7 +158,7 @@ key2hash(Crypt::PK::DH self)
         if (self->key.type == -1) XSRETURN_UNDEF;
         rv_hash = newHV();
         /* x */
-        siz = (self->key.x) ? mp_unsigned_bin_size(self->key.x) : 0;
+        siz = (self->key.x) ? mp_ubin_size(self->key.x) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'x' too big number");
         }
@@ -170,7 +170,7 @@ key2hash(Crypt::PK::DH self)
           not_used = hv_store(rv_hash, "x", 1, newSVpv("", 0), 0);
         }
         /* y */
-        siz = (self->key.y) ? mp_unsigned_bin_size(self->key.y) : 0;
+        siz = (self->key.y) ? mp_ubin_size(self->key.y) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'y' too big number");
         }
@@ -182,7 +182,7 @@ key2hash(Crypt::PK::DH self)
           not_used = hv_store(rv_hash, "y", 1, newSVpv("", 0), 0);
         }
         /* p */
-        siz = (self->key.prime) ? mp_unsigned_bin_size(self->key.prime) : 0;
+        siz = (self->key.prime) ? mp_ubin_size(self->key.prime) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'p' too big number");
         }
@@ -195,7 +195,7 @@ key2hash(Crypt::PK::DH self)
         }
 
         /* g */
-        siz = (self->key.base) ? mp_unsigned_bin_size(self->key.base) : 0;
+        siz = (self->key.base) ? mp_ubin_size(self->key.base) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'g' too big number");
         }
@@ -226,7 +226,7 @@ params2hash(Crypt::PK::DH self)
         if (self->key.type == -1) XSRETURN_UNDEF;
         rv_hash = newHV();
         /* p */
-        siz = (self->key.prime) ? mp_unsigned_bin_size(self->key.prime) : 0;
+        siz = (self->key.prime) ? mp_ubin_size(self->key.prime) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'p' too big number");
         }
@@ -239,7 +239,7 @@ params2hash(Crypt::PK::DH self)
         }
 
         /* g */
-        siz = (self->key.base) ? mp_unsigned_bin_size(self->key.base) : 0;
+        siz = (self->key.base) ? mp_ubin_size(self->key.base) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'g' too big number");
         }

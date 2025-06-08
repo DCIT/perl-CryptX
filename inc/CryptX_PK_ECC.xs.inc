@@ -200,7 +200,7 @@ key2hash(Crypt::PK::ECC self)
         esize = ecc_get_size(&self->key);
         rv_hash = newHV();
         /* k */
-        siz = (self->key.k) ? mp_unsigned_bin_size(self->key.k) : 0;
+        siz = (self->key.k) ? mp_ubin_size(self->key.k) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'k' too big number");
         }
@@ -212,7 +212,7 @@ key2hash(Crypt::PK::ECC self)
           not_used = hv_store(rv_hash, "k", 1, newSVpv("", 0), 0);
         }
         /* pub_x */
-        siz = (self->key.pubkey.x) ? mp_unsigned_bin_size(self->key.pubkey.x) : 0;
+        siz = (self->key.pubkey.x) ? mp_ubin_size(self->key.pubkey.x) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'pub_x' too big number");
         }
@@ -224,7 +224,7 @@ key2hash(Crypt::PK::ECC self)
           not_used = hv_store(rv_hash, "pub_x", 5, newSVpv("", 0), 0);
         }
         /* pub_y */
-        siz = (self->key.pubkey.y) ? mp_unsigned_bin_size(self->key.pubkey.y) : 0;
+        siz = (self->key.pubkey.y) ? mp_ubin_size(self->key.pubkey.y) : 0;
         if (siz>10000) {
           croak("FATAL: key2hash failed - 'pub_y' too big number");
         }
@@ -250,7 +250,7 @@ key2hash(Crypt::PK::ECC self)
           not_used = hv_store(rv_hash, "curve_Gx",                       8, newSVpv(buf, strlen(buf)), 0);
           cryptx_internal_mp2hex_with_leading_zero(self->key.dp.base.y, buf, 20000, 0);
           not_used = hv_store(rv_hash, "curve_Gy",                       8, newSVpv(buf, strlen(buf)), 0);
-          not_used = hv_store(rv_hash, "curve_bytes",                   11, newSViv(mp_unsigned_bin_size(self->key.dp.prime)), 0);
+          not_used = hv_store(rv_hash, "curve_bytes",                   11, newSViv(mp_ubin_size(self->key.dp.prime)), 0);
           not_used = hv_store(rv_hash, "curve_bits",                    10, newSViv(mp_count_bits(self->key.dp.prime)), 0);
 
           if (self->key.dp.oidlen > 0) {

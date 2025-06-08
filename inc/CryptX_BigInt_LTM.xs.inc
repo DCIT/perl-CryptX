@@ -12,11 +12,7 @@ _new(Class, SV *x)
   CODE:
     Newz(0, RETVAL, 1, mp_int);
     merr = mp_init(RETVAL);
-#ifdef BN_MP_SET_INT_C
-    if ((SvUOK(x) || SvIOK(x)) && (sizeof(UV) <= sizeof(unsigned long) || SvUV(x) == (unsigned long)SvUV(x))) {
-      mp_set_int(RETVAL, (unsigned long)SvUV(x));
-    }
-#elif IVSIZE == 8
+#if IVSIZE == 8
     if (SvUOK(x)) {
       mp_set_u64(RETVAL, (unsigned long long)SvUV(x));
     }
@@ -118,7 +114,7 @@ _from_bytes(Class, SV *x)
     Newz(0, RETVAL, 1, mp_int);
     merr = mp_init(RETVAL);
     buf_ptr = (unsigned char *)SvPVbyte(x, buf_len);
-    merr = mp_read_unsigned_bin(RETVAL, buf_ptr, buf_len);
+    merr = mp_from_ubin(RETVAL, buf_ptr, buf_len);
     PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
@@ -131,11 +127,7 @@ _set(Class, Math::BigInt::LTM n, SV *x)
   PREINIT:
     mp_err merr;
   CODE:
-#ifdef BN_MP_SET_INT_C
-    if ((SvUOK(x) || SvIOK(x)) && (sizeof(UV) <= sizeof(unsigned long) || SvUV(x) == (unsigned long)SvUV(x))) {
-      mp_set_int(n, (unsigned long)SvIV(x));
-    }
-#elif IVSIZE == 8
+#if IVSIZE == 8
     if (SvUOK(x)) {
       mp_set_u64(n, (unsigned long long)SvUV(x));
     }
@@ -181,11 +173,7 @@ _one(Class)
   CODE:
     Newz(0, RETVAL, 1, mp_int);
     merr = mp_init(RETVAL);
-#ifdef BN_MP_SET_INT_C
-    mp_set_int(RETVAL, 1);
-#else
     mp_set_u32(RETVAL, 1);
-#endif
     PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
@@ -200,11 +188,7 @@ _two(Class)
   CODE:
     Newz(0, RETVAL, 1, mp_int);
     merr = mp_init(RETVAL);
-#ifdef BN_MP_SET_INT_C
-    mp_set_int(RETVAL, 2);
-#else
     mp_set_u32(RETVAL, 2);
-#endif
     PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
@@ -219,11 +203,7 @@ _ten(Class)
   CODE:
     Newz(0, RETVAL, 1, mp_int);
     merr = mp_init(RETVAL);
-#ifdef BN_MP_SET_INT_C
-    mp_set_int(RETVAL, 10);
-#else
     mp_set_u32(RETVAL, 10);
-#endif
     PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
@@ -238,12 +218,8 @@ _1ex(Class, int x)
   CODE:
     Newz(0, RETVAL, 1, mp_int);
     merr = mp_init(RETVAL);
-#ifdef BN_MP_SET_INT_C
-    mp_set_int(RETVAL, 10);
-#else
     mp_set_u32(RETVAL, 10);
-#endif
-    merr = mp_expt_d(RETVAL, x, RETVAL);
+    merr = mp_expt_n(RETVAL, x, RETVAL);
     PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
@@ -275,7 +251,7 @@ _str(Class, Math::BigInt::LTM n)
     else {
       len = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
-      merr = mp_toradix_n(n, buf, 10, len);
+      merr = mp_to_radix(n, buf, len, NULL, 10);
       RETVAL = newSVpv(buf, 0);
       Safefree(buf);
     }
@@ -299,7 +275,7 @@ _len(Class, Math::BigInt::LTM n)
     else {
       len = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
-      merr = mp_toradix_n(n, buf, 10, len);
+      merr = mp_to_radix(n, buf, len, NULL, 10);
       RETVAL = (int)strlen(buf);
       Safefree(buf);
     }
@@ -342,7 +318,7 @@ _zeros(Class, Math::BigInt::LTM n)
     else {
       len = mp_count_bits(n) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
-      merr = mp_toradix_n(n, buf, 10, len);
+      merr = mp_to_radix(n, buf, len, NULL, 10);
       len = (int)strlen(buf);
       RETVAL = 0;
       while (len > 0) {
@@ -366,11 +342,11 @@ _to_hex(Class, Math::BigInt::LTM n)
     int i, len;
     char *buf;
   CODE:
-    len = mp_unsigned_bin_size(n) * 2 + 1;
+    len = mp_iszero(n) ? 2 : mp_ubin_size(n) * 2 + 1; /* incl. NUL-byte */
     RETVAL = newSV(len);
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);
-    merr = mp_toradix(n, buf, 16); /* to hex */
+    merr = mp_to_radix(n, buf, len, NULL, 16); /* to hex */
     for (i=0; i<len && buf[i]>0; i++) buf[i] = toLOWER(buf[i]);
     SvCUR_set(RETVAL, strlen(buf));
     PERL_UNUSED_VAR(merr);
@@ -387,11 +363,11 @@ _to_bin(Class, Math::BigInt::LTM n)
     int len;
     char *buf;
   CODE:
-    len = mp_unsigned_bin_size(n) * 8 + 1;
+    len = mp_iszero(n) ? 2 : mp_ubin_size(n) * 8 + 1; /* incl. NUL-byte */
     RETVAL = newSV(len);
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);
-    merr = mp_toradix(n, buf, 2); /* to binary */
+    merr = mp_to_radix(n, buf, len, NULL, 2); /* to binary */
     SvCUR_set(RETVAL, strlen(buf));
     PERL_UNUSED_VAR(merr);
   OUTPUT:
@@ -407,11 +383,11 @@ _to_oct(Class, Math::BigInt::LTM n)
     int len;
     char *buf;
   CODE:
-    len = mp_unsigned_bin_size(n) * 3 + 1;
+    len = mp_iszero(n) ? 2 : mp_ubin_size(n) * 3 + 1; /* incl. NUL-byte */
     RETVAL = newSV(len);
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);
-    merr = mp_toradix(n, buf, 8); /* to octal */
+    merr = mp_to_radix(n, buf, len, NULL, 8); /* to octal */
     SvCUR_set(RETVAL, strlen(buf));
     PERL_UNUSED_VAR(merr);
   OUTPUT:
@@ -427,18 +403,12 @@ _to_base(Class, Math::BigInt::LTM n, int base)
     int len;
     char *buf;
   CODE:
-    len = mp_unsigned_bin_size(n) * 8; /* the worst case for base == 2 */
-    RETVAL = newSV(len + 1);
+    len = mp_iszero(n) ? 2 : mp_ubin_size(n) * 8 + 1; /* the worst case for base == 2 */
+    RETVAL = newSV(len);
     SvPOK_on(RETVAL);
     buf = SvPVX(RETVAL);
-    if (len > 0) {
-      merr = mp_toradix_n(n, buf, base, len);
-      SvCUR_set(RETVAL, strlen(buf));
-    }
-    else {
-      buf[0] = '0';
-      SvCUR_set(RETVAL, 1);
-    }
+    merr = mp_to_radix(n, buf, len, NULL, base);
+    SvCUR_set(RETVAL, strlen(buf));
     PERL_UNUSED_VAR(merr);
   OUTPUT:
     RETVAL
@@ -457,15 +427,18 @@ _to_bytes(Class, Math::BigInt::LTM n)
     unsigned char *buf;
   CODE:
     PERL_UNUSED_VAR(ix);
-    len = mp_unsigned_bin_size(n);
-    RETVAL = newSV(len + 1);
-    SvPOK_on(RETVAL);
-    buf = (unsigned char*)SvPVX(RETVAL);
+    len = mp_ubin_size(n);
     if (len > 0) {
-      merr = mp_to_unsigned_bin(n, buf);
+      RETVAL = newSV(len);
+      SvPOK_on(RETVAL);
+      buf = (unsigned char*)SvPVX(RETVAL);
+      merr = mp_to_ubin(n, buf, len, NULL);
       SvCUR_set(RETVAL, len);
     }
     else {
+      RETVAL = newSV(1);
+      SvPOK_on(RETVAL);
+      buf = (unsigned char*)SvPVX(RETVAL);
       buf[0] = 0;
       SvCUR_set(RETVAL, 1);
     }
@@ -591,16 +564,8 @@ _rsft(Class, Math::BigInt::LTM x, Math::BigInt::LTM y, unsigned long base_int)
   PPCODE:
     Newz(0, BASE, 1, mp_int);
     merr = mp_init(BASE);
-#ifdef BN_MP_SET_INT_C
-    mp_set_int(BASE, base_int);
-#else
     mp_set_ul(BASE, base_int);
-#endif
-#ifdef BN_MP_GET_LONG_C
-    merr = mp_expt_d(BASE, mp_get_long(y), BASE);
-#else
-    merr = mp_expt_d(BASE, mp_get_ul(y), BASE);
-#endif
+    merr = mp_expt_n(BASE, mp_get_l(y), BASE);
     merr = mp_div(x, BASE, x, NULL);
     PERL_UNUSED_VAR(merr);
     mp_clear(BASE);
@@ -618,16 +583,8 @@ _lsft(Class, Math::BigInt::LTM x, Math::BigInt::LTM y, unsigned long base_int)
   PPCODE:
     Newz(0, BASE, 1, mp_int);
     merr = mp_init(BASE);
-#ifdef BN_MP_SET_INT_C
-    mp_set_int(BASE, base_int);
-#else
     mp_set_ul(BASE, base_int);
-#endif
-#ifdef BN_MP_GET_LONG_C
-    merr = mp_expt_d(BASE, mp_get_long(y), BASE);
-#else
-    merr = mp_expt_d(BASE, mp_get_ul(y), BASE);
-#endif
+    merr = mp_expt_n(BASE, mp_get_l(y), BASE);
     merr = mp_mul(x, BASE, x);
     PERL_UNUSED_VAR(merr);
     mp_clear(BASE);
@@ -741,11 +698,7 @@ _pow(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
   PREINIT:
     mp_err merr;
   PPCODE:
-#ifdef BN_MP_GET_LONG_C
-    merr = mp_expt_d(x, mp_get_long(y), x);
-#else
-    merr = mp_expt_d(x, mp_get_ul(y), x);
-#endif
+    merr = mp_expt_n(x, mp_get_l(y), x);
     PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
@@ -855,11 +808,7 @@ _root(Class, Math::BigInt::LTM x, Math::BigInt::LTM y)
   PREINIT:
     mp_err merr;
   PPCODE:
-#ifdef BN_MP_GET_LONG_C
-    merr = mp_n_root(x, mp_get_long(y), x);
-#else
-    merr = mp_n_root(x, mp_get_ul(y), x);
-#endif
+    merr = mp_root_n(x, mp_get_l(y), x);
     PERL_UNUSED_VAR(merr);
     XPUSHs(ST(1)); /* x */
 
@@ -918,7 +867,7 @@ STORABLE_freeze(self, cloning = NULL)
     else {
       len = mp_count_bits(self) / 3 + 3; /* decimal_size ~ (binary_size/3 + 1) +1 for sign +1 for NUL-byte */
       Newz(0, buf, len, char);
-      merr = mp_toradix_n(self, buf, 10, len);
+      merr = mp_to_radix(self, buf, len, NULL, 10);
       PERL_UNUSED_VAR(merr);
       RETVAL = newSVpv(buf, 0);
       Safefree(buf);

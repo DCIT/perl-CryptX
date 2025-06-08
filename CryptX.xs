@@ -211,7 +211,7 @@ STATIC int cryptx_internal_mp2hex_with_leading_zero(mp_int * a, char *str, int m
     return MP_VAL;
   }
 
-  rv = mp_toradix_n(a, str, 16, maxlen);
+  rv = mp_to_radix(a, str, maxlen, NULL, 16);
   if (rv != MP_OKAY) {
     *str = '\0';
     return rv;
@@ -462,8 +462,8 @@ _radix_to_bin(char *in, int radix)
         if (strlen(in) == 0) {
           RETVAL = newSVpvn("", 0);
         }
-        else if (mp_read_radix(&mpi, in, radix) == CRYPT_OK) {
-          len = mp_unsigned_bin_size(&mpi);
+        else if (mp_read_radix(&mpi, in, radix) == MP_OKAY) {
+          len = mp_ubin_size(&mpi);
           if (len == 0) {
             RETVAL = newSVpvn("", 0);
           }
@@ -472,7 +472,7 @@ _radix_to_bin(char *in, int radix)
             SvPOK_only(RETVAL);
             SvCUR_set(RETVAL, len);
             out_data = (unsigned char *)SvPVX(RETVAL);
-            if (mp_to_unsigned_bin(&mpi, out_data) != MP_OKAY) {
+            if (mp_to_ubin(&mpi, out_data, len, NULL) != MP_OKAY) {
               SvREFCNT_dec(RETVAL);
               RETVAL = newSVpvn(NULL, 0); /* undef */
             }
@@ -505,7 +505,7 @@ _bin_to_radix(SV *in, int radix)
           RETVAL = newSVpvn("", 0);
         }
         else {
-          if (mp_read_unsigned_bin(&mpi, in_data, (unsigned long)len) == CRYPT_OK) {
+          if (mp_from_ubin(&mpi, in_data, (size_t)len) == MP_OKAY) {
             merr = mp_copy(&mpi, &tmp);
             while (merr == MP_OKAY && mp_iszero(&tmp) == MP_NO) {
               merr = mp_div_d(&tmp, (mp_digit)radix, &tmp, &d);
@@ -521,7 +521,7 @@ _bin_to_radix(SV *in, int radix)
               RETVAL = NEWSV(0, digits + 2); /* +2 for sign and NUL byte */
               SvPOK_only(RETVAL);
               out_data = SvPVX(RETVAL);
-              if (mp_toradix(&mpi, out_data, radix) == MP_OKAY) {
+              if (mp_to_radix(&mpi, out_data, digits + 2, NULL, radix) == MP_OKAY) {
                 SvCUR_set(RETVAL, strlen(out_data));
               }
               else {
