@@ -8,7 +8,7 @@
 
 #include <tommath.h>
 #if !defined(PRIVATE_MP_WARRAY) && !defined(BN_MP_PRIME_IS_PRIME_C)
-#include <stdbool.h>
+/*#include <stdbool.h>*/
 #endif
 
 static const struct {
@@ -196,7 +196,7 @@ static int write_radix(const void *a, char *b, int radix)
 #ifdef BN_MP_TORADIX_C
    return mpi_to_ltc_error(mp_toradix(a, b, radix));
 #else
-   return mpi_to_ltc_error(mp_to_radix(a, b, SIZE_MAX, NULL, radix));
+   return mpi_to_ltc_error(mp_to_radix(a, b, 0xFFFFFFFF, NULL, radix));
 #endif
 }
 
@@ -219,7 +219,7 @@ static int unsigned_write(const void *a, unsigned char *b)
 #ifdef BN_MP_TO_UNSIGNED_BIN_C
    return mpi_to_ltc_error(mp_to_unsigned_bin(a, b));
 #else
-   return mpi_to_ltc_error(mp_to_ubin(a, b, SIZE_MAX, NULL));
+   return mpi_to_ltc_error(mp_to_ubin(a, b, 0xFFFFFFFF, NULL));
 #endif
 }
 
@@ -447,7 +447,7 @@ static int isprime(const void *a, int b, int *c)
 #if defined(PRIVATE_MP_WARRAY) || defined(BN_MP_PRIME_IS_PRIME_C)
    int res;
 #else
-   bool res;
+   mp_bool res;
 #endif
    LTC_ARGCHK(a != NULL);
    LTC_ARGCHK(c != NULL);

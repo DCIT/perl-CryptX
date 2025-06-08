@@ -43,6 +43,11 @@ system 'rm', '-rf', "$FindBin::Bin/ltm/mp_set_double.c";
 find({ wanted=>sub { unlink $_ if -f $_ && $_ =~ /test\.c$/ && $_ !~ /sha3_test.c$/ }, no_chdir=>1 }, "$FindBin::Bin/ltc");
 find({ wanted=>sub { unlink $_ if -f $_ && $_ =~ /\.o$/ }, no_chdir=>1 }, "$FindBin::Bin/ltm", "$FindBin::Bin/ltc");
 
+# ugly hacks
+system 'sed', '-i', 's,SIZE_MAX,0xFFFFFFFF,', 'src/ltc/math/ltm_desc.c';
+system 'sed', '-i', 's, bool res;, mp_bool res;,', 'src/ltc/math/ltm_desc.c';
+system 'sed', '-i', 's,#include <stdbool.h>,/*#include <stdbool.h>*/,', 'src/ltc/math/ltm_desc.c';
+
 #fix modes
 warn "gonna chmod..\n";
 find({ wanted=>sub { system "chmod -x $_" if -f $_ && -x $_ && $_ =~ /\.(c|h)/ }, no_chdir=>1 }, "$FindBin::Bin/ltm", "$FindBin::Bin/ltc");
