@@ -154,42 +154,43 @@ ltc/stream/rc4/rc4_stream_memory.obj ltc/stream/salsa20/salsa20_crypt.obj ltc/st
 ltc/stream/salsa20/salsa20_ivctr64.obj ltc/stream/salsa20/salsa20_keystream.obj ltc/stream/salsa20/salsa20_memory.obj \
 ltc/stream/salsa20/salsa20_setup.obj ltc/stream/salsa20/xsalsa20_memory.obj ltc/stream/salsa20/xsalsa20_setup.obj \
 ltc/stream/sober128/sober128_stream.obj ltc/stream/sober128/sober128_stream_memory.obj \
-ltc/stream/sosemanuk/sosemanuk.obj ltc/stream/sosemanuk/sosemanuk_memory.obj ltm/bn_error.obj \
-ltm/bn_fast_mp_invmod.obj ltm/bn_fast_mp_montgomery_reduce.obj ltm/bn_fast_s_mp_mul_digs.obj \
-ltm/bn_fast_s_mp_mul_high_digs.obj ltm/bn_fast_s_mp_sqr.obj ltm/bn_mp_2expt.obj ltm/bn_mp_abs.obj \
-ltm/bn_mp_add.obj ltm/bn_mp_add_d.obj ltm/bn_mp_addmod.obj ltm/bn_mp_and.obj ltm/bn_mp_clamp.obj \
-ltm/bn_mp_clear.obj ltm/bn_mp_clear_multi.obj ltm/bn_mp_cmp.obj ltm/bn_mp_cmp_d.obj \
-ltm/bn_mp_cmp_mag.obj ltm/bn_mp_cnt_lsb.obj ltm/bn_mp_complement.obj ltm/bn_mp_copy.obj \
-ltm/bn_mp_count_bits.obj ltm/bn_mp_div.obj ltm/bn_mp_div_2.obj ltm/bn_mp_div_2d.obj \
-ltm/bn_mp_div_3.obj ltm/bn_mp_div_d.obj ltm/bn_mp_dr_is_modulus.obj ltm/bn_mp_dr_reduce.obj \
-ltm/bn_mp_dr_setup.obj ltm/bn_mp_exch.obj ltm/bn_mp_export.obj ltm/bn_mp_expt_d.obj \
-ltm/bn_mp_expt_d_ex.obj ltm/bn_mp_exptmod.obj ltm/bn_mp_exptmod_fast.obj ltm/bn_mp_exteuclid.obj \
-ltm/bn_mp_fread.obj ltm/bn_mp_fwrite.obj ltm/bn_mp_gcd.obj ltm/bn_mp_get_bit.obj \
-ltm/bn_mp_get_int.obj ltm/bn_mp_get_long.obj ltm/bn_mp_grow.obj ltm/bn_mp_import.obj \
-ltm/bn_mp_init.obj ltm/bn_mp_init_copy.obj ltm/bn_mp_init_multi.obj ltm/bn_mp_init_set.obj \
-ltm/bn_mp_init_set_int.obj ltm/bn_mp_init_size.obj ltm/bn_mp_invmod.obj ltm/bn_mp_invmod_slow.obj \
-ltm/bn_mp_is_square.obj ltm/bn_mp_jacobi.obj ltm/bn_mp_karatsuba_mul.obj ltm/bn_mp_karatsuba_sqr.obj \
-ltm/bn_mp_kronecker.obj ltm/bn_mp_lcm.obj ltm/bn_mp_lshd.obj ltm/bn_mp_mod.obj ltm/bn_mp_mod_2d.obj \
-ltm/bn_mp_mod_d.obj ltm/bn_mp_montgomery_calc_normalization.obj ltm/bn_mp_montgomery_reduce.obj \
-ltm/bn_mp_montgomery_setup.obj ltm/bn_mp_mul.obj ltm/bn_mp_mul_2.obj ltm/bn_mp_mul_2d.obj \
-ltm/bn_mp_mul_d.obj ltm/bn_mp_mulmod.obj ltm/bn_mp_n_root.obj ltm/bn_mp_n_root_ex.obj \
-ltm/bn_mp_neg.obj ltm/bn_mp_or.obj ltm/bn_mp_prime_fermat.obj ltm/bn_mp_prime_frobenius_underwood.obj \
-ltm/bn_mp_prime_is_divisible.obj ltm/bn_mp_prime_is_prime.obj ltm/bn_mp_prime_miller_rabin.obj \
-ltm/bn_mp_prime_next_prime.obj ltm/bn_mp_prime_rabin_miller_trials.obj ltm/bn_mp_prime_random_ex.obj \
-ltm/bn_mp_prime_strong_lucas_selfridge.obj ltm/bn_mp_radix_size.obj ltm/bn_mp_radix_smap.obj \
-ltm/bn_mp_rand.obj ltm/bn_mp_read_radix.obj ltm/bn_mp_read_signed_bin.obj ltm/bn_mp_read_unsigned_bin.obj \
-ltm/bn_mp_reduce.obj ltm/bn_mp_reduce_2k.obj ltm/bn_mp_reduce_2k_l.obj ltm/bn_mp_reduce_2k_setup.obj \
-ltm/bn_mp_reduce_2k_setup_l.obj ltm/bn_mp_reduce_is_2k.obj ltm/bn_mp_reduce_is_2k_l.obj \
-ltm/bn_mp_reduce_setup.obj ltm/bn_mp_rshd.obj ltm/bn_mp_set.obj ltm/bn_mp_set_int.obj \
-ltm/bn_mp_set_long.obj ltm/bn_mp_shrink.obj ltm/bn_mp_signed_bin_size.obj ltm/bn_mp_sqr.obj \
-ltm/bn_mp_sqrmod.obj ltm/bn_mp_sqrt.obj ltm/bn_mp_sqrtmod_prime.obj ltm/bn_mp_sub.obj \
-ltm/bn_mp_sub_d.obj ltm/bn_mp_submod.obj ltm/bn_mp_tc_and.obj ltm/bn_mp_tc_div_2d.obj \
-ltm/bn_mp_tc_or.obj ltm/bn_mp_tc_xor.obj ltm/bn_mp_to_signed_bin.obj ltm/bn_mp_to_signed_bin_n.obj \
-ltm/bn_mp_to_unsigned_bin.obj ltm/bn_mp_to_unsigned_bin_n.obj ltm/bn_mp_toom_mul.obj \
-ltm/bn_mp_toom_sqr.obj ltm/bn_mp_toradix.obj ltm/bn_mp_toradix_n.obj ltm/bn_mp_unsigned_bin_size.obj \
-ltm/bn_mp_xor.obj ltm/bn_mp_zero.obj ltm/bn_prime_tab.obj ltm/bn_reverse.obj ltm/bn_s_mp_add.obj \
-ltm/bn_s_mp_exptmod.obj ltm/bn_s_mp_mul_digs.obj ltm/bn_s_mp_mul_high_digs.obj ltm/bn_s_mp_sqr.obj \
-ltm/bn_s_mp_sub.obj ltm/bncore.obj
+ltc/stream/sosemanuk/sosemanuk.obj ltc/stream/sosemanuk/sosemanuk_memory.obj ltm/mp_2expt.obj \
+ltm/mp_abs.obj ltm/mp_add.obj ltm/mp_add_d.obj ltm/mp_addmod.obj ltm/mp_and.obj ltm/mp_clamp.obj \
+ltm/mp_clear.obj ltm/mp_clear_multi.obj ltm/mp_cmp.obj ltm/mp_cmp_d.obj ltm/mp_cmp_mag.obj \
+ltm/mp_cnt_lsb.obj ltm/mp_complement.obj ltm/mp_copy.obj ltm/mp_count_bits.obj ltm/mp_cutoffs.obj \
+ltm/mp_div.obj ltm/mp_div_2.obj ltm/mp_div_2d.obj ltm/mp_div_d.obj ltm/mp_dr_is_modulus.obj \
+ltm/mp_dr_reduce.obj ltm/mp_dr_setup.obj ltm/mp_error_to_string.obj ltm/mp_exch.obj \
+ltm/mp_expt_n.obj ltm/mp_exptmod.obj ltm/mp_exteuclid.obj ltm/mp_fread.obj ltm/mp_from_sbin.obj \
+ltm/mp_from_ubin.obj ltm/mp_fwrite.obj ltm/mp_gcd.obj ltm/mp_get_i32.obj ltm/mp_get_i64.obj \
+ltm/mp_get_l.obj ltm/mp_get_mag_u32.obj ltm/mp_get_mag_u64.obj ltm/mp_get_mag_ul.obj \
+ltm/mp_grow.obj ltm/mp_hash.obj ltm/mp_init.obj ltm/mp_init_copy.obj ltm/mp_init_i32.obj \
+ltm/mp_init_i64.obj ltm/mp_init_l.obj ltm/mp_init_multi.obj ltm/mp_init_set.obj ltm/mp_init_size.obj \
+ltm/mp_init_u32.obj ltm/mp_init_u64.obj ltm/mp_init_ul.obj ltm/mp_invmod.obj ltm/mp_is_square.obj \
+ltm/mp_kronecker.obj ltm/mp_lcm.obj ltm/mp_log.obj ltm/mp_log_n.obj ltm/mp_lshd.obj \
+ltm/mp_mod.obj ltm/mp_mod_2d.obj ltm/mp_montgomery_calc_normalization.obj ltm/mp_montgomery_reduce.obj \
+ltm/mp_montgomery_setup.obj ltm/mp_mul.obj ltm/mp_mul_2.obj ltm/mp_mul_2d.obj ltm/mp_mul_d.obj \
+ltm/mp_mulmod.obj ltm/mp_neg.obj ltm/mp_or.obj ltm/mp_pack.obj ltm/mp_pack_count.obj \
+ltm/mp_prime_fermat.obj ltm/mp_prime_frobenius_underwood.obj ltm/mp_prime_is_prime.obj \
+ltm/mp_prime_miller_rabin.obj ltm/mp_prime_next_prime.obj ltm/mp_prime_rabin_miller_trials.obj \
+ltm/mp_prime_rand.obj ltm/mp_prime_strong_lucas_selfridge.obj ltm/mp_radix_size.obj \
+ltm/mp_radix_size_overestimate.obj ltm/mp_rand.obj ltm/mp_rand_source.obj ltm/mp_read_radix.obj \
+ltm/mp_reduce.obj ltm/mp_reduce_2k.obj ltm/mp_reduce_2k_l.obj ltm/mp_reduce_2k_setup.obj \
+ltm/mp_reduce_2k_setup_l.obj ltm/mp_reduce_is_2k.obj ltm/mp_reduce_is_2k_l.obj ltm/mp_reduce_setup.obj \
+ltm/mp_root_n.obj ltm/mp_rshd.obj ltm/mp_sbin_size.obj ltm/mp_set.obj ltm/mp_set_i32.obj \
+ltm/mp_set_i64.obj ltm/mp_set_l.obj ltm/mp_set_u32.obj ltm/mp_set_u64.obj ltm/mp_set_ul.obj \
+ltm/mp_shrink.obj ltm/mp_signed_rsh.obj ltm/mp_sqrmod.obj ltm/mp_sqrt.obj ltm/mp_sqrtmod_prime.obj \
+ltm/mp_sub.obj ltm/mp_sub_d.obj ltm/mp_submod.obj ltm/mp_to_radix.obj ltm/mp_to_sbin.obj \
+ltm/mp_to_ubin.obj ltm/mp_ubin_size.obj ltm/mp_unpack.obj ltm/mp_warray_free.obj \
+ltm/mp_xor.obj ltm/mp_zero.obj ltm/s_mp_add.obj ltm/s_mp_copy_digs.obj ltm/s_mp_div_3.obj \
+ltm/s_mp_div_recursive.obj ltm/s_mp_div_school.obj ltm/s_mp_div_small.obj ltm/s_mp_exptmod.obj \
+ltm/s_mp_exptmod_fast.obj ltm/s_mp_fp_log.obj ltm/s_mp_fp_log_d.obj ltm/s_mp_get_bit.obj \
+ltm/s_mp_invmod.obj ltm/s_mp_invmod_odd.obj ltm/s_mp_log_2expt.obj ltm/s_mp_montgomery_reduce_comba.obj \
+ltm/s_mp_mul.obj ltm/s_mp_mul_balance.obj ltm/s_mp_mul_comba.obj ltm/s_mp_mul_high.obj \
+ltm/s_mp_mul_high_comba.obj ltm/s_mp_mul_karatsuba.obj ltm/s_mp_mul_toom.obj ltm/s_mp_prime_is_divisible.obj \
+ltm/s_mp_prime_tab.obj ltm/s_mp_radix_map.obj ltm/s_mp_radix_size_overestimate.obj \
+ltm/s_mp_rand_platform.obj ltm/s_mp_rand_source.obj ltm/s_mp_sqr.obj ltm/s_mp_sqr_comba.obj \
+ltm/s_mp_sqr_karatsuba.obj ltm/s_mp_sqr_toom.obj ltm/s_mp_sub.obj ltm/s_mp_warray.obj \
+ltm/s_mp_warray_get.obj ltm/s_mp_warray_put.obj ltm/s_mp_zero_buf.obj ltm/s_mp_zero_digs.obj
 
 PERL       =perl
 RM_F       =$(PERL) -MExtUtils::Command -e rm_f --
