@@ -1,5 +1,10 @@
 Changes for CryptX
 
+0.087   2025-??-??
+        - bundled libtomcrypt update branch:develop (commit: d448df1 2025-05-06)
+        - bundled libtommath update branch:develop (commit: e823b0c 2025-03-15)
+        - fix #120 Create SECURITY.md
+
 0.086   2025-05-02
         - fixe #118 Syncing with recent Math-BigInt
         - bundled libtomcrypt update branch:develop (commit:3905c289 2025-04-23)
