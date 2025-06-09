@@ -40,11 +40,11 @@ typedef unsigned __int64    mp_u64;
 #else
 
 typedef signed char         mp_i8;
-typedef short int           mp_i16;
-typedef int                 mp_i32;
-typedef long long           mp_i64;
+typedef signed short int    mp_i16;
+typedef signed int          mp_i32;
+typedef signed long long    mp_i64;
 typedef unsigned char       mp_u8;
-typedef short unsigned int  mp_u16;
+typedef unsigned short int  mp_u16;
 typedef unsigned int        mp_u32;
 typedef unsigned long long  mp_u64;
 
