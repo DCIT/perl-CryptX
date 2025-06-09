@@ -151,7 +151,7 @@ SV*
 key2hash(Crypt::PK::DH self)
     PREINIT:
         HV *rv_hash;
-        long siz;
+        size_t siz;
         char buf[20001];
         SV **not_used;
     CODE:

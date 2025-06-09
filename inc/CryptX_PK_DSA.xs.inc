@@ -208,7 +208,7 @@ is_private(Crypt::PK::DSA self)
     OUTPUT:
         RETVAL
 
-int
+size_t
 size(Crypt::PK::DSA self)
     CODE:
         if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
@@ -216,7 +216,7 @@ size(Crypt::PK::DSA self)
     OUTPUT:
         RETVAL
 
-int
+size_t
 size_q(Crypt::PK::DSA self)
     CODE:
         if (self->key.type == -1 || self->key.qord <= 0) XSRETURN_UNDEF;
@@ -228,7 +228,7 @@ SV*
 key2hash(Crypt::PK::DSA self)
     PREINIT:
         HV *rv_hash;
-        long siz, qsize, psize;
+        size_t siz, qsize, psize;
         char buf[20001];
         SV **not_used;
     CODE:

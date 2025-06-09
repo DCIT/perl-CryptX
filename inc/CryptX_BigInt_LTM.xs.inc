@@ -339,7 +339,7 @@ SV *
 _to_hex(Class, Math::BigInt::LTM n)
   PREINIT:
     mp_err merr;
-    int i, len;
+    size_t i, len;
     char *buf;
   CODE:
     len = mp_iszero(n) ? 2 : mp_ubin_size(n) * 2 + 1; /* incl. NUL-byte */
@@ -360,7 +360,7 @@ SV *
 _to_bin(Class, Math::BigInt::LTM n)
   PREINIT:
     mp_err merr;
-    int len;
+    size_t len;
     char *buf;
   CODE:
     len = mp_iszero(n) ? 2 : mp_ubin_size(n) * 8 + 1; /* incl. NUL-byte */
@@ -380,7 +380,7 @@ SV *
 _to_oct(Class, Math::BigInt::LTM n)
   PREINIT:
     mp_err merr;
-    int len;
+    size_t len;
     char *buf;
   CODE:
     len = mp_iszero(n) ? 2 : mp_ubin_size(n) * 3 + 1; /* incl. NUL-byte */
@@ -400,7 +400,7 @@ SV *
 _to_base(Class, Math::BigInt::LTM n, int base)
   PREINIT:
     mp_err merr;
-    int len;
+    size_t len;
     char *buf;
   CODE:
     len = mp_iszero(n) ? 2 : mp_ubin_size(n) * 8 + 1; /* the worst case for base == 2 */
@@ -423,7 +423,7 @@ _to_bytes(Class, Math::BigInt::LTM n)
     _as_bytes = 1
   PREINIT:
     mp_err merr;
-    int len;
+    size_t len;
     unsigned char *buf;
   CODE:
     PERL_UNUSED_VAR(ix);

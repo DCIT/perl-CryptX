@@ -192,7 +192,7 @@ STATIC int cryptx_internal_password_cb_getpw(void **p, unsigned long *l, void *u
     return 1;
   }
   Copy(pwd, *p, pwd_len, unsigned char);
-  *l = pwd_len;
+  *l = (unsigned long)pwd_len;
 
   return 0;
 }

@@ -196,7 +196,7 @@ is_private(Crypt::PK::RSA self)
     OUTPUT:
         RETVAL
 
-int
+size_t
 size(Crypt::PK::RSA self)
     CODE:
         if (self->key.type == -1 || self->key.N == NULL) XSRETURN_UNDEF;
@@ -208,7 +208,7 @@ SV*
 key2hash(Crypt::PK::RSA self)
     PREINIT:
         HV *rv_hash;
-        long siz, nsize;
+        size_t siz, nsize;
         char buf[20001];
         SV **not_used;
     CODE:
