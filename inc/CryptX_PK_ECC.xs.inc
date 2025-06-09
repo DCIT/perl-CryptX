@@ -536,8 +536,9 @@ recovery_pub(Crypt::PK::ECC self, SV * sig, SV* hash, SV* recid = NULL)
                                recovery_id, LTC_ECCSIG_RFC7518, &self->key);
         }
         else if (ix == 2) {
-          // Ethereum's signature contains the recovery id in the last byte of the signature
-          // don't need to pass it as a separate argument
+          /* Ethereum's signature contains the recovery id in the last byte of the signature
+           * don't need to pass it as a separate argument
+           */
           rv = ecc_recover_key(sig_ptr, (unsigned long)sig_len, hash_ptr, (unsigned long) hash_len,
                                recovery_id, LTC_ECCSIG_ETH27, &self->key);
         }
