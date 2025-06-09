@@ -43,7 +43,8 @@ system 'rm', '-rf', "$FindBin::Bin/ltm/mp_set_double.c";
 find({ wanted=>sub { unlink $_ if -f $_ && $_ =~ /test\.c$/ && $_ !~ /sha3_test.c$/ }, no_chdir=>1 }, "$FindBin::Bin/ltc");
 find({ wanted=>sub { unlink $_ if -f $_ && $_ =~ /\.o$/ }, no_chdir=>1 }, "$FindBin::Bin/ltm", "$FindBin::Bin/ltc");
 
-# ugly hacks
+# hacks
+system 'cp', 'src/custom_tommath_c89.h', 'src/ltm/tommath_c89.h';
 system 'sed', '-i', 's,SIZE_MAX,0xFFFFFFFF,', 'src/ltc/math/ltm_desc.c';
 system 'sed', '-i', 's, bool res;, mp_bool res;,', 'src/ltc/math/ltm_desc.c';
 system 'sed', '-i', 's,#include <stdbool.h>,/*#include <stdbool.h>*/,', 'src/ltc/math/ltm_desc.c';
