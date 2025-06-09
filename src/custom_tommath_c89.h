@@ -15,18 +15,7 @@
 
 typedef enum { MP_NO, MP_YES } mp_bool;
 
-#if defined(_MSC_VER)
-
-typedef   __int8            mp_i8;
-typedef   __int16           mp_i16;
-typedef   __int32           mp_i32;
-typedef   __int64           mp_i64;
-typedef   unsigned __int8   mp_u8;
-typedef   unsigned __int16  mp_u16;
-typedef   unsigned __int32  mp_u32;
-typedef   unsigned __int64  mp_u64;
-
-#elif defined(__INT64_TYPE__) && defined(__UINT64_TYPE__)
+#if defined(__INT64_TYPE__) && defined(__UINT64_TYPE__)
 
 typedef __INT8_TYPE__       mp_i8;
 typedef __INT16_TYPE__      mp_i16;
@@ -36,6 +25,17 @@ typedef __UINT8_TYPE__      mp_u8;
 typedef __UINT16_TYPE__     mp_u16;
 typedef __UINT32_TYPE__     mp_u32;
 typedef __UINT64_TYPE__     mp_u64;
+
+#elif defined(_MSC_VER)
+
+typedef __int8              mp_i8;
+typedef __int16             mp_i16;
+typedef __int32             mp_i32;
+typedef __int64             mp_i64;
+typedef unsigned __int8     mp_u8;
+typedef unsigned __int16    mp_u16;
+typedef unsigned __int32    mp_u32;
+typedef unsigned __int64    mp_u64;
 
 #else
 
