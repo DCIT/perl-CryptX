@@ -2,7 +2,7 @@ package Crypt::Checksum::CRC32;
 
 use strict;
 use warnings;
-our $VERSION = '0.086_001';
+our $VERSION = '0.086_002';
 
 use base qw(Crypt::Checksum Exporter);
 our %EXPORT_TAGS = ( all => [qw( crc32_data crc32_data_hex crc32_data_int crc32_file crc32_file_hex crc32_file_int )] );
