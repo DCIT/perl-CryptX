@@ -2,7 +2,7 @@ package CryptX;
 
 use strict;
 use warnings ;
-our $VERSION = '0.086_003';
+our $VERSION = '0.086_004';
 
 require XSLoader;
 XSLoader::load('CryptX', $VERSION);
