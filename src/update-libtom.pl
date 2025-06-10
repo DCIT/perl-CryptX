@@ -44,7 +44,8 @@ find({ wanted=>sub { unlink $_ if -f $_ && $_ =~ /test\.c$/ && $_ !~ /sha3_test.
 find({ wanted=>sub { unlink $_ if -f $_ && $_ =~ /\.o$/ }, no_chdir=>1 }, "$FindBin::Bin/ltm", "$FindBin::Bin/ltc");
 
 # hacks
-system 'cp', 'src/custom_tommath_c89.h', 'src/ltm/tommath_c89.h';
+system 'cp', 'src/patched_tommath_c89.h', 'src/ltm/tommath_c89.h';
+system 'cp', 'src/patched_s_mp_rand_platform.c', 'src/ltm/s_mp_rand_platform.c';
 system 'sed', '-i', 's,SIZE_MAX,0xFFFFFFFF,', 'src/ltc/math/ltm_desc.c';
 system 'sed', '-i', 's, bool res;, mp_bool res;,', 'src/ltc/math/ltm_desc.c';
 system 'sed', '-i', 's,#include <stdbool.h>,/*#include <stdbool.h>*/,', 'src/ltc/math/ltm_desc.c';
