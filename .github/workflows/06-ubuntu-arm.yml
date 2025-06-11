@@ -37,6 +37,6 @@ jobs:
       - name: Run tests
         run: |
           cd $(basename ${{ github.repository }})
-          prove -j4 -b t
+          prove -b t
         env:
           AUTHOR_MODE: 1
