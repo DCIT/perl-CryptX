@@ -15,9 +15,8 @@ jobs:
       matrix:
         codename:
           - bullseye
-          - bookworm
     container:
-      image: arm64v8/perl:5.40-${{ matrix.codename }}
+      image: arm64v8/perl:5.41-${{ matrix.codename }}
     steps:
       - name: Checkout code using git
         run: |
