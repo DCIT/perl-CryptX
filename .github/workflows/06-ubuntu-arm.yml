@@ -1,0 +1,42 @@
+name: 06-ubuntu-arm
+
+on:
+  push:
+    branches:
+      - 'master'
+    tags-ignore:
+      - '*'
+
+jobs:
+  ubuntu-arm:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-24.04-arm ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y git make gcc perl libmath-bigint-perl libjson-perl
+      - name: Checkout code using git
+        run: |
+          git clone --single-branch --branch $(echo ${GITHUB_REF#refs/heads/}) https://github.com/${{ github.repository }}.git
+      - name: perl -V
+        run: perl -V
+      - name: gcc -v
+        run: gcc -v
+      - name: Run build
+        run: |
+          cd $(basename ${{ github.repository }})
+          cpanm -n --installdeps .
+          perl Makefile.PL
+          make -j4
+        env:
+          AUTHOR_MODE: 1
+      - name: Run tests
+        run: |
+          cd $(basename ${{ github.repository }})
+          prove -j4 -b t
+        env:
+          AUTHOR_MODE: 1
