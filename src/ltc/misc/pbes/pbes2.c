@@ -51,7 +51,7 @@ static const oid_to_pbes s_pbes2_list[] = {
 static int s_pbes2_from_oid(const ltc_asn1_list *cipher_oid, const ltc_asn1_list *hmac_oid, pbes_properties *res)
 {
    unsigned int i;
-   for (i = 0; i < sizeof(s_pbes2_list)/sizeof(s_pbes2_list[0]); ++i) {
+   for (i = 0; i < LTC_ARRAY_SIZE(s_pbes2_list); ++i) {
       if (pk_oid_cmp_with_asn1(s_pbes2_list[i].oid, cipher_oid) == CRYPT_OK) {
          *res = *s_pbes2_list[i].data;
          break;
@@ -59,7 +59,7 @@ static int s_pbes2_from_oid(const ltc_asn1_list *cipher_oid, const ltc_asn1_list
    }
    if (res->c == NULL) return CRYPT_INVALID_CIPHER;
    if (hmac_oid != NULL) {
-      for (i = 0; i < sizeof(s_hmac_oid_names)/sizeof(s_hmac_oid_names[0]); ++i) {
+      for (i = 0; i < LTC_ARRAY_SIZE(s_hmac_oid_names); ++i) {
          if (pk_oid_cmp_with_asn1(s_hmac_oid_names[i].oid, hmac_oid) == CRYPT_OK) {
             res->h = s_hmac_oid_names[i].id;
             return CRYPT_OK;

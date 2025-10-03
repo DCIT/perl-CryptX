@@ -89,7 +89,7 @@ static int s_dsa_make_params(prng_state *prng, int wprng, int group_size, int mo
 #endif
 
   hash = -1;
-  for (i = 0; i < sizeof(accepted_hashes)/sizeof(accepted_hashes[0]); ++i) {
+  for (i = 0; i < LTC_ARRAY_SIZE(accepted_hashes); ++i) {
     hash = find_hash(accepted_hashes[i]);
     if (hash != -1) break;
   }

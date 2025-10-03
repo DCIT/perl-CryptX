@@ -226,7 +226,7 @@ int idea_test(void)
       return CRYPT_FAIL_TESTVECTOR;
    }
 
-   for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
       if ((err = idea_setup(tests[x].key, 16, 8, &key)) != CRYPT_OK) {
          return err;
       }

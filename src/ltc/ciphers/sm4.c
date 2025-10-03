@@ -67,7 +67,7 @@ static const sm4_u8_t sm4_sbox_table[16][16] = {
  * S-box
  * defined in section 2.6 S-box
  */
-LTC_INLINE static sm4_u8_t s_sm4_sbox(sm4_u8_t a)
+static LTC_INLINE sm4_u8_t s_sm4_sbox(sm4_u8_t a)
 {
     return sm4_sbox_table[(a >> 4) & 0x0f][a & 0x0f];
 }
@@ -80,7 +80,7 @@ LTC_INLINE static sm4_u8_t s_sm4_sbox(sm4_u8_t a)
  * But we just convert a 32bit word byte by byte.
  * So it's OK if we don't convert the endian order
  */
-LTC_INLINE static sm4_u32_t s_sm4_t(sm4_u32_t A)
+static LTC_INLINE sm4_u32_t s_sm4_t(sm4_u32_t A)
 {
     sm4_u8_t  a[4];
     sm4_u8_t  b[4];
@@ -98,7 +98,7 @@ LTC_INLINE static sm4_u32_t s_sm4_t(sm4_u32_t A)
 /*
  * defined in section 6.2 (2) Linear transformation L
  */
-LTC_INLINE static sm4_u32_t s_sm4_L62(sm4_u32_t B)
+static LTC_INLINE sm4_u32_t s_sm4_L62(sm4_u32_t B)
 {
     return B ^ ROLc(B, 2) ^ ROLc(B, 10) ^ ROLc(B, 18) ^ ROLc(B, 24);
 }
@@ -106,7 +106,7 @@ LTC_INLINE static sm4_u32_t s_sm4_L62(sm4_u32_t B)
 /*
  * defined in section 6.2 Permutation T
  */
-LTC_INLINE static sm4_u32_t s_sm4_T62(sm4_u32_t Z)
+static LTC_INLINE sm4_u32_t s_sm4_T62(sm4_u32_t Z)
 {
     return s_sm4_L62(s_sm4_t(Z));
 }
@@ -137,7 +137,7 @@ static const sm4_u32_t sm4_CK[32] =
 /*
  * defined in section 7.3 (1) L'
  */
-LTC_INLINE static sm4_u32_t s_sm4_L73(sm4_u32_t B)
+static LTC_INLINE sm4_u32_t s_sm4_L73(sm4_u32_t B)
 {
     return B ^ ROLc(B, 13) ^ ROLc(B, 23);
 }
@@ -145,7 +145,7 @@ LTC_INLINE static sm4_u32_t s_sm4_L73(sm4_u32_t B)
 /*
  * defined in section 7.3 (1) T'
  */
-LTC_INLINE static sm4_u32_t s_sm4_T73(sm4_u32_t Z)
+static LTC_INLINE sm4_u32_t s_sm4_T73(sm4_u32_t Z)
 {
     return s_sm4_L73(s_sm4_t(Z));
 }
@@ -153,7 +153,7 @@ LTC_INLINE static sm4_u32_t s_sm4_T73(sm4_u32_t Z)
 /*
  * defined in section 7.3 Key Expansion
  */
-LTC_INLINE static void s_sm4_mk2rk(sm4_u32_t rk[32], sm4_u8_t mk[16])
+static LTC_INLINE void s_sm4_mk2rk(sm4_u32_t rk[32], sm4_u8_t mk[16])
 {
     sm4_u32_t MK[4] = { 0 };
     sm4_u32_t K[4+32] = { 0 };
@@ -175,7 +175,7 @@ LTC_INLINE static void s_sm4_mk2rk(sm4_u32_t rk[32], sm4_u8_t mk[16])
 /*
  * defined in section 6 Round Function F
  */
-LTC_INLINE static sm4_u32_t s_sm4_F(sm4_u32_t X[4], sm4_u32_t rk)
+static LTC_INLINE sm4_u32_t s_sm4_F(sm4_u32_t X[4], sm4_u32_t rk)
 {
     return X[0] ^ s_sm4_T62(X[1] ^ X[2] ^ X[3] ^ rk);
 }
@@ -183,7 +183,7 @@ LTC_INLINE static sm4_u32_t s_sm4_F(sm4_u32_t X[4], sm4_u32_t rk)
 /*
  * defined in section 7.1 (2) The reverse transformation
  */
-LTC_INLINE static void s_sm4_R(sm4_u32_t Y[4], sm4_u32_t X[32+4])
+static LTC_INLINE void s_sm4_R(sm4_u32_t Y[4], sm4_u32_t X[32+4])
 {
     Y[0] = X[35];
     Y[1] = X[34];
@@ -194,7 +194,7 @@ LTC_INLINE static void s_sm4_R(sm4_u32_t Y[4], sm4_u32_t X[32+4])
 /*
  * defined in section 7.1 (En)cryption
  */
-LTC_INLINE static void s_sm4_crypt(sm4_u32_t Y[4], sm4_u32_t X[4+32], const sm4_u32_t rk[32])
+static LTC_INLINE void s_sm4_crypt(sm4_u32_t Y[4], sm4_u32_t X[4+32], const sm4_u32_t rk[32])
 {
     int i;
 
@@ -203,7 +203,7 @@ LTC_INLINE static void s_sm4_crypt(sm4_u32_t Y[4], sm4_u32_t X[4+32], const sm4_
     s_sm4_R(Y, X);
 }
 
-LTC_INLINE static void s_sm4_setkey(struct sm4_key *sm4, const unsigned char *key)
+static LTC_INLINE void s_sm4_setkey(struct sm4_key *sm4, const unsigned char *key)
 {
     int i;
 
@@ -229,7 +229,7 @@ int sm4_setup(const unsigned char *key, int keylen,
 /*
  * SM4 encryption.
  */
-LTC_INLINE static void s_sm4_do(void *output, const void *input, const sm4_u32_t rk[32])
+static LTC_INLINE void s_sm4_do(void *output, const void *input, const sm4_u32_t rk[32])
 {
     sm4_u32_t Y[4];
     sm4_u32_t X[32+4];

@@ -90,7 +90,7 @@ int ecc_export_openssl(unsigned char *out, unsigned long *outlen, int type, cons
          }
       */
 
-      oidlen = sizeof(oid)/sizeof(oid[0]);
+      oidlen = LTC_ARRAY_SIZE(oid);
       if ((err = pk_oid_str_to_num(OID, oid, &oidlen)) != CRYPT_OK) {
          goto error;
       }

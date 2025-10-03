@@ -26,9 +26,10 @@
 int rsa_sign_hash_ex(const unsigned char *in,       unsigned long  inlen,
                            unsigned char *out,      unsigned long *outlen,
                            int            padding,
-                           prng_state    *prng,     int            prng_idx,
-                           int            hash_idx, unsigned long  saltlen,
-                     const rsa_key *key)
+                           prng_state    *prng,               int  prng_idx,
+                           int            hash_idx,           int  mgf_hash_idx,
+                           unsigned long  saltlen,
+                     const rsa_key       *key)
 {
    unsigned long modulus_bitlen, modulus_bytelen, x, y;
    int           err;
@@ -39,22 +40,13 @@ int rsa_sign_hash_ex(const unsigned char *in,       unsigned long  inlen,
    LTC_ARGCHK(key      != NULL);
 
    /* valid padding? */
-   if ((padding != LTC_PKCS_1_V1_5) &&
-       (padding != LTC_PKCS_1_PSS) &&
-       (padding != LTC_PKCS_1_V1_5_NA1)) {
-     return CRYPT_PK_INVALID_PADDING;
+   if ((err = rsa_key_valid_op(key, LTC_RSA_SIGN, padding, hash_idx)) != CRYPT_OK) {
+     return err;
    }
 
    if (padding == LTC_PKCS_1_PSS) {
      /* valid prng ? */
      if ((err = prng_is_valid(prng_idx)) != CRYPT_OK) {
-        return err;
-     }
-   }
-
-   if (padding != LTC_PKCS_1_V1_5_NA1) {
-     /* valid hash ? */
-     if ((err = hash_is_valid(hash_idx)) != CRYPT_OK) {
         return err;
      }
    }
@@ -72,8 +64,8 @@ int rsa_sign_hash_ex(const unsigned char *in,       unsigned long  inlen,
   if (padding == LTC_PKCS_1_PSS) {
     /* PSS pad the key */
     x = *outlen;
-    if ((err = pkcs_1_pss_encode(in, inlen, saltlen, prng, prng_idx,
-                                 hash_idx, modulus_bitlen, out, &x)) != CRYPT_OK) {
+    if ((err = pkcs_1_pss_encode_mgf1(in, inlen, saltlen, prng, prng_idx,
+                                      hash_idx, mgf_hash_idx, modulus_bitlen, out, &x)) != CRYPT_OK) {
        return err;
     }
   } else {

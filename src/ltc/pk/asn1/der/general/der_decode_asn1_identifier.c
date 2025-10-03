@@ -47,7 +47,7 @@ static const unsigned char tag_constructed_map[] =
  LTC_ASN1_PC_PRIMITIVE,
  LTC_ASN1_PC_PRIMITIVE,
 };
- static const unsigned long tag_constructed_map_sz = sizeof(tag_constructed_map)/sizeof(tag_constructed_map[0]);
+ static const unsigned long tag_constructed_map_sz = LTC_ARRAY_SIZE(tag_constructed_map);
 
 /**
   Decode the ASN.1 Identifier

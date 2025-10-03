@@ -669,7 +669,7 @@ int ECB_TEST(void)
   unsigned char tmp[2][16];
   int i, y;
 
-  for (i = 0; i < (int)(sizeof(tests)/sizeof(tests[0])); i++) {
+  for (i = 0; i < (int)LTC_ARRAY_SIZE(tests); i++) {
     zeromem(&key, sizeof(key));
     if ((err = rijndael_setup(tests[i].key, tests[i].keylen, 0, &key)) != CRYPT_OK) {
        return err;

@@ -794,7 +794,7 @@ int khazad_test(void)
    unsigned char buf[2][8];
    symmetric_key skey;
 
-   for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
        khazad_setup(tests[x].key, 16, 0, &skey);
        khazad_ecb_encrypt(tests[x].pt, buf[0], &skey);
        khazad_ecb_decrypt(buf[0], buf[1], &skey);

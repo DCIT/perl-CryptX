@@ -2018,7 +2018,7 @@ int des_test(void)
     symmetric_key skey;
     int i, err;
 
-    for (i = 0; i < (int)(sizeof(cases)/sizeof(cases[0])); i++)
+    for (i = 0; i < (int)LTC_ARRAY_SIZE(cases); i++)
     {
         if ((err = des_setup(cases[i].key, 8, 0, &skey)) != CRYPT_OK) {
             return err;
@@ -2125,7 +2125,7 @@ int des3_test(void)
         return err;
     }
 
-    for (i = 0; i < (int)(sizeof(cases)/sizeof(cases[0])); i++)
+    for (i = 0; i < (int)LTC_ARRAY_SIZE(cases); i++)
     {
         if ((err = des3_setup(cases[i].key, 16, 0, &skey)) != CRYPT_OK) {
             return err;

@@ -101,11 +101,12 @@ ltc/pk/asn1/der/utf8/der_encode_utf8_string.o ltc/pk/asn1/der/utf8/der_length_ut
 ltc/pk/asn1/oid/pk_get.o ltc/pk/asn1/oid/pk_oid_cmp.o ltc/pk/asn1/oid/pk_oid_str.o \
 ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.o ltc/pk/asn1/pkcs8/pkcs8_get.o ltc/pk/asn1/x509/x509_decode_public_key_from_certificate.o \
 ltc/pk/asn1/x509/x509_decode_spki.o ltc/pk/asn1/x509/x509_decode_subject_public_key_info.o \
-ltc/pk/asn1/x509/x509_encode_subject_public_key_info.o ltc/pk/dh/dh.o ltc/pk/dh/dh_check_pubkey.o \
-ltc/pk/dh/dh_export.o ltc/pk/dh/dh_export_key.o ltc/pk/dh/dh_free.o ltc/pk/dh/dh_generate_key.o \
-ltc/pk/dh/dh_import.o ltc/pk/dh/dh_import_pkcs8.o ltc/pk/dh/dh_set.o ltc/pk/dh/dh_set_pg_dhparam.o \
-ltc/pk/dh/dh_shared_secret.o ltc/pk/dsa/dsa_decrypt_key.o ltc/pk/dsa/dsa_encrypt_key.o \
-ltc/pk/dsa/dsa_export.o ltc/pk/dsa/dsa_free.o ltc/pk/dsa/dsa_generate_key.o ltc/pk/dsa/dsa_generate_pqg.o \
+ltc/pk/asn1/x509/x509_encode_subject_public_key_info.o ltc/pk/asn1/x509/x509_get_pka.o \
+ltc/pk/asn1/x509/x509_import_spki.o ltc/pk/dh/dh.o ltc/pk/dh/dh_check_pubkey.o ltc/pk/dh/dh_export.o \
+ltc/pk/dh/dh_export_key.o ltc/pk/dh/dh_free.o ltc/pk/dh/dh_generate_key.o ltc/pk/dh/dh_import.o \
+ltc/pk/dh/dh_import_pkcs8.o ltc/pk/dh/dh_set.o ltc/pk/dh/dh_set_pg_dhparam.o ltc/pk/dh/dh_shared_secret.o \
+ltc/pk/dsa/dsa_decrypt_key.o ltc/pk/dsa/dsa_encrypt_key.o ltc/pk/dsa/dsa_export.o \
+ltc/pk/dsa/dsa_free.o ltc/pk/dsa/dsa_generate_key.o ltc/pk/dsa/dsa_generate_pqg.o \
 ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_import_pkcs8.o ltc/pk/dsa/dsa_init.o ltc/pk/dsa/dsa_make_key.o \
 ltc/pk/dsa/dsa_set.o ltc/pk/dsa/dsa_set_pqg_dsaparam.o ltc/pk/dsa/dsa_shared_secret.o \
 ltc/pk/dsa/dsa_sign_hash.o ltc/pk/dsa/dsa_verify_hash.o ltc/pk/dsa/dsa_verify_key.o \
@@ -115,16 +116,16 @@ ltc/pk/ecc/ecc_decrypt_key.o ltc/pk/ecc/ecc_encrypt_key.o ltc/pk/ecc/ecc_export.
 ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_find_curve.o ltc/pk/ecc/ecc_free.o \
 ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_oid_str.o ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o \
 ltc/pk/ecc/ecc_import_openssl.o ltc/pk/ecc/ecc_import_pkcs8.o ltc/pk/ecc/ecc_import_x509.o \
-ltc/pk/ecc/ecc_make_key.o ltc/pk/ecc/ecc_recover_key.o ltc/pk/ecc/ecc_set_curve.o \
-ltc/pk/ecc/ecc_set_curve_internal.o ltc/pk/ecc/ecc_set_key.o ltc/pk/ecc/ecc_shared_secret.o \
-ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sign_hash_eth27.o ltc/pk/ecc/ecc_sign_hash_internal.o \
-ltc/pk/ecc/ecc_sign_hash_rfc5656.o ltc/pk/ecc/ecc_sign_hash_rfc7518.o ltc/pk/ecc/ecc_sizes.o \
-ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.o ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ecc_verify_hash_eth27.o \
-ltc/pk/ecc/ecc_verify_hash_internal.o ltc/pk/ecc/ecc_verify_hash_rfc5656.o ltc/pk/ecc/ecc_verify_hash_rfc7518.o \
-ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o ltc/pk/ecc/ltc_ecc_is_point.o \
-ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_map.o ltc/pk/ecc/ltc_ecc_mul2add.o \
-ltc/pk/ecc/ltc_ecc_mulmod.o ltc/pk/ecc/ltc_ecc_mulmod_timing.o ltc/pk/ecc/ltc_ecc_points.o \
-ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc/ltc_ecc_projective_dbl_point.o \
+ltc/pk/ecc/ecc_make_key.o ltc/pk/ecc/ecc_recover_key.o ltc/pk/ecc/ecc_rfc6979_key.o \
+ltc/pk/ecc/ecc_set_curve.o ltc/pk/ecc/ecc_set_curve_internal.o ltc/pk/ecc/ecc_set_key.o \
+ltc/pk/ecc/ecc_shared_secret.o ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sign_hash_eth27.o \
+ltc/pk/ecc/ecc_sign_hash_internal.o ltc/pk/ecc/ecc_sign_hash_rfc5656.o ltc/pk/ecc/ecc_sign_hash_rfc7518.o \
+ltc/pk/ecc/ecc_sizes.o ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.o ltc/pk/ecc/ecc_verify_hash.o \
+ltc/pk/ecc/ecc_verify_hash_eth27.o ltc/pk/ecc/ecc_verify_hash_internal.o ltc/pk/ecc/ecc_verify_hash_rfc5656.o \
+ltc/pk/ecc/ecc_verify_hash_rfc7518.o ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o \
+ltc/pk/ecc/ltc_ecc_is_point.o ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_map.o \
+ltc/pk/ecc/ltc_ecc_mul2add.o ltc/pk/ecc/ltc_ecc_mulmod.o ltc/pk/ecc/ltc_ecc_mulmod_timing.o \
+ltc/pk/ecc/ltc_ecc_points.o ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc/ltc_ecc_projective_dbl_point.o \
 ltc/pk/ecc/ltc_ecc_verify_key.o ltc/pk/ed25519/ed25519_export.o ltc/pk/ed25519/ed25519_import.o \
 ltc/pk/ed25519/ed25519_import_pkcs8.o ltc/pk/ed25519/ed25519_import_raw.o ltc/pk/ed25519/ed25519_import_x509.o \
 ltc/pk/ed25519/ed25519_make_key.o ltc/pk/ed25519/ed25519_sign.o ltc/pk/ed25519/ed25519_verify.o \

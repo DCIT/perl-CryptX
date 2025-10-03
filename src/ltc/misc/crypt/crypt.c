@@ -455,6 +455,7 @@ const char *crypt_build_settings =
 #if defined(LTC_DER)
     " DER "
     " " NAME_VALUE(LTC_DER_MAX_RECURSION) " "
+    " " NAME_VALUE(LTC_DER_OID_DEFAULT_NODES) " "
 #endif
 #if defined(LTC_PKCS_1)
     " PKCS#1 "
@@ -547,6 +548,15 @@ const char *crypt_build_settings =
 #if defined(LTC_NO_ROLC)
     " LTC_NO_ROLC "
 #endif
+#endif
+#if defined(LTC_HAVE_ROTATE_BUILTIN)
+    " LTC_HAVE_ROTATE_BUILTIN "
+#endif
+#if defined(LTC_HAVE_CLZL_BUILTIN)
+    " LTC_HAVE_CLZL_BUILTIN "
+#endif
+#if defined(LTC_HAVE_CTZL_BUILTIN)
+    " LTC_HAVE_CTZL_BUILTIN "
 #endif
 #if defined(LTC_NO_TEST)
     " LTC_NO_TEST "

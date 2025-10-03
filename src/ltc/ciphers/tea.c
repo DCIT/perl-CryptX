@@ -150,7 +150,7 @@ int tea_test(void)
    symmetric_key skey;
    size_t i;
    int err, y;
-   for (i = 0; i < sizeof(tests)/sizeof(tests[0]); i++) {
+   for (i = 0; i < LTC_ARRAY_SIZE(tests); i++) {
        zeromem(&skey, sizeof(skey));
 
        l = sizeof(key);

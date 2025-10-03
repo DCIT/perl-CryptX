@@ -54,7 +54,7 @@ static const char * const err_2_str[CRYPT_ERR_NUM] =
    "The PEM header was not recognized",
 };
 
-LTC_STATIC_ASSERT(correct_err_2_str_size, (sizeof(err_2_str)/sizeof(err_2_str[0])) == CRYPT_ERR_NUM)
+LTC_STATIC_ASSERT(correct_err_2_str_size, LTC_ARRAY_SIZE(err_2_str) == CRYPT_ERR_NUM)
 
 /**
    Convert an LTC error code to ASCII

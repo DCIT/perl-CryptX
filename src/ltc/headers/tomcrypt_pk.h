@@ -40,6 +40,7 @@ enum ltc_pka_id {
    LTC_PKA_X25519,
    LTC_PKA_ED25519,
    LTC_PKA_DH,
+   LTC_PKA_RSA_PSS,
    LTC_PKA_NUM
 };
 
@@ -62,7 +63,18 @@ int rand_prime(void *N, long len, prng_state *prng, int wprng);
 /* ---- RSA ---- */
 #ifdef LTC_MRSA
 
-/** RSA PKCS style key */
+typedef struct ltc_rsa_parameters {
+   /** PSS/OAEP or PKCS #1 v1.5 style
+    *  0 -> PKCS #1 v1.5, 1 -> PSS/OAEP */
+   int pss_oaep;
+   /** saltLength is only defined for PSS
+    * If saltLength == 0 -> OAEP, else -> PSS */
+   unsigned long saltlen;
+   /** hash and MGF hash algorithms */
+   const char *hash_alg, *mgf1_hash_alg;
+} ltc_rsa_parameters;
+
+/** RSA key */
 typedef struct Rsa_key {
     /** Type of key, PK_PRIVATE or PK_PUBLIC */
     int type;
@@ -82,6 +94,8 @@ typedef struct Rsa_key {
     void *dP;
     /** The d mod (q - 1) CRT param */
     void *dQ;
+    /** Further parameters of the RSA key */
+    ltc_rsa_parameters params;
 } rsa_key;
 
 int rsa_make_key(prng_state *prng, int wprng, int size, long e, rsa_key *key);
@@ -103,10 +117,10 @@ void rsa_free(rsa_key *key);
   rsa_decrypt_key_ex(in, inlen, out, outlen, lparam, lparamlen, hash_idx, -1, LTC_PKCS_1_OAEP, stat, key)
 
 #define rsa_sign_hash(in, inlen, out, outlen, prng, prng_idx, hash_idx, saltlen, key) \
-  rsa_sign_hash_ex(in, inlen, out, outlen, LTC_PKCS_1_PSS, prng, prng_idx, hash_idx, saltlen, key)
+  rsa_sign_hash_ex(in, inlen, out, outlen, LTC_PKCS_1_PSS, prng, prng_idx, hash_idx, hash_idx, saltlen, key)
 
 #define rsa_verify_hash(sig, siglen, hash, hashlen, hash_idx, saltlen, stat, key) \
-  rsa_verify_hash_ex(sig, siglen, hash, hashlen, LTC_PKCS_1_PSS, hash_idx, saltlen, stat, key)
+  rsa_verify_hash_ex(sig, siglen, hash, hashlen, LTC_PKCS_1_PSS, hash_idx, hash_idx, saltlen, stat, key)
 
 #define rsa_sign_saltlen_get_max(hash_idx, key) \
   rsa_sign_saltlen_get_max_ex(LTC_PKCS_1_PSS, hash_idx, key)
@@ -130,14 +144,16 @@ int rsa_decrypt_key_ex(const unsigned char *in,             unsigned long  inlen
 int rsa_sign_hash_ex(const unsigned char *in,       unsigned long  inlen,
                            unsigned char *out,      unsigned long *outlen,
                            int            padding,
-                           prng_state    *prng,     int            prng_idx,
-                           int            hash_idx, unsigned long  saltlen,
+                           prng_state    *prng,               int  prng_idx,
+                           int            hash_idx,           int  mgf_hash_idx,
+                           unsigned long  saltlen,
                      const rsa_key       *key);
 
 int rsa_verify_hash_ex(const unsigned char *sig,            unsigned long  siglen,
                        const unsigned char *hash,           unsigned long  hashlen,
                              int            padding,
-                             int            hash_idx,       unsigned long  saltlen,
+                             int            hash_idx,                 int  mgf_hash_idx,
+                             unsigned long  saltlen,
                              int           *stat,     const rsa_key       *key);
 
 int rsa_sign_saltlen_get_max_ex(int padding, int hash_idx, const rsa_key *key);
@@ -281,7 +297,17 @@ typedef struct {
 
     /** The private key */
     void *k;
+
+    /** The hash algorithm to use when creating a signature.
+     *  Setting this will enable RFC6979 compatible signature generation.
+     *  The macro ECC_SET_RFC6979_HASH_ALG() is provided as a helper
+     *  to set this.*/
+    const char *rfc6979_hash_alg;
 } ecc_key;
+
+#define ECC_SET_RFC6979_HASH_ALG(key, alg) do { \
+   (key)->rfc6979_hash_alg = (alg);             \
+} while(0)
 
 /** Formats of ECC signatures */
 typedef enum ecc_signature_type_ {
@@ -713,9 +739,10 @@ typedef struct ltc_asn1_list_ {
 #define LTC_SET_ASN1_CUSTOM_PRIMITIVE(list, index, Class, Tag, Type, Data, Size)          \
    do {                                                                                   \
       int LTC_TMPVAR(SACP) = (index);                                                     \
+      ltc_asn1_list *LTC_TMPVAR(SACP_list) = (list);                        \
       LTC_SET_ASN1(list, LTC_TMPVAR(SACP), LTC_ASN1_CUSTOM_TYPE, Data, Size);             \
       LTC_SET_ASN1_IDENTIFIER(list, LTC_TMPVAR(SACP), Class, LTC_ASN1_PC_PRIMITIVE, Tag); \
-      list[LTC_TMPVAR(SACP)].used = (int)(Type);                                          \
+      LTC_TMPVAR(SACP_list)[LTC_TMPVAR(SACP)].used = (int)(Type);                                          \
    } while (0)
 
 extern const char*          der_asn1_class_to_string_map[];
@@ -834,7 +861,6 @@ int der_encode_object_identifier(const unsigned long *words, unsigned long  nwor
 int der_decode_object_identifier(const unsigned char *in,    unsigned long  inlen,
                                        unsigned long *words, unsigned long *outlen);
 int der_length_object_identifier(const unsigned long *words, unsigned long nwords, unsigned long *outlen);
-unsigned long der_object_identifier_bits(unsigned long x);
 
 /* IA5 STRING */
 int der_encode_ia5_string(const unsigned char *in, unsigned long inlen,
@@ -842,9 +868,6 @@ int der_encode_ia5_string(const unsigned char *in, unsigned long inlen,
 int der_decode_ia5_string(const unsigned char *in, unsigned long inlen,
                                 unsigned char *out, unsigned long *outlen);
 int der_length_ia5_string(const unsigned char *octets, unsigned long noctets, unsigned long *outlen);
-
-int der_ia5_char_encode(int c);
-int der_ia5_value_decode(int v);
 
 /* TELETEX STRING */
 int der_decode_teletex_string(const unsigned char *in, unsigned long inlen,
@@ -857,9 +880,6 @@ int der_encode_printable_string(const unsigned char *in, unsigned long inlen,
 int der_decode_printable_string(const unsigned char *in, unsigned long inlen,
                                 unsigned char *out, unsigned long *outlen);
 int der_length_printable_string(const unsigned char *octets, unsigned long noctets, unsigned long *outlen);
-
-int der_printable_char_encode(int c);
-int der_printable_value_decode(int v);
 
 /* UTF-8 */
 #if (defined(SIZE_MAX) || __STDC_VERSION__ >= 199901L || defined(WCHAR_MAX) || defined(__WCHAR_MAX__) || defined(_WCHAR_T) || defined(_WCHAR_T_DEFINED) || defined (__WCHAR_TYPE__)) && !defined(LTC_NO_WCHAR)
@@ -880,7 +900,6 @@ int der_encode_utf8_string(const wchar_t *in,  unsigned long inlen,
 
 int der_decode_utf8_string(const unsigned char *in,  unsigned long inlen,
                                        wchar_t *out, unsigned long *outlen);
-unsigned long der_utf8_charsize(const wchar_t c);
 int der_length_utf8_string(const wchar_t *in, unsigned long noctets, unsigned long *outlen);
 
 

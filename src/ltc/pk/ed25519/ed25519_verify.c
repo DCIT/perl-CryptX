@@ -26,6 +26,7 @@ static int s_ed25519_verify(const  unsigned char *msg, unsigned long msglen,
 
    *stat = 0;
 
+   if (find_hash("sha512") == -1) return CRYPT_INVALID_HASH;
    if (siglen != 64uL) return CRYPT_INVALID_ARG;
    if (public_key->pka != LTC_PKA_ED25519) return CRYPT_PK_INVALID_TYPE;
 

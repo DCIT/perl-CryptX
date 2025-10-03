@@ -52,10 +52,11 @@ int base16_encode(const unsigned char *in,  unsigned long  inlen,
       alphabet = alphabets[1];
    }
 
-   for (i = 0; i < x; i += 2) {
-      out[i]   = alphabet[(in[i/2] >> 4) & 0x0f];
-      out[i+1] = alphabet[in[i/2] & 0x0f];
+   for (i = x; i > 0; i -= 2) {
+      out[i-2] = alphabet[(in[(i-1)/2] >> 4) & 0x0f];
+      out[i-1] = alphabet[in[(i-1)/2] & 0x0f];
    }
+
    out[x] = '\0';
 
    return CRYPT_OK;

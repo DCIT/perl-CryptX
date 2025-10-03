@@ -39,7 +39,7 @@ static int tfm_to_ltc_error(int err)
 {
    int x;
 
-   for (x = 0; x < (int)(sizeof(tfm_to_ltc_codes)/sizeof(tfm_to_ltc_codes[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(tfm_to_ltc_codes); x++) {
        if (err == tfm_to_ltc_codes[x].tfm_code) {
           return tfm_to_ltc_codes[x].ltc_code;
        }

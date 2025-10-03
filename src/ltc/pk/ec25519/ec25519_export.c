@@ -46,7 +46,7 @@ int ec25519_export(       unsigned char *out, unsigned long *outlen,
          if ((err = pk_get_oid(oid_id, &OID)) != CRYPT_OK) {
             return err;
          }
-         oidlen = sizeof(oid)/sizeof(oid[0]);
+         oidlen = LTC_ARRAY_SIZE(oid);
          if ((err = pk_oid_str_to_num(OID, oid, &oidlen)) != CRYPT_OK) {
             return err;
          }

@@ -405,7 +405,7 @@ int rmd256_test(void)
    unsigned char tmp[32];
    hash_state md;
 
-   for (i = 0; i < (int)(sizeof(tests)/sizeof(tests[0])); i++) {
+   for (i = 0; i < (int)LTC_ARRAY_SIZE(tests); i++) {
        rmd256_init(&md);
        rmd256_process(&md, (unsigned char *)tests[i].msg, XSTRLEN(tests[i].msg));
        rmd256_done(&md, tmp);

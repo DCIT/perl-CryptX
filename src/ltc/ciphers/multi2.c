@@ -242,7 +242,7 @@ int multi2_test(void)
    symmetric_key skey;
    int err, x;
 
-   for (x = 1; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 1; x < (int)LTC_ARRAY_SIZE(tests); x++) {
       if ((err = multi2_setup(tests[x].key, 40, tests[x].rounds, &skey)) != CRYPT_OK) {
          return err;
       }

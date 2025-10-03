@@ -23,6 +23,7 @@ static int s_ed25519_sign(const unsigned char  *msg, unsigned long  msglen,
    LTC_ARGCHK(siglen      != NULL);
    LTC_ARGCHK(private_key != NULL);
 
+   if (find_hash("sha512") == -1) return CRYPT_INVALID_HASH;
    if (private_key->pka != LTC_PKA_ED25519) return CRYPT_PK_INVALID_TYPE;
    if (private_key->type != PK_PRIVATE) return CRYPT_PK_INVALID_TYPE;
 

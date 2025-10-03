@@ -39,7 +39,7 @@ const int der_asn1_type_to_identifier_map[] =
  24, /* LTC_ASN1_GENERALIZEDTIME, */
  -1, /* LTC_ASN1_CUSTOM_TYPE, */
 };
-const unsigned long der_asn1_type_to_identifier_map_sz = sizeof(der_asn1_type_to_identifier_map)/sizeof(der_asn1_type_to_identifier_map[0]);
+const unsigned long der_asn1_type_to_identifier_map_sz = LTC_ARRAY_SIZE(der_asn1_type_to_identifier_map);
 
 /**
   A Map from the ASN.1 Class to its string
@@ -51,7 +51,7 @@ const char* der_asn1_class_to_string_map[] =
   "CONTEXT-SPECIFIC",
   "PRIVATE",
 };
-const unsigned long der_asn1_class_to_string_map_sz = sizeof(der_asn1_class_to_string_map)/sizeof(der_asn1_class_to_string_map[0]);
+const unsigned long der_asn1_class_to_string_map_sz = LTC_ARRAY_SIZE(der_asn1_class_to_string_map);
 
 /**
   A Map from the ASN.1 P/C-bit to its string
@@ -61,7 +61,7 @@ const char* der_asn1_pc_to_string_map[] =
   "PRIMITIVE",
   "CONSTRUCTED",
 };
-const unsigned long der_asn1_pc_to_string_map_sz = sizeof(der_asn1_pc_to_string_map)/sizeof(der_asn1_pc_to_string_map[0]);
+const unsigned long der_asn1_pc_to_string_map_sz = LTC_ARRAY_SIZE(der_asn1_pc_to_string_map);
 
 /**
   A Map from the ASN.1 tag to its string
@@ -106,7 +106,7 @@ const char* der_asn1_tag_to_string_map[] =
   "OID internationalized resource identifier type",
   "Relative OID internationalized resource identifier type",
 };
-const unsigned long der_asn1_tag_to_string_map_sz = sizeof(der_asn1_tag_to_string_map)/sizeof(der_asn1_tag_to_string_map[0]);
+const unsigned long der_asn1_tag_to_string_map_sz = LTC_ARRAY_SIZE(der_asn1_tag_to_string_map);
 
 /**
   A Map from ASN.1 Tags to ltc_asn1_type
@@ -152,6 +152,6 @@ const ltc_asn1_type der_asn1_tag_to_type_map[] =
   /* 30 */
   LTC_ASN1_CUSTOM_TYPE,      /* BMPString types */
 };
-const unsigned long der_asn1_tag_to_type_map_sz = sizeof(der_asn1_tag_to_type_map)/sizeof(der_asn1_tag_to_type_map[0]);
+const unsigned long der_asn1_tag_to_type_map_sz = LTC_ARRAY_SIZE(der_asn1_tag_to_type_map);
 
 #endif

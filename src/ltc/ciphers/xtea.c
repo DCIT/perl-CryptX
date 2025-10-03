@@ -197,7 +197,7 @@ int xtea_test(void)
    unsigned char tmp[2][8];
    symmetric_key skey;
    int i, err, y;
-   for (i = 0; i < (int)(sizeof(tests)/sizeof(tests[0])); i++) {
+   for (i = 0; i < (int)LTC_ARRAY_SIZE(tests); i++) {
        zeromem(&skey, sizeof(skey));
        if ((err = xtea_setup(tests[i].key, 16, 0, &skey)) != CRYPT_OK)  {
           return err;

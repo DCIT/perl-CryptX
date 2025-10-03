@@ -492,7 +492,7 @@ int cast5_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_
 #endif
 
 #define FI cast5_FI
-LTC_INLINE static ulong32 FI(ulong32 R, ulong32 Km, ulong32 Kr)
+static LTC_INLINE ulong32 FI(ulong32 R, ulong32 Km, ulong32 Kr)
 {
    ulong32 I;
    I = (Km + R);
@@ -500,7 +500,7 @@ LTC_INLINE static ulong32 FI(ulong32 R, ulong32 Km, ulong32 Kr)
    return ((S1[LTC_BYTE(I, 3)] ^ S2[LTC_BYTE(I,2)]) - S3[LTC_BYTE(I,1)]) + S4[LTC_BYTE(I,0)];
 }
 
-LTC_INLINE static ulong32 FII(ulong32 R, ulong32 Km, ulong32 Kr)
+static LTC_INLINE ulong32 FII(ulong32 R, ulong32 Km, ulong32 Kr)
 {
    ulong32 I;
    I = (Km ^ R);
@@ -508,7 +508,7 @@ LTC_INLINE static ulong32 FII(ulong32 R, ulong32 Km, ulong32 Kr)
    return ((S1[LTC_BYTE(I, 3)] - S2[LTC_BYTE(I,2)]) + S3[LTC_BYTE(I,1)]) ^ S4[LTC_BYTE(I,0)];
 }
 
-LTC_INLINE static ulong32 FIII(ulong32 R, ulong32 Km, ulong32 Kr)
+static LTC_INLINE ulong32 FIII(ulong32 R, ulong32 Km, ulong32 Kr)
 {
    ulong32 I;
    I = (Km - R);

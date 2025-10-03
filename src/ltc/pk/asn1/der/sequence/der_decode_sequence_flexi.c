@@ -27,6 +27,22 @@ static int s_new_element(ltc_asn1_list **l)
    }
    return CRYPT_OK;
 }
+#if defined(LTC_TEST_DBG)
+void s_print_err(const char *errstr, ltc_asn1_list *l, int err, unsigned long identifier, unsigned long data_offset, unsigned long len)
+{
+#if LTC_TEST_DBG <= 1
+   if (err == CRYPT_OK)
+      return;
+#endif
+   if (l->type == LTC_ASN1_CUSTOM_TYPE) {
+      fprintf(stderr, "%s %02lx: hl=%4lu l=%4lu - %s[%s %llu] (%s)\n", errstr, identifier, data_offset, len, der_asn1_class_to_string_map[l->klass], der_asn1_pc_to_string_map[l->pc], l->tag, error_to_string(err));
+   } else {
+      fprintf(stderr, "%s %02lx: hl=%4lu l=%4lu - %s (%s)\n", errstr, identifier, data_offset, len, der_asn1_tag_to_string_map[l->tag], error_to_string(err));
+   }
+}
+#else
+#define s_print_err(errstr, l, err, identifier, data_offset, len) LTC_UNUSED_PARAM(data_offset)
+#endif
 
 /**
    ASN.1 DER Flexi(ble) decoder will decode arbitrary DER packets and create a linked list of the decoded elements.
@@ -39,7 +55,8 @@ static int s_new_element(ltc_asn1_list **l)
 static int s_der_decode_sequence_flexi(const unsigned char *in, unsigned long *inlen, ltc_asn1_list **out, unsigned long depth)
 {
    ltc_asn1_list *l;
-   unsigned long err, identifier, len, totlen, data_offset, id_len, len_len;
+   int err;
+   unsigned long identifier, len, totlen, data_offset, id_len, len_len;
    void          *realloc_tmp;
 
    LTC_ARGCHK(in    != NULL);
@@ -73,30 +90,19 @@ static int s_der_decode_sequence_flexi(const unsigned char *in, unsigned long *i
       if (l->type != LTC_ASN1_EOL) {
          /* fetch length */
          len_len = *inlen - id_len;
-#if defined(LTC_TEST_DBG)
+         /* init with dummy values for error cases */
          data_offset = 666;
          len = 0;
-#endif
          if ((err = der_decode_asn1_length(&in[id_len], &len_len, &len)) != CRYPT_OK) {
-#if defined(LTC_TEST_DBG)
-            fprintf(stderr, "E1 %02lx: hl=%4lu l=%4lu - %s (%s)\n", identifier, data_offset, len, der_asn1_tag_to_string_map[l->tag], error_to_string(err));
-#endif
+            s_print_err("E1", l, err, identifier, data_offset, len);
             goto error;
          } else if (len > (*inlen - id_len - len_len)) {
             err = CRYPT_INVALID_PACKET;
-#if defined(LTC_TEST_DBG)
-            fprintf(stderr, "E2 %02lx: hl=%4lu l=%4lu - %s (%s)\n", identifier, data_offset, len, der_asn1_tag_to_string_map[l->tag], error_to_string(err));
-#endif
+            s_print_err("E2", l, err, identifier, data_offset, len);
             goto error;
          }
          data_offset = id_len + len_len;
-#if defined(LTC_TEST_DBG) && LTC_TEST_DBG > 1
-         if (l->type == LTC_ASN1_CUSTOM_TYPE && l->klass == LTC_ASN1_CL_CONTEXT_SPECIFIC) {
-            fprintf(stderr, "OK %02lx: hl=%4lu l=%4lu - Context Specific[%s %llu]\n", identifier, data_offset, len, der_asn1_pc_to_string_map[l->pc], l->tag);
-         } else {
-            fprintf(stderr, "OK %02lx: hl=%4lu l=%4lu - %s\n", identifier, data_offset, len, der_asn1_tag_to_string_map[l->tag]);
-         }
-#endif
+         s_print_err("OK", l, err, identifier, data_offset, len);
          len += data_offset;
 
          if (l->type == LTC_ASN1_CUSTOM_TYPE) {

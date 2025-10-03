@@ -135,7 +135,7 @@ static const struct {
 int der_teletex_char_encode(int c)
 {
    int x;
-   for (x = 0; x < (int)(sizeof(teletex_table)/sizeof(teletex_table[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(teletex_table); x++) {
        if (teletex_table[x].code == c) {
           return teletex_table[x].value;
        }
@@ -146,7 +146,7 @@ int der_teletex_char_encode(int c)
 int der_teletex_value_decode(int v)
 {
    int x;
-   for (x = 0; x < (int)(sizeof(teletex_table)/sizeof(teletex_table[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(teletex_table); x++) {
        if (teletex_table[x].value == v) {
           return teletex_table[x].code;
        }

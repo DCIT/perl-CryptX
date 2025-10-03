@@ -11,6 +11,13 @@
 
 const struct pem_header_id pem_std_headers[] = {
    {
+     /* X.509 Certificates */
+     SET_CSTR(.start, "-----BEGIN CERTIFICATE-----"),
+     SET_CSTR(.end, "-----END CERTIFICATE-----"),
+     .has_more_headers = no,
+     .flags = pf_x509,
+   },
+   {
      /* PKCS#8 encrypted */
      SET_CSTR(.start, "-----BEGIN ENCRYPTED PRIVATE KEY-----"),
      SET_CSTR(.end, "-----END ENCRYPTED PRIVATE KEY-----"),
@@ -23,13 +30,6 @@ const struct pem_header_id pem_std_headers[] = {
      SET_CSTR(.end, "-----END PRIVATE KEY-----"),
      .has_more_headers = no,
      .flags = pf_pkcs8,
-   },
-   {
-     /* X.509 Certificates */
-     SET_CSTR(.start, "-----BEGIN CERTIFICATE-----"),
-     SET_CSTR(.end, "-----END CERTIFICATE-----"),
-     .has_more_headers = no,
-     .flags = pf_x509,
    },
    {
      /* Regular (plain) public keys */
@@ -65,7 +65,7 @@ const struct pem_header_id pem_std_headers[] = {
      .pka = LTC_PKA_DSA,
    },
 };
-const unsigned long pem_std_headers_num = sizeof(pem_std_headers)/sizeof(pem_std_headers[0]);
+const unsigned long pem_std_headers_num = LTC_ARRAY_SIZE(pem_std_headers);
 
 /* Encrypted PEM files */
 const struct str pem_proc_type_encrypted = { SET_CSTR(, "Proc-Type: 4,ENCRYPTED") };
@@ -147,7 +147,7 @@ const struct blockcipher_info pem_dek_infos[] =
       { .name = "SEED-CFB,",          .algo = "seed",     .keylen = 128 / 8, .mode = cm_cfb,    },
       { .name = "SEED-OFB,",          .algo = "seed",     .keylen = 128 / 8, .mode = cm_ofb,    },
    };
-const unsigned long pem_dek_infos_num = sizeof(pem_dek_infos)/sizeof(pem_dek_infos[0]);
+const unsigned long pem_dek_infos_num = LTC_ARRAY_SIZE(pem_dek_infos);
 
 int pem_decrypt(unsigned char *data, unsigned long *datalen,
                 unsigned char *key,  unsigned long keylen,
@@ -197,7 +197,7 @@ int pem_decrypt(unsigned char *data, unsigned long *datalen,
             goto error_out;
          }
 
-         if ((err = padding_depad(data, datalen, padding | s.ctx.cbc.blocklen)) != CRYPT_OK) {
+         if ((err = padding_depad(data, datalen, padding | s.ctx.cbc.ecb.blocklen)) != CRYPT_OK) {
             goto error_out;
          }
 #else

@@ -119,7 +119,7 @@ static const struct {
 int der_ia5_char_encode(int c)
 {
    int x;
-   for (x = 0; x < (int)(sizeof(ia5_table)/sizeof(ia5_table[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(ia5_table); x++) {
        if (ia5_table[x].code == c) {
           return ia5_table[x].value;
        }
@@ -130,7 +130,7 @@ int der_ia5_char_encode(int c)
 int der_ia5_value_decode(int v)
 {
    int x;
-   for (x = 0; x < (int)(sizeof(ia5_table)/sizeof(ia5_table[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(ia5_table); x++) {
        if (ia5_table[x].value == v) {
           return ia5_table[x].code;
        }

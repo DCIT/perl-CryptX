@@ -107,7 +107,8 @@ ltc/pk/asn1/der/utf8/der_encode_utf8_string.obj ltc/pk/asn1/der/utf8/der_length_
 ltc/pk/asn1/oid/pk_get.obj ltc/pk/asn1/oid/pk_oid_cmp.obj ltc/pk/asn1/oid/pk_oid_str.obj \
 ltc/pk/asn1/pkcs8/pkcs8_decode_flexi.obj ltc/pk/asn1/pkcs8/pkcs8_get.obj ltc/pk/asn1/x509/x509_decode_public_key_from_certificate.obj \
 ltc/pk/asn1/x509/x509_decode_spki.obj ltc/pk/asn1/x509/x509_decode_subject_public_key_info.obj \
-ltc/pk/asn1/x509/x509_encode_subject_public_key_info.obj ltc/pk/dh/dh.obj ltc/pk/dh/dh_check_pubkey.obj \
+ltc/pk/asn1/x509/x509_encode_subject_public_key_info.obj ltc/pk/asn1/x509/x509_get_pka.obj \
+ltc/pk/asn1/x509/x509_import_spki.obj ltc/pk/dh/dh.obj ltc/pk/dh/dh_check_pubkey.obj \
 ltc/pk/dh/dh_export.obj ltc/pk/dh/dh_export_key.obj ltc/pk/dh/dh_free.obj ltc/pk/dh/dh_generate_key.obj \
 ltc/pk/dh/dh_import.obj ltc/pk/dh/dh_import_pkcs8.obj ltc/pk/dh/dh_set.obj ltc/pk/dh/dh_set_pg_dhparam.obj \
 ltc/pk/dh/dh_shared_secret.obj ltc/pk/dsa/dsa_decrypt_key.obj ltc/pk/dsa/dsa_encrypt_key.obj \
@@ -122,16 +123,16 @@ ltc/pk/ecc/ecc_encrypt_key.obj ltc/pk/ecc/ecc_export.obj ltc/pk/ecc/ecc_export_o
 ltc/pk/ecc/ecc_find_curve.obj ltc/pk/ecc/ecc_free.obj ltc/pk/ecc/ecc_get_key.obj \
 ltc/pk/ecc/ecc_get_oid_str.obj ltc/pk/ecc/ecc_get_size.obj ltc/pk/ecc/ecc_import.obj \
 ltc/pk/ecc/ecc_import_openssl.obj ltc/pk/ecc/ecc_import_pkcs8.obj ltc/pk/ecc/ecc_import_x509.obj \
-ltc/pk/ecc/ecc_make_key.obj ltc/pk/ecc/ecc_recover_key.obj ltc/pk/ecc/ecc_set_curve.obj \
-ltc/pk/ecc/ecc_set_curve_internal.obj ltc/pk/ecc/ecc_set_key.obj ltc/pk/ecc/ecc_shared_secret.obj \
-ltc/pk/ecc/ecc_sign_hash.obj ltc/pk/ecc/ecc_sign_hash_eth27.obj ltc/pk/ecc/ecc_sign_hash_internal.obj \
-ltc/pk/ecc/ecc_sign_hash_rfc5656.obj ltc/pk/ecc/ecc_sign_hash_rfc7518.obj ltc/pk/ecc/ecc_sizes.obj \
-ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.obj ltc/pk/ecc/ecc_verify_hash.obj ltc/pk/ecc/ecc_verify_hash_eth27.obj \
-ltc/pk/ecc/ecc_verify_hash_internal.obj ltc/pk/ecc/ecc_verify_hash_rfc5656.obj ltc/pk/ecc/ecc_verify_hash_rfc7518.obj \
-ltc/pk/ecc/ltc_ecc_export_point.obj ltc/pk/ecc/ltc_ecc_import_point.obj ltc/pk/ecc/ltc_ecc_is_point.obj \
-ltc/pk/ecc/ltc_ecc_is_point_at_infinity.obj ltc/pk/ecc/ltc_ecc_map.obj ltc/pk/ecc/ltc_ecc_mul2add.obj \
-ltc/pk/ecc/ltc_ecc_mulmod.obj ltc/pk/ecc/ltc_ecc_mulmod_timing.obj ltc/pk/ecc/ltc_ecc_points.obj \
-ltc/pk/ecc/ltc_ecc_projective_add_point.obj ltc/pk/ecc/ltc_ecc_projective_dbl_point.obj \
+ltc/pk/ecc/ecc_make_key.obj ltc/pk/ecc/ecc_recover_key.obj ltc/pk/ecc/ecc_rfc6979_key.obj \
+ltc/pk/ecc/ecc_set_curve.obj ltc/pk/ecc/ecc_set_curve_internal.obj ltc/pk/ecc/ecc_set_key.obj \
+ltc/pk/ecc/ecc_shared_secret.obj ltc/pk/ecc/ecc_sign_hash.obj ltc/pk/ecc/ecc_sign_hash_eth27.obj \
+ltc/pk/ecc/ecc_sign_hash_internal.obj ltc/pk/ecc/ecc_sign_hash_rfc5656.obj ltc/pk/ecc/ecc_sign_hash_rfc7518.obj \
+ltc/pk/ecc/ecc_sizes.obj ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.obj ltc/pk/ecc/ecc_verify_hash.obj \
+ltc/pk/ecc/ecc_verify_hash_eth27.obj ltc/pk/ecc/ecc_verify_hash_internal.obj ltc/pk/ecc/ecc_verify_hash_rfc5656.obj \
+ltc/pk/ecc/ecc_verify_hash_rfc7518.obj ltc/pk/ecc/ltc_ecc_export_point.obj ltc/pk/ecc/ltc_ecc_import_point.obj \
+ltc/pk/ecc/ltc_ecc_is_point.obj ltc/pk/ecc/ltc_ecc_is_point_at_infinity.obj ltc/pk/ecc/ltc_ecc_map.obj \
+ltc/pk/ecc/ltc_ecc_mul2add.obj ltc/pk/ecc/ltc_ecc_mulmod.obj ltc/pk/ecc/ltc_ecc_mulmod_timing.obj \
+ltc/pk/ecc/ltc_ecc_points.obj ltc/pk/ecc/ltc_ecc_projective_add_point.obj ltc/pk/ecc/ltc_ecc_projective_dbl_point.obj \
 ltc/pk/ecc/ltc_ecc_verify_key.obj ltc/pk/ed25519/ed25519_export.obj ltc/pk/ed25519/ed25519_import.obj \
 ltc/pk/ed25519/ed25519_import_pkcs8.obj ltc/pk/ed25519/ed25519_import_raw.obj ltc/pk/ed25519/ed25519_import_x509.obj \
 ltc/pk/ed25519/ed25519_make_key.obj ltc/pk/ed25519/ed25519_sign.obj ltc/pk/ed25519/ed25519_verify.obj \

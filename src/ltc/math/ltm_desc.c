@@ -33,7 +33,7 @@ static int mpi_to_ltc_error(mp_err err)
 {
    size_t x;
 
-   for (x = 0; x < sizeof(mpi_to_ltc_codes)/sizeof(mpi_to_ltc_codes[0]); x++) {
+   for (x = 0; x < LTC_ARRAY_SIZE(mpi_to_ltc_codes); x++) {
        if (err == mpi_to_ltc_codes[x].mpi_code) {
           return mpi_to_ltc_codes[x].ltc_code;
        }

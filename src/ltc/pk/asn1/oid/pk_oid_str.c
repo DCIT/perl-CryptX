@@ -6,20 +6,18 @@
 int pk_oid_str_to_num(const char *OID, unsigned long *oid, unsigned long *oidlen)
 {
    unsigned long i, j, limit, oid_j;
-   size_t OID_len;
 
    LTC_ARGCHK(oidlen != NULL);
 
    limit = *oidlen;
    *oidlen = 0; /* make sure that we return zero oidlen on error */
-   for (i = 0; i < limit; i++) oid[i] = 0;
-
+   if (oid != NULL) {
+      XMEMSET(oid, 0, sizeof(*oid) * limit);
+   }
    if (OID == NULL) return CRYPT_OK;
+   if (OID[0] == '\0') return CRYPT_OK;
 
-   OID_len = XSTRLEN(OID);
-   if (OID_len == 0) return CRYPT_OK;
-
-   for (i = 0, j = 0; i < OID_len; i++) {
+   for (i = 0, j = 0; OID[i] != '\0'; i++) {
       if (OID[i] == '.') {
          if (++j >= limit) continue;
       }
@@ -34,49 +32,74 @@ int pk_oid_str_to_num(const char *OID, unsigned long *oid, unsigned long *oidlen
       }
    }
    if (j == 0) return CRYPT_ERROR;
-   if (j >= limit) {
-      *oidlen = j;
+   *oidlen = j + 1;
+   if (j >= limit || oid == NULL) {
       return CRYPT_BUFFER_OVERFLOW;
    }
-   *oidlen = j + 1;
    return CRYPT_OK;
+}
+
+typedef struct num_to_str {
+   int err;
+   char *wr;
+   unsigned long max_len, res_len;
+} num_to_str;
+
+static LTC_INLINE void s_wr(char c, num_to_str *w)
+{
+   if (w->res_len == ULONG_MAX) {
+      w->err = CRYPT_OVERFLOW;
+      return;
+   }
+   w->res_len++;
+   if (w->res_len > w->max_len) w->wr = NULL;
+   if (w->wr) w->wr[w->max_len - w->res_len] = c;
 }
 
 int pk_oid_num_to_str(const unsigned long *oid, unsigned long oidlen, char *OID, unsigned long *outlen)
 {
    int i;
-   unsigned long j, k;
-   char tmp[LTC_OID_MAX_STRLEN] = { 0 };
+   num_to_str w;
+   unsigned long j;
 
    LTC_ARGCHK(oid != NULL);
    LTC_ARGCHK(oidlen < INT_MAX);
    LTC_ARGCHK(outlen != NULL);
 
-   for (i = oidlen - 1, k = 0; i >= 0; i--) {
+   if (OID == NULL || *outlen == 0) {
+      w.max_len = ULONG_MAX;
+      w.wr = NULL;
+   } else {
+      w.max_len = *outlen;
+      w.wr = OID;
+   }
+   w.res_len = 0;
+   w.err = CRYPT_OK;
+
+   s_wr('\0', &w);
+   for (i = oidlen; i --> 0;) {
       j = oid[i];
       if (j == 0) {
-         tmp[k] = '0';
-         if (++k >= sizeof(tmp)) return CRYPT_ERROR;
-      }
-      else {
+         s_wr('0', &w);
+      } else {
          while (j > 0) {
-            tmp[k] = '0' + (j % 10);
-            if (++k >= sizeof(tmp)) return CRYPT_ERROR;
+            s_wr('0' + (j % 10), &w);
             j /= 10;
          }
       }
       if (i > 0) {
-        tmp[k] = '.';
-        if (++k >= sizeof(tmp)) return CRYPT_ERROR;
+         s_wr('.', &w);
       }
    }
-   if (*outlen < k + 1) {
-      *outlen = k + 1;
+   if (w.err != CRYPT_OK) {
+      return w.err;
+   }
+   if (*outlen < w.res_len || OID == NULL) {
+      *outlen = w.res_len;
       return CRYPT_BUFFER_OVERFLOW;
    }
    LTC_ARGCHK(OID != NULL);
-   for (j = 0; j < k; j++) OID[j] = tmp[k - j - 1];
-   OID[k] = '\0';
-   *outlen = k; /* the length without terminating NUL byte */
+   XMEMMOVE(OID, OID + (w.max_len - w.res_len), w.res_len);
+   *outlen = w.res_len;
    return CRYPT_OK;
 }

@@ -19,7 +19,7 @@
 */
 int ecc_ssh_ecdsa_encode_name(char *buffer, unsigned long *buflen, const ecc_key *key)
 {
-   char oidstr[64] = {0};
+   char oidstr[LTC_OID_MAX_STRLEN] = {0};
    unsigned long oidlen = sizeof(oidstr);
    int err, size = 0;
 

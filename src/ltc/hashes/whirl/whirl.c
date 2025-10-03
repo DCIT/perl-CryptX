@@ -281,7 +281,7 @@ int  whirlpool_test(void)
   unsigned char tmp[64];
   hash_state md;
 
-  for (i = 0; i < (int)(sizeof(tests)/sizeof(tests[0])); i++) {
+  for (i = 0; i < (int)LTC_ARRAY_SIZE(tests); i++) {
       whirlpool_init(&md);
       whirlpool_process(&md, (unsigned char *)tests[i].msg, tests[i].len);
       whirlpool_done(&md, tmp);

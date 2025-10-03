@@ -57,8 +57,12 @@ int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
 
    /* make up a key and export the public copy */
    do {
-      if ((err = ecc_copy_curve(key, &pubkey)) != CRYPT_OK)                { goto errnokey; }
-      if ((err = ecc_generate_key(prng, wprng, &pubkey)) != CRYPT_OK)      { goto errnokey; }
+      if ((err = ecc_copy_curve(key, &pubkey)) != CRYPT_OK)                    { goto errnokey; }
+      if (key->rfc6979_hash_alg != NULL) {
+         if ((err = ecc_rfc6979_key(key, in, inlen, &pubkey)) != CRYPT_OK)     { goto errnokey; }
+      } else {
+         if ((err = ecc_generate_key(prng, wprng, &pubkey)) != CRYPT_OK)       { goto errnokey; }
+      }
 
       /* find r = x1 mod n */
       if ((err = ltc_mp_mod(pubkey.pubkey.x, p, r)) != CRYPT_OK)               { goto error; }
@@ -78,7 +82,7 @@ int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
       if (ltc_mp_iszero(r) == LTC_MP_YES) {
          ecc_free(&pubkey);
       } else {
-         if ((err = rand_bn_upto(b, p, prng, wprng)) != CRYPT_OK)          { goto error; } /* b = blinding value */
+         if ((err = rand_bn_upto(b, p, prng, wprng)) != CRYPT_OK)              { goto error; } /* b = blinding value */
          /* find s = (e + xr)/k */
          if ((err = ltc_mp_mulmod(pubkey.k, b, p, pubkey.k)) != CRYPT_OK)      { goto error; } /* k = kb */
          if ((err = ltc_mp_invmod(pubkey.k, p, pubkey.k)) != CRYPT_OK)         { goto error; } /* k = 1/kb */

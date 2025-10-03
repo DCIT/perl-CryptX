@@ -17,14 +17,76 @@ extern const struct str pem_dek_info_start;
 extern const struct blockcipher_info pem_dek_infos[];
 extern const unsigned long pem_dek_infos_num;
 
-#ifndef LTC_NO_FILE
-int pem_get_char_from_file(struct get_char *g)
+static LTC_INLINE unsigned long s_bufp_alloc_len(struct bufp *buf)
 {
-   return getc(g->data.f);
+   if (buf->start == NULL || buf->end == NULL)
+      return 0;
+   return buf->end - buf->start - 1;
 }
+
+static LTC_INLINE unsigned long s_bufp_used_len(struct bufp *buf)
+{
+   if (buf->start == NULL || buf->end == NULL)
+      return 0;
+   return buf->work - buf->start;
+}
+
+static LTC_INLINE int s_bufp_grow(struct bufp *buf)
+{
+   int err = CRYPT_OK;
+   void *ret;
+   unsigned long alloc_len = s_bufp_alloc_len(buf), realloc_len;
+   unsigned long work_offset = s_bufp_used_len(buf);
+   if (alloc_len == 0)
+      realloc_len = LTC_PEM_READ_BUFSIZE;
+   else
+      realloc_len = alloc_len * 2;
+   if (realloc_len < alloc_len)
+      return CRYPT_OVERFLOW;
+   ret = XREALLOC(buf->start, realloc_len);
+   if (ret == NULL) {
+      err = CRYPT_MEM;
+   } else {
+      UPDATE_BUFP((*buf), ret, work_offset, realloc_len);
+   }
+   return err;
+}
+
+static LTC_INLINE int s_bufp_fits(struct bufp *buf, unsigned long to_write)
+{
+   char *d = buf->work;
+   char *e = buf->end;
+   char *w = d + to_write;
+   if (d == NULL || w < d || w > e)
+      return 0;
+   return 1;
+}
+
+static LTC_INLINE int s_bufp_add(struct bufp *buf, const void *src, unsigned long len)
+{
+   int err;
+   if (!s_bufp_fits(buf, len)) {
+      if ((err = s_bufp_grow(buf)) != CRYPT_OK) {
+         return err;
+      }
+   }
+   XMEMCPY(buf->work, src, len);
+   buf->work += len;
+   return CRYPT_OK;
+}
+
+#ifndef LTC_NO_FILE
+static int s_pem_get_char_from_file(struct get_char *g)
+{
+   return getc(g->data.f.f);
+}
+
+const struct get_char_api get_char_filehandle_api = {
+                                                     .get = s_pem_get_char_from_file,
+};
 #endif /* LTC_NO_FILE */
 
-int pem_get_char_from_buf(struct get_char *g)
+static int s_pem_get_char_from_buf(struct get_char *g)
 {
    int ret;
    if (g->data.buf.work == g->data.buf.end) {
@@ -34,6 +96,10 @@ int pem_get_char_from_buf(struct get_char *g)
    g->data.buf.work++;
    return ret;
 }
+
+const struct get_char_api get_char_buffer_api = {
+                                                     .get = s_pem_get_char_from_buf,
+};
 
 static void s_unget_line(char *buf, unsigned long buflen, struct get_char *g)
 {
@@ -62,10 +128,10 @@ static void s_tts(char *buf, unsigned long *buflen)
    }
 }
 
-static char* s_get_line(char *buf, unsigned long *buflen, struct get_char *g)
+static char* s_get_line_i(char *buf, unsigned long *buflen, struct get_char *g, int search_for_start)
 {
-   unsigned long blen = 0;
-   int c = -1, c_;
+   unsigned long blen = 0, wr = 0;
+   int c_;
    if (g->unget_buf.p) {
       if (*buflen < g->unget_buf.len) {
          return NULL;
@@ -75,38 +141,44 @@ static char* s_get_line(char *buf, unsigned long *buflen, struct get_char *g)
       RESET_STR(g->unget_buf);
       return buf;
    }
-   while(blen < *buflen) {
-      c_ = c;
-      c = g->get(g);
-      if (c == '\n') {
-         buf[blen] = '\0';
+   if (g->prev_get == -1) {
+      return NULL;
+   }
+   while(blen < *buflen || search_for_start) {
+      wr = blen < *buflen ? blen : *buflen - 1;
+      c_ = g->prev_get;
+      g->prev_get = g->api.get(g);
+      if (g->prev_get == '\n') {
+         buf[wr] = '\0';
          if (c_ == '\r') {
-            buf[--blen] = '\0';
+            buf[--wr] = '\0';
          }
-         s_tts(buf, &blen);
-         *buflen = blen;
+         s_tts(buf, &wr);
+         *buflen = wr;
+         g->total_read++;
          return buf;
       }
-      if (c == -1 || c == '\0') {
-         buf[blen] = '\0';
-         s_tts(buf, &blen);
-         *buflen = blen;
+      if (g->prev_get == -1 || g->prev_get == '\0') {
+         buf[wr] = '\0';
+         s_tts(buf, &wr);
+         *buflen = wr;
          return buf;
       }
-      buf[blen] = c;
+      buf[wr] = g->prev_get;
       blen++;
+      g->total_read++;
    }
    return NULL;
 }
 
-static LTC_INLINE int s_fits_buf(void *dest, unsigned long to_write, void *end)
+static LTC_INLINE char* s_get_first_line(char *buf, unsigned long *buflen, struct get_char *g)
 {
-   unsigned char *d = dest;
-   unsigned char *e = end;
-   unsigned char *w = d + to_write;
-   if (w < d || w > e)
-      return 0;
-   return 1;
+   return s_get_line_i(buf, buflen, g, 1);
+}
+
+static LTC_INLINE char* s_get_line(char *buf, unsigned long *buflen, struct get_char *g)
+{
+   return s_get_line_i(buf, buflen, g, 0);
 }
 
 static int s_pem_decode_headers(struct pem_headers *hdr, struct get_char *g)
@@ -176,22 +248,30 @@ static int s_pem_decode_headers(struct pem_headers *hdr, struct get_char *g)
    return CRYPT_OK;
 }
 
-int pem_read(void *pem, unsigned long *w, struct pem_headers *hdr, struct get_char *g)
+int pem_read(void **dest, unsigned long *len, struct pem_headers *hdr, struct get_char *g)
 {
-   char buf[LTC_PEM_DECODE_BUFSZ];
-   char *wpem = pem;
-   char *end = wpem + *w;
-   unsigned long slen, linelen;
+   char line[LTC_PEM_DECODE_BUFSZ];
+   struct bufp b_ = {0}, *b = &b_;
+   const char pem_start[] = "----";
+   unsigned long slen, read_len = 0;
    int err, hdr_ok = 0;
-   int would_overflow = 0;
    unsigned char empty_lines = 0;
 
-   linelen = sizeof(buf);
-   if (s_get_line(buf, &linelen, g) == NULL) {
-      return CRYPT_INVALID_PACKET;
-   }
-   if (hdr->id->start.len != linelen || XMEMCMP(buf, hdr->id->start.p, hdr->id->start.len)) {
-      s_unget_line(buf, linelen, g);
+   g->prev_get = 0;
+   do {
+      slen = sizeof(line);
+      if (s_get_first_line(line, &slen, g) == NULL) {
+         if (g->prev_get == -1)
+            return CRYPT_NOP;
+         else
+            return CRYPT_INVALID_PACKET;
+      }
+      read_len += slen;
+      if (slen < sizeof(pem_start) - 1)
+         continue;
+   } while(XMEMCMP(line, pem_start, sizeof(pem_start) - 1) != 0);
+   if (hdr->id->start.len != slen || XMEMCMP(line, hdr->id->start.p, hdr->id->start.len)) {
+      s_unget_line(line, slen, g);
       return CRYPT_UNKNOWN_PEM;
    }
 
@@ -200,9 +280,10 @@ int pem_read(void *pem, unsigned long *w, struct pem_headers *hdr, struct get_ch
       return err;
 
    /* Read the base64 encoded part of the PEM */
-   slen = sizeof(buf);
-   while (s_get_line(buf, &slen, g)) {
-      if (slen == hdr->id->end.len && !XMEMCMP(buf, hdr->id->end.p, slen)) {
+   slen = sizeof(line);
+   while (s_get_line(line, &slen, g)) {
+      read_len += slen;
+      if (slen == hdr->id->end.len && !XMEMCMP(line, hdr->id->end.p, slen)) {
          hdr_ok = 1;
          break;
       }
@@ -211,34 +292,26 @@ int pem_read(void *pem, unsigned long *w, struct pem_headers *hdr, struct get_ch
             break;
          empty_lines++;
       }
-      if (!would_overflow && s_fits_buf(wpem, slen, end)) {
-         XMEMCPY(wpem, buf, slen);
-      } else {
-         would_overflow = 1;
+      if ((err = s_bufp_add(b, line, slen)) != CRYPT_OK) {
+         goto error_out;
       }
-      wpem += slen;
-      slen = sizeof(buf);
+      slen = sizeof(line);
    }
-   if (!hdr_ok)
-      return CRYPT_INVALID_PACKET;
-
-   if (would_overflow || !s_fits_buf(wpem, 1, end)) {
-      /* NUL termination */
-      wpem++;
-      /* prevent a wrap-around */
-      if (wpem < (char*)pem)
-         return CRYPT_OVERFLOW;
-      *w = wpem - (char*)pem;
-      return CRYPT_BUFFER_OVERFLOW;
+   if (!hdr_ok) {
+      err = CRYPT_INVALID_PACKET;
+   } else {
+      slen = s_bufp_alloc_len(b);
+      err = base64_strict_decode(b->start, s_bufp_used_len(b), (void*)b->start, &slen);
    }
+   if (err == CRYPT_OK) {
+      *dest = b->start;
+      *len = slen;
 
-   *w = wpem - (char*)pem;
-   *wpem++ = '\0';
-
-   if ((err = base64_strict_decode(pem, *w, pem, w)) != CRYPT_OK) {
-      return err;
+   } else {
+error_out:
+      XFREE(b->start);
    }
-   return CRYPT_OK;
+   return err;
 }
 
 #endif /* LTC_PEM */

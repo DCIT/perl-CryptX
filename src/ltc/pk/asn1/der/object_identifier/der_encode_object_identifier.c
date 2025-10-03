@@ -27,23 +27,12 @@ int der_encode_object_identifier(const unsigned long *words, unsigned long  nwor
    LTC_ARGCHK(outlen != NULL);
 
    /* check length */
-   if ((err = der_length_object_identifier(words, nwords, &x)) != CRYPT_OK) {
+   if ((err = der_length_object_identifier_full(words, nwords, &x, &z)) != CRYPT_OK) {
       return err;
    }
    if (x > *outlen) {
       *outlen = x;
       return CRYPT_BUFFER_OVERFLOW;
-   }
-
-   /* compute length to store OID data */
-   z = 0;
-   wordbuf = words[0] * 40 + words[1];
-   for (y = 1; y < nwords; y++) {
-       t = der_object_identifier_bits(wordbuf);
-       z += t/7 + ((t%7) ? 1 : 0) + (wordbuf == 0 ? 1 : 0);
-       if (y < nwords - 1) {
-          wordbuf = words[y + 1];
-       }
    }
 
    /* store header + length */
@@ -59,7 +48,7 @@ int der_encode_object_identifier(const unsigned long *words, unsigned long  nwor
    wordbuf = words[0] * 40 + words[1];
    for (i = 1; i < nwords; i++) {
       /* store 7 bit words in little endian */
-      t    = wordbuf & 0xFFFFFFFF;
+      t    = wordbuf;
       if (t) {
          y    = x;
          mask = 0;

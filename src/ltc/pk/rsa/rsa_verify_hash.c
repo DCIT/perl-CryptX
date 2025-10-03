@@ -25,7 +25,8 @@
 int rsa_verify_hash_ex(const unsigned char *sig,            unsigned long  siglen,
                        const unsigned char *hash,           unsigned long  hashlen,
                              int            padding,
-                             int            hash_idx,       unsigned long  saltlen,
+                             int            hash_idx,                 int  mgf_hash_idx,
+                             unsigned long  saltlen,
                              int           *stat,     const rsa_key       *key)
 {
   unsigned long modulus_bitlen, modulus_bytelen, x;
@@ -41,18 +42,8 @@ int rsa_verify_hash_ex(const unsigned char *sig,            unsigned long  sigle
   *stat = 0;
 
   /* valid padding? */
-
-  if ((padding != LTC_PKCS_1_V1_5) &&
-      (padding != LTC_PKCS_1_PSS) &&
-      (padding != LTC_PKCS_1_V1_5_NA1)) {
-    return CRYPT_PK_INVALID_PADDING;
-  }
-
-  if (padding != LTC_PKCS_1_V1_5_NA1) {
-    /* valid hash ? */
-    if ((err = hash_is_valid(hash_idx)) != CRYPT_OK) {
-       return err;
-    }
+  if ((err = rsa_key_valid_op(key, LTC_RSA_SIGN, padding, hash_idx)) != CRYPT_OK) {
+    return err;
   }
 
   /* get modulus len in bits */
@@ -87,10 +78,10 @@ int rsa_verify_hash_ex(const unsigned char *sig,            unsigned long  sigle
     /* PSS decode and verify it */
 
     if(modulus_bitlen%8 == 1){
-      err = pkcs_1_pss_decode(hash, hashlen, tmpbuf+1, x-1, saltlen, hash_idx, modulus_bitlen, stat);
+      err = pkcs_1_pss_decode_mgf1(hash, hashlen, tmpbuf+1, x-1, saltlen, hash_idx, mgf_hash_idx, modulus_bitlen, stat);
     }
     else{
-      err = pkcs_1_pss_decode(hash, hashlen, tmpbuf, x, saltlen, hash_idx, modulus_bitlen, stat);
+      err = pkcs_1_pss_decode_mgf1(hash, hashlen, tmpbuf, x, saltlen, hash_idx, mgf_hash_idx, modulus_bitlen, stat);
     }
 
   } else {
@@ -131,7 +122,7 @@ int rsa_verify_hash_ex(const unsigned char *sig,            unsigned long  sigle
            hash    OCTET STRING
         }
      */
-      LTC_SET_ASN1(digestinfo, 0, LTC_ASN1_OBJECT_IDENTIFIER, loid, sizeof(loid)/sizeof(loid[0]));
+      LTC_SET_ASN1(digestinfo, 0, LTC_ASN1_OBJECT_IDENTIFIER, loid, LTC_ARRAY_SIZE(loid));
       LTC_SET_ASN1(digestinfo, 1, LTC_ASN1_NULL,              NULL,                          0);
       LTC_SET_ASN1(siginfo,    0, LTC_ASN1_SEQUENCE,          digestinfo,                    2);
       LTC_SET_ASN1(siginfo,    1, LTC_ASN1_OCTET_STRING,      tmpbuf,                        siglen);

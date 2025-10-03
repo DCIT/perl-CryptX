@@ -295,6 +295,14 @@ typedef unsigned long ltc_mp_digit;
    #define LTC_HAVE_ROTATE_BUILTIN
 #endif
 
+#if __has_builtin(__builtin_clzl)
+   #define LTC_HAVE_CLZL_BUILTIN
+#endif
+
+#if __has_builtin(__builtin_ctzl)
+   #define LTC_HAVE_CTZL_BUILTIN
+#endif
+
 #if defined(__GNUC__)
    #define LTC_ALIGN(n) __attribute__((aligned(n)))
 #else

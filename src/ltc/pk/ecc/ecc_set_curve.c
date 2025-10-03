@@ -19,6 +19,8 @@ int ecc_set_curve(const ltc_ecc_curve *cu, ecc_key *key)
       return err;
    }
 
+   key->rfc6979_hash_alg = NULL;
+
    /* A, B, order, prime, Gx, Gy */
    if ((err = ltc_mp_read_radix(key->dp.prime, cu->prime, 16)) != CRYPT_OK) { goto error; }
    if ((err = ltc_mp_read_radix(key->dp.order, cu->order, 16)) != CRYPT_OK) { goto error; }

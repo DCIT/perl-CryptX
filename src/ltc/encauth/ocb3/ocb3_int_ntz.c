@@ -16,6 +16,11 @@
 */
 int ocb3_int_ntz(unsigned long x)
 {
+#if defined(LTC_HAVE_CTZL_BUILTIN)
+   if (x == 0)
+      return sizeof(unsigned long) * CHAR_BIT;
+   return __builtin_ctzl(x);
+#else
    int c;
    x &= 0xFFFFFFFFUL;
    c = 0;
@@ -24,6 +29,7 @@ int ocb3_int_ntz(unsigned long x)
       x >>= 1;
    }
    return c;
+#endif
 }
 
 #endif

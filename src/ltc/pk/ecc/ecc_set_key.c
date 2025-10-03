@@ -33,7 +33,7 @@ int ecc_set_key(const unsigned char *in, unsigned long inlen, int type, ecc_key 
    else if (type == PK_PUBLIC) {
       /* load public key */
       if ((err = ltc_ecc_import_point(in, inlen, prime, a, b, key->pubkey.x, key->pubkey.y)) != CRYPT_OK) { goto error; }
-      if ((err = ltc_mp_set(key->pubkey.z, 1)) != CRYPT_OK)                                                   { goto error; }
+      if ((err = ltc_mp_set(key->pubkey.z, 1)) != CRYPT_OK)                                               { goto error; }
    }
    else {
       err = CRYPT_INVALID_PACKET;
@@ -46,6 +46,7 @@ int ecc_set_key(const unsigned char *in, unsigned long inlen, int type, ecc_key 
    }
 
    key->type = type;
+   key->rfc6979_hash_alg = NULL;
    return CRYPT_OK;
 
 error:

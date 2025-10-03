@@ -91,7 +91,7 @@ static const struct {
 int der_printable_char_encode(int c)
 {
    int x;
-   for (x = 0; x < (int)(sizeof(printable_table)/sizeof(printable_table[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(printable_table); x++) {
        if (printable_table[x].code == c) {
           return printable_table[x].value;
        }
@@ -102,7 +102,7 @@ int der_printable_char_encode(int c)
 int der_printable_value_decode(int v)
 {
    int x;
-   for (x = 0; x < (int)(sizeof(printable_table)/sizeof(printable_table[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(printable_table); x++) {
        if (printable_table[x].value == v) {
           return printable_table[x].code;
        }

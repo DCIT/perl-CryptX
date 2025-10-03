@@ -57,12 +57,12 @@ int cfb_encrypt(const unsigned char *pt, unsigned char *ct, unsigned long len, s
       return CRYPT_OVERFLOW;
    }
 
-   if ((err = cipher_is_valid(cfb->cipher)) != CRYPT_OK) {
+   if ((err = cipher_is_valid(cfb->ecb.cipher)) != CRYPT_OK) {
        return err;
    }
 
    /* is blocklen/padlen valid? */
-   if (cfb->blocklen < 0 || cfb->blocklen > (int)sizeof(cfb->IV) ||
+   if (cfb->ecb.blocklen < 0 || cfb->ecb.blocklen > (int)sizeof(cfb->IV) ||
        cfb->padlen   < 0 || cfb->padlen   > (int)sizeof(cfb->pad)) {
       return CRYPT_INVALID_ARG;
    }
@@ -70,8 +70,8 @@ int cfb_encrypt(const unsigned char *pt, unsigned char *ct, unsigned long len, s
    bits_per_round = cfb->width == 1 ? 1 : 8;
 
    while (bitlen > 0) {
-      if (cfb->padlen == cfb->blocklen) {
-         if ((err = cipher_descriptor[cfb->cipher].ecb_encrypt(cfb->pad, cfb->IV, &cfb->key)) != CRYPT_OK) {
+       if (cfb->padlen == cfb->ecb.blocklen) {
+          if ((err = ecb_encrypt_block(cfb->pad, cfb->IV, &cfb->ecb)) != CRYPT_OK) {
             return err;
          }
          cfb->padlen = 0;
@@ -86,22 +86,22 @@ int cfb_encrypt(const unsigned char *pt, unsigned char *ct, unsigned long len, s
                ct_ <<= 1;
             }
             ct_ |= ((pt_ ^ cfb->IV[0]) >> 7) & 0x01u;
-            if (cfb->blocklen == 16)
+            if (cfb->ecb.blocklen == 16)
                s_shift1left_128(cfb->pad, ct_);
             else
                s_shift1left_64(cfb->pad, ct_);
-            cfb->padlen = cfb->blocklen;
+            cfb->padlen = cfb->ecb.blocklen;
             if (cur_bit % 8 == 0) {
                *ct++ = ct_;
                cur_bit = 0;
             }
             break;
          case 8:
-            XMEMMOVE(cfb->pad, cfb->pad + 1, cfb->blocklen - 1);
-            cfb->pad[cfb->blocklen - 1] = (*ct = *pt ^ cfb->IV[0]);
+            XMEMMOVE(cfb->pad, cfb->pad + 1, cfb->ecb.blocklen - 1);
+            cfb->pad[cfb->ecb.blocklen - 1] = (*ct = *pt ^ cfb->IV[0]);
             ++pt;
             ++ct;
-            cfb->padlen = cfb->blocklen;
+            cfb->padlen = cfb->ecb.blocklen;
             break;
          case 64:
          case 128:

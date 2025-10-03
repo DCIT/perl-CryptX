@@ -47,7 +47,7 @@ int x509_encode_subject_public_key_info(unsigned char *out, unsigned long *outle
         return err;
    }
 
-   oidlen = sizeof(oid)/sizeof(oid[0]);
+   oidlen = LTC_ARRAY_SIZE(oid);
    if ((err = pk_oid_str_to_num(OID, oid, &oidlen)) != CRYPT_OK) {
       return err;
    }
@@ -56,7 +56,7 @@ int x509_encode_subject_public_key_info(unsigned char *out, unsigned long *outle
    LTC_SET_ASN1(alg_id, 1, parameters_type,            parameters, parameters_len);
 
    return der_encode_sequence_multi(out, outlen,
-        LTC_ASN1_SEQUENCE, (unsigned long)sizeof(alg_id)/sizeof(alg_id[0]), alg_id,
+        LTC_ASN1_SEQUENCE, (unsigned long)LTC_ARRAY_SIZE(alg_id), alg_id,
         LTC_ASN1_RAW_BIT_STRING, public_key_len*8U, public_key,
         LTC_ASN1_EOL,     0UL, NULL);
 

@@ -608,7 +608,7 @@ int siv_test(void)
 
    cipher = find_cipher("aes");
 
-   for (n = 0; n < sizeof(siv_tests)/sizeof(siv_tests[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(siv_tests); ++n) {
       buflen = sizeof(buf);
       if ((err = siv_encrypt_memory(cipher,
                              siv_tests[n].Key, siv_tests[n].Keylen,

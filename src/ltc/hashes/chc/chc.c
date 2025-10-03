@@ -277,7 +277,7 @@ int chc_test(void)
    oldhashidx = cipher_idx;
    chc_register(idx);
 
-   for (i = 0; i < (int)(sizeof(tests)/sizeof(tests[0])); i++) {
+   for (i = 0; i < (int)LTC_ARRAY_SIZE(tests); i++) {
        if ((err = chc_init(&md)) != CRYPT_OK) {
           return err;
        }

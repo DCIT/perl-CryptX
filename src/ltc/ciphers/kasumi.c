@@ -286,7 +286,7 @@ int kasumi_test(void)
    symmetric_key key;
    int err, x;
 
-   for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
        if ((err = kasumi_setup(tests[x].key, 16, 0, &key)) != CRYPT_OK) {
           return err;
        }
