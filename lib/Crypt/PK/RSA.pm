@@ -623,10 +623,13 @@ If you don't know what this is, see RFC 7638 L<https://tools.ietf.org/html/rfc76
  my $signature = $priv->sign_hash($message_hash, $hash_name, $padding);
  #or
  my $signature = $priv->sign_hash($message_hash, $hash_name, 'pss', $saltlen);
+ #or
+ my $signature = $priv->sign_hash($message_hash, $hash_name, 'pss', $saltlen, $mgf_hash_name);
 
- # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
- # $saltlen (only for pss) .. DEFAULT is 12
+ # $hash_name ................. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................... 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
+ # $saltlen (pss only) ........ DEFAULT is 12
+ # $mgf_hash_name (pss only) .. MGF hash function name (DEFAULT: the $hash_name value)
 
 =head2 verify_hash
 
@@ -638,10 +641,13 @@ If you don't know what this is, see RFC 7638 L<https://tools.ietf.org/html/rfc76
  my $valid = $pub->verify_hash($signature, $message_hash, $hash_name, $padding);
  #or
  my $valid = $pub->verify_hash($signature, $message_hash, $hash_name, 'pss', $saltlen);
+ #or
+ my $valid = $pub->verify_hash($signature, $message_hash, $hash_name, 'pss', $saltlen, $mgf_hash_name);
 
- # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
- # $saltlen (only for pss) .. DEFAULT is 12
+ # $hash_name ................. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................... 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
+ # $saltlen (pss only) ........ DEFAULT is 12
+ # $mgf_hash_name (pss only) .. MGF hash function name (DEFAULT: the $hash_name value)
 
 =head2 is_private
 

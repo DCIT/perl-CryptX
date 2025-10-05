@@ -70,7 +70,7 @@ add(Crypt::Mode::CBC self, ...)
         RETVAL = newSVpvn("", 0);
         for (j = 1; j < items; j++) {
           in_data = (unsigned char *)SvPVbyte(ST(j), in_data_len);
-          blen = (&self->state)->blocklen;
+          blen = (&self->state)->ecb.blocklen;
           in_data_start = 0;
           has_tmp_block = 0;
           if (in_data_len > 0) {
@@ -213,17 +213,17 @@ finish(Crypt::Mode::CBC self)
     {
         unsigned char tmp_block[MAXBLOCKSIZE];
         int rv;
-        unsigned long blen = (&self->state)->blocklen;
+        unsigned long blen = (&self->state)->ecb.blocklen;
         unsigned long padmode;
 
         if (self->direction == 1) {
           if (self->padlen < 0 || self->padlen >= (int)blen) croak("FATAL: invalid padlen");
           if (self->padding_mode != 0) {
-            if      (self->padding_mode == 1) { padmode = LTC_PAD_PKCS7        | (&self->state)->blocklen; }
-            else if (self->padding_mode == 2) { padmode = LTC_PAD_ONE_AND_ZERO | (&self->state)->blocklen; }
-            else if (self->padding_mode == 3) { padmode = LTC_PAD_ANSI_X923    | (&self->state)->blocklen; }
-            else if (self->padding_mode == 4) { padmode = LTC_PAD_ZERO         | (&self->state)->blocklen; }
-            else if (self->padding_mode == 5) { padmode = LTC_PAD_ZERO_ALWAYS  | (&self->state)->blocklen; }
+            if      (self->padding_mode == 1) { padmode = LTC_PAD_PKCS7        | (&self->state)->ecb.blocklen; }
+            else if (self->padding_mode == 2) { padmode = LTC_PAD_ONE_AND_ZERO | (&self->state)->ecb.blocklen; }
+            else if (self->padding_mode == 3) { padmode = LTC_PAD_ANSI_X923    | (&self->state)->ecb.blocklen; }
+            else if (self->padding_mode == 4) { padmode = LTC_PAD_ZERO         | (&self->state)->ecb.blocklen; }
+            else if (self->padding_mode == 5) { padmode = LTC_PAD_ZERO_ALWAYS  | (&self->state)->ecb.blocklen; }
             else { croak("FATAL: unknown padding"); }
             blen = sizeof(self->pad);
             rv = padding_pad(self->pad, self->padlen, &blen, padmode);
@@ -242,11 +242,11 @@ finish(Crypt::Mode::CBC self)
             rv = cbc_decrypt(self->pad, tmp_block, blen, &self->state);
             if (rv != CRYPT_OK) croak("FATAL: cbc_decrypt failed: %s", error_to_string(rv));
             if (self->padding_mode != 0) {
-              if      (self->padding_mode == 1) { padmode = LTC_PAD_PKCS7        | (&self->state)->blocklen; }
-              else if (self->padding_mode == 2) { padmode = LTC_PAD_ONE_AND_ZERO | (&self->state)->blocklen; }
-              else if (self->padding_mode == 3) { padmode = LTC_PAD_ANSI_X923    | (&self->state)->blocklen; }
-              else if (self->padding_mode == 4) { padmode = LTC_PAD_ZERO         | (&self->state)->blocklen; }
-              else if (self->padding_mode == 5) { padmode = LTC_PAD_ZERO_ALWAYS  | (&self->state)->blocklen; }
+              if      (self->padding_mode == 1) { padmode = LTC_PAD_PKCS7        | (&self->state)->ecb.blocklen; }
+              else if (self->padding_mode == 2) { padmode = LTC_PAD_ONE_AND_ZERO | (&self->state)->ecb.blocklen; }
+              else if (self->padding_mode == 3) { padmode = LTC_PAD_ANSI_X923    | (&self->state)->ecb.blocklen; }
+              else if (self->padding_mode == 4) { padmode = LTC_PAD_ZERO         | (&self->state)->ecb.blocklen; }
+              else if (self->padding_mode == 5) { padmode = LTC_PAD_ZERO_ALWAYS  | (&self->state)->ecb.blocklen; }
               else { croak("FATAL: unknown padding"); }
               rv = padding_depad(tmp_block, &blen, padmode);
               if (rv != CRYPT_OK) croak("FATAL: padding_depad failed: %s", error_to_string(rv));

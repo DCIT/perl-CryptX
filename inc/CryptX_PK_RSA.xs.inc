@@ -451,12 +451,12 @@ decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
         RETVAL
 
 SV *
-sign_hash(Crypt::PK::RSA self, SV * data, const char * hash_name = "SHA1", const char * padding = "pss", unsigned long saltlen=12)
+sign_hash(Crypt::PK::RSA self, SV * data, const char * hash_name = "SHA1", const char * padding = "pss", unsigned long saltlen=12, const char * mgf_hash_name = NULL)
     ALIAS:
         sign_message = 1
     CODE:
     {
-        int rv, hash_id;
+        int rv, hash_id, mgf_hash_id;
         unsigned char buffer[1024], tmp[MAXBLOCKSIZE], *data_ptr = NULL;
         unsigned long tmp_len = MAXBLOCKSIZE, buffer_len = 1024;
         STRLEN data_len = 0;
@@ -473,9 +473,11 @@ sign_hash(Crypt::PK::RSA self, SV * data, const char * hash_name = "SHA1", const
         if (strnEQ(padding, "pss", 3)) {
           hash_id = cryptx_internal_find_hash(hash_name);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
+          mgf_hash_id = mgf_hash_name ? cryptx_internal_find_hash(mgf_hash_name) : hash_id;
+          if (mgf_hash_id == -1) croak("FATAL: find_hash failed for '%s'", mgf_hash_name);
           rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_PSS,
                                 &self->pstate, self->pindex,
-                                hash_id, saltlen, &self->key);
+                                hash_id, mgf_hash_id, saltlen, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_sign_hash_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
@@ -484,7 +486,7 @@ sign_hash(Crypt::PK::RSA self, SV * data, const char * hash_name = "SHA1", const
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_sign_hash_ex(data_ptr, (unsigned long)data_len, buffer, &buffer_len, LTC_PKCS_1_V1_5,
                                 &self->pstate, self->pindex,
-                                hash_id, 0, &self->key);
+                                hash_id, -1, 0, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_sign_hash_ex failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)buffer, buffer_len);
         }
@@ -502,12 +504,12 @@ sign_hash(Crypt::PK::RSA self, SV * data, const char * hash_name = "SHA1", const
         RETVAL
 
 int
-verify_hash(Crypt::PK::RSA self, SV * sig, SV * data, const char * hash_name = "SHA1", const char * padding = "pss", unsigned long saltlen = 12)
+verify_hash(Crypt::PK::RSA self, SV * sig, SV * data, const char * hash_name = "SHA1", const char * padding = "pss", unsigned long saltlen = 12, const char * mgf_hash_name = NULL)
     ALIAS:
         verify_message = 1
     CODE:
     {
-        int rv, hash_id, stat;
+        int rv, hash_id, mgf_hash_id, stat;
         unsigned char tmp[MAXBLOCKSIZE], buffer[1024], *data_ptr = NULL, *sig_ptr = NULL;
         unsigned long i, tmp_len = MAXBLOCKSIZE, buffer_len = 1024;
         STRLEN data_len = 0, sig_len = 0;
@@ -527,15 +529,17 @@ verify_hash(Crypt::PK::RSA self, SV * sig, SV * data, const char * hash_name = "
         if (strnEQ(padding, "pss", 3)) {
           hash_id = cryptx_internal_find_hash(hash_name);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
+          mgf_hash_id = mgf_hash_name ? cryptx_internal_find_hash(mgf_hash_name) : hash_id;
+          if (mgf_hash_id == -1) croak("FATAL: find_hash failed for '%s'", mgf_hash_name);
           rv = rsa_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_PKCS_1_PSS,
-                                hash_id, saltlen, &stat, &self->key);
+                                hash_id, mgf_hash_id, saltlen, &stat, &self->key);
           if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
         }
         else if (strnEQ(padding, "v1.5", 4)) {
           hash_id = cryptx_internal_find_hash(hash_name);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = rsa_verify_hash_ex(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, LTC_PKCS_1_V1_5,
-                                hash_id, 0, &stat, &self->key);
+                                hash_id, -1, 0, &stat, &self->key);
           if (rv != CRYPT_OK || stat != 1) RETVAL = 0;
         }
         else if (strnEQ(padding, "none", 4)) {
