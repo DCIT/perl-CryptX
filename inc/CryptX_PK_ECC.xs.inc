@@ -553,6 +553,21 @@ recovery_pub(Crypt::PK::ECC self, SV * sig, SV* hash, SV* recid = NULL)
         RETVAL
 
 void
+set_rfc6979_hash_alg(Crypt::PK::ECC self, const char * hash_name = "SHA1")
+    PPCODE:
+    {
+        int hash_id;
+        const char *normalized_hash_name;
+
+        hash_id = cryptx_internal_find_hash(hash_name);
+        if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
+        normalized_hash_name = hash_descriptor[hash_id].name;
+
+        ECC_SET_RFC6979_HASH_ALG(&self->key, normalized_hash_name);
+        XPUSHs(ST(0)); /* return self */
+    }
+
+void
 DESTROY(Crypt::PK::ECC self)
     CODE:
         if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
