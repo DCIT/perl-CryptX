@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 146;
+use Test::More tests => 156;
 
 use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret);
 use Crypt::Misc qw(read_rawfile);
@@ -249,6 +249,49 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   ok($rk->recovery_pub_rfc7518($sig, $hash, 1), 'recovery pub rfc7518 with 1 bit ok');
   my $pub1 = $rk->export_key_raw('public');
   ok($pub0 eq $pub || $pub1 eq $pub, 'recovery rfc7518 pub key matched');
+}
+
+### RFC6979 deterministic signature tests
+{
+  my $k = Crypt::PK::ECC->new();
+  $k->generate_key('secp256k1');
+
+  # Test deterministic signatures with SHA256
+  $k->set_rfc6979_hash_alg('SHA256');
+  my $msg = "test message for deterministic signing";
+  my $sig1 = $k->sign_message($msg);
+  my $sig2 = $k->sign_message($msg);
+  my $sig3 = $k->sign_message($msg);
+
+  is($sig1, $sig2, 'same message produces identical signature (1st vs 2nd)');
+  is($sig2, $sig3, 'same message produces identical signature (2nd vs 3rd)');
+  ok($k->verify_message($sig1, $msg), 'signature verifies correctly');
+
+  # Test deterministic signatures with SHA1
+  $k->set_rfc6979_hash_alg('SHA1');
+  my $sig1_sha1 = $k->sign_message($msg);
+  my $sig2_sha1 = $k->sign_message($msg);
+
+  is($sig1_sha1, $sig2_sha1, 'same message produces identical signature');
+  ok($k->verify_message($sig1_sha1, $msg), 'signature verifies correctly');
+
+  # Different hash algorithms should produce different signatures
+  isnt($sig1, $sig1_sha1, 'different hash algorithms produce different signatures');
+
+  # Test with different messages
+  my $msg2 = "different test message";
+  my $sig_msg2 = $k->sign_message($msg2);
+  isnt($sig1_sha1, $sig_msg2, 'different messages produce different signatures');
+  ok($k->verify_message($sig_msg2, $msg2), 'different message signature verifies correctly');
+
+  # Test hash algorithm switching
+  $k->set_rfc6979_hash_alg('sha256'); # case insensitive
+  my $sig_back_to_sha256 = $k->sign_message($msg);
+  is($sig_back_to_sha256, $sig1, 'switching back to SHA256 produces original signature');
+
+  $k->set_rfc6979_hash_alg('sha1'); # case insensitive
+  my $sig_back_to_sha1 = $k->sign_message($msg);
+  is($sig_back_to_sha1, $sig1_sha1, 'switching back to SHA1 produces original signature');
 }
 
 {
