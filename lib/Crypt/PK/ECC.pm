@@ -851,7 +851,11 @@ to get a fully RFC-7518-compliant signature.
 =head2 sign_hash
 
  my $pk = Crypt::PK::ECC->new($priv_key_filename);
- my $signature = $priv->sign_hash($message_hash);
+ my $signature = $priv->sign_hash($message_hash, $deterministic_hash_name);
+
+ #NOTE: $deterministic_hash_name can be 'SHA1', 'SHA256' or any other hash supported by Crypt::Digest
+ #      in most cases it will be the same as used to create $message_hash, if not provided non-deterministic
+ #      signature will be created
 
 I<Since: CryptX-0.081>
 
@@ -891,17 +895,6 @@ This method will recover public key from ECDSA signature in Ethereum format
  my $pk = Crypt::PK::ECC->new($priv_key_filename);
  my $signature = $pk->sign_hash_eth($message_hash);
  my $pub_key = $pk->recovery_pub_eth($sig, $hash)
-
-=head2 set_rfc6979_hash_alg
-
-I<Since: CryptX-0.087>
-
-Set the hash algorithm used for deterministic k generation as per RFC 6979.
-Default is SHA-1, but for better security you should use SHA-256 or stronger.
-
- my $pk = Crypt::PK::ECC->new($priv_key_filename);
- $pk->set_rfc6979_hash_alg('SHA256');
- my $signature = $pk->sign_hash_eth($message_hash);
 
 =head2 recovery_pub
 
