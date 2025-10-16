@@ -103,12 +103,12 @@ use Crypt::Misc qw(read_rawfile);
   ok($pu1->verify_message_rfc7518($sig_rfc7518, "message"), 'verify_message_rfc7518');
 
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  $sig = $pr1->sign_hash($hash);
+  $sig = $pr1->sign_hash($hash, 'SHA1');
   ok(length $sig > 60, 'sign_hash ' . length($sig));
   ok($pu1->verify_hash($sig, $hash, 'SHA1'), 'verify_hash');
 
   $hash = pack("H*", "04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  $sig = $pr1->sign_hash_eth($hash);
+  $sig = $pr1->sign_hash_eth($hash, 'SHA1');
   ok(length $sig == 65, 'sign_hash_eth ' . length($sig));
   ok($pu1->verify_hash_eth($sig, $hash), 'verify_hash_eth');
 
@@ -144,7 +144,7 @@ use Crypt::Misc qw(read_rawfile);
   ok($sig, 'ecc_sign_message');
   ok(ecc_verify_message('t/data/cryptx_pub_ecc1.der', $sig, 'test string'), 'ecc_verify_message');
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  $sig = ecc_sign_hash('t/data/cryptx_priv_ecc1.der', $hash);
+  $sig = ecc_sign_hash('t/data/cryptx_priv_ecc1.der', $hash, 'SHA1');
   ok($sig, 'ecc_sign_hash');
   ok(ecc_verify_hash('t/data/cryptx_pub_ecc1.der', $sig, $hash, 'SHA1'), 'ecc_verify_hash');
 
@@ -212,7 +212,7 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   ok($k->generate_key('secp256k1'), 'generate_key secp256k1');
   my $pub = $k->export_key_raw('public');
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  my $sig = $k->sign_hash_eth($hash);
+  my $sig = $k->sign_hash_eth($hash, 'SHA1');
   my $rk = Crypt::PK::ECC->new;
   $rk->generate_key('secp256k1');
   ok($rk->recovery_pub_eth($sig, $hash), 'recovery eth pub ok');
@@ -226,7 +226,7 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   ok($k->generate_key('secp256k1'), 'generate_key secp256k1');
   my $pub = $k->export_key_raw('public');
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  my $sig = $k->sign_hash($hash);
+  my $sig = $k->sign_hash($hash, 'SHA1');
   my $rk = Crypt::PK::ECC->new;
   $rk->generate_key('secp256k1');
   ok($rk->recovery_pub($sig, $hash, 0), 'recovery pub with 0 bit ok');
@@ -241,7 +241,7 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   ok($k->generate_key('secp256k1'), 'generate_key secp256k1');
   my $pub = $k->export_key_raw('public');
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  my $sig = $k->sign_hash_rfc7518($hash);
+  my $sig = $k->sign_hash_rfc7518($hash, 'SHA1');
   my $rk = Crypt::PK::ECC->new;
   $rk->generate_key('secp256k1');
   ok($rk->recovery_pub_rfc7518($sig, $hash, 0), 'recovery pub rfc7518 with 0 bit ok');
@@ -252,9 +252,7 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
 }
 
 ### RFC6979 deterministic signature tests
-SKIP: {
-  skip 'RFC6979 tests skipped on Cygwin due to LibTomCrypt issues', 41 if $^O eq 'cygwin';
-
+{
   my $k = Crypt::PK::ECC->new();
   $k->generate_key('secp256k1');
 
