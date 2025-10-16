@@ -851,9 +851,13 @@ to get a fully RFC-7518-compliant signature.
 =head2 sign_hash
 
  my $pk = Crypt::PK::ECC->new($priv_key_filename);
- my $signature = $priv->sign_hash($message_hash);
+ my $signature = $priv->sign_hash($message_hash, $deterministic_hash_name);
 
-I<Since: CyrptX-0.081>
+ #NOTE: $deterministic_hash_name can be 'SHA1', 'SHA256' or any other hash supported by Crypt::Digest
+ #      in most cases it will be the same as used to create $message_hash, if not provided non-deterministic
+ #      signature will be created
+
+I<Since: CryptX-0.081>
 
 =head2 sign_hash_eth
 
@@ -874,7 +878,7 @@ Same as L<sign_hash|/sign_hash> only the signature format is as defined by L<htt
 
 =head2 verify_hash_rfc7518
 
-I<Since: CyrptX-0.081>
+I<Since: CryptX-0.081>
 
 =head2 verify_hash_eth
 

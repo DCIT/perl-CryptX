@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 146;
+use Test::More tests => 187;
 
 use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret);
 use Crypt::Misc qw(read_rawfile);
@@ -103,12 +103,12 @@ use Crypt::Misc qw(read_rawfile);
   ok($pu1->verify_message_rfc7518($sig_rfc7518, "message"), 'verify_message_rfc7518');
 
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  $sig = $pr1->sign_hash($hash, 'SHA1');
+  $sig = $pr1->sign_hash($hash);
   ok(length $sig > 60, 'sign_hash ' . length($sig));
   ok($pu1->verify_hash($sig, $hash, 'SHA1'), 'verify_hash');
 
   $hash = pack("H*", "04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  $sig = $pr1->sign_hash_eth($hash, 'SHA1');
+  $sig = $pr1->sign_hash_eth($hash);
   ok(length $sig == 65, 'sign_hash_eth ' . length($sig));
   ok($pu1->verify_hash_eth($sig, $hash), 'verify_hash_eth');
 
@@ -144,7 +144,7 @@ use Crypt::Misc qw(read_rawfile);
   ok($sig, 'ecc_sign_message');
   ok(ecc_verify_message('t/data/cryptx_pub_ecc1.der', $sig, 'test string'), 'ecc_verify_message');
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  $sig = ecc_sign_hash('t/data/cryptx_priv_ecc1.der', $hash, 'SHA1');
+  $sig = ecc_sign_hash('t/data/cryptx_priv_ecc1.der', $hash);
   ok($sig, 'ecc_sign_hash');
   ok(ecc_verify_hash('t/data/cryptx_pub_ecc1.der', $sig, $hash, 'SHA1'), 'ecc_verify_hash');
 
@@ -212,7 +212,7 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   ok($k->generate_key('secp256k1'), 'generate_key secp256k1');
   my $pub = $k->export_key_raw('public');
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  my $sig = $k->sign_hash_eth($hash, 'SHA1');
+  my $sig = $k->sign_hash_eth($hash);
   my $rk = Crypt::PK::ECC->new;
   $rk->generate_key('secp256k1');
   ok($rk->recovery_pub_eth($sig, $hash), 'recovery eth pub ok');
@@ -226,7 +226,7 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   ok($k->generate_key('secp256k1'), 'generate_key secp256k1');
   my $pub = $k->export_key_raw('public');
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  my $sig = $k->sign_hash($hash, 'SHA1');
+  my $sig = $k->sign_hash($hash);
   my $rk = Crypt::PK::ECC->new;
   $rk->generate_key('secp256k1');
   ok($rk->recovery_pub($sig, $hash, 0), 'recovery pub with 0 bit ok');
@@ -241,7 +241,7 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   ok($k->generate_key('secp256k1'), 'generate_key secp256k1');
   my $pub = $k->export_key_raw('public');
   my $hash = pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd");
-  my $sig = $k->sign_hash_rfc7518($hash, 'SHA1');
+  my $sig = $k->sign_hash_rfc7518($hash);
   my $rk = Crypt::PK::ECC->new;
   $rk->generate_key('secp256k1');
   ok($rk->recovery_pub_rfc7518($sig, $hash, 0), 'recovery pub rfc7518 with 0 bit ok');
@@ -249,6 +249,66 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   ok($rk->recovery_pub_rfc7518($sig, $hash, 1), 'recovery pub rfc7518 with 1 bit ok');
   my $pub1 = $rk->export_key_raw('public');
   ok($pub0 eq $pub || $pub1 eq $pub, 'recovery rfc7518 pub key matched');
+}
+
+### RFC6979 deterministic signature tests
+SKIP: {
+  skip 'RFC6979 tests skipped on Cygwin due to LibTomCrypt issues', 41 if $^O eq 'cygwin';
+
+  my $k = Crypt::PK::ECC->new();
+  $k->generate_key('secp256k1');
+
+  my $sign_hash_methods = [
+    ['sign_hash',        'verify_hash'],
+    ['sign_hash_eth',    'verify_hash_eth'],
+    ['sign_hash_rfc7518','verify_hash_rfc7518'],
+  ];
+
+  my $hash = pack("H*","4646464646464646464646464646464646464646464646464646464646464646");
+
+  for my $m (@$sign_hash_methods) {
+    my ($sign_m, $ver_m, $sig_len) = @$m;
+    my $sig = $k->$sign_m($hash, 'SHA256');
+    ok($sig, "$sign_m produced signature");
+    ok($k->$ver_m($sig, $hash, 'SHA256'), "$ver_m verified signature");
+
+    my $sig2 = $k->$sign_m($hash, 'SHA256');
+    is ($sig, $sig2, "same hash produces identical signature for $sign_m");
+
+    my $sig3 = $k->$sign_m($hash);
+    ok($sig3, "$sign_m with default hash produced signature");
+    ok($k->$ver_m($sig3, $hash), "$ver_m verified signature");
+    ok($sig3 ne $sig, "default hash produces different signature for $sign_m");
+
+    my $sig4 = $k->$sign_m($hash, undef, 'SHA256');
+    ok($sig4, "$sign_m with undef as second parameter produced signature");
+    ok($k->$ver_m($sig4, $hash, 'SHA256'), "$ver_m verified signature");
+    is($sig4, $sig, "undef as second parameter produces identical signature for $sign_m");
+  }
+
+  my $sign_message_methods = [
+    ['sign_message',        'verify_message'],
+    ['sign_message_rfc7518','verify_message_rfc7518'],
+  ];
+
+  my $message = "the fox jumps over the lazy dog";
+
+  for my $m (@$sign_message_methods) {
+    my ($sign_m, $ver_m, $sig_len) = @$m;
+    my $sig = $k->$sign_m($message, 'SHA256', 'SHA256');
+    ok($sig, "$sign_m produced signature");
+    ok($k->$ver_m($sig, $message, 'SHA256'), "$ver_m verified signature");
+
+    my $sig2 = $k->$sign_m($message, 'SHA256', 'SHA256');
+    is ($sig, $sig2, "same message produces identical signature for $sign_m");
+
+    my $sig3 = $k->$sign_m($message);
+    ok($sig3, "$sign_m with default hash produced signature");
+    ok($k->$ver_m($sig3, $message), "$ver_m verified signature");
+    ok($sig3 ne $sig, "default hash produces different signature for $sign_m");
+
+    ok $k->$sign_m($message, undef, 'SHA256'), "$sign_m with undef as second parameter produced signature";
+  }
 }
 
 {

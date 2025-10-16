@@ -409,7 +409,7 @@ decrypt(Crypt::PK::ECC self, SV * data)
         RETVAL
 
 SV *
-sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
+sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = NULL, const char * hash_rfc6979_name = NULL)
     ALIAS:
         sign_hash_rfc7518    = 3
         sign_message         = 1
@@ -417,13 +417,23 @@ sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
         sign_hash_eth        = 4
     CODE:
     {
-        int rv, id;
+        int rv, id, hash_rfc6979_id;
         unsigned char buffer[1024], tmp[MAXBLOCKSIZE], *data_ptr = NULL;
         unsigned long tmp_len = MAXBLOCKSIZE, buffer_len = 1024;
         STRLEN data_len = 0;
 
+        // Handle dual signature modes for backward compatibility
+        // For sign_hash_*: if only 2 params passed, treat second as RFC6979 hash
+        if ((ix == 0 || ix == 3 || ix == 4) && hash_name != NULL && hash_rfc6979_name == NULL) {
+          hash_rfc6979_name = hash_name;
+        }
+
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         if (ix == 1 || ix == 2) {
+          // for backward compatibility, if hash_name is NULL, use SHA1
+          if (hash_name == NULL) {
+            hash_name = "SHA1";
+          }
           id = cryptx_internal_find_hash(hash_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = hash_memory(id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
@@ -431,6 +441,18 @@ sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
           data_ptr = tmp;
           data_len = tmp_len;
         }
+
+        if (hash_rfc6979_name != NULL) {
+          hash_rfc6979_id = cryptx_internal_find_hash(hash_rfc6979_name);
+          if (hash_rfc6979_id == -1) croak("FATAL: find_hash failed for rfc6979 hash '%s'", hash_rfc6979_name);
+          ECC_SET_RFC6979_HASH_ALG(&self->key, hash_descriptor[hash_rfc6979_id].name);
+        } else {
+          // Clear any previously set RFC6979 hash to ensure non-deterministic signing
+          // when RFC6979 parameter is not provided. This prevents hidden state from
+          // previous method calls affecting current signature behavior.
+          ECC_SET_RFC6979_HASH_ALG(&self->key, NULL);
+        }
+
         if (ix == 2 || ix == 3) {
           rv = ecc_sign_hash_rfc7518(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                              &self->pstate, self->pindex,
