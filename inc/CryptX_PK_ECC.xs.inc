@@ -417,11 +417,11 @@ sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = NULL, const c
         sign_hash_eth        = 4
     CODE:
     {
-        int rv, id, hash_rfc6979_id;
+        int rv, id, hash_rfc6979_id, r = -1;
         unsigned char buffer[1024], tmp[MAXBLOCKSIZE], *data_ptr = NULL;
         unsigned long tmp_len = MAXBLOCKSIZE, buffer_len = 1024;
         STRLEN data_len = 0;
-        ltc_ecc_sig_opts sig_opts = { .prng = &self->pstate, .wprng = self->pindex, .type = LTC_ECCSIG_ANSIX962 };
+        ltc_ecc_sig_opts sig_opts = { .prng = &self->pstate, .wprng = self->pindex, .type = LTC_ECCSIG_ANSIX962, .recid = &r, .rfc6979_hash_alg = NULL };
 
         // Handle dual signature modes for backward compatibility
         // For sign_hash_*: if only 2 params passed, treat second as RFC6979 hash
@@ -482,11 +482,11 @@ verify_hash(Crypt::PK::ECC self, SV * sig, SV * data, const char * hash_name = "
         verify_hash_eth        = 4
     CODE:
     {
-        int rv, stat, id;
+        int rv, stat, id, r = -1;
         unsigned char tmp[MAXBLOCKSIZE], *data_ptr = NULL, *sig_ptr = NULL;
         unsigned long tmp_len = MAXBLOCKSIZE;
         STRLEN data_len = 0, sig_len = 0;
-        ltc_ecc_sig_opts sig_opts = { .prng = &self->pstate, .wprng = self->pindex, .type = LTC_ECCSIG_ANSIX962 };
+        ltc_ecc_sig_opts sig_opts = { .prng = &self->pstate, .wprng = self->pindex, .type = LTC_ECCSIG_ANSIX962, .recid = &r, .rfc6979_hash_alg = NULL };
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
@@ -543,7 +543,7 @@ recovery_pub(Crypt::PK::ECC self, SV * sig, SV* hash, SV* recid = NULL)
         int rv, r = -1;
         unsigned char *sig_ptr = NULL, *hash_ptr = NULL;
         STRLEN hash_len = 0, sig_len = 0;
-        ltc_ecc_sig_opts sig_opts = { .prng = &self->pstate, .wprng = self->pindex, .type = LTC_ECCSIG_ANSIX962 };
+        ltc_ecc_sig_opts sig_opts = { .prng = &self->pstate, .wprng = self->pindex, .type = LTC_ECCSIG_ANSIX962, .recid = &r, .rfc6979_hash_alg = NULL };
 
         if (recid != NULL) {
           r = (int) SvIV(recid);
@@ -555,7 +555,6 @@ recovery_pub(Crypt::PK::ECC self, SV * sig, SV* hash, SV* recid = NULL)
             croak("FATAL: recovery_pub requires recid argument");
           }
         }
-        sig_opts.recid = &r;
 
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
         hash_ptr = (unsigned char *)SvPVbyte(hash, hash_len);
