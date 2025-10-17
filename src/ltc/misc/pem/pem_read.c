@@ -253,7 +253,7 @@ int pem_read(void **dest, unsigned long *len, struct pem_headers *hdr, struct ge
    char line[LTC_PEM_DECODE_BUFSZ];
    struct bufp b_ = {0}, *b = &b_;
    const char pem_start[] = "----";
-   unsigned long slen, read_len = 0;
+   unsigned long slen;
    int err, hdr_ok = 0;
    unsigned char empty_lines = 0;
 
@@ -266,7 +266,6 @@ int pem_read(void **dest, unsigned long *len, struct pem_headers *hdr, struct ge
          else
             return CRYPT_INVALID_PACKET;
       }
-      read_len += slen;
       if (slen < sizeof(pem_start) - 1)
          continue;
    } while(XMEMCMP(line, pem_start, sizeof(pem_start) - 1) != 0);
@@ -282,7 +281,6 @@ int pem_read(void **dest, unsigned long *len, struct pem_headers *hdr, struct ge
    /* Read the base64 encoded part of the PEM */
    slen = sizeof(line);
    while (s_get_line(line, &slen, g)) {
-      read_len += slen;
       if (slen == hdr->id->end.len && !XMEMCMP(line, hdr->id->end.p, slen)) {
          hdr_ok = 1;
          break;

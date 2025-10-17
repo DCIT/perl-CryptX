@@ -14,9 +14,12 @@
 */
 int register_cipher(const struct ltc_cipher_descriptor *cipher)
 {
-   int x;
+   int x, blank = -1;
 
    LTC_ARGCHK(cipher != NULL);
+
+   if (cipher->name == NULL)
+      return -1;
 
    /* is it already registered? */
    LTC_MUTEX_LOCK(&ltc_cipher_mutex);
@@ -25,18 +28,17 @@ int register_cipher(const struct ltc_cipher_descriptor *cipher)
           LTC_MUTEX_UNLOCK(&ltc_cipher_mutex);
           return x;
        }
+       if (cipher_descriptor[x].name == NULL && blank == -1) {
+          blank = x;
+       }
    }
 
    /* find a blank spot */
-   for (x = 0; x < TAB_SIZE; x++) {
-       if (cipher_descriptor[x].name == NULL) {
-          XMEMCPY(&cipher_descriptor[x], cipher, sizeof(struct ltc_cipher_descriptor));
-          LTC_MUTEX_UNLOCK(&ltc_cipher_mutex);
-          return x;
-       }
+   if (blank != -1) {
+       XMEMCPY(&cipher_descriptor[blank], cipher, sizeof(struct ltc_cipher_descriptor));
    }
 
    /* no spot */
    LTC_MUTEX_UNLOCK(&ltc_cipher_mutex);
-   return -1;
+   return blank;
 }

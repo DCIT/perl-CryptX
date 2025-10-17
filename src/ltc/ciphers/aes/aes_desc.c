@@ -63,10 +63,19 @@ static LTC_INLINE int s_aesni_is_supported(void)
       a = 1;
       c = 0;
 
+#if defined(_MSC_VER) && !defined(__clang__)
+      int arr[4];
+      __cpuidex(arr, a, c);
+      a = arr[0];
+      b = arr[1];
+      c = arr[2];
+      d = arr[3];
+#else
       __asm__ volatile ("cpuid"
            :"=a"(a), "=b"(b), "=c"(c), "=d"(d)
            :"a"(a), "c"(c)
           );
+#endif
 
       is_supported = ((c >> 19) & 1) && ((c >> 25) & 1);
       initialized = 1;

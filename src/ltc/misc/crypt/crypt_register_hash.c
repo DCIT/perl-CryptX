@@ -36,11 +36,9 @@ int register_hash(const struct ltc_hash_descriptor *hash)
    /* fill in blank spot */
    if (blank != -1) {
        XMEMCPY(&hash_descriptor[blank], hash, sizeof(struct ltc_hash_descriptor));
-       LTC_MUTEX_UNLOCK(&ltc_hash_mutex);
-       return x;
    }
 
    /* no spot */
    LTC_MUTEX_UNLOCK(&ltc_hash_mutex);
-   return -1;
+   return blank;
 }

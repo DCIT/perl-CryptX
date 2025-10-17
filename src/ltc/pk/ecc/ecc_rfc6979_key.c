@@ -19,7 +19,7 @@
   @param key          [out] Newly created deterministic key
   @return CRYPT_OK if successful, upon error all allocated memory will be freed
 */
-int ecc_rfc6979_key(const ecc_key *priv, const unsigned char *in, unsigned long inlen, ecc_key *key)
+int ecc_rfc6979_key(const ecc_key *priv, const unsigned char *in, unsigned long inlen, const char *rfc6979_hash_alg, ecc_key *key)
 {
    int            err, hash = -1;
    unsigned char  v[MAXBLOCKSIZE], k[MAXBLOCKSIZE];
@@ -32,10 +32,10 @@ int ecc_rfc6979_key(const ecc_key *priv, const unsigned char *in, unsigned long 
    LTC_ARGCHK(key         != NULL);
    LTC_ARGCHK(key->dp.size > 0);
 
-   if (priv->rfc6979_hash_alg == NULL) {
+   if (rfc6979_hash_alg == NULL) {
       return CRYPT_INVALID_ARG;
    }
-   hash = find_hash(priv->rfc6979_hash_alg);
+   hash = find_hash(rfc6979_hash_alg);
    if ((err = hash_is_valid(hash)) != CRYPT_OK) {
       return err;
    }

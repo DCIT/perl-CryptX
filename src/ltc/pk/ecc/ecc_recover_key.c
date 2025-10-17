@@ -23,20 +23,21 @@
 */
 int ecc_recover_key(const unsigned char *sig,  unsigned long siglen,
                     const unsigned char *hash, unsigned long hashlen,
-                    int recid, ecc_signature_type sigformat, ecc_key *key)
+                    ltc_ecc_sig_opts *opts, ecc_key *key)
 {
    ecc_point     *mG = NULL, *mQ = NULL, *mR = NULL;
    void          *p, *m, *a, *b;
    void          *r, *s, *v, *w, *t1, *t2, *u1, *u2, *v1, *v2, *e, *x, *y, *a_plus3;
    void          *mu = NULL, *ma = NULL;
    void          *mp = NULL;
-   int           err;
+   int           err, recid;
    unsigned long pbits, pbytes, i, shift_right;
    unsigned char ch, buf[MAXBLOCKSIZE];
 
    LTC_ARGCHK(sig  != NULL);
    LTC_ARGCHK(hash != NULL);
    LTC_ARGCHK(key  != NULL);
+   LTC_ARGCHK(opts != NULL);
 
    /* BEWARE: requires sqrtmod_prime */
    if (ltc_mp.sqrtmod_prime == NULL) {
@@ -64,8 +65,9 @@ int ecc_recover_key(const unsigned char *sig,  unsigned long siglen,
       err = CRYPT_MEM;
       goto error;
    }
+   recid = (opts->recid != NULL) ? *(opts->recid) : -1;
 
-   if (sigformat == LTC_ECCSIG_RFC7518) {
+   if (opts->type == LTC_ECCSIG_RFC7518) {
       /* RFC7518 format - raw (r,s) */
       i = ltc_mp_unsigned_bin_size(key->dp.order);
       if (siglen != (2*i)) {
@@ -75,7 +77,7 @@ int ecc_recover_key(const unsigned char *sig,  unsigned long siglen,
       if ((err = ltc_mp_read_unsigned_bin(r, sig,   i)) != CRYPT_OK)                                    { goto error; }
       if ((err = ltc_mp_read_unsigned_bin(s, sig+i, i)) != CRYPT_OK)                                    { goto error; }
    }
-   else if (sigformat == LTC_ECCSIG_ETH27) {
+   else if (opts->type == LTC_ECCSIG_ETH27) {
       /* Ethereum (v,r,s) format */
       if (pk_oid_cmp_with_ulong("1.3.132.0.10", key->dp.oid, key->dp.oidlen) != CRYPT_OK) {
          /* Only valid for secp256k1 - OID 1.3.132.0.10 */
@@ -97,7 +99,7 @@ int ecc_recover_key(const unsigned char *sig,  unsigned long siglen,
       if ((err = ltc_mp_read_unsigned_bin(s, sig+32, 32)) != CRYPT_OK)                                  { goto error; }
    }
 #ifdef LTC_DER
-   else if (sigformat == LTC_ECCSIG_ANSIX962) {
+   else if (opts->type == LTC_ECCSIG_ANSIX962) {
          /* ANSI X9.62 format - ASN.1 encoded SEQUENCE{ INTEGER(r), INTEGER(s) }  */
          if ((err = der_decode_sequence_multi_ex(sig, siglen, LTC_DER_SEQ_SEQUENCE | LTC_DER_SEQ_STRICT,
                                                  LTC_ASN1_INTEGER, 1UL, r,
@@ -106,7 +108,7 @@ int ecc_recover_key(const unsigned char *sig,  unsigned long siglen,
    }
 #endif
 #ifdef LTC_SSH
-   else if (sigformat == LTC_ECCSIG_RFC5656) {
+   else if (opts->type == LTC_ECCSIG_RFC5656) {
       char name[64], name2[64];
       unsigned long namelen = sizeof(name);
       unsigned long name2len = sizeof(name2);

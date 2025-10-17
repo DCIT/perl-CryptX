@@ -11,14 +11,13 @@
   @param inlen     The length of the digest
   @param out       [out] The destination for the signature
   @param outlen    [in/out] The max size and resulting size of the signature
-  @param prng      An active PRNG state
-  @param wprng     The index of the PRNG you wish to use
+  @param opts      The signature options that shall be applied
   @param key       A private ECC key
   @return CRYPT_OK if successful
 */
 int ecc_sign_hash_eth27(const unsigned char *in,  unsigned long inlen,
                         unsigned char *out, unsigned long *outlen,
-                        prng_state *prng, int wprng, const ecc_key *key)
+                        ltc_ecc_sig_opts *opts, const ecc_key *key)
 {
    int err, recid;
    void *r, *s;
@@ -26,6 +25,7 @@ int ecc_sign_hash_eth27(const unsigned char *in,  unsigned long inlen,
 
    LTC_ARGCHK(out    != NULL);
    LTC_ARGCHK(outlen != NULL);
+   LTC_ARGCHK(opts   != NULL);
    LTC_ARGCHK(key    != NULL);
 
    /* Only valid for secp256k1 - OID 1.3.132.0.10 */
@@ -38,7 +38,9 @@ int ecc_sign_hash_eth27(const unsigned char *in,  unsigned long inlen,
    }
 
    if ((err = ltc_mp_init_multi(&r, &s, LTC_NULL)) != CRYPT_OK) return err;
-   if ((err = ecc_sign_hash_internal(in, inlen, r, s, prng, wprng, &recid, key)) != CRYPT_OK) goto error;
+   if (opts->recid == NULL)
+      opts->recid = &recid;
+   if ((err = ecc_sign_hash_internal(in, inlen, r, s, opts, key)) != CRYPT_OK) goto error;
 
    zeromem(out, 65);
    *outlen = 65;
@@ -46,10 +48,12 @@ int ecc_sign_hash_eth27(const unsigned char *in,  unsigned long inlen,
    if ((err = ltc_mp_to_unsigned_bin(r, out + 32 - i)) != CRYPT_OK) goto error;
    i = ltc_mp_unsigned_bin_size(s);
    if ((err = ltc_mp_to_unsigned_bin(s, out + 64 - i)) != CRYPT_OK) goto error;
-   out[64] = (unsigned char)(recid + 27); /* Recovery ID is 27/28 for Ethereum */
+   out[64] = (unsigned char)(*(opts->recid) + 27); /* Recovery ID is 27/28 for Ethereum */
    err = CRYPT_OK;
 
 error:
+   if (opts->recid == &recid)
+      opts->recid = NULL;
    ltc_mp_deinit_multi(r, s, LTC_NULL);
    return err;
 }

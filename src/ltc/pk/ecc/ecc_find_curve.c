@@ -206,6 +206,22 @@ static int s_name_match(const char *left, const char *right)
    return 0;
 }
 
+int ecc_get_curve_names(const char *oid, const char * const **names)
+{
+   unsigned long i;
+
+   LTC_ARGCHK(oid   != NULL);
+   LTC_ARGCHK(names != NULL);
+
+   for (i = 0; s_curve_names[i].OID != NULL; ++i) {
+      if (XSTRCMP(s_curve_names[i].OID, oid) == 0) {
+         *names = s_curve_names[i].names;
+         return CRYPT_OK;
+      }
+   }
+   return CRYPT_INVALID_ARG; /* not found */
+}
+
 int ecc_find_curve(const char *name_or_oid, const ltc_ecc_curve **cu)
 {
    int i, j;

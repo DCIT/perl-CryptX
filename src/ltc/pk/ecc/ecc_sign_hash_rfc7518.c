@@ -11,16 +11,13 @@
   @param inlen     The length of the digest
   @param out       [out] The destination for the signature
   @param outlen    [in/out] The max size and resulting size of the signature
-  @param prng      An active PRNG state
-  @param wprng     The index of the PRNG you wish to use
-  @param recid     [out] Recovery ID
+  @param opts      The signature options that shall be applied
   @param key       A private ECC key
   @return CRYPT_OK if successful
 */
-int ecc_sign_hash_rfc7518_ex(const unsigned char *in,  unsigned long inlen,
-                             unsigned char *out, unsigned long *outlen,
-                             prng_state *prng, int wprng,
-                             int *recid, const ecc_key *key)
+int ecc_sign_hash_rfc7518_internal(const unsigned char *in,  unsigned long inlen,
+                                         unsigned char *out, unsigned long *outlen,
+                                         ltc_ecc_sig_opts *opts, const ecc_key *key)
 {
    int err;
    void *r, *s;
@@ -38,7 +35,7 @@ int ecc_sign_hash_rfc7518_ex(const unsigned char *in,  unsigned long inlen,
    }
 
    if ((err = ltc_mp_init_multi(&r, &s, LTC_NULL)) != CRYPT_OK) return err;
-   if ((err = ecc_sign_hash_internal(in, inlen, r, s, prng, wprng, recid, key)) != CRYPT_OK) goto error;
+   if ((err = ecc_sign_hash_internal(in, inlen, r, s, opts, key)) != CRYPT_OK) goto error;
 
    zeromem(out, 2 * pbytes);
    *outlen = 2 * pbytes;
@@ -50,24 +47,6 @@ int ecc_sign_hash_rfc7518_ex(const unsigned char *in,  unsigned long inlen,
 error:
    ltc_mp_deinit_multi(r, s, LTC_NULL);
    return err;
-}
-
-/**
-  Sign a message digest (RFC7518 format)
-  @param in        The message digest to sign
-  @param inlen     The length of the digest
-  @param out       [out] The destination for the signature
-  @param outlen    [in/out] The max size and resulting size of the signature
-  @param prng      An active PRNG state
-  @param wprng     The index of the PRNG you wish to use
-  @param key       A private ECC key
-  @return CRYPT_OK if successful
-*/
-int ecc_sign_hash_rfc7518(const unsigned char *in,  unsigned long inlen,
-                          unsigned char *out, unsigned long *outlen,
-                          prng_state *prng, int wprng, const ecc_key *key)
-{
-   return ecc_sign_hash_rfc7518_ex(in, inlen, out, outlen, prng, wprng, NULL, key);
 }
 
 #endif

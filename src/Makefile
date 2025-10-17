@@ -56,8 +56,8 @@ ltc/misc/crypt/crypt_prng_rng_descriptor.o ltc/misc/crypt/crypt_register_all_cip
 ltc/misc/crypt/crypt_register_all_hashes.o ltc/misc/crypt/crypt_register_all_prngs.o \
 ltc/misc/crypt/crypt_register_cipher.o ltc/misc/crypt/crypt_register_hash.o ltc/misc/crypt/crypt_register_prng.o \
 ltc/misc/crypt/crypt_sizes.o ltc/misc/crypt/crypt_unregister_cipher.o ltc/misc/crypt/crypt_unregister_hash.o \
-ltc/misc/crypt/crypt_unregister_prng.o ltc/misc/error_to_string.o ltc/misc/hkdf/hkdf.o \
-ltc/misc/mem_neq.o ltc/misc/padding/padding_depad.o ltc/misc/padding/padding_pad.o \
+ltc/misc/crypt/crypt_unregister_prng.o ltc/misc/deprecated.o ltc/misc/error_to_string.o \
+ltc/misc/hkdf/hkdf.o ltc/misc/mem_neq.o ltc/misc/padding/padding_depad.o ltc/misc/padding/padding_pad.o \
 ltc/misc/password_free.o ltc/misc/pbes/pbes.o ltc/misc/pbes/pbes1.o ltc/misc/pbes/pbes2.o \
 ltc/misc/pem/pem.o ltc/misc/pem/pem_pkcs.o ltc/misc/pem/pem_read.o ltc/misc/pem/pem_ssh.o \
 ltc/misc/pkcs12/pkcs12_kdf.o ltc/misc/pkcs12/pkcs12_utf8_to_utf16.o ltc/misc/pkcs5/pkcs_5_1.o \
@@ -120,12 +120,13 @@ ltc/pk/ecc/ecc_make_key.o ltc/pk/ecc/ecc_recover_key.o ltc/pk/ecc/ecc_rfc6979_ke
 ltc/pk/ecc/ecc_set_curve.o ltc/pk/ecc/ecc_set_curve_internal.o ltc/pk/ecc/ecc_set_key.o \
 ltc/pk/ecc/ecc_shared_secret.o ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sign_hash_eth27.o \
 ltc/pk/ecc/ecc_sign_hash_internal.o ltc/pk/ecc/ecc_sign_hash_rfc5656.o ltc/pk/ecc/ecc_sign_hash_rfc7518.o \
-ltc/pk/ecc/ecc_sizes.o ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.o ltc/pk/ecc/ecc_verify_hash.o \
-ltc/pk/ecc/ecc_verify_hash_eth27.o ltc/pk/ecc/ecc_verify_hash_internal.o ltc/pk/ecc/ecc_verify_hash_rfc5656.o \
-ltc/pk/ecc/ecc_verify_hash_rfc7518.o ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o \
-ltc/pk/ecc/ltc_ecc_is_point.o ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_map.o \
-ltc/pk/ecc/ltc_ecc_mul2add.o ltc/pk/ecc/ltc_ecc_mulmod.o ltc/pk/ecc/ltc_ecc_mulmod_timing.o \
-ltc/pk/ecc/ltc_ecc_points.o ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc/ltc_ecc_projective_dbl_point.o \
+ltc/pk/ecc/ecc_sign_hash_x962.o ltc/pk/ecc/ecc_sizes.o ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.o \
+ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ecc_verify_hash_eth27.o ltc/pk/ecc/ecc_verify_hash_internal.o \
+ltc/pk/ecc/ecc_verify_hash_rfc5656.o ltc/pk/ecc/ecc_verify_hash_rfc7518.o ltc/pk/ecc/ecc_verify_hash_x962.o \
+ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o ltc/pk/ecc/ltc_ecc_is_point.o \
+ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_map.o ltc/pk/ecc/ltc_ecc_mul2add.o \
+ltc/pk/ecc/ltc_ecc_mulmod.o ltc/pk/ecc/ltc_ecc_mulmod_timing.o ltc/pk/ecc/ltc_ecc_points.o \
+ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc/ltc_ecc_projective_dbl_point.o \
 ltc/pk/ecc/ltc_ecc_verify_key.o ltc/pk/ed25519/ed25519_export.o ltc/pk/ed25519/ed25519_import.o \
 ltc/pk/ed25519/ed25519_import_pkcs8.o ltc/pk/ed25519/ed25519_import_raw.o ltc/pk/ed25519/ed25519_import_x509.o \
 ltc/pk/ed25519/ed25519_make_key.o ltc/pk/ed25519/ed25519_sign.o ltc/pk/ed25519/ed25519_verify.o \

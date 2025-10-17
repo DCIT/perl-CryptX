@@ -6,8 +6,7 @@
 #ifdef LTC_MECC
 
 int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
-                           void *r, void *s, prng_state *prng, int wprng,
-                           int *recid, const ecc_key *key)
+                           void *r, void *s, ltc_ecc_sig_opts *opts, const ecc_key *key)
 {
    ecc_key       pubkey;
    void          *e, *p, *b;
@@ -19,6 +18,7 @@ int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
    LTC_ARGCHK(r      != NULL);
    LTC_ARGCHK(s      != NULL);
    LTC_ARGCHK(in     != NULL);
+   LTC_ARGCHK(opts   != NULL);
    LTC_ARGCHK(key    != NULL);
 
    /* is this a private key? */
@@ -58,16 +58,16 @@ int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
    /* make up a key and export the public copy */
    do {
       if ((err = ecc_copy_curve(key, &pubkey)) != CRYPT_OK)                    { goto errnokey; }
-      if (key->rfc6979_hash_alg != NULL) {
-         if ((err = ecc_rfc6979_key(key, in, inlen, &pubkey)) != CRYPT_OK)     { goto errnokey; }
+      if (opts->rfc6979_hash_alg != NULL) {
+         if ((err = ecc_rfc6979_key(key, in, inlen, opts->rfc6979_hash_alg, &pubkey)) != CRYPT_OK)     { goto errnokey; }
       } else {
-         if ((err = ecc_generate_key(prng, wprng, &pubkey)) != CRYPT_OK)       { goto errnokey; }
+         if ((err = ecc_generate_key(opts->prng, opts->wprng, &pubkey)) != CRYPT_OK)       { goto errnokey; }
       }
 
       /* find r = x1 mod n */
       if ((err = ltc_mp_mod(pubkey.pubkey.x, p, r)) != CRYPT_OK)               { goto error; }
 
-      if (recid) {
+      if (opts->recid) {
          /* find recovery ID (if needed) */
          v = 0;
          if (ltc_mp_copy(pubkey.pubkey.x, s) != CRYPT_OK)                      { goto error; }
@@ -82,7 +82,7 @@ int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
       if (ltc_mp_iszero(r) == LTC_MP_YES) {
          ecc_free(&pubkey);
       } else {
-         if ((err = rand_bn_upto(b, p, prng, wprng)) != CRYPT_OK)              { goto error; } /* b = blinding value */
+         if ((err = rand_bn_upto(b, p, opts->prng, opts->wprng)) != CRYPT_OK)              { goto error; } /* b = blinding value */
          /* find s = (e + xr)/k */
          if ((err = ltc_mp_mulmod(pubkey.k, b, p, pubkey.k)) != CRYPT_OK)      { goto error; } /* k = kb */
          if ((err = ltc_mp_invmod(pubkey.k, p, pubkey.k)) != CRYPT_OK)         { goto error; } /* k = 1/kb */
@@ -102,7 +102,7 @@ int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
       goto errnokey;
    }
 
-   if (recid) *recid = v;
+   if (opts->recid) *opts->recid = v;
 
    goto errnokey;
 error:

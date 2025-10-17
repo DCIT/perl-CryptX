@@ -12,7 +12,7 @@
 int x509_get_pka(const ltc_asn1_list *pub, enum ltc_pka_id *pka)
 {
    der_flexi_check flexi_should[4];
-   ltc_asn1_list *seqid, *id;
+   ltc_asn1_list *seqid, *id = NULL;
    enum ltc_oid_id oid_id;
    int err;
    unsigned long n = 0;

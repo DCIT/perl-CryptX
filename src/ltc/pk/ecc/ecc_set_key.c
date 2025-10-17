@@ -46,7 +46,6 @@ int ecc_set_key(const unsigned char *in, unsigned long inlen, int type, ecc_key 
    }
 
    key->type = type;
-   key->rfc6979_hash_alg = NULL;
    return CRYPT_OK;
 
 error:

@@ -10,8 +10,26 @@
   ECC Crypto, Tom St Denis
 */
 
+typedef int (*ecc_verify_fn)(const unsigned char *sig,
+                                   unsigned long  siglen,
+                             const unsigned char *hash,
+                                   unsigned long  hashlen,
+                                             int *stat,
+                             const       ecc_key *key);
+
+static const ecc_verify_fn s_ecc_verify_hash[] = {
+#ifdef LTC_DER
+                                [LTC_ECCSIG_ANSIX962] = ecc_verify_hash_x962,
+#endif
+                                [LTC_ECCSIG_RFC7518] = ecc_verify_hash_rfc7518_internal,
+                                [LTC_ECCSIG_ETH27] = ecc_verify_hash_eth27,
+#ifdef LTC_SSH
+                                [LTC_ECCSIG_RFC5656] = ecc_verify_hash_rfc5656,
+#endif
+};
+
 /**
-   Verify an ECC signature (ANSI X9.62 format)
+   Verify an ECC signature
    @param sig         The signature to verify
    @param siglen      The length of the signature (octets)
    @param hash        The hash (message digest) that was signed
@@ -20,28 +38,19 @@
    @param key         The corresponding public ECC key
    @return CRYPT_OK if successful (even if the signature is not valid)
 */
-int ecc_verify_hash(const unsigned char *sig,  unsigned long siglen,
-                    const unsigned char *hash, unsigned long hashlen,
-                    int *stat, const ecc_key *key)
+int ecc_verify_hash_v2(const unsigned char *sig,
+                             unsigned long  siglen,
+                       const unsigned char *hash,
+                             unsigned long  hashlen,
+                          ltc_ecc_sig_opts *opts,
+                                       int *stat,
+                       const       ecc_key *key)
 {
-   void *r, *s;
-   int err;
-
-   LTC_ARGCHK(sig != NULL);
-
-   if ((err = ltc_mp_init_multi(&r, &s, NULL)) != CRYPT_OK) return err;
-
-   /* ANSI X9.62 format - ASN.1 encoded SEQUENCE{ INTEGER(r), INTEGER(s) }  */
-   if ((err = der_decode_sequence_multi_ex(sig, siglen, LTC_DER_SEQ_SEQUENCE | LTC_DER_SEQ_STRICT,
-                                     LTC_ASN1_INTEGER, 1UL, r,
-                                     LTC_ASN1_INTEGER, 1UL, s,
-                                     LTC_ASN1_EOL, 0UL, LTC_NULL)) != CRYPT_OK)                         { goto error; }
-
-   err = ecc_verify_hash_internal(r, s, hash, hashlen, stat, key);
-
-error:
-   ltc_mp_deinit_multi(r, s, LTC_NULL);
-   return err;
+   if (opts->type < 0 || opts->type >= LTC_ARRAY_SIZE(s_ecc_verify_hash))
+      return CRYPT_PK_INVALID_TYPE;
+   if (s_ecc_verify_hash[opts->type] == NULL)
+      return CRYPT_PK_INVALID_TYPE;
+   return s_ecc_verify_hash[opts->type](sig, siglen, hash, hashlen, stat, key);
 }
 
 #endif

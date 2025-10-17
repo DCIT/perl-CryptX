@@ -28,7 +28,7 @@ const struct blockcipher_info ssh_ciphers[] =
    { .name = "aes256-gcm@openssh.com",        .algo = "aes",      .keylen = 256 / 8, .mode = cm_gcm                 },
    { .name = "blowfish128-cbc",               .algo = "blowfish", .keylen = 128 / 8, .mode = cm_cbc                 },
    { .name = "blowfish128-ctr",               .algo = "blowfish", .keylen = 128 / 8, .mode = cm_ctr                 },
-   /* The algo name doesn't matter, it's only used in pem-info */
+   /* The algo name doesn't matter, it's only used in latex-tables */
    { .name = "chacha20-poly1305@openssh.com", .algo = "c20p1305", .keylen = 256 / 8, .mode = cm_stream | cm_openssh },
    { .name = "des-cbc",                       .algo = "des",      .keylen = 64 / 8,  .mode = cm_cbc                 },
    { .name = "3des-cbc",                      .algo = "3des",     .keylen = 192 / 8, .mode = cm_cbc                 },

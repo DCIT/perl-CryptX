@@ -6,7 +6,7 @@
 #ifdef LTC_MECC
 
 /**
-  @file ecc_verify_hash.c
+  @file ecc_verify_hash_eth27.c
   ECC Crypto, Tom St Denis
 */
 

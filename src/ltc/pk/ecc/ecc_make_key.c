@@ -59,7 +59,6 @@ int ecc_generate_key(prng_state *prng, int wprng, ecc_key *key)
       goto error;
    }
    key->type = PK_PRIVATE;
-   key->rfc6979_hash_alg = NULL;
 
    /* success */
    err = CRYPT_OK;

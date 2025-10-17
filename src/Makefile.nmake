@@ -60,8 +60,8 @@ ltc/misc/crypt/crypt_register_all_ciphers.obj ltc/misc/crypt/crypt_register_all_
 ltc/misc/crypt/crypt_register_all_prngs.obj ltc/misc/crypt/crypt_register_cipher.obj \
 ltc/misc/crypt/crypt_register_hash.obj ltc/misc/crypt/crypt_register_prng.obj ltc/misc/crypt/crypt_sizes.obj \
 ltc/misc/crypt/crypt_unregister_cipher.obj ltc/misc/crypt/crypt_unregister_hash.obj \
-ltc/misc/crypt/crypt_unregister_prng.obj ltc/misc/error_to_string.obj ltc/misc/hkdf/hkdf.obj \
-ltc/misc/mem_neq.obj ltc/misc/padding/padding_depad.obj ltc/misc/padding/padding_pad.obj \
+ltc/misc/crypt/crypt_unregister_prng.obj ltc/misc/deprecated.obj ltc/misc/error_to_string.obj \
+ltc/misc/hkdf/hkdf.obj ltc/misc/mem_neq.obj ltc/misc/padding/padding_depad.obj ltc/misc/padding/padding_pad.obj \
 ltc/misc/password_free.obj ltc/misc/pbes/pbes.obj ltc/misc/pbes/pbes1.obj ltc/misc/pbes/pbes2.obj \
 ltc/misc/pem/pem.obj ltc/misc/pem/pem_pkcs.obj ltc/misc/pem/pem_read.obj ltc/misc/pem/pem_ssh.obj \
 ltc/misc/pkcs12/pkcs12_kdf.obj ltc/misc/pkcs12/pkcs12_utf8_to_utf16.obj ltc/misc/pkcs5/pkcs_5_1.obj \
@@ -127,12 +127,13 @@ ltc/pk/ecc/ecc_make_key.obj ltc/pk/ecc/ecc_recover_key.obj ltc/pk/ecc/ecc_rfc697
 ltc/pk/ecc/ecc_set_curve.obj ltc/pk/ecc/ecc_set_curve_internal.obj ltc/pk/ecc/ecc_set_key.obj \
 ltc/pk/ecc/ecc_shared_secret.obj ltc/pk/ecc/ecc_sign_hash.obj ltc/pk/ecc/ecc_sign_hash_eth27.obj \
 ltc/pk/ecc/ecc_sign_hash_internal.obj ltc/pk/ecc/ecc_sign_hash_rfc5656.obj ltc/pk/ecc/ecc_sign_hash_rfc7518.obj \
-ltc/pk/ecc/ecc_sizes.obj ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.obj ltc/pk/ecc/ecc_verify_hash.obj \
-ltc/pk/ecc/ecc_verify_hash_eth27.obj ltc/pk/ecc/ecc_verify_hash_internal.obj ltc/pk/ecc/ecc_verify_hash_rfc5656.obj \
-ltc/pk/ecc/ecc_verify_hash_rfc7518.obj ltc/pk/ecc/ltc_ecc_export_point.obj ltc/pk/ecc/ltc_ecc_import_point.obj \
-ltc/pk/ecc/ltc_ecc_is_point.obj ltc/pk/ecc/ltc_ecc_is_point_at_infinity.obj ltc/pk/ecc/ltc_ecc_map.obj \
-ltc/pk/ecc/ltc_ecc_mul2add.obj ltc/pk/ecc/ltc_ecc_mulmod.obj ltc/pk/ecc/ltc_ecc_mulmod_timing.obj \
-ltc/pk/ecc/ltc_ecc_points.obj ltc/pk/ecc/ltc_ecc_projective_add_point.obj ltc/pk/ecc/ltc_ecc_projective_dbl_point.obj \
+ltc/pk/ecc/ecc_sign_hash_x962.obj ltc/pk/ecc/ecc_sizes.obj ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.obj \
+ltc/pk/ecc/ecc_verify_hash.obj ltc/pk/ecc/ecc_verify_hash_eth27.obj ltc/pk/ecc/ecc_verify_hash_internal.obj \
+ltc/pk/ecc/ecc_verify_hash_rfc5656.obj ltc/pk/ecc/ecc_verify_hash_rfc7518.obj ltc/pk/ecc/ecc_verify_hash_x962.obj \
+ltc/pk/ecc/ltc_ecc_export_point.obj ltc/pk/ecc/ltc_ecc_import_point.obj ltc/pk/ecc/ltc_ecc_is_point.obj \
+ltc/pk/ecc/ltc_ecc_is_point_at_infinity.obj ltc/pk/ecc/ltc_ecc_map.obj ltc/pk/ecc/ltc_ecc_mul2add.obj \
+ltc/pk/ecc/ltc_ecc_mulmod.obj ltc/pk/ecc/ltc_ecc_mulmod_timing.obj ltc/pk/ecc/ltc_ecc_points.obj \
+ltc/pk/ecc/ltc_ecc_projective_add_point.obj ltc/pk/ecc/ltc_ecc_projective_dbl_point.obj \
 ltc/pk/ecc/ltc_ecc_verify_key.obj ltc/pk/ed25519/ed25519_export.obj ltc/pk/ed25519/ed25519_import.obj \
 ltc/pk/ed25519/ed25519_import_pkcs8.obj ltc/pk/ed25519/ed25519_import_raw.obj ltc/pk/ed25519/ed25519_import_x509.obj \
 ltc/pk/ed25519/ed25519_make_key.obj ltc/pk/ed25519/ed25519_sign.obj ltc/pk/ed25519/ed25519_verify.obj \

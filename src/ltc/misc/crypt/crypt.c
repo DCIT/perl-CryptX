@@ -582,6 +582,9 @@ const char *crypt_build_settings =
 #if defined(LTC_CLOCK_GETTIME)
     " LTC_CLOCK_GETTIME "
 #endif
+#if defined(LTC_NO_DEPRECATED_APIS)
+    " LTC_NO_DEPRECATED_APIS "
+#endif
     "\n"
     ;
 

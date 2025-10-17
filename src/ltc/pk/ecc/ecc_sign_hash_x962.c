@@ -3,10 +3,10 @@
 
 #include "tomcrypt_private.h"
 
-#if defined(LTC_MECC) && defined(LTC_SSH)
+#if defined(LTC_MECC) && defined(LTC_DER)
 
 /**
-  Sign a message digest (RFC5656 / SSH format)
+  Sign a message digest (ANSI X9.62 format)
   @param in        The message digest to sign
   @param inlen     The length of the digest
   @param out       [out] The destination for the signature
@@ -15,30 +15,27 @@
   @param key       A private ECC key
   @return CRYPT_OK if successful
 */
-int ecc_sign_hash_rfc5656(const unsigned char *in,  unsigned long inlen,
-                          unsigned char *out, unsigned long *outlen,
-                          ltc_ecc_sig_opts *opts, const ecc_key *key)
+int ecc_sign_hash_x962(const unsigned char    *in,
+                             unsigned long     inlen,
+                             unsigned char    *out,
+                             unsigned long    *outlen,
+                             ltc_ecc_sig_opts *opts,
+                       const       ecc_key    *key)
 {
    int err;
    void *r, *s;
-   char name[64];
-   unsigned long namelen = sizeof(name);
 
    LTC_ARGCHK(out    != NULL);
    LTC_ARGCHK(outlen != NULL);
 
-   /* Get identifier string */
-   if ((err = ecc_ssh_ecdsa_encode_name(name, &namelen, key)) != CRYPT_OK) return err;
-
    if ((err = ltc_mp_init_multi(&r, &s, LTC_NULL)) != CRYPT_OK) return err;
    if ((err = ecc_sign_hash_internal(in, inlen, r, s, opts, key)) != CRYPT_OK) goto error;
 
-   /* Store as SSH data sequence, per RFC4251 */
-   err = ssh_encode_sequence_multi(out, outlen,
-                                   LTC_SSHDATA_STRING, name, namelen,
-                                   LTC_SSHDATA_MPINT,  r,
-                                   LTC_SSHDATA_MPINT,  s,
-                                   LTC_SSHDATA_EOL,    LTC_NULL);
+   /* store as ASN.1 SEQUENCE { r, s -- integer } */
+   err = der_encode_sequence_multi(out, outlen,
+                                   LTC_ASN1_INTEGER, 1UL, r,
+                                   LTC_ASN1_INTEGER, 1UL, s,
+                                   LTC_ASN1_EOL, 0UL, NULL);
 error:
    ltc_mp_deinit_multi(r, s, LTC_NULL);
    return err;
