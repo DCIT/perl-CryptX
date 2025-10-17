@@ -423,15 +423,14 @@ sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = NULL, const c
         STRLEN data_len = 0;
         ltc_ecc_sig_opts sig_opts = { .prng = &self->pstate, .wprng = self->pindex, .type = LTC_ECCSIG_ANSIX962, .recid = &r, .rfc6979_hash_alg = NULL };
 
-        // Handle dual signature modes for backward compatibility
-        // For sign_hash_*: if only 2 params passed, treat second as RFC6979 hash
+        /* Handle dual signature modes for backward compatibility: if only 2 params passed, treat second as RFC6979 hash */
         if ((ix == 0 || ix == 3 || ix == 4) && hash_name != NULL && hash_rfc6979_name == NULL) {
           hash_rfc6979_name = hash_name;
         }
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         if (ix == 1 || ix == 2) {
-          // for backward compatibility, if hash_name is NULL, use SHA1
+          /* for backward compatibility, if hash_name is NULL, use SHA1 */
           if (hash_name == NULL) {
             hash_name = "SHA1";
           }
@@ -444,14 +443,10 @@ sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = NULL, const c
         }
 
         if (hash_rfc6979_name != NULL) {
+          /* deterministic signing */
           hash_rfc6979_id = cryptx_internal_find_hash(hash_rfc6979_name);
           if (hash_rfc6979_id == -1) croak("FATAL: find_hash failed for rfc6979 hash '%s'", hash_rfc6979_name);
           sig_opts.rfc6979_hash_alg = hash_descriptor[hash_rfc6979_id].name;
-        } else {
-          // Clear any previously set RFC6979 hash to ensure non-deterministic signing
-          // when RFC6979 parameter is not provided. This prevents hidden state from
-          // previous method calls affecting current signature behavior.
-          sig_opts.rfc6979_hash_alg = NULL;
         }
 
         if (ix == 2 || ix == 3) {
