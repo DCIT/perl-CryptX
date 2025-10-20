@@ -18,7 +18,8 @@
    @param outlen    [in/out] Max size and resulting size of authentication tag
    @param in        The data to HMAC
    @param inlen     The length of the data to HMAC (octets)
-   @param ...       tuples of (data,len) pairs to HMAC, terminated with a (NULL,x) (x=don't care)
+   @param ...       tuples of (data,len) pairs of type (unsigned char*,unsigned long) to HMAC,
+                     terminated with a (NULL,x) (x=don't care)
    @return CRYPT_OK if successful
 */
 int hmac_memory_multi(int hash,
