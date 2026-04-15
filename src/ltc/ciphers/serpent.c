@@ -700,13 +700,13 @@ int serpent_test(void)
       if ((err = serpent_ecb_encrypt(tests[x].pt, buf[0], &key)) != CRYPT_OK) {
         return err;
       }
-      if (compare_testvector(buf[0], 16, tests[x].ct, 16, "SERPENT Encrypt", x)) {
+      if (ltc_compare_testvector(buf[0], 16, tests[x].ct, 16, "SERPENT Encrypt", x)) {
         return CRYPT_FAIL_TESTVECTOR;
       }
       if ((err = serpent_ecb_decrypt(tests[x].ct, buf[1], &key)) != CRYPT_OK) {
         return err;
       }
-      if (compare_testvector(buf[1], 16, tests[x].pt, 16, "SERPENT Decrypt", x)) {
+      if (ltc_compare_testvector(buf[1], 16, tests[x].pt, 16, "SERPENT Decrypt", x)) {
         return CRYPT_FAIL_TESTVECTOR;
       }
    }

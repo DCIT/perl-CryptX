@@ -194,7 +194,7 @@ int chacha20_prng_test(void)
    if ((err = chacha20_prng_add_entropy(en, sizeof(en), &st)) != CRYPT_OK) return err;
    if ((err = chacha20_prng_ready(&st)) != CRYPT_OK)                       return err;
    if (chacha20_prng_read(out, 10, &st) != 10)                             return CRYPT_ERROR_READPRNG; /* 10 bytes for testing */
-   if (compare_testvector(out, 10, t1, sizeof(t1), "CHACHA-PRNG", 1))      return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(out, 10, t1, sizeof(t1), "CHACHA-PRNG", 1))      return CRYPT_FAIL_TESTVECTOR;
    if (chacha20_prng_read(out, 500, &st) != 500)                           return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
    /* add entropy to already initialized prng */
    if ((err = chacha20_prng_add_entropy(en, sizeof(en), &st)) != CRYPT_OK) return err;
@@ -202,13 +202,13 @@ int chacha20_prng_test(void)
    if ((err = chacha20_prng_export(dmp, &dmplen, &st)) != CRYPT_OK)        return err;
    if (chacha20_prng_read(out, 500, &st) != 500)                           return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
    if (chacha20_prng_read(out, 10, &st) != 10)                             return CRYPT_ERROR_READPRNG; /* 10 bytes for testing */
-   if (compare_testvector(out, 10, t2, sizeof(t2), "CHACHA-PRNG", 2))      return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(out, 10, t2, sizeof(t2), "CHACHA-PRNG", 2))      return CRYPT_FAIL_TESTVECTOR;
    if ((err = chacha20_prng_done(&st)) != CRYPT_OK)                        return err;
    if ((err = chacha20_prng_import(dmp, dmplen, &st)) != CRYPT_OK)         return err;
    if ((err = chacha20_prng_ready(&st)) != CRYPT_OK)                       return err;
    if (chacha20_prng_read(out, 500, &st) != 500)                           return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
    if (chacha20_prng_read(out, 10, &st) != 10)                             return CRYPT_ERROR_READPRNG; /* 10 bytes for testing */
-   if (compare_testvector(out, 10, t3, sizeof(t3), "CHACHA-PRNG", 3))      return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(out, 10, t3, sizeof(t3), "CHACHA-PRNG", 3))      return CRYPT_FAIL_TESTVECTOR;
    if ((err = chacha20_prng_done(&st)) != CRYPT_OK)                        return err;
 
    return CRYPT_OK;

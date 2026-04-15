@@ -518,8 +518,8 @@ int saferp_test(void)
       saferp_ecb_decrypt(tmp[0], tmp[1], &skey);
 
       /* compare */
-      if (compare_testvector(tmp[0], 16, tests[i].ct, 16, "Safer+ Encrypt", i) ||
-            compare_testvector(tmp[1], 16, tests[i].pt, 16, "Safer+ Decrypt", i)) {
+      if (ltc_compare_testvector(tmp[0], 16, tests[i].ct, 16, "Safer+ Encrypt", i) ||
+            ltc_compare_testvector(tmp[1], 16, tests[i].pt, 16, "Safer+ Decrypt", i)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
 

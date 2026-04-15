@@ -364,7 +364,7 @@ int rabbit_test(void)
          if ((err = rabbit_setup(&st, k, sizeof(k)))                   != CRYPT_OK) return err;
          if ((err = rabbit_setiv(&st, iv, sizeof(iv)))                 != CRYPT_OK) return err;
          if ((err = rabbit_crypt(&st, (unsigned char*)pt, ptlen, out)) != CRYPT_OK) return err;
-         if (compare_testvector(out, ptlen, ct, ptlen, "RABBIT-TV1", 1))   return CRYPT_FAIL_TESTVECTOR;
+         if (ltc_compare_testvector(out, ptlen, ct, ptlen, "RABBIT-TV1", 1))   return CRYPT_FAIL_TESTVECTOR;
       }
 
       /* --- Test 2 (generate unusual number of bytes each time) ------------ */
@@ -389,7 +389,7 @@ int rabbit_test(void)
          if ((err = rabbit_crypt(&st, (unsigned char*)pt + 16, 14, out + 16)) != CRYPT_OK) return err;
          if ((err = rabbit_crypt(&st, (unsigned char*)pt + 30,  2, out + 30)) != CRYPT_OK) return err;
          if ((err = rabbit_crypt(&st, (unsigned char*)pt + 32,  7, out + 32)) != CRYPT_OK) return err;
-         if (compare_testvector(out, ptlen, ct, ptlen, "RABBIT-TV2", 1))   return CRYPT_FAIL_TESTVECTOR;
+         if (ltc_compare_testvector(out, ptlen, ct, ptlen, "RABBIT-TV2", 1))   return CRYPT_FAIL_TESTVECTOR;
       }
 
       /* --- Test 3 (use non-null data) ------------------------------------- */
@@ -414,13 +414,13 @@ int rabbit_test(void)
          if ((err = rabbit_crypt(&st, (unsigned char*)pt,       5, out))      != CRYPT_OK) return err;
          if ((err = rabbit_crypt(&st, (unsigned char*)pt +  5, 29, out +  5)) != CRYPT_OK) return err;
          if ((err = rabbit_crypt(&st, (unsigned char*)pt + 34,  5, out + 34)) != CRYPT_OK) return err;
-         if (compare_testvector(out, ptlen, ct, ptlen, "RABBIT-TV3", 1))   return CRYPT_FAIL_TESTVECTOR;
+         if (ltc_compare_testvector(out, ptlen, ct, ptlen, "RABBIT-TV3", 1))   return CRYPT_FAIL_TESTVECTOR;
 
       /* --- Test 4 (crypt in a single call) ------------------------------------ */
 
          if ((err = rabbit_memory(k, sizeof(k), iv, sizeof(iv),
                                    (unsigned char*)pt, sizeof(pt), out))      != CRYPT_OK) return err;
-         if (compare_testvector(out, ptlen, ct, ptlen, "RABBIT-TV4", 1))   return CRYPT_FAIL_TESTVECTOR;
+         if (ltc_compare_testvector(out, ptlen, ct, ptlen, "RABBIT-TV4", 1))   return CRYPT_FAIL_TESTVECTOR;
          /* use 'out' (ciphertext) in the next decryption test */
 
       /* --- Test 5 (decrypt ciphertext) ------------------------------------ */
@@ -428,12 +428,12 @@ int rabbit_test(void)
          /* decrypt ct (out) and compare with pt (start with only setiv() to reset) */
          if ((err = rabbit_setiv(&st, iv, sizeof(iv)))                        != CRYPT_OK) return err;
          if ((err = rabbit_crypt(&st, out, ptlen, out2))                      != CRYPT_OK) return err;
-         if (compare_testvector(out2, ptlen, pt, ptlen, "RABBIT-TV5", 1))  return CRYPT_FAIL_TESTVECTOR;
+         if (ltc_compare_testvector(out2, ptlen, pt, ptlen, "RABBIT-TV5", 1))  return CRYPT_FAIL_TESTVECTOR;
 
       /* --- Test 6 (wipe state, incl key) ---------------------------------- */
 
          if ((err = rabbit_done(&st))                      != CRYPT_OK) return err;
-         if (compare_testvector(&st, sizeof(st), nulls, sizeof(st), "RABBIT-TV6", 1))  return CRYPT_FAIL_TESTVECTOR;
+         if (ltc_compare_testvector(&st, sizeof(st), nulls, sizeof(st), "RABBIT-TV6", 1))  return CRYPT_FAIL_TESTVECTOR;
 
       }
 

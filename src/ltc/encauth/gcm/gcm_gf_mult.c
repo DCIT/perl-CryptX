@@ -7,6 +7,229 @@
 */
 #include "tomcrypt_private.h"
 
+#if defined(LTC_GCM_MODE) || defined(LTC_LRW_MODE)
+#if defined(LTC_GCM_PCLMUL)
+#if defined(_MSC_VER)
+#include <intrin.h>
+#else
+#include <cpuid.h>
+#endif
+#include <wmmintrin.h>
+#include <smmintrin.h>
+#include <emmintrin.h>
+
+static LTC_INLINE int s_pclmul_is_supported(void)
+{
+   static int initialized = 0, is_supported = 0;
+
+   if (initialized == 0) {
+      /* Test CPUID.1.0.ECX[1]
+       * EAX = 1, ECX = 0 */
+#if defined(_MSC_VER)
+      int cpuInfo[4];
+      __cpuid(cpuInfo, 1);
+      is_supported = ((cpuInfo[2] >> 1) & 1);
+#else
+      int a = 1 , b, c = 0, d;
+
+      asm volatile ("cpuid"
+           :"=a"(a), "=b"(b), "=c"(c), "=d"(d)
+           :"a"(a), "c"(c)
+          );
+
+      is_supported = ((c >> 1) & 1);
+#endif
+      initialized = 1;
+   }
+
+   return is_supported;
+}
+
+/*
+ * 128x128-bit binary polynomial multiplication for Intel x86 and x86_64
+ * Based on "Intel Carry-Less Multiplication Instruction and its Usage for
+ * Computing the GCM Mode", Shay Gueron, Michael E. Kounavis
+ * https://cdrdv2-public.intel.com/836172/clmul-wp-rev-2-02-2014-04-20.pdf
+ */
+LTC_GCM_PCLMUL_TARGET
+static void s_gfmul_pclmul(__m128i a, __m128i b, __m128i *res){
+   /* Page 25. Figure 5. Code Sample - Performing Ghash Using Algorithms 1 and 5 (C) */
+   __m128i /*tmp0, tmp1,*/ tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, tmp8, tmp9;
+   tmp3 = _mm_clmulepi64_si128(a, b, 0x00);
+   tmp4 = _mm_clmulepi64_si128(a, b, 0x10);
+   tmp5 = _mm_clmulepi64_si128(a, b, 0x01);
+   tmp6 = _mm_clmulepi64_si128(a, b, 0x11);
+   tmp4 = _mm_xor_si128(tmp4, tmp5);
+   tmp5 = _mm_slli_si128(tmp4, 8);
+   tmp4 = _mm_srli_si128(tmp4, 8);
+   tmp3 = _mm_xor_si128(tmp3, tmp5);
+   tmp6 = _mm_xor_si128(tmp6, tmp4);
+   tmp7 = _mm_srli_epi32(tmp3, 31);
+   tmp8 = _mm_srli_epi32(tmp6, 31);
+   tmp3 = _mm_slli_epi32(tmp3, 1);
+   tmp6 = _mm_slli_epi32(tmp6, 1);
+   tmp9 = _mm_srli_si128(tmp7, 12);
+   tmp8 = _mm_slli_si128(tmp8, 4);
+   tmp7 = _mm_slli_si128(tmp7, 4);
+   tmp3 = _mm_or_si128(tmp3, tmp7);
+   tmp6 = _mm_or_si128(tmp6, tmp8);
+   tmp6 = _mm_or_si128(tmp6, tmp9);
+   tmp7 = _mm_slli_epi32(tmp3, 31);
+   tmp8 = _mm_slli_epi32(tmp3, 30);
+   tmp9 = _mm_slli_epi32(tmp3, 25);
+   tmp7 = _mm_xor_si128(tmp7, tmp8);
+   tmp7 = _mm_xor_si128(tmp7, tmp9);
+   tmp8 = _mm_srli_si128(tmp7, 4);
+   tmp7 = _mm_slli_si128(tmp7, 12);
+   tmp3 = _mm_xor_si128(tmp3, tmp7);
+   tmp2 = _mm_srli_epi32(tmp3, 1);
+   tmp4 = _mm_srli_epi32(tmp3, 2);
+   tmp5 = _mm_srli_epi32(tmp3, 7);
+   tmp2 = _mm_xor_si128(tmp2, tmp4);
+   tmp2 = _mm_xor_si128(tmp2, tmp5);
+   tmp2 = _mm_xor_si128(tmp2, tmp8);
+   tmp3 = _mm_xor_si128(tmp3, tmp2);
+   tmp6 = _mm_xor_si128(tmp6, tmp3);
+   *res = tmp6;
+}
+
+LTC_GCM_PCLMUL_TARGET
+static void s_gcm_gf_mult_pclmul(const unsigned char *a, const unsigned char *b, unsigned char *c)
+{
+   __m128i ci;
+   __m128i BSWAP_MASK = _mm_set_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+   __m128i ai = _mm_loadu_si128((const __m128i *) a);
+   __m128i bi = _mm_loadu_si128((const __m128i *) b);
+
+   ai = _mm_shuffle_epi8(ai, BSWAP_MASK);
+   bi = _mm_shuffle_epi8(bi, BSWAP_MASK);
+
+   s_gfmul_pclmul(ai, bi, &ci);
+
+   ci = _mm_shuffle_epi8(ci, BSWAP_MASK);
+
+   XMEMCPY(c, &ci, sizeof(ci));
+}
+#endif /* defined(LTC_GCM_PCLMUL) */
+
+#if defined(LTC_GCM_PMULL)
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wbad-function-cast"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#pragma GCC diagnostic ignored "-Wshadow"
+#endif
+#include <arm_neon.h>
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
+
+#if defined(__APPLE__)
+#include <sys/sysctl.h>
+#elif defined(_WIN32)
+#include <windows.h>
+#else
+#include <sys/auxv.h>
+#include <asm/hwcap.h>
+#endif
+
+static LTC_INLINE int s_pmull_is_supported(void)
+{
+   static int initialized = 0, is_supported = 0;
+
+   if (initialized == 0) {
+#if defined(__APPLE__)
+      int val = 0;
+      size_t len = sizeof(val);
+      if (sysctlbyname("hw.optional.arm.FEAT_PMULL", &val, &len, NULL, 0) == 0) {
+        is_supported = (val != 0);
+      }
+#elif defined (_WIN32)
+      is_supported = IsProcessorFeaturePresent(PF_ARM_V8_CRYPTO_INSTRUCTIONS_AVAILABLE);
+#else
+      unsigned long hwcaps = getauxval(AT_HWCAP);
+      is_supported = (hwcaps & HWCAP_PMULL);
+#endif
+      initialized = 1;
+   }
+
+   return is_supported;
+}
+
+/*
+ * 128x128-bit binary polynomial multiplication for AArch64 using PMULL/PMULL2
+ * Based on "Implementing GCM on ARMv8", Conrado P. L. Gouvea and Julio Lopez
+ * https://conradoplg.modp.net/files/2010/12/gcm14.pdf
+ */
+#if defined(_MSC_VER)
+#define GET_LOW_P64(x) vreinterpret_p64_u64(vcreate_u64((uint64_t)vgetq_lane_p64((x), 0)))
+#else
+#define GET_LOW_P64(x) vgetq_lane_p64((x), 0)
+#endif
+
+LTC_GCM_PMULL_TARGET
+static void s_gfmul_pmull(uint8x16_t a, uint8x16_t b, uint8x16_t *res) {
+   uint8x16_t r0, r1, t0, t1, z, p;
+   poly64x2_t pa, pb, pt0, pr1, pp;
+
+   z = vdupq_n_u8(0);
+
+   pa = vreinterpretq_p64_u8(a);
+   pb = vreinterpretq_p64_u8(b);
+
+   /* Page 7. Algorithm 3 128 x 128-bit binary polynomial multiplier for ARMv8 AArch64 (PMULL) */
+   r0 = vreinterpretq_u8_p128(vmull_p64(GET_LOW_P64(pa), GET_LOW_P64(pb)));
+   r1 = vreinterpretq_u8_p128(vmull_high_p64(pa, pb));
+   t0 = vextq_u8(b, b, 8);
+   pt0 = vreinterpretq_p64_u8(t0);
+
+   t1 = vreinterpretq_u8_p128(vmull_p64(GET_LOW_P64(pa), GET_LOW_P64(pt0)));
+   t0 = vreinterpretq_u8_p128(vmull_high_p64(pa, pt0));
+   t0 = veorq_u8(t0, t1);
+   t1 = vextq_u8(z, t0, 8);
+   r0 = veorq_u8(r0, t1);
+   t1 = vextq_u8(t0, z, 8);
+   r1 = veorq_u8(r1, t1);
+
+   /* Page 8. Algorithm 5 256-bit to 128-bit GCM polynomial reduction for ARMv8 AAarch64 using PMULL */
+   p = vreinterpretq_u8_u64(vdupq_n_u64(0x0000000000000087ULL));
+   pp = vreinterpretq_p64_u8(p);
+   pr1 = vreinterpretq_p64_u8(r1);
+   t0 = vreinterpretq_u8_p128(vmull_high_p64(pr1, pp));
+   t1 = vextq_u8(t0, z, 8);
+   r1 = veorq_u8(r1, t1);
+   t1 = vextq_u8(z, t0, 8);
+   r0 = veorq_u8(r0, t1);
+   pr1 = vreinterpretq_p64_u8(r1);
+
+   t0 = vreinterpretq_u8_p128(vmull_p64(GET_LOW_P64(pr1), GET_LOW_P64(pp)));
+   a  = veorq_u8(r0, t0);
+
+   *res = a;
+}
+
+LTC_GCM_PMULL_TARGET
+static void s_gcm_gf_mult_pmull(const unsigned char *a, const unsigned char *b, unsigned char *c)
+{
+   uint8x16_t va, vb, vc;
+
+   va = vld1q_u8(a);
+   vb = vld1q_u8(b);
+   va = vrbitq_u8(va);
+   vb = vrbitq_u8(vb);
+
+   s_gfmul_pmull(va, vb, &vc);
+
+   vc = vrbitq_u8(vc);
+
+   XMEMCPY(c, &vc, sizeof(vc));
+}
+
+#endif /* defined(LTC_GCM_PMULL) */
+#endif /* defined(LTC_GCM_MODE) || defined(LTC_LRW_MODE) */
+
 #if defined(LTC_GCM_TABLES) || defined(LTC_LRW_TABLES) || (defined(LTC_GCM_MODE) && defined(LTC_FAST))
 
 /* this is x*2^128 mod p(x) ... the results are 16 bytes each stored in a packed format.  Since only the
@@ -50,6 +273,7 @@ const unsigned char gcm_shift_table[256*2] = {
 
 #if defined(LTC_GCM_MODE) || defined(LTC_LRW_MODE)
 
+
 #ifndef LTC_FAST
 /* right shift */
 static void s_gcm_rightshift(unsigned char *a)
@@ -72,7 +296,7 @@ static const unsigned char poly[] = { 0x00, 0xE1 };
   @param b   Second value
   @param c   Destination for a * b
  */
-void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *c)
+static void s_gcm_gf_mult_sw(const unsigned char *a, const unsigned char *b, unsigned char *c)
 {
    unsigned char Z[16], V[16];
    unsigned char x, y, z;
@@ -106,7 +330,7 @@ void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *
   @param b   Second value
   @param c   Destination for a * b
  */
-void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *c)
+static void s_gcm_gf_mult_sw(const unsigned char *a, const unsigned char *b, unsigned char *c)
 {
    int i, j, k, u;
    LTC_FAST_TYPE B[16][WPV], tmp[32 / sizeof(LTC_FAST_TYPE)], pB[16 / sizeof(LTC_FAST_TYPE)], zz, z;
@@ -208,6 +432,30 @@ void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *
 #undef WPV
 
 #endif
+
+/**
+  GCM GF multiplier (internal use only)
+  @param a   First value
+  @param b   Second value
+  @param c   Destination for a * b
+ */
+void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *c)
+{
+#if defined(LTC_GCM_PCLMUL)
+   if(s_pclmul_is_supported()) {
+      s_gcm_gf_mult_pclmul(a, b, c);
+      return;
+   }
+#endif
+#if defined(LTC_GCM_PMULL)
+   if(s_pmull_is_supported()) {
+      s_gcm_gf_mult_pmull(a, b, c);
+      return;
+   }
+#endif
+   s_gcm_gf_mult_sw(a, b, c);
+}
+
 
 #endif
 

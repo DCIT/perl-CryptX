@@ -12,7 +12,8 @@
    @param name        The name of the hash desired
    @param digestlen   The minimum length of the digest size (octets)
    @return >= 0 if found, -1 if not present
-*/int find_hash_any(const char *name, int digestlen)
+*/
+int find_hash_any(const char *name, int digestlen)
 {
    int x, y, z;
    LTC_ARGCHK(name != NULL);

@@ -694,8 +694,8 @@ int camellia_test(void)
          return err;
       }
       camellia_done(&skey);
-      if (compare_testvector(tests[x].ct, 16, buf[0], 16, "Camellia Encrypt", x) ||
-            compare_testvector(tests[x].pt, 16, buf[1], 16, "Camellia Decrypt", x)) {
+      if (ltc_compare_testvector(tests[x].ct, 16, buf[0], 16, "Camellia Encrypt", x) ||
+            ltc_compare_testvector(tests[x].pt, 16, buf[1], 16, "Camellia Decrypt", x)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
    }

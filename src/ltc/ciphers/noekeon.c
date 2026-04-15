@@ -275,8 +275,8 @@ int noekeon_test(void)
 
     noekeon_ecb_encrypt(tests[i].pt, tmp[0], &key);
     noekeon_ecb_decrypt(tmp[0], tmp[1], &key);
-    if (compare_testvector(tmp[0], 16, tests[i].ct, 16, "Noekeon Encrypt", i) ||
-          compare_testvector(tmp[1], 16, tests[i].pt, 16, "Noekeon Decrypt", i)) {
+    if (ltc_compare_testvector(tmp[0], 16, tests[i].ct, 16, "Noekeon Encrypt", i) ||
+          ltc_compare_testvector(tmp[1], 16, tests[i].pt, 16, "Noekeon Decrypt", i)) {
         return CRYPT_FAIL_TESTVECTOR;
     }
 

@@ -9,28 +9,6 @@
   like Python - Larry Bugbee, February 2013
 */
 
-
-#ifdef LTM_DESC
-void init_LTM(void)
-{
-    ltc_mp = ltm_desc;
-}
-#endif
-
-#ifdef TFM_DESC
-void init_TFM(void)
-{
-    ltc_mp = tfm_desc;
-}
-#endif
-
-#ifdef GMP_DESC
-void init_GMP(void)
-{
-    ltc_mp = gmp_desc;
-}
-#endif
-
 int crypt_mp_init(const char* mpi)
 {
    if (mpi == NULL) return CRYPT_ERROR;

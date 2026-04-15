@@ -4,11 +4,19 @@
 
 /**
   @file sha1.c
-  LTC_SHA1 code by Tom St Denis
+  SHA1 code by Tom St Denis
 */
 
 
 #ifdef LTC_SHA1
+
+/* While implementing the SMALL STACK option in https://github.com/libtom/libtomcrypt/pull/709
+ * we came to the conclusion that SHA1 profits from the SMALL STACK option when the SMALL CODE
+ * option is enabled, so let's do that.
+ */
+#if defined(LTC_SMALL_STACK) || defined(LTC_SMALL_CODE)
+#define LTC_SMALL_STACK_SHA1
+#endif
 
 const struct ltc_hash_descriptor sha1_desc =
 {
@@ -39,7 +47,12 @@ static int ss_sha1_compress(hash_state *md, const unsigned char *buf)
 static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
 #endif
 {
-    ulong32 a,b,c,d,e,W[80],i;
+    ulong32 a,b,c,d,e,i;
+#ifdef LTC_SMALL_STACK_SHA1
+    ulong32 W[16];
+#else
+    ulong32 W[80];
+#endif
 #ifdef LTC_SMALL_CODE
     ulong32 t;
 #endif
@@ -56,71 +69,86 @@ static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
     d = md->sha1.state[3];
     e = md->sha1.state[4];
 
+#ifdef LTC_SMALL_STACK_SHA1
+    #define Wi(i) do { W[(i) % 16] = ROL(W[((i) - 3) % 16] ^ W[((i) - 8) % 16] ^ W[((i) - 14) % 16] ^ W[((i) - 16) % 16], 1); } while(0)
+    #define Windex(i) ((i) % 16)
+#else
+    #define Wi(i) do { } while(0)
+    #define Windex(i) (i)
     /* expand it */
     for (i = 16; i < 80; i++) {
         W[i] = ROL(W[i-3] ^ W[i-8] ^ W[i-14] ^ W[i-16], 1);
     }
+#endif
 
     /* compress */
     /* round one */
-    #define FF0(a,b,c,d,e,i) e = (ROLc(a, 5) + F0(b,c,d) + e + W[i] + 0x5a827999UL); b = ROLc(b, 30);
-    #define FF1(a,b,c,d,e,i) e = (ROLc(a, 5) + F1(b,c,d) + e + W[i] + 0x6ed9eba1UL); b = ROLc(b, 30);
-    #define FF2(a,b,c,d,e,i) e = (ROLc(a, 5) + F2(b,c,d) + e + W[i] + 0x8f1bbcdcUL); b = ROLc(b, 30);
-    #define FF3(a,b,c,d,e,i) e = (ROLc(a, 5) + F3(b,c,d) + e + W[i] + 0xca62c1d6UL); b = ROLc(b, 30);
+    #define FF0(a,b,c,d,e,i) e = (ROLc(a, 5) + F0(b,c,d) + e + W[Windex(i)] + 0x5a827999UL); b = ROLc(b, 30);
+    #define FF1(a,b,c,d,e,i) e = (ROLc(a, 5) + F1(b,c,d) + e + W[Windex(i)] + 0x6ed9eba1UL); b = ROLc(b, 30);
+    #define FF2(a,b,c,d,e,i) e = (ROLc(a, 5) + F2(b,c,d) + e + W[Windex(i)] + 0x8f1bbcdcUL); b = ROLc(b, 30);
+    #define FF3(a,b,c,d,e,i) e = (ROLc(a, 5) + F3(b,c,d) + e + W[Windex(i)] + 0xca62c1d6UL); b = ROLc(b, 30);
 
 #ifdef LTC_SMALL_CODE
 
-    for (i = 0; i < 20; ) {
+    for (i = 0; i < 16; ) {
        FF0(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
+    }
+    for (; i < 20; ) {
+       Wi(i); FF0(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
     }
 
     for (; i < 40; ) {
-       FF1(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
+       Wi(i); FF1(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
     }
 
     for (; i < 60; ) {
-       FF2(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
+       Wi(i); FF2(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
     }
 
     for (; i < 80; ) {
-       FF3(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
+       Wi(i); FF3(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
     }
 
 #else
 
-    for (i = 0; i < 20; ) {
+    for (i = 0; i < 15; ) {
        FF0(a,b,c,d,e,i++);
        FF0(e,a,b,c,d,i++);
        FF0(d,e,a,b,c,i++);
        FF0(c,d,e,a,b,i++);
        FF0(b,c,d,e,a,i++);
     }
+    FF0(a,b,c,d,e,i++);
+    Wi(i); FF0(e,a,b,c,d,i++);
+    Wi(i); FF0(d,e,a,b,c,i++);
+    Wi(i); FF0(c,d,e,a,b,i++);
+    Wi(i); FF0(b,c,d,e,a,i++);
 
     /* round two */
     for (; i < 40; )  {
-       FF1(a,b,c,d,e,i++);
-       FF1(e,a,b,c,d,i++);
-       FF1(d,e,a,b,c,i++);
-       FF1(c,d,e,a,b,i++);
-       FF1(b,c,d,e,a,i++);
+       Wi(i); FF1(a,b,c,d,e,i++);
+       Wi(i); FF1(e,a,b,c,d,i++);
+       Wi(i); FF1(d,e,a,b,c,i++);
+       Wi(i); FF1(c,d,e,a,b,i++);
+       Wi(i); FF1(b,c,d,e,a,i++);
     }
 
     /* round three */
     for (; i < 60; )  {
-       FF2(a,b,c,d,e,i++);
-       FF2(e,a,b,c,d,i++);
-       FF2(d,e,a,b,c,i++);
-       FF2(c,d,e,a,b,i++);
-       FF2(b,c,d,e,a,i++);
+       Wi(i); FF2(a,b,c,d,e,i++);
+       Wi(i); FF2(e,a,b,c,d,i++);
+       Wi(i); FF2(d,e,a,b,c,i++);
+       Wi(i); FF2(c,d,e,a,b,i++);
+       Wi(i); FF2(b,c,d,e,a,i++);
     }
 
     /* round four */
     for (; i < 80; )  {
-       FF3(a,b,c,d,e,i++);
-       FF3(e,a,b,c,d,i++);
-       FF3(d,e,a,b,c,i++);
-       FF3(c,d,e,a,b,i++);
-       FF3(b,c,d,e,a,i++);
+       Wi(i); FF3(a,b,c,d,e,i++);
+       Wi(i); FF3(e,a,b,c,d,i++);
+       Wi(i); FF3(d,e,a,b,c,i++);
+       Wi(i); FF3(c,d,e,a,b,i++);
+       Wi(i); FF3(b,c,d,e,a,i++);
     }
 #endif
 
@@ -128,6 +156,8 @@ static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
     #undef FF1
     #undef FF2
     #undef FF3
+    #undef Wi
+    #undef Windex
 
     /* store */
     md->sha1.state[0] = md->sha1.state[0] + a;
@@ -263,7 +293,7 @@ int  sha1_test(void)
       sha1_init(&md);
       sha1_process(&md, (unsigned char*)tests[i].msg, (unsigned long)XSTRLEN(tests[i].msg));
       sha1_done(&md, tmp);
-      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "SHA1", i)) {
+      if (ltc_compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "SHA1", i)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
   }

@@ -83,13 +83,17 @@ static LTC_INLINE int s_aesni_is_supported(void)
 
    return is_supported;
 }
+#endif
 
 #ifndef ENCRYPT_ONLY
 int aesni_is_supported(void)
 {
+#ifdef LTC_AES_NI
    return s_aesni_is_supported();
-}
+#else
+   return 0;
 #endif
+}
 #endif
 
  /**
@@ -205,12 +209,12 @@ int AES_TEST(void)
     }
 
     AES_ENC(tests[i].pt, tmp[0], &key);
-    if (compare_testvector(tmp[0], 16, tests[i].ct, 16, "AES Encrypt", i)) {
+    if (ltc_compare_testvector(tmp[0], 16, tests[i].ct, 16, "AES Encrypt", i)) {
         return CRYPT_FAIL_TESTVECTOR;
     }
 #ifndef ENCRYPT_ONLY
     AES_DEC(tmp[0], tmp[1], &key);
-    if (compare_testvector(tmp[1], 16, tests[i].pt, 16, "AES Decrypt", i)) {
+    if (ltc_compare_testvector(tmp[1], 16, tests[i].pt, 16, "AES Decrypt", i)) {
         return CRYPT_FAIL_TESTVECTOR;
     }
 

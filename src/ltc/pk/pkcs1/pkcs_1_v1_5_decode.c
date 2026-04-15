@@ -21,13 +21,13 @@
  *
  *  @return CRYPT_OK if successful
  */
-int pkcs_1_v1_5_decode(const unsigned char *msg,
-                             unsigned long  msglen,
-                                       int  block_type,
-                             unsigned long  modulus_bitlen,
-                             unsigned char *out,
-                             unsigned long *outlen,
-                                       int *is_valid)
+int ltc_pkcs_1_v1_5_decode(const unsigned char *msg,
+                                 unsigned long  msglen,
+                                           int  block_type,
+                                 unsigned long  modulus_bitlen,
+                                 unsigned char *out,
+                                 unsigned long *outlen,
+                                           int *is_valid)
 {
   unsigned long modulus_len, ps_len, i;
   int result;

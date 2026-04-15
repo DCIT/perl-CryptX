@@ -59,8 +59,8 @@ do { x = (((ulong64)((y)[0] & 255))<<56)|(((ulong64)((y)[1] & 255))<<48) | \
 #ifdef LTC_HAVE_BSWAP_BUILTIN
 
 #define STORE32H(x, y)                          \
-do { ulong32 ttt = __builtin_bswap32 ((x));     \
-      XMEMCPY ((y), &ttt, 4); } while(0)
+do { ulong32 LTC_TMPVAR(ttt) = __builtin_bswap32 ((x));     \
+      XMEMCPY ((y), &LTC_TMPVAR(ttt), 4); } while(0)
 
 #define LOAD32H(x, y)                           \
 do { XMEMCPY (&(x), (y), 4);                    \
@@ -98,8 +98,8 @@ __asm__ volatile (             \
 #ifdef LTC_HAVE_BSWAP_BUILTIN
 
 #define STORE64H(x, y)                          \
-do { ulong64 ttt = __builtin_bswap64 ((x));     \
-      XMEMCPY ((y), &ttt, 8); } while(0)
+do { ulong64 LTC_TMPVAR(ttt) = __builtin_bswap64 ((x));     \
+      XMEMCPY ((y), &LTC_TMPVAR(ttt), 8); } while(0)
 
 #define LOAD64H(x, y)                           \
 do { XMEMCPY (&(x), (y), 8);                    \
@@ -140,7 +140,7 @@ do { x = (((ulong64)((y)[0] & 255))<<56)|(((ulong64)((y)[1] & 255))<<48) | \
 #ifdef ENDIAN_32BITWORD
 
 #define STORE32L(x, y)        \
-  do { ulong32  ttt = (x); XMEMCPY(y, &ttt, 4); } while(0)
+  do { ulong32  LTC_TMPVAR(ttt) = (x); XMEMCPY(y, &LTC_TMPVAR(ttt), 4); } while(0)
 
 #define LOAD32L(x, y)         \
   do { XMEMCPY(&(x), y, 4); } while(0)
@@ -160,13 +160,13 @@ do { x = (((ulong64)((y)[0] & 255))<<56)|(((ulong64)((y)[1] & 255))<<48) | \
 #else /* 64-bit words then  */
 
 #define STORE32L(x, y)        \
-  do { ulong32 ttt = (x); XMEMCPY(y, &ttt, 4); } while(0)
+  do { ulong32 LTC_TMPVAR(ttt) = (x); XMEMCPY(y, &LTC_TMPVAR(ttt), 4); } while(0)
 
 #define LOAD32L(x, y)         \
   do { XMEMCPY(&(x), y, 4); x &= 0xFFFFFFFF; } while(0)
 
 #define STORE64L(x, y)        \
-  do { ulong64 ttt = (x); XMEMCPY(y, &ttt, 8); } while(0)
+  do { ulong64 LTC_TMPVAR(ttt) = (x); XMEMCPY(y, &LTC_TMPVAR(ttt), 8); } while(0)
 
 #define LOAD64L(x, y)         \
   do { XMEMCPY(&(x), y, 8); } while(0)
@@ -200,7 +200,7 @@ do { x = (((ulong64)((y)[7] & 255))<<56)|(((ulong64)((y)[6] & 255))<<48) | \
 #ifdef ENDIAN_32BITWORD
 
 #define STORE32H(x, y)        \
-  do { ulong32 ttt = (x); XMEMCPY(y, &ttt, 4); } while(0)
+  do { ulong32 LTC_TMPVAR(ttt) = (x); XMEMCPY(y, &LTC_TMPVAR(ttt), 4); } while(0)
 
 #define LOAD32H(x, y)         \
   do { XMEMCPY(&(x), y, 4); } while(0)
@@ -220,13 +220,13 @@ do { x = (((ulong64)((y)[7] & 255))<<56)|(((ulong64)((y)[6] & 255))<<48) | \
 #else /* 64-bit words then  */
 
 #define STORE32H(x, y)        \
-  do { ulong32 ttt = (x); XMEMCPY(y, &ttt, 4); } while(0)
+  do { ulong32 LTC_TMPVAR(ttt) = (x); XMEMCPY(y, &LTC_TMPVAR(ttt), 4); } while(0)
 
 #define LOAD32H(x, y)         \
   do { XMEMCPY(&(x), y, 4); x &= 0xFFFFFFFF; } while(0)
 
 #define STORE64H(x, y)        \
-  do { ulong64 ttt = (x); XMEMCPY(y, &ttt, 8); } while(0)
+  do { ulong64 LTC_TMPVAR(ttt) = (x); XMEMCPY(y, &LTC_TMPVAR(ttt), 8); } while(0)
 
 #define LOAD64H(x, y)         \
   do { XMEMCPY(&(x), y, 8); } while(0)
@@ -452,6 +452,11 @@ static inline ulong64 ROR64(ulong64 word, int i)
 #ifndef LTC_UNUSED_PARAM
    #define LTC_UNUSED_PARAM(x) (void)(x)
 #endif
+
+/* Calculates the number of bytes required to hold a buffer that will later on be
+ * aligned by using LTC_ALIGN_BUF().
+ */
+#define LTC_ALIGNED_BUF_SIZE(type, n, align) (((n) + ((align)/sizeof(type))) * sizeof(type))
 
 /* there is no snprintf before Visual C++ 2015 */
 #if defined(_MSC_VER) && _MSC_VER < 1900

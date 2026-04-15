@@ -166,8 +166,8 @@ int tea_test(void)
        tea_ecb_encrypt(ptct[0], tmp[0], &skey);
        tea_ecb_decrypt(tmp[0], tmp[1], &skey);
 
-       if (compare_testvector(tmp[0], 8, ptct[1], 8, "TEA Encrypt", i) != 0 ||
-             compare_testvector(tmp[1], 8, ptct[0], 8, "TEA Decrypt", i) != 0) {
+       if (ltc_compare_testvector(tmp[0], 8, ptct[1], 8, "TEA Encrypt", i) != 0 ||
+             ltc_compare_testvector(tmp[1], 8, ptct[0], 8, "TEA Decrypt", i) != 0) {
           return CRYPT_FAIL_TESTVECTOR;
        }
 

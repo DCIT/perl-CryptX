@@ -157,6 +157,12 @@ const char *crypt_build_settings =
 #if defined(LTC_SHA3)
    "   SHA3\n"
 #endif
+#if defined(LTC_TURBO_SHAKE)
+   "   TurboSHAKE\n"
+#endif
+#if defined(LTC_KANGAROO_TWELVE)
+   "   KangarooTwelve\n"
+#endif
 #if defined(LTC_KECCAK)
    "   KECCAK\n"
 #endif
@@ -445,9 +451,15 @@ const char *crypt_build_settings =
 #if defined(LTC_BASE16)
     " BASE16 "
 #endif
+#if defined(LTC_ARGON2)
+    " ARGON2 "
+#endif
 #if defined(LTC_BCRYPT)
     " BCRYPT "
     " " NAME_VALUE(LTC_BCRYPT_DEFAULT_ROUNDS) " "
+#endif
+#if defined(LTC_SCRYPT)
+    " SCRYPT "
 #endif
 #if defined(LTC_CRC32)
     " CRC32 "
@@ -522,6 +534,9 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_SMALL_CODE)
     " LTC_SMALL_CODE "
+#endif
+#if defined(LTC_SMALL_STACK)
+    " LTC_SMALL_STACK "
 #endif
 #if defined(LTC_NO_FILE)
     " LTC_NO_FILE "

@@ -233,13 +233,13 @@ int idea_test(void)
       if ((err = idea_ecb_encrypt(tests[x].pt, buf[0], &key)) != CRYPT_OK) {
          return err;
       }
-      if (compare_testvector(buf[0], 8, tests[x].ct, 8, "IDEA Encrypt", x)) {
+      if (ltc_compare_testvector(buf[0], 8, tests[x].ct, 8, "IDEA Encrypt", x)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
       if ((err = idea_ecb_decrypt(tests[x].ct, buf[1], &key)) != CRYPT_OK) {
          return err;
       }
-      if (compare_testvector(buf[1], 8, tests[x].pt, 8, "IDEA Decrypt", x)) {
+      if (ltc_compare_testvector(buf[1], 8, tests[x].pt, 8, "IDEA Decrypt", x)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
    }

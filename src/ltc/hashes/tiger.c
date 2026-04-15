@@ -862,7 +862,7 @@ static int s_tiger_test(unsigned int idx)
       init[idx](&md);
       tiger_process(&md, (unsigned char *)tests[i].msg, (unsigned long)XSTRLEN(tests[i].msg));
       tiger_done(&md, tmp);
-      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash[idx], sizeof(tests[i].hash[idx]), !idx ? "TIGER": "TIGER2", i)) {
+      if (ltc_compare_testvector(tmp, sizeof(tmp), tests[i].hash[idx], sizeof(tests[i].hash[idx]), !idx ? "TIGER": "TIGER2", i)) {
           return CRYPT_FAIL_TESTVECTOR;
       }
   }

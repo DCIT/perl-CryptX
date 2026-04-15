@@ -250,14 +250,14 @@ int multi2_test(void)
          return err;
       }
 
-      if (compare_testvector(buf, 8, tests[x].ct, 8, "Multi2 Encrypt", x)) {
+      if (ltc_compare_testvector(buf, 8, tests[x].ct, 8, "Multi2 Encrypt", x)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
 
       if ((err = multi2_ecb_decrypt(buf, buf, &skey)) != CRYPT_OK) {
          return err;
       }
-      if (compare_testvector(buf, 8, tests[x].pt, 8, "Multi2 Decrypt", x)) {
+      if (ltc_compare_testvector(buf, 8, tests[x].pt, 8, "Multi2 Decrypt", x)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
    }
@@ -274,7 +274,7 @@ int multi2_test(void)
         if ((err = multi2_ecb_decrypt(ct, buf, &skey)) != CRYPT_OK) {
                 return err;
         }
-        if (compare_testvector(buf, 8, tests[0].pt, 8, "Multi2 Rounds", x)) {
+        if (ltc_compare_testvector(buf, 8, tests[0].pt, 8, "Multi2 Rounds", x)) {
                 return CRYPT_FAIL_TESTVECTOR;
         }
    }

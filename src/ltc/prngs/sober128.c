@@ -196,7 +196,7 @@ int sober128_test(void)
    if ((err = sober128_add_entropy(en, sizeof(en), &st)) != CRYPT_OK)   return err;
    if ((err = sober128_ready(&st)) != CRYPT_OK)                         return err;
    if (sober128_read(out, 10, &st) != 10)                               return CRYPT_ERROR_READPRNG; /* 10 bytes for testing */
-   if (compare_testvector(out, 10, t1, sizeof(t1), "SOBER128-PRNG", 1)) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(out, 10, t1, sizeof(t1), "SOBER128-PRNG", 1)) return CRYPT_FAIL_TESTVECTOR;
    if (sober128_read(out, 500, &st) != 500)                             return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
    /* add entropy to already initialized prng */
    if ((err = sober128_add_entropy(en, sizeof(en), &st)) != CRYPT_OK)   return err;
@@ -204,13 +204,13 @@ int sober128_test(void)
    if ((err = sober128_export(dmp, &dmplen, &st)) != CRYPT_OK)          return err;
    if (sober128_read(out, 500, &st) != 500)                             return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
    if (sober128_read(out, 10, &st) != 10)                               return CRYPT_ERROR_READPRNG; /* 10 bytes for testing */
-   if (compare_testvector(out, 10, t2, sizeof(t2), "SOBER128-PRNG", 2)) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(out, 10, t2, sizeof(t2), "SOBER128-PRNG", 2)) return CRYPT_FAIL_TESTVECTOR;
    if ((err = sober128_done(&st)) != CRYPT_OK)                          return err;
    if ((err = sober128_import(dmp, dmplen, &st)) != CRYPT_OK)           return err;
    if ((err = sober128_ready(&st)) != CRYPT_OK)                         return err;
    if (sober128_read(out, 500, &st) != 500)                             return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
    if (sober128_read(out, 10, &st) != 10)                               return CRYPT_ERROR_READPRNG; /* 10 bytes for testing */
-   if (compare_testvector(out, 10, t3, sizeof(t3), "SOBER128-PRNG", 3)) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(out, 10, t3, sizeof(t3), "SOBER128-PRNG", 3)) return CRYPT_FAIL_TESTVECTOR;
    if ((err = sober128_done(&st)) != CRYPT_OK)                          return err;
 
    return CRYPT_OK;

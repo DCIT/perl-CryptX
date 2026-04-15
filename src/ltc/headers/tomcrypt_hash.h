@@ -14,6 +14,18 @@ struct sha3_state {
 };
 #endif
 
+#ifdef LTC_KANGAROO_TWELVE
+struct kangaroo_twelve_state {
+    struct sha3_state outer;
+    struct sha3_state inner;
+    ulong64 blocks_count;
+    ulong64 customization_len;
+    unsigned short remaining; /* bytes out of 8kB block */
+    unsigned char phase; /* 0 -- initial, 1 -- additional */
+    unsigned char finished; /* 0 -- false, 1 -- true */
+};
+#endif
+
 #ifdef LTC_SHA512
 struct sha512_state {
     ulong64  length, state[8];
@@ -151,6 +163,9 @@ typedef union Hash_state {
 #endif
 #if defined(LTC_SHA3) || defined(LTC_KECCAK)
     struct sha3_state sha3;
+#endif
+#ifdef LTC_KANGAROO_TWELVE
+    struct kangaroo_twelve_state kt;
 #endif
 #ifdef LTC_SHA512
     struct sha512_state sha512;
@@ -300,6 +315,21 @@ int keccak_256_test(void);
 extern const struct ltc_hash_descriptor keccak_224_desc;
 int keccak_224_test(void);
 int keccak_done(hash_state *md, unsigned char *out);
+#endif
+
+#ifdef LTC_TURBO_SHAKE
+#define turbo_shake_init(a, b) sha3_shake_init(a, b)
+int turbo_shake_process(hash_state *md, const unsigned char *in, unsigned long inlen);
+int turbo_shake_done(hash_state *md, unsigned char *out, unsigned long outlen);
+int turbo_shake_test(void);
+#endif
+
+#ifdef LTC_KANGAROO_TWELVE
+int kangaroo_twelve_init(hash_state *md, int num);
+int kangaroo_twelve_process(hash_state *md, const unsigned char *in, unsigned long inlen);
+int kangaroo_twelve_customization(hash_state *md, const unsigned char *in, unsigned long inlen);
+int kangaroo_twelve_done(hash_state *md, unsigned char *out, unsigned long outlen);
+int kangaroo_twelve_test(void);
 #endif
 
 #ifdef LTC_SHA512

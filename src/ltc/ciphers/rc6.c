@@ -280,8 +280,8 @@ int rc6_test(void)
       rc6_ecb_decrypt(tmp[0], tmp[1], &key);
 
       /* compare */
-      if (compare_testvector(tmp[0], 16, tests[x].ct, 16, "RC6 Encrypt", x) ||
-            compare_testvector(tmp[1], 16, tests[x].pt, 16, "RC6 Decrypt", x)) {
+      if (ltc_compare_testvector(tmp[0], 16, tests[x].ct, 16, "RC6 Encrypt", x) ||
+            ltc_compare_testvector(tmp[1], 16, tests[x].pt, 16, "RC6 Decrypt", x)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
 

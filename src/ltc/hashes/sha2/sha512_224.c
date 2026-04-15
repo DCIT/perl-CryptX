@@ -109,7 +109,7 @@ int  sha512_224_test(void)
       sha512_224_init(&md);
       sha512_224_process(&md, (unsigned char*)tests[i].msg, (unsigned long)XSTRLEN(tests[i].msg));
       sha512_224_done(&md, tmp);
-      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "SHA512-224", i)) {
+      if (ltc_compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "SHA512-224", i)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
   }

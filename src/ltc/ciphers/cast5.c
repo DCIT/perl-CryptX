@@ -663,8 +663,8 @@ int cast5_test(void)
        }
        cast5_ecb_encrypt(tests[i].pt, tmp[0], &key);
        cast5_ecb_decrypt(tmp[0], tmp[1], &key);
-       if ((compare_testvector(tmp[0], 8, tests[i].ct, 8, "CAST5 Encrypt", i) != 0) ||
-             (compare_testvector(tmp[1], 8, tests[i].pt, 8, "CAST5 Decrypt", i) != 0)) {
+       if ((ltc_compare_testvector(tmp[0], 8, tests[i].ct, 8, "CAST5 Encrypt", i) != 0) ||
+             (ltc_compare_testvector(tmp[1], 8, tests[i].pt, 8, "CAST5 Decrypt", i) != 0)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
       /* now see if we can encrypt all zero bytes 1000 times, decrypt and come back where we started */

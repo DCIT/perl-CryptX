@@ -409,7 +409,7 @@ int rmd256_test(void)
        rmd256_init(&md);
        rmd256_process(&md, (unsigned char *)tests[i].msg, XSTRLEN(tests[i].msg));
        rmd256_done(&md, tmp);
-       if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "RIPEMD256", i)) {
+       if (ltc_compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "RIPEMD256", i)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
    }

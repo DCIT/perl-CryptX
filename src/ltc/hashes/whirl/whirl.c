@@ -285,7 +285,7 @@ int  whirlpool_test(void)
       whirlpool_init(&md);
       whirlpool_process(&md, (unsigned char *)tests[i].msg, tests[i].len);
       whirlpool_done(&md, tmp);
-      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "WHIRLPOOL", i)) {
+      if (ltc_compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "WHIRLPOOL", i)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
   }

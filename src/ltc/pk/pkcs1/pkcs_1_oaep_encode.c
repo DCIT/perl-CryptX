@@ -8,55 +8,35 @@
 */
 
 #ifdef LTC_PKCS_1
-
 /**
   PKCS #1 v2.00 OAEP encode
   @param msg             The data to encode
   @param msglen          The length of the data to encode (octets)
-  @param lparam          A session or system parameter (can be NULL)
-  @param lparamlen       The length of the lparam data
+  @param params          The PKCS#1 operation's parameters
   @param modulus_bitlen  The bit length of the RSA modulus
-  @param prng            An active PRNG state
-  @param prng_idx        The index of the PRNG desired
-  @param hash_idx        The index of the hash desired
   @param out             [out] The destination for the encoded data
   @param outlen          [in/out] The max size and resulting size of the encoded data
   @return CRYPT_OK if successful
 */
-int pkcs_1_oaep_encode(const unsigned char *msg,    unsigned long msglen,
-                       const unsigned char *lparam, unsigned long lparamlen,
-                             unsigned long modulus_bitlen, prng_state *prng,
-                             int           prng_idx,
-                             int           mgf_hash, int lparam_hash,
-                             unsigned char *out,    unsigned long *outlen)
+int ltc_pkcs_1_oaep_encode(const unsigned char   *msg,    unsigned long msglen,
+                          ltc_rsa_op_parameters *params,
+                                unsigned long    modulus_bitlen,
+                                unsigned char   *out,    unsigned long *outlen)
 {
    unsigned char *DB, *seed, *mask;
    unsigned long hLen, x, y, modulus_len;
-   int           err, lparam_hash_used;
+   int           err;
+   ltc_rsa_op_checked op_checked = ltc_pkcs1_op_checked_init(params);
 
    LTC_ARGCHK((msglen == 0) || (msg != NULL));
    LTC_ARGCHK(out    != NULL);
    LTC_ARGCHK(outlen != NULL);
 
-   /* test valid hash */
-   if ((err = hash_is_valid(mgf_hash)) != CRYPT_OK) {
-      return err;
-   }
-   if (lparam_hash != -1) {
-      if ((err = hash_is_valid(lparam_hash)) != CRYPT_OK) {
-         return err;
-      }
-      lparam_hash_used = lparam_hash;
-   } else {
-      lparam_hash_used = mgf_hash;
-   }
-
-   /* valid prng */
-   if ((err = prng_is_valid(prng_idx)) != CRYPT_OK) {
+   if ((err = rsa_key_valid_op(LTC_PKCS1_ENCRYPT, &op_checked)) != CRYPT_OK) {
       return err;
    }
 
-   hLen        = hash_descriptor[lparam_hash_used].hashsize;
+   hLen        = hash_descriptor[op_checked.hash_alg].hashsize;
    modulus_len = (modulus_bitlen >> 3) + (modulus_bitlen & 7 ? 1 : 0);
 
    /* test message size */
@@ -84,13 +64,13 @@ int pkcs_1_oaep_encode(const unsigned char *msg,    unsigned long msglen,
    /* get lhash */
    /* DB == lhash || PS || 0x01 || M, PS == k - mlen - 2hlen - 2 zeroes */
    x = modulus_len;
-   if (lparam != NULL) {
-      if ((err = hash_memory(lparam_hash_used, lparam, lparamlen, DB, &x)) != CRYPT_OK) {
+   if (op_checked.params->u.crypt.lparam != NULL) {
+      if ((err = hash_memory(op_checked.hash_alg, op_checked.params->u.crypt.lparam, op_checked.params->u.crypt.lparamlen, DB, &x)) != CRYPT_OK) {
          goto LBL_ERR;
       }
    } else {
       /* can't pass hash_memory a NULL so use `out` with zero length */
-      if ((err = hash_memory(lparam_hash_used, out, 0, DB, &x)) != CRYPT_OK) {
+      if ((err = hash_memory(op_checked.hash_alg, out, 0, DB, &x)) != CRYPT_OK) {
          goto LBL_ERR;
       }
    }
@@ -111,13 +91,13 @@ int pkcs_1_oaep_encode(const unsigned char *msg,    unsigned long msglen,
    }
 
    /* now choose a random seed */
-   if (prng_descriptor[prng_idx].read(seed, hLen, prng) != hLen) {
+   if (prng_descriptor[op_checked.params->wprng].read(seed, hLen, op_checked.params->prng) != hLen) {
       err = CRYPT_ERROR_READPRNG;
       goto LBL_ERR;
    }
 
    /* compute MGF1 of seed (k - hlen - 1) */
-   if ((err = pkcs_1_mgf1(mgf_hash, seed, hLen, mask, modulus_len - hLen - 1)) != CRYPT_OK) {
+   if ((err = ltc_pkcs_1_mgf1(op_checked.mgf1_hash_alg, seed, hLen, mask, modulus_len - hLen - 1)) != CRYPT_OK) {
       goto LBL_ERR;
    }
 
@@ -127,7 +107,7 @@ int pkcs_1_oaep_encode(const unsigned char *msg,    unsigned long msglen,
    }
 
    /* compute MGF1 of maskedDB (hLen) */
-   if ((err = pkcs_1_mgf1(mgf_hash, DB, modulus_len - hLen - 1, mask, hLen)) != CRYPT_OK) {
+   if ((err = ltc_pkcs_1_mgf1(op_checked.mgf1_hash_alg, DB, modulus_len - hLen - 1, mask, hLen)) != CRYPT_OK) {
       goto LBL_ERR;
    }
 

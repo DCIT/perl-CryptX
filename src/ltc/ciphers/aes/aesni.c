@@ -29,7 +29,7 @@ const struct ltc_cipher_descriptor aesni_desc =
 #define temp_update(t, k) _mm_insert_epi32(t, k, 3)
 #define temp_invert(k) _mm_aesimc_si128(*((__m128i*)(k)))
 
-
+#define rcon aesni_rcon
 static const ulong32 rcon[] = {
     0x01UL, 0x02UL, 0x04UL, 0x08UL, 0x10UL, 0x20UL, 0x40UL, 0x80UL, 0x1BUL, 0x36UL
 };
@@ -147,7 +147,6 @@ int aesni_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_
    for (i = 1; i < skey->rijndael.Nr; i++) {
       rrk -= 4;
       rk += 4;
-      temp = temp_invert(rk);
       *((__m128i*) rk) = temp_invert(rrk);
    }
 
@@ -321,8 +320,8 @@ int aesni_test(void)
 
     aesni_ecb_encrypt(tests[i].pt, tmp[0], &key);
     aesni_ecb_decrypt(tmp[0], tmp[1], &key);
-    if (compare_testvector(tmp[0], 16, tests[i].ct, 16, "AES-NI Encrypt", i) ||
-          compare_testvector(tmp[1], 16, tests[i].pt, 16, "AES-NI Decrypt", i)) {
+    if (ltc_compare_testvector(tmp[0], 16, tests[i].ct, 16, "AES-NI Encrypt", i) ||
+          ltc_compare_testvector(tmp[1], 16, tests[i].pt, 16, "AES-NI Decrypt", i)) {
         return CRYPT_FAIL_TESTVECTOR;
     }
 
@@ -369,6 +368,8 @@ int aesni_keysize(int *keysize)
    *keysize = 32;
    return CRYPT_OK;
 }
+
+#undef rcon
 
 #endif
 

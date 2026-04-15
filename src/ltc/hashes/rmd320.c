@@ -474,7 +474,7 @@ int rmd320_test(void)
        rmd320_init(&md);
        rmd320_process(&md, (unsigned char *)tests[i].msg, XSTRLEN(tests[i].msg));
        rmd320_done(&md, tmp);
-       if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "RIPEMD320", i)) {
+       if (ltc_compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "RIPEMD320", i)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
    }

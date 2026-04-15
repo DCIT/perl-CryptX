@@ -33,7 +33,7 @@ LTC_STATIC_ASSERT(correct_ltc_uintptr_size, sizeof(ltc_uintptr) == sizeof(void*)
 /* Aligns a `unsigned char` buffer `buf` to `n` bytes and returns that aligned address.
  * Make sure that the buffer that is passed is huge enough.
  */
-#define LTC_ALIGN_BUF(buf, n) ((void*)((ltc_uintptr)&((unsigned char*)(buf))[n - 1] & (~(CONSTPTR(n) - CONSTPTR(1)))))
+#define LTC_ALIGN_BUF(buf, align) ((void*)((ltc_uintptr)&((unsigned char*)(buf))[(align) - 1] & (~(CONSTPTR(align) - CONSTPTR(1)))))
 
 #define LTC_OID_MAX_STRLEN 256
 
@@ -396,6 +396,17 @@ struct get_char {
 void copy_or_zeromem(const unsigned char* src, unsigned char* dest, unsigned long len, int coz);
 void password_free(struct password *pw, const struct password_ctx *ctx);
 
+int ltc_compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
+int ltc_do_compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
+
+#define LTC_COMPARE_TESTVECTOR(i, il, s, sl, wa, wi)                                      \
+   do {                                                                                   \
+      int LTC_TMPVAR(ret) = ltc_do_compare_testvector((i), (il), (s), (sl), (wa), (wi));  \
+      if (LTC_TMPVAR(ret) != CRYPT_OK) {                                                  \
+         return LTC_TMPVAR(ret);                                                          \
+      }                                                                                   \
+   } while(0)
+
 #if defined(LTC_PBES)
 int pbes_decrypt(const pbes_arg  *arg, unsigned char *dec_data, unsigned long *dec_size);
 
@@ -433,22 +444,60 @@ int pk_oid_num_to_str(const unsigned long *oid, unsigned long oidlen, char *OID,
 
 int pk_oid_cmp_with_ulong(const char *o1, const unsigned long *o2, unsigned long o2size);
 
-/* ---- DH Routines ---- */
+/* ---- RSA Routines ---- */
 #ifdef LTC_MRSA
+/* Receiving side, i.e. Decrypt or Verify */
+#define LTC_RSA_OP_RECV  0x00u
+/* Sending side, i.e. Encrypt or Sign */
+#define LTC_RSA_OP_SEND  0x01u
+/* En- or Decrypt */
+#define LTC_RSA_OP_CRYPT 0x00u
+/* Sign or Verify */
+#define LTC_RSA_OP_SIGN  0x02u
+/* All combinations of the above
+ * but only the PKCS#1 de-/encoding part */
+#define LTC_RSA_OP_PKCS1 0x04u
+
 typedef enum ltc_rsa_op {
-   LTC_RSA_CRYPT,
-   LTC_RSA_SIGN
+   LTC_RSA_DECRYPT = LTC_RSA_OP_CRYPT | LTC_RSA_OP_RECV,
+   LTC_RSA_ENCRYPT = LTC_RSA_OP_CRYPT | LTC_RSA_OP_SEND,
+   LTC_RSA_VERIFY  = LTC_RSA_OP_SIGN | LTC_RSA_OP_RECV,
+   LTC_RSA_SIGN    = LTC_RSA_OP_SIGN | LTC_RSA_OP_SEND,
+   LTC_PKCS1_ENCRYPT = LTC_RSA_OP_PKCS1 | LTC_RSA_ENCRYPT,
+   LTC_PKCS1_DECRYPT = LTC_RSA_OP_PKCS1 | LTC_RSA_DECRYPT,
+   LTC_PKCS1_SIGN    = LTC_RSA_OP_PKCS1 | LTC_RSA_SIGN,
+   LTC_PKCS1_VERIFY  = LTC_RSA_OP_PKCS1 | LTC_RSA_VERIFY,
 } ltc_rsa_op;
+
+typedef struct ltc_rsa_op_checked {
+   const rsa_key *key;
+   ltc_rsa_op_parameters *params;
+   int hash_alg, mgf1_hash_alg;
+} ltc_rsa_op_checked;
+
+#define ltc_rsa_op_checked_init(k, p) {  \
+   .key = k,                           \
+   .params = p,                        \
+   .hash_alg = -1,                     \
+   .mgf1_hash_alg = -1,                \
+}
+
+#define ltc_pkcs1_op_checked_init(p) ltc_rsa_op_checked_init(NULL, p)
+
 int rsa_init(rsa_key *key);
 void rsa_shrink_key(rsa_key *key);
-int rsa_key_valid_op(const rsa_key *key, ltc_rsa_op op, int padding, int hash_idx);
+int rsa_args_to_op_params(const unsigned char *lparam, unsigned long lparamlen,
+                          prng_state *prng, int prng_idx, int hash_idx,
+                          int padding, unsigned long saltlen,
+                          ltc_rsa_op_parameters *params);
+int rsa_key_valid_op(ltc_rsa_op op, ltc_rsa_op_checked *params);
 int rsa_params_equal(const ltc_rsa_parameters *a, const ltc_rsa_parameters *b);
 int rsa_make_key_bn_e(prng_state *prng, int wprng, int size, void *e,
                       rsa_key *key); /* used by op-tee */
 int rsa_import_pkcs1(const unsigned char *in, unsigned long inlen, rsa_key *key);
 int rsa_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key, rsa_key *key);
 int rsa_import_spki(const unsigned char *in, unsigned long inlen, rsa_key *key);
-int rsa_decode_parameters(const ltc_asn1_list *parameters, ltc_rsa_parameters *rsa_params);
+int rsa_decode_parameters(const ltc_asn1_list *parameters, rsa_key *key);
 #endif /* LTC_MRSA */
 
 /* ---- DH Routines ---- */
@@ -755,19 +804,43 @@ int pk_oid_cmp_with_asn1(const char *o1, const ltc_asn1_list *o2);
 /* tomcrypt_pkcs.h */
 
 #ifdef LTC_PKCS_1
+int ltc_pkcs_1_mgf1(int                  hash_idx,
+                    const unsigned char *seed, unsigned long seedlen,
+                          unsigned char *mask, unsigned long masklen);
 
-int pkcs_1_pss_encode_mgf1(const unsigned char *msghash,       unsigned long  msghashlen,
-                                 unsigned long saltlen,
-                                 prng_state    *prng,                    int  prng_idx,
-                                 int           hash_idx,                 int  mgf_hash_idx,
-                                 unsigned long modulus_bitlen,
-                                 unsigned char *out,           unsigned long *outlen);
-int pkcs_1_pss_decode_mgf1(const unsigned char *msghash, unsigned long msghashlen,
-                           const unsigned char *sig,     unsigned long siglen,
-                                 unsigned long saltlen,
-                                          int  hash_idx,           int mgf_hash_idx,
-                                 unsigned long modulus_bitlen,     int *res);
+int ltc_pkcs_1_pss_encode_mgf1(const unsigned char *msghash,       unsigned long  msghashlen,
+                             ltc_rsa_op_parameters *params,
+                                     unsigned long  modulus_bitlen,
+                                     unsigned char *out,           unsigned long *outlen);
+int ltc_pkcs_1_pss_decode_mgf1(const unsigned char *msghash, unsigned long  msghashlen,
+                               const unsigned char *sig,     unsigned long  siglen,
+                               ltc_rsa_op_parameters *params,
+                                     unsigned long  modulus_bitlen,    int *res);
+int ltc_pkcs_1_oaep_encode(const unsigned char   *msg,    unsigned long msglen,
+                          ltc_rsa_op_parameters *params,
+                                unsigned long    modulus_bitlen,
+                                unsigned char   *out,    unsigned long *outlen);
+int ltc_pkcs_1_oaep_decode(const unsigned char *msg,    unsigned long msglen,
+                         ltc_rsa_op_parameters *params,
+                                 unsigned long  modulus_bitlen,
+                                 unsigned char *out,    unsigned long *outlen,
+                                 int           *res);
 
+int ltc_pkcs_1_v1_5_encode(const unsigned char *msg,
+                                 unsigned long  msglen,
+                                           int  block_type,
+                                 unsigned long  modulus_bitlen,
+                                    prng_state *prng,
+                                           int  prng_idx,
+                                 unsigned char *out,
+                                 unsigned long *outlen);
+int ltc_pkcs_1_v1_5_decode(const unsigned char *msg,
+                                 unsigned long  msglen,
+                                           int  block_type,
+                                 unsigned long  modulus_bitlen,
+                                 unsigned char *out,
+                                 unsigned long *outlen,
+                                           int *is_valid);
 #endif /* LTC_PKCS_1 */
 
 #ifdef LTC_PKCS_8

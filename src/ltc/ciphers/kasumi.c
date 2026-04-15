@@ -296,8 +296,8 @@ int kasumi_test(void)
        if ((err = kasumi_ecb_decrypt(tests[x].ct, buf[1], &key)) != CRYPT_OK) {
           return err;
        }
-       if (compare_testvector(buf[1], 8, tests[x].pt, 8, "Kasumi Decrypt", x) ||
-             compare_testvector(buf[0], 8, tests[x].ct, 8, "Kasumi Encrypt", x)) {
+       if (ltc_compare_testvector(buf[1], 8, tests[x].pt, 8, "Kasumi Decrypt", x) ||
+             ltc_compare_testvector(buf[0], 8, tests[x].ct, 8, "Kasumi Encrypt", x)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
    }

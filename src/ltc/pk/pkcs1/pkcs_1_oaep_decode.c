@@ -8,53 +8,41 @@
 */
 
 #ifdef LTC_PKCS_1
-
 /**
    PKCS #1 v2.00 OAEP decode
    @param msg              The encoded data to decode
    @param msglen           The length of the encoded data (octets)
-   @param lparam           The session or system data (can be NULL)
-   @param lparamlen        The length of the lparam
+   @param params           The PKCS#1 operation's parameters
    @param modulus_bitlen   The bit length of the RSA modulus
-   @param mgf_hash         The hash algorithm used for the MGF
-   @param lparam_hash      The hash algorithm used when hashing the lparam (can be -1)
    @param out              [out] Destination of decoding
    @param outlen           [in/out] The max size and resulting size of the decoding
    @param res              [out] Result of decoding, 1==valid, 0==invalid
    @return CRYPT_OK if successful
 */
-int pkcs_1_oaep_decode(const unsigned char *msg,    unsigned long msglen,
-                       const unsigned char *lparam, unsigned long lparamlen,
-                             unsigned long modulus_bitlen,
-                             int mgf_hash, int lparam_hash,
-                             unsigned char *out,    unsigned long *outlen,
-                             int           *res)
+int ltc_pkcs_1_oaep_decode(const unsigned char *msg,    unsigned long msglen,
+                         ltc_rsa_op_parameters *params,
+                                 unsigned long  modulus_bitlen,
+                                 unsigned char *out,    unsigned long *outlen,
+                                 int           *res)
 {
    unsigned char *DB, *seed, *mask;
    unsigned long hLen, x, y, modulus_len;
-   int           err, ret, lparam_hash_used;
+   int           err, ret;
+   ltc_rsa_op_checked op_checked = ltc_pkcs1_op_checked_init(params);
 
    LTC_ARGCHK(msg    != NULL);
    LTC_ARGCHK(out    != NULL);
    LTC_ARGCHK(outlen != NULL);
    LTC_ARGCHK(res    != NULL);
 
+   if ((err = rsa_key_valid_op(LTC_PKCS1_DECRYPT, &op_checked)) != CRYPT_OK) {
+      return err;
+   }
+
    /* default to invalid packet */
    *res = 0;
 
-   /* test valid hash */
-   if ((err = hash_is_valid(mgf_hash)) != CRYPT_OK) {
-      return err;
-   }
-   if (lparam_hash != -1) {
-      if ((err = hash_is_valid(lparam_hash)) != CRYPT_OK) {
-         return err;
-      }
-      lparam_hash_used = lparam_hash;
-   } else {
-      lparam_hash_used = mgf_hash;
-   }
-   hLen        = hash_descriptor[lparam_hash_used].hashsize;
+   hLen        = hash_descriptor[op_checked.hash_alg].hashsize;
    modulus_len = (modulus_bitlen >> 3) + (modulus_bitlen & 7 ? 1 : 0);
 
    /* test hash/message size */
@@ -104,7 +92,7 @@ int pkcs_1_oaep_decode(const unsigned char *msg,    unsigned long msglen,
    x += modulus_len - hLen - 1;
 
    /* compute MGF1 of maskedDB (hLen) */
-   if ((err = pkcs_1_mgf1(mgf_hash, DB, modulus_len - hLen - 1, mask, hLen)) != CRYPT_OK) {
+   if ((err = ltc_pkcs_1_mgf1(op_checked.mgf1_hash_alg, DB, modulus_len - hLen - 1, mask, hLen)) != CRYPT_OK) {
       goto LBL_ERR;
    }
 
@@ -114,7 +102,7 @@ int pkcs_1_oaep_decode(const unsigned char *msg,    unsigned long msglen,
    }
 
    /* compute MGF1 of seed (k - hlen - 1) */
-   if ((err = pkcs_1_mgf1(mgf_hash, seed, hLen, mask, modulus_len - hLen - 1)) != CRYPT_OK) {
+   if ((err = ltc_pkcs_1_mgf1(op_checked.mgf1_hash_alg, seed, hLen, mask, modulus_len - hLen - 1)) != CRYPT_OK) {
       goto LBL_ERR;
    }
 
@@ -127,13 +115,13 @@ int pkcs_1_oaep_decode(const unsigned char *msg,    unsigned long msglen,
 
    /* compute lhash and store it in seed [reuse temps!] */
    x = modulus_len;
-   if (lparam != NULL) {
-      if ((err = hash_memory(lparam_hash_used, lparam, lparamlen, seed, &x)) != CRYPT_OK) {
+   if (op_checked.params->u.crypt.lparam != NULL) {
+      if ((err = hash_memory(op_checked.hash_alg, op_checked.params->u.crypt.lparam, op_checked.params->u.crypt.lparamlen, seed, &x)) != CRYPT_OK) {
          goto LBL_ERR;
       }
    } else {
       /* can't pass hash_memory a NULL so use DB with zero length */
-      if ((err = hash_memory(lparam_hash_used, DB, 0, seed, &x)) != CRYPT_OK) {
+      if ((err = hash_memory(op_checked.hash_alg, DB, 0, seed, &x)) != CRYPT_OK) {
          goto LBL_ERR;
       }
    }

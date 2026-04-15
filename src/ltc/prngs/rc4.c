@@ -197,7 +197,7 @@ int rc4_test(void)
    if ((err = rc4_add_entropy(en, sizeof(en), &st)) != CRYPT_OK)   return err;
    if ((err = rc4_ready(&st)) != CRYPT_OK)                         return err;
    if (rc4_read(out, 10, &st) != 10)                               return CRYPT_ERROR_READPRNG; /* 10 bytes for testing */
-   if (compare_testvector(out, 10, t1, sizeof(t1), "RC4-PRNG", 1)) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(out, 10, t1, sizeof(t1), "RC4-PRNG", 1)) return CRYPT_FAIL_TESTVECTOR;
    if (rc4_read(out, 500, &st) != 500)                             return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
    /* add entropy to already initialized prng */
    if ((err = rc4_add_entropy(en, sizeof(en), &st)) != CRYPT_OK)   return err;
@@ -205,13 +205,13 @@ int rc4_test(void)
    if ((err = rc4_export(dmp, &dmplen, &st)) != CRYPT_OK)          return err;
    if (rc4_read(out, 500, &st) != 500)                             return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
    if (rc4_read(out, 10, &st) != 10)                               return CRYPT_ERROR_READPRNG; /* 10 bytes for testing */
-   if (compare_testvector(out, 10, t2, sizeof(t2), "RC4-PRNG", 2)) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(out, 10, t2, sizeof(t2), "RC4-PRNG", 2)) return CRYPT_FAIL_TESTVECTOR;
    if ((err = rc4_done(&st)) != CRYPT_OK)                          return err;
    if ((err = rc4_import(dmp, dmplen, &st)) != CRYPT_OK)           return err;
    if ((err = rc4_ready(&st)) != CRYPT_OK)                         return err;
    if (rc4_read(out, 500, &st) != 500)                             return CRYPT_ERROR_READPRNG; /* skip 500 bytes */
    if (rc4_read(out, 10, &st) != 10)                               return CRYPT_ERROR_READPRNG; /* 10 bytes for testing */
-   if (compare_testvector(out, 10, t3, sizeof(t3), "RC4-PRNG", 3)) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(out, 10, t3, sizeof(t3), "RC4-PRNG", 3)) return CRYPT_FAIL_TESTVECTOR;
    if ((err = rc4_done(&st)) != CRYPT_OK)                          return err;
 
    return CRYPT_OK;

@@ -316,24 +316,24 @@ static int sm4_self_test_ltc(void)
 
     /*A.1 example 1*/
     sm4_ecb_encrypt(plaintext, output, &skey);
-    if (compare_testvector(output, 16, ciphertext, 16, "SM4 single encryption", 0) != 0)
+    if (ltc_compare_testvector(output, 16, ciphertext, 16, "SM4 single encryption", 0) != 0)
         result = CRYPT_ERROR;
 
     sm4_ecb_decrypt(ciphertext, output, &skey);
-    if (compare_testvector(output, 16, plaintext, 16, "SM4 single decryption", 0) != 0)
+    if (ltc_compare_testvector(output, 16, plaintext, 16, "SM4 single decryption", 0) != 0)
         result = CRYPT_ERROR;
 
     /*A.2 example 2*/
     XMEMCPY(output, plaintext, 16);
     for (i = 0; i < 1000000; ++i)
         sm4_ecb_encrypt(output, output, &skey);
-    if (compare_testvector(output, 16, ciphertext_1000000t, 16, "SM4 1000000 times encryption", 0) != 0)
+    if (ltc_compare_testvector(output, 16, ciphertext_1000000t, 16, "SM4 1000000 times encryption", 0) != 0)
         result = CRYPT_ERROR;
 
     XMEMCPY(output, ciphertext_1000000t, 16);
     for (i = 0; i < 1000000; ++i)
         sm4_ecb_decrypt(output, output, &skey);
-    if (compare_testvector(output, 16, plaintext, 16, "SM4 1000000 times encryption", 0) != 0)
+    if (ltc_compare_testvector(output, 16, plaintext, 16, "SM4 1000000 times encryption", 0) != 0)
         result = CRYPT_ERROR;
 
     keysize = 128;

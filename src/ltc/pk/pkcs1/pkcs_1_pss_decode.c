@@ -10,46 +10,41 @@
 #ifdef LTC_PKCS_1
 
 /**
-   PKCS #1 v2.00 PSS decode
+   PKCS #1 v2.00 Signature Verification
    @param  msghash         The hash to verify
    @param  msghashlen      The length of the hash (octets)
    @param  sig             The signature data (encoded data)
    @param  siglen          The length of the signature data (octets)
-   @param  saltlen         The length of the salt used (octets)
-   @param  hash_idx        The index of the hash desired
-   @param  mgf_hash_idx    The index of the hash desired for MGF1
+   @param  params          The PKCS#1 operation's parameters
    @param  modulus_bitlen  The bit length of the RSA modulus
    @param  res             [out] The result of the comparison, 1==valid, 0==invalid
    @return CRYPT_OK if successful (even if the comparison failed)
 */
-int pkcs_1_pss_decode_mgf1(const unsigned char *msghash, unsigned long msghashlen,
-                           const unsigned char *sig,     unsigned long siglen,
-                                 unsigned long saltlen,
-                                          int  hash_idx,           int mgf_hash_idx,
-                                 unsigned long modulus_bitlen,     int *res)
+int ltc_pkcs_1_pss_decode_mgf1(const unsigned char *msghash, unsigned long  msghashlen,
+                               const unsigned char *sig,     unsigned long  siglen,
+                               ltc_rsa_op_parameters *params,
+                                     unsigned long  modulus_bitlen,    int *res)
 {
    unsigned char *DB, *mask, *salt, *hash;
-   unsigned long x, y, hLen, modulus_len;
+   unsigned long x, y, hLen, modulus_len, saltlen;
    int           err;
    hash_state    md;
+   ltc_rsa_op_checked op_checked = ltc_pkcs1_op_checked_init(params);
 
    LTC_ARGCHK(msghash != NULL);
+   LTC_ARGCHK(sig     != NULL);
+   LTC_ARGCHK(params  != NULL);
    LTC_ARGCHK(res     != NULL);
 
    /* default to invalid */
    *res = 0;
 
-   /* ensure hash is valid */
-   if ((err = hash_is_valid(hash_idx)) != CRYPT_OK) {
+   if ((err = rsa_key_valid_op(LTC_PKCS1_VERIFY, &op_checked)) != CRYPT_OK) {
       return err;
    }
-   if (hash_idx != mgf_hash_idx) {
-      if ((err = hash_is_valid(mgf_hash_idx)) != CRYPT_OK) {
-         return err;
-      }
-   }
 
-   hLen        = hash_descriptor[hash_idx].hashsize;
+   hLen        = hash_descriptor[op_checked.hash_alg].hashsize;
+   saltlen     = params->params.saltlen;
    modulus_bitlen--;
    modulus_len = (modulus_bitlen>>3) + (modulus_bitlen & 7 ? 1 : 0);
 
@@ -102,7 +97,7 @@ int pkcs_1_pss_decode_mgf1(const unsigned char *msghash, unsigned long msghashle
    }
 
    /* generate mask of length modulus_len - hLen - 1 from hash */
-   if ((err = pkcs_1_mgf1(mgf_hash_idx, hash, hLen, mask, modulus_len - hLen - 1)) != CRYPT_OK) {
+   if ((err = ltc_pkcs_1_mgf1(op_checked.mgf1_hash_alg, hash, hLen, mask, modulus_len - hLen - 1)) != CRYPT_OK) {
       goto LBL_ERR;
    }
 
@@ -131,20 +126,20 @@ int pkcs_1_pss_decode_mgf1(const unsigned char *msghash, unsigned long msghashle
    }
 
    /* M = (eight) 0x00 || msghash || salt, mask = H(M) */
-   if ((err = hash_descriptor[hash_idx].init(&md)) != CRYPT_OK) {
+   if ((err = hash_descriptor[op_checked.hash_alg].init(&md)) != CRYPT_OK) {
       goto LBL_ERR;
    }
    zeromem(mask, 8);
-   if ((err = hash_descriptor[hash_idx].process(&md, mask, 8)) != CRYPT_OK) {
+   if ((err = hash_descriptor[op_checked.hash_alg].process(&md, mask, 8)) != CRYPT_OK) {
       goto LBL_ERR;
    }
-   if ((err = hash_descriptor[hash_idx].process(&md, msghash, msghashlen)) != CRYPT_OK) {
+   if ((err = hash_descriptor[op_checked.hash_alg].process(&md, msghash, msghashlen)) != CRYPT_OK) {
       goto LBL_ERR;
    }
-   if ((err = hash_descriptor[hash_idx].process(&md, DB+x, saltlen)) != CRYPT_OK) {
+   if ((err = hash_descriptor[op_checked.hash_alg].process(&md, DB+x, saltlen)) != CRYPT_OK) {
       goto LBL_ERR;
    }
-   if ((err = hash_descriptor[hash_idx].done(&md, mask)) != CRYPT_OK) {
+   if ((err = hash_descriptor[op_checked.hash_alg].done(&md, mask)) != CRYPT_OK) {
       goto LBL_ERR;
    }
 
@@ -168,27 +163,6 @@ LBL_ERR:
    XFREE(DB);
 
    return err;
-}
-
-
-/**
-   PKCS #1 v2.00 PSS decode
-   @param  msghash         The hash to verify
-   @param  msghashlen      The length of the hash (octets)
-   @param  sig             The signature data (encoded data)
-   @param  siglen          The length of the signature data (octets)
-   @param  saltlen         The length of the salt used (octets)
-   @param  hash_idx        The index of the hash desired
-   @param  modulus_bitlen  The bit length of the RSA modulus
-   @param  res             [out] The result of the comparison, 1==valid, 0==invalid
-   @return CRYPT_OK if successful (even if the comparison failed)
-*/
-int pkcs_1_pss_decode(const unsigned char *msghash, unsigned long msghashlen,
-                      const unsigned char *sig,     unsigned long siglen,
-                            unsigned long saltlen,  int           hash_idx,
-                            unsigned long modulus_bitlen, int    *res)
-{
-   return pkcs_1_pss_decode_mgf1(msghash, msghashlen, sig, siglen, saltlen, hash_idx, hash_idx, modulus_bitlen, res);
 }
 
 #endif /* LTC_PKCS_1 */

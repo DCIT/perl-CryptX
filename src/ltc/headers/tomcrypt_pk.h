@@ -64,14 +64,12 @@ int rand_prime(void *N, long len, prng_state *prng, int wprng);
 #ifdef LTC_MRSA
 
 typedef struct ltc_rsa_parameters {
-   /** PSS/OAEP or PKCS #1 v1.5 style
-    *  0 -> PKCS #1 v1.5, 1 -> PSS/OAEP */
-   int pss_oaep;
-   /** saltLength is only defined for PSS
-    * If saltLength == 0 -> OAEP, else -> PSS */
+   /** saltLength for PSS */
    unsigned long saltlen;
-   /** hash and MGF hash algorithms */
-   const char *hash_alg, *mgf1_hash_alg;
+   /** Hash algorithm index for OAEP/PSS, -1 if unset */
+   int hash_idx;
+   /** MGF1 hash algorithm index, -1 if unset */
+   int mgf1_hash_idx;
 } ltc_rsa_parameters;
 
 /** RSA key */
@@ -94,7 +92,9 @@ typedef struct Rsa_key {
     void *dP;
     /** The d mod (q - 1) CRT param */
     void *dQ;
-    /** Further parameters of the RSA key */
+    /** Key is constrained to PSS/OAEP operations */
+    int pss_oaep;
+    /** PSS/OAEP parameters of the RSA key */
     ltc_rsa_parameters params;
 } rsa_key;
 
@@ -109,52 +109,131 @@ int rsa_exptmod(const unsigned char *in,   unsigned long inlen,
 
 void rsa_free(rsa_key *key);
 
+typedef struct ltc_rsa_op_parameters {
+   ltc_rsa_parameters params;
+   /* The padding type */
+   int padding;
+   /* The PRNG to use.
+    * Only required for signing and encryption. */
+   int wprng;
+   prng_state *prng;
+   /* Operation-specific parameters */
+   union {
+      struct {
+         const unsigned char *lparam;
+               unsigned long  lparamlen;
+      } crypt;
+      /* let's make space for potential future extensions */
+      ulong64 dummy[8];
+   } u;
+} ltc_rsa_op_parameters;
+
+int rsa_encrypt_key_v2(const unsigned char   *in,     unsigned long  inlen,
+                             unsigned char   *out,    unsigned long *outlen,
+                       ltc_rsa_op_parameters *params,
+                       const rsa_key         *key);
+
+int rsa_decrypt_key_v2(const unsigned char   *in,     unsigned long  inlen,
+                             unsigned char   *out,    unsigned long *outlen,
+                       ltc_rsa_op_parameters *params,
+                             int             *stat,
+                       const rsa_key         *key);
+
+int rsa_sign_hash_v2(const unsigned char   *hash,   unsigned long  hashlen,
+                           unsigned char   *sig,    unsigned long *siglen,
+                     ltc_rsa_op_parameters *params,
+                     const rsa_key         *key);
+
+int rsa_verify_hash_v2(const unsigned char   *sig,    unsigned long  siglen,
+                       const unsigned char   *hash,   unsigned long  hashlen,
+                       ltc_rsa_op_parameters *params,
+                             int             *stat,
+                       const rsa_key         *key);
+
 /* These use PKCS #1 v2.0 padding */
-#define rsa_encrypt_key(in, inlen, out, outlen, lparam, lparamlen, prng, prng_idx, hash_idx, key) \
-  rsa_encrypt_key_ex(in, inlen, out, outlen, lparam, lparamlen, prng, prng_idx, hash_idx, -1, LTC_PKCS_1_OAEP, key)
+#define ltc_rsa_encrypt_key(in, inlen, out, outlen, lp, lplen, prng_, prng_idx, hash_idx_, key) \
+      rsa_encrypt_key_v2(in, inlen, out, outlen, \
+                         &(ltc_rsa_op_parameters){ \
+                           .u.crypt.lparam = lp, \
+                           .u.crypt.lparamlen = lplen,\
+                           .prng = prng_, \
+                           .wprng = prng_idx, \
+                           .params.mgf1_hash_idx = hash_idx_, \
+                           .params.hash_idx = hash_idx_, \
+                           .padding = LTC_PKCS_1_OAEP, \
+                         }, key)
 
-#define rsa_decrypt_key(in, inlen, out, outlen, lparam, lparamlen, hash_idx, stat, key) \
-  rsa_decrypt_key_ex(in, inlen, out, outlen, lparam, lparamlen, hash_idx, -1, LTC_PKCS_1_OAEP, stat, key)
+#define ltc_rsa_decrypt_key(in, inlen, out, outlen, lp, lplen, hash_idx_, stat, key) \
+      rsa_decrypt_key_v2(in, inlen, out, outlen, \
+                         &(ltc_rsa_op_parameters){ \
+                           .u.crypt.lparam = lp, \
+                           .u.crypt.lparamlen = lplen,\
+                           .params.mgf1_hash_idx = hash_idx_, \
+                           .params.hash_idx = hash_idx_, \
+                           .padding = LTC_PKCS_1_OAEP, \
+                         }, stat, key)
 
-#define rsa_sign_hash(in, inlen, out, outlen, prng, prng_idx, hash_idx, saltlen, key) \
-  rsa_sign_hash_ex(in, inlen, out, outlen, LTC_PKCS_1_PSS, prng, prng_idx, hash_idx, hash_idx, saltlen, key)
+#define ltc_rsa_sign_hash(hash, hashlen, sig, siglen, prng_, prng_idx, hash_idx_, saltlen_, key) \
+      rsa_sign_hash_v2(hash, hashlen, sig, siglen, \
+                         &(ltc_rsa_op_parameters){ \
+                           .prng = prng_, \
+                           .wprng = prng_idx, \
+                           .params.mgf1_hash_idx = hash_idx_, \
+                           .params.hash_idx = hash_idx_, \
+                           .params.saltlen = saltlen_, \
+                           .padding = LTC_PKCS_1_PSS, \
+                         }, key)
 
-#define rsa_verify_hash(sig, siglen, hash, hashlen, hash_idx, saltlen, stat, key) \
-  rsa_verify_hash_ex(sig, siglen, hash, hashlen, LTC_PKCS_1_PSS, hash_idx, hash_idx, saltlen, stat, key)
+#define ltc_rsa_verify_hash(sig, siglen, hash, hashlen, hash_idx_, saltlen_, stat, key) \
+      rsa_verify_hash_v2(sig, siglen, hash, hashlen, \
+                         &(ltc_rsa_op_parameters){ \
+                           .params.mgf1_hash_idx = hash_idx_, \
+                           .params.hash_idx = hash_idx_, \
+                           .params.saltlen = saltlen_, \
+                           .padding = LTC_PKCS_1_PSS, \
+                         }, stat, key)
 
-#define rsa_sign_saltlen_get_max(hash_idx, key) \
-  rsa_sign_saltlen_get_max_ex(LTC_PKCS_1_PSS, hash_idx, key)
+/* If you used those in v1, they're still working */
+#define rsa_encrypt_key ltc_rsa_encrypt_key
+#define rsa_decrypt_key ltc_rsa_decrypt_key
+#define rsa_sign_hash   ltc_rsa_sign_hash
+#define rsa_verify_hash ltc_rsa_verify_hash
 
+#ifndef LTC_NO_DEPRECATED_APIS
 /* These can be switched between PKCS #1 v2.x and PKCS #1 v1.5 paddings */
+LTC_DEPRECATED(rsa_encrypt_key_v2)
 int rsa_encrypt_key_ex(const unsigned char *in,       unsigned long  inlen,
                              unsigned char *out,      unsigned long *outlen,
                        const unsigned char *lparam,   unsigned long  lparamlen,
                              prng_state    *prng,     int            prng_idx,
-                             int            mgf_hash, int            lparam_hash,
-                             int            padding,
+                             int            hash_idx, int            padding,
                        const rsa_key       *key);
 
+LTC_DEPRECATED(rsa_decrypt_key_v2)
 int rsa_decrypt_key_ex(const unsigned char *in,             unsigned long  inlen,
                              unsigned char *out,            unsigned long *outlen,
                        const unsigned char *lparam,         unsigned long  lparamlen,
-                             int            mgf_hash,       int            lparam_hash,
-                             int            padding,
+                             int            hash_idx,       int            padding,
                              int           *stat,     const rsa_key       *key);
 
+LTC_DEPRECATED(rsa_sign_hash_v2)
 int rsa_sign_hash_ex(const unsigned char *in,       unsigned long  inlen,
                            unsigned char *out,      unsigned long *outlen,
                            int            padding,
                            prng_state    *prng,               int  prng_idx,
-                           int            hash_idx,           int  mgf_hash_idx,
-                           unsigned long  saltlen,
+                           int            hash_idx, unsigned long  saltlen,
                      const rsa_key       *key);
 
+LTC_DEPRECATED(rsa_verify_hash_v2)
 int rsa_verify_hash_ex(const unsigned char *sig,            unsigned long  siglen,
                        const unsigned char *hash,           unsigned long  hashlen,
                              int            padding,
-                             int            hash_idx,                 int  mgf_hash_idx,
-                             unsigned long  saltlen,
+                             int            hash_idx,       unsigned long  saltlen,
                              int           *stat,     const rsa_key       *key);
+#endif /* LTC_NO_DEPRECATED_APIS */
+
+#define rsa_sign_saltlen_get_max(hash_idx, key) \
+  rsa_sign_saltlen_get_max_ex(LTC_PKCS_1_PSS, hash_idx, key)
 
 int rsa_sign_saltlen_get_max_ex(int padding, int hash_idx, const rsa_key *key);
 

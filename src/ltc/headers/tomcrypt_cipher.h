@@ -35,7 +35,7 @@ struct saferp_key {
 
 #ifdef LTC_RIJNDAEL
 struct rijndael_key {
-   unsigned char K[(60 + 60 + 4) * sizeof(ulong32)];
+   unsigned char K[LTC_ALIGNED_BUF_SIZE(ulong32, 60 + 60, 16)];
    ulong32 *eK;
    ulong32 *dK;
    int Nr;
@@ -711,10 +711,11 @@ void rijndael_enc_done(symmetric_key *skey);
 int rijndael_enc_keysize(int *keysize);
 extern const struct ltc_cipher_descriptor rijndael_desc;
 extern const struct ltc_cipher_descriptor rijndael_enc_desc;
+
+int aesni_is_supported(void);
 #endif
 
 #if defined(LTC_AES_NI)
-int aesni_is_supported(void);
 int aesni_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_key *skey);
 int aesni_ecb_encrypt(const unsigned char *pt, unsigned char *ct, const symmetric_key *skey);
 int aesni_ecb_decrypt(const unsigned char *ct, unsigned char *pt, const symmetric_key *skey);

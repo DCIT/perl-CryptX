@@ -13,46 +13,34 @@
    PKCS #1 v2.00 Signature Encoding
    @param msghash          The hash to encode
    @param msghashlen       The length of the hash (octets)
-   @param saltlen          The length of the salt desired (octets)
-   @param prng             An active PRNG context
-   @param prng_idx         The index of the PRNG desired
-   @param hash_idx         The index of the hash desired
-   @param mgf_hash_idx     The index of the hash desired for MGF1
+   @param params           The PKCS#1 operation's parameters
    @param modulus_bitlen   The bit length of the RSA modulus
    @param out              [out] The destination of the encoding
    @param outlen           [in/out] The max size and resulting size of the encoded data
    @return CRYPT_OK if successful
 */
-int pkcs_1_pss_encode_mgf1(const unsigned char *msghash,       unsigned long  msghashlen,
-                                 unsigned long saltlen,
-                                 prng_state    *prng,                    int  prng_idx,
-                                 int           hash_idx,                 int  mgf_hash_idx,
-                                 unsigned long modulus_bitlen,
-                                 unsigned char *out,           unsigned long *outlen)
+int ltc_pkcs_1_pss_encode_mgf1(const unsigned char *msghash,       unsigned long  msghashlen,
+                             ltc_rsa_op_parameters *params,
+                                     unsigned long  modulus_bitlen,
+                                     unsigned char *out,           unsigned long *outlen)
 {
    unsigned char *DB, *mask, *salt, *hash;
-   unsigned long x, y, hLen, modulus_len;
+   unsigned long x, y, hLen, modulus_len, saltlen;
    int           err;
    hash_state    md;
+   ltc_rsa_op_checked op_checked = ltc_pkcs1_op_checked_init(params);
 
    LTC_ARGCHK(msghash != NULL);
+   LTC_ARGCHK(params  != NULL);
    LTC_ARGCHK(out     != NULL);
    LTC_ARGCHK(outlen  != NULL);
 
-   /* ensure hashes and PRNG are valid */
-   if ((err = hash_is_valid(hash_idx)) != CRYPT_OK) {
-      return err;
-   }
-   if (hash_idx != mgf_hash_idx) {
-      if ((err = hash_is_valid(mgf_hash_idx)) != CRYPT_OK) {
-         return err;
-      }
-   }
-   if ((err = prng_is_valid(prng_idx)) != CRYPT_OK) {
+   if ((err = rsa_key_valid_op(LTC_PKCS1_SIGN, &op_checked)) != CRYPT_OK) {
       return err;
    }
 
-   hLen        = hash_descriptor[hash_idx].hashsize;
+   hLen        = hash_descriptor[op_checked.hash_alg].hashsize;
+   saltlen     = params->params.saltlen;
    modulus_bitlen--;
    modulus_len = (modulus_bitlen>>3) + (modulus_bitlen & 7 ? 1 : 0);
 
@@ -85,27 +73,27 @@ int pkcs_1_pss_encode_mgf1(const unsigned char *msghash,       unsigned long  ms
 
    /* generate random salt */
    if (saltlen > 0) {
-      if (prng_descriptor[prng_idx].read(salt, saltlen, prng) != saltlen) {
+      if (prng_descriptor[params->wprng].read(salt, saltlen, params->prng) != saltlen) {
          err = CRYPT_ERROR_READPRNG;
          goto LBL_ERR;
       }
    }
 
    /* M = (eight) 0x00 || msghash || salt, hash = H(M) */
-   if ((err = hash_descriptor[hash_idx].init(&md)) != CRYPT_OK) {
+   if ((err = hash_descriptor[op_checked.hash_alg].init(&md)) != CRYPT_OK) {
       goto LBL_ERR;
    }
    zeromem(DB, 8);
-   if ((err = hash_descriptor[hash_idx].process(&md, DB, 8)) != CRYPT_OK) {
+   if ((err = hash_descriptor[op_checked.hash_alg].process(&md, DB, 8)) != CRYPT_OK) {
       goto LBL_ERR;
    }
-   if ((err = hash_descriptor[hash_idx].process(&md, msghash, msghashlen)) != CRYPT_OK) {
+   if ((err = hash_descriptor[op_checked.hash_alg].process(&md, msghash, msghashlen)) != CRYPT_OK) {
       goto LBL_ERR;
    }
-   if ((err = hash_descriptor[hash_idx].process(&md, salt, saltlen)) != CRYPT_OK) {
+   if ((err = hash_descriptor[op_checked.hash_alg].process(&md, salt, saltlen)) != CRYPT_OK) {
       goto LBL_ERR;
    }
-   if ((err = hash_descriptor[hash_idx].done(&md, hash)) != CRYPT_OK) {
+   if ((err = hash_descriptor[op_checked.hash_alg].done(&md, hash)) != CRYPT_OK) {
       goto LBL_ERR;
    }
 
@@ -118,7 +106,7 @@ int pkcs_1_pss_encode_mgf1(const unsigned char *msghash,       unsigned long  ms
    /* x += saltlen; */
 
    /* generate mask of length modulus_len - hLen - 1 from hash */
-   if ((err = pkcs_1_mgf1(mgf_hash_idx, hash, hLen, mask, modulus_len - hLen - 1)) != CRYPT_OK) {
+   if ((err = ltc_pkcs_1_mgf1(op_checked.mgf1_hash_alg, hash, hLen, mask, modulus_len - hLen - 1)) != CRYPT_OK) {
       goto LBL_ERR;
    }
 
@@ -166,29 +154,6 @@ LBL_ERR:
    XFREE(DB);
 
    return err;
-}
-
-
-/**
-   PKCS #1 v2.00 Signature Encoding using MGF1 and both hashes are the same
-   @param msghash          The hash to encode
-   @param msghashlen       The length of the hash (octets)
-   @param saltlen          The length of the salt desired (octets)
-   @param prng             An active PRNG context
-   @param prng_idx         The index of the PRNG desired
-   @param hash_idx         The index of the hash desired
-   @param modulus_bitlen   The bit length of the RSA modulus
-   @param out              [out] The destination of the encoding
-   @param outlen           [in/out] The max size and resulting size of the encoded data
-   @return CRYPT_OK if successful
-*/
-int pkcs_1_pss_encode(const unsigned char *msghash,  unsigned long msghashlen,
-                            unsigned long saltlen,   prng_state   *prng,
-                            int           prng_idx,  int           hash_idx,
-                            unsigned long modulus_bitlen,
-                            unsigned char *out,      unsigned long *outlen)
-{
-   return pkcs_1_pss_encode_mgf1(msghash, msghashlen, saltlen, prng, prng_idx, hash_idx, hash_idx, modulus_bitlen, out, outlen);
 }
 
 #endif /* LTC_PKCS_1 */

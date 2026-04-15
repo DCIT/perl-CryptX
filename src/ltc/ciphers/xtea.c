@@ -205,8 +205,8 @@ int xtea_test(void)
        xtea_ecb_encrypt(tests[i].pt, tmp[0], &skey);
        xtea_ecb_decrypt(tmp[0], tmp[1], &skey);
 
-       if (compare_testvector(tmp[0], 8, tests[i].ct, 8, "XTEA Encrypt", i) != 0 ||
-             compare_testvector(tmp[1], 8, tests[i].pt, 8, "XTEA Decrypt", i) != 0) {
+       if (ltc_compare_testvector(tmp[0], 8, tests[i].ct, 8, "XTEA Encrypt", i) != 0 ||
+             ltc_compare_testvector(tmp[1], 8, tests[i].pt, 8, "XTEA Decrypt", i) != 0) {
           return CRYPT_FAIL_TESTVECTOR;
        }
 

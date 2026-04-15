@@ -657,8 +657,8 @@ int twofish_test(void)
     }
     twofish_ecb_encrypt(tests[i].pt, tmp[0], &key);
     twofish_ecb_decrypt(tmp[0], tmp[1], &key);
-    if (compare_testvector(tmp[0], 16, tests[i].ct, 16, "Twofish Encrypt", i) != 0 ||
-          compare_testvector(tmp[1], 16, tests[i].pt, 16, "Twofish Decrypt", i) != 0) {
+    if (ltc_compare_testvector(tmp[0], 16, tests[i].ct, 16, "Twofish Encrypt", i) != 0 ||
+          ltc_compare_testvector(tmp[1], 16, tests[i].pt, 16, "Twofish Decrypt", i) != 0) {
        return CRYPT_FAIL_TESTVECTOR;
     }
     /* now see if we can encrypt all zero bytes 1000 times, decrypt and come back where we started */

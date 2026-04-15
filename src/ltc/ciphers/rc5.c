@@ -278,8 +278,8 @@ int rc5_test(void)
       rc5_ecb_decrypt(tmp[0], tmp[1], &key);
 
       /* compare */
-      if (compare_testvector(tmp[0], 8, tests[x].ct, 8, "RC5 Encrypt", x) != 0 ||
-            compare_testvector(tmp[1], 8, tests[x].pt, 8, "RC5 Decrypt", x) != 0) {
+      if (ltc_compare_testvector(tmp[0], 8, tests[x].ct, 8, "RC5 Encrypt", x) != 0 ||
+            ltc_compare_testvector(tmp[1], 8, tests[x].pt, 8, "RC5 Decrypt", x) != 0) {
          return CRYPT_FAIL_TESTVECTOR;
       }
 

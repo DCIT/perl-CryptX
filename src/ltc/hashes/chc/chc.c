@@ -287,7 +287,7 @@ int chc_test(void)
        if ((err = chc_done(&md, tmp)) != CRYPT_OK) {
           return err;
        }
-       if (compare_testvector(tmp, tests[i].len, tests[i].hash, tests[i].len, "CHC", i)) {
+       if (ltc_compare_testvector(tmp, tests[i].len, tests[i].hash, tests[i].len, "CHC", i)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
    }
