@@ -1,5 +1,7 @@
 .git
 .svn
+.claude
+.codex
 ^_build
 ^_generators
 ^_tmp
