@@ -1,5 +1,8 @@
 Changes for CryptX
 
+0.100   TBD
+        - Crypt::KeyDerivation - new functions: bcrypt_pbkdf, scrypt_pbkdf, argon2_pbkdf
+
 0.087   2025-06-11
         - bundled libtomcrypt update branch:develop (commit: d448df1 2025-05-06)
         - bundled libtommath update branch:develop (commit: 839ae9e 2025-06-11)

@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-use Test::More tests => 27;
+use Test::More tests => 36;
 
-use Crypt::KeyDerivation qw(pbkdf1 pbkdf2 hkdf hkdf_expand hkdf_extract);
+use Crypt::KeyDerivation qw(pbkdf1 pbkdf2 hkdf hkdf_expand hkdf_extract bcrypt_pbkdf scrypt_pbkdf argon2_pbkdf);
 
 { ### rfc5869 test case 1
   my $keying_material = pack("H*", "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b");
@@ -121,6 +121,48 @@ use Crypt::KeyDerivation qw(pbkdf1 pbkdf2 hkdf hkdf_expand hkdf_extract);
   is(unpack("H*", $prk),  $expected_prk, "PRK hkdf_extract/7");
   is(unpack("H*", $okm1), $expected_okm, "OKM1 hkdf_expand/7");
   is(unpack("H*", $okm2), $expected_okm, "OKM2 hkdf/7");
+}
+
+{ ### bcrypt_pbkdf - OpenBSD test vectors (SHA512)
+  # https://cvsweb.openbsd.org/cgi-bin/cvsweb/src/regress/lib/libutil/bcrypt_pbkdf/bcrypt_pbkdf_test.c
+  is(unpack('H*', bcrypt_pbkdf("password",    "salt",     4, 'SHA512', 32)),
+     '5bbf0cc293587f1c3635555c27796598d47e579071bf427e9d8fbe842aba34d9',
+     'bcrypt_pbkdf basic');
+  is(unpack('H*', bcrypt_pbkdf("pass\0word",  "sa\0lt",   4, 'SHA512', 16)),
+     '4ba4ac3925c0e8d7f0cdb6bb1684a56f',
+     'bcrypt_pbkdf nul bytes');
+  is(unpack('H*', bcrypt_pbkdf("password",    "salt",    42, 'SHA512', 16)),
+     '833cf0dcf56db65608e8f0dc0ce882bd',
+     'bcrypt_pbkdf more rounds');
+}
+
+{ ### scrypt_pbkdf - RFC 7914 test vectors
+  is(unpack('H*', scrypt_pbkdf("", "",              16,    1,  1, 64)),
+     '77d6576238657b203b19ca42c18a0497f16b4844e3074ae8dfdffa3fede21442fcd0069ded0948f8326a753a0fc81f17e8d3e0fb2e0d3628cf35e20c38d18906',
+     'scrypt_pbkdf("", "", 16, 1, 1)');
+  is(unpack('H*', scrypt_pbkdf("password", "NaCl", 1024,   8, 16, 64)),
+     'fdbabe1c9d3472007856e7190d01e9fe7c6ad7cbc8237830e77376634b3731622eaf30d92e22a3886ff109279d9830dac727afb94a83ee6d8360cbdfa2cc0640',
+     'scrypt_pbkdf("password", "NaCl", 1024, 8, 16)');
+  is(unpack('H*', scrypt_pbkdf("pleaseletmein", "SodiumChloride", 16384, 8, 1, 64)),
+     '7023bdcb3afd7348461c06cd81fd38ebfda8fbba904f8e3ea9b543f6545da1f2d5432955613f0fcf62d49705242a9af9e61e85dc0d651e40dfcf017b45575887',
+     'scrypt_pbkdf("pleaseletmein", "SodiumChloride", 16384, 8, 1)');
+}
+
+{ ### argon2_pbkdf - RFC 9106 test vectors
+  my $password = "\x01" x 32;
+  my $salt     = "\x02" x 16;
+  my $secret   = "\x03" x 8;
+  my $ad       = "\x04" x 12;
+  # t_cost=3, m_cost=32, parallelism=4
+  is(unpack('H*', argon2_pbkdf('argon2d',  $password, $salt, 3, 32, 4, 32, $secret, $ad)),
+     '512b391b6f1162975371d30919734294f868e3be3984f3c1a13a4db9fabe4acb',
+     'argon2_pbkdf argon2d');
+  is(unpack('H*', argon2_pbkdf('argon2i',  $password, $salt, 3, 32, 4, 32, $secret, $ad)),
+     'c814d9d1dc7f37aa13f0d77f2494bda1c8de6b016dd388d29952a4c4672b6ce8',
+     'argon2_pbkdf argon2i');
+  is(unpack('H*', argon2_pbkdf('argon2id', $password, $salt, 3, 32, 4, 32, $secret, $ad)),
+     '0d640df58d78766c08c037a34a8b53c9d01ef0452d75b65eb52520e96b01e659',
+     'argon2_pbkdf argon2id');
 }
 
 { #PBKDF1

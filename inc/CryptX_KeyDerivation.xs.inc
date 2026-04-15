@@ -172,3 +172,117 @@ hkdf(SV * in, SV * salt, const char * hash_name = "SHA256", unsigned long output
     }
     OUTPUT:
         RETVAL
+
+SV *
+bcrypt_pbkdf(SV * password, SV * salt, unsigned int rounds = 16, const char * hash_name = "SHA512", unsigned long output_len = 32)
+    CODE:
+    {
+        int rv, id;
+        unsigned char *output;
+        unsigned char *password_ptr=NULL;
+        STRLEN password_len=0;
+        unsigned char *salt_ptr=NULL;
+        STRLEN salt_len=0;
+
+        if (output_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          id = cryptx_internal_find_hash(hash_name);
+          if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
+
+          password_ptr = (unsigned char *)SvPVbyte(password, password_len);
+          salt_ptr     = (unsigned char *)SvPVbyte(salt, salt_len);
+
+          RETVAL = NEWSV(0, output_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, output_len);
+          output = (unsigned char *)SvPVX(RETVAL);
+
+          rv = bcrypt_pbkdf_openbsd(password_ptr, (unsigned long)password_len, salt_ptr, (unsigned long)salt_len, rounds, id, output, &output_len);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: bcrypt_pbkdf process failed: %s", error_to_string(rv));
+          }
+          SvCUR_set(RETVAL, output_len);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+scrypt_pbkdf(SV * password, SV * salt, unsigned long N = 1024, unsigned long r = 8, unsigned long p = 1, unsigned long output_len = 32)
+    CODE:
+    {
+        int rv;
+        unsigned char *output;
+        unsigned char *password_ptr=NULL;
+        STRLEN password_len=0;
+        unsigned char *salt_ptr=NULL;
+        STRLEN salt_len=0;
+
+        if (output_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          password_ptr = (unsigned char *)SvPVbyte(password, password_len);
+          salt_ptr     = (unsigned char *)SvPVbyte(salt, salt_len);
+
+          RETVAL = NEWSV(0, output_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, output_len);
+          output = (unsigned char *)SvPVX(RETVAL);
+
+          rv = scrypt_pbkdf(password_ptr, (unsigned long)password_len, salt_ptr, (unsigned long)salt_len, N, r, p, output, output_len);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: scrypt_pbkdf process failed: %s", error_to_string(rv));
+          }
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+argon2_pbkdf(const char * type, SV * password, SV * salt, unsigned int t_cost = 3, unsigned int m_factor = 65536, unsigned int parallelism = 1, unsigned long output_len = 32, SV * secret = &PL_sv_undef, SV * ad = &PL_sv_undef)
+    CODE:
+    {
+        int rv;
+        argon2_type argon2_t;
+        unsigned char *output;
+        unsigned char *password_ptr=NULL, *salt_ptr=NULL, *secret_ptr=NULL, *ad_ptr=NULL;
+        STRLEN password_len=0, salt_len=0, secret_len=0, ad_len=0;
+
+        if (output_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          if      (strcmp(type, "argon2d")  == 0) argon2_t = ARGON2_D;
+          else if (strcmp(type, "argon2i")  == 0) argon2_t = ARGON2_I;
+          else if (strcmp(type, "argon2id") == 0) argon2_t = ARGON2_ID;
+          else croak("FATAL: unknown argon2 type '%s'", type);
+
+          password_ptr = (unsigned char *)SvPVbyte(password, password_len);
+          salt_ptr     = (unsigned char *)SvPVbyte(salt, salt_len);
+          if (SvPOK(secret)) secret_ptr = (unsigned char *)SvPVbyte(secret, secret_len);
+          if (SvPOK(ad))     ad_ptr     = (unsigned char *)SvPVbyte(ad, ad_len);
+
+          RETVAL = NEWSV(0, output_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, output_len);
+          output = (unsigned char *)SvPVX(RETVAL);
+
+          rv = argon2_hash(password_ptr, (unsigned long)password_len,
+                           salt_ptr,     (unsigned long)salt_len,
+                           secret_ptr,   (unsigned long)secret_len,
+                           ad_ptr,       (unsigned long)ad_len,
+                           t_cost, m_factor, parallelism, argon2_t,
+                           output, output_len);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: argon2_pbkdf failed: %s", error_to_string(rv));
+          }
+        }
+    }
+    OUTPUT:
+        RETVAL
