@@ -18,7 +18,7 @@
 #define LTC_SMALL_STACK_SHA1
 #endif
 
-const struct ltc_hash_descriptor sha1_desc =
+const struct ltc_hash_descriptor sha1_portable_desc =
 {
     "sha1",
     2,
@@ -29,10 +29,10 @@ const struct ltc_hash_descriptor sha1_desc =
    { 1, 3, 14, 3, 2, 26,  },
    6,
 
-    &sha1_init,
-    &sha1_process,
-    &sha1_done,
-    &sha1_test,
+    &sha1_c_init,
+    &sha1_c_process,
+    &sha1_c_done,
+    &sha1_c_test,
     NULL
 };
 
@@ -42,9 +42,9 @@ const struct ltc_hash_descriptor sha1_desc =
 #define F3(x,y,z)  (x ^ y ^ z)
 
 #ifdef LTC_CLEAN_STACK
-static int ss_sha1_compress(hash_state *md, const unsigned char *buf)
+static int ss_sha1_c_compress(hash_state *md, const unsigned char *buf)
 #else
-static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
+static int  s_sha1_c_compress(hash_state *md, const unsigned char *buf)
 #endif
 {
     ulong32 a,b,c,d,e,i;
@@ -170,10 +170,10 @@ static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
 }
 
 #ifdef LTC_CLEAN_STACK
-static int s_sha1_compress(hash_state *md, const unsigned char *buf)
+static int s_sha1_c_compress(hash_state *md, const unsigned char *buf)
 {
    int err;
-   err = ss_sha1_compress(md, buf);
+   err = ss_sha1_c_compress(md, buf);
    burn_stack(sizeof(ulong32) * 87);
    return err;
 }
@@ -184,9 +184,12 @@ static int s_sha1_compress(hash_state *md, const unsigned char *buf)
    @param md   The hash state you wish to initialize
    @return CRYPT_OK if successful
 */
-int sha1_init(hash_state * md)
+int sha1_c_init(hash_state * md)
 {
    LTC_ARGCHK(md != NULL);
+
+   md->sha1.state = LTC_ALIGN_BUF(md->sha1.state_buf, 16);
+
    md->sha1.state[0] = 0x67452301UL;
    md->sha1.state[1] = 0xefcdab89UL;
    md->sha1.state[2] = 0x98badcfeUL;
@@ -204,7 +207,7 @@ int sha1_init(hash_state * md)
    @param inlen  The length of the data (octets)
    @return CRYPT_OK if successful
 */
-HASH_PROCESS(sha1_process, s_sha1_compress, sha1, 64)
+HASH_PROCESS(sha1_c_process, s_sha1_c_compress, sha1, 64)
 
 /**
    Terminate the hash to get the digest
@@ -212,7 +215,7 @@ HASH_PROCESS(sha1_process, s_sha1_compress, sha1, 64)
    @param out [out] The destination of the hash (20 bytes)
    @return CRYPT_OK if successful
 */
-int sha1_done(hash_state * md, unsigned char *out)
+int sha1_c_done(hash_state * md, unsigned char *out)
 {
     int i;
 
@@ -237,7 +240,7 @@ int sha1_done(hash_state * md, unsigned char *out)
         while (md->sha1.curlen < 64) {
             md->sha1.buf[md->sha1.curlen++] = (unsigned char)0;
         }
-        s_sha1_compress(md, md->sha1.buf);
+        s_sha1_c_compress(md, md->sha1.buf);
         md->sha1.curlen = 0;
     }
 
@@ -248,7 +251,7 @@ int sha1_done(hash_state * md, unsigned char *out)
 
     /* store length */
     STORE64H(md->sha1.length, md->sha1.buf+56);
-    s_sha1_compress(md, md->sha1.buf);
+    s_sha1_c_compress(md, md->sha1.buf);
 
     /* copy output */
     for (i = 0; i < 5; i++) {
@@ -264,41 +267,9 @@ int sha1_done(hash_state * md, unsigned char *out)
   Self-test the hash
   @return CRYPT_OK if successful, CRYPT_NOP if self-tests have been disabled
 */
-int  sha1_test(void)
+int  sha1_c_test(void)
 {
- #ifndef LTC_TEST
-    return CRYPT_NOP;
- #else
-  static const struct {
-      const char *msg;
-      unsigned char hash[20];
-  } tests[] = {
-    { "abc",
-      { 0xa9, 0x99, 0x3e, 0x36, 0x47, 0x06, 0x81, 0x6a,
-        0xba, 0x3e, 0x25, 0x71, 0x78, 0x50, 0xc2, 0x6c,
-        0x9c, 0xd0, 0xd8, 0x9d }
-    },
-    { "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
-      { 0x84, 0x98, 0x3E, 0x44, 0x1C, 0x3B, 0xD2, 0x6E,
-        0xBA, 0xAE, 0x4A, 0xA1, 0xF9, 0x51, 0x29, 0xE5,
-        0xE5, 0x46, 0x70, 0xF1 }
-    }
-  };
-
-  int i;
-  unsigned char tmp[20];
-  hash_state md;
-
-  for (i = 0; i < (int)(sizeof(tests) / sizeof(tests[0]));  i++) {
-      sha1_init(&md);
-      sha1_process(&md, (unsigned char*)tests[i].msg, (unsigned long)XSTRLEN(tests[i].msg));
-      sha1_done(&md, tmp);
-      if (ltc_compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "SHA1", i)) {
-         return CRYPT_FAIL_TESTVECTOR;
-      }
-  }
-  return CRYPT_OK;
-  #endif
+   return sha1_test_desc(&sha1_portable_desc, "SHA1 portable");
 }
 
 #undef F0

@@ -24,8 +24,10 @@ ltc/encauth/ocb3/ocb3_int_xor_blocks.obj ltc/encauth/siv/siv.obj ltc/hashes/blak
 ltc/hashes/blake2s.obj ltc/hashes/chc/chc.obj ltc/hashes/helper/hash_file.obj ltc/hashes/helper/hash_filehandle.obj \
 ltc/hashes/helper/hash_memory.obj ltc/hashes/helper/hash_memory_multi.obj ltc/hashes/md2.obj \
 ltc/hashes/md4.obj ltc/hashes/md5.obj ltc/hashes/rmd128.obj ltc/hashes/rmd160.obj \
-ltc/hashes/rmd256.obj ltc/hashes/rmd320.obj ltc/hashes/sha1.obj ltc/hashes/sha2/sha224.obj \
-ltc/hashes/sha2/sha256.obj ltc/hashes/sha2/sha384.obj ltc/hashes/sha2/sha512.obj \
+ltc/hashes/rmd256.obj ltc/hashes/rmd320.obj ltc/hashes/sha1.obj ltc/hashes/sha1_desc.obj \
+ltc/hashes/sha1_x86.obj ltc/hashes/sha2/sha224.obj ltc/hashes/sha2/sha224_desc.obj \
+ltc/hashes/sha2/sha224_x86.obj ltc/hashes/sha2/sha256.obj ltc/hashes/sha2/sha256_desc.obj \
+ltc/hashes/sha2/sha256_x86.obj ltc/hashes/sha2/sha384.obj ltc/hashes/sha2/sha512.obj \
 ltc/hashes/sha2/sha512_224.obj ltc/hashes/sha2/sha512_256.obj ltc/hashes/sha3.obj \
 ltc/hashes/sha3_test.obj ltc/hashes/tiger.obj ltc/hashes/whirl/whirl.obj ltc/mac/blake2/blake2bmac.obj \
 ltc/mac/blake2/blake2bmac_file.obj ltc/mac/blake2/blake2bmac_memory.obj ltc/mac/blake2/blake2bmac_memory_multi.obj \
