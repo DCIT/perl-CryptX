@@ -84,7 +84,7 @@ B<BEWARE:> if you are not sure, do not use C<pbkdf1> but rather choose C<pbkdf2>
 
 =head2 pbkdf1_openssl
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.088>
 
 OpenSSL-compatible variant of PBKDF1 (implements C<EVP_BytesToKey>). Unlike strict
 C<pbkdf1>, the output length is not limited to the hash size -- it can be arbitrarily
@@ -166,7 +166,7 @@ long by chaining hash blocks. OpenSSL defaults: C<MD5> hash, C<iteration_count=1
 
 bcrypt-based key derivation as defined by the OpenBSD project.
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.088>
 
 
   $derived_key = bcrypt_pbkdf($password, $salt, $rounds, $hash_name, $len);
@@ -187,7 +187,7 @@ I<Since: CryptX-0.100>
 
 scrypt key derivation according to L<https://tools.ietf.org/html/rfc7914>.
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.088>
 
 
   $derived_key = scrypt_pbkdf($password, $salt, $N, $r, $p, $len);
@@ -209,7 +209,7 @@ I<Since: CryptX-0.100>
 
 Argon2 key derivation according to L<https://tools.ietf.org/html/rfc9106>.
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.088>
 
 
   $derived_key = argon2_pbkdf($type, $password, $salt, $t_cost, $m_factor, $parallelism, $len, $secret, $ad);

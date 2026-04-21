@@ -382,7 +382,7 @@ Checks the given C<$uuid> string whether it matches V4 UUID format and returns C
 
 =head2 random_v7uuid
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.088>
 
  my $uuid = random_v7uuid();
 
@@ -392,7 +392,7 @@ generation time), followed by random bits. C<Y> is one of 8, 9, A, B (RFC 9562 v
 
 =head2 is_uuid
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.088>
 
   if (is_uuid($uuid)) {
     ...

@@ -1,8 +1,8 @@
 Changes for CryptX
 
-0.100   TBD
-        - Crypt::KeyDerivation - NEW functions: pbkdf1_openssl, bcrypt_pbkdf, scrypt_pbkdf, argon2_pbkdf
-        - Crypt::Misc - NEW functions: random_v7uuid, is_uuid
+0.088   2026-MM-DD
+        - Crypt::KeyDerivation - new functions: pbkdf1_openssl, bcrypt_pbkdf, scrypt_pbkdf, argon2_pbkdf
+        - Crypt::Misc - new functions: random_v7uuid, is_uuid
         - bundled libtomcrypt update branch:develop (commit: 2e441a17 2026-04-15)
         - bundled libtommath update branch:develop (commit: ae40a87 2026-04-20)
         - security fix CVE-2026-41564 https://github.com/DCIT/perl-CryptX/security/advisories/GHSA-24c2-gp6c-24c6
