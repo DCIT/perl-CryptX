@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-use Test::More tests => 36;
+use Test::More tests => 38;
 
-use Crypt::KeyDerivation qw(pbkdf1 pbkdf2 hkdf hkdf_expand hkdf_extract bcrypt_pbkdf scrypt_pbkdf argon2_pbkdf);
+use Crypt::KeyDerivation qw(pbkdf1 pbkdf1_openssl pbkdf2 hkdf hkdf_expand hkdf_extract bcrypt_pbkdf scrypt_pbkdf argon2_pbkdf);
 
 { ### rfc5869 test case 1
   my $keying_material = pack("H*", "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b");
@@ -167,6 +167,11 @@ use Crypt::KeyDerivation qw(pbkdf1 pbkdf2 hkdf hkdf_expand hkdf_extract bcrypt_p
 
 { #PBKDF1
   is(unpack('H*', pbkdf1(unpack("H*", "012345678910111231415161717"), unpack("H*", "F7560045C70A96DB"), 12, 'SHA1', 20)), '59a9c8a32646428e6724cc9f43c72aa69a6edc1f', 'test pbkdf1 A');
+}
+
+{ #PBKDF1_OPENSSL
+  is(unpack('H*', pbkdf1_openssl("password", "saltsalt", 1, 'SHA1', 20)), 'cab86dd6261710891e8cb56ee3625691a75df344',       'test pbkdf1_openssl A (len<=hashsize)');
+  is(unpack('H*', pbkdf1_openssl("password", "saltsalt", 1, 'SHA1', 30)), 'cab86dd6261710891e8cb56ee3625691a75df344f0bff4c12cf3596fc00b', 'test pbkdf1_openssl B (len>hashsize)');
 }
 
 { #PBKDF2 http://tools.ietf.org/html/rfc6070

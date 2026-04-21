@@ -5,7 +5,7 @@ use warnings;
 our $VERSION = '0.087_005';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
-our %EXPORT_TAGS = ( all => [qw(pbkdf1 pbkdf2 hkdf hkdf_expand hkdf_extract bcrypt_pbkdf scrypt_pbkdf argon2_pbkdf)] );
+our %EXPORT_TAGS = ( all => [qw(pbkdf1 pbkdf1_openssl pbkdf2 hkdf hkdf_expand hkdf_extract bcrypt_pbkdf scrypt_pbkdf argon2_pbkdf)] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
@@ -27,10 +27,11 @@ Crypt::KeyDerivation - PBKDF1, PBKDF2, HKDF, Bcrypt, Scrypt, Argon2 key derivati
 
   ### PBKDF1/2
   $derived_key1 = pbkdf1($password, $salt, $iteration_count, $hash_name, $len);
-  $derived_key2 = pbkdf2($password, $salt, $iteration_count, $hash_name, $len);
+  $derived_key2 = pbkdf1_openssl($password, $salt, $iteration_count, $hash_name, $len);
+  $derived_key3 = pbkdf2($password, $salt, $iteration_count, $hash_name, $len);
 
   ### HKDF & co.
-  $derived_key3 = hkdf($keying_material, $salt, $hash_name, $len, $info);
+  $derived_key4 = hkdf($keying_material, $salt, $hash_name, $len, $info);
   $prk  = hkdf_extract($keying_material, $salt, $hash_name);
   $okm1 = hkdf_expand($prk, $hash_name, $len, $info);
 
@@ -76,6 +77,28 @@ B<BEWARE:> if you are not sure, do not use C<pbkdf1> but rather choose C<pbkdf2>
   $derived_key = pbkdf1($password, $salt);
 
   # $password ......... input keying material  (password)
+  # $salt ............. salt/nonce (expected length: 8)
+  # $iteration_count .. optional, DEFAULT: 5000
+  # $hash_name ........ optional, DEFAULT: 'SHA256'
+  # $len .............. optional, derived key len, DEFAULT: 32
+
+=head2 pbkdf1_openssl
+
+I<Since: CryptX-0.100>
+
+OpenSSL-compatible variant of PBKDF1 (implements C<EVP_BytesToKey>). Unlike strict
+C<pbkdf1>, the output length is not limited to the hash size -- it can be arbitrarily
+long by chaining hash blocks. OpenSSL defaults: C<MD5> hash, C<iteration_count=1>.
+
+  $derived_key = pbkdf1_openssl($password, $salt, $iteration_count, $hash_name, $len);
+  #or
+  $derived_key = pbkdf1_openssl($password, $salt, $iteration_count, $hash_name);
+  #or
+  $derived_key = pbkdf1_openssl($password, $salt, $iteration_count);
+  #or
+  $derived_key = pbkdf1_openssl($password, $salt);
+
+  # $password ......... input keying material (password)
   # $salt ............. salt/nonce (expected length: 8)
   # $iteration_count .. optional, DEFAULT: 5000
   # $hash_name ........ optional, DEFAULT: 'SHA256'

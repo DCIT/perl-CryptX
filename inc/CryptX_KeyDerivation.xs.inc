@@ -41,6 +41,44 @@ pbkdf1(SV * password, SV * salt, int iteration_count = 5000, const char * hash_n
         RETVAL
 
 SV *
+pbkdf1_openssl(SV * password, SV * salt, int iteration_count = 5000, const char * hash_name = "SHA256", unsigned long output_len = 32)
+    CODE:
+    {
+        int rv, id;
+        unsigned char *output;
+        unsigned char *password_ptr=NULL;
+        STRLEN password_len=0;
+        unsigned char *salt_ptr=NULL;
+        STRLEN salt_len=0;
+
+        if (output_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          id = cryptx_internal_find_hash(hash_name);
+          if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
+
+          password_ptr = (unsigned char *)SvPVbyte(password, password_len);
+          salt_ptr = (unsigned char *)SvPVbyte(salt, salt_len);
+          if (salt_len < 8) croak("FATAL: salt_len has to be 8");
+
+          RETVAL = NEWSV(0, output_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, output_len);
+          output = (unsigned char *)SvPVX(RETVAL);
+
+          rv = pkcs_5_alg1_openssl(password_ptr, (unsigned long)password_len, salt_ptr, iteration_count, id, output, &output_len);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: pkcs_5_alg1_openssl process failed: %s", error_to_string(rv));
+          }
+          SvCUR_set(RETVAL, output_len);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
 pbkdf2(SV * password, SV * salt, int iteration_count = 5000, const char * hash_name = "SHA256", unsigned long output_len = 32)
     CODE:
     {
