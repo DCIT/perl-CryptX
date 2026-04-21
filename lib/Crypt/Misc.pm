@@ -20,6 +20,7 @@ our %EXPORT_TAGS = ( all => [qw(encode_b64   decode_b64
                                 pem_to_der   der_to_pem
                                 read_rawfile write_rawfile
                                 slow_eq is_v4uuid random_v4uuid
+                                is_uuid random_v7uuid
                                 increment_octets_be increment_octets_le
                                )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
@@ -34,6 +35,7 @@ use Crypt::Mode::ECB;
 use Crypt::Mode::OFB;
 use Crypt::Cipher;
 use Crypt::PRNG 'random_bytes';
+use Time::HiRes (); # perl core module
 
 sub _encode_b58 {
   my ($bytes, $alphabet) = @_;
@@ -200,10 +202,34 @@ sub random_v4uuid() {
   return $hex;
 }
 
+sub random_v7uuid {
+  # RFC 9562 §5.7 - Version 7 UUID (time-ordered)
+  # Format: xxxxxxxx-xxxx-7xxx-[89ab]xxx-xxxxxxxxxxxx
+  # Structure: 48-bit ms timestamp | 4-bit ver=7 | 12-bit rand | 2-bit var=10 | 62-bit rand
+  my ($sec, $usec) = Time::HiRes::gettimeofday();
+  my $ms = $sec * 1000 + int($usec / 1000);
+  my $rand = random_bytes(10);
+  my $raw = pack("N",  int($ms / 65536)) .                                      # bytes 0-3:  ms[47:16]
+            pack("n",  $ms % 65536) .                                           # bytes 4-5:  ms[15:0]
+            pack("n",  0x7000 | (unpack("n", substr($rand, 0, 2)) & 0x0FFF)) .  # bytes 6-7:  ver=7 + rand_a
+            pack("C",  0x80   | (unpack("C", substr($rand, 2, 1)) & 0x3F)) .    # byte 8:     var=10 + rand_b
+            substr($rand, 3, 7);                                                # bytes 9-15: rand_b (cont.)
+  my $hex = unpack("H*", $raw);
+  $hex =~ s/^(.{8})(.{4})(.{4})(.{4})(.{12})$/$1-$2-$3-$4-$5/;
+  return $hex;
+}
+
 sub is_v4uuid($) {
   my $uuid = shift;
   return 0 if !$uuid;
   return 1 if $uuid =~ /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return 0;
+}
+
+sub is_uuid($) {
+  my $uuid = shift;
+  return 0 if !$uuid;
+  return 1 if $uuid =~ /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return 0;
 }
 
@@ -353,6 +379,28 @@ I<Since: 0.031>
   }
 
 Checks the given C<$uuid> string whether it matches V4 UUID format and returns C<0> (mismatch) or C<1> (match).
+
+=head2 random_v7uuid
+
+I<Since: CryptX-0.100>
+
+ my $uuid = random_v7uuid();
+
+Returns a cryptographically strong Version 7 time-ordered UUID: C<xxxxxxxx-xxxx-7xxx-Yxxx-xxxxxxxxxxxx>
+where the first 48 bits encode the current Unix time in milliseconds (making UUIDs sortable by
+generation time), followed by random bits. C<Y> is one of 8, 9, A, B (RFC 9562 variant).
+
+=head2 is_uuid
+
+I<Since: CryptX-0.100>
+
+  if (is_uuid($uuid)) {
+    ...
+  }
+
+Checks whether C<$uuid> is a validly formatted UUID (any version) in the standard
+C<xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx> form. Returns C<1> (match) or C<0> (mismatch).
+For a version-specific check see L</is_v4uuid>.
 
 =head2 increment_octets_le
 

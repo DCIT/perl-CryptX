@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 680;
+use Test::More tests => 693;
 
 use Crypt::Misc qw( encode_b64   decode_b64
                     encode_b64u  decode_b64u
@@ -16,6 +16,7 @@ use Crypt::Misc qw( encode_b64   decode_b64
                     pem_to_der   der_to_pem
                     read_rawfile write_rawfile
                     slow_eq is_v4uuid random_v4uuid
+                    is_uuid random_v7uuid
                     increment_octets_be increment_octets_le
                   );
 
@@ -66,8 +67,31 @@ ok(slow_eq(read_rawfile("tmp.$$.file"), "a\nb\r\nc\rd\te"), "slow_eq + read_rawf
 unlink "tmp.$$.file";
 
 my $uuid = random_v4uuid;
-ok($uuid, 'random_v4uuid');
-ok(is_v4uuid($uuid), 'is_v4uuid');
+ok($uuid,            'random_v4uuid');
+ok(is_v4uuid($uuid), 'is_v4uuid: accepts v4');
+ok(is_uuid($uuid),   'is_uuid: accepts v4');
+
+{ ### random_v7uuid / is_uuid
+  my $v7 = random_v7uuid();
+  ok($v7,                                        'random_v7uuid: defined');
+  is(substr($v7, 14, 1), '7',                    'random_v7uuid: version digit is 7');
+  ok(substr($v7, 19, 1) =~ /^[89ab]$/i,         'random_v7uuid: variant digit is 8/9/a/b');
+  ok(is_uuid($v7),                               'is_uuid: accepts v7');
+  ok(!is_v4uuid($v7),                            'is_v4uuid: rejects v7');
+
+  # two successive UUIDs must have non-decreasing 12-char timestamp prefix
+  my ($u1, $u2) = (random_v7uuid(), random_v7uuid());
+  my $ts = sub { substr($_[0],0,8).substr($_[0],9,4) };
+  ok($ts->($u2) ge $ts->($u1),                   'random_v7uuid: time-ordered');
+
+  # is_uuid accepts any version/variant
+  ok( is_uuid('f47ac10b-58cc-4372-a567-0e02b2c3d479'), 'is_uuid: v4 lowercase');
+  ok( is_uuid('F47AC10B-58CC-4372-A567-0E02B2C3D479'), 'is_uuid: uppercase');
+  ok( is_uuid('017f22e2-79b0-7cc3-98c4-dc0c0c07398f'), 'is_uuid: v7 example');
+  ok(!is_uuid(''),                                     'is_uuid: rejects empty');
+  ok(!is_uuid('not-a-uuid'),                           'is_uuid: rejects garbage');
+  ok(!is_uuid('f47ac10b-58cc-4372-a567-0e02b2c3d47'),  'is_uuid: rejects short');
+}
 
 my @hex = (qw/fb
               9534
