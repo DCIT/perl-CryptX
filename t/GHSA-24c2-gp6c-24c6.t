@@ -136,7 +136,7 @@ expect_fork_divergence(
     my $pk = Crypt::PK::RSA->new;
     sub {
       $pk->generate_key(128, 65537);
-      return $pk->export_key_jwk_thumbprint('SHA256');
+      return $pk->key2hash->{N};
     };
   },
 );
@@ -147,7 +147,8 @@ expect_fork_divergence(
     my $pk = Crypt::PK::ECC->new;
     sub {
       $pk->generate_key('secp256k1');
-      return $pk->export_key_jwk_thumbprint('SHA256');
+      my $key = $pk->key2hash;
+      return join ':', @{$key}{qw(pub_x pub_y)};
     };
   },
 );
