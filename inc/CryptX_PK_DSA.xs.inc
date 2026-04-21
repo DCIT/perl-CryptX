@@ -11,6 +11,7 @@ _new(Class)
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->key.type = -1;
         RETVAL->pindex = find_prng("chacha20");
+        RETVAL->last_pid = (IV)PerlProc_getpid();
         if (RETVAL->pindex == -1) {
           Safefree(RETVAL);
           croak("FATAL: find_prng('chacha20') failed");
@@ -29,6 +30,7 @@ _generate_key_size(Crypt::PK::DSA self, int group_size=30, int modulus_size=256)
     PPCODE:
     {
         int rv;
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         /* gen the key */
         rv = dsa_make_key(&self->pstate, self->pindex, group_size, modulus_size, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dsa_make_key failed: %s", error_to_string(rv));
@@ -42,6 +44,7 @@ _generate_key_dsaparam(Crypt::PK::DSA self, SV * dsaparam)
         int rv;
         unsigned char *data=NULL;
         STRLEN data_len=0;
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         data = (unsigned char *)SvPVbyte(dsaparam, data_len);
         /* load d p q */
         rv = dsa_set_pqg_dsaparam(data, (unsigned long)data_len, &self->key);
@@ -59,6 +62,7 @@ _generate_key_pqg_hex(Crypt::PK::DSA self, char *p, char *q, char *g)
         int rv;
         unsigned char pbin[512], qbin[512], gbin[512];
         unsigned long plen=sizeof(pbin), qlen=sizeof(qbin), glen=sizeof(gbin);
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         if (!p || !strlen(p) || !q || !strlen(q) || !g || !strlen(g)) {
           croak("FATAL: generate_key_pqg_hex incomplete args");
         }
@@ -342,6 +346,7 @@ encrypt(Crypt::PK::DSA self, SV * data, const char * hash_name = "SHA1")
         unsigned long buffer_len = 1024;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
 
         hash_id = cryptx_internal_find_hash(hash_name);
         if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
@@ -385,6 +390,7 @@ sign_hash(Crypt::PK::DSA self, SV * data, const char * hash_name = "SHA1")
         STRLEN data_len = 0;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         if (ix == 1) {
           id = cryptx_internal_find_hash(hash_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
@@ -436,4 +442,3 @@ DESTROY(Crypt::PK::DSA self)
     CODE:
         if (self->key.type != -1) { dsa_free(&self->key); self->key.type = -1; }
         Safefree(self);
-

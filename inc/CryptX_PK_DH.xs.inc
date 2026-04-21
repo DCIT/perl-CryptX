@@ -11,6 +11,7 @@ _new(Class)
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->key.type = -1;
         RETVAL->pindex = find_prng("chacha20");
+        RETVAL->last_pid = (IV)PerlProc_getpid();
         if (RETVAL->pindex == -1) {
           Safefree(RETVAL);
           croak("FATAL: find_prng('chacha20') failed");
@@ -29,6 +30,7 @@ _generate_key_size(Crypt::PK::DH self, int groupsize=256)
     PPCODE:
     {
         int rv;
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         rv = dh_set_pg_groupsize(groupsize, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dh_set_pg_groupsize failed: %s", error_to_string(rv));
         rv = dh_generate_key(&self->pstate, self->pindex, &self->key);
@@ -43,6 +45,7 @@ _generate_key_gp(Crypt::PK::DH self, char *g, char *p)
         int rv;
         unsigned char pbin[1024], gbin[512];
         unsigned long plen=sizeof(pbin), glen=sizeof(gbin);
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
 
         if (p && strlen(p) > 0 && g && strlen(g) > 0) {
           rv = radix_to_bin(p, 16, pbin, &plen);
@@ -66,6 +69,7 @@ _generate_key_dhparam(Crypt::PK::DH self, SV * dhparam)
         int rv;
         unsigned char *data=NULL;
         STRLEN data_len=0;
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         data = (unsigned char *)SvPVbyte(dhparam, data_len);
         /* load d p q */
         rv = dh_set_pg_dhparam(data, (unsigned long)data_len, &self->key);

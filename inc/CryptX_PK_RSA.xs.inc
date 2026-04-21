@@ -11,6 +11,7 @@ _new(Class)
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->key.type = -1;
         RETVAL->pindex = find_prng("chacha20");
+        RETVAL->last_pid = (IV)PerlProc_getpid();
         if (RETVAL->pindex == -1) {
           Safefree(RETVAL);
           croak("FATAL: find_prng('chacha20') failed");
@@ -30,6 +31,7 @@ generate_key(Crypt::PK::RSA self, int key_size=256, long key_e=65537)
     {
         /* key_size is in octets */
         int rv;
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         /* gen the key */
         rv = rsa_make_key(&self->pstate, self->pindex, key_size, key_e, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: rsa_make_key failed: %s", error_to_string(rv));
@@ -362,6 +364,7 @@ encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         if (strnEQ(padding, "oaep", 4)) {
           mgf_hash_id = cryptx_internal_find_hash(mgf_hash);
           if (mgf_hash_id == -1) croak("FATAL: find_hash failed for '%s'", mgf_hash);
@@ -427,6 +430,7 @@ decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         if (strnEQ(padding, "oaep", 4)) {
           mgf_hash_id = cryptx_internal_find_hash(mgf_hash);
           if (mgf_hash_id == -1) croak("FATAL: find_hash failed for '%s'", mgf_hash);
@@ -491,6 +495,7 @@ sign_hash(Crypt::PK::RSA self, SV * data, const char * hash_name = "SHA1", const
         ltc_rsa_op_parameters rsa_oparams;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         if (ix == 1) {
           hash_id = cryptx_internal_find_hash(hash_name);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
@@ -561,6 +566,7 @@ verify_hash(Crypt::PK::RSA self, SV * sig, SV * data, const char * hash_name = "
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         if (ix == 1) {
           hash_id = cryptx_internal_find_hash(hash_name);
           if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);

@@ -130,30 +130,35 @@ typedef struct prng_struct {            /* used by Crypt::PRNG */
 typedef struct rsa_struct {             /* used by Crypt::PK::RSA */
   prng_state pstate;
   int pindex;
+  IV last_pid;
   rsa_key key;
 } *Crypt__PK__RSA;
 
 typedef struct dsa_struct {             /* used by Crypt::PK::DSA */
   prng_state pstate;
   int pindex;
+  IV last_pid;
   dsa_key key;
 } *Crypt__PK__DSA;
 
 typedef struct dh_struct {              /* used by Crypt::PK::DH */
   prng_state pstate;
   int pindex;
+  IV last_pid;
   dh_key key;
 } *Crypt__PK__DH;
 
 typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
   prng_state pstate;
   int pindex;
+  IV last_pid;
   ecc_key key;
 } *Crypt__PK__ECC;
 
 typedef struct ed25519_struct {         /* used by Crypt::PK::Ed25519 */
   prng_state pstate;
   int pindex;
+  IV last_pid;
   curve25519_key key;
   int initialized;
 } *Crypt__PK__Ed25519;
@@ -161,6 +166,7 @@ typedef struct ed25519_struct {         /* used by Crypt::PK::Ed25519 */
 typedef struct x25519_struct {          /* used by Crypt::PK::X25519 */
   prng_state pstate;
   int pindex;
+  IV last_pid;
   curve25519_key key;
   int initialized;
 } *Crypt__PK__X25519;
@@ -195,6 +201,23 @@ STATIC int cryptx_internal_password_cb_getpw(void **p, unsigned long *l, void *u
   *l = (unsigned long)pwd_len;
 
   return 0;
+}
+
+STATIC void cryptx_internal_pk_prng_reseed(prng_state *state, int pindex, IV *last_pid) {
+  IV curpid = (IV)PerlProc_getpid();
+  unsigned char entropy_buf[40];
+  int rv;
+
+  if (*last_pid == curpid) return;
+
+  if (rng_get_bytes(entropy_buf, sizeof(entropy_buf), NULL) != sizeof(entropy_buf)) {
+    croak("FATAL: rng_get_bytes failed");
+  }
+  rv = prng_descriptor[pindex].add_entropy(entropy_buf, sizeof(entropy_buf), state);
+  if (rv != CRYPT_OK) croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
+  rv = prng_descriptor[pindex].ready(state);
+  if (rv != CRYPT_OK) croak("FATAL: PRNG_ready failed: %s", error_to_string(rv));
+  *last_pid = curpid;
 }
 
 STATIC void cryptx_internal_password_cb_free(void *p) {

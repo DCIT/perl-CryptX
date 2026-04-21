@@ -10,6 +10,7 @@ _new(Class)
         Newz(0, RETVAL, 1, struct ecc_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->pindex = find_prng("chacha20");
+        RETVAL->last_pid = (IV)PerlProc_getpid();
         RETVAL->key.type = -1;
         if (RETVAL->pindex == -1) {
           Safefree(RETVAL);
@@ -29,6 +30,7 @@ generate_key(Crypt::PK::ECC self, SV *curve)
     PPCODE:
     {
         int rv;
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         /* setup dp structure */
         rv = cryptx_internal_ecc_set_curve_from_SV(&self->key, curve); /* croaks on error */
         if (rv != CRYPT_OK) croak("FATAL: ecc_set_curve failed: %s", error_to_string(rv));
@@ -377,6 +379,7 @@ encrypt(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
         unsigned long buffer_len = 1024;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
 
         hash_id = cryptx_internal_find_hash(hash_name);
         if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
@@ -429,6 +432,7 @@ sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = NULL, const c
         }
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         if (ix == 1 || ix == 2) {
           /* for backward compatibility, if hash_name is NULL, use SHA1 */
           if (hash_name == NULL) {
@@ -485,6 +489,7 @@ verify_hash(Crypt::PK::ECC self, SV * sig, SV * data, const char * hash_name = "
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         if (ix == 1 || ix == 2) {
           id = cryptx_internal_find_hash(hash_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
@@ -553,6 +558,7 @@ recovery_pub(Crypt::PK::ECC self, SV * sig, SV* hash, SV* recid = NULL)
 
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
         hash_ptr = (unsigned char *)SvPVbyte(hash, hash_len);
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         if (ix == 1) {
           sig_opts.type = LTC_ECCSIG_RFC7518;
         }
@@ -574,4 +580,3 @@ DESTROY(Crypt::PK::ECC self)
     CODE:
         if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
         Safefree(self);
-

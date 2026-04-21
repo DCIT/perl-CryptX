@@ -11,6 +11,7 @@ _new(Class)
         if (!RETVAL) croak("FATAL: Newz failed");
         RETVAL->initialized = 0;
         RETVAL->pindex = find_prng("chacha20");
+        RETVAL->last_pid = (IV)PerlProc_getpid();
         if (RETVAL->pindex == -1) {
           Safefree(RETVAL);
           croak("FATAL: find_prng('chacha20') failed");
@@ -30,6 +31,7 @@ generate_key(Crypt::PK::X25519 self)
     {
         int rv;
         self->initialized = 0;
+        cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
         rv = x25519_make_key(&self->pstate, self->pindex, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: x25519_make_key failed: %s", error_to_string(rv));
         self->initialized = 1;
