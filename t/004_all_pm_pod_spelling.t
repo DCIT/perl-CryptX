@@ -21,6 +21,9 @@ Test::Pod::Spelling->import(
                           blakes_ blakeb_
                           XOR'ing XOR'ed XORed
                           keccak Ethereum recid
+                          XOF BER flexi MSB YY
+                          XSalsa UUIDs
+                          moduli RSA
                           RC rand reseeding SSH CTR Poly CipherHash en aka
                           Scrypt Bcrypt bcrypt scrypt OpenBSD
                           XChaCha
@@ -38,7 +41,7 @@ Test::Pod::Spelling->import(
                     },
 );
 
-plan tests => 109;
+plan tests => 114;
 
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');

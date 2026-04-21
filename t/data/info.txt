@@ -42,6 +42,24 @@ openssl req -x509 -days 99999 -nodes -subj /CN=CryptX -key openssl_ed25519_sk.pe
 openssl x509 -in openssl_ed25519_x509.pem -outform der -out openssl_ed25519_x509.der
 openssl x509 -in openssl_ed25519_x509.pem -text
 
+openssl genpkey -algorithm SM2 -out openssl_sm2_sk.pem
+openssl pkey -in openssl_sm2_sk.pem -text -noout
+openssl pkey -in openssl_sm2_sk.pem -inform PEM -out openssl_sm2_sk.der -outform DER
+openssl pkey -in openssl_sm2_sk.pem -inform PEM -out openssl_sm2_sk_t.pem -traditional -outform PEM
+openssl pkey -in openssl_sm2_sk.pem -inform PEM -out openssl_sm2_sk_pw.pem -outform PEM -aes256 -passout pass:secret
+openssl pkey -in openssl_sm2_sk.pem -inform PEM -out openssl_sm2_sk_pw_t.pem -traditional -outform PEM -des3 -passout pass:secret
+openssl pkey -in openssl_sm2_sk.pem -inform PEM -out openssl_sm2_pk.der -pubout -outform DER
+openssl pkey -in openssl_sm2_sk.pem -inform PEM -out openssl_sm2_pk.pem -pubout -outform PEM
+openssl pkcs8 -topk8 -inform PEM -outform DER -in openssl_sm2_sk.pem -out openssl_sm2_sk.pkcs8 -nocrypt
+openssl pkcs8 -topk8 -inform PEM -outform DER -in openssl_sm2_sk.pem -out openssl_sm2_sk_pbes1.pkcs8 -passout pass:secret -v1 PBE-SHA1-3DES
+openssl pkcs8 -topk8 -inform PEM -outform DER -in openssl_sm2_sk.pem -out openssl_sm2_sk_pbes2.pkcs8 -passout pass:secret -v2 aes256 -v2prf hmacWithSHA512
+openssl pkcs8 -topk8 -inform PEM -outform PEM -in openssl_sm2_sk.pem -out openssl_sm2_sk.pk8 -nocrypt
+openssl pkcs8 -topk8 -inform PEM -outform PEM -in openssl_sm2_sk.pem -out openssl_sm2_sk_pbes1.pk8 -passout pass:secret -v1 PBE-SHA1-3DES
+openssl pkcs8 -topk8 -inform PEM -outform PEM -in openssl_sm2_sk.pem -out openssl_sm2_sk_pbes2.pk8 -passout pass:secret -v2 aes256 -v2prf hmacWithSHA512
+openssl req -x509 -days 99999 -nodes -subj /CN=CryptX-SM2 -key openssl_sm2_sk.pem -out openssl_sm2_x509.pem -sm3 -sigopt distid:1234567812345678
+openssl x509 -in openssl_sm2_x509.pem -outform der -out openssl_sm2_x509.der
+openssl x509 -in openssl_sm2_x509.pem -text -noout
+
 openssl genpkey -algorithm x448 -out openssl_x448_sk.pem
 openssl pkey -in openssl_x448_sk.pem -text
 openssl pkey -in openssl_x448_sk.pem -inform PEM -out openssl_x448_sk.der -outform DER

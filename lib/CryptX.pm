@@ -269,12 +269,12 @@ L<Crypt::Mode::CBC>, L<Crypt::Mode::CFB>, L<Crypt::Mode::CTR>, L<Crypt::Mode::EC
 
 =item * Stream ciphers
 
-L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sober128>,
-L<Crypt::Stream::Sosemanuk>, L<Crypt::Stream::Rabbit>
+L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::XSalsa20>,
+L<Crypt::Stream::Sober128>, L<Crypt::Stream::Sosemanuk>, L<Crypt::Stream::Rabbit>
 
 =item * Authenticated encryption modes
 
-L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::OCB>, L<Crypt::AuthEnc::ChaCha20Poly1305>
+L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::OCB>, L<Crypt::AuthEnc::ChaCha20Poly1305>, L<Crypt::AuthEnc::SIV>
 
 =item * Hash Functions - see L<Crypt::Digest> and related modules
 
@@ -284,7 +284,8 @@ L<Crypt::Digest::CHAES>, L<Crypt::Digest::MD2>, L<Crypt::Digest::MD4>, L<Crypt::
 L<Crypt::Digest::RIPEMD256>, L<Crypt::Digest::RIPEMD320>, L<Crypt::Digest::SHA1>, L<Crypt::Digest::SHA224>, L<Crypt::Digest::SHA256>, L<Crypt::Digest::SHA384>,
 L<Crypt::Digest::SHA512>, L<Crypt::Digest::SHA512_224>, L<Crypt::Digest::SHA512_256>, L<Crypt::Digest::Tiger192>, L<Crypt::Digest::Whirlpool>,
 L<Crypt::Digest::Keccak224>, L<Crypt::Digest::Keccak256>, L<Crypt::Digest::Keccak384>, L<Crypt::Digest::Keccak512>,
-L<Crypt::Digest::SHA3_224>, L<Crypt::Digest::SHA3_256>, L<Crypt::Digest::SHA3_384>, L<Crypt::Digest::SHA3_512>, L<Crypt::Digest::SHAKE>
+L<Crypt::Digest::SHA3_224>, L<Crypt::Digest::SHA3_256>, L<Crypt::Digest::SHA3_384>, L<Crypt::Digest::SHA3_512>, L<Crypt::Digest::SHAKE>,
+L<Crypt::Digest::TurboSHAKE>, L<Crypt::Digest::KangarooTwelve>
 
 =item * Checksums
 
@@ -306,6 +307,10 @@ L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::Yarrow>, L<Crypt::PRNG::RC4>, L<Crypt::P
 =item * Key derivation functions - PBKDF1, PBKDF2, HKDF, Bcrypt, Scrypt, Argon2
 
 L<Crypt::KeyDerivation>
+
+=item * ASN.1 parser
+
+L<Crypt::ASN1>
 
 =item * Other handy functions related to cryptography
 
