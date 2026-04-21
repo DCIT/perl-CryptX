@@ -51,9 +51,9 @@ Provides an interface to key derivation functions:
 
 =item * Bcrypt-PBKDF as defined by the OpenBSD project
 
-=item * Scrypt according to L<https://tools.ietf.org/html/rfc7914|RFC 7914>
+=item * Scrypt according to L<https://tools.ietf.org/html/rfc7914>
 
-=item * Argon2 according to L<https://tools.ietf.org/html/rfc9106|RFC 9106>
+=item * Argon2 according to L<https://tools.ietf.org/html/rfc9106>
 
 =back
 
@@ -162,7 +162,7 @@ I<Since: CryptX-0.100>
 
 =head2 scrypt_pbkdf
 
-scrypt key derivation according to L<https://tools.ietf.org/html/rfc7914|RFC 7914>.
+scrypt key derivation according to L<https://tools.ietf.org/html/rfc7914>.
 
 I<Since: CryptX-0.100>
 
@@ -184,7 +184,7 @@ I<Since: CryptX-0.100>
 
 =head2 argon2_pbkdf
 
-Argon2 key derivation according to L<https://tools.ietf.org/html/rfc9106|RFC 9106>.
+Argon2 key derivation according to L<https://tools.ietf.org/html/rfc9106>.
 
 I<Since: CryptX-0.100>
 

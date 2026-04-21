@@ -22,6 +22,7 @@ Test::Pod::Spelling->import(
                           XOR'ing XOR'ed
                           keccak Ethereum recid
                           RC rand reseeding SSH CTR Poly CipherHash en aka
+                          Scrypt Bcrypt bcrypt scrypt OpenBSD
                         )]
                     },
 );
