@@ -5,6 +5,7 @@ use POSIX ();
 use Test::More;
 
 plan skip_all => "fork not available on this platform" unless $Config{d_fork};
+plan tests => 18;
 
 use IO::Handle;
 use Crypt::PK::DH;
@@ -256,5 +257,3 @@ expect_fork_divergence(
     };
   },
 );
-
-done_testing;
