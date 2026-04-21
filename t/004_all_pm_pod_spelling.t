@@ -14,7 +14,7 @@ Test::Pod::Spelling->import(
                         import_speller => 'Pod::Spelling::Ispell',
                         allow_words => [qw(
                           ASN AES BLAKEb BLAKEs CPAN CRC ChaCha CryptX DCIT DER Diffie EAX ECCDH ECDH ECDSA Flickr HKDF JSON JWA JWK
-                          Karel Miko OCB OCBv OID OMAC OO OpenSSL PBKDF PEM PKCS RIPEMD Rijndael SHA UUID RFC
+                          Karel Miko OCB OCBv OID OMAC OO OpenSSL PBKDF PEM PKCS RIPEMD Rijndael SHA UUID RFC UUIDs
                           decrypt decrypts interoperability cryptographically cryptographic octects
                           libtomcrypt libtommath
                           params paramshash irand perl endian zbase bumac bmac budigest bdigest md de
