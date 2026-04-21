@@ -121,7 +121,9 @@ int sha224_test(void)
 int sha224_test_desc(const struct ltc_hash_descriptor *desc, const char *name)
 {
  #ifndef LTC_TEST
-    return CRYPT_NOP;
+   (void)desc;
+   (void)name;
+   return CRYPT_NOP;
  #else
   static const struct {
       const char *msg;
