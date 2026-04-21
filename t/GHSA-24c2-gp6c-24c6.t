@@ -5,7 +5,7 @@ use POSIX ();
 use Test::More;
 
 plan skip_all => "fork not available on this platform" unless $Config{d_fork};
-plan tests => 18;
+plan tests => 72;
 
 use IO::Handle;
 use Crypt::PK::DH;
@@ -61,14 +61,12 @@ sub fork_capture {
 sub expect_fork_divergence {
   my ($name, $code) = @_;
 
-  subtest $name => sub {
-    my ($parent_value, $child_value, $child_status) = fork_capture($code);
+  my ($parent_value, $child_value, $child_status) = fork_capture($code);
 
-    ok(defined $parent_value && length $parent_value, 'parent produced output');
-    ok(defined $child_value && length $child_value, 'child produced output');
-    is($child_status, 0, 'child exited cleanly');
-    isnt($parent_value, $child_value, 'parent and child diverge after fork');
-  };
+  ok(defined $parent_value && length $parent_value, "$name: parent produced output");
+  ok(defined $child_value && length $child_value, "$name: child produced output");
+  is($child_status, 0, "$name: child exited cleanly");
+  isnt($parent_value, $child_value, "$name: parent and child diverge after fork");
 }
 
 expect_fork_divergence(
