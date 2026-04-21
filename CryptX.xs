@@ -204,6 +204,7 @@ STATIC int cryptx_internal_password_cb_getpw(void **p, unsigned long *l, void *u
 }
 
 STATIC void cryptx_internal_pk_prng_reseed(prng_state *state, int pindex, IV *last_pid) {
+  dTHX; /* fetch context */
   IV curpid = (IV)PerlProc_getpid();
   unsigned char entropy_buf[40];
   int rv;
