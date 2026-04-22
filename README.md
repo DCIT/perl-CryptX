@@ -54,7 +54,7 @@ Perl modules providing a cryptography based on [LibTomCrypt](https://github.com/
 
     [Crypt::PRNG::Fortuna](https://metacpan.org/pod/Crypt%3A%3APRNG%3A%3AFortuna), [Crypt::PRNG::Yarrow](https://metacpan.org/pod/Crypt%3A%3APRNG%3A%3AYarrow), [Crypt::PRNG::RC4](https://metacpan.org/pod/Crypt%3A%3APRNG%3A%3ARC4), [Crypt::PRNG::Sober128](https://metacpan.org/pod/Crypt%3A%3APRNG%3A%3ASober128), [Crypt::PRNG::ChaCha20](https://metacpan.org/pod/Crypt%3A%3APRNG%3A%3AChaCha20)
 
-- Key derivation functions - PBKDF1, PBKDF2 and HKDF
+- Key derivation functions - PBKDF1, PBKDF2, HKDF, Bcrypt, Scrypt, Argon2
 
     [Crypt::KeyDerivation](https://metacpan.org/pod/Crypt%3A%3AKeyDerivation)
 

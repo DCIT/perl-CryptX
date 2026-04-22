@@ -95,7 +95,7 @@ L<Crypt::PK::RSA>, L<Crypt::PK::DSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DH>, L<Cry
 
 L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::Yarrow>, L<Crypt::PRNG::RC4>, L<Crypt::PRNG::Sober128>, L<Crypt::PRNG::ChaCha20>
 
-=item * Key derivation functions - PBKDF1, PBKDF2 and HKDF
+=item * Key derivation functions - PBKDF1, PBKDF2, HKDF, Bcrypt, Scrypt, Argon2
 
 L<Crypt::KeyDerivation>
 
