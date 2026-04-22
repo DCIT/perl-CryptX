@@ -246,8 +246,11 @@ gcm_decrypt_verify(char *cipher_name, SV *key, SV *nonce, SV *header, SV *cipher
         output = NEWSV(0, ct_len > 0 ? ct_len : 1); /* avoid zero! */
         SvPOK_only(output);
         SvCUR_set(output, ct_len);
-        tag_len = (unsigned long)t_len;
-        Copy(t, tag, t_len, unsigned char);
+        /* Clamp malformed tags to the stack buffer size before copying. */
+        tag_len = (unsigned long)(t_len > sizeof(tag) ? sizeof(tag) : t_len);
+        if (tag_len > 0) {
+          Copy(t, tag, tag_len, unsigned char);
+        }
 
         rv = gcm_memory(id, k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len,
                         (unsigned char *)SvPVX(output), (unsigned long)ct_len, ct, tag, &tag_len, GCM_DECRYPT);
