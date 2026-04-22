@@ -130,9 +130,11 @@ static void s_gcm_gf_mult_pclmul(const unsigned char *a, const unsigned char *b,
 #include <sys/sysctl.h>
 #elif defined(_WIN32)
 #include <windows.h>
-#else
+#elif defined(__linux__)
 #include <sys/auxv.h>
 #include <asm/hwcap.h>
+#elif defined(__FreeBSD__)
+#include <sys/auxv.h>
 #endif
 
 static LTC_INLINE int s_pmull_is_supported(void)
@@ -148,9 +150,14 @@ static LTC_INLINE int s_pmull_is_supported(void)
       }
 #elif defined (_WIN32)
       is_supported = IsProcessorFeaturePresent(PF_ARM_V8_CRYPTO_INSTRUCTIONS_AVAILABLE);
-#else
+#elif defined(__linux__)
       unsigned long hwcaps = getauxval(AT_HWCAP);
       is_supported = (hwcaps & HWCAP_PMULL);
+#elif defined(__FreeBSD__)
+      unsigned long hwcaps = 0;
+      if (elf_aux_info(AT_HWCAP, &hwcaps, sizeof(hwcaps)) == 0) {
+         is_supported = (hwcaps & HWCAP_PMULL) != 0;
+      }
 #endif
       initialized = 1;
    }
