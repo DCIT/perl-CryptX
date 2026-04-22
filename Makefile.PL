@@ -27,12 +27,21 @@ else {
   );
   $mycflags = " $Config{ccflags} $Config{cccdlflags} $Config{optimize} "; # keep leading + trailing spaces
 
+  my $extrainc = '';
   if ($Config{gccversion}) {
     my $ver1;
     $ver1 ||= $1 if $Config{gccversion} =~ /^([0-9]+)\./; # gccversion='10.2.0'
     $ver1 ||= $1 if $Config{gccversion} =~ /LLVM ([0-9]+)\./i; # gccversion='Apple LLVM 14.0.0 (clang-1400.0.29.202)'
     $ver1 ||= $1 if $Config{gccversion} =~ /Clang ([0-9]+)\./i; # gccversion='FreeBSD Clang 13.0.0 (git@github.com:llvm/llvm-project.git llvmorg-13.0.0-0-gd7b669b3a303)' or 'OpenBSD Clang 13.0.0'
-    $mycflags .= " -DLTC_NO_AES_NI -DLTC_NO_GCM_PCLMUL" if $ver1 < 5; # target attributes are supported since gcc-4.9
+    if ($ver1 < 5) {
+      # target attributes needed for AESNI & co. are supported since gcc-4.9
+      $mycflags .= " -DLTC_NO_AES_NI -DLTC_NO_GCM_PCLMUL";
+      $extrainc .= " -DLTC_NO_AES_NI -DLTC_NO_GCM_PCLMUL";
+      ### we need $extrainc HACK here because otherwise this is going to happen:
+      # - libtomcrypt (with LTC_NO_GCM_PCLMUL): LTC_GCM_TABLES defined >> gcm_state includes a 64KB lookup table
+      # - XS code (w/o LTC_NO_GCM_PCLMUL): LTC_GCM_PCLMUL gets defined, which #undefs LTC_GCM_TABLES >> gcm_state is ~600 bytes
+      # - later XS code allocates the small struct, but library functions wrote to the 64KB table >> massive heap overflow
+    }
   }
 
   #FIX: this is particularly useful for Debian https://github.com/DCIT/perl-CryptX/pull/39
@@ -66,8 +75,8 @@ else {
   $mycflags = "$mycflags -Wall -Werror -Wextra" if $ENV{AUTHOR_MODE};
 
   @EUMM_INC_LIB = (
-    INC      => $ENV{AUTHOR_MODE} ? '-DLTM_DESC -Isrc/ltc/headers -Isrc/ltm -Wall -Werror -Wextra' #gcc only!!
-                                  : '-DLTM_DESC -Isrc/ltc/headers -Isrc/ltm',
+    INC      => $ENV{AUTHOR_MODE} ? "-DLTM_DESC -Isrc/ltc/headers -Isrc/ltm $extrainc -Wall -Werror -Wextra" #gcc only!!
+                                  : "-DLTM_DESC -Isrc/ltc/headers -Isrc/ltm $extrainc",
     MYEXTLIB => "src/liballinone$Config{lib_ext}",
     clean    => { 'FILES' => join(' ', @myobjs, "src/liballinone$Config{lib_ext}") },
   );
