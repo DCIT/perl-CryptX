@@ -27,5 +27,5 @@ jobs:
             cd "$(basename "${GITHUB_REPOSITORY}")"
             cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
-            make
+            make -j4
             env AUTHOR_MODE=0 prove -b t
