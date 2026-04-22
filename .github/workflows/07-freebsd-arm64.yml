@@ -25,7 +25,7 @@ jobs:
             perl -V
             gcc -v
             cd "$(basename "${GITHUB_REPOSITORY}")"
-            env AUTHOR_MODE=1 cpanm -n --installdeps .
-            env AUTHOR_MODE=1 perl Makefile.PL
+            cpanm -n --installdeps .
+            env AUTHOR_MODE=0 perl Makefile.PL
             make
-            env AUTHOR_MODE=1 prove -b t
+            env AUTHOR_MODE=0 prove -b t
