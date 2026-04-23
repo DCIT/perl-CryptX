@@ -6,7 +6,9 @@ use File::Slurper qw(read_text write_text);
 use File::Glob qw(bsd_glob);
 use FindBin;
 
+my $ltc_repo = "https://github.com/libtom/libtomcrypt.git";
 my $ltc_branch = "develop";
+my $ltm_repo = "https://github.com/libtom/libtommath.git";
 my $ltm_branch = "develop";
 my $tmpdir = "/tmp/libtom.git.checkout.$$";
 
@@ -14,13 +16,13 @@ warn "update libtommath from github (branch: $ltm_branch)..\n";
 system 'rm', '-rf', bsd_glob("$FindBin::Bin/ltm/*");
 system "rm -rf $tmpdir; mkdir $tmpdir";
 # IMPORTANT HACK: make -C $tmpdir c89
-system "git clone -b $ltm_branch https://github.com/libtom/libtommath.git $tmpdir && make -C $tmpdir c89 && cp $tmpdir/LICENSE $tmpdir/*.c $tmpdir/tom*.h $FindBin::Bin/ltm/ && echo ok";
+system "git clone -b $ltm_branch $ltm_repo $tmpdir && make -C $tmpdir c89 && cp $tmpdir/LICENSE $tmpdir/*.c $tmpdir/tom*.h $FindBin::Bin/ltm/ && echo ok";
 system "(cd $tmpdir && git log  --pretty='%h %ai %s') | head -1";
 
 warn "update libtomcrypt from github (branch: $ltc_branch)..\n";
 system 'rm', '-rf', bsd_glob("$FindBin::Bin/ltc/*");
 system "rm -rf $tmpdir; mkdir $tmpdir";
-system "git clone -b $ltc_branch https://github.com/libtom/libtomcrypt.git $tmpdir && cp -R $tmpdir/LICENSE $tmpdir/src/* $FindBin::Bin/ltc/ && echo ok";
+system "git clone -b $ltc_branch $ltc_repo $tmpdir && cp -R $tmpdir/LICENSE $tmpdir/src/* $FindBin::Bin/ltc/ && echo ok";
 system "(cd $tmpdir && git log  --pretty='%h %ai %s') | head -1";
 
 system "rm -rf $tmpdir";
