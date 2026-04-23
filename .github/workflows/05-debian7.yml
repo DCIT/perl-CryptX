@@ -1,0 +1,53 @@
+name: 05-debian7
+
+on:
+  push:
+    branches:
+      - 'master'
+    tags-ignore:
+      - '*'
+
+jobs:
+  debian7:
+    runs-on: ubuntu-22.04
+    container:
+      image: debian/eol:wheezy
+    steps:
+      - name: Show OS release
+        run: cat /etc/os-release
+      - name: Install dependencies
+        run: |
+          cat > /etc/apt/sources.list <<'EOF'
+          deb http://archive.debian.org/debian wheezy main
+          deb http://archive.debian.org/debian-security wheezy/updates main
+          EOF
+          printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99archive
+          apt-get update -qq
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            ca-certificates \
+            gcc \
+            git \
+            libjson-perl \
+            libmath-bigint-perl \
+            make \
+            perl
+      - name: Checkout code using git
+        run: |
+          git clone --single-branch --branch $(echo ${GITHUB_REF#refs/heads/}) https://github.com/${{ github.repository }}.git
+      - name: perl -V
+        run: perl -V
+      - name: gcc -v
+        run: gcc -v
+      - name: Run build
+        run: |
+          cd $(basename ${{ github.repository }})
+          perl Makefile.PL
+          make -j4
+        env:
+          AUTHOR_MODE: 0
+      - name: Run tests
+        run: |
+          cd $(basename ${{ github.repository }})
+          prove -b t
+        env:
+          AUTHOR_MODE: 0
