@@ -9,7 +9,7 @@ on:
 
 jobs:
   debian7:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
       image: debian/eol:wheezy
     steps:
