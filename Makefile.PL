@@ -35,8 +35,8 @@ else {
     $ver1 ||= $1 if $Config{gccversion} =~ /Clang ([0-9]+)\./i; # gccversion='FreeBSD Clang 13.0.0 (git@github.com:llvm/llvm-project.git llvmorg-13.0.0-0-gd7b669b3a303)' or 'OpenBSD Clang 13.0.0'
     if ($ver1 < 5) {
       # target attributes needed for AESNI & co. are supported since gcc-4.9
-      $mycflags .= " -DLTC_NO_AES_NI -DLTC_NO_GCM_PCLMUL";
-      $extrainc .= " -DLTC_NO_AES_NI -DLTC_NO_GCM_PCLMUL";
+      $mycflags .= " -DLTC_NO_ACCEL";
+      $extrainc .= " -DLTC_NO_ACCEL";
       ### we need $extrainc HACK here because otherwise this is going to happen:
       # - libtomcrypt (with LTC_NO_GCM_PCLMUL): LTC_GCM_TABLES defined >> gcm_state includes a 64KB lookup table
       # - XS code (w/o LTC_NO_GCM_PCLMUL): LTC_GCM_PCLMUL gets defined, which #undefs LTC_GCM_TABLES >> gcm_state is ~600 bytes
