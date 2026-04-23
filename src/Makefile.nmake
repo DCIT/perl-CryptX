@@ -27,36 +27,39 @@ ltc/hashes/md4.obj ltc/hashes/md5.obj ltc/hashes/rmd128.obj ltc/hashes/rmd160.ob
 ltc/hashes/rmd256.obj ltc/hashes/rmd320.obj ltc/hashes/sha1.obj ltc/hashes/sha1_desc.obj \
 ltc/hashes/sha1_x86.obj ltc/hashes/sha2/sha224.obj ltc/hashes/sha2/sha224_desc.obj \
 ltc/hashes/sha2/sha224_x86.obj ltc/hashes/sha2/sha256.obj ltc/hashes/sha2/sha256_desc.obj \
-ltc/hashes/sha2/sha256_x86.obj ltc/hashes/sha2/sha384.obj ltc/hashes/sha2/sha512.obj \
-ltc/hashes/sha2/sha512_224.obj ltc/hashes/sha2/sha512_256.obj ltc/hashes/sha3.obj \
-ltc/hashes/sha3_test.obj ltc/hashes/tiger.obj ltc/hashes/whirl/whirl.obj ltc/mac/blake2/blake2bmac.obj \
-ltc/mac/blake2/blake2bmac_file.obj ltc/mac/blake2/blake2bmac_memory.obj ltc/mac/blake2/blake2bmac_memory_multi.obj \
-ltc/mac/blake2/blake2smac.obj ltc/mac/blake2/blake2smac_file.obj ltc/mac/blake2/blake2smac_memory.obj \
-ltc/mac/blake2/blake2smac_memory_multi.obj ltc/mac/f9/f9_done.obj ltc/mac/f9/f9_file.obj \
-ltc/mac/f9/f9_init.obj ltc/mac/f9/f9_memory.obj ltc/mac/f9/f9_memory_multi.obj ltc/mac/f9/f9_process.obj \
-ltc/mac/hmac/hmac_done.obj ltc/mac/hmac/hmac_file.obj ltc/mac/hmac/hmac_init.obj \
-ltc/mac/hmac/hmac_memory.obj ltc/mac/hmac/hmac_memory_multi.obj ltc/mac/hmac/hmac_process.obj \
-ltc/mac/omac/omac_done.obj ltc/mac/omac/omac_file.obj ltc/mac/omac/omac_init.obj \
-ltc/mac/omac/omac_memory.obj ltc/mac/omac/omac_memory_multi.obj ltc/mac/omac/omac_process.obj \
-ltc/mac/pelican/pelican.obj ltc/mac/pelican/pelican_memory.obj ltc/mac/pmac/pmac_done.obj \
-ltc/mac/pmac/pmac_file.obj ltc/mac/pmac/pmac_init.obj ltc/mac/pmac/pmac_memory.obj \
-ltc/mac/pmac/pmac_memory_multi.obj ltc/mac/pmac/pmac_ntz.obj ltc/mac/pmac/pmac_process.obj \
-ltc/mac/pmac/pmac_shift_xor.obj ltc/mac/poly1305/poly1305.obj ltc/mac/poly1305/poly1305_file.obj \
-ltc/mac/poly1305/poly1305_memory.obj ltc/mac/poly1305/poly1305_memory_multi.obj ltc/mac/xcbc/xcbc_done.obj \
-ltc/mac/xcbc/xcbc_file.obj ltc/mac/xcbc/xcbc_init.obj ltc/mac/xcbc/xcbc_memory.obj \
-ltc/mac/xcbc/xcbc_memory_multi.obj ltc/mac/xcbc/xcbc_process.obj ltc/math/fp/ltc_ecc_fp_mulmod.obj \
-ltc/math/ltm_desc.obj ltc/math/multi.obj ltc/math/radix_to_bin.obj ltc/math/rand_bn.obj \
-ltc/math/rand_prime.obj ltc/math/tfm_desc.obj ltc/misc/adler32.obj ltc/misc/argon2/argon2.obj \
-ltc/misc/base16/base16_decode.obj ltc/misc/base16/base16_encode.obj ltc/misc/base32/base32_decode.obj \
-ltc/misc/base32/base32_encode.obj ltc/misc/base64/base64_decode.obj ltc/misc/base64/base64_encode.obj \
-ltc/misc/bcrypt/bcrypt.obj ltc/misc/burn_stack.obj ltc/misc/compare_testvector.obj \
-ltc/misc/copy_or_zeromem.obj ltc/misc/crc32.obj ltc/misc/crypt/crypt.obj ltc/misc/crypt/crypt_argchk.obj \
-ltc/misc/crypt/crypt_cipher_descriptor.obj ltc/misc/crypt/crypt_cipher_is_valid.obj \
-ltc/misc/crypt/crypt_constants.obj ltc/misc/crypt/crypt_find_cipher.obj ltc/misc/crypt/crypt_find_cipher_any.obj \
-ltc/misc/crypt/crypt_find_cipher_id.obj ltc/misc/crypt/crypt_find_hash.obj ltc/misc/crypt/crypt_find_hash_any.obj \
-ltc/misc/crypt/crypt_find_hash_id.obj ltc/misc/crypt/crypt_find_hash_oid.obj ltc/misc/crypt/crypt_find_prng.obj \
-ltc/misc/crypt/crypt_fsa.obj ltc/misc/crypt/crypt_hash_descriptor.obj ltc/misc/crypt/crypt_hash_is_valid.obj \
-ltc/misc/crypt/crypt_inits.obj ltc/misc/crypt/crypt_ltc_mp_descriptor.obj ltc/misc/crypt/crypt_prng_descriptor.obj \
+ltc/hashes/sha2/sha256_x86.obj ltc/hashes/sha2/sha384.obj ltc/hashes/sha2/sha384_desc.obj \
+ltc/hashes/sha2/sha384_x86.obj ltc/hashes/sha2/sha512.obj ltc/hashes/sha2/sha512_224.obj \
+ltc/hashes/sha2/sha512_224_desc.obj ltc/hashes/sha2/sha512_224_x86.obj ltc/hashes/sha2/sha512_256.obj \
+ltc/hashes/sha2/sha512_256_desc.obj ltc/hashes/sha2/sha512_256_x86.obj ltc/hashes/sha2/sha512_desc.obj \
+ltc/hashes/sha2/sha512_x86.obj ltc/hashes/sha3.obj ltc/hashes/sha3_test.obj ltc/hashes/tiger.obj \
+ltc/hashes/whirl/whirl.obj ltc/mac/blake2/blake2bmac.obj ltc/mac/blake2/blake2bmac_file.obj \
+ltc/mac/blake2/blake2bmac_memory.obj ltc/mac/blake2/blake2bmac_memory_multi.obj ltc/mac/blake2/blake2smac.obj \
+ltc/mac/blake2/blake2smac_file.obj ltc/mac/blake2/blake2smac_memory.obj ltc/mac/blake2/blake2smac_memory_multi.obj \
+ltc/mac/f9/f9_done.obj ltc/mac/f9/f9_file.obj ltc/mac/f9/f9_init.obj ltc/mac/f9/f9_memory.obj \
+ltc/mac/f9/f9_memory_multi.obj ltc/mac/f9/f9_process.obj ltc/mac/hmac/hmac_done.obj \
+ltc/mac/hmac/hmac_file.obj ltc/mac/hmac/hmac_init.obj ltc/mac/hmac/hmac_memory.obj \
+ltc/mac/hmac/hmac_memory_multi.obj ltc/mac/hmac/hmac_process.obj ltc/mac/omac/omac_done.obj \
+ltc/mac/omac/omac_file.obj ltc/mac/omac/omac_init.obj ltc/mac/omac/omac_memory.obj \
+ltc/mac/omac/omac_memory_multi.obj ltc/mac/omac/omac_process.obj ltc/mac/pelican/pelican.obj \
+ltc/mac/pelican/pelican_memory.obj ltc/mac/pmac/pmac_done.obj ltc/mac/pmac/pmac_file.obj \
+ltc/mac/pmac/pmac_init.obj ltc/mac/pmac/pmac_memory.obj ltc/mac/pmac/pmac_memory_multi.obj \
+ltc/mac/pmac/pmac_ntz.obj ltc/mac/pmac/pmac_process.obj ltc/mac/pmac/pmac_shift_xor.obj \
+ltc/mac/poly1305/poly1305.obj ltc/mac/poly1305/poly1305_file.obj ltc/mac/poly1305/poly1305_memory.obj \
+ltc/mac/poly1305/poly1305_memory_multi.obj ltc/mac/xcbc/xcbc_done.obj ltc/mac/xcbc/xcbc_file.obj \
+ltc/mac/xcbc/xcbc_init.obj ltc/mac/xcbc/xcbc_memory.obj ltc/mac/xcbc/xcbc_memory_multi.obj \
+ltc/mac/xcbc/xcbc_process.obj ltc/math/fp/ltc_ecc_fp_mulmod.obj ltc/math/ltm_desc.obj \
+ltc/math/multi.obj ltc/math/radix_to_bin.obj ltc/math/rand_bn.obj ltc/math/rand_prime.obj \
+ltc/math/tfm_desc.obj ltc/misc/adler32.obj ltc/misc/argon2/argon2.obj ltc/misc/base16/base16_decode.obj \
+ltc/misc/base16/base16_encode.obj ltc/misc/base32/base32_decode.obj ltc/misc/base32/base32_encode.obj \
+ltc/misc/base64/base64_decode.obj ltc/misc/base64/base64_encode.obj ltc/misc/bcrypt/bcrypt.obj \
+ltc/misc/burn_stack.obj ltc/misc/compare_testvector.obj ltc/misc/copy_or_zeromem.obj \
+ltc/misc/crc32.obj ltc/misc/crypt/crypt.obj ltc/misc/crypt/crypt_argchk.obj ltc/misc/crypt/crypt_cipher_descriptor.obj \
+ltc/misc/crypt/crypt_cipher_is_valid.obj ltc/misc/crypt/crypt_constants.obj ltc/misc/crypt/crypt_find_cipher.obj \
+ltc/misc/crypt/crypt_find_cipher_any.obj ltc/misc/crypt/crypt_find_cipher_id.obj \
+ltc/misc/crypt/crypt_find_hash.obj ltc/misc/crypt/crypt_find_hash_any.obj ltc/misc/crypt/crypt_find_hash_id.obj \
+ltc/misc/crypt/crypt_find_hash_oid.obj ltc/misc/crypt/crypt_find_prng.obj ltc/misc/crypt/crypt_fsa.obj \
+ltc/misc/crypt/crypt_hash_descriptor.obj ltc/misc/crypt/crypt_hash_is_valid.obj ltc/misc/crypt/crypt_inits.obj \
+ltc/misc/crypt/crypt_ltc_mp_descriptor.obj ltc/misc/crypt/crypt_prng_descriptor.obj \
 ltc/misc/crypt/crypt_prng_is_valid.obj ltc/misc/crypt/crypt_prng_rng_descriptor.obj \
 ltc/misc/crypt/crypt_register_all_ciphers.obj ltc/misc/crypt/crypt_register_all_hashes.obj \
 ltc/misc/crypt/crypt_register_all_prngs.obj ltc/misc/crypt/crypt_register_cipher.obj \
