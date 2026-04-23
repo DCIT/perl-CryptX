@@ -9,7 +9,7 @@
 
 #if defined(LTC_SHA384) && defined(LTC_SHA512)
 
-const struct ltc_hash_descriptor sha384_portable_desc =
+const struct ltc_hash_descriptor sha384_desc =
 {
     "sha384",
     4,
@@ -20,9 +20,9 @@ const struct ltc_hash_descriptor sha384_portable_desc =
    { 2, 16, 840, 1, 101, 3, 4, 2, 2,  },
    9,
 
-    &sha384_c_init,
-    &sha512_c_process,
-    &sha384_c_done,
+    &sha384_init,
+    &sha512_process,
+    &sha384_done,
     &sha384_test,
     NULL
 };
@@ -32,11 +32,10 @@ const struct ltc_hash_descriptor sha384_portable_desc =
    @param md   The hash state you wish to initialize
    @return CRYPT_OK if successful
 */
-int sha384_c_init(hash_state * md)
+int sha384_init(hash_state * md)
 {
     LTC_ARGCHK(md != NULL);
 
-    md->sha512.state = LTC_ALIGN_BUF(md->sha512.state_buf, 32);
     md->sha512.curlen = 0;
     md->sha512.length = 0;
     md->sha512.state[0] = CONST64(0xcbbb9d5dc1059ed8);
@@ -56,7 +55,7 @@ int sha384_c_init(hash_state * md)
    @param out [out] The destination of the hash (48 bytes)
    @return CRYPT_OK if successful
 */
-int sha384_c_done(hash_state * md, unsigned char *out)
+int sha384_done(hash_state * md, unsigned char *out)
 {
    unsigned char buf[64];
 
@@ -67,7 +66,7 @@ int sha384_c_done(hash_state * md, unsigned char *out)
        return CRYPT_INVALID_ARG;
     }
 
-   sha512_c_done(md, buf);
+   sha512_done(md, buf);
    XMEMCPY(out, buf, 48);
 #ifdef LTC_CLEAN_STACK
    zeromem(buf, sizeof(buf));
@@ -79,9 +78,47 @@ int sha384_c_done(hash_state * md, unsigned char *out)
   Self-test the hash
   @return CRYPT_OK if successful, CRYPT_NOP if self-tests have been disabled
 */
-int  sha384_c_test(void)
+int  sha384_test(void)
 {
-   return sha384_test_desc(&sha384_portable_desc, "SHA384 portable");
+ #ifndef LTC_TEST
+    return CRYPT_NOP;
+ #else
+  static const struct {
+      const char *msg;
+      unsigned char hash[48];
+  } tests[] = {
+    { "abc",
+      { 0xcb, 0x00, 0x75, 0x3f, 0x45, 0xa3, 0x5e, 0x8b,
+        0xb5, 0xa0, 0x3d, 0x69, 0x9a, 0xc6, 0x50, 0x07,
+        0x27, 0x2c, 0x32, 0xab, 0x0e, 0xde, 0xd1, 0x63,
+        0x1a, 0x8b, 0x60, 0x5a, 0x43, 0xff, 0x5b, 0xed,
+        0x80, 0x86, 0x07, 0x2b, 0xa1, 0xe7, 0xcc, 0x23,
+        0x58, 0xba, 0xec, 0xa1, 0x34, 0xc8, 0x25, 0xa7 }
+    },
+    { "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
+      { 0x09, 0x33, 0x0c, 0x33, 0xf7, 0x11, 0x47, 0xe8,
+        0x3d, 0x19, 0x2f, 0xc7, 0x82, 0xcd, 0x1b, 0x47,
+        0x53, 0x11, 0x1b, 0x17, 0x3b, 0x3b, 0x05, 0xd2,
+        0x2f, 0xa0, 0x80, 0x86, 0xe3, 0xb0, 0xf7, 0x12,
+        0xfc, 0xc7, 0xc7, 0x1a, 0x55, 0x7e, 0x2d, 0xb9,
+        0x66, 0xc3, 0xe9, 0xfa, 0x91, 0x74, 0x60, 0x39 }
+    },
+  };
+
+  int i;
+  unsigned char tmp[48];
+  hash_state md;
+
+  for (i = 0; i < (int)(sizeof(tests) / sizeof(tests[0])); i++) {
+      sha384_init(&md);
+      sha384_process(&md, (unsigned char*)tests[i].msg, (unsigned long)XSTRLEN(tests[i].msg));
+      sha384_done(&md, tmp);
+      if (ltc_compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "SHA384", i)) {
+         return CRYPT_FAIL_TESTVECTOR;
+      }
+  }
+  return CRYPT_OK;
+ #endif
 }
 
 #endif /* defined(LTC_SHA384) && defined(LTC_SHA512) */

@@ -29,6 +29,29 @@
 #pragma GCC diagnostic pop
 #endif
 
+#if !defined (LTC_S_X86_CPUID)
+#define LTC_S_X86_CPUID
+static LTC_INLINE void s_x86_cpuid(int* regs, int leaf)
+{
+#if defined _MSC_VER
+   __cpuid(regs, leaf);
+#else
+   int a, b, c, d;
+
+   a = leaf;
+   b = c = d = 0;
+   asm volatile ("cpuid"
+       :"=a"(a), "=b"(b), "=c"(c), "=d"(d)
+       :"a"(a), "c"(c)
+   );
+   regs[0] = a;
+   regs[1] = b;
+   regs[2] = c;
+   regs[3] = d;
+#endif
+}
+#endif /* LTC_S_X86_CPUID */
+
 static LTC_INLINE int s_pclmul_is_supported(void)
 {
    static int initialized = 0, is_supported = 0;
@@ -130,11 +153,9 @@ static void s_gcm_gf_mult_pclmul(const unsigned char *a, const unsigned char *b,
 #include <sys/sysctl.h>
 #elif defined(_WIN32)
 #include <windows.h>
-#elif defined(__linux__)
+#else
 #include <sys/auxv.h>
 #include <asm/hwcap.h>
-#elif defined(__FreeBSD__)
-#include <sys/auxv.h>
 #endif
 
 static LTC_INLINE int s_pmull_is_supported(void)
@@ -150,14 +171,9 @@ static LTC_INLINE int s_pmull_is_supported(void)
       }
 #elif defined (_WIN32)
       is_supported = IsProcessorFeaturePresent(PF_ARM_V8_CRYPTO_INSTRUCTIONS_AVAILABLE);
-#elif defined(__linux__)
+#else
       unsigned long hwcaps = getauxval(AT_HWCAP);
       is_supported = (hwcaps & HWCAP_PMULL);
-#elif defined(__FreeBSD__)
-      unsigned long hwcaps = 0;
-      if (elf_aux_info(AT_HWCAP, &hwcaps, sizeof(hwcaps)) == 0) {
-         is_supported = (hwcaps & HWCAP_PMULL) != 0;
-      }
 #endif
       initialized = 1;
    }

@@ -9,7 +9,7 @@
 
 #if defined(LTC_SHA512_224) && defined(LTC_SHA512)
 
-const struct ltc_hash_descriptor sha512_224_portable_desc =
+const struct ltc_hash_descriptor sha512_224_desc =
 {
     "sha512-224",
     15,
@@ -20,10 +20,10 @@ const struct ltc_hash_descriptor sha512_224_portable_desc =
    { 2, 16, 840, 1, 101, 3, 4, 2, 5,  },
    9,
 
-    &sha512_224_c_init,
-    &sha512_c_process,
-    &sha512_224_c_done,
-    &sha512_224_c_test,
+    &sha512_224_init,
+    &sha512_process,
+    &sha512_224_done,
+    &sha512_224_test,
     NULL
 };
 
@@ -32,11 +32,10 @@ const struct ltc_hash_descriptor sha512_224_portable_desc =
    @param md   The hash state you wish to initialize
    @return CRYPT_OK if successful
 */
-int sha512_224_c_init(hash_state * md)
+int sha512_224_init(hash_state * md)
 {
     LTC_ARGCHK(md != NULL);
 
-    md->sha512.state = LTC_ALIGN_BUF(md->sha512.state_buf, 32);
     md->sha512.curlen = 0;
     md->sha512.length = 0;
     md->sha512.state[0] = CONST64(0x8C3D37C819544DA2);
@@ -56,7 +55,7 @@ int sha512_224_c_init(hash_state * md)
    @param out [out] The destination of the hash (48 bytes)
    @return CRYPT_OK if successful
 */
-int sha512_224_c_done(hash_state * md, unsigned char *out)
+int sha512_224_done(hash_state * md, unsigned char *out)
 {
    unsigned char buf[64];
 
@@ -67,7 +66,7 @@ int sha512_224_c_done(hash_state * md, unsigned char *out)
        return CRYPT_INVALID_ARG;
     }
 
-   sha512_c_done(md, buf);
+   sha512_done(md, buf);
    XMEMCPY(out, buf, 28);
 #ifdef LTC_CLEAN_STACK
    zeromem(buf, sizeof(buf));
@@ -79,9 +78,43 @@ int sha512_224_c_done(hash_state * md, unsigned char *out)
   Self-test the hash
   @return CRYPT_OK if successful, CRYPT_NOP if self-tests have been disabled
 */
-int  sha512_224_c_test(void)
+int  sha512_224_test(void)
 {
-   return sha512_224_test_desc(&sha512_224_portable_desc, "SHA512-224 portable");
+ #ifndef LTC_TEST
+    return CRYPT_NOP;
+ #else
+  static const struct {
+      const char *msg;
+      unsigned char hash[28];
+  } tests[] = {
+    { "abc",
+      { 0x46, 0x34, 0x27, 0x0F, 0x70, 0x7B, 0x6A, 0x54,
+        0xDA, 0xAE, 0x75, 0x30, 0x46, 0x08, 0x42, 0xE2,
+        0x0E, 0x37, 0xED, 0x26, 0x5C, 0xEE, 0xE9, 0xA4,
+        0x3E, 0x89, 0x24, 0xAA }
+    },
+    { "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu",
+      { 0x23, 0xFE, 0xC5, 0xBB, 0x94, 0xD6, 0x0B, 0x23,
+        0x30, 0x81, 0x92, 0x64, 0x0B, 0x0C, 0x45, 0x33,
+        0x35, 0xD6, 0x64, 0x73, 0x4F, 0xE4, 0x0E, 0x72,
+        0x68, 0x67, 0x4A, 0xF9 }
+    },
+  };
+
+  int i;
+  unsigned char tmp[28];
+  hash_state md;
+
+  for (i = 0; i < (int)(sizeof(tests) / sizeof(tests[0])); i++) {
+      sha512_224_init(&md);
+      sha512_224_process(&md, (unsigned char*)tests[i].msg, (unsigned long)XSTRLEN(tests[i].msg));
+      sha512_224_done(&md, tmp);
+      if (ltc_compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "SHA512-224", i)) {
+         return CRYPT_FAIL_TESTVECTOR;
+      }
+  }
+  return CRYPT_OK;
+ #endif
 }
 
-#endif /* defined(LTC_SHA512_224) && defined(LTC_SHA512) */
+#endif /* defined(LTC_SHA384) && defined(LTC_SHA512) */
