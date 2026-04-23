@@ -27,6 +27,7 @@ jobs:
             ca-certificates \
             gcc \
             git \
+            libc6-dev \
             libjson-perl \
             libmath-bigint-perl \
             make \
