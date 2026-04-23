@@ -184,7 +184,6 @@ int func_name (hash_state * md, const unsigned char *in, unsigned long inlen)   
 
 
 #define LTC_SHA_TARGET LTC_ATTRIBUTE((__target__("sse2,ssse3,sse4.1,sha")))
-#define LTC_SHA512_TARGET LTC_ATTRIBUTE((__target__("sse2,avx,avx2,sha512")))
 
 #ifdef LTC_SHA1
 int sha1_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
@@ -194,18 +193,6 @@ int sha224_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
 #endif
 #ifdef LTC_SHA256
 int sha256_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
-#endif
-#ifdef LTC_SHA512
-int sha512_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
-#endif
-#ifdef LTC_SHA384
-int sha384_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
-#endif
-#ifdef LTC_SHA512_224
-int sha512_224_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
-#endif
-#ifdef LTC_SHA512_256
-int sha512_256_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
 #endif
 
 /* tomcrypt_mac.h */
@@ -957,52 +944,5 @@ int which ## _export(unsigned char *out, unsigned long *outlen, prng_state *prng
       #define LTC_WIN32_BCRYPT
    #endif
 #endif
-
-#if defined LTC_ARCH_X86
-#if defined _MSC_VER
-#include <intrin.h>
-#pragma intrinsic(__cpuid)
-#pragma intrinsic(__cpuidex)
-#endif
-static LTC_INLINE void s_x86_cpuid(int* regs, int leaf)
-{
-#if defined _MSC_VER
-   __cpuid(regs, leaf);
-#else
-    int a, b, c, d;
-
-    a = leaf;
-    b = c = d = 0;
-    asm volatile ("cpuid"
-        :"=a"(a), "=b"(b), "=c"(c), "=d"(d)
-        :"a"(a), "c"(c)
-    );
-    regs[0] = a;
-    regs[1] = b;
-    regs[2] = c;
-    regs[3] = d;
-#endif
-}
-static LTC_INLINE void s_x86_cpuidex(int* regs, int eax, int ecx)
-{
-#if defined _MSC_VER
-   __cpuidex(regs, eax, ecx);
-#else
-    int a, b, c, d;
-
-    a = eax;
-    c = ecx;
-    b = d = 0;
-    asm volatile ("cpuid"
-        :"=a"(a), "=b"(b), "=c"(c), "=d"(d)
-        :"a"(a), "c"(c)
-    );
-    regs[0] = a;
-    regs[1] = b;
-    regs[2] = c;
-    regs[3] = d;
-#endif
-}
-#endif /* LTC_ARCH_X86 */
 
 #endif /* TOMCRYPT_PRIVATE_H_ */

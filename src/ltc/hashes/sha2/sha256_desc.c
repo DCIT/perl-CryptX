@@ -4,6 +4,29 @@
 
 #if defined LTC_ARCH_X86
 
+#if !defined (LTC_S_X86_CPUID)
+#define LTC_S_X86_CPUID
+static LTC_INLINE void s_x86_cpuid(int* regs, int leaf)
+{
+#if defined _MSC_VER
+   __cpuid(regs, leaf);
+#else
+    int a, b, c, d;
+
+    a = leaf;
+    b = c = d = 0;
+    asm volatile ("cpuid"
+        :"=a"(a), "=b"(b), "=c"(c), "=d"(d)
+        :"a"(a), "c"(c)
+    );
+    regs[0] = a;
+    regs[1] = b;
+    regs[2] = c;
+    regs[3] = d;
+#endif
+}
+#endif /* LTC_S_X86_CPUID */
+
 static LTC_INLINE int s_sha256_x86_is_supported(void)
 {
     static int initialized = 0;
@@ -118,8 +141,8 @@ int sha256_test(void)
 int sha256_test_desc(const struct ltc_hash_descriptor *desc, const char *name)
 {
 #ifndef LTC_TEST
-   LTC_UNUSED_PARAM(desc);
-   LTC_UNUSED_PARAM(name);
+   (void)desc;
+   (void)name;
    return CRYPT_NOP;
 #else
    static const struct {

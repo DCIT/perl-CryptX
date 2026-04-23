@@ -6,10 +6,8 @@ use File::Slurper qw(read_text write_text);
 use File::Glob qw(bsd_glob);
 use FindBin;
 
-#my $ltc_repo = "https://github.com/libtom/libtomcrypt.git";
-#my $ltc_branch = "develop";
-my $ltc_repo = "https://github.com/MarekKnapek/libtomcrypt";
-my $ltc_branch = "sha512x86";
+my $ltc_repo = "https://github.com/libtom/libtomcrypt.git";
+my $ltc_branch = "develop";
 my $ltm_repo = "https://github.com/libtom/libtommath.git";
 my $ltm_branch = "develop";
 my $tmpdir = "/tmp/libtom.git.checkout.$$";
