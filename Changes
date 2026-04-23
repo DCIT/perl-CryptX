@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.088   2026-MM-DD
+0.088   2026-04-23
         - Crypt::KeyDerivation - new functions: pbkdf1_openssl, bcrypt_pbkdf, scrypt_pbkdf, argon2_pbkdf
         - Crypt::Misc - new functions: random_v7uuid, is_uuid
         - bundled libtomcrypt update branch:develop (commit: 2e441a17 2026-04-15)
