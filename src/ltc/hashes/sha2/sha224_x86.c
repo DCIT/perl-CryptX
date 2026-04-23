@@ -7,7 +7,7 @@
 
 #include "tomcrypt_private.h"
 
-#if defined(LTC_SHA224) && defined(LTC_SHA256) && defined(LTC_SHA224_X86)
+#if defined(LTC_SHA224) && defined(LTC_SHA256) && defined(LTC_SHA224_X86) && defined(LTC_SHA256_X86)
 
 const struct ltc_hash_descriptor sha224_x86_desc =
 {
@@ -66,7 +66,7 @@ int sha224_x86_done(hash_state * md, unsigned char *out)
     LTC_ARGCHK(md  != NULL);
     LTC_ARGCHK(out != NULL);
 
-    err = sha256_done(md, buf);
+    err = sha256_x86_done(md, buf);
     XMEMCPY(out, buf, 28);
 #ifdef LTC_CLEAN_STACK
     zeromem(buf, sizeof(buf));

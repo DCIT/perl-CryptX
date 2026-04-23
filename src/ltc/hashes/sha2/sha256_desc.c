@@ -2,50 +2,7 @@
 /* SPDX-License-Identifier: Unlicense */
 #include "tomcrypt_private.h"
 
-#ifdef LTC_SHA256
-
-const struct ltc_hash_descriptor sha256_desc =
-{
-    "sha256",
-    0,
-    32,
-    64,
-
-    /* OID */
-   { 2, 16, 840, 1, 101, 3, 4, 2, 1,  },
-   9,
-
-    &sha256_init,
-    &sha256_process,
-    &sha256_done,
-    &sha256_test,
-    NULL
-};
-
-#if defined LTC_SHA256_X86
-
-#if !defined (LTC_S_X86_CPUID)
-#define LTC_S_X86_CPUID
-static LTC_INLINE void s_x86_cpuid(int* regs, int leaf)
-{
-#if defined _MSC_VER
-   __cpuid(regs, leaf);
-#else
-    int a, b, c, d;
-
-    a = leaf;
-    b = c = d = 0;
-    asm volatile ("cpuid"
-        :"=a"(a), "=b"(b), "=c"(c), "=d"(d)
-        :"a"(a), "c"(c)
-    );
-    regs[0] = a;
-    regs[1] = b;
-    regs[2] = c;
-    regs[3] = d;
-#endif
-}
-#endif /* LTC_S_X86_CPUID */
+#if defined LTC_ARCH_X86
 
 static LTC_INLINE int s_sha256_x86_is_supported(void)
 {
@@ -70,7 +27,36 @@ static LTC_INLINE int s_sha256_x86_is_supported(void)
     }
     return is_supported;
 }
-#endif /* LTC_SHA256_X86 */
+#endif /* LTC_ARCH_X86 */
+
+int shani_is_supported(void)
+{
+#ifdef LTC_ARCH_X86
+   return s_sha256_x86_is_supported();
+#else
+   return 0;
+#endif
+}
+
+#ifdef LTC_SHA256
+
+const struct ltc_hash_descriptor sha256_desc =
+{
+    "sha256",
+    0,
+    32,
+    64,
+
+    /* OID */
+   { 2, 16, 840, 1, 101, 3, 4, 2, 1,  },
+   9,
+
+    &sha256_init,
+    &sha256_process,
+    &sha256_done,
+    &sha256_test,
+    NULL
+};
 
 /**
    Initialize the hash state
@@ -132,8 +118,8 @@ int sha256_test(void)
 int sha256_test_desc(const struct ltc_hash_descriptor *desc, const char *name)
 {
 #ifndef LTC_TEST
-   (void)desc;
-   (void)name;
+   LTC_UNUSED_PARAM(desc);
+   LTC_UNUSED_PARAM(name);
    return CRYPT_NOP;
 #else
    static const struct {

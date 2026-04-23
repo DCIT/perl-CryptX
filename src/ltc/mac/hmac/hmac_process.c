@@ -20,7 +20,8 @@ int hmac_process(hmac_state *hmac, const unsigned char *in, unsigned long inlen)
 {
     int err;
     LTC_ARGCHK(hmac != NULL);
-    LTC_ARGCHK(in != NULL);
+    LTC_ARGCHK(in != NULL || inlen == 0);
+    if (inlen == 0) return CRYPT_OK;
     if ((err = hash_is_valid(hmac->hash)) != CRYPT_OK) {
         return err;
     }

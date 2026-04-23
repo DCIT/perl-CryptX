@@ -243,14 +243,22 @@ typedef unsigned long ltc_mp_digit;
    #undef ENDIAN_32BITWORD
    #undef ENDIAN_64BITWORD
    #undef LTC_FAST
-   #define LTC_NO_AES_NI
+   #define LTC_NO_ACCEL
    #define LTC_NO_BSWAP
    #define LTC_NO_CLZL
    #define LTC_NO_CTZL
    #define LTC_NO_ROLC
    #define LTC_NO_ROTATE
+#endif
+
+/* Just portable C implementations */
+#ifdef LTC_NO_ACCEL
+   #define LTC_NO_AES_NI
    #define LTC_NO_GCM_PCLMUL
    #define LTC_NO_GCM_PMULL
+   #define LTC_NO_SHA1_X86
+   #define LTC_NO_SHA224_X86
+   #define LTC_NO_SHA256_X86
 #endif
 
 /* No LTC_FAST if: explicitly disabled OR non-gcc/non-clang compiler OR old gcc OR using -ansi -std=c99 */
@@ -307,9 +315,14 @@ typedef unsigned long ltc_mp_digit;
    #define LTC_HAVE_CTZL_BUILTIN
 #endif
 
-#if (defined(__x86_64__) || defined(_M_X64))
+#if (defined(__x86_64__) || defined(__i386__) || defined(_M_X64) || defined(_M_IX86))
+   #define LTC_ARCH_X86
    #if !defined(LTC_NO_AES_NI)
       #define LTC_AES_NI
+   #endif
+   #if !defined(LTC_NO_GCM_PCLMUL)
+      #define LTC_GCM_PCLMUL
+      #undef LTC_GCM_TABLES
    #endif
    #if !defined(LTC_NO_SHA1_X86)
       #define LTC_SHA1_X86
@@ -319,6 +332,23 @@ typedef unsigned long ltc_mp_digit;
    #endif
    #if !defined(LTC_NO_SHA256_X86)
       #define LTC_SHA256_X86
+   #endif
+   #if \
+      (defined __GNUC__ && defined __GNUC_MINOR__ && (__GNUC__) >= 14) || \
+      (defined __clang__ && defined __clang_major__ && defined __clang_minor__ & (__clang_major__) >= 17) || \
+      (defined _MSC_VER && defined _MSC_FULL_VER && (_MSC_VER) >= 1930)
+      #if !defined(LTC_NO_SHA512_X86)
+         #define LTC_SHA512_X86
+      #endif
+      #if !defined(LTC_NO_SHA384_X86)
+         #define LTC_SHA384_X86
+      #endif
+      #if !defined(LTC_NO_SHA512_256_X86)
+         #define LTC_SHA512_256_X86
+      #endif
+      #if !defined(LTC_NO_SHA512_224_X86)
+         #define LTC_SHA512_224_X86
+      #endif
    #endif
 #endif
 
@@ -382,19 +412,6 @@ typedef unsigned long ltc_mp_digit;
 #  define LTC_ATTRIBUTE(x) __attribute__(x)
 #else
 #  define LTC_ATTRIBUTE(x)
-#endif
-
-#if !defined(LTC_NO_GCM_PCLMUL) && (defined(__x86_64__) || defined(__i386__) || defined(_M_X64) || defined(_M_IX86))
-#define LTC_GCM_PCLMUL
-#undef LTC_GCM_TABLES
-#endif
-
-#if defined(__clang__) || defined(__GNUC__)
-#define LTC_GCM_PCLMUL_TARGET __attribute__((target("pclmul,ssse3")))
-#define LTC_SHA_TARGET __attribute__((__target__("sse2,ssse3,sse4.1,sha")))
-#else
-#define LTC_GCM_PCLMUL_TARGET
-#define LTC_SHA_TARGET
 #endif
 
 #if !defined(LTC_NO_GCM_PMULL) && (defined(__aarch64__) || defined(_M_ARM64))

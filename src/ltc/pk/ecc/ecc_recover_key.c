@@ -65,7 +65,7 @@ int ecc_recover_key(const unsigned char *sig,  unsigned long siglen,
       err = CRYPT_MEM;
       goto error;
    }
-   recid = (opts->recid != NULL) ? *(opts->recid) : -1;
+   recid = (opts->enable_recovery_id) ? opts->recovery_id : -1;
 
    if (opts->type == LTC_ECCSIG_RFC7518) {
       /* RFC7518 format - raw (r,s) */

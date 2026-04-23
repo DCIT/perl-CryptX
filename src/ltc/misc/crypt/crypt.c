@@ -13,9 +13,12 @@ const char *crypt_build_settings =
    "LibTomCrypt " SCRYPT " (www.libtom.net)\n"
    "LibTomCrypt is public domain software.\n"
 #if defined(INCLUDE_BUILD_DATE)
-   "Built on " __DATE__ " at " __TIME__ "\n"
+   "Built on " __DATE__ " at " __TIME__ "\n\n"
 #endif
-   "\n\nEndianness: "
+#if defined(LTC_ARCH_X86)
+   "LTC_ARCH_X86\n"
+#endif
+   "\nEndianness: "
 #if defined(ENDIAN_NEUTRAL)
    "neutral/"
 #endif
@@ -502,14 +505,26 @@ const char *crypt_build_settings =
 #if defined(LTC_PEM_SSH)
     " OpenSSH-PEM "
 #endif
-#if defined(LTC_SHA1_X86)
+#if defined(LTC_SHA1) && defined(LTC_SHA1_X86)
    " SHA1-NI "
 #endif
-#if defined(LTC_SHA224_X86)
+#if defined(LTC_SHA224) && defined(LTC_SHA224_X86)
    " SHA224-NI "
 #endif
-#if defined(LTC_SHA256_X86)
+#if defined(LTC_SHA256) && defined(LTC_SHA256_X86)
    " SHA256-NI "
+#endif
+#if defined(LTC_SHA512_X86)
+   " SHA512-NI "
+#endif
+#if defined(LTC_SHA384_X86)
+   " SHA384-NI "
+#endif
+#if defined(LTC_SHA512_224_X86)
+   " SHA512_224-NI "
+#endif
+#if defined(LTC_SHA512_256_X86)
+   " SHA512_256-NI "
 #endif
 #if defined(LTC_DEVRANDOM)
     " LTC_DEVRANDOM "

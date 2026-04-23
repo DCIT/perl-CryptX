@@ -7,11 +7,11 @@
   SHA1 code by Marek Knapek
 */
 
-
-#ifdef LTC_SHA1_X86
+#if defined(LTC_SHA1) && defined(LTC_SHA1_X86)
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
 #pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
 #pragma GCC diagnostic ignored "-Wuninitialized"
 #pragma GCC diagnostic ignored "-Wunused-function"

@@ -123,9 +123,7 @@ int scrypt_pbkdf(const unsigned char *password, unsigned long password_len,
                  unsigned char *out, unsigned long outlen)
 {
    unsigned char *B = NULL, *V = NULL, *XY = NULL;
-   const unsigned char *pwd;
-   unsigned long pwd_len, Blen, Vlen, XYlen, i;
-   unsigned char zero_byte = 0;
+   unsigned long Blen, Vlen, XYlen, i;
    int err, hash_idx;
 
    LTC_ARGCHK(out != NULL);
@@ -143,15 +141,6 @@ int scrypt_pbkdf(const unsigned char *password, unsigned long password_len,
    hash_idx = find_hash("sha256");
    if (hash_idx == -1)                        return CRYPT_INVALID_HASH;
 
-   /* WORKAROUND: HMAC rejects zero-length keys; a single zero byte
-    * produces the same zero-padded key block as an empty key. */
-   pwd = password;
-   pwd_len = password_len;
-   if (pwd_len == 0) {
-      pwd = &zero_byte;
-      pwd_len = 1;
-   }
-
    Blen  = 128 * r * p;
    Vlen  = 128 * r * N;
    XYlen = 256 * r;
@@ -167,7 +156,7 @@ int scrypt_pbkdf(const unsigned char *password, unsigned long password_len,
    /* 1: B = PBKDF2-HMAC-SHA256(password, salt, 1, p * 128 * r) */
    {
       unsigned long blen_out = Blen;
-      err = pkcs_5_alg2(pwd, pwd_len, salt, salt_len, 1, hash_idx, B, &blen_out);
+      err = pkcs_5_alg2(password, password_len, salt, salt_len, 1, hash_idx, B, &blen_out);
       if (err != CRYPT_OK) goto cleanup;
    }
    /* 2: for i = 0 to p-1: B[i] = ROMix(r, B[i], N) */
@@ -177,7 +166,7 @@ int scrypt_pbkdf(const unsigned char *password, unsigned long password_len,
    /* 3: DK = PBKDF2-HMAC-SHA256(password, B, 1, dkLen) */
    {
       unsigned long outlen_out = outlen;
-      err = pkcs_5_alg2(pwd, pwd_len, B, Blen, 1, hash_idx, out, &outlen_out);
+      err = pkcs_5_alg2(password, password_len, B, Blen, 1, hash_idx, out, &outlen_out);
    }
 
 cleanup:

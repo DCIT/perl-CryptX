@@ -404,7 +404,8 @@ typedef struct ltc_ecc_sig_opts {
     *  This must be set in case one requires the recovery ID of a
     *  signature operation.
     */
-   int *recid;
+   unsigned char enable_recovery_id;
+   int recovery_id;
 
    /** The hash algorithm to use when creating a signature.
     *  Setting this will enable RFC6979 compatible signature generation.

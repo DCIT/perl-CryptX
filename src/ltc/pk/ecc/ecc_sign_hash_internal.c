@@ -67,7 +67,7 @@ int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
       /* find r = x1 mod n */
       if ((err = ltc_mp_mod(pubkey.pubkey.x, p, r)) != CRYPT_OK)               { goto error; }
 
-      if (opts->recid) {
+      if (opts->enable_recovery_id) {
          /* find recovery ID (if needed) */
          v = 0;
          if (ltc_mp_copy(pubkey.pubkey.x, s) != CRYPT_OK)                      { goto error; }
@@ -102,7 +102,7 @@ int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
       goto errnokey;
    }
 
-   if (opts->recid) *opts->recid = v;
+   if (opts->enable_recovery_id) opts->recovery_id = v;
 
    goto errnokey;
 error:

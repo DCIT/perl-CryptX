@@ -23,7 +23,7 @@ int omac_process(omac_state *omac, const unsigned char *in, unsigned long inlen)
    int           err;
 
    LTC_ARGCHK(omac  != NULL);
-   LTC_ARGCHK(in    != NULL);
+   LTC_ARGCHK(in    != NULL || inlen == 0);
 
    if ((omac->buflen > (int)sizeof(omac->block)) || (omac->buflen < 0) ||
        (omac->blklen > (int)sizeof(omac->block)) || (omac->buflen > omac->blklen)) {

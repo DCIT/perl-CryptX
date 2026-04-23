@@ -27,7 +27,7 @@ int hmac_init(hmac_state *hmac, int hash, const unsigned char *key, unsigned lon
     int err;
 
     LTC_ARGCHK(hmac != NULL);
-    LTC_ARGCHK(key  != NULL);
+    LTC_ARGCHK(key  != NULL || keylen == 0);
 
     /* valid hash? */
     if ((err = hash_is_valid(hash)) != CRYPT_OK) {
@@ -35,11 +35,6 @@ int hmac_init(hmac_state *hmac, int hash, const unsigned char *key, unsigned lon
     }
     hmac->hash = hash;
     hashsize   = hash_descriptor[hash].hashsize;
-
-    /* valid key length? */
-    if (keylen == 0) {
-        return CRYPT_INVALID_KEYSIZE;
-    }
 
     /* allocate ram for buf */
     buf = XMALLOC(LTC_HMAC_BLOCKSIZE);
@@ -60,7 +55,7 @@ int hmac_init(hmac_state *hmac, int hash, const unsigned char *key, unsigned lon
            goto LBL_ERR;
         }
         keylen = hashsize;
-    } else {
+    } else if (keylen != 0) {
         XMEMCPY(hmac->key, key, (size_t)keylen);
     }
 

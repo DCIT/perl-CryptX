@@ -20,9 +20,17 @@ const struct ltc_cipher_descriptor aesni_desc =
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+#pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
+#endif
 #include <emmintrin.h>
 #include <smmintrin.h>
 #include <wmmintrin.h>
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 #define setup_mix(t, c) _mm_extract_epi32(_mm_aeskeygenassist_si128(t, 0), c)
 #define temp_load(k) _mm_loadu_si128((__m128i*)(k))

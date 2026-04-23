@@ -34,8 +34,8 @@ int hmac_memory_multi(int hash,
     const unsigned char *curptr;
     unsigned long        curlen;
 
-    LTC_ARGCHK(key    != NULL);
-    LTC_ARGCHK(in     != NULL);
+    LTC_ARGCHK(key    != NULL || keylen == 0);
+    LTC_ARGCHK(in     != NULL || inlen == 0);
     LTC_ARGCHK(out    != NULL);
     LTC_ARGCHK(outlen != NULL);
 

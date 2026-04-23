@@ -388,7 +388,7 @@ int sha3_shake_test(void)
 #endif
 }
 
-#if defined LTC_TURBO_SHAKE || defined LTC_KANGAROO_TWELVE
+#if (defined LTC_TURBO_SHAKE || defined LTC_KANGAROO_TWELVE) && defined LTC_TEST
 static LTC_INLINE int s_turbo_shake_generate_ptn(unsigned char* buffer, long offset, long amount)
 {
    long i;
@@ -405,7 +405,7 @@ static LTC_INLINE int s_turbo_shake_generate_ptn(unsigned char* buffer, long off
 }
 #endif
 
-#ifdef LTC_TURBO_SHAKE
+#if defined(LTC_TURBO_SHAKE) && defined(LTC_TEST)
 typedef struct turbo_shake_test_case {
    int bits_count;
    unsigned long input_bytes_count, skip_digest_bytes, digest_bytes_count;
@@ -509,7 +509,7 @@ int turbo_shake_test(void)
 }
 #endif
 
-#ifdef LTC_KANGAROO_TWELVE
+#if defined(LTC_KANGAROO_TWELVE) && defined(LTC_TEST)
 typedef struct kangaroo_twelve_test_case {
    int bits_count, is_ptn;
    unsigned long input_bytes_count, customization_bytes_count, skip_digest_bytes, digest_bytes_count;

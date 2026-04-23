@@ -711,9 +711,9 @@ void rijndael_enc_done(symmetric_key *skey);
 int rijndael_enc_keysize(int *keysize);
 extern const struct ltc_cipher_descriptor rijndael_desc;
 extern const struct ltc_cipher_descriptor rijndael_enc_desc;
+#endif
 
 int aesni_is_supported(void);
-#endif
 
 #if defined(LTC_AES_NI)
 int aesni_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_key *skey);

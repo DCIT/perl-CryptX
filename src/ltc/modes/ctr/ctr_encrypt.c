@@ -81,7 +81,7 @@ int ctr_encrypt(const unsigned char *pt, unsigned char *ct, unsigned long len, s
 {
    int err, fr;
 
-   LTC_ARGCHK(pt != NULL);
+   LTC_ARGCHK(pt != NULL || len == 0);
    LTC_ARGCHK(ct != NULL);
    LTC_ARGCHK(ctr != NULL);
 

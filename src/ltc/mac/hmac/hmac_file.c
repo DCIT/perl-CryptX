@@ -39,7 +39,7 @@ int hmac_file(int hash, const char *fname,
    int err;
 
    LTC_ARGCHK(fname  != NULL);
-   LTC_ARGCHK(key    != NULL);
+   LTC_ARGCHK(key    != NULL || keylen == 0);
    LTC_ARGCHK(out    != NULL);
    LTC_ARGCHK(outlen != NULL);
 

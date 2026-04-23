@@ -9,21 +9,19 @@
   Generate a random prime, Tom St Denis
 */
 
-#define USE_BBS 1
-
 int rand_prime(void *N, long len, prng_state *prng, int wprng)
 {
-   int            err, res, type;
-   unsigned char *buf;
+   int            err, res;
+   unsigned char *buf, bbs;
 
    LTC_ARGCHK(N != NULL);
 
-   /* get type */
    if (len < 0) {
-      type = USE_BBS;
+      /* Create BBS (Blum Blum Shub) style prime */
+      bbs = 0x02;
       len = -len;
    } else {
-      type = 0;
+      bbs = 0x00;
    }
 
    /* allow sizes between 2 and 512 bytes for a prime size */
@@ -51,7 +49,7 @@ int rand_prime(void *N, long len, prng_state *prng, int wprng)
 
       /* munge bits */
       buf[0]     |= 0x80 | 0x40;
-      buf[len-1] |= 0x01 | ((type & USE_BBS) ? 0x02 : 0x00);
+      buf[len-1] |= 0x01 | bbs;
 
       /* load value */
       if ((err = ltc_mp_read_unsigned_bin(N, buf, len)) != CRYPT_OK) {

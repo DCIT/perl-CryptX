@@ -19,7 +19,7 @@ int ecc_sign_hash_eth27(const unsigned char *in,  unsigned long inlen,
                         unsigned char *out, unsigned long *outlen,
                         ltc_ecc_sig_opts *opts, const ecc_key *key)
 {
-   int err, recid;
+   int err;
    void *r, *s;
    unsigned long i;
 
@@ -37,9 +37,9 @@ int ecc_sign_hash_eth27(const unsigned char *in,  unsigned long inlen,
       return CRYPT_BUFFER_OVERFLOW;
    }
 
+   opts->enable_recovery_id = 1;
+
    if ((err = ltc_mp_init_multi(&r, &s, LTC_NULL)) != CRYPT_OK) return err;
-   if (opts->recid == NULL)
-      opts->recid = &recid;
    if ((err = ecc_sign_hash_internal(in, inlen, r, s, opts, key)) != CRYPT_OK) goto error;
 
    zeromem(out, 65);
@@ -48,12 +48,10 @@ int ecc_sign_hash_eth27(const unsigned char *in,  unsigned long inlen,
    if ((err = ltc_mp_to_unsigned_bin(r, out + 32 - i)) != CRYPT_OK) goto error;
    i = ltc_mp_unsigned_bin_size(s);
    if ((err = ltc_mp_to_unsigned_bin(s, out + 64 - i)) != CRYPT_OK) goto error;
-   out[64] = (unsigned char)(*(opts->recid) + 27); /* Recovery ID is 27/28 for Ethereum */
+   out[64] = (unsigned char)(opts->recovery_id + 27); /* Recovery ID is 27/28 for Ethereum */
    err = CRYPT_OK;
 
 error:
-   if (opts->recid == &recid)
-      opts->recid = NULL;
    ltc_mp_deinit_multi(r, s, LTC_NULL);
    return err;
 }

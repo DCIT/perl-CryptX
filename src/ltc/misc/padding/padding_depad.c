@@ -17,7 +17,7 @@
 int padding_depad(const unsigned char *data, unsigned long *length, unsigned long mode)
 {
    unsigned long padded_length, unpadded_length, n;
-   unsigned char pad;
+   unsigned char pad, data_xor_pad = 0;
    enum padding_type type;
 
    LTC_ARGCHK(data   != NULL);
@@ -30,9 +30,12 @@ int padding_depad(const unsigned char *data, unsigned long *length, unsigned lon
    if (type < LTC_PAD_ONE_AND_ZERO) {
       pad = data[padded_length - 1];
 
-      if (pad > padded_length || pad == 0) return CRYPT_INVALID_ARG;
-
-      unpadded_length = padded_length - pad;
+      if (pad > padded_length || pad == 0)  {
+         unpadded_length = padded_length - (padded_length > 16 ? padded_length - 16 : padded_length);
+         data_xor_pad = 1;
+      } else {
+         unpadded_length = padded_length - pad;
+      }
    } else {
       /* init pad to calm old compilers */
       pad = 0x0;
@@ -45,7 +48,7 @@ int padding_depad(const unsigned char *data, unsigned long *length, unsigned lon
          /* FALLTHROUGH */
       case LTC_PAD_PKCS7:
          for (n = unpadded_length; n < padded_length - 1; ++n) {
-            if (data[n] != pad) return CRYPT_INVALID_PACKET;
+            data_xor_pad |= data[n] ^ pad;
          }
          break;
 #ifdef LTC_RNG_GET_BYTES
@@ -56,17 +59,17 @@ int padding_depad(const unsigned char *data, unsigned long *length, unsigned lon
       case LTC_PAD_SSH:
          pad = 0x1;
          for (n = unpadded_length; n < padded_length; ++n) {
-            if (data[n] != pad++) return CRYPT_INVALID_PACKET;
+            data_xor_pad |= data[n] ^ pad++;
          }
          break;
       case LTC_PAD_ONE_AND_ZERO:
          while (unpadded_length > 0 && data[unpadded_length - 1] != 0x80) {
-            if (data[unpadded_length - 1] != 0x0) return CRYPT_INVALID_PACKET;
+            data_xor_pad |= data[unpadded_length - 1];
             unpadded_length--;
          }
-         if (unpadded_length == 0) return CRYPT_INVALID_PACKET;
-         unpadded_length--;
-         if (data[unpadded_length] != 0x80) return CRYPT_INVALID_PACKET;
+         if (unpadded_length == 0) data_xor_pad |= 1;
+         else unpadded_length--;
+         if (data[unpadded_length] != 0x80) data_xor_pad |= 1;
          break;
       case LTC_PAD_ZERO:
       case LTC_PAD_ZERO_ALWAYS:
@@ -81,6 +84,9 @@ int padding_depad(const unsigned char *data, unsigned long *length, unsigned lon
       default:
          return CRYPT_INVALID_ARG;
    }
+
+   if (data_xor_pad != 0)
+      return CRYPT_INVALID_PACKET;
 
    *length = unpadded_length;
 

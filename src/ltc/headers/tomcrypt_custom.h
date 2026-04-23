@@ -126,6 +126,7 @@
    #define LTC_RIJNDAEL
    #define LTC_SHA256
    #define LTC_YARROW
+   #define LTC_ECB_MODE
    #define LTC_CTR_MODE
 
    #define LTC_RNG_MAKE_PRNG

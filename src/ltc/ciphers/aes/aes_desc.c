@@ -9,6 +9,37 @@
 
 #include "tomcrypt_private.h"
 
+#if defined(LTC_ARCH_X86) && (defined(LTC_AES_NI) || !defined(ENCRYPT_ONLY))
+
+static LTC_INLINE int s_aesni_is_supported(void)
+{
+   static int initialized = 0, is_supported = 0;
+
+   if (initialized == 0) {
+      /* Look for CPUID.1.0.ECX[19] (SSE4.1) and CPUID.1.0.ECX[25] (AES-NI)
+       * EAX = 1, ECX = 0
+       */
+      int regs[4];
+      s_x86_cpuid(regs, 1);
+      is_supported = ((regs[2] >> 19) & 1) && ((regs[2] >> 25) & 1);
+      initialized = 1;
+   }
+
+   return is_supported;
+}
+#endif /* LTC_ARCH_X86 */
+
+#ifndef ENCRYPT_ONLY
+int aesni_is_supported(void)
+{
+#if defined(LTC_ARCH_X86)
+   return s_aesni_is_supported();
+#else
+   return 0;
+#endif
+}
+#endif /* ENCRYPT_ONLY */
+
 #if defined(LTC_RIJNDAEL)
 
 #ifndef ENCRYPT_ONLY
@@ -46,54 +77,6 @@ const struct ltc_cipher_descriptor aes_enc_desc =
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
 
-#endif
-
-/* Code partially borrowed from https://software.intel.com/content/www/us/en/develop/articles/intel-sha-extensions.html */
-#if defined(LTC_AES_NI)
-static LTC_INLINE int s_aesni_is_supported(void)
-{
-   static int initialized = 0, is_supported = 0;
-
-   if (initialized == 0) {
-      int a, b, c, d;
-
-      /* Look for CPUID.1.0.ECX[19] (SSE4.1) and CPUID.1.0.ECX[25] (AES-NI)
-       * EAX = 1, ECX = 0
-       */
-      a = 1;
-      c = 0;
-
-#if defined(_MSC_VER) && !defined(__clang__)
-      int arr[4];
-      __cpuidex(arr, a, c);
-      a = arr[0];
-      b = arr[1];
-      c = arr[2];
-      d = arr[3];
-#else
-      __asm__ volatile ("cpuid"
-           :"=a"(a), "=b"(b), "=c"(c), "=d"(d)
-           :"a"(a), "c"(c)
-          );
-#endif
-
-      is_supported = ((c >> 19) & 1) && ((c >> 25) & 1);
-      initialized = 1;
-   }
-
-   return is_supported;
-}
-#endif
-
-#ifndef ENCRYPT_ONLY
-int aesni_is_supported(void)
-{
-#ifdef LTC_AES_NI
-   return s_aesni_is_supported();
-#else
-   return 0;
-#endif
-}
 #endif
 
  /**
