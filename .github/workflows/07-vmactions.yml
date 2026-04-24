@@ -167,10 +167,12 @@ jobs:
           run: |
             uname -a
             pkgman refresh
-            pkgman install -y git make gcc perl cpanminus perl_json
+            pkgman install -y git make gcc perl perl_json
             perl -V
             gcc -v
-            cpanm -n --installdeps .
+            curl -L https://cpanmin.us/ -o cpanm
+            chmod +x cpanm
+            ./cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j4
             env AUTHOR_MODE=0 prove -b t
@@ -193,8 +195,7 @@ jobs:
               developer/gcc \
               developer/build/gnu-make \
               developer/versioning/git \
-              runtime/perl-532 \
-              library/perl-5/json
+              runtime/perl-532
             export PATH="/usr/gnu/bin:/usr/gcc/bin:/usr/perl5/bin:$PATH"
             perl -V
             gcc -v
