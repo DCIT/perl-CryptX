@@ -35,8 +35,8 @@ jobs:
       - name: Install dependencies
         run: |
           cat > /etc/apt/sources.list <<'EOF'
-          deb http://archive.debian.org/debian ${{ matrix.codename }} main
-          deb http://archive.debian.org/debian-security ${{ matrix.codename }}/updates main
+          deb [trusted=yes] http://archive.debian.org/debian ${{ matrix.codename }} main contrib non-free
+          deb [trusted=yes] http://archive.debian.org/debian-security ${{ matrix.codename }}/updates main contrib non-free
           EOF
           printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99archive
           apt-get update -qq
