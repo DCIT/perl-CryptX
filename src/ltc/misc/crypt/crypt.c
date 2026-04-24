@@ -137,6 +137,9 @@ const char *crypt_build_settings =
 #if defined(LTC_CHACHA)
    "   ChaCha\n"
 #endif
+#if defined(LTC_XCHACHA20)
+   "   XChaCha20\n"
+#endif
 #if defined(LTC_SALSA20)
    "   Salsa20\n"
 #endif

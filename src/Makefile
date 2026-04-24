@@ -146,14 +146,15 @@ ltc/pk/x25519/x25519_shared_secret.o ltc/prngs/chacha20.o ltc/prngs/fortuna.o lt
 ltc/prngs/rng_get_bytes.o ltc/prngs/rng_make_prng.o ltc/prngs/sober128.o ltc/prngs/sprng.o \
 ltc/prngs/yarrow.o ltc/stream/chacha/chacha_crypt.o ltc/stream/chacha/chacha_done.o \
 ltc/stream/chacha/chacha_ivctr32.o ltc/stream/chacha/chacha_ivctr64.o ltc/stream/chacha/chacha_keystream.o \
-ltc/stream/chacha/chacha_memory.o ltc/stream/chacha/chacha_setup.o ltc/stream/rabbit/rabbit.o \
-ltc/stream/rabbit/rabbit_memory.o ltc/stream/rc4/rc4_stream.o ltc/stream/rc4/rc4_stream_memory.o \
-ltc/stream/salsa20/salsa20_crypt.o ltc/stream/salsa20/salsa20_done.o ltc/stream/salsa20/salsa20_ivctr64.o \
-ltc/stream/salsa20/salsa20_keystream.o ltc/stream/salsa20/salsa20_memory.o ltc/stream/salsa20/salsa20_setup.o \
-ltc/stream/salsa20/xsalsa20_memory.o ltc/stream/salsa20/xsalsa20_setup.o ltc/stream/sober128/sober128_stream.o \
-ltc/stream/sober128/sober128_stream_memory.o ltc/stream/sosemanuk/sosemanuk.o ltc/stream/sosemanuk/sosemanuk_memory.o \
-ltm/mp_2expt.o ltm/mp_abs.o ltm/mp_add.o ltm/mp_add_d.o ltm/mp_addmod.o ltm/mp_and.o \
-ltm/mp_clamp.o ltm/mp_clear.o ltm/mp_clear_multi.o ltm/mp_cmp.o ltm/mp_cmp_d.o ltm/mp_cmp_mag.o \
+ltc/stream/chacha/chacha_memory.o ltc/stream/chacha/chacha_setup.o ltc/stream/chacha/xchacha20_memory.o \
+ltc/stream/chacha/xchacha20_setup.o ltc/stream/rabbit/rabbit.o ltc/stream/rabbit/rabbit_memory.o \
+ltc/stream/rc4/rc4_stream.o ltc/stream/rc4/rc4_stream_memory.o ltc/stream/salsa20/salsa20_crypt.o \
+ltc/stream/salsa20/salsa20_done.o ltc/stream/salsa20/salsa20_ivctr64.o ltc/stream/salsa20/salsa20_keystream.o \
+ltc/stream/salsa20/salsa20_memory.o ltc/stream/salsa20/salsa20_setup.o ltc/stream/salsa20/xsalsa20_memory.o \
+ltc/stream/salsa20/xsalsa20_setup.o ltc/stream/sober128/sober128_stream.o ltc/stream/sober128/sober128_stream_memory.o \
+ltc/stream/sosemanuk/sosemanuk.o ltc/stream/sosemanuk/sosemanuk_memory.o ltm/mp_2expt.o \
+ltm/mp_abs.o ltm/mp_add.o ltm/mp_add_d.o ltm/mp_addmod.o ltm/mp_and.o ltm/mp_clamp.o \
+ltm/mp_clear.o ltm/mp_clear_multi.o ltm/mp_cmp.o ltm/mp_cmp_d.o ltm/mp_cmp_mag.o \
 ltm/mp_cnt_lsb.o ltm/mp_complement.o ltm/mp_copy.o ltm/mp_count_bits.o ltm/mp_cutoffs.o \
 ltm/mp_div.o ltm/mp_div_2.o ltm/mp_div_2d.o ltm/mp_div_d.o ltm/mp_dr_is_modulus.o \
 ltm/mp_dr_reduce.o ltm/mp_dr_setup.o ltm/mp_error_to_string.o ltm/mp_exch.o ltm/mp_expt_n.o \

@@ -348,6 +348,16 @@ int tweetnacl_crypto_sign_keypair(prng_state *prng, int wprng, u8 *pk, u8 *sk)
 
 static const u64 L[32] = {0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x10};
 
+static int is_canonical_s(const u8 s[32])
+{
+  int i;
+  for (i = 31; i >= 0; --i) {
+    if (s[i] < L[i]) return 1;
+    if (s[i] > L[i]) return 0;
+  }
+  return 0;
+}
+
 sv modL(u8 *r,i64 x[64])
 {
   i64 carry,i,j;
@@ -463,6 +473,7 @@ int tweetnacl_crypto_sign_open(int *stat, u8 *m,u64 *mlen,const u8 *sm,u64 smlen
   if (*mlen < smlen) return CRYPT_BUFFER_OVERFLOW;
   *mlen = -1;
   if (smlen < 64) return CRYPT_INVALID_ARG;
+  if (!is_canonical_s(sm + 32)) return CRYPT_OK;
 
   if (unpackneg(q,pk)) return CRYPT_ERROR;
 

@@ -1056,6 +1056,22 @@ int chacha_memory(const unsigned char *key,    unsigned long keylen,  unsigned l
 
 #endif /* LTC_CHACHA */
 
+#ifdef LTC_XCHACHA20
+
+int xchacha20_hchacha20(unsigned char *out,  unsigned long outlen,
+                        const unsigned char *key, unsigned long keylen,
+                        const unsigned char *in,  unsigned long inlen,
+                        int rounds);
+int xchacha20_setup(chacha_state *st, const unsigned char *key,   unsigned long keylen,
+                                      const unsigned char *nonce, unsigned long noncelen,
+                                      int rounds);
+int xchacha20_test(void);
+int xchacha20_memory(const unsigned char *key,    unsigned long keylen,   unsigned long rounds,
+                     const unsigned char *nonce,  unsigned long noncelen,
+                     const unsigned char *datain, unsigned long datalen,  unsigned char *dataout);
+
+#endif /* LTC_XCHACHA20 */
+
 #ifdef LTC_SALSA20
 
 typedef struct {

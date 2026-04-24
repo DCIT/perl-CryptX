@@ -206,9 +206,6 @@ static const crypt_size s_crypt_sizes[] = {
 #ifdef LTC_EAX_MODE
     SZ_STRINGIFY_T(eax_state),
 #endif
-#ifdef LTC_OCB_MODE
-    SZ_STRINGIFY_T(ocb_state),
-#endif
 #ifdef LTC_OCB3_MODE
     SZ_STRINGIFY_T(ocb3_state),
 #endif

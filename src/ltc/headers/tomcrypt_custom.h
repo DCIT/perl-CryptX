@@ -219,6 +219,7 @@
 
 /* stream ciphers */
 #define LTC_CHACHA
+#define LTC_XCHACHA20
 #define LTC_SALSA20
 #define LTC_XSALSA20
 #define LTC_SOSEMANUK
@@ -304,7 +305,6 @@
 
 #define LTC_EAX_MODE
 
-#define LTC_OCB_MODE
 #define LTC_OCB3_MODE
 #define LTC_CCM_MODE
 #define LTC_GCM_MODE
@@ -706,6 +706,10 @@
    #error LTC_CHACHA20_PRNG requires LTC_CHACHA
 #endif
 
+#if defined(LTC_XCHACHA20) && !defined(LTC_CHACHA)
+   #error LTC_XCHACHA20 requires LTC_CHACHA
+#endif
+
 #if defined(LTC_XSALSA20) && !defined(LTC_SALSA20)
    #error LTC_XSALSA20 requires LTC_SALSA20
 #endif
@@ -748,7 +752,7 @@
    #error LTC_ECB_MODE not defined, but all other modes depend on it
 #endif
 #if defined(LTC_OMAC) || defined(LTC_PMAC) || defined(LTC_XCBC) || defined(LTC_F9_MODE) || defined(LTC_EAX_MODE) || \
-    defined(LTC_OCB_MODE) || defined(LTC_OCB3_MODE) || defined(LTC_CCM_MODE) || defined(LTC_GCM_MODE) )
+    defined(LTC_OCB3_MODE) || defined(LTC_CCM_MODE) || defined(LTC_GCM_MODE) )
    #error LTC_ECB_MODE not defined, but most MAC and AEAD modes depend on it
 #endif
 #endif
