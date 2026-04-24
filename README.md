@@ -172,12 +172,12 @@ or the wrong key/nonce was used.
 
 - Stream ciphers
 
-    [Crypt::Stream::RC4](https://metacpan.org/pod/Crypt%3A%3AStream%3A%3ARC4), [Crypt::Stream::ChaCha](https://metacpan.org/pod/Crypt%3A%3AStream%3A%3AChaCha), [Crypt::Stream::Salsa20](https://metacpan.org/pod/Crypt%3A%3AStream%3A%3ASalsa20), [Crypt::Stream::Sober128](https://metacpan.org/pod/Crypt%3A%3AStream%3A%3ASober128),
+    [Crypt::Stream::RC4](https://metacpan.org/pod/Crypt%3A%3AStream%3A%3ARC4), [Crypt::Stream::ChaCha](https://metacpan.org/pod/Crypt%3A%3AStream%3A%3AChaCha), [Crypt::Stream::XChaCha](https://metacpan.org/pod/Crypt%3A%3AStream%3A%3AXChaCha), [Crypt::Stream::Salsa20](https://metacpan.org/pod/Crypt%3A%3AStream%3A%3ASalsa20), [Crypt::Stream::XSalsa20](https://metacpan.org/pod/Crypt%3A%3AStream%3A%3AXSalsa20), [Crypt::Stream::Sober128](https://metacpan.org/pod/Crypt%3A%3AStream%3A%3ASober128),
     [Crypt::Stream::Sosemanuk](https://metacpan.org/pod/Crypt%3A%3AStream%3A%3ASosemanuk), [Crypt::Stream::Rabbit](https://metacpan.org/pod/Crypt%3A%3AStream%3A%3ARabbit)
 
 - Authenticated encryption modes
 
-    [Crypt::AuthEnc::CCM](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3ACCM), [Crypt::AuthEnc::EAX](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AEAX), [Crypt::AuthEnc::GCM](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AGCM), [Crypt::AuthEnc::OCB](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AOCB), [Crypt::AuthEnc::ChaCha20Poly1305](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AChaCha20Poly1305)
+    [Crypt::AuthEnc::CCM](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3ACCM), [Crypt::AuthEnc::EAX](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AEAX), [Crypt::AuthEnc::GCM](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AGCM), [Crypt::AuthEnc::OCB](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AOCB), [Crypt::AuthEnc::ChaCha20Poly1305](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AChaCha20Poly1305), [Crypt::AuthEnc::XChaCha20Poly1305](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AXChaCha20Poly1305)
 
 - Hash Functions - see [Crypt::Digest](https://metacpan.org/pod/Crypt%3A%3ADigest) and related modules
 

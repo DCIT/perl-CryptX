@@ -11,6 +11,7 @@ END { die "Could not load all modules" unless $ok }
 
 use Crypt::AuthEnc::CCM;
 use Crypt::AuthEnc::ChaCha20Poly1305;
+use Crypt::AuthEnc::XChaCha20Poly1305;
 use Crypt::AuthEnc::SIV;
 use Crypt::AuthEnc::EAX;
 use Crypt::AuthEnc::GCM;
@@ -117,6 +118,7 @@ use Crypt::PRNG::Sober128;
 use Crypt::PRNG::Yarrow;
 use Crypt::PRNG;
 use Crypt::Stream::ChaCha;
+use Crypt::Stream::XChaCha;
 use Crypt::Stream::RC4;
 use Crypt::Stream::Salsa20;
 use Crypt::Stream::XSalsa20;

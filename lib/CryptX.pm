@@ -269,12 +269,12 @@ L<Crypt::Mode::CBC>, L<Crypt::Mode::CFB>, L<Crypt::Mode::CTR>, L<Crypt::Mode::EC
 
 =item * Stream ciphers
 
-L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::XSalsa20>,
+L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::XChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::XSalsa20>,
 L<Crypt::Stream::Sober128>, L<Crypt::Stream::Sosemanuk>, L<Crypt::Stream::Rabbit>
 
 =item * Authenticated encryption modes
 
-L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::OCB>, L<Crypt::AuthEnc::ChaCha20Poly1305>, L<Crypt::AuthEnc::SIV>
+L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::OCB>, L<Crypt::AuthEnc::ChaCha20Poly1305>, L<Crypt::AuthEnc::XChaCha20Poly1305>, L<Crypt::AuthEnc::SIV>
 
 =item * Hash Functions - see L<Crypt::Digest> and related modules
 

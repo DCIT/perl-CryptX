@@ -70,6 +70,7 @@ typedef struct cryptx_authenc_ocb_struct {
 } *Crypt__AuthEnc__OCB;
 
 typedef chacha_state            *Crypt__Stream__ChaCha;
+typedef chacha_state            *Crypt__Stream__XChaCha;
 typedef salsa20_state           *Crypt__Stream__Salsa20;
 typedef salsa20_state           *Crypt__Stream__XSalsa20;
 typedef sosemanuk_state         *Crypt__Stream__Sosemanuk;
@@ -1253,6 +1254,7 @@ INCLUDE: inc/CryptX_AuthEnc_ChaCha20Poly1305.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_SIV.xs.inc
 
 INCLUDE: inc/CryptX_Stream_ChaCha.xs.inc
+INCLUDE: inc/CryptX_Stream_XChaCha.xs.inc
 INCLUDE: inc/CryptX_Stream_Salsa20.xs.inc
 INCLUDE: inc/CryptX_Stream_XSalsa20.xs.inc
 INCLUDE: inc/CryptX_Stream_RC4.xs.inc
