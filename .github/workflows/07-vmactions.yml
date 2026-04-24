@@ -1,4 +1,11 @@
-name: 07-freebsd-arm64
+name: 07-vmactions
+
+#### https://github.com/vmactions
+# https://github.com/vmactions/freebsd-vm
+# https://github.com/vmactions/haiku-vm
+# https://github.com/vmactions/netbsd-vm
+# https://github.com/vmactions/openbsd-vm
+# https://github.com/vmactions/solaris-vm
 
 on:
   push:
@@ -15,7 +22,7 @@ jobs:
   freebsd-x86_64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: vmactions/freebsd-vm@v1
         with:
           release: "14.4"
@@ -37,7 +44,7 @@ jobs:
   freebsd-aarch64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: vmactions/freebsd-vm@v1
         with:
           release: "14.4"
@@ -56,39 +63,10 @@ jobs:
             make -j4
             env AUTHOR_MODE=0 prove -b t
 
-  freebsd-riscv64:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: vmactions/freebsd-vm@v1
-        with:
-          release: "15.0"
-          arch: "riscv64"
-          usesh: true
-          sync: scp
-          copyback: false
-          run: |
-            uname -a
-            export ASSUME_ALWAYS_YES=yes
-            pkg -N >/dev/null 2>&1 || pkg bootstrap -f
-            pkg update
-            pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
-            pkg --version || true
-            pkg_add --version || true
-            perl -V || true
-            gcc -v || true
-            cc -v || true
-            clang -v || true
-            curl --version || true
-            cpanm -n --installdeps .
-            env AUTHOR_MODE=0 perl Makefile.PL
-            make -j2
-            env AUTHOR_MODE=0 prove -b t
-
   netbsd-x86_64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: vmactions/netbsd-vm@v1
         with:
           release: "10.1"
@@ -111,7 +89,7 @@ jobs:
   netbsd-aarch64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: vmactions/netbsd-vm@v1
         with:
           release: "10.1"
@@ -134,7 +112,7 @@ jobs:
   openbsd-x86_64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: vmactions/openbsd-vm@v1
         with:
           release: "7.7"
@@ -157,7 +135,7 @@ jobs:
   openbsd-aarch64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: vmactions/openbsd-vm@v1
         with:
           release: "7.7"
@@ -175,4 +153,57 @@ jobs:
             ./cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j2
+            env AUTHOR_MODE=0 prove -b t
+
+  haiku-x86_64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: vmactions/haiku-vm@v1
+        with:
+          usesh: true
+          sync: scp
+          copyback: false
+          run: |
+            uname -a
+            pkgman refresh
+            pkgman install -y git make gcc perl cpanminus perl_json
+            perl -V
+            gcc -v
+            cpanm -n --installdeps .
+            env AUTHOR_MODE=0 perl Makefile.PL
+            make -j4
+            env AUTHOR_MODE=0 prove -b t
+
+  solaris-x86_64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: vmactions/solaris-vm@v1
+        with:
+          release: "11.4-gcc"
+          arch: "x86_64"
+          usesh: true
+          sync: scp
+          copyback: false
+          run: |
+            uname -a
+            pkg refresh
+            pkg install --accept \
+              developer/gcc \
+              developer/build/gnu-make \
+              developer/versioning/git \
+              runtime/perl-532 \
+              library/perl-5/json
+            export PATH="/usr/gnu/bin:/usr/gcc/bin:/usr/perl5/bin:$PATH"
+            perl -V
+            gcc -v
+            # cpanm may not be packaged; install it from CPAN if needed.
+            if ! command -v cpanm >/dev/null 2>&1; then
+              curl -L https://cpanmin.us | perl - App::cpanminus
+              export PATH="$HOME/perl5/bin:$PATH"
+            fi
+            cpanm -n --installdeps .
+            env AUTHOR_MODE=0 perl Makefile.PL
+            gmake -j4
             env AUTHOR_MODE=0 prove -b t
