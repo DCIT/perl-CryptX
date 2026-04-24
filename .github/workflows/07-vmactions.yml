@@ -167,12 +167,15 @@ jobs:
           run: |
             uname -a
             pkgman refresh
-            pkgman install -y git make gcc perl perl_json
+            pkgman install -y git make gcc perl
             perl -V
             gcc -v
-            curl -L https://cpanmin.us/ -o cpanm
-            chmod +x cpanm
-            ./cpanm -n --installdeps .
+            if ! command -v cpanm >/dev/null 2>&1; then
+              curl -L https://cpanmin.us | perl - App::cpanminus
+              export PATH="$HOME/perl5/bin:$PATH"
+            fi
+            cpanm -n --installdeps .
+            cpanm JSON
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j4
             env AUTHOR_MODE=0 prove -b t
@@ -190,6 +193,7 @@ jobs:
           copyback: false
           run: |
             uname -a
+
             pkg refresh
             pkg install --accept \
               developer/gcc \
@@ -199,12 +203,14 @@ jobs:
             export PATH="/usr/gnu/bin:/usr/gcc/bin:/usr/perl5/bin:$PATH"
             perl -V
             gcc -v
-            # cpanm may not be packaged; install it from CPAN if needed.
+
             if ! command -v cpanm >/dev/null 2>&1; then
               curl -L https://cpanmin.us | perl - App::cpanminus
               export PATH="$HOME/perl5/bin:$PATH"
             fi
             cpanm -n --installdeps .
+            cpanm JSON
+
             env AUTHOR_MODE=0 perl Makefile.PL
             gmake -j4
             env AUTHOR_MODE=0 prove -b t
