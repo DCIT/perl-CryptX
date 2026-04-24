@@ -45,7 +45,6 @@ jobs:
         env:
           AUTHOR_MODE: 1
 
-jobs:
   linux-gcc12:
     runs-on: ubuntu-latest
     strategy:
