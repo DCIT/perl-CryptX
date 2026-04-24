@@ -63,6 +63,10 @@ static const struct {
                                                 [LTC_OID_X25519] =  { LTC_PKA_X25519, (pkcs8_import_fn)x25519_import_pkcs8_asn1 },
                                                 [LTC_OID_ED25519] = { LTC_PKA_ED25519, (pkcs8_import_fn)ed25519_import_pkcs8_asn1 },
 #endif
+#ifdef LTC_CURVE448
+                                                [LTC_OID_X448] =  { LTC_PKA_X448, (pkcs8_import_fn)x448_import_pkcs8_asn1 },
+                                                [LTC_OID_ED448] = { LTC_PKA_ED448, (pkcs8_import_fn)ed448_import_pkcs8_asn1 },
+#endif
 };
 
 static int s_import_pkcs8(unsigned char *asn1_cert, unsigned long asn1_len, ltc_pka_key *k, const password_ctx *pw_ctx)
@@ -121,6 +125,10 @@ static const import_fn s_import_openssl_fns[LTC_PKA_NUM] = {
 #ifdef LTC_CURVE25519
                                                 [LTC_PKA_X25519] = (import_fn)x25519_import,
                                                 [LTC_PKA_ED25519] = (import_fn)ed25519_import,
+#endif
+#ifdef LTC_CURVE448
+                                                [LTC_PKA_X448] = (import_fn)x448_import,
+                                                [LTC_PKA_ED448] = (import_fn)ed448_import,
 #endif
 };
 

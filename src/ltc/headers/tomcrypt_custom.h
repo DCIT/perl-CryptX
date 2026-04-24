@@ -454,6 +454,9 @@
 /* Ed25519 & X25519 */
 #define LTC_CURVE25519
 
+/* Ed448 & X448 */
+#define LTC_CURVE448
+
 /* ECC */
 #define LTC_MECC
 

@@ -41,6 +41,8 @@ enum ltc_pka_id {
    LTC_PKA_ED25519,
    LTC_PKA_DH,
    LTC_PKA_RSA_PSS,
+   LTC_PKA_X448,
+   LTC_PKA_ED448,
    LTC_PKA_NUM
 };
 
@@ -629,6 +631,80 @@ int x25519_shared_secret(const curve25519_key *private_key,
 
 #endif /* LTC_CURVE25519 */
 
+
+#ifdef LTC_CURVE448
+
+typedef struct {
+    /** Type of key, PK_PRIVATE or PK_PUBLIC */
+    enum public_key_type type;
+    /** Algorithm: LTC_PKA_X448 or LTC_PKA_ED448 */
+    enum ltc_pka_id pka;
+    /** The private key (56 bytes for X448, 57 bytes for Ed448) */
+    unsigned char priv[57];
+    /** The public key (56 bytes for X448, 57 bytes for Ed448) */
+    unsigned char pub[57];
+} curve448_key;
+
+/** X448 Diffie-Hellman key exchange */
+int x448_make_key(prng_state *prng, int wprng, curve448_key *key);
+
+int x448_export(       unsigned char *out, unsigned long *outlen,
+                                 int  which,
+                const curve448_key *key);
+
+int x448_import(const unsigned char *in, unsigned long inlen, curve448_key *key);
+int x448_import_raw(const unsigned char *in, unsigned long inlen, int which, curve448_key *key);
+int x448_import_x509(const unsigned char *in, unsigned long inlen, curve448_key *key);
+int x448_import_pkcs8(const unsigned char  *in, unsigned long inlen,
+                      const password_ctx   *pw_ctx,
+                            curve448_key *key);
+
+int x448_shared_secret(const curve448_key *private_key,
+                       const curve448_key *public_key,
+                             unsigned char *out, unsigned long *outlen);
+
+/** Ed448 Signature API */
+int ed448_make_key(prng_state *prng, int wprng, curve448_key *key);
+
+int ed448_export(       unsigned char *out, unsigned long *outlen,
+                                  int  which,
+                 const curve448_key *key);
+
+int ed448_import(const unsigned char *in, unsigned long inlen, curve448_key *key);
+int ed448_import_raw(const unsigned char *in, unsigned long inlen, int which, curve448_key *key);
+int ed448_import_x509(const unsigned char *in, unsigned long inlen, curve448_key *key);
+int ed448_import_pkcs8(const unsigned char  *in, unsigned long inlen,
+                       const password_ctx   *pw_ctx,
+                             curve448_key *key);
+
+int ed448_sign(const  unsigned char *msg, unsigned long msglen,
+                      unsigned char *sig, unsigned long *siglen,
+               const curve448_key *private_key);
+int ed448ctx_sign(const  unsigned char *msg, unsigned long  msglen,
+                         unsigned char *sig, unsigned long *siglen,
+                  const  unsigned char *ctx, unsigned long  ctxlen,
+                  const curve448_key *private_key);
+int ed448ph_sign(const  unsigned char *msg, unsigned long  msglen,
+                        unsigned char *sig, unsigned long *siglen,
+                 const  unsigned char *ctx, unsigned long  ctxlen,
+                 const curve448_key *private_key);
+int ed448_verify(const  unsigned char *msg, unsigned long msglen,
+                 const  unsigned char *sig, unsigned long siglen,
+                                  int *stat,
+                 const curve448_key *public_key);
+int ed448ctx_verify(const  unsigned char *msg, unsigned long msglen,
+                    const  unsigned char *sig, unsigned long siglen,
+                    const  unsigned char *ctx, unsigned long ctxlen,
+                                     int *stat,
+                    const curve448_key *public_key);
+int ed448ph_verify(const  unsigned char *msg, unsigned long msglen,
+                   const  unsigned char *sig, unsigned long siglen,
+                   const  unsigned char *ctx, unsigned long ctxlen,
+                                    int *stat,
+                   const curve448_key *public_key);
+
+#endif /* LTC_CURVE448 */
+
 #ifdef LTC_MDSA
 
 /* Max diff between group and modulus size in bytes (max case: L=8192bits, N=256bits) */
@@ -723,6 +799,10 @@ typedef struct {
 #ifdef LTC_CURVE25519
       curve25519_key x25519;
       curve25519_key ed25519;
+#endif
+#ifdef LTC_CURVE448
+      curve448_key x448;
+      curve448_key ed448;
 #endif
 #ifdef LTC_MDH
       dh_key dh;

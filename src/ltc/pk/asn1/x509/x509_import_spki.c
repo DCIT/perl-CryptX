@@ -52,6 +52,10 @@ static const import_fn s_import_spki_fns[LTC_PKA_NUM] = {
                                                 [LTC_PKA_X25519] = (import_fn)s_x25519_import_spki,
                                                 [LTC_PKA_ED25519] = (import_fn)s_ed25519_import_spki,
 #endif
+#ifdef LTC_CURVE448
+                                                [LTC_PKA_X448] = (import_fn)x448_import_x509,
+                                                [LTC_PKA_ED448] = (import_fn)ed448_import_x509,
+#endif
 };
 
 int x509_import_spki(const unsigned char *asn1_cert, unsigned long asn1_len, ltc_pka_key *k, ltc_asn1_list **root)

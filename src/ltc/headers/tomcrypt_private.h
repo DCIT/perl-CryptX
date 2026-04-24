@@ -59,6 +59,8 @@ enum ltc_oid_id {
    LTC_OID_EC_PRIMEF,
    LTC_OID_X25519,
    LTC_OID_ED25519,
+   LTC_OID_X448,
+   LTC_OID_ED448,
    LTC_OID_DH,
    LTC_OID_RSA_OAEP,
    LTC_OID_RSA_MGF1,
@@ -712,6 +714,33 @@ int ec25519_crypto_ctx(      unsigned char *out, unsigned long *outlen,
                              unsigned char flag,
                        const unsigned char *ctx, unsigned long  ctxlen);
 #endif /* LTC_CURVE25519 */
+
+#ifdef LTC_CURVE448
+int ec448_export(unsigned char *out, unsigned long *outlen, int which, const curve448_key *key);
+int ec448_import_pkcs8(const unsigned char *in, unsigned long inlen,
+                       const password_ctx *pw_ctx, enum ltc_oid_id id, curve448_key *key);
+int ec448_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key,
+                            enum ltc_oid_id id, curve448_key *key);
+int x448_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key,
+                           curve448_key *key);
+int ec448_keypair_internal(prng_state *prng, int wprng, unsigned char *pk, unsigned char *sk);
+int ec448_sk_to_pk_internal(unsigned char *pk, const unsigned char *sk);
+int ec448_sign_internal(unsigned char *sm, unsigned long long *smlen,
+                        const unsigned char *m, unsigned long long mlen,
+                        const unsigned char *sk, const unsigned char *pk,
+                        const unsigned char *ctx, unsigned long long cs);
+int ec448_verify_internal(int *stat, unsigned char *m, unsigned long long *mlen,
+                          const unsigned char *sm, unsigned long long smlen,
+                          const unsigned char *ctx, unsigned long long cs,
+                          const unsigned char *pk);
+int ec448_prehash_internal(unsigned char *out, const unsigned char *msg, unsigned long long msglen);
+int ec448_crypto_ctx(unsigned char *out, unsigned long *outlen, unsigned char flag,
+                   const unsigned char *ctx, unsigned long ctxlen);
+int ec448_scalarmult_internal(unsigned char *out, const unsigned char *scalar, const unsigned char *point);
+int ec448_scalarmult_base_internal(unsigned char *out, const unsigned char *scalar);
+int ed448_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key,
+                            curve448_key *key);
+#endif /* LTC_CURVE448 */
 
 #ifdef LTC_DER
 

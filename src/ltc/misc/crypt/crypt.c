@@ -384,6 +384,10 @@ const char *crypt_build_settings =
     "   X25519\n"
 #endif
 #endif
+#if defined(LTC_CURVE448)
+    "   Ed448\n"
+    "   X448\n"
+#endif
 #if defined(LTC_PK_MAX_RETRIES)
     "   "NAME_VALUE(LTC_PK_MAX_RETRIES)"\n"
 #endif
