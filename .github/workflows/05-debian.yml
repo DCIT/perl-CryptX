@@ -1,5 +1,7 @@
 name: 05-debian
 
+## https://hub.docker.com/r/debian/eol/
+
 on:
   push:
     branches:
@@ -10,6 +12,55 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+jobs:
+  debian-current:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        codename:
+          - forky
+          - trixie
+          - bookworm
+
+    container:
+      image: debian/${{ matrix.codename }}
+    steps:
+      - name: Show OS release
+        run: cat /etc/os-release || cat /etc/debian_version || echo unknown-release
+      - name: Install dependencies
+        run: |
+          apt-get update -qq
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes \
+            ca-certificates \
+            gcc \
+            git \
+            libc6-dev \
+            libmath-bigint-perl \
+            libjson-perl \
+            make \
+            perl
+      - name: Checkout code using git
+        run: |
+          git clone --branch $(echo ${GITHUB_REF#refs/heads/}) https://github.com/${{ github.repository }}.git
+      - name: perl -V
+        run: perl -V
+      - name: gcc -v
+        run: gcc -v
+      - name: Run build
+        run: |
+          cd $(basename ${{ github.repository }})
+          perl Makefile.PL
+          make -j4
+        env:
+          AUTHOR_MODE: 0
+      - name: Run tests
+        run: |
+          cd $(basename ${{ github.repository }})
+          prove -j 4 -b t
+        env:
+          AUTHOR_MODE: 0
 
 jobs:
   debian-eol-2:
@@ -79,6 +130,7 @@ jobs:
         run: cat /etc/os-release || cat /etc/debian_version || echo unknown-release
       - name: Install dependencies
         run: |
+          printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99archive
           apt-get update -qq
           DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-recommends \
             ca-certificates \
