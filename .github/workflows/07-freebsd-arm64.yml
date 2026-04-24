@@ -25,6 +25,9 @@ jobs:
           run: |
             pkg update
             pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
+            echo XXX
+            ls -l
+            echo YYY
             git clone --single-branch --branch "$(echo ${GITHUB_REF#refs/heads/})" https://github.com/${GITHUB_REPOSITORY}.git
             perl -V
             gcc -v
@@ -43,6 +46,7 @@ jobs:
           release: "14.4"
           arch: "riscv64"
           usesh: true
+          sync: scp
           run: |
             pkg update
             pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
@@ -64,11 +68,12 @@ jobs:
           arch: "x86_64"
           usesh: true
           run: |
+            pkg_add pkgin
             pkgin -y update
             pkgin -y install git gmake gcc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
             git clone --single-branch --branch "$(echo ${GITHUB_REF#refs/heads/})" https://github.com/${GITHUB_REPOSITORY}.git
             perl -V
-            gcc -v
+            egcc -v || gcc -v || cc -v || echo unknown-cc
             cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j4
@@ -84,11 +89,12 @@ jobs:
           arch: "aarch64"
           usesh: true
           run: |
+            pkg_add pkgin
             pkgin -y update
             pkgin -y install git gmake gcc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
             git clone --single-branch --branch "$(echo ${GITHUB_REF#refs/heads/})" https://github.com/${GITHUB_REPOSITORY}.git
             perl -V
-            gcc -v
+            egcc -v || gcc -v || cc -v || echo unknown-cc
             cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j2
@@ -107,7 +113,7 @@ jobs:
             pkg_add git gmake gcc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
             git clone --single-branch --branch "$(echo ${GITHUB_REF#refs/heads/})" https://github.com/${GITHUB_REPOSITORY}.git
             perl -V
-            egcc -v || gcc -v
+            egcc -v || gcc -v || cc -v || echo unknown-cc
             cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j4
@@ -126,7 +132,7 @@ jobs:
             pkg_add git gmake gcc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
             git clone --single-branch --branch "$(echo ${GITHUB_REF#refs/heads/})" https://github.com/${GITHUB_REPOSITORY}.git
             perl -V
-            egcc -v || gcc -v
+            egcc -v || gcc -v || cc -v || echo unknown-cc
             cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j2
