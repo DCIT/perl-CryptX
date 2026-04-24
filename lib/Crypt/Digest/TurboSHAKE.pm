@@ -65,18 +65,26 @@ can be called multiple times to stream arbitrary amounts of output.
 
 =head2 new
 
+I<Since: CryptX-0.100>
+
  $d = Crypt::Digest::TurboSHAKE->new($num);
  # $num ... 128 or 256
 
 =head2 clone
 
+I<Since: CryptX-0.100>
+
  $d2 = $d->clone;
 
 =head2 reset
 
+I<Since: CryptX-0.100>
+
  $d->reset;
 
 =head2 add
+
+I<Since: CryptX-0.100>
 
  $d->add('any data');
  #or
@@ -84,11 +92,15 @@ can be called multiple times to stream arbitrary amounts of output.
 
 =head2 addfile
 
+I<Since: CryptX-0.100>
+
  $d->addfile('filename.dat');
  #or
  $d->addfile(*FILEHANDLE);
 
 =head2 done
+
+I<Since: CryptX-0.100>
 
  $result_raw = $d->done($len);
  # can be called multiple times for streaming output

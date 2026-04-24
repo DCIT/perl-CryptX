@@ -30,12 +30,16 @@ Crypt::Stream::XChaCha - Stream cipher XChaCha20
 
 =head1 DESCRIPTION
 
+I<Since: CryptX-0.100>
+
 Provides an interface to the XChaCha20 stream cipher, an extended-nonce
 variant of ChaCha20 using a 192-bit (24-byte) nonce.
 
 =head1 METHODS
 
 =head2 new
+
+I<Since: CryptX-0.100>
 
  $stream = Crypt::Stream::XChaCha->new($key, $nonce);
  #or
@@ -47,15 +51,21 @@ variant of ChaCha20 using a 192-bit (24-byte) nonce.
 
 =head2 crypt
 
+I<Since: CryptX-0.100>
+
  $ciphertext = $stream->crypt($plaintext);
  #or
  $plaintext = $stream->crypt($ciphertext);
 
 =head2 keystream
 
+I<Since: CryptX-0.100>
+
  $random_bytes = $stream->keystream($length);
 
 =head2 clone
+
+I<Since: CryptX-0.100>
 
  $stream2 = $stream->clone;
 

@@ -40,6 +40,8 @@ makes random nonce generation safe in practice.
 
 =head2 new
 
+I<Since: CryptX-0.100>
+
  $stream = Crypt::Stream::XSalsa20->new($key, $nonce);
  #or
  $stream = Crypt::Stream::XSalsa20->new($key, $nonce, $rounds);
@@ -50,15 +52,21 @@ makes random nonce generation safe in practice.
 
 =head2 crypt
 
+I<Since: CryptX-0.100>
+
  $ciphertext = $stream->crypt($plaintext);
  #or
  $plaintext = $stream->crypt($ciphertext);
 
 =head2 keystream
 
+I<Since: CryptX-0.100>
+
  $random_bytes = $stream->keystream($length);
 
 =head2 clone
+
+I<Since: CryptX-0.100>
 
  $stream2 = $stream->clone;
 

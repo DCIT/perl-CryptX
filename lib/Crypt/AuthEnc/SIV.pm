@@ -60,6 +60,8 @@ You can export selected functions:
 
 =head2 siv_encrypt_authenticate
 
+I<Since: CryptX-0.100>
+
   my $ciphertext = siv_encrypt_authenticate($cipher, $key, $plaintext);
   #or
   my $ciphertext = siv_encrypt_authenticate($cipher, $key, $plaintext, $adata);
@@ -74,6 +76,8 @@ You can export selected functions:
 Returns a string of C<length($plaintext) + 16> bytes (16-byte SIV tag prepended to ciphertext).
 
 =head2 siv_decrypt_verify
+
+I<Since: CryptX-0.100>
 
   my $plaintext = siv_decrypt_verify($cipher, $key, $ciphertext);
   #or

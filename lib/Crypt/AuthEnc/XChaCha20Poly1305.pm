@@ -103,6 +103,8 @@ Crypt::AuthEnc::XChaCha20Poly1305 - Authenticated encryption in XChaCha20-Poly13
 
 =head1 DESCRIPTION
 
+I<Since: CryptX-0.100>
+
 Provides encryption and authentication based on XChaCha20 + Poly1305 using
 the extended 192-bit (24-byte) nonce variant of ChaCha20-Poly1305.
 
@@ -121,6 +123,8 @@ You can export selected functions:
 
 =head2 xchacha20poly1305_encrypt_authenticate
 
+I<Since: CryptX-0.100>
+
  my ($ciphertext, $tag) = xchacha20poly1305_encrypt_authenticate($key, $nonce, $adata, $plaintext);
 
  # $key ..... encryption key (256 bits / 32 bytes)
@@ -129,12 +133,16 @@ You can export selected functions:
 
 =head2 xchacha20poly1305_decrypt_verify
 
+I<Since: CryptX-0.100>
+
  my $plaintext = xchacha20poly1305_decrypt_verify($key, $nonce, $adata, $ciphertext, $tag);
  # on error returns undef
 
 =head1 METHODS
 
 =head2 new
+
+I<Since: CryptX-0.100>
 
  my $ae = Crypt::AuthEnc::XChaCha20Poly1305->new($key, $nonce);
  my $ae = Crypt::AuthEnc::XChaCha20Poly1305->new($key);
@@ -144,6 +152,8 @@ You can export selected functions:
 
 =head2 adata_add
 
+I<Since: CryptX-0.100>
+
 Add B<additional authenticated data>.
 Can be called before the first C<encrypt_add> or C<decrypt_add>;
 
@@ -151,17 +161,25 @@ Can be called before the first C<encrypt_add> or C<decrypt_add>;
 
 =head2 encrypt_add
 
+I<Since: CryptX-0.100>
+
  $ciphertext = $ae->encrypt_add($data);         # can be called multiple times
 
 =head2 encrypt_done
+
+I<Since: CryptX-0.100>
 
  $tag = $ae->encrypt_done();                    # returns $tag value
 
 =head2 decrypt_add
 
+I<Since: CryptX-0.100>
+
  $plaintext = $ae->decrypt_add($ciphertext);    # can be called multiple times
 
 =head2 decrypt_done
+
+I<Since: CryptX-0.100>
 
  my $tag = $ae->decrypt_done;           # returns $tag value
  #or
@@ -169,10 +187,14 @@ Can be called before the first C<encrypt_add> or C<decrypt_add>;
 
 =head2 set_iv
 
+I<Since: CryptX-0.100>
+
  my $ae = Crypt::AuthEnc::XChaCha20Poly1305->new($key)->set_iv($nonce);
  # $nonce ... extended nonce (192 bits / 24 bytes)
 
 =head2 clone
+
+I<Since: CryptX-0.100>
 
  my $ae_new = $ae->clone;
 

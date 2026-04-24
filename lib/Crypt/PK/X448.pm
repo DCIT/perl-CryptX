@@ -130,9 +130,15 @@ Crypt::PK::X448 - Asymmetric cryptography based on X448
  my $public_pem  = $generated->export_key_pem('public');
  my $private_jwk = $generated->export_key_jwk('private');
 
+=head1 DESCRIPTION
+
+I<Since: CryptX-0.100>
+
 =head1 METHODS
 
 =head2 new
+
+I<Since: CryptX-0.100>
 
  my $pk = Crypt::PK::X448->new();
  my $pk = Crypt::PK::X448->new($filename);
@@ -141,9 +147,13 @@ Crypt::PK::X448 - Asymmetric cryptography based on X448
 
 =head2 generate_key
 
+I<Since: CryptX-0.100>
+
  $pk->generate_key;
 
 =head2 import_key
+
+I<Since: CryptX-0.100>
 
 Loads X448 private or public keys from DER, PEM, PKCS#8, SubjectPublicKeyInfo, or JWK.
 
@@ -164,6 +174,8 @@ Loads X448 private or public keys from DER, PEM, PKCS#8, SubjectPublicKeyInfo, o
 
 =head2 import_key_raw
 
+I<Since: CryptX-0.100>
+
 Import raw public/private key bytes.
 
  $pk->import_key_raw($key, 'public');
@@ -173,10 +185,14 @@ The raw key must be exactly 56 bytes long.
 
 =head2 export_key_der
 
+I<Since: CryptX-0.100>
+
  my $der = $pk->export_key_der('private');
  my $der = $pk->export_key_der('public');
 
 =head2 export_key_pem
+
+I<Since: CryptX-0.100>
 
  my $pem = $pk->export_key_pem('private');
  my $pem = $pk->export_key_pem('public');
@@ -184,23 +200,33 @@ The raw key must be exactly 56 bytes long.
 
 =head2 export_key_jwk
 
+I<Since: CryptX-0.100>
+
  my $json = $pk->export_key_jwk('private');
  my $hash = $pk->export_key_jwk('public', 1);
 
 =head2 export_key_raw
+
+I<Since: CryptX-0.100>
 
  my $raw = $pk->export_key_raw('private');
  my $raw = $pk->export_key_raw('public');
 
 =head2 shared_secret
 
+I<Since: CryptX-0.100>
+
  my $shared_secret = $private_key->shared_secret($public_key);
 
 =head2 is_private
 
+I<Since: CryptX-0.100>
+
  my $rv = $pk->is_private;
 
 =head2 key2hash
+
+I<Since: CryptX-0.100>
 
  my $hash = $pk->key2hash;
 

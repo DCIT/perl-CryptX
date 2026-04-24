@@ -121,6 +121,8 @@ C<0>), and C<tag> (integer tag number).
 
 =head2 asn1_decode_der
 
+I<Since: CryptX-0.100>
+
   my $tree = asn1_decode_der($der_bytes);
   my $tree = asn1_decode_der($der_bytes, \%opts);
 
@@ -161,6 +163,8 @@ C<name> key with the mapped value.
 
 =head2 asn1_decode_pem
 
+I<Since: CryptX-0.100>
+
   my $tree = asn1_decode_pem($pem_string);
 
 Convenience wrapper: decodes the PEM envelope first (via L<Crypt::Misc/pem_to_der>),
@@ -169,11 +173,15 @@ DER cannot be parsed.
 
 =head2 asn1_decode_der_file
 
+I<Since: CryptX-0.100>
+
   my $tree = asn1_decode_der_file($filename);
 
 Reads C<$filename> as raw binary (via L<Crypt::Misc/read_rawfile>) and parses it as DER.
 
 =head2 asn1_decode_pem_file
+
+I<Since: CryptX-0.100>
 
   my $tree = asn1_decode_pem_file($filename);
 

@@ -130,9 +130,15 @@ Crypt::PK::Ed448 - Digital signature based on Ed448
  my $sk = Crypt::PK::Ed448->new;
  $sk->import_key_raw(pack("H*", "f82bd65291965de46d87c7447863924e8efb8da36993618a784cd3b69a6d66e61cdc0a48a31e66bd8e81e4d77cedc311aa0f72a322ef3e4fad"), "private");
 
+=head1 DESCRIPTION
+
+I<Since: CryptX-0.100>
+
 =head1 METHODS
 
 =head2 new
+
+I<Since: CryptX-0.100>
 
  my $pk = Crypt::PK::Ed448->new();
  my $pk = Crypt::PK::Ed448->new($filename);
@@ -141,9 +147,13 @@ Crypt::PK::Ed448 - Digital signature based on Ed448
 
 =head2 generate_key
 
+I<Since: CryptX-0.100>
+
  $pk->generate_key;
 
 =head2 import_key
+
+I<Since: CryptX-0.100>
 
 Loads Ed448 private or public keys from DER, PEM, PKCS#8, X.509 certificates, SubjectPublicKeyInfo, or JWK.
 
@@ -164,6 +174,8 @@ Loads Ed448 private or public keys from DER, PEM, PKCS#8, X.509 certificates, Su
 
 =head2 import_key_raw
 
+I<Since: CryptX-0.100>
+
 Import raw public/private key bytes.
 
  $pk->import_key_raw($key, 'public');
@@ -173,10 +185,14 @@ The raw key must be exactly 57 bytes long.
 
 =head2 export_key_der
 
+I<Since: CryptX-0.100>
+
  my $der = $pk->export_key_der('private');
  my $der = $pk->export_key_der('public');
 
 =head2 export_key_pem
+
+I<Since: CryptX-0.100>
 
  my $pem = $pk->export_key_pem('private');
  my $pem = $pk->export_key_pem('public');
@@ -184,27 +200,39 @@ The raw key must be exactly 57 bytes long.
 
 =head2 export_key_jwk
 
+I<Since: CryptX-0.100>
+
  my $json = $pk->export_key_jwk('private');
  my $hash = $pk->export_key_jwk('public', 1);
 
 =head2 export_key_raw
+
+I<Since: CryptX-0.100>
 
  my $raw = $pk->export_key_raw('private');
  my $raw = $pk->export_key_raw('public');
 
 =head2 sign_message
 
+I<Since: CryptX-0.100>
+
  my $signature = $priv->sign_message($message);
 
 =head2 verify_message
+
+I<Since: CryptX-0.100>
 
  my $valid = $pub->verify_message($signature, $message);
 
 =head2 is_private
 
+I<Since: CryptX-0.100>
+
  my $rv = $pk->is_private;
 
 =head2 key2hash
+
+I<Since: CryptX-0.100>
 
  my $hash = $pk->key2hash;
 
