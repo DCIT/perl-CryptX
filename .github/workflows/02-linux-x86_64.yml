@@ -1,4 +1,4 @@
-name: 02-linux-x64
+name: 02-linux-x86_64
 
 on:
   push:
@@ -19,6 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         codename:
+          - trixie
+          - bookworm
           - bullseye
         perl-version:
           - '5.30'
@@ -27,6 +29,7 @@ jobs:
           - '5.36'
           - '5.38'
           - '5.40'
+          - '5.42'
     container:
       image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
     steps:
