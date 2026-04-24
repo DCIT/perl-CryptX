@@ -11,7 +11,7 @@ jobs:
   debianeol:
     runs-on: ubuntu-24.04
     container:
-      image: debian/eol:etch
+      image: debian/eol:lenny
     steps:
       - name: Show OS release
         run: cat /etc/os-release
