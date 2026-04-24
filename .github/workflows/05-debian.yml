@@ -90,7 +90,7 @@ jobs:
             perl
       - name: Checkout code using git
         run: |
-          git-clone "https://github.com/${{ github.repository }}.git"
+          GIT_SSL_NO_VERIFY=true git-clone "https://github.com/${{ github.repository }}.git"
           cd "${{ github.repository }}"
           git-checkout "$(echo ${GITHUB_REF#refs/heads/})"
       - name: perl -V
