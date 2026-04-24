@@ -3,6 +3,8 @@ use warnings;
 
 use Test::More;
 
+plan tests => 17;
+
 use Crypt::AuthEnc::XChaCha20Poly1305 qw(
   xchacha20poly1305_encrypt_authenticate
   xchacha20poly1305_decrypt_verify
@@ -68,5 +70,3 @@ my $tag_hex = "996a94a6808314a5d012d9e4e329aabf";
   like($@, qr/nonce length must be 24 bytes/, 'invalid nonce error');
 
 }
-
-done_testing;

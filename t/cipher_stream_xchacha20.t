@@ -5,6 +5,8 @@ use Test::More;
 use Digest::SHA qw(sha256_hex);
 use Crypt::Stream::XChaCha;
 
+plan tests => 6;
+
 my $key   = pack("H*", "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
 my $nonce = pack("H*", "000102030405060708090a0b0c0d0e0f1011121314151617");
 
@@ -37,5 +39,3 @@ my $nonce = pack("H*", "000102030405060708090a0b0c0d0e0f1011121314151617");
   ok(!$err, 'rejects non-24-byte nonce');
   like($@, qr/xchacha20_setup failed/, 'invalid nonce error');
 }
-
-done_testing;

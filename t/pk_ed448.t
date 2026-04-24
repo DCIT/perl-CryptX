@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 
 plan skip_all => "JSON module not installed" unless eval { require JSON };
+plan tests => 70;
 
 use Crypt::PK::Ed448;
 use Crypt::Misc qw(read_rawfile);
@@ -131,5 +132,3 @@ my $pk_jwk = {
   ok($pk->verify_message($sig, 'message'), 'verify_message');
   ok(!$pk->verify_message($sig, 'message!'), 'verify_message rejects tampered message');
 }
-
-done_testing;

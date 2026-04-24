@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 
 plan skip_all => "JSON module not installed" unless eval { require JSON };
+plan tests => 63;
 
 use Crypt::PK::X448;
 use Crypt::Misc qw(read_rawfile);
@@ -134,5 +135,3 @@ my $pk_jwk = {
   is(length($ss1), 56, 'shared_secret length');
   is(unpack('H*', $ss1), unpack('H*', $ss2), 'shared_secret symmetry');
 }
-
-done_testing;
