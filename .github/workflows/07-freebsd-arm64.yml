@@ -16,7 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run on FreeBSD x86_64
       - uses: vmactions/freebsd-vm@v1
         with:
           release: "14.4"
@@ -39,7 +38,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run on FreeBSD aarch64
       - uses: vmactions/freebsd-vm@v1
         with:
           release: "14.4"
@@ -62,7 +60,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run on FreeBSD riscv64
       - uses: vmactions/freebsd-vm@v1
         with:
           release: "15.0"
@@ -92,7 +89,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run on NetBSD x86_64
       - uses: vmactions/netbsd-vm@v1
         with:
           release: "10.1"
@@ -116,7 +112,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run on NetBSD aarch64
       - uses: vmactions/netbsd-vm@v1
         with:
           release: "10.1"
@@ -140,7 +135,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run on OpenBSD x86_64
       - uses: vmactions/openbsd-vm@v1
         with:
           release: "7.7"
@@ -164,7 +158,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run on OpenBSD aarch64
       - uses: vmactions/openbsd-vm@v1
         with:
           release: "7.7"
