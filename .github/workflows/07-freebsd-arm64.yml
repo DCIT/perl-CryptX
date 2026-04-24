@@ -118,10 +118,12 @@ jobs:
           copyback: false
           run: |
             uname -a
-            pkg_add git gmake gcc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
+            pkg_add curl make clang p5-JSON
             perl -V
             egcc -v || gcc -v || cc -v || echo unknown-cc
-            cpanm -n --installdeps .
+            curl -L https://cpanmin.us/ -o cpanm
+            chmod +x cpanm
+            ./cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j4
             env AUTHOR_MODE=0 prove -b t
