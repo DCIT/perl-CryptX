@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: vmactions/freebsd-vm@v1
         with:
-          release: "14.4"
+          release: "15.0"
           arch: "riscv64"
           usesh: true
           sync: scp
@@ -55,6 +55,8 @@ jobs:
             cc -v || true
             clang -v || true
             curl --version || true
+            pkg update
+            pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
             cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j2
