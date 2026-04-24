@@ -71,6 +71,7 @@ jobs:
           - lenny
           - etch
           - sarge
+          - woody
     container:
       image: debian/eol:${{ matrix.codename }}
     steps:
@@ -78,11 +79,6 @@ jobs:
         run: cat /etc/os-release || cat /etc/debian_version || echo unknown-release
       - name: Install dependencies
         run: |
-          cat > /etc/apt/sources.list <<'EOF'
-          deb http://archive.debian.org/debian ${{ matrix.codename }} main contrib non-free
-          deb http://archive.debian.org/debian-security ${{ matrix.codename }}/updates main contrib non-free
-          EOF
-          printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99archive
           apt-get update -qq
           DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-recommends \
             ca-certificates \
