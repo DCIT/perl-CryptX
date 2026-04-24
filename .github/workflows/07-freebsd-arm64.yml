@@ -30,7 +30,6 @@ jobs:
             pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
             perl -V
             gcc -v
-            cd "$(basename "${GITHUB_REPOSITORY}")"
             cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j4
@@ -49,11 +48,13 @@ jobs:
           copyback: false
           run: |
             uname -a
-            env ASSUME_ALWAYS_YES=YES pkg bootstrap -f
-            pkg update
-            pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
-            perl -V
-            gcc -v
+            pkg --version || true
+            pkg_add --version || true
+            perl -V || true
+            gcc -v || true
+            cc -v || true
+            clang -v || true
+            curl --version || true
             cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j2
@@ -74,12 +75,12 @@ jobs:
             uname -a
             pkg_add pkgin
             pkgin -y update
-            pkgin -y install git gmake gcc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
+            pkgin -y install curl make cc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
             perl -V
             egcc -v || gcc -v || cc -v || echo unknown-cc
             cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
-            make -j4
+            make -j2
             env AUTHOR_MODE=0 prove -b t
 
   netbsd-arm64:
@@ -97,7 +98,7 @@ jobs:
             uname -a
             pkg_add pkgin
             pkgin -y update
-            pkgin -y install git gmake gcc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
+            pkgin -y install curl make cc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
             perl -V
             egcc -v || gcc -v || cc -v || echo unknown-cc
             cpanm -n --installdeps .
@@ -141,10 +142,12 @@ jobs:
           copyback: false
           run: |
             uname -a
-            pkg_add git gmake gcc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
+            pkg_add curl make clang p5-JSON
             perl -V
             egcc -v || gcc -v || cc -v || echo unknown-cc
-            cpanm -n --installdeps .
+            curl -L https://cpanmin.us/ -o cpanm
+            chmod +x cpanm
+            ./cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j2
             env AUTHOR_MODE=0 prove -b t
