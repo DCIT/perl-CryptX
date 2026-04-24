@@ -23,7 +23,7 @@ jobs:
           EOF
           printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99archive
           apt-get update -qq
-          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-recommends \
             ca-certificates \
             gcc \
             git \
