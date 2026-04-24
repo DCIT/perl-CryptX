@@ -59,7 +59,6 @@ jobs:
         env:
           AUTHOR_MODE: 0
 
-jobs:
   debian-eol-2:
     runs-on: ubuntu-24.04
     strategy:
