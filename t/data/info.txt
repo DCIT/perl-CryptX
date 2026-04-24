@@ -63,6 +63,7 @@ openssl x509 -in openssl_sm2_x509.pem -text -noout
 openssl genpkey -algorithm x448 -out openssl_x448_sk.pem
 openssl pkey -in openssl_x448_sk.pem -text
 openssl pkey -in openssl_x448_sk.pem -inform PEM -out openssl_x448_sk.der -outform DER
+openssl pkey -in openssl_x448_sk.pem -inform PEM -out openssl_x448_sk_pw.pem -outform PEM -aes256 -passout pass:secret
 openssl pkey -in openssl_x448_sk.pem -inform PEM -out openssl_x448_pk.der -pubout -outform DER
 openssl pkey -in openssl_x448_sk.pem -inform PEM -out openssl_x448_pk.pem -pubout -outform PEM
 openssl pkcs8 -topk8 -inform PEM -outform DER -in openssl_x448_sk.pem -out openssl_x448_sk.pkcs8 -nocrypt
@@ -75,6 +76,7 @@ openssl pkcs8 -topk8 -inform PEM -outform PEM -in openssl_x448_sk.pem -out opens
 openssl genpkey -algorithm Ed448 -out openssl_ed448_sk.pem
 openssl pkey -in openssl_ed448_sk.pem -text
 openssl pkey -in openssl_ed448_sk.pem -inform PEM -out openssl_ed448_sk.der -outform DER
+openssl pkey -in openssl_ed448_sk.pem -inform PEM -out openssl_ed448_sk_pw.pem -outform PEM -aes256 -passout pass:secret
 openssl pkey -in openssl_ed448_sk.pem -inform PEM -out openssl_ed448_pk.der -pubout -outform DER
 openssl pkey -in openssl_ed448_sk.pem -inform PEM -out openssl_ed448_pk.pem -pubout -outform PEM
 openssl pkcs8 -topk8 -inform PEM -outform DER -in openssl_ed448_sk.pem -out openssl_ed448_sk.pkcs8 -nocrypt

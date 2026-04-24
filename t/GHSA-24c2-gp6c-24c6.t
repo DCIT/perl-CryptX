@@ -5,15 +5,17 @@ use POSIX ();
 use Test::More;
 
 plan skip_all => "fork not available on this platform" unless $Config{d_fork};
-plan tests => 72;
+plan tests => 80;
 
 use IO::Handle;
 use Crypt::PK::DH;
 use Crypt::PK::DSA;
 use Crypt::PK::ECC;
 use Crypt::PK::Ed25519;
+use Crypt::PK::Ed448;
 use Crypt::PK::RSA;
 use Crypt::PK::X25519;
+use Crypt::PK::X448;
 use Crypt::PRNG;
 use Crypt::PRNG::ChaCha20;
 use Crypt::PRNG::Fortuna;
@@ -189,6 +191,28 @@ expect_fork_divergence(
   'Crypt::PK::X25519 generate_key',
   do {
     my $pk = Crypt::PK::X25519->new;
+    sub {
+      $pk->generate_key;
+      return $pk->key2hash->{pub};
+    };
+  },
+);
+
+expect_fork_divergence(
+  'Crypt::PK::Ed448 generate_key',
+  do {
+    my $pk = Crypt::PK::Ed448->new;
+    sub {
+      $pk->generate_key;
+      return $pk->key2hash->{pub};
+    };
+  },
+);
+
+expect_fork_divergence(
+  'Crypt::PK::X448 generate_key',
+  do {
+    my $pk = Crypt::PK::X448->new;
     sub {
       $pk->generate_key;
       return $pk->key2hash->{pub};

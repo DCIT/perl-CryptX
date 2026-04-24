@@ -53,6 +53,8 @@ Crypt::PK::ECC          T_PTROBJ
 Crypt::PK::DH           T_PTROBJ
 Crypt::PK::Ed25519      T_PTROBJ
 Crypt::PK::X25519       T_PTROBJ
+Crypt::PK::Ed448        T_PTROBJ
+Crypt::PK::X448         T_PTROBJ
 
 Math::BigInt::LTM       T_PTROBJ
 

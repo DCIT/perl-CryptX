@@ -558,6 +558,22 @@ typedef struct x25519_struct {          /* used by Crypt::PK::X25519 */
   int initialized;
 } *Crypt__PK__X25519;
 
+typedef struct ed448_struct {           /* used by Crypt::PK::Ed448 */
+  prng_state pstate;
+  int pindex;
+  IV last_pid;
+  curve448_key key;
+  int initialized;
+} *Crypt__PK__Ed448;
+
+typedef struct x448_struct {            /* used by Crypt::PK::X448 */
+  prng_state pstate;
+  int pindex;
+  IV last_pid;
+  curve448_key key;
+  int initialized;
+} *Crypt__PK__X448;
+
 STATIC int cryptx_internal_password_cb_getpw(void **p, unsigned long *l, void *u) {
   dTHX; /* fetch context */
   SV *passwd = u;
@@ -1271,6 +1287,8 @@ INCLUDE: inc/CryptX_PK_DH.xs.inc
 INCLUDE: inc/CryptX_PK_ECC.xs.inc
 INCLUDE: inc/CryptX_PK_Ed25519.xs.inc
 INCLUDE: inc/CryptX_PK_X25519.xs.inc
+INCLUDE: inc/CryptX_PK_Ed448.xs.inc
+INCLUDE: inc/CryptX_PK_X448.xs.inc
 
 INCLUDE: inc/CryptX_KeyDerivation.xs.inc
 

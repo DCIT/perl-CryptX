@@ -200,7 +200,7 @@ or the wrong key/nonce was used.
 
 - Public key cryptography
 
-    [Crypt::PK::RSA](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ARSA), [Crypt::PK::DSA](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ADSA), [Crypt::PK::ECC](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AECC), [Crypt::PK::DH](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ADH), [Crypt::PK::Ed25519](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AEd25519), [Crypt::PK::X25519](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AX25519)
+    [Crypt::PK::RSA](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ARSA), [Crypt::PK::DSA](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ADSA), [Crypt::PK::ECC](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AECC), [Crypt::PK::DH](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ADH), [Crypt::PK::Ed25519](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AEd25519), [Crypt::PK::X25519](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AX25519), [Crypt::PK::Ed448](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AEd448), [Crypt::PK::X448](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AX448)
 
 - Cryptographically secure random number generators - see [Crypt::PRNG](https://metacpan.org/pod/Crypt%3A%3APRNG) and related modules
 
