@@ -1,4 +1,4 @@
-name: 05-debian7
+name: 05-debian
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
   debian7:
     runs-on: ubuntu-24.04
     container:
-      image: debian/eol:wheezy
+      image: debian/eol:potato
     steps:
       - name: Show OS release
         run: cat /etc/os-release
