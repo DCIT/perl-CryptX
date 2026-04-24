@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 4;
-use Digest::SHA qw(sha256_hex);
+use Crypt::Digest::SHA256 qw(sha256_hex);
 use Crypt::Stream::XSalsa20;
 
 # Test vectors from libtomcrypt xsalsa20_test.c

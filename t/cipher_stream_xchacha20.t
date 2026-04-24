@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Digest::SHA qw(sha256_hex);
+use Crypt::Digest::SHA256 qw(sha256_hex);
 use Crypt::Stream::XChaCha;
 
 plan tests => 6;
