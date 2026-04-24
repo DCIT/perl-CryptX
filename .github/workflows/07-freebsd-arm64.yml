@@ -12,12 +12,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  freebsd-arm64:
+  freebsd-x86_64:
     runs-on: ubuntu-latest
     steps:
+      - name: Run on FreeBSD x86_64
       - uses: actions/checkout@v4
-      - name: Run on FreeBSD arm64
-        uses: vmactions/freebsd-vm@v1
+      - uses: vmactions/freebsd-vm@v1
+        with:
+          release: "14.4"
+          arch: "x86_64"
+          usesh: true
+          sync: scp
+          copyback: false
+          run: |
+            uname -a
+            pkg update
+            pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
+            perl -V
+            gcc -v
+            cpanm -n --installdeps .
+            env AUTHOR_MODE=0 perl Makefile.PL
+            make -j4
+            env AUTHOR_MODE=0 prove -b t
+
+  freebsd-aarch64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run on FreeBSD aarch64
+      - uses: actions/checkout@v4
+      - uses: vmactions/freebsd-vm@v1
         with:
           release: "14.4"
           arch: "aarch64"
@@ -38,6 +61,7 @@ jobs:
   freebsd-riscv64:
     runs-on: ubuntu-latest
     steps:
+      - name: Run on FreeBSD riscv64
       - uses: actions/checkout@v4
       - uses: vmactions/freebsd-vm@v1
         with:
@@ -48,6 +72,10 @@ jobs:
           copyback: false
           run: |
             uname -a
+            export ASSUME_ALWAYS_YES=yes
+            pkg -N >/dev/null 2>&1 || pkg bootstrap -f
+            pkg update
+            pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
             pkg --version || true
             pkg_add --version || true
             perl -V || true
@@ -55,16 +83,15 @@ jobs:
             cc -v || true
             clang -v || true
             curl --version || true
-            pkg update
-            pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
             cpanm -n --installdeps .
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j2
             env AUTHOR_MODE=0 prove -b t
 
-  netbsd-x64:
+  netbsd-x86_64:
     runs-on: ubuntu-latest
     steps:
+      - name: Run on NetBSD x86_64
       - uses: actions/checkout@v4
       - uses: vmactions/netbsd-vm@v1
         with:
@@ -85,9 +112,10 @@ jobs:
             make -j2
             env AUTHOR_MODE=0 prove -b t
 
-  netbsd-arm64:
+  netbsd-aarch64:
     runs-on: ubuntu-latest
     steps:
+      - name: Run on NetBSD aarch64
       - uses: actions/checkout@v4
       - uses: vmactions/netbsd-vm@v1
         with:
@@ -108,9 +136,10 @@ jobs:
             make -j2
             env AUTHOR_MODE=0 prove -b t
 
-  openbsd-x64:
+  openbsd-x86_64:
     runs-on: ubuntu-latest
     steps:
+      - name: Run on OpenBSD x86_64
       - uses: actions/checkout@v4
       - uses: vmactions/openbsd-vm@v1
         with:
@@ -131,9 +160,10 @@ jobs:
             make -j4
             env AUTHOR_MODE=0 prove -b t
 
-  openbsd-arm64:
+  openbsd-aarch64:
     runs-on: ubuntu-latest
     steps:
+      - name: Run on OpenBSD aarch64
       - uses: actions/checkout@v4
       - uses: vmactions/openbsd-vm@v1
         with:
