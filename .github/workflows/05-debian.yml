@@ -3,23 +3,47 @@ name: 05-debian
 on:
   push:
     branches:
-      - 'master'
+      - '*'
     tags-ignore:
       - '*'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  debianeol:
+  debian-eol:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        codename:
+          - bullseye
+          - buster
+          - stretch
+          - jessie
+          - wheezy
+          - squeeze
+          - lenny
+          - etch
+          - sarge
+          - woody
+          - potato
+          - slink
+          - hamm
+          - bo
+          - rex
+          - buzz
     container:
-      image: debian/eol:woody
+      image: debian/eol:${{ matrix.codename }}
     steps:
       - name: Show OS release
-        run: cat /etc/os-release || echo no-os-release
+        run: cat /etc/os-release || cat /etc/debian_version || echo unknown-release
       - name: Install dependencies
         run: |
           cat > /etc/apt/sources.list <<'EOF'
-          deb http://archive.debian.org/debian wheezy main
-          deb http://archive.debian.org/debian-security wheezy/updates main
+          deb http://archive.debian.org/debian ${{ matrix.codename }} main
+          deb http://archive.debian.org/debian-security ${{ matrix.codename }}/updates main
           EOF
           printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99archive
           apt-get update -qq
@@ -49,6 +73,6 @@ jobs:
       - name: Run tests
         run: |
           cd $(basename ${{ github.repository }})
-          prove -b t
+          prove -j 4 -b t
         env:
           AUTHOR_MODE: 0

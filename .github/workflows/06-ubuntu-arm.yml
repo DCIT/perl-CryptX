@@ -3,9 +3,13 @@ name: 06-ubuntu-arm
 on:
   push:
     branches:
-      - 'master'
+      - '*'
     tags-ignore:
       - '*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   ubuntu-arm:

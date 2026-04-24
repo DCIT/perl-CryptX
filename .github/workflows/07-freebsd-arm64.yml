@@ -3,9 +3,13 @@ name: 07-freebsd-arm64
 on:
   push:
     branches:
-      - 'master'
+      - '*'
     tags-ignore:
       - '*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   freebsd-arm64:
