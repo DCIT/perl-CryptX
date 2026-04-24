@@ -41,7 +41,7 @@ jobs:
             perl
       - name: Checkout code using git
         run: |
-          git clone --branch $(echo ${GITHUB_REF#refs/heads/}) https://github.com/${{ github.repository }}.git
+          git clone --single-branch --branch $(echo ${GITHUB_REF#refs/heads/}) https://github.com/${{ github.repository }}.git
       - name: perl -V
         run: perl -V
       - name: gcc -v
@@ -90,7 +90,7 @@ jobs:
             perl
       - name: Checkout code using git
         run: |
-          git clone --branch $(echo ${GITHUB_REF#refs/heads/}) https://github.com/${{ github.repository }}.git
+          git clone --single-branch --branch $(echo ${GITHUB_REF#refs/heads/}) https://github.com/${{ github.repository }}.git
       - name: perl -V
         run: perl -V
       - name: gcc -v
