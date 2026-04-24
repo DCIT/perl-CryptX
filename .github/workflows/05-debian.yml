@@ -34,6 +34,7 @@ jobs:
             gcc \
             git \
             libc6-dev \
+            libcrypt-dev \
             libmath-bigint-perl \
             libjson-perl \
             make \
@@ -59,7 +60,7 @@ jobs:
         env:
           AUTHOR_MODE: 0
 
-  debian-eol-2:
+  debian-eol:
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -90,59 +91,6 @@ jobs:
       - name: Checkout code using git
         run: |
           git clone --branch $(echo ${GITHUB_REF#refs/heads/}) https://github.com/${{ github.repository }}.git
-      - name: perl -V
-        run: perl -V
-      - name: gcc -v
-        run: gcc -v
-      - name: Run build
-        run: |
-          cd $(basename ${{ github.repository }})
-          perl Makefile.PL
-          make -j4
-        env:
-          AUTHOR_MODE: 0
-      - name: Run tests
-        run: |
-          cd $(basename ${{ github.repository }})
-          prove -j 4 -b t
-        env:
-          AUTHOR_MODE: 0
-
-  debian-eol-1:
-    runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix:
-        codename:
-          - squeeze
-          - lenny
-          - etch
-          - sarge
-          - woody
-    container:
-      image: debian/eol:${{ matrix.codename }}
-    steps:
-      - name: Show OS release
-        run: cat /etc/os-release || cat /etc/debian_version || echo unknown-release
-      - name: Install dependencies
-        run: |
-          printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99archive
-          apt-get update -qq
-          DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes \
-            ca-certificates \
-            curl \
-            gcc \
-            git-core \
-            libc6 libc6-dev \
-            libmath-bigint-perl \
-            make \
-            perl
-          update-ca-certificates
-      - name: Checkout code using git
-        run: |
-          GIT_SSL_NO_VERIFY=1 git-clone "https://github.com/${{ github.repository }}.git"
-          cd "${{ github.repository }}"
-          git-checkout "$(echo ${GITHUB_REF#refs/heads/})"
       - name: perl -V
         run: perl -V
       - name: gcc -v
