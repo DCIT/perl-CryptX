@@ -8,10 +8,10 @@ on:
       - '*'
 
 jobs:
-  debian7:
+  debianeol:
     runs-on: ubuntu-24.04
     container:
-      image: debian/eol:potato
+      image: debian/eol:etch
     steps:
       - name: Show OS release
         run: cat /etc/os-release
