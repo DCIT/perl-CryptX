@@ -79,8 +79,9 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update -qq
-          DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes \
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-recommends \
             ca-certificates \
+            curl \
             gcc \
             git-core \
             libc6 libc6-dev \
