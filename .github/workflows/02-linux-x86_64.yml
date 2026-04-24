@@ -13,6 +13,73 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  linux-gcc14:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        codename:
+          - trixie
+        perl-version:
+          - '5.40'
+          - '5.42'
+    container:
+      image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: perl -V
+        run: perl -V
+      - name: gcc -v
+        run: gcc -v
+      - name: Install dependencies
+        run: |
+          cpanm -n --installdeps .
+      - name: Run build
+        run: |
+          perl Makefile.PL
+          make -j4
+        env:
+          AUTHOR_MODE: 1
+      - name: Run tests
+        run: prove -b t
+        env:
+          AUTHOR_MODE: 1
+
+jobs:
+  linux-gcc12:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        codename:
+          - bookworm
+        perl-version:
+          - '5.36'
+          - '5.38'
+          - '5.40'
+          - '5.42'
+    container:
+      image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: perl -V
+        run: perl -V
+      - name: gcc -v
+        run: gcc -v
+      - name: Install dependencies
+        run: |
+          cpanm -n --installdeps .
+      - name: Run build
+        run: |
+          perl Makefile.PL
+          make -j4
+        env:
+          AUTHOR_MODE: 1
+      - name: Run tests
+        run: prove -b t
+        env:
+          AUTHOR_MODE: 1
+
   linux-gcc10:
     runs-on: ubuntu-latest
     strategy:
@@ -77,6 +144,7 @@ jobs:
           - '5.36'
           - '5.38'
           - '5.40'
+          - '5.42'
     container:
       image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
     steps:
