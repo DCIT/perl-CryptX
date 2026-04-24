@@ -33,3 +33,101 @@ jobs:
             env AUTHOR_MODE=0 perl Makefile.PL
             make -j4
             env AUTHOR_MODE=0 prove -b t
+
+  freebsd-riscv64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/freebsd-vm@v1
+        with:
+          release: "14.4"
+          arch: "riscv64"
+          usesh: true
+          run: |
+            pkg update
+            pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
+            git clone --single-branch --branch "$(echo ${GITHUB_REF#refs/heads/})" https://github.com/${GITHUB_REPOSITORY}.git
+            perl -V
+            gcc -v
+            cpanm -n --installdeps .
+            env AUTHOR_MODE=0 perl Makefile.PL
+            make -j2
+            env AUTHOR_MODE=0 prove -b t
+
+  netbsd-x64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/netbsd-vm@v1
+        with:
+          release: "10.1"
+          arch: "x86_64"
+          usesh: true
+          run: |
+            pkgin -y update
+            pkgin -y install git gmake gcc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
+            git clone --single-branch --branch "$(echo ${GITHUB_REF#refs/heads/})" https://github.com/${GITHUB_REPOSITORY}.git
+            perl -V
+            gcc -v
+            cpanm -n --installdeps .
+            env AUTHOR_MODE=0 perl Makefile.PL
+            make -j4
+            env AUTHOR_MODE=0 prove -b t
+
+  netbsd-arm64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/netbsd-vm@v1
+        with:
+          release: "10.1"
+          arch: "aarch64"
+          usesh: true
+          run: |
+            pkgin -y update
+            pkgin -y install git gmake gcc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
+            git clone --single-branch --branch "$(echo ${GITHUB_REF#refs/heads/})" https://github.com/${GITHUB_REPOSITORY}.git
+            perl -V
+            gcc -v
+            cpanm -n --installdeps .
+            env AUTHOR_MODE=0 perl Makefile.PL
+            make -j2
+            env AUTHOR_MODE=0 prove -b t
+
+  openbsd-x64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/openbsd-vm@v1
+        with:
+          release: "7.7"
+          arch: "x86_64"
+          usesh: true
+          run: |
+            pkg_add git gmake gcc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
+            git clone --single-branch --branch "$(echo ${GITHUB_REF#refs/heads/})" https://github.com/${GITHUB_REPOSITORY}.git
+            perl -V
+            egcc -v || gcc -v
+            cpanm -n --installdeps .
+            env AUTHOR_MODE=0 perl Makefile.PL
+            make -j4
+            env AUTHOR_MODE=0 prove -b t
+
+  openbsd-arm64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/openbsd-vm@v1
+        with:
+          release: "7.7"
+          arch: "aarch64"
+          usesh: true
+          run: |
+            pkg_add git gmake gcc perl p5-App-cpanminus p5-Math-BigInt p5-JSON
+            git clone --single-branch --branch "$(echo ${GITHUB_REF#refs/heads/})" https://github.com/${GITHUB_REPOSITORY}.git
+            perl -V
+            egcc -v || gcc -v
+            cpanm -n --installdeps .
+            env AUTHOR_MODE=0 perl Makefile.PL
+            make -j2
+            env AUTHOR_MODE=0 prove -b t
