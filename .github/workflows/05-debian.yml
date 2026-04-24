@@ -1,7 +1,5 @@
 name: 05-debian
 
-## https://hub.docker.com/r/debian/eol/
-
 on:
   push:
     branches:
@@ -23,7 +21,6 @@ jobs:
           - forky
           - trixie
           - bookworm
-
     container:
       image: debian/${{ matrix.codename }}
     steps:
