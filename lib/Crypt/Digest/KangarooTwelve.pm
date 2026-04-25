@@ -2,7 +2,7 @@ package Crypt::Digest::KangarooTwelve;
 
 use strict;
 use warnings;
-our $VERSION = '0.087_004';
+our $VERSION = '0.088_001';
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
