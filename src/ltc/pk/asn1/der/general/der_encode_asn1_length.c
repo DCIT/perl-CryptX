@@ -29,7 +29,7 @@ int der_encode_asn1_length(unsigned long len, unsigned char *out, unsigned long 
       x >>= 8;
    }
    if (y == 0) {
-      return CRYPT_PK_ASN1_ERROR;
+      y = 1; /* len == 0 is valid: short form, single byte 0x00 */
    }
 
    if (out == NULL) {

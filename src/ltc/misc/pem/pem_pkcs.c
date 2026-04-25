@@ -115,6 +115,7 @@ typedef int (*import_fn)(const unsigned char *, unsigned long, void*);
 static const import_fn s_import_openssl_fns[LTC_PKA_NUM] = {
 #ifdef LTC_MRSA
                                                 [LTC_PKA_RSA] = (import_fn)rsa_import,
+                                                [LTC_PKA_RSA_PSS] = (import_fn)rsa_import,
 #endif
 #ifdef LTC_MDSA
                                                 [LTC_PKA_DSA] = (import_fn)dsa_import,
