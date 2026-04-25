@@ -45,10 +45,14 @@ Crypt::Digest::TurboSHAKE - XOF (extendable output) hash functions TurboSHAKE128
 
    use Crypt::Digest::TurboSHAKE;
 
-   $d = Crypt::Digest::TurboSHAKE->new(128);    # TurboSHAKE128
+   my $d = Crypt::Digest::TurboSHAKE->new(128); # TurboSHAKE128
    $d->add('any data');
-   $d->addfile('filename.dat');
-   $result = $d->done(32);                       # 32 bytes of output
+   my $result = $d->done(32);                   # 32 bytes of output
+
+   # or absorb input from a file instead
+   my $file_d = Crypt::Digest::TurboSHAKE->new(128);
+   $file_d->addfile('filename.dat');
+   my $file_result = $file_d->done(32);
 
 =head1 DESCRIPTION
 
@@ -61,20 +65,29 @@ TurboSHAKE is a faster variant of SHAKE based on the reduced-round KeccakP-1600
 permutation. Like SHAKE, it is an XOF (extendable output function): C<done()>
 can be called multiple times to stream arbitrary amounts of output.
 
+After the first C<done()>, treat the object as being in output mode:
+do not call C<add()> again on that state. Use C<reset()> or a new object
+to start hashing a new message.
+
 =head1 METHODS
+
+Unless noted otherwise, assume C<$d> is an existing TurboSHAKE object created
+via C<new>, for example:
+
+ my $d = Crypt::Digest::TurboSHAKE->new(128);
 
 =head2 new
 
 I<Since: CryptX-0.100>
 
- $d = Crypt::Digest::TurboSHAKE->new($num);
- # $num ... 128 or 256
+ my $d = Crypt::Digest::TurboSHAKE->new($num);
+ # $num ... [integer] 128 or 256 (selects TurboSHAKE128 or TurboSHAKE256)
 
 =head2 clone
 
 I<Since: CryptX-0.100>
 
- $d2 = $d->clone;
+ my $d2 = $d->clone;
 
 =head2 reset
 
@@ -86,6 +99,8 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
+Appends data to the message. Returns the object itself (for chaining).
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
@@ -94,16 +109,28 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
+Reads the file content and appends it to the message. Returns the object itself (for chaining).
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 done
 
 I<Since: CryptX-0.100>
 
- $result_raw = $d->done($len);
+Returns C<$len> bytes of output as a binary string. Can be called repeatedly
+to stream an unlimited amount of output from the same absorbed input. The
+C<$len> argument is required and must be a positive integer.
+
+After the first C<done()> call the object is in output mode. Calling
+C<add()> in this state is not permitted; use C<reset()> or create a new
+object to hash a different message.
+
+ my $result_raw = $d->done($len);
  # can be called multiple times for streaming output
+ # after the first done(), call reset() before hashing a new message
 
 =head1 SEE ALSO
 

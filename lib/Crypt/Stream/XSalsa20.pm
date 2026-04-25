@@ -19,14 +19,14 @@ Crypt::Stream::XSalsa20 - Stream cipher XSalsa20
    use Crypt::Stream::XSalsa20;
 
    # encrypt
-   $key    = "12345678901234567890123456789012";  # 32 bytes
-   $nonce  = "123456789012345678901234";          # 24 bytes
-   $stream = Crypt::Stream::XSalsa20->new($key, $nonce);
-   $ct = $stream->crypt("plain message");
+   my $key    = "12345678901234567890123456789012";  # 32 bytes
+   my $nonce  = "123456789012345678901234";          # 24 bytes
+   my $enc_stream = Crypt::Stream::XSalsa20->new($key, $nonce);
+   my $ct = $enc_stream->crypt("plain message");
 
    # decrypt
-   $stream = Crypt::Stream::XSalsa20->new($key, $nonce);
-   $pt = $stream->crypt($ct);
+   my $dec_stream = Crypt::Stream::XSalsa20->new($key, $nonce);
+   my $pt = $dec_stream->crypt($ct);
 
 =head1 DESCRIPTION
 
@@ -38,43 +38,57 @@ makes random nonce generation safe in practice.
 
 =head1 METHODS
 
+Unless noted otherwise, assume C<$stream> is an existing stream object created
+via C<new>, for example:
+
+ my $stream = Crypt::Stream::XSalsa20->new($key, $nonce);
+
 =head2 new
 
 I<Since: CryptX-0.100>
 
- $stream = Crypt::Stream::XSalsa20->new($key, $nonce);
+ my $stream = Crypt::Stream::XSalsa20->new($key, $nonce);
  #or
- $stream = Crypt::Stream::XSalsa20->new($key, $nonce, $rounds);
+ my $stream = Crypt::Stream::XSalsa20->new($key, $nonce, $rounds);
 
- # $key    .. 32 bytes
- # $nonce  .. 24 bytes
- # $rounds .. optional, rounds (DEFAULT: 20)
+ # $key    .. [binary string] 32 bytes
+ # $nonce  .. [binary string] 24 bytes
+ # $rounds .. [integer] optional, rounds (DEFAULT: 20)
 
 =head2 crypt
 
 I<Since: CryptX-0.100>
 
- $ciphertext = $stream->crypt($plaintext);
+Encrypts or decrypts data. The output has the same length as the input.
+Returns a binary string (raw bytes).
+
+ my $ciphertext = $stream->crypt($plaintext);
  #or
- $plaintext = $stream->crypt($ciphertext);
+ my $plaintext = $stream->crypt($ciphertext);
 
 =head2 keystream
 
 I<Since: CryptX-0.100>
 
- $random_bytes = $stream->keystream($length);
+Returns C<$length> bytes of raw keystream as a binary string.
+
+ my $random_bytes = $stream->keystream($length);
 
 =head2 clone
 
 I<Since: CryptX-0.100>
 
- $stream2 = $stream->clone;
+Returns a copy of the stream cipher object in its current state.
+
+ my $stream2 = $stream->clone;
 
 =head1 SEE ALSO
 
 =over
 
 =item * L<Crypt::Stream::Salsa20>, L<Crypt::Stream::ChaCha>
+
+=item * L<https://cr.yp.to/snuffle/xsalsa-20110204.pdf>
 
 =back
 

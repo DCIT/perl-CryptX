@@ -115,9 +115,11 @@ Crypt::PK::X448 - Asymmetric cryptography based on X448
 
  use Crypt::PK::X448;
 
- my $alice = Crypt::PK::X448->new('Alice_priv_x448.der');
- my $bob   = Crypt::PK::X448->new('Bob_pub_x448.der');
- my $shared_secret = $alice->shared_secret($bob);
+ my $alice = Crypt::PK::X448->new->generate_key;
+ my $bob = Crypt::PK::X448->new->generate_key;
+ my $alice_secret = $alice->shared_secret($bob);
+ my $bob_secret = $bob->shared_secret($alice);
+ die "ERROR" unless $alice_secret eq $bob_secret;
 
  my $pk = Crypt::PK::X448->new;
  $pk->import_key_raw(pack("H*", "cf807ab0fc3efa03108469f29e499db2eefefeb12544d8d4e711f187385aaf31b4f38c8f84a3dd9e43da309fd410c3816a50e644b5500c05"), "public");
@@ -140,14 +142,23 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
- my $pk = Crypt::PK::X448->new();
- my $pk = Crypt::PK::X448->new($filename);
- my $pk = Crypt::PK::X448->new(\$buffer);
- my $pk = Crypt::PK::X448->new($filename, $password);
+ my $source = Crypt::PK::X448->new();
+ $source->generate_key;
+
+ my $public_der = $source->export_key_der('public');
+ my $pub = Crypt::PK::X448->new(\$public_der);
+
+ my $private_pem = $source->export_key_pem('private', 'secret', 'AES-256-CBC');
+ my $priv = Crypt::PK::X448->new(\$private_pem, 'secret');
+
+Passing C<$filename> or C<\$buffer> to C<new> is equivalent: both forms
+immediately import the key material into the new object.
 
 =head2 generate_key
 
 I<Since: CryptX-0.100>
+
+Returns the object itself (for chaining).
 
  $pk->generate_key;
 
@@ -157,9 +168,15 @@ I<Since: CryptX-0.100>
 
 Loads X448 private or public keys from DER, PEM, PKCS#8, SubjectPublicKeyInfo, or JWK.
 
- $pk->import_key($filename);
- $pk->import_key(\$buffer);
- $pk->import_key($filename, $password);
+ my $source = Crypt::PK::X448->new();
+ $source->generate_key;
+
+ my $public_der = $source->export_key_der('public');
+ my $pub = Crypt::PK::X448->new();
+ $pub->import_key(\$public_der);
+ my $private_pem = $source->export_key_pem('private', 'secret', 'AES-256-CBC');
+ my $priv = Crypt::PK::X448->new();
+ $priv->import_key(\$private_pem, 'secret');
  $pk->import_key({
    curve => "x448",
    pub   => "CF807AB0FC3EFA03108469F29E499DB2EEFEFEB12544D8D4E711F187385AAF31B4F38C8F84A3DD9E43DA309FD410C3816A50E644B5500C05",
@@ -171,6 +188,8 @@ Loads X448 private or public keys from DER, PEM, PKCS#8, SubjectPublicKeyInfo, o
    d   => "ENQYsRFAGVarxaksL7uEBtHWRrqTD976IQjv5o8gAJc3VaqVK-AY9kCUfAUTX7-ZJevU2oKNhuw",
    x   => "z4B6sPw--gMQhGnynkmdsu7-_rElRNjU5xHxhzharzG084yPhKPdnkPaMJ_UEMOBalDmRLVQDAU",
  });
+
+The same method also accepts filenames instead of buffers.
 
 =head2 import_key_raw
 
@@ -187,12 +206,16 @@ The raw key must be exactly 56 bytes long.
 
 I<Since: CryptX-0.100>
 
+Returns the key as a binary DER-encoded string.
+
  my $der = $pk->export_key_der('private');
  my $der = $pk->export_key_der('public');
 
 =head2 export_key_pem
 
 I<Since: CryptX-0.100>
+
+Returns the key as a PEM-encoded string (ASCII).
 
  my $pem = $pk->export_key_pem('private');
  my $pem = $pk->export_key_pem('public');
@@ -202,6 +225,8 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
+Returns a JSON string, or a hashref if the optional second argument is true.
+
  my $json = $pk->export_key_jwk('private');
  my $hash = $pk->export_key_jwk('public', 1);
 
@@ -209,12 +234,16 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
+Returns the raw key as a binary string.
+
  my $raw = $pk->export_key_raw('private');
  my $raw = $pk->export_key_raw('public');
 
 =head2 shared_secret
 
 I<Since: CryptX-0.100>
+
+Returns the shared secret as a binary string (raw bytes).
 
  my $shared_secret = $private_key->shared_secret($public_key);
 
@@ -228,6 +257,8 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
+Returns a hashref with the key components, or C<undef> if no key is loaded.
+
  my $hash = $pk->key2hash;
 
 Returns a hash like:
@@ -237,6 +268,24 @@ Returns a hash like:
    pub   => "CF807AB0FC3EFA03108469F29E499DB2EEFEFEB12544D8D4E711F187385AAF31B4F38C8F84A3DD9E43DA309FD410C3816A50E644B5500C05",
    priv  => "10D418B111401956ABC5A92C2FBB8406D1D646BA930FDEFA2108EFE68F2000973755AA952BE018F640947C05135FBF9925EBD4DA828D86EC",
  }
+
+=head1 OpenSSL interoperability
+
+ # Generate a key with OpenSSL
+ # openssl genpkey -algorithm x448 -out x448_priv.pem
+ # openssl pkey -in x448_priv.pem -pubout -out x448_pub.pem
+
+ # Load the OpenSSL-generated key in CryptX
+ use Crypt::PK::X448;
+ my $alice = Crypt::PK::X448->new("x448_priv.pem");
+ my $bob_pub = Crypt::PK::X448->new("bob_x448_pub.pem");
+
+ # Derive shared secret
+ my $shared_secret = $alice->shared_secret($bob_pub);
+
+ # Export CryptX key for OpenSSL
+ my $pem = $alice->export_key_pem('private');
+ # then: openssl pkey -in priv.pem -text -noout
 
 =head1 SEE ALSO
 

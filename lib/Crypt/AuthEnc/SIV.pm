@@ -38,7 +38,7 @@ Crypt::AuthEnc::SIV - Authenticated encryption in SIV mode
 I<Since: CryptX-0.100>
 
 SIV (Synthetic IV) is a deterministic authenticated encryption scheme defined in
-L<RFC 5297|https://tools.ietf.org/html/rfc5297>. Unlike nonce-based modes, SIV derives
+L<RFC 5297|https://www.rfc-editor.org/rfc/rfc5297>. Unlike nonce-based modes, SIV derives
 the authentication tag (the IV) synthetically from the key, associated data, and plaintext,
 making it nonce-misuse resistant.
 
@@ -47,6 +47,8 @@ The output of C<siv_encrypt_authenticate> is the 16-byte SIV tag prepended to th
 
 B<BEWARE:> SIV requires a key that is twice the length of the underlying cipher key
 (e.g. 256 bits for AES-128-SIV, 512 bits for AES-256-SIV).
+
+If you pass associated data as an arrayref, at most 126 components are accepted.
 
 =head1 EXPORT
 
@@ -68,10 +70,10 @@ I<Since: CryptX-0.100>
   #or
   my $ciphertext = siv_encrypt_authenticate($cipher, $key, $plaintext, [$ad1, $ad2, ...]);
 
-  # $cipher    ... cipher name (e.g. 'AES')
-  # $key       ... key (must be double the cipher's standard key length)
-  # $plaintext ... plaintext to encrypt
-  # $adata     ... optional associated data: a scalar string or an arrayref of strings
+  # $cipher    ... [string] cipher name (e.g. 'AES')
+  # $key       ... [binary string] key (must be double the cipher's standard key length)
+  # $plaintext ... [binary string] plaintext to encrypt
+  # $adata     ... [binary string | arrayref] optional associated data: a scalar string or an arrayref of up to 126 strings
 
 Returns a string of C<length($plaintext) + 16> bytes (16-byte SIV tag prepended to ciphertext).
 
@@ -85,12 +87,14 @@ I<Since: CryptX-0.100>
   #or
   my $plaintext = siv_decrypt_verify($cipher, $key, $ciphertext, [$ad1, $ad2, ...]);
 
-  # $cipher     ... cipher name (e.g. 'AES')
-  # $key        ... key (must be double the cipher's standard key length)
-  # $ciphertext ... ciphertext with 16-byte SIV tag prepended
-  # $adata      ... optional associated data: a scalar string or an arrayref of strings
+  # $cipher     ... [string] cipher name (e.g. 'AES')
+  # $key        ... [binary string] key (must be double the cipher's standard key length)
+  # $ciphertext ... [binary string] ciphertext with 16-byte SIV tag prepended
+  # $adata      ... [binary string | arrayref] optional associated data: a scalar string or an arrayref of up to 126 strings
 
 Returns the plaintext on success, or C<undef> if authentication fails.
+Malformed ciphertext shorter than 16 bytes croaks because it cannot contain the required
+prepended SIV tag.
 
 =head1 SEE ALSO
 
@@ -98,7 +102,7 @@ Returns the plaintext on success, or C<undef> if authentication fails.
 
 =item * L<CryptX|CryptX>, L<Crypt::AuthEnc::EAX|Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM|Crypt::AuthEnc::GCM>
 
-=item * L<RFC 5297|https://tools.ietf.org/html/rfc5297>
+=item * L<RFC 5297|https://www.rfc-editor.org/rfc/rfc5297>
 
 =back
 

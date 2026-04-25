@@ -45,10 +45,16 @@ Crypt::Digest::KangarooTwelve - XOF (extendable output) hash function KangarooTw
 
    use Crypt::Digest::KangarooTwelve;
 
-   $d = Crypt::Digest::KangarooTwelve->new(128);  # 128-bit security
+   my $d = Crypt::Digest::KangarooTwelve->new(128); # 128-bit security
    $d->add('any data');
-   $d->customization('optional context string');   # optional, before done()
-   $result = $d->done(32);                         # 32 bytes of output
+   $d->customization('optional context string');
+   my $result = $d->done(32);                      # 32 bytes of output
+
+   # or absorb input from a file instead
+   my $file_d = Crypt::Digest::KangarooTwelve->new(128);
+   $file_d->addfile('filename.dat');
+   $file_d->customization('optional context string');
+   my $file_result = $file_d->done(32);
 
 =head1 DESCRIPTION
 
@@ -64,21 +70,29 @@ times to stream arbitrary amounts of output.
 
 B<Order of operations>: C<add()> must be called before C<customization()>;
 C<customization()> must be called before C<done()>.
+After the first C<done()>, treat the object as being in output mode:
+do not call C<add()> or C<customization()> again on that state. Use C<reset()>
+or a new object to start hashing a new message.
 
 =head1 METHODS
+
+Unless noted otherwise, assume C<$d> is an existing KangarooTwelve object
+created via C<new>, for example:
+
+ my $d = Crypt::Digest::KangarooTwelve->new(128);
 
 =head2 new
 
 I<Since: CryptX-0.100>
 
- $d = Crypt::Digest::KangarooTwelve->new($num);
- # $num ... 128 or 256
+ my $d = Crypt::Digest::KangarooTwelve->new($num);
+ # $num ... [integer] 128 or 256 (security level in bits)
 
 =head2 clone
 
 I<Since: CryptX-0.100>
 
- $d2 = $d->clone;
+ my $d2 = $d->clone;
 
 =head2 reset
 
@@ -90,6 +104,8 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
+Appends data to the message. Returns the object itself (for chaining).
+
  $d->add('any data');
  #or
  $d->add('chunk1', 'chunk2', ...);
@@ -98,9 +114,12 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
+Reads the file content and appends it to the message. Returns the object itself (for chaining).
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 customization
 
@@ -112,8 +131,17 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
- $result_raw = $d->done($len);
+Returns C<$len> bytes of output as a binary string. Can be called repeatedly
+to stream an unlimited amount of output from the same absorbed input. The
+C<$len> argument is required and must be a positive integer.
+
+After the first C<done()> call the object is in output mode. Calling
+C<add()> or C<customization()> in this state is not permitted; use
+C<reset()> or create a new object to hash a different message.
+
+ my $result_raw = $d->done($len);
  # can be called multiple times for streaming output
+ # after the first done(), call reset() before hashing a new message
 
 =head1 SEE ALSO
 

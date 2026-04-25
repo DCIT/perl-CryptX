@@ -118,11 +118,13 @@ Crypt::PK::Ed448 - Digital signature based on Ed448
 
  use Crypt::PK::Ed448;
 
- my $priv = Crypt::PK::Ed448->new('Alice_priv_ed448.der');
- my $sig  = $priv->sign_message($message);
+ my $message = 'hello world';
+ my $signer = Crypt::PK::Ed448->new->generate_key;
+ my $signature = $signer->sign_message($message);
 
- my $pub = Crypt::PK::Ed448->new('Alice_pub_ed448.der');
- $pub->verify_message($sig, $message) or die "ERROR";
+ my $public_der = $signer->export_key_der('public');
+ my $verifier = Crypt::PK::Ed448->new(\$public_der);
+ $verifier->verify_message($signature, $message) or die "ERROR";
 
  my $pk = Crypt::PK::Ed448->new;
  $pk->import_key_raw(pack("H*", "1b0055aad3b239a0fa1ed1ea8023151a5791d0bb556435299da6cf1aaa272d858b0238822654bc15f64adbab97f1bb9ec848d72cd8ad856800"), "public");
@@ -140,14 +142,23 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
- my $pk = Crypt::PK::Ed448->new();
- my $pk = Crypt::PK::Ed448->new($filename);
- my $pk = Crypt::PK::Ed448->new(\$buffer);
- my $pk = Crypt::PK::Ed448->new($filename, $password);
+ my $source = Crypt::PK::Ed448->new();
+ $source->generate_key;
+
+ my $public_der = $source->export_key_der('public');
+ my $pub = Crypt::PK::Ed448->new(\$public_der);
+
+ my $private_pem = $source->export_key_pem('private', 'secret', 'AES-256-CBC');
+ my $priv = Crypt::PK::Ed448->new(\$private_pem, 'secret');
+
+Passing C<$filename> or C<\$buffer> to C<new> is equivalent: both forms
+immediately import the key material into the new object.
 
 =head2 generate_key
 
 I<Since: CryptX-0.100>
+
+Returns the object itself (for chaining).
 
  $pk->generate_key;
 
@@ -157,9 +168,15 @@ I<Since: CryptX-0.100>
 
 Loads Ed448 private or public keys from DER, PEM, PKCS#8, X.509 certificates, SubjectPublicKeyInfo, or JWK.
 
- $pk->import_key($filename);
- $pk->import_key(\$buffer);
- $pk->import_key($filename, $password);
+ my $source = Crypt::PK::Ed448->new();
+ $source->generate_key;
+
+ my $public_der = $source->export_key_der('public');
+ my $pub = Crypt::PK::Ed448->new();
+ $pub->import_key(\$public_der);
+ my $private_pem = $source->export_key_pem('private', 'secret', 'AES-256-CBC');
+ my $priv = Crypt::PK::Ed448->new();
+ $priv->import_key(\$private_pem, 'secret');
  $pk->import_key({
    curve => "ed448",
    pub   => "1B0055AAD3B239A0FA1ED1EA8023151A5791D0BB556435299DA6CF1AAA272D858B0238822654BC15F64ADBAB97F1BB9EC848D72CD8AD856800",
@@ -171,6 +188,8 @@ Loads Ed448 private or public keys from DER, PEM, PKCS#8, X.509 certificates, Su
    d   => "-CvWUpGWXeRth8dEeGOSTo77jaNpk2GKeEzTtpptZuYc3ApIox5mvY6B5Nd87cMRqg9yoyLvPk-t",
    x   => "GwBVqtOyOaD6HtHqgCMVGleR0LtVZDUpnabPGqonLYWLAjiCJlS8FfZK26uX8bueyEjXLNithWgA",
  });
+
+The same method also accepts filenames instead of buffers.
 
 =head2 import_key_raw
 
@@ -187,12 +206,16 @@ The raw key must be exactly 57 bytes long.
 
 I<Since: CryptX-0.100>
 
+Returns the key as a binary DER-encoded string.
+
  my $der = $pk->export_key_der('private');
  my $der = $pk->export_key_der('public');
 
 =head2 export_key_pem
 
 I<Since: CryptX-0.100>
+
+Returns the key as a PEM-encoded string (ASCII).
 
  my $pem = $pk->export_key_pem('private');
  my $pem = $pk->export_key_pem('public');
@@ -202,12 +225,16 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
+Returns a JSON string, or a hashref if the optional second argument is true.
+
  my $json = $pk->export_key_jwk('private');
  my $hash = $pk->export_key_jwk('public', 1);
 
 =head2 export_key_raw
 
 I<Since: CryptX-0.100>
+
+Returns the raw key as a binary string.
 
  my $raw = $pk->export_key_raw('private');
  my $raw = $pk->export_key_raw('public');
@@ -216,11 +243,16 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
+Returns the signature as a binary string. Ed448 uses a fixed hash internally
+(SHAKE256); unlike RSA or ECDSA there is no C<$hash_name> parameter.
+
  my $signature = $priv->sign_message($message);
 
 =head2 verify_message
 
 I<Since: CryptX-0.100>
+
+Returns C<1> if the signature is valid, C<0> otherwise.
 
  my $valid = $pub->verify_message($signature, $message);
 
@@ -234,6 +266,8 @@ I<Since: CryptX-0.100>
 
 I<Since: CryptX-0.100>
 
+Returns a hashref with the key components, or C<undef> if no key is loaded.
+
  my $hash = $pk->key2hash;
 
 Returns a hash like:
@@ -243,6 +277,25 @@ Returns a hash like:
    pub   => "1B0055AAD3B239A0FA1ED1EA8023151A5791D0BB556435299DA6CF1AAA272D858B0238822654BC15F64ADBAB97F1BB9EC848D72CD8AD856800",
    priv  => "F82BD65291965DE46D87C7447863924E8EFB8DA36993618A784CD3B69A6D66E61CDC0A48A31E66BD8E81E4D77CEDC311AA0F72A322EF3E4FAD",
  }
+
+=head1 OpenSSL interoperability
+
+ # Generate a key with OpenSSL
+ # openssl genpkey -algorithm ed448 -out ed448_priv.pem
+ # openssl pkey -in ed448_priv.pem -pubout -out ed448_pub.pem
+
+ # Load the OpenSSL-generated key in CryptX
+ use Crypt::PK::Ed448;
+ my $priv = Crypt::PK::Ed448->new("ed448_priv.pem");
+ my $pub  = Crypt::PK::Ed448->new("ed448_pub.pem");
+
+ # Sign in CryptX, verify with OpenSSL
+ my $message = "hello";
+ my $signature = $priv->sign_message($message);
+
+ # Export CryptX key for OpenSSL
+ my $pem = $priv->export_key_pem('private');
+ # then: openssl pkey -in priv.pem -text -noout
 
 =head1 SEE ALSO
 
