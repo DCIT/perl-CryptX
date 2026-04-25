@@ -211,18 +211,20 @@ static SV * s_asn1_oid_name_sv(pTHX_ HV *oidmap, SV *oid_sv)
 /* Encode binary data according to bin_fmt */
 static SV * s_asn1_bin_sv(pTHX_ const void *data, unsigned long size, int bin_fmt)
 {
-    if (!data || size == 0) return newSV(0);
+    if (!data || size == 0) return newSVpvn("", 0);
     if (bin_fmt == 1) { /* hex */
+        SV *s;
         unsigned long outlen = size * 2 + 1;
         char *buf; Newz(0, buf, outlen, char);
         { unsigned long ol = outlen; base16_encode((const unsigned char*)data, size, buf, &ol, 0); }
-        SV *s = newSVpvn(buf, size * 2); Safefree(buf);
+        s = newSVpvn(buf, size * 2); Safefree(buf);
         return s;
     } else if (bin_fmt == 2) { /* base64 */
+        SV *s;
         unsigned long outlen = ((size + 2) / 3) * 4 + 4;
         char *buf; Newz(0, buf, outlen, char);
         base64_encode((const unsigned char*)data, size, buf, &outlen);
-        SV *s = newSVpvn(buf, outlen); Safefree(buf);
+        s = newSVpvn(buf, outlen); Safefree(buf);
         return s;
     }
     return newSVpvn((const char *)data, size); /* raw */
@@ -234,20 +236,24 @@ static IV s_asn1_to_epoch(unsigned YYYY, unsigned MM, unsigned DD,
                            unsigned off_dir, unsigned off_hh, unsigned off_mm)
 {
     long y = YYYY, m = MM, d = DD;
+    long days;
+    IV epoch, offset;
     if (m <= 2) { y--; m += 12; }
-    long days = 365*y + y/4 - y/100 + y/400 + (153*m - 457)/5 + d - 719469;
-    IV epoch = (IV)days * 86400 + (IV)hh * 3600 + (IV)mm * 60 + (IV)ss;
-    IV offset = (IV)(off_hh * 3600 + off_mm * 60);
-    epoch += (off_dir ? offset : -offset); /* off_dir 0='+' 1='-' */
+    days = 365*y + y/4 - y/100 + y/400 + (153*m - 457)/5 + d - 719469;
+    epoch = (IV)days * 86400 + (IV)hh * 3600 + (IV)mm * 60 + (IV)ss;
+    offset = (IV)(off_hh * 3600 + off_mm * 60);
+    /* off_dir: 0 = '+' (local ahead of UTC, subtract to get UTC)
+     *          1 = '-' (local behind UTC, add to get UTC) */
+    epoch += (off_dir ? offset : -offset);
     return epoch;
 }
 
 static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
 {
     AV *av = newAV();
-    while (node != NULL) {
+    while (node != NULL && node->type != LTC_ASN1_EOL) {
         HV   *hv         = newHV();
-        SV   *value_sv   = newSV(0);
+        SV   *value_sv   = NULL;
         const char *type_str   = "UNKNOWN";
         const char *format_str = "unknown";
         switch (node->type) {
@@ -256,21 +262,34 @@ static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
                 if (node->data) value_sv = newSViv(*(int *)node->data ? 1 : 0);
                 break;
             case LTC_ASN1_INTEGER: {
-                type_str = "INTEGER";
                 mp_int *mpi = (mp_int *)node->data;
+                type_str = "INTEGER";
                 if (mpi) {
                     if (opts.int_fmt == 2) { /* bytes */
+                        if (mp_isneg(mpi)) {
+                            SvREFCNT_dec(hv);
+                            croak("FATAL: asn1_decode_der: negative INTEGER cannot be represented with int=>'bytes'");
+                        }
                         format_str = "bytes";
-                        unsigned long usize = mp_ubin_size(mpi);
-                        unsigned char *ubuf; Newz(0, ubuf, usize ? usize : 1, unsigned char);
-                        { mp_err me = mp_to_ubin(mpi, ubuf, usize, NULL); PERL_UNUSED_VAR(me); }
-                        value_sv = newSVpvn((char *)ubuf, usize); Safefree(ubuf);
+                        if (mp_iszero(mpi)) {
+                            value_sv = newSVpvn("\0", 1);
+                        } else {
+                            unsigned long usize = mp_ubin_size(mpi);
+                            unsigned char *ubuf; Newz(0, ubuf, usize, unsigned char);
+                            { mp_err me = mp_to_ubin(mpi, ubuf, usize, NULL); PERL_UNUSED_VAR(me); }
+                            value_sv = newSVpvn((char *)ubuf, usize); Safefree(ubuf);
+                        }
                     } else {
                         int radix = (opts.int_fmt == 1) ? 16 : 10;
+                        int len;
+                        char *buf;
                         format_str = (opts.int_fmt == 1) ? "hex" : "decimal";
-                        int len = mp_count_bits(mpi) / (opts.int_fmt == 1 ? 4 : 3) + 4;
-                        char *buf; Newz(0, buf, len, char);
+                        len = mp_count_bits(mpi) / (opts.int_fmt == 1 ? 4 : 3) + 4;
+                        Newz(0, buf, len, char);
                         { mp_err me = mp_to_radix(mpi, buf, len, NULL, radix); PERL_UNUSED_VAR(me); }
+                        if (opts.int_fmt == 1) { /* lowercase hex */
+                            char *p; for (p = buf; *p; p++) if (*p >= 'A' && *p <= 'F') *p += 32;
+                        }
                         value_sv = newSVpv(buf, 0); Safefree(buf);
                     }
                 }
@@ -281,16 +300,17 @@ static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
                 if (node->data) {
                     unsigned long v = *(unsigned long *)node->data;
                     if (opts.int_fmt == 1) { /* hex */
+                        char buf[32];
                         format_str = "hex";
-                        char buf[32]; snprintf(buf, sizeof(buf), "%lx", v);
+                        snprintf(buf, sizeof(buf), "%lx", v);
                         value_sv = newSVpv(buf, 0);
                     } else if (opts.int_fmt == 2) { /* bytes */
-                        format_str = "bytes";
-                        unsigned char b[8]; int n = 0;
+                        unsigned char b[8], be[8];
+                        int n = 0, k;
                         unsigned long tmp = v;
+                        format_str = "bytes";
                         while (tmp) { b[n++] = (unsigned char)(tmp & 0xff); tmp >>= 8; }
                         if (!n) { b[0] = 0; n = 1; }
-                        unsigned char be[8]; int k;
                         for (k = 0; k < n; k++) be[k] = b[n - 1 - k];
                         value_sv = newSVpvn((char *)be, n);
                     } else {
@@ -301,12 +321,13 @@ static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
                 break;
             }
             case LTC_ASN1_BIT_STRING: {
-                type_str = "BIT_STRING";
-                format_str = (opts.bin_fmt == 1) ? "hex" : (opts.bin_fmt == 2) ? "base64" : "bytes";
                 unsigned char *bits = (unsigned char *)node->data;
                 unsigned long nbits = node->size, nbytes = (nbits + 7) / 8;
+                type_str = "BIT_STRING";
+                format_str = (opts.bin_fmt == 1) ? "hex" : (opts.bin_fmt == 2) ? "base64" : "bytes";
                 if (bits && nbytes > 0) {
-                    unsigned long i; unsigned char *packed;
+                    unsigned long i;
+                    unsigned char *packed;
                     Newz(0, packed, nbytes, unsigned char);
                     for (i = 0; i < nbits; i++)
                         if (bits[i]) packed[i/8] |= (unsigned char)(0x80u >> (i%8));
@@ -316,11 +337,15 @@ static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
                 hv_stores(hv, "bits", newSVuv((UV)nbits));
                 break;
             }
-            case LTC_ASN1_RAW_BIT_STRING:
+            case LTC_ASN1_RAW_BIT_STRING: {
+                unsigned long nbits_raw = node->size;
+                unsigned long nbytes_raw = (nbits_raw + 7) / 8;
                 type_str = "BIT_STRING";
                 format_str = (opts.bin_fmt == 1) ? "hex" : (opts.bin_fmt == 2) ? "base64" : "bytes";
-                value_sv = s_asn1_bin_sv(aTHX_ node->data, node->size, opts.bin_fmt);
+                value_sv = s_asn1_bin_sv(aTHX_ node->data, nbytes_raw, opts.bin_fmt);
+                hv_stores(hv, "bits", newSVuv((UV)nbits_raw));
                 break;
+            }
             case LTC_ASN1_OCTET_STRING:
                 type_str = "OCTET_STRING";
                 format_str = (opts.bin_fmt == 1) ? "hex" : (opts.bin_fmt == 2) ? "base64" : "bytes";
@@ -330,8 +355,8 @@ static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
                 type_str = "NULL"; format_str = "null";
                 break;
             case LTC_ASN1_OBJECT_IDENTIFIER: {
-                type_str = "OID"; format_str = "oid";
                 unsigned long *oid = (unsigned long *)node->data;
+                type_str = "OID"; format_str = "oid";
                 if (oid && node->size > 0) {
                     unsigned long i; SV *s = newSVpvn("", 0);
                     for (i = 0; i < node->size; i++) {
@@ -358,10 +383,11 @@ static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
                 if (node->data && node->size > 0) value_sv = newSVpvn((char *)node->data, node->size);
                 break;
             case LTC_ASN1_UTF8_STRING: {
-                type_str = "UTF8_STRING"; format_str = "utf8";
                 wchar_t *wstr = (wchar_t *)node->data;
+                type_str = "UTF8_STRING"; format_str = "utf8";
                 if (wstr && node->size > 0) {
-                    unsigned long i; SV *s = newSVpvn("", 0); SvUTF8_on(s);
+                    unsigned long i;
+                    SV *s = newSVpvn("", 0); SvUTF8_on(s);
                     for (i = 0; i < node->size; i++) {
                         U8 ubuf[UTF8_MAXBYTES + 1];
                         U8 *end = uvchr_to_utf8(ubuf, (UV)wstr[i]);
@@ -372,8 +398,8 @@ static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
                 break;
             }
             case LTC_ASN1_UTCTIME: {
-                type_str = "UTCTIME";
                 ltc_utctime *t = (ltc_utctime *)node->data;
+                type_str = "UTCTIME";
                 if (t) {
                     unsigned YYYY = (t->YY >= 50) ? 1900 + t->YY : 2000 + t->YY;
                     if (opts.dt_fmt == 1) { /* epoch */
@@ -381,8 +407,8 @@ static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
                         value_sv = newSViv(s_asn1_to_epoch(YYYY, t->MM, t->DD, t->hh, t->mm, t->ss,
                                                             t->off_dir, t->off_hh, t->off_mm));
                     } else { /* rfc3339 */
-                        format_str = "rfc3339";
                         char buf[32];
+                        format_str = "rfc3339";
                         if (t->off_dir == 0 && t->off_hh == 0 && t->off_mm == 0)
                             snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02uZ",
                                      YYYY, t->MM, t->DD, t->hh, t->mm, t->ss);
@@ -396,22 +422,25 @@ static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
                 break;
             }
             case LTC_ASN1_GENERALIZEDTIME: {
-                type_str = "GENERALIZEDTIME";
                 ltc_generalizedtime *t = (ltc_generalizedtime *)node->data;
+                type_str = "GENERALIZEDTIME";
                 if (t) {
                     if (opts.dt_fmt == 1) { /* epoch */
                         format_str = "epoch";
                         value_sv = newSViv(s_asn1_to_epoch(t->YYYY, t->MM, t->DD, t->hh, t->mm, t->ss,
                                                             t->off_dir, t->off_hh, t->off_mm));
                     } else { /* rfc3339 */
+                        char buf[48];
+                        int pos;
                         format_str = "rfc3339";
-                        char buf[40];
+                        pos = snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02u",
+                                       t->YYYY, t->MM, t->DD, t->hh, t->mm, t->ss);
+                        if (t->fs > 0)
+                            pos += snprintf(buf + pos, sizeof(buf) - pos, ".%u", t->fs);
                         if (t->off_dir == 0 && t->off_hh == 0 && t->off_mm == 0)
-                            snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02uZ",
-                                     t->YYYY, t->MM, t->DD, t->hh, t->mm, t->ss);
+                            snprintf(buf + pos, sizeof(buf) - pos, "Z");
                         else
-                            snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02u%c%02u:%02u",
-                                     t->YYYY, t->MM, t->DD, t->hh, t->mm, t->ss,
+                            snprintf(buf + pos, sizeof(buf) - pos, "%c%02u:%02u",
                                      t->off_dir ? '-' : '+', t->off_hh, t->off_mm);
                         value_sv = newSVpv(buf, 0);
                     }
@@ -428,8 +457,8 @@ static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
                 value_sv = node->child ? newRV_noinc(s_ltc_asn1_to_perl(aTHX_ node->child, opts)) : newRV_noinc((SV *)newAV());
                 break;
             case LTC_ASN1_CUSTOM_TYPE: {
-                type_str = "CUSTOM";
                 unsigned int cls = (unsigned int)node->klass;
+                type_str = "CUSTOM";
                 hv_stores(hv, "class",       newSVpv((cls < 4) ? s_asn1_class_names[cls] : "UNKNOWN", 0));
                 hv_stores(hv, "constructed", newSViv(node->pc == LTC_ASN1_PC_CONSTRUCTED ? 1 : 0));
                 hv_stores(hv, "tag",         newSVuv((UV)node->tag));
@@ -442,17 +471,264 @@ static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
                 }
                 break;
             }
-            default: break;
+            default:
+                /* Unknown ltc_asn1_type — skip rather than emit unroundtrippable node */
+                SvREFCNT_dec(hv);
+                node = node->next;
+                continue;
         }
         hv_stores(hv, "type",   newSVpv(type_str,   0));
         hv_stores(hv, "format", newSVpv(format_str, 0));
-        hv_stores(hv, "value",  value_sv);
+        hv_stores(hv, "value",  value_sv ? value_sv : newSV(0));
         av_push(av, newRV_noinc((SV *)hv));
         node = node->next;
     }
     return (SV *)av;
 }
-/* --- end Crypt::ASN1 helper ---------------------------------------------- */
+/* --- end Crypt::ASN1 decoder helper -------------------------------------- */
+
+/* --- Crypt::ASN1 encoder helpers ----------------------------------------- */
+
+/* Write DER length to buf, return bytes written (buf must be >= 5 bytes) */
+static unsigned long s_asn1_put_der_length(pTHX_ unsigned char *buf, unsigned long len)
+{
+    if (len > 0xffffffffUL) {
+        croak("FATAL: asn1_encode: DER length exceeds 0xffffffff bytes");
+    }
+    if (len < 128) {
+        buf[0] = (unsigned char)len;
+        return 1;
+    } else if (len <= 0xffUL) {
+        buf[0] = 0x81; buf[1] = (unsigned char)len;
+        return 2;
+    } else if (len <= 0xffffUL) {
+        buf[0] = 0x82;
+        buf[1] = (unsigned char)(len >> 8);
+        buf[2] = (unsigned char)(len & 0xff);
+        return 3;
+    } else if (len <= 0xffffffUL) {
+        buf[0] = 0x83;
+        buf[1] = (unsigned char)(len >> 16);
+        buf[2] = (unsigned char)((len >> 8) & 0xff);
+        buf[3] = (unsigned char)(len & 0xff);
+        return 4;
+    }
+    buf[0] = 0x84;
+    buf[1] = (unsigned char)(len >> 24);
+    buf[2] = (unsigned char)((len >> 16) & 0xff);
+    buf[3] = (unsigned char)((len >> 8) & 0xff);
+    buf[4] = (unsigned char)(len & 0xff);
+    return 5;
+}
+
+/* Append single-byte tag + DER length + content to SV */
+static void s_asn1_append_tlv(pTHX_ SV *out, unsigned char tag,
+                               const void *content, unsigned long clen)
+{
+    unsigned char lbuf[5];
+    unsigned long llen = s_asn1_put_der_length(aTHX_ lbuf, clen);
+    sv_catpvn(out, (char *)&tag, 1);
+    sv_catpvn(out, (char *)lbuf, llen);
+    if (clen > 0 && content) sv_catpvn(out, (const char *)content, clen);
+}
+
+/* Append multi-byte tag (for CUSTOM) + DER length + content to SV */
+static void s_asn1_append_custom_tlv(pTHX_ SV *out,
+                                      unsigned int klass, unsigned int pc,
+                                      unsigned long tag,
+                                      const void *content, unsigned long clen)
+{
+    unsigned char tbuf[12], lbuf[5];
+    unsigned long tlen, llen;
+    unsigned char first = (unsigned char)(((klass & 0x3) << 6) | ((pc & 0x1) << 5));
+
+    if (tag < 31) {
+        tbuf[0] = first | (unsigned char)tag;
+        tlen = 1;
+    } else {
+        unsigned char tmp[10];
+        int n = 0, i;
+        unsigned long t = tag;
+        tbuf[0] = first | 0x1f;
+        /* base-128 big-endian */
+        do { tmp[n++] = (unsigned char)(t & 0x7f); t >>= 7; } while (t > 0);
+        tlen = 1;
+        for (i = n - 1; i >= 0; i--) tbuf[tlen++] = tmp[i] | (i > 0 ? 0x80 : 0x00);
+    }
+    llen = s_asn1_put_der_length(aTHX_ lbuf, clen);
+    sv_catpvn(out, (char *)tbuf, tlen);
+    sv_catpvn(out, (char *)lbuf, llen);
+    if (clen > 0 && content) sv_catpvn(out, (const char *)content, clen);
+}
+
+/* Forward declarations */
+static void s_asn1_encode_node(pTHX_ SV *out, HV *node);
+
+static void s_asn1_encode_nodes(pTHX_ SV *out, AV *nodes)
+{
+    I32 i, len = av_top_index(nodes);
+    for (i = 0; i <= len; i++) {
+        SV **elem = av_fetch(nodes, i, 0);
+        if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV) continue;
+        s_asn1_encode_node(aTHX_ out, (HV *)SvRV(*elem));
+    }
+}
+
+static void s_asn1_encode_node(pTHX_ SV *out, HV *node)
+{
+    SV **sv_type = hv_fetchs(node, "type", 0);
+    SV **sv_value = hv_fetchs(node, "value", 0);
+    const char *type;
+
+    if (!sv_type || !SvOK(*sv_type)) croak("FATAL: asn1_encode: node missing 'type'");
+    type = SvPV_nolen(*sv_type);
+
+    if (strEQ(type, "BOOLEAN")) {
+        int val = (sv_value && SvOK(*sv_value)) ? SvIV(*sv_value) : 0;
+        unsigned char c = val ? 0xFF : 0x00;
+        s_asn1_append_tlv(aTHX_ out, 0x01, &c, 1);
+    }
+    else if (strEQ(type, "NULL")) {
+        s_asn1_append_tlv(aTHX_ out, 0x05, NULL, 0);
+    }
+    else if (strEQ(type, "INTEGER")) {
+        STRLEN slen; const char *str;
+        mp_int mpi; int rv;
+        unsigned long outlen; unsigned char *buf;
+
+        if (!sv_value || !SvOK(*sv_value)) croak("FATAL: asn1_encode: INTEGER missing value");
+        str = SvPV(*sv_value, slen);
+
+        if (mp_init(&mpi) != MP_OKAY) croak("FATAL: asn1_encode: mp_init failed");
+        if (mp_read_radix(&mpi, str, 10) != MP_OKAY) { mp_clear(&mpi); croak("FATAL: asn1_encode: invalid INTEGER value '%s'", str); }
+
+        rv = der_length_integer(&mpi, &outlen);
+        if (rv != CRYPT_OK) { mp_clear(&mpi); croak("FATAL: asn1_encode: der_length_integer failed"); }
+
+        Newx(buf, outlen, unsigned char);
+        rv = der_encode_integer(&mpi, buf, &outlen);
+        mp_clear(&mpi);
+        if (rv != CRYPT_OK) { Safefree(buf); croak("FATAL: asn1_encode: der_encode_integer failed"); }
+
+        sv_catpvn(out, (char *)buf, outlen);
+        Safefree(buf);
+    }
+    else if (strEQ(type, "OID")) {
+        STRLEN slen; const char *str; const char *p;
+        unsigned long words[64], nwords = 0, outlen;
+        unsigned char *buf; int rv;
+
+        if (!sv_value || !SvOK(*sv_value)) croak("FATAL: asn1_encode: OID missing value");
+        str = SvPV(*sv_value, slen);
+
+        p = str;
+        while (*p && nwords < 64) {
+            words[nwords++] = strtoul(p, (char **)&p, 10);
+            if (*p == '.') p++;
+        }
+        if (nwords < 2) croak("FATAL: asn1_encode: OID must have at least 2 arcs");
+
+        rv = der_length_object_identifier(words, nwords, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: asn1_encode: der_length_object_identifier failed");
+
+        Newx(buf, outlen, unsigned char);
+        rv = der_encode_object_identifier(words, nwords, buf, &outlen);
+        if (rv != CRYPT_OK) { Safefree(buf); croak("FATAL: asn1_encode: der_encode_object_identifier failed"); }
+
+        sv_catpvn(out, (char *)buf, outlen);
+        Safefree(buf);
+    }
+    else if (strEQ(type, "OCTET_STRING")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPVbyte(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x04, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "BIT_STRING")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPVbyte(*sv_value, vlen) : "";
+        SV **sv_bits = hv_fetchs(node, "bits", 0);
+        unsigned long nbits = (sv_bits && SvOK(*sv_bits)) ? (unsigned long)SvUV(*sv_bits) : (unsigned long)(vlen * 8);
+        unsigned long nbytes = (nbits + 7) / 8;
+        unsigned char unused = (nbytes > 0) ? (unsigned char)(8 * nbytes - nbits) : 0;
+        unsigned long content_len = 1 + nbytes;
+        unsigned char *content;
+
+        Newxz(content, content_len, unsigned char);
+        content[0] = unused;
+        if (nbytes > 0 && vlen > 0) {
+            Copy(data, content + 1, nbytes < (unsigned long)vlen ? nbytes : (unsigned long)vlen, unsigned char);
+            if (unused > 0) content[nbytes] &= (unsigned char)(0xFF << unused);
+        }
+        s_asn1_append_tlv(aTHX_ out, 0x03, content, content_len);
+        Safefree(content);
+    }
+    else if (strEQ(type, "UTF8_STRING")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPVutf8(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x0C, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "IA5_STRING")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPVbyte(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x16, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "PRINTABLE_STRING")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPVbyte(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x13, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "TELETEX_STRING")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPVbyte(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x14, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "UTCTIME")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPV(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x17, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "GENERALIZEDTIME")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPV(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x18, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "SEQUENCE") || strEQ(type, "SET")) {
+        unsigned char tag = strEQ(type, "SEQUENCE") ? 0x30 : 0x31;
+        if (sv_value && SvROK(*sv_value) && SvTYPE(SvRV(*sv_value)) == SVt_PVAV) {
+            SV *content = newSVpvn("", 0);
+            s_asn1_encode_nodes(aTHX_ content, (AV *)SvRV(*sv_value));
+            { STRLEN clen; const char *cdata = SvPV(content, clen);
+              s_asn1_append_tlv(aTHX_ out, tag, cdata, (unsigned long)clen); }
+            SvREFCNT_dec(content);
+        } else {
+            s_asn1_append_tlv(aTHX_ out, tag, NULL, 0);
+        }
+    }
+    else if (strEQ(type, "CUSTOM")) {
+        SV **sv_class  = hv_fetchs(node, "class", 0);
+        SV **sv_constr = hv_fetchs(node, "constructed", 0);
+        SV **sv_tag    = hv_fetchs(node, "tag", 0);
+        unsigned int klass = (sv_class && SvOK(*sv_class)) ? (unsigned int)SvIV(*sv_class) : 2;
+        unsigned int pc    = (sv_constr && SvOK(*sv_constr) && SvIV(*sv_constr)) ? 1 : 0;
+        unsigned long tag  = (sv_tag && SvOK(*sv_tag)) ? (unsigned long)SvUV(*sv_tag) : 0;
+
+        if (pc && sv_value && SvROK(*sv_value) && SvTYPE(SvRV(*sv_value)) == SVt_PVAV) {
+            SV *content = newSVpvn("", 0);
+            s_asn1_encode_nodes(aTHX_ content, (AV *)SvRV(*sv_value));
+            { STRLEN clen; const char *cdata = SvPV(content, clen);
+              s_asn1_append_custom_tlv(aTHX_ out, klass, pc, tag, cdata, (unsigned long)clen); }
+            SvREFCNT_dec(content);
+        } else {
+            STRLEN vlen = 0;
+            const char *data = (sv_value && SvOK(*sv_value)) ? SvPVbyte(*sv_value, vlen) : "";
+            s_asn1_append_custom_tlv(aTHX_ out, klass, pc, tag, data, (unsigned long)vlen);
+        }
+    }
+    else {
+        croak("FATAL: asn1_encode: unsupported type '%s'", type);
+    }
+}
+/* --- end Crypt::ASN1 encoder helpers ------------------------------------- */
 
 typedef struct cbc_struct {             /* used by Crypt::Mode::CBC */
   int cipher_id, cipher_rounds;

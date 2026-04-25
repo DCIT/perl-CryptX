@@ -43,3 +43,19 @@ asn1_decode_der(SV *der, SV *opts = &PL_sv_undef)
     }
     OUTPUT:
         RETVAL
+
+SV *
+_asn1_encode_der(SV *tree)
+    CODE:
+    {
+        AV *nodes;
+
+        if (!SvROK(tree) || SvTYPE(SvRV(tree)) != SVt_PVAV)
+            croak("FATAL: _asn1_encode_der: argument must be an arrayref");
+
+        nodes = (AV *)SvRV(tree);
+        RETVAL = newSVpvn("", 0);
+        s_asn1_encode_nodes(aTHX_ RETVAL, nodes);
+    }
+    OUTPUT:
+        RETVAL

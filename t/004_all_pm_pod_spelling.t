@@ -34,6 +34,7 @@ Test::Pod::Spelling->import(
                           RNG PRNG
                           CBC OFB ECB CFB
                           flexi MSB YY BER moduli SubjectPublicKeyInfo
+                          rarr UTCTime TLV
                         )]
                     },
 );
