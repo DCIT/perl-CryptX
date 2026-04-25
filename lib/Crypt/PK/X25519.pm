@@ -119,10 +119,11 @@ Crypt::PK::X25519 - Asymmetric cryptography based on X25519
 
  use Crypt::PK::X25519;
 
- #Shared secret
- my $priv = Crypt::PK::X25519->new('Alice_priv_x25519.der');
- my $pub = Crypt::PK::X25519->new('Bob_pub_x25519.der');
- my $shared_secret = $priv->shared_secret($pub);
+ my $alice = Crypt::PK::X25519->new->generate_key;
+ my $bob = Crypt::PK::X25519->new->generate_key;
+ my $alice_secret = $alice->shared_secret($bob);
+ my $bob_secret = $bob->shared_secret($alice);
+ die "ERROR" unless $alice_secret eq $bob_secret;
 
  #Load key
  my $pk = Crypt::PK::X25519->new;
@@ -151,22 +152,23 @@ I<Since: CryptX-0.067>
 
 =head2 new
 
- my $pk = Crypt::PK::X25519->new();
- #or
- my $pk = Crypt::PK::X25519->new($priv_or_pub_key_filename);
- #or
- my $pk = Crypt::PK::X25519->new(\$buffer_containing_priv_or_pub_key);
+ my $source = Crypt::PK::X25519->new();
+ $source->generate_key;
 
-Support for password protected PEM keys
+ my $public_der = $source->export_key_der('public');
+ my $pub = Crypt::PK::X25519->new(\$public_der);
 
- my $pk = Crypt::PK::X25519->new($priv_pem_key_filename, $password);
- #or
- my $pk = Crypt::PK::X25519->new(\$buffer_containing_priv_pem_key, $password);
+ my $private_pem = $source->export_key_pem('private', 'secret', 'AES-256-CBC');
+ my $priv = Crypt::PK::X25519->new(\$private_pem, 'secret');
+
+Passing C<$filename> or C<\$buffer> to C<new> is equivalent: both forms
+immediately import the key material into the new object.
 
 =head2 generate_key
 
 Uses Yarrow-based cryptographically strong random number generator seeded with
 random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
+Returns the object itself (for chaining).
 
  $pk->generate_key;
 
@@ -174,15 +176,18 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 Loads private or public key in DER or PEM format.
 
- $pk->import_key($filename);
- #or
- $pk->import_key(\$buffer_containing_key);
+ my $source = Crypt::PK::X25519->new();
+ $source->generate_key;
 
-Support for password protected PEM keys:
+ my $public_der = $source->export_key_der('public');
+ my $pub = Crypt::PK::X25519->new();
+ $pub->import_key(\$public_der);
 
- $pk->import_key($filename, $password);
- #or
- $pk->import_key(\$buffer_containing_key, $password);
+ my $private_pem = $source->export_key_pem('private', 'secret', 'AES-256-CBC');
+ my $priv = Crypt::PK::X25519->new();
+ $priv->import_key(\$private_pem, 'secret');
+
+The same method also accepts filenames instead of buffers.
 
 Loading private or public keys form perl hash:
 
@@ -251,7 +256,7 @@ Supported key formats:
 
 =item * X25519 private keys in JSON Web Key (JWK) format
 
-See L<https://tools.ietf.org/html/rfc8037>
+See L<https://www.rfc-editor.org/rfc/rfc8037>
 
  {
   "kty":"OKP",
@@ -283,11 +288,15 @@ Import raw public/private key - can load raw key data exported by L</export_key_
 
 =head2 export_key_der
 
+Returns the key as a binary DER-encoded string.
+
  my $private_der = $pk->export_key_der('private');
  #or
  my $public_der = $pk->export_key_der('public');
 
 =head2 export_key_pem
+
+Returns the key as a PEM-encoded string (ASCII).
 
  my $private_pem = $pk->export_key_pem('private');
  #or
@@ -311,6 +320,8 @@ Support for password protected PEM keys
 
 =head2 export_key_jwk
 
+Returns a JSON string, or a hashref if the optional second argument is true.
+
 Exports public/private keys as a JSON Web Key (JWK).
 
  my $private_json_text = $pk->export_key_jwk('private');
@@ -327,6 +338,8 @@ B<BEWARE:> For JWK support you need to have L<JSON> module installed.
 
 =head2 export_key_raw
 
+Returns the raw key as a binary string.
+
 Export raw public/private key
 
  my $private_bytes = $pk->export_key_raw('private');
@@ -334,6 +347,8 @@ Export raw public/private key
  my $public_bytes = $pk->export_key_raw('public');
 
 =head2 shared_secret
+
+Returns the shared secret as a binary string (raw bytes).
 
   # Alice having her priv key $pk and Bob's public key $pkb
   my $pk  = Crypt::PK::X25519->new($priv_key_filename);
@@ -354,6 +369,8 @@ Export raw public/private key
 
 =head2 key2hash
 
+Returns a hashref with the key components, or C<undef> if no key is loaded.
+
  my $hash = $pk->key2hash;
 
  # returns hash like this (or undef if no key loaded):
@@ -365,13 +382,31 @@ Export raw public/private key
    priv  => "002F93D10BA5728D8DD8E9527721DABA3261C0BB1BEFDE7B4BBDAC631D454651",
  }
 
+=head1 OpenSSL interoperability
+
+ # Generate a key with OpenSSL
+ # openssl genpkey -algorithm x25519 -out x25519_priv.pem
+ # openssl pkey -in x25519_priv.pem -pubout -out x25519_pub.pem
+
+ # Load the OpenSSL-generated key in CryptX
+ use Crypt::PK::X25519;
+ my $alice = Crypt::PK::X25519->new("x25519_priv.pem");
+ my $bob_pub = Crypt::PK::X25519->new("bob_x25519_pub.pem");
+
+ # Derive shared secret
+ my $shared_secret = $alice->shared_secret($bob_pub);
+
+ # Export CryptX key for OpenSSL
+ my $pem = $alice->export_key_pem('private');
+ # then: openssl pkey -in priv.pem -text -noout
+
 =head1 SEE ALSO
 
 =over
 
 =item * L<https://en.wikipedia.org/wiki/Curve25519>
 
-=item * L<https://tools.ietf.org/html/rfc7748>
+=item * L<https://www.rfc-editor.org/rfc/rfc7748>
 
 =back
 

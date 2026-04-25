@@ -40,32 +40,35 @@ Crypt::Digest::Tiger192 - Hash function Tiger-192 [size: 192 bits]
                                 tiger192_file tiger192_file_hex tiger192_file_b64 tiger192_file_b64u );
 
    # calculate digest from string/buffer
-   $tiger192_raw  = tiger192('data string');
-   $tiger192_hex  = tiger192_hex('data string');
-   $tiger192_b64  = tiger192_b64('data string');
-   $tiger192_b64u = tiger192_b64u('data string');
-   # calculate digest from file
-   $tiger192_raw  = tiger192_file('filename.dat');
-   $tiger192_hex  = tiger192_file_hex('filename.dat');
-   $tiger192_b64  = tiger192_file_b64('filename.dat');
-   $tiger192_b64u = tiger192_file_b64u('filename.dat');
-   # calculate digest from filehandle
-   $tiger192_raw  = tiger192_file(*FILEHANDLE);
-   $tiger192_hex  = tiger192_file_hex(*FILEHANDLE);
-   $tiger192_b64  = tiger192_file_b64(*FILEHANDLE);
-   $tiger192_b64u = tiger192_file_b64u(*FILEHANDLE);
+   my $data = 'data string';
+   my $tiger192_raw  = tiger192($data);
+   my $tiger192_hex  = tiger192_hex($data);
+   my $tiger192_b64  = tiger192_b64($data);
+   my $tiger192_b64u = tiger192_b64u($data);
+   # or from file
+   my $tiger192_file_raw  = tiger192_file('filename.dat');
+   my $tiger192_file_hex  = tiger192_file_hex('filename.dat');
+   my $tiger192_file_b64  = tiger192_file_b64('filename.dat');
+   my $tiger192_file_b64u = tiger192_file_b64u('filename.dat');
+   # or from filehandle
+   my $filehandle = ...; # existing binary-mode filehandle
+   my $tiger192_fh_raw  = tiger192_file($filehandle);
+   my $tiger192_fh_hex  = tiger192_file_hex($filehandle);
+   my $tiger192_fh_b64  = tiger192_file_b64($filehandle);
+   my $tiger192_fh_b64u = tiger192_file_b64u($filehandle);
 
    ### OO interface:
    use Crypt::Digest::Tiger192;
 
-   $d = Crypt::Digest::Tiger192->new;
+   my $d = Crypt::Digest::Tiger192->new;
    $d->add('any data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $result_raw  = $d->digest;     # raw bytes
-   $result_hex  = $d->hexdigest;  # hexadecimal form
-   $result_b64  = $d->b64digest;  # Base64 form
-   $result_b64u = $d->b64udigest; # Base64 URL Safe form
+   my $result_raw  = $d->digest;     # raw bytes
+   my $result_hex  = $d->hexdigest;  # hexadecimal form
+   my $result_b64  = $d->b64digest;  # Base64 form
+   my $result_b64u = $d->b64udigest; # Base64 URL Safe form
+
+   # or hash a file instead
+   my $file_result_raw = Crypt::Digest::Tiger192->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
 
@@ -90,49 +93,51 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its Tiger192 digest encoded as a binary string.
 
- $tiger192_raw = tiger192('data string');
+ my $tiger192_raw = tiger192('data string');
  #or
- $tiger192_raw = tiger192('any data', 'more data', 'even more data');
+ my $tiger192_raw = tiger192('any data', 'more data', 'even more data');
 
 =head2 tiger192_hex
 
 Logically joins all arguments into a single string, and returns its Tiger192 digest encoded as a hexadecimal string.
 
- $tiger192_hex = tiger192_hex('data string');
+ my $tiger192_hex = tiger192_hex('data string');
  #or
- $tiger192_hex = tiger192_hex('any data', 'more data', 'even more data');
+ my $tiger192_hex = tiger192_hex('any data', 'more data', 'even more data');
 
 =head2 tiger192_b64
 
 Logically joins all arguments into a single string, and returns its Tiger192 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $tiger192_b64 = tiger192_b64('data string');
+ my $tiger192_b64 = tiger192_b64('data string');
  #or
- $tiger192_b64 = tiger192_b64('any data', 'more data', 'even more data');
+ my $tiger192_b64 = tiger192_b64('any data', 'more data', 'even more data');
 
 =head2 tiger192_b64u
 
 Logically joins all arguments into a single string, and returns its Tiger192 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
- $tiger192_b64url = tiger192_b64u('data string');
+ my $tiger192_b64url = tiger192_b64u('data string');
  #or
- $tiger192_b64url = tiger192_b64u('any data', 'more data', 'even more data');
+ my $tiger192_b64url = tiger192_b64u('any data', 'more data', 'even more data');
 
 =head2 tiger192_file
 
 Reads file (defined by filename or filehandle) content, and returns its Tiger192 digest encoded as a binary string.
 
- $tiger192_raw = tiger192_file('filename.dat');
+ my $tiger192_raw = tiger192_file('filename.dat');
  #or
- $tiger192_raw = tiger192_file(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $tiger192_raw = tiger192_file($filehandle);
 
 =head2 tiger192_file_hex
 
 Reads file (defined by filename or filehandle) content, and returns its Tiger192 digest encoded as a hexadecimal string.
 
- $tiger192_hex = tiger192_file_hex('filename.dat');
+ my $tiger192_hex = tiger192_file_hex('filename.dat');
  #or
- $tiger192_hex = tiger192_file_hex(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $tiger192_hex = tiger192_file_hex($filehandle);
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
@@ -140,25 +145,31 @@ B<BEWARE:> You have to make sure that the filehandle is in binary mode before yo
 
 Reads file (defined by filename or filehandle) content, and returns its Tiger192 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $tiger192_b64 = tiger192_file_b64('filename.dat');
+ my $tiger192_b64 = tiger192_file_b64('filename.dat');
  #or
- $tiger192_b64 = tiger192_file_b64(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $tiger192_b64 = tiger192_file_b64($filehandle);
 
 =head2 tiger192_file_b64u
 
 Reads file (defined by filename or filehandle) content, and returns its Tiger192 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
- $tiger192_b64url = tiger192_file_b64u('filename.dat');
+ my $tiger192_b64url = tiger192_file_b64u('filename.dat');
  #or
- $tiger192_b64url = tiger192_file_b64u(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $tiger192_b64url = tiger192_file_b64u($filehandle);
 
 =head1 METHODS
 
 The OO interface provides the same set of functions as L<Crypt::Digest>.
+Unless noted otherwise, assume C<$d> is an existing digest object created via
+C<new>, for example:
+
+ my $d = Crypt::Digest::Tiger192->new();
 
 =head2 new
 
- $d = Crypt::Digest::Tiger192->new();
+ my $d = Crypt::Digest::Tiger192->new();
 
 =head2 clone
 
@@ -170,15 +181,20 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 add
 
+Appends data to the message. Returns the object itself (for chaining).
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 
+Reads the file content and appends it to the message. Returns the object itself (for chaining).
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 add_bits
 
@@ -196,19 +212,27 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 digest
 
- $result_raw = $d->digest();
+Returns the binary digest (raw bytes).
+
+ my $result_raw = $d->digest();
 
 =head2 hexdigest
 
- $result_hex = $d->hexdigest();
+Returns the digest encoded as a lowercase hexadecimal string.
+
+ my $result_hex = $d->hexdigest();
 
 =head2 b64digest
 
- $result_b64 = $d->b64digest();
+Returns the digest encoded as a Base64 string with trailing C<=> padding.
+
+ my $result_b64 = $d->b64digest();
 
 =head2 b64udigest
 
- $result_b64url = $d->b64udigest();
+Returns the digest encoded as a Base64 URL Safe string (no trailing C<=>).
+
+ my $result_b64url = $d->b64udigest();
 
 =head1 SEE ALSO
 

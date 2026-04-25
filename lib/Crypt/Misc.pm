@@ -275,31 +275,40 @@ Crypt::Misc - miscellaneous functions related to (or used by) CryptX
 
 =head1 SYNOPSIS
 
+ use Crypt::Misc ':all';
+
+ my $rawbytes = 'hello world';
+ my $filename = 'sample.bin';
+ my $pem_data = "-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----\n";
+ my $str1 = 'same';
+ my $str2 = 'same';
+
+ # Base64 and Base64/URL-safe functions
+ my $base64    = encode_b64($rawbytes);
+ my $rawbytes2 = decode_b64($base64);
+ my $base64url = encode_b64u($rawbytes);
+ my $rawbytes3 = decode_b64u($base64url);
+
+ # read/write file
+ my $rawdata = read_rawfile($filename);
+ write_rawfile($filename, $rawdata);
+
+ # convert PEM/DER
+ my $der_data = pem_to_der($pem_data);
+ my $pem_data2 = der_to_pem($der_data, "PUBLIC KEY");
+
+ # others
+ die "mismatch" unless slow_eq($str1, $str2);
+
+=head1 DESCRIPTION
+
 This module contains a collection of mostly unsorted functions loosely-related to CryptX distribution but not implementing cryptography.
 
 Most of them are also available in other perl modules but once you utilize CryptX you might avoid dependencies on other modules by using
 functions from Crypt::Misc.
 
-=head1 DESCRIPTION
-
- use Crypt::Misc ':all';
-
- # Base64 and Base64/URL-safe functions
- $base64    = encode_b64($rawbytes);
- $rawbytes  = decode_b64($base64);
- $base64url = encode_b64u($encode_b64u);
- $rawbytes  = decode_b64u($base64url);
-
- # read/write file
- $rawdata = read_rawfile($filename);
- write_rawfile($filename, $rawdata);
-
- # convert PEM/DER
- $der_data = pem_to_der($pem_data);
- $pem_data = der_to_pem($der_data);
-
-  # others
-  die "mismatch" unless slow_eq($str1, $str2);
+By default, Crypt::Misc doesn't import any function. You can import individual functions
+or use the C<:all> tag.
 
 =head1 FUNCTIONS
 
@@ -310,6 +319,11 @@ By default, Crypt::Misc doesn't import any function. You can import individual f
 Or import all available functions:
 
  use Crypt::Misc ':all';
+
+All encoding functions (C<encode_b64>, C<encode_b58b>, etc.) accept a binary
+string and return an ASCII string. All decoding functions (C<decode_b64>,
+C<decode_b58b>, etc.) accept an ASCII string and return a binary string, or
+C<undef> if the input is malformed.
 
 =head2  read_rawfile
 
@@ -333,7 +347,9 @@ I<Since: 0.029>
 
  if (slow_eq($data1, $data2)) { ... }
 
-Constant time compare (to avoid timing side-channel).
+Constant time compare (to avoid timing side-channel). Returns C<1> if the
+strings are equal, C<0> if they differ, or C<undef> if either argument is
+C<undef>.
 
 =head2  pem_to_der
 
@@ -344,6 +360,8 @@ I<Since: 0.029>
   $der_data = pem_to_der($pem_data, $password);
 
 Convert PEM to DER representation. Supports also password protected PEM data.
+Returns C<undef> if C<$pem_data> cannot be parsed (no valid PEM block found).
+Croaks if the PEM is encrypted but no C<$password> is provided.
 
 =head2  der_to_pem
 
@@ -353,12 +371,13 @@ I<Since: 0.029>
   #or
   $pem_data = der_to_pem($der_data, $header_name, $password);
   #or
-  $pem_data = der_to_pem($der_data, $header_name, $passord, $cipher_name);
+  $pem_data = der_to_pem($der_data, $header_name, $password, $cipher_name);
 
   # $header_name e.g. "PUBLIC KEY", "RSA PRIVATE KEY" ...
   # $cipher_name e.g. "DES-EDE3-CBC", "AES-256-CBC" (DEFAULT) ...
 
-Convert DER to PEM representation. Supports also password protected PEM data.
+Convert DER to PEM representation. Returns a PEM string (ASCII).
+Supports also password protected PEM data.
 
 =head2  random_v4uuid
 
@@ -406,17 +425,17 @@ For a version-specific check see L</is_v4uuid>.
 
 I<Since: 0.048>
 
- $octects = increment_octets_le($octets);
+ $octets = increment_octets_le($octets);
 
-Take input C<$octets> as a little-endian big number and return an increment.
+Treat input C<$octets> as a little-endian big number and return the incremented value.
 
 =head2 increment_octets_be
 
 I<Since: 0.048>
 
- $octects = increment_octets_be($octets);
+ $octets = increment_octets_be($octets);
 
-Take input C<$octets> as a big-endian big number and return an increment.
+Treat input C<$octets> as a big-endian big number and return the incremented value.
 
 =head2 encode_b64
 
@@ -438,7 +457,7 @@ Decode a Base64 string.
 
 I<Since: 0.029>
 
- $base64url_string = encode_b64($rawdata);
+ $base64url_string = encode_b64u($rawdata);
 
 Encode $rawbytes into Base64/URL-Safe string, no line-endings in the output string.
 
@@ -446,7 +465,7 @@ Encode $rawbytes into Base64/URL-Safe string, no line-endings in the output stri
 
 I<Since: 0.029>
 
- $rawdata = decode_b64($base64url_string);
+ $rawdata = decode_b64u($base64url_string);
 
 Decode a Base64/URL-Safe string.
 

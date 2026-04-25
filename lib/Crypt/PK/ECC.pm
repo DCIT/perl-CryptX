@@ -150,7 +150,7 @@ sub export_key_jwk {
       $kh->{$_} = "0$kh->{$_}" if length($kh->{$_}) % 2;
     }
     # NOTE: x + y are not necessary in privkey
-    # but they are used in https://tools.ietf.org/html/rfc7517#appendix-A.2
+    # but they are used in https://www.rfc-editor.org/rfc/rfc7517#appendix-A.2
     my $hash = {
       kty => "EC", crv => $curve_jwt,
       x => encode_b64u(pack("H*", $kh->{pub_x})),
@@ -238,7 +238,7 @@ sub import_key {
     return $self->import_key_raw($pubkey, "$2") if $pubkey && $typ =~ /^ecdsa-(.+?)-(.*)$/;
   }
   elsif ($data =~ /^\s*(\{.*?\})\s*$/s) {
-    # JSON Web Key (JWK) - http://tools.ietf.org/html/draft-ietf-jose-json-web-key
+    # JSON Web Key (JWK) - https://www.rfc-editor.org/rfc/rfc7517
     my $json = "$1";
     my $h = CryptX::_decode_json($json) || {};
     if ($h->{kty} eq "EC") {
@@ -276,7 +276,7 @@ sub curve2hash {
 
 ### FUNCTIONS
 
-sub ecc_encrypt {
+sub ecc_encrypt { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
@@ -284,7 +284,7 @@ sub ecc_encrypt {
   return $key->encrypt(@_);
 }
 
-sub ecc_decrypt {
+sub ecc_decrypt { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
@@ -292,7 +292,7 @@ sub ecc_decrypt {
   return $key->decrypt(@_);
 }
 
-sub ecc_sign_message {
+sub ecc_sign_message { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
@@ -300,7 +300,7 @@ sub ecc_sign_message {
   return $key->sign_message(@_);
 }
 
-sub ecc_verify_message {
+sub ecc_verify_message { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
@@ -308,7 +308,7 @@ sub ecc_verify_message {
   return $key->verify_message(@_);
 }
 
-sub ecc_sign_hash {
+sub ecc_sign_hash { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
@@ -316,7 +316,7 @@ sub ecc_sign_hash {
   return $key->sign_hash(@_);
 }
 
-sub ecc_verify_hash {
+sub ecc_verify_hash { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
@@ -324,7 +324,7 @@ sub ecc_verify_hash {
   return $key->verify_hash(@_);
 }
 
-sub ecc_shared_secret {
+sub ecc_shared_secret { # legacy/obsolete
   my ($privkey, $pubkey) = @_;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $privkey = __PACKAGE__->new($privkey) unless ref $privkey;
@@ -348,50 +348,29 @@ Crypt::PK::ECC - Public key cryptography based on EC
 
  ### OO interface
 
- #Encryption: Alice
- my $pub = Crypt::PK::ECC->new('Bob_pub_ecc1.der');
- my $ct = $pub->encrypt("secret message");
- #
- #Encryption: Bob (received ciphertext $ct)
- my $priv = Crypt::PK::ECC->new('Bob_priv_ecc1.der');
- my $pt = $priv->decrypt($ct);
+ my $message = 'hello world';
+ my $alice = Crypt::PK::ECC->new();
+ $alice->generate_key('secp256r1');
+ my $alice_public_der = $alice->export_key_der('public');
+ my $alice_public = Crypt::PK::ECC->new(\$alice_public_der);
 
- #Signature: Alice
- my $priv = Crypt::PK::ECC->new('Alice_priv_ecc1.der');
- my $sig = $priv->sign_message($message);
- #
- #Signature: Bob (received $message + $sig)
- my $pub = Crypt::PK::ECC->new('Alice_pub_ecc1.der');
- $pub->verify_message($sig, $message) or die "ERROR";
+ my $ciphertext = $alice_public->encrypt($message);
+ my $plaintext = $alice->decrypt($ciphertext);
 
- #Shared secret
- my $priv = Crypt::PK::ECC->new('Alice_priv_ecc1.der');
- my $pub = Crypt::PK::ECC->new('Bob_pub_ecc1.der');
- my $shared_secret = $priv->shared_secret($pub);
+ my $signature = $alice->sign_message($message);
+ $alice_public->verify_message($signature, $message) or die "ERROR";
 
- #Key generation
- my $pk = Crypt::PK::ECC->new();
- $pk->generate_key('secp160r1');
- my $private_der = $pk->export_key_der('private');
- my $public_der = $pk->export_key_der('public');
- my $private_pem = $pk->export_key_pem('private');
- my $public_pem = $pk->export_key_pem('public');
- my $public_raw = $pk->export_key_raw('public');
+ my $bob = Crypt::PK::ECC->new();
+ $bob->generate_key('secp256r1');
+ my $bob_public_der = $bob->export_key_der('public');
+ my $bob_public = Crypt::PK::ECC->new(\$bob_public_der);
 
- ### Functional interface
+ my $alice_secret = $alice->shared_secret($bob_public);
+ my $bob_secret = $bob->shared_secret($alice_public);
 
- #Encryption: Alice
- my $ct = ecc_encrypt('Bob_pub_ecc1.der', "secret message");
- #Encryption: Bob (received ciphertext $ct)
- my $pt = ecc_decrypt('Bob_priv_ecc1.der', $ct);
-
- #Signature: Alice
- my $sig = ecc_sign_message('Alice_priv_ecc1.der', $message);
- #Signature: Bob (received $message + $sig)
- ecc_verify_message('Alice_pub_ecc1.der', $sig, $message) or die "ERROR";
-
- #Shared secret
- my $shared_secret = ecc_shared_secret('Alice_priv_ecc1.der', 'Bob_pub_ecc1.der');
+ my $private_der = $alice->export_key_der('private');
+ my $public_pem = $alice_public->export_key_pem('public');
+ my $public_raw = $alice_public->export_key_raw('public');
 
 =head1 DESCRIPTION
 
@@ -399,26 +378,32 @@ The module provides a set of core ECC functions as well as implementation of ECD
 
 Supports elliptic curves C<y^2 = x^3 + a*x + b> over prime fields C<Fp = Z/pZ> (binary fields not supported).
 
+Legacy function-style wrappers still exist in code for backwards compatibility,
+but they are intentionally undocumented.
+
 =head1 METHODS
 
 =head2 new
 
  my $pk = Crypt::PK::ECC->new();
  #or
- my $pk = Crypt::PK::ECC->new($priv_or_pub_key_filename);
- #or
- my $pk = Crypt::PK::ECC->new(\$buffer_containing_priv_or_pub_key);
+ my $source = Crypt::PK::ECC->new();
+ $source->generate_key('secp256r1');
 
-Support for password protected PEM keys
+ my $public_der = $source->export_key_der('public');
+ my $pub = Crypt::PK::ECC->new(\$public_der);
 
- my $pk = Crypt::PK::ECC->new($priv_pem_key_filename, $password);
- #or
- my $pk = Crypt::PK::ECC->new(\$buffer_containing_priv_pem_key, $password);
+ my $private_pem = $source->export_key_pem('private', 'secret', 'AES-256-CBC');
+ my $priv = Crypt::PK::ECC->new(\$private_pem, 'secret');
+
+Passing C<$filename> or C<\$buffer> to C<new> is equivalent: both forms
+immediately import the key material into the new object.
 
 =head2 generate_key
 
 Uses Yarrow-based cryptographically strong random number generator seeded with
 random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
+Returns the object itself (for chaining).
 
  $pk->generate_key($curve_name);
  #or
@@ -426,7 +411,7 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 The following predefined C<$curve_name> values are supported:
 
- # curves from http://www.ecc-brainpool.org/download/Domain-parameters.pdf
+ # curves from https://www.rfc-editor.org/rfc/rfc5639
  'brainpoolp160r1'
  'brainpoolp192r1'
  'brainpoolp224r1'
@@ -434,7 +419,7 @@ The following predefined C<$curve_name> values are supported:
  'brainpoolp320r1'
  'brainpoolp384r1'
  'brainpoolp512r1'
- # curves from http://www.secg.org/collateral/sec2_final.pdf
+ # curves from https://www.secg.org/sec2-v2.pdf
  'secp112r1'
  'secp112r2'
  'secp128r1'
@@ -450,7 +435,7 @@ The following predefined C<$curve_name> values are supported:
  'secp256r1'   ... same as nistp256, prime256v1
  'secp384r1'   ... same as nistp384
  'secp521r1'   ... same as nistp521
- #curves from http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
+ #curves from https://csrc.nist.gov/pubs/fips/186-4/final
  'nistp192'    ... same as secp192r1, prime192v1
  'nistp224'    ... same as secp224r1
  'nistp256'    ... same as secp256r1, prime256v1
@@ -475,21 +460,26 @@ Using custom curve parameters:
                      order    => 'FFFFFFFFFFFFFFFFFFFFFFFF7A62D031C83F4294F640EC13',
                      cofactor => 1 });
 
-See L<http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf>, L<http://www.secg.org/collateral/sec2_final.pdf>, L<http://www.ecc-brainpool.org/download/Domain-parameters.pdf>
+See L<https://csrc.nist.gov/pubs/fips/186-4/final>,
+L<https://www.secg.org/sec2-v2.pdf>,
+L<https://www.rfc-editor.org/rfc/rfc5639>
 
 =head2 import_key
 
 Loads private or public key in DER or PEM format.
 
- $pk->import_key($filename);
- #or
- $pk->import_key(\$buffer_containing_key);
+ my $source = Crypt::PK::ECC->new();
+ $source->generate_key('secp256r1');
 
-Support for password protected PEM keys:
+ my $public_der = $source->export_key_der('public');
+ my $pub = Crypt::PK::ECC->new();
+ $pub->import_key(\$public_der);
 
- $pk->import_key($filename, $password);
- #or
- $pk->import_key(\$buffer_containing_key, $password);
+ my $private_pem = $source->export_key_pem('private', 'secret', 'AES-256-CBC');
+ my $priv = Crypt::PK::ECC->new();
+ $priv->import_key(\$private_pem, 'secret');
+
+The same method also accepts filenames instead of buffers.
 
 Loading private or public keys form perl hash:
 
@@ -666,7 +656,7 @@ Supported key formats:
 
 =item * EC private keys in JSON Web Key (JWK) format
 
-See L<http://tools.ietf.org/html/draft-ietf-jose-json-web-key>
+See L<https://www.rfc-editor.org/rfc/rfc7517>
 
  {
   "kty":"EC",
@@ -696,10 +686,12 @@ B<BEWARE:> For JWK support you need to have L<JSON> module installed.
 Import raw public/private key - can load data exported by L</export_key_raw>.
 
  $pk->import_key_raw($key, $curve);
- # $key .... data exported by export_key_raw()
- # $curve .. curve name or hashref with curve parameters - same as by generate_key()
+ # $key .... [binary string] data exported by export_key_raw()
+ # $curve .. [string | hashref] curve name or hashref with curve parameters - same as by generate_key()
 
 =head2 export_key_der
+
+Returns the key as a binary DER-encoded string.
 
  my $private_der = $pk->export_key_der('private');
  #or
@@ -720,6 +712,8 @@ that defines curve by OID + stores public point in compressed form.
  my $public_pem = $pk->export_key_der('public_compressed');
 
 =head2 export_key_pem
+
+Returns the key as a PEM-encoded string (ASCII).
 
  my $private_pem = $pk->export_key_pem('private');
  #or
@@ -759,6 +753,8 @@ Support for password protected PEM keys
 
 I<Since: CryptX-0.022>
 
+Returns a JSON string, or a hashref if the optional second argument is true.
+
 Exports public/private keys as a JSON Web Key (JWK).
 
  my $private_json_text = $pk->export_key_jwk('private');
@@ -779,11 +775,13 @@ I<Since: CryptX-0.031>
 
 Exports the key's JSON Web Key Thumbprint as a string.
 
-If you don't know what this is, see RFC 7638 L<https://tools.ietf.org/html/rfc7638>.
+If you don't know what this is, see RFC 7638 L<https://www.rfc-editor.org/rfc/rfc7638>.
 
  my $thumbprint = $pk->export_key_jwk_thumbprint('SHA256');
 
 =head2 export_key_raw
+
+Returns the raw key as a binary string.
 
 Export raw public/private key. Public key is exported in ASN X9.62 format (compressed or uncompressed),
 private key is exported as raw bytes (padded with leading zeros to have the same size as the ECC curve).
@@ -796,32 +794,38 @@ private key is exported as raw bytes (padded with leading zeros to have the same
 
 =head2 encrypt
 
+Returns the ciphertext as a binary string.
+
  my $pk = Crypt::PK::ECC->new($pub_key_filename);
  my $ct = $pk->encrypt($message);
  #or
  my $ct = $pk->encrypt($message, $hash_name);
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $hash_name .. [string] 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 decrypt
+
+Returns the plaintext as a binary string.
 
  my $pk = Crypt::PK::ECC->new($priv_key_filename);
  my $pt = $pk->decrypt($ciphertext);
 
 =head2 sign_message
 
- my $pk = Crypt::PK::ECC->new($priv_key_filename);
- my $signature = $priv->sign_message($message);
- #or
- my $signature = $priv->sign_message($message, $hash_name);
+Returns the signature as a binary string.
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ my $pk = Crypt::PK::ECC->new($priv_key_filename);
+ my $signature = $pk->sign_message($message);
+ #or
+ my $signature = $pk->sign_message($message, $hash_name);
+
+ # $hash_name .. [string] 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 sign_message_rfc7518
 
 I<Since: CryptX-0.024>
 
-Same as L<sign_message|/sign_message> only the signature format is as defined by L<https://tools.ietf.org/html/rfc7518>
+Same as L<sign_message|/sign_message> only the signature format is as defined by L<https://www.rfc-editor.org/rfc/rfc7518>
 (JWA - JSON Web Algorithms).
 
 B<BEWARE:> This creates signatures according to the structure that RFC 7518 describes but does not apply
@@ -830,18 +834,20 @@ to get a fully RFC-7518-compliant signature.
 
 =head2 verify_message
 
- my $pk = Crypt::PK::ECC->new($pub_key_filename);
- my $valid = $pub->verify_message($signature, $message)
- #or
- my $valid = $pub->verify_message($signature, $message, $hash_name);
+Returns C<1> if the signature is valid, C<0> otherwise.
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ my $pk = Crypt::PK::ECC->new($pub_key_filename);
+ my $valid = $pk->verify_message($signature, $message);
+ #or
+ my $valid = $pk->verify_message($signature, $message, $hash_name);
+
+ # $hash_name .. [string] 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 verify_message_rfc7518
 
 I<Since: CryptX-0.024>
 
-Same as L<verify_message|/verify_message> only the signature format is as defined by L<https://tools.ietf.org/html/rfc7518>
+Same as L<verify_message|/verify_message> only the signature format is as defined by L<https://www.rfc-editor.org/rfc/rfc7518>
 (JWA - JSON Web Algorithms).
 
 B<BEWARE:> This verifies signatures according to the structure that RFC 7518 describes but does not apply
@@ -850,10 +856,12 @@ to get a fully RFC-7518-compliant signature.
 
 =head2 sign_hash
 
- my $pk = Crypt::PK::ECC->new($priv_key_filename);
- my $signature = $priv->sign_hash($message_hash, $deterministic_hash_name);
+Returns the signature as a binary string.
 
- #NOTE: $deterministic_hash_name can be 'SHA1', 'SHA256' or any other hash supported by Crypt::Digest
+ my $pk = Crypt::PK::ECC->new($priv_key_filename);
+ my $signature = $pk->sign_hash($message_hash, $deterministic_hash_name);
+
+ # $deterministic_hash_name .. [string] 'SHA1', 'SHA256' or any other hash supported by Crypt::Digest
  #      in most cases it will be the same as used to create $message_hash, if not provided non-deterministic
  #      signature will be created
 
@@ -861,67 +869,81 @@ I<Since: CryptX-0.081>
 
 =head2 sign_hash_eth
 
-Same as L<sign_hash|/sign_hash> only the signature format is as defined by Ethereum.
-32 byte r value, 32 byte s value, 1 recovery byte (27 or 28)
+Same as L<sign_hash|/sign_hash> but returns the signature in Ethereum format:
+32-byte C<r> value, 32-byte C<s> value, 1-byte recovery ID (27 or 28). Total
+output is always exactly 65 bytes.
 
 =head2 sign_hash_rfc7518
 
 I<Since: CryptX-0.059>
 
-Same as L<sign_hash|/sign_hash> only the signature format is as defined by L<https://tools.ietf.org/html/rfc7518>
+Same as L<sign_hash|/sign_hash> only the signature format is as defined by L<https://www.rfc-editor.org/rfc/rfc7518>
 (JWA - JSON Web Algorithms).
 
 =head2 verify_hash
 
+Returns C<1> if the signature is valid, C<0> otherwise.
+
  my $pk = Crypt::PK::ECC->new($pub_key_filename);
- my $valid = $pub->verify_hash($signature, $message_hash);
+ my $valid = $pk->verify_hash($signature, $message_hash);
 
 =head2 verify_hash_rfc7518
 
 I<Since: CryptX-0.081>
 
+Same as L<verify_hash|/verify_hash> only the signature format is as defined by L<https://www.rfc-editor.org/rfc/rfc7518>
+(JWA - JSON Web Algorithms).
+
 =head2 verify_hash_eth
 
-Same as L<verify_hash|/verify_hash> only the signature format is as defined by Ethereum.
+Returns C<1> if the signature is valid, C<0> otherwise.
+Same as L<verify_hash|/verify_hash> but expects the signature in Ethereum format
+(65 bytes: r &#124;&#124; s &#124;&#124; recovery_id).
 Compatible with signatures generated by L<sign_hash_eth|/sign_hash_eth>.
 
 =head2 recovery_pub_eth
 
 Alternative method to verify a signature with recovery of the public key.
-Mainly used for in Ethereum-like blockchain networks.
+Mainly used in Ethereum-like blockchain networks.
 This method will recover public key from ECDSA signature in Ethereum format
 (see L<sign_hash_eth|sign_hash_eth>).
 
  my $pk = Crypt::PK::ECC->new($priv_key_filename);
  my $signature = $pk->sign_hash_eth($message_hash);
- my $pub_key = $pk->recovery_pub_eth($sig, $hash)
+ my $pub_key = $pk->recovery_pub_eth($signature, $message_hash);
 
 =head2 recovery_pub
 
-Same logic as recovery_pub_eth except, but compatible with L<sign_hash|/sign_hash>
-signature. The main difference that B<$recid> is required, because B<sign_hash> signature
-doesn't contain parity bit, so you need to specify it explicitly.
+Recovers the public key from an ECDSA signature produced by L</sign_hash>.
+Returns a new L<Crypt::PK::ECC> object containing the recovered public key.
+
+Unlike L</recovery_pub_eth>, the standard DER-encoded signature does not embed
+the recovery identifier, so C<$recid> must be supplied explicitly.
 
  my $pk = Crypt::PK::ECC->new($priv_key_filename);
  my $signature = $pk->sign_hash($message_hash);
- my $pub_key = $pk->recovery_pub($signature, $message_hash, $recid)
+ my $pub_key = $pk->recovery_pub($signature, $message_hash, $recid);
+
+ # $signature .... [binary string] binary DER-encoded ECDSA signature (from sign_hash)
+ # $message_hash . [binary string] the hash that was signed
+ # $recid ........ [integer] recovery identifier, 0 or 1 (selects which of the
+ #                 two possible public keys corresponds to the signature)
 
 =head2 recovery_pub_rfc7518
 
-Same logic as recovery_pub_eth except, but compatible with L<sign_hash_refc7518|/sign_hash_refc7518>
+I<Since: CryptX-0.059>
+
+Same logic as recovery_pub_eth except, but compatible with L<sign_hash_rfc7518|/sign_hash_rfc7518>
 signature. The main difference that B<$recid> is required, because rfc7518 signature
 doesn't contain parity bit, so you need to specify it explicitly.
 
  my $pk = Crypt::PK::ECC->new($priv_key_filename);
  my $signature = $pk->sign_hash_rfc7518($message_hash);
- my $pub_key = $pk->recovery_pub_rfc7518($signature, $message_hash, $recid)
-
-I<Since: CryptX-0.059>
-
-Same as L<verify_hash|/verify_hash> only the signature format is as defined by L<https://tools.ietf.org/html/rfc7518>
-(JWA - JSON Web Algorithms).
+ my $pub_key = $pk->recovery_pub_rfc7518($signature, $message_hash, $recid);
 
 =head2 shared_secret
+
+Returns the shared secret as a binary string (raw bytes).
 
   # Alice having her priv key $pk and Bob's public key $pkb
   my $pk  = Crypt::PK::ECC->new($priv_key_filename);
@@ -946,6 +968,8 @@ Same as L<verify_hash|/verify_hash> only the signature format is as defined by L
  # returns key size in bytes or undef if no key loaded
 
 =head2 key2hash
+
+Returns a hashref with the key components, or C<undef> if no key is loaded.
 
  my $hash = $pk->key2hash;
 
@@ -988,76 +1012,6 @@ I<Since: CryptX-0.024>
    prime    => "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF",
  }
 
-=head1 FUNCTIONS
-
-=head2 ecc_encrypt
-
-Elliptic Curve Diffie-Hellman (ECDH) encryption as implemented by libtomcrypt. See method L</encrypt> below.
-
- my $ct = ecc_encrypt($pub_key_filename, $message);
- #or
- my $ct = ecc_encrypt(\$buffer_containing_pub_key, $message);
- #or
- my $ct = ecc_encrypt($pub_key_filename, $message, $hash_name);
-
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
-
-ECCDH Encryption is performed by producing a random key, hashing it, and XOR'ing the digest against the plaintext.
-
-=head2 ecc_decrypt
-
-Elliptic Curve Diffie-Hellman (ECDH) decryption as implemented by libtomcrypt. See method L</decrypt> below.
-
- my $pt = ecc_decrypt($priv_key_filename, $ciphertext);
- #or
- my $pt = ecc_decrypt(\$buffer_containing_priv_key, $ciphertext);
-
-=head2 ecc_sign_message
-
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation. See method L</sign_message> below.
-
- my $sig = ecc_sign_message($priv_key_filename, $message);
- #or
- my $sig = ecc_sign_message(\$buffer_containing_priv_key, $message);
- #or
- my $sig = ecc_sign_message($priv_key, $message, $hash_name);
-
-=head2 ecc_verify_message
-
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification. See method L</verify_message> below.
-
- ecc_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
- #or
- ecc_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
- #or
- ecc_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
-
-=head2 ecc_sign_hash
-
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature generation. See method L</sign_hash> below.
-
- my $sig = ecc_sign_hash($priv_key_filename, $message_hash);
- #or
- my $sig = ecc_sign_hash(\$buffer_containing_priv_key, $message_hash);
-
-=head2 ecc_verify_hash
-
-Elliptic Curve Digital Signature Algorithm (ECDSA) - signature verification. See method L</verify_hash> below.
-
- ecc_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
- #or
- ecc_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
-
-=head2 ecc_shared_secret
-
-Elliptic curve Diffie-Hellman (ECDH) - construct a Diffie-Hellman shared secret with a private and public ECC key. See method L</shared_secret> below.
-
- #on Alice side
- my $shared_secret = ecc_shared_secret('Alice_priv_ecc1.der', 'Bob_pub_ecc1.der');
-
- #on Bob side
- my $shared_secret = ecc_shared_secret('Bob_priv_ecc1.der', 'Alice_pub_ecc1.der');
-
 =head1 OpenSSL interoperability
 
  ### let's have:
@@ -1079,7 +1033,7 @@ Verify signature (Perl code):
 
  my $pkec = Crypt::PK::ECC->new("eckey.pub.pem");
  my $signature = read_rawfile("input.sha1-ec.sig");
- my $valid = $pkec->verify_hash($signature, digest_file("SHA1", "input.data"), "SHA1", "v1.5");
+ my $valid = $pkec->verify_hash($signature, digest_file("SHA1", "input.data"));
  print $valid ? "SUCCESS" : "FAILURE";
 
 =head2 Sign by Crypt::PK::ECC, verify by OpenSSL
@@ -1091,7 +1045,7 @@ Create signature (Perl code):
  use Crypt::Misc 'write_rawfile';
 
  my $pkec = Crypt::PK::ECC->new("eckey.priv.pem");
- my $signature = $pkec->sign_hash(digest_file("SHA1", "input.data"), "SHA1", "v1.5");
+ my $signature = $pkec->sign_hash(digest_file("SHA1", "input.data"));
  write_rawfile("input.sha1-ec.sig", $signature);
 
 Verify signature (from commandline):

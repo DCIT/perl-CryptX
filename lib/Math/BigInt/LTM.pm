@@ -1040,6 +1040,15 @@ Provides support for big integer calculations by means of the libtommath c-libra
 
 I<Since: CryptX-0.029>
 
+=head1 METHODS
+
+=head2 api_version
+
+Returns the backend API version expected by L<Math::BigInt>.
+
+This method exists for L<Math::BigInt> backend integration; normal application code
+should not need to call it directly.
+
 =head1 SEE ALSO
 
 L<Math::BigInt>, L<https://github.com/libtom/libtommath>

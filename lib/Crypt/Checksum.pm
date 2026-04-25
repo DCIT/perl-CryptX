@@ -62,8 +62,17 @@ sub CLONE_SKIP { 1 } # prevent cloning
 
 Crypt::Checksum - [internal only]
 
+=head1 SYNOPSIS
+
+Do not use this module directly in new code.
+
+Use L<Crypt::Checksum::CRC32> or L<Crypt::Checksum::Adler32> instead.
+
 =head1 DESCRIPTION
 
-You are probably looking for L<Crypt::Checksum::CRC32> or L<Crypt::Checksum::Adler32>.
+Compatibility wrapper for the checksum modules.
+
+Do not use this module directly in new code. Use
+L<Crypt::Checksum::CRC32> or L<Crypt::Checksum::Adler32> instead.
 
 =cut

@@ -23,14 +23,14 @@ warn "STARTED: outdir_l='$outdir_l' outdir_t='$outdir_t'\n";
 
 my %list = (
         F9      => { info=>'Message authentication code F9', urls=>[] },
-        HMAC    => { info=>'Message authentication code HMAC', urls=>['https://en.wikipedia.org/wiki/Hmac', 'https://tools.ietf.org/html/rfc2104'] },
+        HMAC    => { info=>'Message authentication code HMAC', urls=>['https://en.wikipedia.org/wiki/Hmac', 'https://www.rfc-editor.org/rfc/rfc2104'] },
         OMAC    => { info=>'Message authentication code OMAC', urls=>['https://en.wikipedia.org/wiki/OMAC_%28cryptography%29'] },
-        Pelican => { info=>'Message authentication code Pelican (AES based MAC)', urls=>['http://eprint.iacr.org/2005/088.pdf'] },
+        Pelican => { info=>'Message authentication code Pelican (AES based MAC)', urls=>['https://eprint.iacr.org/2005/088.pdf'] },
         PMAC    => { info=>'Message authentication code PMAC', urls=>['https://en.wikipedia.org/wiki/PMAC_%28cryptography%29'] },
-        XCBC    => { info=>'Message authentication code XCBC (RFC 3566)', urls=>['https://www.ietf.org/rfc/rfc3566.txt'] },
-        Poly1305=> { info=>'Message authentication code Poly1305 (RFC 7539)', urls=>['https://www.ietf.org/rfc/rfc7539.txt'] },
-        BLAKE2s => { info=>'Message authentication code BLAKE2s MAC (RFC 7693)', urls=>['https://tools.ietf.org/html/rfc7693'] },
-        BLAKE2b => { info=>'Message authentication code BLAKE2b MAC (RFC 7693)', urls=>['https://tools.ietf.org/html/rfc7693'] },
+        XCBC    => { info=>'Message authentication code XCBC (RFC 3566)', urls=>['https://www.rfc-editor.org/rfc/rfc3566'] },
+        Poly1305=> { info=>'Message authentication code Poly1305 (RFC 7539)', urls=>['https://www.rfc-editor.org/rfc/rfc7539'] },
+        BLAKE2s => { info=>'Message authentication code BLAKE2s MAC (RFC 7693)', urls=>['https://www.rfc-editor.org/rfc/rfc7693'] },
+        BLAKE2b => { info=>'Message authentication code BLAKE2b MAC (RFC 7693)', urls=>['https://www.rfc-editor.org/rfc/rfc7693'] },
 );
 
 my @test_strings = ( '', '123', "test\0test\0test\n");

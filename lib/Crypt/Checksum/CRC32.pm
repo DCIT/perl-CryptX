@@ -31,33 +31,38 @@ Crypt::Checksum::CRC32 - Compute CRC32 checksum
    use Crypt::Checksum::CRC32 ':all';
 
    # calculate CRC32 checksum from string/buffer
-   $checksum_raw  = crc32_data($data);
-   $checksum_hex  = crc32_data_hex($data);
-   $checksum_int  = crc32_data_int($data);
-   # calculate CRC32 checksum from file
-   $checksum_raw  = crc32_file('filename.dat');
-   $checksum_hex  = crc32_file_hex('filename.dat');
-   $checksum_int  = crc32_file_int('filename.dat');
-   # calculate CRC32 checksum from filehandle
-   $checksum_raw  = crc32_file(*FILEHANDLE);
-   $checksum_hex  = crc32_file_hex(*FILEHANDLE);
-   $checksum_int  = crc32_file_int(*FILEHANDLE);
+   my $data = 'data string';
+   my $checksum_raw  = crc32_data($data);
+   my $checksum_hex  = crc32_data_hex($data);
+   my $checksum_int  = crc32_data_int($data);
+   # or from file
+   my $checksum_file_raw  = crc32_file('filename.dat');
+   my $checksum_file_hex  = crc32_file_hex('filename.dat');
+   my $checksum_file_int  = crc32_file_int('filename.dat');
+   # or from filehandle
+   my $filehandle = ...; # existing binary-mode filehandle
+   my $checksum_fh_raw  = crc32_file($filehandle);
+   my $checksum_fh_hex  = crc32_file_hex($filehandle);
+   my $checksum_fh_int  = crc32_file_int($filehandle);
 
    ### OO interface:
    use Crypt::Checksum::CRC32;
 
-   $d = Crypt::Checksum::CRC32->new;
+   my $d = Crypt::Checksum::CRC32->new;
    $d->add('any data');
    $d->add('another data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $checksum_raw = $d->digest;     # raw 4 bytes
-   $checksum_hex = $d->hexdigest;  # hexadecimal form
-   $checksum_int = $d->intdigest;  # 32bit unsigned integer
+   my $checksum_raw = $d->digest;     # raw 4 bytes
+   my $checksum_hex = $d->hexdigest;  # hexadecimal form
+   my $checksum_int = $d->intdigest;  # 32bit unsigned integer
+
+   # or checksum a file instead
+   my $checksum_file_raw = Crypt::Checksum::CRC32->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
 
-Calculating CRC32 checksums.
+Computes CRC-32 checksums using the ISO 3309 / ITU-T V.42 polynomial
+(C<0xEDB88320>, also known as CRC-32/ISO-HDLC). This is the same variant
+used by Ethernet (IEEE 802.3), PKZIP, gzip, and PNG.
 
 I<Updated: v0.057>
 
@@ -77,59 +82,65 @@ Or all of them at once:
 
 =head2 crc32_data
 
-Returns checksum as raw octects.
+Returns the checksum as raw octets.
 
- $checksum_raw = crc32_data('data string');
+ my $checksum_raw = crc32_data('data string');
  #or
- $checksum_raw = crc32_data('any data', 'more data', 'even more data');
+ my $checksum_raw = crc32_data('any data', 'more data', 'even more data');
 
 =head2 crc32_data_hex
 
 Returns checksum as a hexadecimal string.
 
- $checksum_hex = crc32_data_hex('data string');
+ my $checksum_hex = crc32_data_hex('data string');
  #or
- $checksum_hex = crc32_data_hex('any data', 'more data', 'even more data');
+ my $checksum_hex = crc32_data_hex('any data', 'more data', 'even more data');
 
 =head2 crc32_data_int
 
 Returns checksum as unsigned 32bit integer.
 
- $checksum_int = crc32_data_int('data string');
+ my $checksum_int = crc32_data_int('data string');
  #or
- $checksum_int = crc32_data_int('any data', 'more data', 'even more data');
+ my $checksum_int = crc32_data_int('any data', 'more data', 'even more data');
 
 =head2 crc32_file
 
-Returns checksum as raw octects.
+Returns the checksum as raw octets.
 
- $checksum_raw = crc32_file('filename.dat');
+ my $checksum_raw = crc32_file('filename.dat');
  #or
- $checksum_raw = crc32_file(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $checksum_raw = crc32_file($filehandle);
 
 =head2 crc32_file_hex
 
 Returns checksum as a hexadecimal string.
 
- $checksum_hex = crc32_file_hex('filename.dat');
+ my $checksum_hex = crc32_file_hex('filename.dat');
  #or
- $checksum_hex = crc32_file_hex(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $checksum_hex = crc32_file_hex($filehandle);
 
 =head2 crc32_file_int
 
 Returns checksum as unsigned 32bit integer.
 
- $checksum_int = crc32_file_int('filename.dat');
+ my $checksum_int = crc32_file_int('filename.dat');
  #or
- $checksum_int = crc32_file_int(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $checksum_int = crc32_file_int($filehandle);
 
 =head1 METHODS
+
+Unless noted otherwise, assume C<$d> is an existing checksum object created via
+C<new>.
 
 =head2 new
 
 Constructor, returns a reference to the checksum object.
 
- $d = Crypt::Checksum::CRC32->new;
+ my $d = Crypt::Checksum::CRC32->new;
 
 =head2 clone
 
@@ -159,7 +170,8 @@ The return value is the checksum object itself.
 
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
@@ -167,19 +179,19 @@ B<BEWARE:> You have to make sure that the filehandle is in binary mode before yo
 
 Returns the binary checksum (raw bytes).
 
- $result_raw = $d->digest();
+ my $result_raw = $d->digest();
 
 =head2 hexdigest
 
 Returns the checksum encoded as a hexadecimal string.
 
- $result_hex = $d->hexdigest();
+ my $result_hex = $d->hexdigest();
 
 =head2 intdigest
 
 Returns the checksum encoded as unsigned 32bit integer.
 
- $result_int = $d->intdigest();
+ my $result_int = $d->intdigest();
 
 =head1 SEE ALSO
 

@@ -26,46 +26,55 @@ Crypt::Mac::[%orig_name%] - [%info%]
 
    # calculate MAC from string/buffer
 [%-IF lc_name == 'hmac' %]
-   $[%lc_name%]_raw  = [%lc_name%]('SHA256', $key, 'data buffer');
-   $[%lc_name%]_hex  = [%lc_name%]_hex('SHA256', $key, 'data buffer');
-   $[%lc_name%]_b64  = [%lc_name%]_b64('SHA256', $key, 'data buffer');
-   $[%lc_name%]_b64u = [%lc_name%]_b64u('SHA256', $key, 'data buffer');
+   my $[%lc_name%]_raw  = [%lc_name%]('SHA256', $key, 'data buffer');
+   my $[%lc_name%]_hex  = [%lc_name%]_hex('SHA256', $key, 'data buffer');
+   my $[%lc_name%]_b64  = [%lc_name%]_b64('SHA256', $key, 'data buffer');
+   my $[%lc_name%]_b64u = [%lc_name%]_b64u('SHA256', $key, 'data buffer');
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
-   $[%lc_name%]_raw  = [%lc_name%]($size, $key, 'data buffer');
-   $[%lc_name%]_hex  = [%lc_name%]_hex($size, $key, 'data buffer');
-   $[%lc_name%]_b64  = [%lc_name%]_b64($size, $key, 'data buffer');
-   $[%lc_name%]_b64u = [%lc_name%]_b64u($size, $key, 'data buffer');
+   my $[%lc_name%]_raw  = [%lc_name%]($size, $key, 'data buffer');
+   my $[%lc_name%]_hex  = [%lc_name%]_hex($size, $key, 'data buffer');
+   my $[%lc_name%]_b64  = [%lc_name%]_b64($size, $key, 'data buffer');
+   my $[%lc_name%]_b64u = [%lc_name%]_b64u($size, $key, 'data buffer');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
-   $[%lc_name%]_raw  = [%lc_name%]($key, 'data buffer');
-   $[%lc_name%]_hex  = [%lc_name%]_hex($key, 'data buffer');
-   $[%lc_name%]_b64  = [%lc_name%]_b64($key, 'data buffer');
-   $[%lc_name%]_b64u = [%lc_name%]_b64u($key, 'data buffer');
+   my $[%lc_name%]_raw  = [%lc_name%]($key, 'data buffer');
+   my $[%lc_name%]_hex  = [%lc_name%]_hex($key, 'data buffer');
+   my $[%lc_name%]_b64  = [%lc_name%]_b64($key, 'data buffer');
+   my $[%lc_name%]_b64u = [%lc_name%]_b64u($key, 'data buffer');
 [%-ELSE%]
-   $[%lc_name%]_raw  = [%lc_name%]($cipher_name, $key, 'data buffer');
-   $[%lc_name%]_hex  = [%lc_name%]_hex($cipher_name, $key, 'data buffer');
-   $[%lc_name%]_b64  = [%lc_name%]_b64($cipher_name, $key, 'data buffer');
-   $[%lc_name%]_b64u = [%lc_name%]_b64u($cipher_name, $key, 'data buffer');
+   my $[%lc_name%]_raw  = [%lc_name%]($cipher_name, $key, 'data buffer');
+   my $[%lc_name%]_hex  = [%lc_name%]_hex($cipher_name, $key, 'data buffer');
+   my $[%lc_name%]_b64  = [%lc_name%]_b64($cipher_name, $key, 'data buffer');
+   my $[%lc_name%]_b64u = [%lc_name%]_b64u($cipher_name, $key, 'data buffer');
 [%-END%]
 
    ### OO interface:
    use Crypt::Mac::[%orig_name%];
 
 [%-IF lc_name == 'hmac' %]
-   $d = Crypt::Mac::[%orig_name%]->new('SHA256', $key);
+   my $d = Crypt::Mac::[%orig_name%]->new('SHA256', $key);
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
-   $d = Crypt::Mac::[%orig_name%]->new($size, $key);
+   my $d = Crypt::Mac::[%orig_name%]->new($size, $key);
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
-   $d = Crypt::Mac::[%orig_name%]->new($key);
+   my $d = Crypt::Mac::[%orig_name%]->new($key);
 [%-ELSE%]
-   $d = Crypt::Mac::[%orig_name%]->new($cipher_name, $key);
+   my $d = Crypt::Mac::[%orig_name%]->new($cipher_name, $key);
 [%-END%]
    $d->add('any data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $result_raw  = $d->mac;     # raw bytes
-   $result_hex  = $d->hexmac;  # hexadecimal form
-   $result_b64  = $d->b64mac;  # Base64 form
-   $result_b64u = $d->b64umac; # Base64 URL Safe form
+   my $result_raw  = $d->mac;     # raw bytes
+   my $result_hex  = $d->hexmac;  # hexadecimal form
+   my $result_b64  = $d->b64mac;  # Base64 form
+   my $result_b64u = $d->b64umac; # Base64 URL Safe form
+
+   # or MAC a file instead
+[%-IF lc_name == 'hmac' %]
+   my $file_result_raw = Crypt::Mac::[%orig_name%]->new('SHA256', $key)->addfile('filename.dat')->mac;
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+   my $file_result_raw = Crypt::Mac::[%orig_name%]->new($size, $key)->addfile('filename.dat')->mac;
+[%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
+   my $file_result_raw = Crypt::Mac::[%orig_name%]->new($key)->addfile('filename.dat')->mac;
+[%-ELSE%]
+   my $file_result_raw = Crypt::Mac::[%orig_name%]->new($cipher_name, $key)->addfile('filename.dat')->mac;
+[%-END%]
 
 =head1 DESCRIPTION
 
@@ -90,24 +99,24 @@ Or all of them at once:
 Logically joins all arguments into a single string, and returns its [%orig_name%] message authentication code encoded as a binary string.
 
 [%-IF lc_name == 'hmac' %]
- $[%lc_name%]_raw = [%lc_name%]($hash_name, $key, 'data buffer');
+ my $[%lc_name%]_raw = [%lc_name%]($hash_name, $key, 'data buffer');
  #or
- $[%lc_name%]_raw = [%lc_name%]($hash_name, $key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_raw = [%lc_name%]($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
- # $key ......... the key (octets/bytes)
+ # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $key ......... [binary string] the key (octets/bytes)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
- $[%lc_name%]_raw = [%lc_name%]($size, $key, 'data buffer');
+ my $[%lc_name%]_raw = [%lc_name%]($size, $key, 'data buffer');
  #or
- $[%lc_name%]_raw = [%lc_name%]($size, $key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_raw = [%lc_name%]($size, $key, 'any data', 'more data', 'even more data');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
- $[%lc_name%]_raw = [%lc_name%]($key, 'data buffer');
+ my $[%lc_name%]_raw = [%lc_name%]($key, 'data buffer');
  #or
- $[%lc_name%]_raw = [%lc_name%]($key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_raw = [%lc_name%]($key, 'any data', 'more data', 'even more data');
 [%-ELSE%]
- $[%lc_name%]_raw = [%lc_name%]($cipher_name, $key, 'data buffer');
+ my $[%lc_name%]_raw = [%lc_name%]($cipher_name, $key, 'data buffer');
  #or
- $[%lc_name%]_raw = [%lc_name%]($cipher_name, $key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_raw = [%lc_name%]($cipher_name, $key, 'any data', 'more data', 'even more data');
 [%-END%]
 
 =head2 [%lc_name%]_hex
@@ -115,24 +124,24 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 Logically joins all arguments into a single string, and returns its [%orig_name%] message authentication code encoded as a hexadecimal string.
 
 [%-IF lc_name == 'hmac' %]
- $[%lc_name%]_hex = [%lc_name%]_hex($hash_name, $key, 'data buffer');
+ my $[%lc_name%]_hex = [%lc_name%]_hex($hash_name, $key, 'data buffer');
  #or
- $[%lc_name%]_hex = [%lc_name%]_hex($hash_name, $key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_hex = [%lc_name%]_hex($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
- # $key ......... the key (octets/bytes, not hex!)
+ # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $key ......... [binary string] the key (not hex!)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
- $[%lc_name%]_hex = [%lc_name%]_hex($size, $key, 'data buffer');
+ my $[%lc_name%]_hex = [%lc_name%]_hex($size, $key, 'data buffer');
  #or
- $[%lc_name%]_hex = [%lc_name%]_hex($size, $key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_hex = [%lc_name%]_hex($size, $key, 'any data', 'more data', 'even more data');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
- $[%lc_name%]_hex = [%lc_name%]_hex($key, 'data buffer');
+ my $[%lc_name%]_hex = [%lc_name%]_hex($key, 'data buffer');
  #or
- $[%lc_name%]_hex = [%lc_name%]_hex($key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_hex = [%lc_name%]_hex($key, 'any data', 'more data', 'even more data');
 [%-ELSE%]
- $[%lc_name%]_hex = [%lc_name%]_hex($cipher_name, $key, 'data buffer');
+ my $[%lc_name%]_hex = [%lc_name%]_hex($cipher_name, $key, 'data buffer');
  #or
- $[%lc_name%]_hex = [%lc_name%]_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_hex = [%lc_name%]_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
 [%-END%]
 
 =head2 [%lc_name%]_b64
@@ -140,24 +149,24 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 Logically joins all arguments into a single string, and returns its [%orig_name%] message authentication code encoded as a Base64 string.
 
 [%-IF lc_name == 'hmac' %]
- $[%lc_name%]_b64 = [%lc_name%]_b64($hash_name, $key, 'data buffer');
+ my $[%lc_name%]_b64 = [%lc_name%]_b64($hash_name, $key, 'data buffer');
  #or
- $[%lc_name%]_b64 = [%lc_name%]_b64($hash_name, $key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_b64 = [%lc_name%]_b64($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
- # $key ......... the key (octets/bytes, not Base64!)
+ # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $key ......... [binary string] the key (not Base64!)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
- $[%lc_name%]_b64 = [%lc_name%]_b64($size, $key, 'data buffer');
+ my $[%lc_name%]_b64 = [%lc_name%]_b64($size, $key, 'data buffer');
  #or
- $[%lc_name%]_b64 = [%lc_name%]_b64($size, $key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_b64 = [%lc_name%]_b64($size, $key, 'any data', 'more data', 'even more data');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
- $[%lc_name%]_b64 = [%lc_name%]_b64($key, 'data buffer');
+ my $[%lc_name%]_b64 = [%lc_name%]_b64($key, 'data buffer');
  #or
- $[%lc_name%]_b64 = [%lc_name%]_b64($key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_b64 = [%lc_name%]_b64($key, 'any data', 'more data', 'even more data');
 [%-ELSE%]
- $[%lc_name%]_b64 = [%lc_name%]_b64($cipher_name, $key, 'data buffer');
+ my $[%lc_name%]_b64 = [%lc_name%]_b64($cipher_name, $key, 'data buffer');
  #or
- $[%lc_name%]_b64 = [%lc_name%]_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_b64 = [%lc_name%]_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 [%-END%]
 
 =head2 [%lc_name%]_b64u
@@ -165,41 +174,76 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 Logically joins all arguments into a single string, and returns its [%orig_name%] message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
 [%-IF lc_name == 'hmac' %]
- $[%lc_name%]_b64url = [%lc_name%]_b64u($hash_name, $key, 'data buffer');
+ my $[%lc_name%]_b64url = [%lc_name%]_b64u($hash_name, $key, 'data buffer');
  #or
- $[%lc_name%]_b64url = [%lc_name%]_b64u($hash_name, $key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_b64url = [%lc_name%]_b64u($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
- # $key ......... the key (octets/bytes, not Base64url!)
+ # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $key ......... [binary string] the key (not Base64url!)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
- $[%lc_name%]_b64url = [%lc_name%]_b64u($size, $key, 'data buffer');
+ my $[%lc_name%]_b64url = [%lc_name%]_b64u($size, $key, 'data buffer');
  #or
- $[%lc_name%]_b64url = [%lc_name%]_b64u($size, $key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_b64url = [%lc_name%]_b64u($size, $key, 'any data', 'more data', 'even more data');
 [%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
- $[%lc_name%]_b64url = [%lc_name%]_b64u($key, 'data buffer');
+ my $[%lc_name%]_b64url = [%lc_name%]_b64u($key, 'data buffer');
  #or
- $[%lc_name%]_b64url = [%lc_name%]_b64u($key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_b64url = [%lc_name%]_b64u($key, 'any data', 'more data', 'even more data');
 [%-ELSE%]
- $[%lc_name%]_b64url = [%lc_name%]_b64u($cipher_name, $key, 'data buffer');
+ my $[%lc_name%]_b64url = [%lc_name%]_b64u($cipher_name, $key, 'data buffer');
  #or
- $[%lc_name%]_b64url = [%lc_name%]_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
+ my $[%lc_name%]_b64url = [%lc_name%]_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
 [%-END%]
 
 =head1 METHODS
 
+Unless noted otherwise, assume C<$d> is an existing MAC object created via
+C<new>, for example:
+[%-IF lc_name == 'hmac' %]
+
+ my $d = Crypt::Mac::[%orig_name%]->new('SHA256', $key);
+[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
+
+ my $d = Crypt::Mac::[%orig_name%]->new($size, $key);
+[%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
+
+ my $d = Crypt::Mac::[%orig_name%]->new($key);
+[%-ELSE%]
+
+ my $d = Crypt::Mac::[%orig_name%]->new($cipher_name, $key);
+[%-END%]
+
 =head2 new
 
 [%-IF lc_name == 'hmac' %]
- $d = Crypt::Mac::[%orig_name%]->new($hash_name, $key);
+ my $d = Crypt::Mac::[%orig_name%]->new($hash_name, $key);
 
- # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
- # $key ......... the key (octets/bytes)
-[%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
- $d = Crypt::Mac::[%orig_name%]->new($size, $key);
-[%-ELSIF lc_name == 'pelican' || lc_name == 'poly1305' %]
- $d = Crypt::Mac::[%orig_name%]->new($key);
+ # $hash_name ... [string] one of 'SHA256', 'SHA384', 'SHA512', 'SHA1', 'SHA3_256', 'BLAKE2b_256',
+ #                'RIPEMD160', etc. - any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $key ......... [binary string] the key (any length - internally padded/hashed as per RFC 2104)
+[%-ELSIF lc_name == 'blake2b' %]
+ my $d = Crypt::Mac::[%orig_name%]->new($size, $key);
+
+ # $size .. [integer] desired MAC output size in bytes (1 - 64)
+ # $key ... [binary string] the key (1 - 64 bytes)
+[%-ELSIF lc_name == 'blake2s' %]
+ my $d = Crypt::Mac::[%orig_name%]->new($size, $key);
+
+ # $size .. [integer] desired MAC output size in bytes (1 - 32)
+ # $key ... [binary string] the key (1 - 32 bytes)
+[%-ELSIF lc_name == 'poly1305' %]
+ my $d = Crypt::Mac::[%orig_name%]->new($key);
+
+ # $key .. [binary string] exactly 32 bytes (256 bits); a fresh one-time key per message
+[%-ELSIF lc_name == 'pelican' %]
+ my $d = Crypt::Mac::[%orig_name%]->new($key);
+
+ # $key .. [binary string] exactly 16 bytes (AES-128 key; Pelican is AES-based)
 [%-ELSE%]
- $d = Crypt::Mac::[%orig_name%]->new($cipher_name, $key);
+ my $d = Crypt::Mac::[%orig_name%]->new($cipher_name, $key);
+
+ # $cipher_name .. [string] one of 'AES', 'Camellia', 'Twofish', 'Serpent', etc.
+ #                 any <NAME> for which there exists Crypt::Cipher::<NAME>
+ # $key .......... [binary string] key of valid length for the chosen cipher (e.g. 16/24/32 bytes for AES)
 [%-END%]
 
 =head2 clone
@@ -212,31 +256,44 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 =head2 add
 
+Appends data to the message. Returns the object itself (for chaining).
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 
+Reads the file content and appends it to the message. Returns the object itself (for chaining).
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 mac
 
- $result_raw = $d->mac();
+Returns the binary MAC (raw bytes).
+
+ my $result_raw = $d->mac();
 
 =head2 hexmac
 
- $result_hex = $d->hexmac();
+Returns the MAC encoded as a lowercase hexadecimal string.
+
+ my $result_hex = $d->hexmac();
 
 =head2 b64mac
 
- $result_b64 = $d->b64mac();
+Returns the MAC encoded as a Base64 string with trailing C<=> padding.
+
+ my $result_b64 = $d->b64mac();
 
 =head2 b64umac
 
- $result_b64url = $d->b64umac();
+Returns the MAC encoded as a Base64 URL Safe string (no trailing C<=>).
+
+ my $result_b64url = $d->b64umac();
 
 =head1 SEE ALSO
 

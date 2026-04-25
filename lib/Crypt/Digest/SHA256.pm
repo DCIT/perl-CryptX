@@ -40,32 +40,35 @@ Crypt::Digest::SHA256 - Hash function SHA-256 [size: 256 bits]
                                 sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u );
 
    # calculate digest from string/buffer
-   $sha256_raw  = sha256('data string');
-   $sha256_hex  = sha256_hex('data string');
-   $sha256_b64  = sha256_b64('data string');
-   $sha256_b64u = sha256_b64u('data string');
-   # calculate digest from file
-   $sha256_raw  = sha256_file('filename.dat');
-   $sha256_hex  = sha256_file_hex('filename.dat');
-   $sha256_b64  = sha256_file_b64('filename.dat');
-   $sha256_b64u = sha256_file_b64u('filename.dat');
-   # calculate digest from filehandle
-   $sha256_raw  = sha256_file(*FILEHANDLE);
-   $sha256_hex  = sha256_file_hex(*FILEHANDLE);
-   $sha256_b64  = sha256_file_b64(*FILEHANDLE);
-   $sha256_b64u = sha256_file_b64u(*FILEHANDLE);
+   my $data = 'data string';
+   my $sha256_raw  = sha256($data);
+   my $sha256_hex  = sha256_hex($data);
+   my $sha256_b64  = sha256_b64($data);
+   my $sha256_b64u = sha256_b64u($data);
+   # or from file
+   my $sha256_file_raw  = sha256_file('filename.dat');
+   my $sha256_file_hex  = sha256_file_hex('filename.dat');
+   my $sha256_file_b64  = sha256_file_b64('filename.dat');
+   my $sha256_file_b64u = sha256_file_b64u('filename.dat');
+   # or from filehandle
+   my $filehandle = ...; # existing binary-mode filehandle
+   my $sha256_fh_raw  = sha256_file($filehandle);
+   my $sha256_fh_hex  = sha256_file_hex($filehandle);
+   my $sha256_fh_b64  = sha256_file_b64($filehandle);
+   my $sha256_fh_b64u = sha256_file_b64u($filehandle);
 
    ### OO interface:
    use Crypt::Digest::SHA256;
 
-   $d = Crypt::Digest::SHA256->new;
+   my $d = Crypt::Digest::SHA256->new;
    $d->add('any data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $result_raw  = $d->digest;     # raw bytes
-   $result_hex  = $d->hexdigest;  # hexadecimal form
-   $result_b64  = $d->b64digest;  # Base64 form
-   $result_b64u = $d->b64udigest; # Base64 URL Safe form
+   my $result_raw  = $d->digest;     # raw bytes
+   my $result_hex  = $d->hexdigest;  # hexadecimal form
+   my $result_b64  = $d->b64digest;  # Base64 form
+   my $result_b64u = $d->b64udigest; # Base64 URL Safe form
+
+   # or hash a file instead
+   my $file_result_raw = Crypt::Digest::SHA256->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
 
@@ -90,49 +93,51 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its SHA256 digest encoded as a binary string.
 
- $sha256_raw = sha256('data string');
+ my $sha256_raw = sha256('data string');
  #or
- $sha256_raw = sha256('any data', 'more data', 'even more data');
+ my $sha256_raw = sha256('any data', 'more data', 'even more data');
 
 =head2 sha256_hex
 
 Logically joins all arguments into a single string, and returns its SHA256 digest encoded as a hexadecimal string.
 
- $sha256_hex = sha256_hex('data string');
+ my $sha256_hex = sha256_hex('data string');
  #or
- $sha256_hex = sha256_hex('any data', 'more data', 'even more data');
+ my $sha256_hex = sha256_hex('any data', 'more data', 'even more data');
 
 =head2 sha256_b64
 
 Logically joins all arguments into a single string, and returns its SHA256 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $sha256_b64 = sha256_b64('data string');
+ my $sha256_b64 = sha256_b64('data string');
  #or
- $sha256_b64 = sha256_b64('any data', 'more data', 'even more data');
+ my $sha256_b64 = sha256_b64('any data', 'more data', 'even more data');
 
 =head2 sha256_b64u
 
 Logically joins all arguments into a single string, and returns its SHA256 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
- $sha256_b64url = sha256_b64u('data string');
+ my $sha256_b64url = sha256_b64u('data string');
  #or
- $sha256_b64url = sha256_b64u('any data', 'more data', 'even more data');
+ my $sha256_b64url = sha256_b64u('any data', 'more data', 'even more data');
 
 =head2 sha256_file
 
 Reads file (defined by filename or filehandle) content, and returns its SHA256 digest encoded as a binary string.
 
- $sha256_raw = sha256_file('filename.dat');
+ my $sha256_raw = sha256_file('filename.dat');
  #or
- $sha256_raw = sha256_file(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $sha256_raw = sha256_file($filehandle);
 
 =head2 sha256_file_hex
 
 Reads file (defined by filename or filehandle) content, and returns its SHA256 digest encoded as a hexadecimal string.
 
- $sha256_hex = sha256_file_hex('filename.dat');
+ my $sha256_hex = sha256_file_hex('filename.dat');
  #or
- $sha256_hex = sha256_file_hex(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $sha256_hex = sha256_file_hex($filehandle);
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
@@ -140,25 +145,31 @@ B<BEWARE:> You have to make sure that the filehandle is in binary mode before yo
 
 Reads file (defined by filename or filehandle) content, and returns its SHA256 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $sha256_b64 = sha256_file_b64('filename.dat');
+ my $sha256_b64 = sha256_file_b64('filename.dat');
  #or
- $sha256_b64 = sha256_file_b64(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $sha256_b64 = sha256_file_b64($filehandle);
 
 =head2 sha256_file_b64u
 
 Reads file (defined by filename or filehandle) content, and returns its SHA256 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
- $sha256_b64url = sha256_file_b64u('filename.dat');
+ my $sha256_b64url = sha256_file_b64u('filename.dat');
  #or
- $sha256_b64url = sha256_file_b64u(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $sha256_b64url = sha256_file_b64u($filehandle);
 
 =head1 METHODS
 
 The OO interface provides the same set of functions as L<Crypt::Digest>.
+Unless noted otherwise, assume C<$d> is an existing digest object created via
+C<new>, for example:
+
+ my $d = Crypt::Digest::SHA256->new();
 
 =head2 new
 
- $d = Crypt::Digest::SHA256->new();
+ my $d = Crypt::Digest::SHA256->new();
 
 =head2 clone
 
@@ -170,15 +181,20 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 add
 
+Appends data to the message. Returns the object itself (for chaining).
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 
+Reads the file content and appends it to the message. Returns the object itself (for chaining).
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 add_bits
 
@@ -196,19 +212,27 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 digest
 
- $result_raw = $d->digest();
+Returns the binary digest (raw bytes).
+
+ my $result_raw = $d->digest();
 
 =head2 hexdigest
 
- $result_hex = $d->hexdigest();
+Returns the digest encoded as a lowercase hexadecimal string.
+
+ my $result_hex = $d->hexdigest();
 
 =head2 b64digest
 
- $result_b64 = $d->b64digest();
+Returns the digest encoded as a Base64 string with trailing C<=> padding.
+
+ my $result_b64 = $d->b64digest();
 
 =head2 b64udigest
 
- $result_b64url = $d->b64udigest();
+Returns the digest encoded as a Base64 URL Safe string (no trailing C<=>).
+
+ my $result_b64url = $d->b64udigest();
 
 =head1 SEE ALSO
 

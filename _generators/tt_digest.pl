@@ -48,14 +48,14 @@ my %list = (
         Keccak512   => { ltc=>'keccak512',   info=>'Hash function Keccak-512 [size: 512 bits]', urls=>['https://keccak.team/index.html'] },
         Tiger192    => { ltc=>'tiger',       info=>'Hash function Tiger-192 [size: 192 bits]', urls=>['https://en.wikipedia.org/wiki/Tiger_(cryptography)'] },
         Whirlpool   => { ltc=>'whirlpool',   info=>'Hash function Whirlpool [size: 512 bits]', urls=>['https://en.wikipedia.org/wiki/Whirlpool_(cryptography)'] },
-        BLAKE2b_160 => { ltc=>'blake2b-160', info=>'Hash function BLAKE2b [size: 160 bits]', urls=>['https://blake2.net/', 'https://tools.ietf.org/html/rfc7693'] },
-        BLAKE2b_256 => { ltc=>'blake2b-256', info=>'Hash function BLAKE2b [size: 256 bits]', urls=>['https://blake2.net/', 'https://tools.ietf.org/html/rfc7693'] },
-        BLAKE2b_384 => { ltc=>'blake2b-384', info=>'Hash function BLAKE2b [size: 384 bits]', urls=>['https://blake2.net/', 'https://tools.ietf.org/html/rfc7693'] },
-        BLAKE2b_512 => { ltc=>'blake2b-512', info=>'Hash function BLAKE2b [size: 512 bits]', urls=>['https://blake2.net/', 'https://tools.ietf.org/html/rfc7693'] },
-        BLAKE2s_128 => { ltc=>'blake2s-128', info=>'Hash function BLAKE2s [size: 128 bits]', urls=>['https://blake2.net/', 'https://tools.ietf.org/html/rfc7693'] },
-        BLAKE2s_160 => { ltc=>'blake2s-160', info=>'Hash function BLAKE2s [size: 160 bits]', urls=>['https://blake2.net/', 'https://tools.ietf.org/html/rfc7693'] },
-        BLAKE2s_224 => { ltc=>'blake2s-224', info=>'Hash function BLAKE2s [size: 224 bits]', urls=>['https://blake2.net/', 'https://tools.ietf.org/html/rfc7693'] },
-        BLAKE2s_256 => { ltc=>'blake2s-256', info=>'Hash function BLAKE2s [size: 256 bits]', urls=>['https://blake2.net/', 'https://tools.ietf.org/html/rfc7693'] },
+        BLAKE2b_160 => { ltc=>'blake2b-160', info=>'Hash function BLAKE2b [size: 160 bits]', urls=>['https://blake2.net/', 'https://www.rfc-editor.org/rfc/rfc7693'] },
+        BLAKE2b_256 => { ltc=>'blake2b-256', info=>'Hash function BLAKE2b [size: 256 bits]', urls=>['https://blake2.net/', 'https://www.rfc-editor.org/rfc/rfc7693'] },
+        BLAKE2b_384 => { ltc=>'blake2b-384', info=>'Hash function BLAKE2b [size: 384 bits]', urls=>['https://blake2.net/', 'https://www.rfc-editor.org/rfc/rfc7693'] },
+        BLAKE2b_512 => { ltc=>'blake2b-512', info=>'Hash function BLAKE2b [size: 512 bits]', urls=>['https://blake2.net/', 'https://www.rfc-editor.org/rfc/rfc7693'] },
+        BLAKE2s_128 => { ltc=>'blake2s-128', info=>'Hash function BLAKE2s [size: 128 bits]', urls=>['https://blake2.net/', 'https://www.rfc-editor.org/rfc/rfc7693'] },
+        BLAKE2s_160 => { ltc=>'blake2s-160', info=>'Hash function BLAKE2s [size: 160 bits]', urls=>['https://blake2.net/', 'https://www.rfc-editor.org/rfc/rfc7693'] },
+        BLAKE2s_224 => { ltc=>'blake2s-224', info=>'Hash function BLAKE2s [size: 224 bits]', urls=>['https://blake2.net/', 'https://www.rfc-editor.org/rfc/rfc7693'] },
+        BLAKE2s_256 => { ltc=>'blake2s-256', info=>'Hash function BLAKE2s [size: 256 bits]', urls=>['https://blake2.net/', 'https://www.rfc-editor.org/rfc/rfc7693'] },
 );
 
 my @test_strings = ( '', '123', "test\0test\0test\n");

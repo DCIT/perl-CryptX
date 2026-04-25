@@ -40,42 +40,46 @@ Crypt::PRNG::RC4 - Cryptographically secure PRNG based on RC4 (stream cipher) al
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::PRNG::RC4 qw(random_bytes random_bytes_hex random_bytes_b64 random_string random_string_from rand irand);
+   use Crypt::PRNG::RC4 qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand);
 
-   $octets = random_bytes(45);
-   $hex_string = random_bytes_hex(45);
-   $base64_string = random_bytes_b64(45);
-   $base64url_string = random_bytes_b64u(45);
-   $alphanumeric_string = random_string(30);
-   $string = random_string_from('ACGT', 64);
-   $floating_point_number_0_to_1 = rand;
-   $floating_point_number_0_to_88 = rand(88);
-   $unsigned_32bit_int = irand;
+   my $octets = random_bytes(45);
+   my $hex_string = random_bytes_hex(45);
+   my $base64_string = random_bytes_b64(45);
+   my $base64url_string = random_bytes_b64u(45);
+   my $alphanumeric_string = random_string(30);
+   my $string = random_string_from('ACGT', 64);
+   my $floating_point_number_0_to_1 = rand;
+   my $floating_point_number_0_to_88 = rand(88);
+   my $unsigned_32bit_int = irand;
 
    ### OO interface:
    use Crypt::PRNG::RC4;
 
-   $prng = Crypt::PRNG::RC4->new;
-   #or
-   $prng = Crypt::PRNG::RC4->new("some data used for seeding PRNG");
+   my $prng = Crypt::PRNG::RC4->new;
+   my $seeded_prng = Crypt::PRNG::RC4->new("some data used for seeding PRNG");
 
-   $octets = $prng->bytes(45);
-   $hex_string = $prng->bytes_hex(45);
-   $base64_string = $prng->bytes_b64(45);
-   $base64url_string = $prng->bytes_b64u(45);
-   $alphanumeric_string = $prng->string(30);
-   $string = $prng->string_from('ACGT', 64);
-   $floating_point_number_0_to_1 = rand;
-   $floating_point_number_0_to_88 = rand(88);
-   $unsigned_32bit_int = irand;
+   my $octets = $prng->bytes(45);
+   my $hex_string = $prng->bytes_hex(45);
+   my $base64_string = $prng->bytes_b64(45);
+   my $base64url_string = $prng->bytes_b64u(45);
+   my $alphanumeric_string = $prng->string(30);
+   my $string = $prng->string_from('ACGT', 64);
+   my $floating_point_number_0_to_1 = $prng->double;
+   my $floating_point_number_0_to_88 = $prng->double(88);
+   my $unsigned_32bit_int = $prng->int32;
 
 =head1 DESCRIPTION
 
-Provides an interface to the RC4 based pseudo random number generator
+Provides an interface to the RC4-based pseudo-random number generator.
 
-All methods and functions are the same as for L<Crypt::PRNG>.
+This is a thin wrapper around L<Crypt::PRNG> with the algorithm fixed to RC4.
+All functions and methods accept the same arguments and return the same values
+as the corresponding L<Crypt::PRNG> entries.
 
 =head1 FUNCTIONS
+
+All functions below behave exactly like the corresponding L<Crypt::PRNG>
+functions, but use a hidden C<Crypt::PRNG::RC4> object internally.
 
 =head2 random_bytes
 
@@ -111,9 +115,16 @@ See L<Crypt::PRNG/irand>.
 
 =head1 METHODS
 
+Unless noted otherwise, assume C<$prng> is an existing C<Crypt::PRNG::RC4>
+object created via C<new>.
+
 =head2 new
 
-See L<Crypt::PRNG/new>.
+ my $prng = Crypt::PRNG::RC4->new;
+ my $seeded_prng = Crypt::PRNG::RC4->new($seed);
+
+Creates a PRNG object using the RC4 algorithm. If C<$seed> is omitted, the
+object is automatically seeded by the underlying L<Crypt::PRNG> logic.
 
 =head2 bytes
 

@@ -19,16 +19,14 @@ Crypt::Stream::Sosemanuk - Stream cipher Sosemanuk
    use Crypt::Stream::Sosemanuk;
 
    # encrypt
-   $key = "1234567890123456";
-   $iv  = "123456789012";
-   $stream = Crypt::Stream::Sosemanuk->new($key, $iv);
-   $ct = $stream->crypt("plain message");
+   my $key = "1234567890123456";
+   my $iv  = "123456789012";
+   my $enc_stream = Crypt::Stream::Sosemanuk->new($key, $iv);
+   my $ct = $enc_stream->crypt("plain message");
 
    # decrypt
-   $key = "1234567890123456";
-   $iv  = "123456789012";
-   $stream = Crypt::Stream::Sosemanuk->new($key, $iv);
-   $pt = $stream->crypt($ct);
+   my $dec_stream = Crypt::Stream::Sosemanuk->new($key, $iv);
+   my $pt = $dec_stream->crypt($ct);
 
 =head1 DESCRIPTION
 
@@ -36,25 +34,37 @@ Provides an interface to the Sosemanuk stream cipher.
 
 =head1 METHODS
 
+Unless noted otherwise, assume C<$stream> is an existing stream object created
+via C<new>, for example:
+
+ my $stream = Crypt::Stream::Sosemanuk->new($key, $iv);
+
 =head2 new
 
- $stream = Crypt::Stream::Sosemanuk->new($key, $iv);
- # $key .. keylen must be multiple of 4 bytes
- # $iv  .. ivlen must be multiple of 4 bytes (OPTIONAL)
+ my $stream = Crypt::Stream::Sosemanuk->new($key, $iv);
+ # $key .. [binary string] keylen must be multiple of 4 bytes
+ # $iv  .. [binary string] ivlen must be multiple of 4 bytes (OPTIONAL - simply omit to skip IV setup)
 
 =head2 crypt
 
- $ciphertext = $stream->crypt($plaintext);
+Encrypts or decrypts data. The output has the same length as the input.
+Returns a binary string (raw bytes).
+
+ my $ciphertext = $stream->crypt($plaintext);
  #or
- $plaintext = $stream->crypt($ciphertext);
+ my $plaintext = $stream->crypt($ciphertext);
 
 =head2 keystream
 
- $random_key = $stream->keystream($length);
+Returns C<$length> bytes of raw keystream as a binary string.
+
+ my $random_key = $stream->keystream($length);
 
 =head2 clone
 
- $stream->clone();
+Returns a copy of the stream cipher object in its current state.
+
+ my $stream2 = $stream->clone();
 
 =head1 SEE ALSO
 

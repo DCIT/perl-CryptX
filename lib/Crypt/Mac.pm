@@ -42,4 +42,19 @@ sub CLONE_SKIP { 1 } # prevent cloning
 
 Crypt::Mac - [internal only]
 
+=head1 SYNOPSIS
+
+Do not use this module directly.
+
+Use a concrete MAC module such as L<Crypt::Mac::HMAC> or
+L<Crypt::Mac::Poly1305>.
+
+=head1 DESCRIPTION
+
+Internal base class for MAC implementations.
+
+Do not use this module directly. Use a concrete implementation such as
+L<Crypt::Mac::HMAC>, L<Crypt::Mac::Poly1305>, L<Crypt::Mac::BLAKE2b>, or
+another C<Crypt::Mac::*> module.
+
 =cut

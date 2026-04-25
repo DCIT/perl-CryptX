@@ -40,32 +40,35 @@ Crypt::Digest::RIPEMD256 - Hash function RIPEMD-256 [size: 256 bits]
                                 ripemd256_file ripemd256_file_hex ripemd256_file_b64 ripemd256_file_b64u );
 
    # calculate digest from string/buffer
-   $ripemd256_raw  = ripemd256('data string');
-   $ripemd256_hex  = ripemd256_hex('data string');
-   $ripemd256_b64  = ripemd256_b64('data string');
-   $ripemd256_b64u = ripemd256_b64u('data string');
-   # calculate digest from file
-   $ripemd256_raw  = ripemd256_file('filename.dat');
-   $ripemd256_hex  = ripemd256_file_hex('filename.dat');
-   $ripemd256_b64  = ripemd256_file_b64('filename.dat');
-   $ripemd256_b64u = ripemd256_file_b64u('filename.dat');
-   # calculate digest from filehandle
-   $ripemd256_raw  = ripemd256_file(*FILEHANDLE);
-   $ripemd256_hex  = ripemd256_file_hex(*FILEHANDLE);
-   $ripemd256_b64  = ripemd256_file_b64(*FILEHANDLE);
-   $ripemd256_b64u = ripemd256_file_b64u(*FILEHANDLE);
+   my $data = 'data string';
+   my $ripemd256_raw  = ripemd256($data);
+   my $ripemd256_hex  = ripemd256_hex($data);
+   my $ripemd256_b64  = ripemd256_b64($data);
+   my $ripemd256_b64u = ripemd256_b64u($data);
+   # or from file
+   my $ripemd256_file_raw  = ripemd256_file('filename.dat');
+   my $ripemd256_file_hex  = ripemd256_file_hex('filename.dat');
+   my $ripemd256_file_b64  = ripemd256_file_b64('filename.dat');
+   my $ripemd256_file_b64u = ripemd256_file_b64u('filename.dat');
+   # or from filehandle
+   my $filehandle = ...; # existing binary-mode filehandle
+   my $ripemd256_fh_raw  = ripemd256_file($filehandle);
+   my $ripemd256_fh_hex  = ripemd256_file_hex($filehandle);
+   my $ripemd256_fh_b64  = ripemd256_file_b64($filehandle);
+   my $ripemd256_fh_b64u = ripemd256_file_b64u($filehandle);
 
    ### OO interface:
    use Crypt::Digest::RIPEMD256;
 
-   $d = Crypt::Digest::RIPEMD256->new;
+   my $d = Crypt::Digest::RIPEMD256->new;
    $d->add('any data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $result_raw  = $d->digest;     # raw bytes
-   $result_hex  = $d->hexdigest;  # hexadecimal form
-   $result_b64  = $d->b64digest;  # Base64 form
-   $result_b64u = $d->b64udigest; # Base64 URL Safe form
+   my $result_raw  = $d->digest;     # raw bytes
+   my $result_hex  = $d->hexdigest;  # hexadecimal form
+   my $result_b64  = $d->b64digest;  # Base64 form
+   my $result_b64u = $d->b64udigest; # Base64 URL Safe form
+
+   # or hash a file instead
+   my $file_result_raw = Crypt::Digest::RIPEMD256->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
 
@@ -90,49 +93,51 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its RIPEMD256 digest encoded as a binary string.
 
- $ripemd256_raw = ripemd256('data string');
+ my $ripemd256_raw = ripemd256('data string');
  #or
- $ripemd256_raw = ripemd256('any data', 'more data', 'even more data');
+ my $ripemd256_raw = ripemd256('any data', 'more data', 'even more data');
 
 =head2 ripemd256_hex
 
 Logically joins all arguments into a single string, and returns its RIPEMD256 digest encoded as a hexadecimal string.
 
- $ripemd256_hex = ripemd256_hex('data string');
+ my $ripemd256_hex = ripemd256_hex('data string');
  #or
- $ripemd256_hex = ripemd256_hex('any data', 'more data', 'even more data');
+ my $ripemd256_hex = ripemd256_hex('any data', 'more data', 'even more data');
 
 =head2 ripemd256_b64
 
 Logically joins all arguments into a single string, and returns its RIPEMD256 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $ripemd256_b64 = ripemd256_b64('data string');
+ my $ripemd256_b64 = ripemd256_b64('data string');
  #or
- $ripemd256_b64 = ripemd256_b64('any data', 'more data', 'even more data');
+ my $ripemd256_b64 = ripemd256_b64('any data', 'more data', 'even more data');
 
 =head2 ripemd256_b64u
 
 Logically joins all arguments into a single string, and returns its RIPEMD256 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
- $ripemd256_b64url = ripemd256_b64u('data string');
+ my $ripemd256_b64url = ripemd256_b64u('data string');
  #or
- $ripemd256_b64url = ripemd256_b64u('any data', 'more data', 'even more data');
+ my $ripemd256_b64url = ripemd256_b64u('any data', 'more data', 'even more data');
 
 =head2 ripemd256_file
 
 Reads file (defined by filename or filehandle) content, and returns its RIPEMD256 digest encoded as a binary string.
 
- $ripemd256_raw = ripemd256_file('filename.dat');
+ my $ripemd256_raw = ripemd256_file('filename.dat');
  #or
- $ripemd256_raw = ripemd256_file(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $ripemd256_raw = ripemd256_file($filehandle);
 
 =head2 ripemd256_file_hex
 
 Reads file (defined by filename or filehandle) content, and returns its RIPEMD256 digest encoded as a hexadecimal string.
 
- $ripemd256_hex = ripemd256_file_hex('filename.dat');
+ my $ripemd256_hex = ripemd256_file_hex('filename.dat');
  #or
- $ripemd256_hex = ripemd256_file_hex(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $ripemd256_hex = ripemd256_file_hex($filehandle);
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
@@ -140,25 +145,31 @@ B<BEWARE:> You have to make sure that the filehandle is in binary mode before yo
 
 Reads file (defined by filename or filehandle) content, and returns its RIPEMD256 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $ripemd256_b64 = ripemd256_file_b64('filename.dat');
+ my $ripemd256_b64 = ripemd256_file_b64('filename.dat');
  #or
- $ripemd256_b64 = ripemd256_file_b64(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $ripemd256_b64 = ripemd256_file_b64($filehandle);
 
 =head2 ripemd256_file_b64u
 
 Reads file (defined by filename or filehandle) content, and returns its RIPEMD256 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
- $ripemd256_b64url = ripemd256_file_b64u('filename.dat');
+ my $ripemd256_b64url = ripemd256_file_b64u('filename.dat');
  #or
- $ripemd256_b64url = ripemd256_file_b64u(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $ripemd256_b64url = ripemd256_file_b64u($filehandle);
 
 =head1 METHODS
 
 The OO interface provides the same set of functions as L<Crypt::Digest>.
+Unless noted otherwise, assume C<$d> is an existing digest object created via
+C<new>, for example:
+
+ my $d = Crypt::Digest::RIPEMD256->new();
 
 =head2 new
 
- $d = Crypt::Digest::RIPEMD256->new();
+ my $d = Crypt::Digest::RIPEMD256->new();
 
 =head2 clone
 
@@ -170,15 +181,20 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 add
 
+Appends data to the message. Returns the object itself (for chaining).
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 
+Reads the file content and appends it to the message. Returns the object itself (for chaining).
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 add_bits
 
@@ -196,19 +212,27 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 digest
 
- $result_raw = $d->digest();
+Returns the binary digest (raw bytes).
+
+ my $result_raw = $d->digest();
 
 =head2 hexdigest
 
- $result_hex = $d->hexdigest();
+Returns the digest encoded as a lowercase hexadecimal string.
+
+ my $result_hex = $d->hexdigest();
 
 =head2 b64digest
 
- $result_b64 = $d->b64digest();
+Returns the digest encoded as a Base64 string with trailing C<=> padding.
+
+ my $result_b64 = $d->b64digest();
 
 =head2 b64udigest
 
- $result_b64url = $d->b64udigest();
+Returns the digest encoded as a Base64 URL Safe string (no trailing C<=>).
+
+ my $result_b64url = $d->b64udigest();
 
 =head1 SEE ALSO
 

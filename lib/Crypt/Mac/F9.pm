@@ -25,22 +25,23 @@ Crypt::Mac::F9 - Message authentication code F9
    use Crypt::Mac::F9 qw( f9 f9_hex );
 
    # calculate MAC from string/buffer
-   $f9_raw  = f9($cipher_name, $key, 'data buffer');
-   $f9_hex  = f9_hex($cipher_name, $key, 'data buffer');
-   $f9_b64  = f9_b64($cipher_name, $key, 'data buffer');
-   $f9_b64u = f9_b64u($cipher_name, $key, 'data buffer');
+   my $f9_raw  = f9($cipher_name, $key, 'data buffer');
+   my $f9_hex  = f9_hex($cipher_name, $key, 'data buffer');
+   my $f9_b64  = f9_b64($cipher_name, $key, 'data buffer');
+   my $f9_b64u = f9_b64u($cipher_name, $key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::F9;
 
-   $d = Crypt::Mac::F9->new($cipher_name, $key);
+   my $d = Crypt::Mac::F9->new($cipher_name, $key);
    $d->add('any data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $result_raw  = $d->mac;     # raw bytes
-   $result_hex  = $d->hexmac;  # hexadecimal form
-   $result_b64  = $d->b64mac;  # Base64 form
-   $result_b64u = $d->b64umac; # Base64 URL Safe form
+   my $result_raw  = $d->mac;     # raw bytes
+   my $result_hex  = $d->hexmac;  # hexadecimal form
+   my $result_b64  = $d->b64mac;  # Base64 form
+   my $result_b64u = $d->b64umac; # Base64 URL Safe form
+
+   # or MAC a file instead
+   my $file_result_raw = Crypt::Mac::F9->new($cipher_name, $key)->addfile('filename.dat')->mac;
 
 =head1 DESCRIPTION
 
@@ -64,39 +65,48 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a binary string.
 
- $f9_raw = f9($cipher_name, $key, 'data buffer');
+ my $f9_raw = f9($cipher_name, $key, 'data buffer');
  #or
- $f9_raw = f9($cipher_name, $key, 'any data', 'more data', 'even more data');
+ my $f9_raw = f9($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 f9_hex
 
 Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a hexadecimal string.
 
- $f9_hex = f9_hex($cipher_name, $key, 'data buffer');
+ my $f9_hex = f9_hex($cipher_name, $key, 'data buffer');
  #or
- $f9_hex = f9_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
+ my $f9_hex = f9_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 f9_b64
 
 Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a Base64 string.
 
- $f9_b64 = f9_b64($cipher_name, $key, 'data buffer');
+ my $f9_b64 = f9_b64($cipher_name, $key, 'data buffer');
  #or
- $f9_b64 = f9_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
+ my $f9_b64 = f9_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 f9_b64u
 
 Logically joins all arguments into a single string, and returns its F9 message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
- $f9_b64url = f9_b64u($cipher_name, $key, 'data buffer');
+ my $f9_b64url = f9_b64u($cipher_name, $key, 'data buffer');
  #or
- $f9_b64url = f9_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
+ my $f9_b64url = f9_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 
+Unless noted otherwise, assume C<$d> is an existing MAC object created via
+C<new>, for example:
+
+ my $d = Crypt::Mac::F9->new($cipher_name, $key);
+
 =head2 new
 
- $d = Crypt::Mac::F9->new($cipher_name, $key);
+ my $d = Crypt::Mac::F9->new($cipher_name, $key);
+
+ # $cipher_name .. [string] one of 'AES', 'Camellia', 'Twofish', 'Serpent', etc.
+ #                 any <NAME> for which there exists Crypt::Cipher::<NAME>
+ # $key .......... [binary string] key of valid length for the chosen cipher (e.g. 16/24/32 bytes for AES)
 
 =head2 clone
 
@@ -108,31 +118,44 @@ Logically joins all arguments into a single string, and returns its F9 message a
 
 =head2 add
 
+Appends data to the message. Returns the object itself (for chaining).
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 
+Reads the file content and appends it to the message. Returns the object itself (for chaining).
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 mac
 
- $result_raw = $d->mac();
+Returns the binary MAC (raw bytes).
+
+ my $result_raw = $d->mac();
 
 =head2 hexmac
 
- $result_hex = $d->hexmac();
+Returns the MAC encoded as a lowercase hexadecimal string.
+
+ my $result_hex = $d->hexmac();
 
 =head2 b64mac
 
- $result_b64 = $d->b64mac();
+Returns the MAC encoded as a Base64 string with trailing C<=> padding.
+
+ my $result_b64 = $d->b64mac();
 
 =head2 b64umac
 
- $result_b64url = $d->b64umac();
+Returns the MAC encoded as a Base64 URL Safe string (no trailing C<=>).
+
+ my $result_b64url = $d->b64umac();
 
 =head1 SEE ALSO
 

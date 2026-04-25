@@ -19,16 +19,14 @@ Crypt::Stream::Salsa20 - Stream cipher Salsa20
    use Crypt::Stream::Salsa20;
 
    # encrypt
-   $key = "1234567890123456";
-   $iv  = "12345678";
-   $stream = Crypt::Stream::Salsa20->new($key, $iv);
-   $ct = $stream->crypt("plain message");
+   my $key = "1234567890123456";
+   my $nonce  = "12345678";
+   my $enc_stream = Crypt::Stream::Salsa20->new($key, $nonce);
+   my $ct = $enc_stream->crypt("plain message");
 
    # decrypt
-   $key = "1234567890123456";
-   $iv  = "12345678";
-   $stream = Crypt::Stream::Salsa20->new($key, $iv);
-   $pt = $stream->crypt($ct);
+   my $dec_stream = Crypt::Stream::Salsa20->new($key, $nonce);
+   my $pt = $dec_stream->crypt($ct);
 
 =head1 DESCRIPTION
 
@@ -36,36 +34,50 @@ Provides an interface to the Salsa20 stream cipher.
 
 =head1 METHODS
 
+Unless noted otherwise, assume C<$stream> is an existing stream object created
+via C<new>, for example:
+
+ my $stream = Crypt::Stream::Salsa20->new($key, $nonce);
+
 =head2 new
 
- $stream = Crypt::Stream::Salsa20->new($key, $iv);
+ my $stream = Crypt::Stream::Salsa20->new($key, $nonce);
  #or
- $stream = Crypt::Stream::Salsa20->new($key, $iv, $counter, $rounds);
+ my $stream = Crypt::Stream::Salsa20->new($key, $nonce, $counter, $rounds);
 
- # $key     .. 32 or 16 bytes
- # $iv      .. 8 bytes
- # $counter .. initial counter value (DEFAULT: 0)
- # $rounds  .. rounds (DEFAULT: 20)
+ # $key     .. [binary string] 32 or 16 bytes
+ # $nonce   .. [binary string] 8 bytes
+ # $counter .. [integer] initial counter value (DEFAULT: 0)
+ # $rounds  .. [integer] rounds (DEFAULT: 20)
 
 =head2 crypt
 
- $ciphertext = $stream->crypt($plaintext);
+Encrypts or decrypts data. The output has the same length as the input.
+Returns a binary string (raw bytes).
+
+ my $ciphertext = $stream->crypt($plaintext);
  #or
- $plaintext = $stream->crypt($ciphertext);
+ my $plaintext = $stream->crypt($ciphertext);
 
 =head2 keystream
 
- $random_key = $stream->keystream($length);
+Returns C<$length> bytes of raw keystream as a binary string.
+
+ my $random_key = $stream->keystream($length);
 
 =head2 clone
 
- $stream->clone();
+Returns a copy of the stream cipher object in its current state.
+
+ my $stream2 = $stream->clone();
 
 =head1 SEE ALSO
 
 =over
 
 =item * L<Crypt::Stream::ChaCha>, L<Crypt::Stream::RC4>, L<Crypt::Stream::Sober128>, L<Crypt::Stream::Sosemanuk>
+
+=item * L<https://cr.yp.to/snuffle/spec.pdf>
 
 =back
 

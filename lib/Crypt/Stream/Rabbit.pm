@@ -19,16 +19,14 @@ Crypt::Stream::Rabbit - Stream cipher Rabbit
    use Crypt::Stream::Rabbit;
 
    # encrypt
-   $key = "1234567890123456";
-   $iv  = "12345678";
-   $stream = Crypt::Stream::Rabbit->new($key, $iv);
-   $ct = $stream->crypt("plain message");
+   my $key = "1234567890123456";
+   my $iv  = "12345678";
+   my $enc_stream = Crypt::Stream::Rabbit->new($key, $iv);
+   my $ct = $enc_stream->crypt("plain message");
 
    # decrypt
-   $key = "1234567890123456";
-   $iv  = "12345678";
-   $stream = Crypt::Stream::Rabbit->new($key, $iv);
-   $pt = $stream->crypt($ct);
+   my $dec_stream = Crypt::Stream::Rabbit->new($key, $iv);
+   my $pt = $dec_stream->crypt($ct);
 
 =head1 DESCRIPTION
 
@@ -36,28 +34,41 @@ Provides an interface to the Rabbit stream cipher.
 
 =head1 METHODS
 
+Unless noted otherwise, assume C<$stream> is an existing stream object created
+via C<new>, for example:
+
+ my $stream = Crypt::Stream::Rabbit->new($key, $iv);
+
 =head2 new
 
- $stream = Crypt::Stream::Rabbit->new($key, $iv);
- # $key .. keylen must be up to 16 bytes
- # $iv  .. ivlen must be up to 8 bytes
+ my $stream = Crypt::Stream::Rabbit->new($key, $iv);
+ # $key .. [binary string] keylen must be up to 16 bytes
+ # $iv  .. [binary string] ivlen must be up to 8 bytes
 
- $stream = Crypt::Stream::Rabbit->new($key);
- #BEWARE: this is different from new($key, "")
+ my $stream = Crypt::Stream::Rabbit->new($key);
+ #BEWARE: new($key) skips IV setup entirely, while new($key, "") performs
+ #        IV setup with a zero-length IV - these produce different keystreams
 
 =head2 crypt
 
- $ciphertext = $stream->crypt($plaintext);
+Encrypts or decrypts data. The output has the same length as the input.
+Returns a binary string (raw bytes).
+
+ my $ciphertext = $stream->crypt($plaintext);
  #or
- $plaintext = $stream->crypt($ciphertext);
+ my $plaintext = $stream->crypt($ciphertext);
 
 =head2 keystream
 
- $random_key = $stream->keystream($length);
+Returns C<$length> bytes of raw keystream as a binary string.
+
+ my $random_key = $stream->keystream($length);
 
 =head2 clone
 
- $stream->clone();
+Returns a copy of the stream cipher object in its current state.
+
+ my $stream2 = $stream->clone();
 
 =head1 SEE ALSO
 
@@ -66,6 +77,8 @@ Provides an interface to the Rabbit stream cipher.
 =item * L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sober128>
 
 =item * L<https://en.wikipedia.org/wiki/Rabbit_(cipher)>
+
+=item * L<https://www.rfc-editor.org/rfc/rfc4503>
 
 =back
 

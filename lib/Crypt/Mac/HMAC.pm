@@ -25,22 +25,23 @@ Crypt::Mac::HMAC - Message authentication code HMAC
    use Crypt::Mac::HMAC qw( hmac hmac_hex );
 
    # calculate MAC from string/buffer
-   $hmac_raw  = hmac('SHA256', $key, 'data buffer');
-   $hmac_hex  = hmac_hex('SHA256', $key, 'data buffer');
-   $hmac_b64  = hmac_b64('SHA256', $key, 'data buffer');
-   $hmac_b64u = hmac_b64u('SHA256', $key, 'data buffer');
+   my $hmac_raw  = hmac('SHA256', $key, 'data buffer');
+   my $hmac_hex  = hmac_hex('SHA256', $key, 'data buffer');
+   my $hmac_b64  = hmac_b64('SHA256', $key, 'data buffer');
+   my $hmac_b64u = hmac_b64u('SHA256', $key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::HMAC;
 
-   $d = Crypt::Mac::HMAC->new('SHA256', $key);
+   my $d = Crypt::Mac::HMAC->new('SHA256', $key);
    $d->add('any data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $result_raw  = $d->mac;     # raw bytes
-   $result_hex  = $d->hexmac;  # hexadecimal form
-   $result_b64  = $d->b64mac;  # Base64 form
-   $result_b64u = $d->b64umac; # Base64 URL Safe form
+   my $result_raw  = $d->mac;     # raw bytes
+   my $result_hex  = $d->hexmac;  # hexadecimal form
+   my $result_b64  = $d->b64mac;  # Base64 form
+   my $result_b64u = $d->b64umac; # Base64 URL Safe form
+
+   # or MAC a file instead
+   my $file_result_raw = Crypt::Mac::HMAC->new('SHA256', $key)->addfile('filename.dat')->mac;
 
 =head1 DESCRIPTION
 
@@ -64,54 +65,60 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a binary string.
 
- $hmac_raw = hmac($hash_name, $key, 'data buffer');
+ my $hmac_raw = hmac($hash_name, $key, 'data buffer');
  #or
- $hmac_raw = hmac($hash_name, $key, 'any data', 'more data', 'even more data');
+ my $hmac_raw = hmac($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
- # $key ......... the key (octets/bytes)
+ # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $key ......... [binary string] the key (octets/bytes)
 
 =head2 hmac_hex
 
 Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a hexadecimal string.
 
- $hmac_hex = hmac_hex($hash_name, $key, 'data buffer');
+ my $hmac_hex = hmac_hex($hash_name, $key, 'data buffer');
  #or
- $hmac_hex = hmac_hex($hash_name, $key, 'any data', 'more data', 'even more data');
+ my $hmac_hex = hmac_hex($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
- # $key ......... the key (octets/bytes, not hex!)
+ # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $key ......... [binary string] the key (not hex!)
 
 =head2 hmac_b64
 
 Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a Base64 string.
 
- $hmac_b64 = hmac_b64($hash_name, $key, 'data buffer');
+ my $hmac_b64 = hmac_b64($hash_name, $key, 'data buffer');
  #or
- $hmac_b64 = hmac_b64($hash_name, $key, 'any data', 'more data', 'even more data');
+ my $hmac_b64 = hmac_b64($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
- # $key ......... the key (octets/bytes, not Base64!)
+ # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $key ......... [binary string] the key (not Base64!)
 
 =head2 hmac_b64u
 
 Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
- $hmac_b64url = hmac_b64u($hash_name, $key, 'data buffer');
+ my $hmac_b64url = hmac_b64u($hash_name, $key, 'data buffer');
  #or
- $hmac_b64url = hmac_b64u($hash_name, $key, 'any data', 'more data', 'even more data');
+ my $hmac_b64url = hmac_b64u($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
- # $key ......... the key (octets/bytes, not Base64url!)
+ # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $key ......... [binary string] the key (not Base64url!)
 
 =head1 METHODS
 
+Unless noted otherwise, assume C<$d> is an existing MAC object created via
+C<new>, for example:
+
+ my $d = Crypt::Mac::HMAC->new('SHA256', $key);
+
 =head2 new
 
- $d = Crypt::Mac::HMAC->new($hash_name, $key);
+ my $d = Crypt::Mac::HMAC->new($hash_name, $key);
 
- # $hash_name ... any <NAME> for which there exists Crypt::Digest::<NAME>
- # $key ......... the key (octets/bytes)
+ # $hash_name ... [string] one of 'SHA256', 'SHA384', 'SHA512', 'SHA1', 'SHA3_256', 'BLAKE2b_256',
+ #                'RIPEMD160', etc. - any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $key ......... [binary string] the key (any length - internally padded/hashed as per RFC 2104)
 
 =head2 clone
 
@@ -123,31 +130,44 @@ Logically joins all arguments into a single string, and returns its HMAC message
 
 =head2 add
 
+Appends data to the message. Returns the object itself (for chaining).
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 
+Reads the file content and appends it to the message. Returns the object itself (for chaining).
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 mac
 
- $result_raw = $d->mac();
+Returns the binary MAC (raw bytes).
+
+ my $result_raw = $d->mac();
 
 =head2 hexmac
 
- $result_hex = $d->hexmac();
+Returns the MAC encoded as a lowercase hexadecimal string.
+
+ my $result_hex = $d->hexmac();
 
 =head2 b64mac
 
- $result_b64 = $d->b64mac();
+Returns the MAC encoded as a Base64 string with trailing C<=> padding.
+
+ my $result_b64 = $d->b64mac();
 
 =head2 b64umac
 
- $result_b64url = $d->b64umac();
+Returns the MAC encoded as a Base64 URL Safe string (no trailing C<=>).
+
+ my $result_b64url = $d->b64umac();
 
 =head1 SEE ALSO
 
@@ -157,7 +177,7 @@ Logically joins all arguments into a single string, and returns its HMAC message
 
 =item * L<https://en.wikipedia.org/wiki/Hmac>
 
-=item * L<https://tools.ietf.org/html/rfc2104>
+=item * L<https://www.rfc-editor.org/rfc/rfc2104>
 
 =back
 

@@ -40,32 +40,35 @@ Crypt::Digest::Keccak224 - Hash function Keccak-224 [size: 224 bits]
                                 keccak224_file keccak224_file_hex keccak224_file_b64 keccak224_file_b64u );
 
    # calculate digest from string/buffer
-   $keccak224_raw  = keccak224('data string');
-   $keccak224_hex  = keccak224_hex('data string');
-   $keccak224_b64  = keccak224_b64('data string');
-   $keccak224_b64u = keccak224_b64u('data string');
-   # calculate digest from file
-   $keccak224_raw  = keccak224_file('filename.dat');
-   $keccak224_hex  = keccak224_file_hex('filename.dat');
-   $keccak224_b64  = keccak224_file_b64('filename.dat');
-   $keccak224_b64u = keccak224_file_b64u('filename.dat');
-   # calculate digest from filehandle
-   $keccak224_raw  = keccak224_file(*FILEHANDLE);
-   $keccak224_hex  = keccak224_file_hex(*FILEHANDLE);
-   $keccak224_b64  = keccak224_file_b64(*FILEHANDLE);
-   $keccak224_b64u = keccak224_file_b64u(*FILEHANDLE);
+   my $data = 'data string';
+   my $keccak224_raw  = keccak224($data);
+   my $keccak224_hex  = keccak224_hex($data);
+   my $keccak224_b64  = keccak224_b64($data);
+   my $keccak224_b64u = keccak224_b64u($data);
+   # or from file
+   my $keccak224_file_raw  = keccak224_file('filename.dat');
+   my $keccak224_file_hex  = keccak224_file_hex('filename.dat');
+   my $keccak224_file_b64  = keccak224_file_b64('filename.dat');
+   my $keccak224_file_b64u = keccak224_file_b64u('filename.dat');
+   # or from filehandle
+   my $filehandle = ...; # existing binary-mode filehandle
+   my $keccak224_fh_raw  = keccak224_file($filehandle);
+   my $keccak224_fh_hex  = keccak224_file_hex($filehandle);
+   my $keccak224_fh_b64  = keccak224_file_b64($filehandle);
+   my $keccak224_fh_b64u = keccak224_file_b64u($filehandle);
 
    ### OO interface:
    use Crypt::Digest::Keccak224;
 
-   $d = Crypt::Digest::Keccak224->new;
+   my $d = Crypt::Digest::Keccak224->new;
    $d->add('any data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $result_raw  = $d->digest;     # raw bytes
-   $result_hex  = $d->hexdigest;  # hexadecimal form
-   $result_b64  = $d->b64digest;  # Base64 form
-   $result_b64u = $d->b64udigest; # Base64 URL Safe form
+   my $result_raw  = $d->digest;     # raw bytes
+   my $result_hex  = $d->hexdigest;  # hexadecimal form
+   my $result_b64  = $d->b64digest;  # Base64 form
+   my $result_b64u = $d->b64udigest; # Base64 URL Safe form
+
+   # or hash a file instead
+   my $file_result_raw = Crypt::Digest::Keccak224->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
 
@@ -90,49 +93,51 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its Keccak224 digest encoded as a binary string.
 
- $keccak224_raw = keccak224('data string');
+ my $keccak224_raw = keccak224('data string');
  #or
- $keccak224_raw = keccak224('any data', 'more data', 'even more data');
+ my $keccak224_raw = keccak224('any data', 'more data', 'even more data');
 
 =head2 keccak224_hex
 
 Logically joins all arguments into a single string, and returns its Keccak224 digest encoded as a hexadecimal string.
 
- $keccak224_hex = keccak224_hex('data string');
+ my $keccak224_hex = keccak224_hex('data string');
  #or
- $keccak224_hex = keccak224_hex('any data', 'more data', 'even more data');
+ my $keccak224_hex = keccak224_hex('any data', 'more data', 'even more data');
 
 =head2 keccak224_b64
 
 Logically joins all arguments into a single string, and returns its Keccak224 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $keccak224_b64 = keccak224_b64('data string');
+ my $keccak224_b64 = keccak224_b64('data string');
  #or
- $keccak224_b64 = keccak224_b64('any data', 'more data', 'even more data');
+ my $keccak224_b64 = keccak224_b64('any data', 'more data', 'even more data');
 
 =head2 keccak224_b64u
 
 Logically joins all arguments into a single string, and returns its Keccak224 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
- $keccak224_b64url = keccak224_b64u('data string');
+ my $keccak224_b64url = keccak224_b64u('data string');
  #or
- $keccak224_b64url = keccak224_b64u('any data', 'more data', 'even more data');
+ my $keccak224_b64url = keccak224_b64u('any data', 'more data', 'even more data');
 
 =head2 keccak224_file
 
 Reads file (defined by filename or filehandle) content, and returns its Keccak224 digest encoded as a binary string.
 
- $keccak224_raw = keccak224_file('filename.dat');
+ my $keccak224_raw = keccak224_file('filename.dat');
  #or
- $keccak224_raw = keccak224_file(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $keccak224_raw = keccak224_file($filehandle);
 
 =head2 keccak224_file_hex
 
 Reads file (defined by filename or filehandle) content, and returns its Keccak224 digest encoded as a hexadecimal string.
 
- $keccak224_hex = keccak224_file_hex('filename.dat');
+ my $keccak224_hex = keccak224_file_hex('filename.dat');
  #or
- $keccak224_hex = keccak224_file_hex(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $keccak224_hex = keccak224_file_hex($filehandle);
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
@@ -140,25 +145,31 @@ B<BEWARE:> You have to make sure that the filehandle is in binary mode before yo
 
 Reads file (defined by filename or filehandle) content, and returns its Keccak224 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $keccak224_b64 = keccak224_file_b64('filename.dat');
+ my $keccak224_b64 = keccak224_file_b64('filename.dat');
  #or
- $keccak224_b64 = keccak224_file_b64(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $keccak224_b64 = keccak224_file_b64($filehandle);
 
 =head2 keccak224_file_b64u
 
 Reads file (defined by filename or filehandle) content, and returns its Keccak224 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
- $keccak224_b64url = keccak224_file_b64u('filename.dat');
+ my $keccak224_b64url = keccak224_file_b64u('filename.dat');
  #or
- $keccak224_b64url = keccak224_file_b64u(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $keccak224_b64url = keccak224_file_b64u($filehandle);
 
 =head1 METHODS
 
 The OO interface provides the same set of functions as L<Crypt::Digest>.
+Unless noted otherwise, assume C<$d> is an existing digest object created via
+C<new>, for example:
+
+ my $d = Crypt::Digest::Keccak224->new();
 
 =head2 new
 
- $d = Crypt::Digest::Keccak224->new();
+ my $d = Crypt::Digest::Keccak224->new();
 
 =head2 clone
 
@@ -170,15 +181,20 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 add
 
+Appends data to the message. Returns the object itself (for chaining).
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 
+Reads the file content and appends it to the message. Returns the object itself (for chaining).
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 add_bits
 
@@ -196,19 +212,27 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 digest
 
- $result_raw = $d->digest();
+Returns the binary digest (raw bytes).
+
+ my $result_raw = $d->digest();
 
 =head2 hexdigest
 
- $result_hex = $d->hexdigest();
+Returns the digest encoded as a lowercase hexadecimal string.
+
+ my $result_hex = $d->hexdigest();
 
 =head2 b64digest
 
- $result_b64 = $d->b64digest();
+Returns the digest encoded as a Base64 string with trailing C<=> padding.
+
+ my $result_b64 = $d->b64digest();
 
 =head2 b64udigest
 
- $result_b64url = $d->b64udigest();
+Returns the digest encoded as a Base64 URL Safe string (no trailing C<=>).
+
+ my $result_b64url = $d->b64udigest();
 
 =head1 SEE ALSO
 

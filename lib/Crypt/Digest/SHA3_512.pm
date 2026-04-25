@@ -40,32 +40,35 @@ Crypt::Digest::SHA3_512 - Hash function SHA3-512 [size: 512 bits]
                                 sha3_512_file sha3_512_file_hex sha3_512_file_b64 sha3_512_file_b64u );
 
    # calculate digest from string/buffer
-   $sha3_512_raw  = sha3_512('data string');
-   $sha3_512_hex  = sha3_512_hex('data string');
-   $sha3_512_b64  = sha3_512_b64('data string');
-   $sha3_512_b64u = sha3_512_b64u('data string');
-   # calculate digest from file
-   $sha3_512_raw  = sha3_512_file('filename.dat');
-   $sha3_512_hex  = sha3_512_file_hex('filename.dat');
-   $sha3_512_b64  = sha3_512_file_b64('filename.dat');
-   $sha3_512_b64u = sha3_512_file_b64u('filename.dat');
-   # calculate digest from filehandle
-   $sha3_512_raw  = sha3_512_file(*FILEHANDLE);
-   $sha3_512_hex  = sha3_512_file_hex(*FILEHANDLE);
-   $sha3_512_b64  = sha3_512_file_b64(*FILEHANDLE);
-   $sha3_512_b64u = sha3_512_file_b64u(*FILEHANDLE);
+   my $data = 'data string';
+   my $sha3_512_raw  = sha3_512($data);
+   my $sha3_512_hex  = sha3_512_hex($data);
+   my $sha3_512_b64  = sha3_512_b64($data);
+   my $sha3_512_b64u = sha3_512_b64u($data);
+   # or from file
+   my $sha3_512_file_raw  = sha3_512_file('filename.dat');
+   my $sha3_512_file_hex  = sha3_512_file_hex('filename.dat');
+   my $sha3_512_file_b64  = sha3_512_file_b64('filename.dat');
+   my $sha3_512_file_b64u = sha3_512_file_b64u('filename.dat');
+   # or from filehandle
+   my $filehandle = ...; # existing binary-mode filehandle
+   my $sha3_512_fh_raw  = sha3_512_file($filehandle);
+   my $sha3_512_fh_hex  = sha3_512_file_hex($filehandle);
+   my $sha3_512_fh_b64  = sha3_512_file_b64($filehandle);
+   my $sha3_512_fh_b64u = sha3_512_file_b64u($filehandle);
 
    ### OO interface:
    use Crypt::Digest::SHA3_512;
 
-   $d = Crypt::Digest::SHA3_512->new;
+   my $d = Crypt::Digest::SHA3_512->new;
    $d->add('any data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $result_raw  = $d->digest;     # raw bytes
-   $result_hex  = $d->hexdigest;  # hexadecimal form
-   $result_b64  = $d->b64digest;  # Base64 form
-   $result_b64u = $d->b64udigest; # Base64 URL Safe form
+   my $result_raw  = $d->digest;     # raw bytes
+   my $result_hex  = $d->hexdigest;  # hexadecimal form
+   my $result_b64  = $d->b64digest;  # Base64 form
+   my $result_b64u = $d->b64udigest; # Base64 URL Safe form
+
+   # or hash a file instead
+   my $file_result_raw = Crypt::Digest::SHA3_512->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
 
@@ -90,49 +93,51 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its SHA3_512 digest encoded as a binary string.
 
- $sha3_512_raw = sha3_512('data string');
+ my $sha3_512_raw = sha3_512('data string');
  #or
- $sha3_512_raw = sha3_512('any data', 'more data', 'even more data');
+ my $sha3_512_raw = sha3_512('any data', 'more data', 'even more data');
 
 =head2 sha3_512_hex
 
 Logically joins all arguments into a single string, and returns its SHA3_512 digest encoded as a hexadecimal string.
 
- $sha3_512_hex = sha3_512_hex('data string');
+ my $sha3_512_hex = sha3_512_hex('data string');
  #or
- $sha3_512_hex = sha3_512_hex('any data', 'more data', 'even more data');
+ my $sha3_512_hex = sha3_512_hex('any data', 'more data', 'even more data');
 
 =head2 sha3_512_b64
 
 Logically joins all arguments into a single string, and returns its SHA3_512 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $sha3_512_b64 = sha3_512_b64('data string');
+ my $sha3_512_b64 = sha3_512_b64('data string');
  #or
- $sha3_512_b64 = sha3_512_b64('any data', 'more data', 'even more data');
+ my $sha3_512_b64 = sha3_512_b64('any data', 'more data', 'even more data');
 
 =head2 sha3_512_b64u
 
 Logically joins all arguments into a single string, and returns its SHA3_512 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
- $sha3_512_b64url = sha3_512_b64u('data string');
+ my $sha3_512_b64url = sha3_512_b64u('data string');
  #or
- $sha3_512_b64url = sha3_512_b64u('any data', 'more data', 'even more data');
+ my $sha3_512_b64url = sha3_512_b64u('any data', 'more data', 'even more data');
 
 =head2 sha3_512_file
 
 Reads file (defined by filename or filehandle) content, and returns its SHA3_512 digest encoded as a binary string.
 
- $sha3_512_raw = sha3_512_file('filename.dat');
+ my $sha3_512_raw = sha3_512_file('filename.dat');
  #or
- $sha3_512_raw = sha3_512_file(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $sha3_512_raw = sha3_512_file($filehandle);
 
 =head2 sha3_512_file_hex
 
 Reads file (defined by filename or filehandle) content, and returns its SHA3_512 digest encoded as a hexadecimal string.
 
- $sha3_512_hex = sha3_512_file_hex('filename.dat');
+ my $sha3_512_hex = sha3_512_file_hex('filename.dat');
  #or
- $sha3_512_hex = sha3_512_file_hex(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $sha3_512_hex = sha3_512_file_hex($filehandle);
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
@@ -140,25 +145,31 @@ B<BEWARE:> You have to make sure that the filehandle is in binary mode before yo
 
 Reads file (defined by filename or filehandle) content, and returns its SHA3_512 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $sha3_512_b64 = sha3_512_file_b64('filename.dat');
+ my $sha3_512_b64 = sha3_512_file_b64('filename.dat');
  #or
- $sha3_512_b64 = sha3_512_file_b64(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $sha3_512_b64 = sha3_512_file_b64($filehandle);
 
 =head2 sha3_512_file_b64u
 
 Reads file (defined by filename or filehandle) content, and returns its SHA3_512 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
 
- $sha3_512_b64url = sha3_512_file_b64u('filename.dat');
+ my $sha3_512_b64url = sha3_512_file_b64u('filename.dat');
  #or
- $sha3_512_b64url = sha3_512_file_b64u(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $sha3_512_b64url = sha3_512_file_b64u($filehandle);
 
 =head1 METHODS
 
 The OO interface provides the same set of functions as L<Crypt::Digest>.
+Unless noted otherwise, assume C<$d> is an existing digest object created via
+C<new>, for example:
+
+ my $d = Crypt::Digest::SHA3_512->new();
 
 =head2 new
 
- $d = Crypt::Digest::SHA3_512->new();
+ my $d = Crypt::Digest::SHA3_512->new();
 
 =head2 clone
 
@@ -170,15 +181,20 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 add
 
+Appends data to the message. Returns the object itself (for chaining).
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 
+Reads the file content and appends it to the message. Returns the object itself (for chaining).
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 add_bits
 
@@ -196,19 +212,27 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 digest
 
- $result_raw = $d->digest();
+Returns the binary digest (raw bytes).
+
+ my $result_raw = $d->digest();
 
 =head2 hexdigest
 
- $result_hex = $d->hexdigest();
+Returns the digest encoded as a lowercase hexadecimal string.
+
+ my $result_hex = $d->hexdigest();
 
 =head2 b64digest
 
- $result_b64 = $d->b64digest();
+Returns the digest encoded as a Base64 string with trailing C<=> padding.
+
+ my $result_b64 = $d->b64digest();
 
 =head2 b64udigest
 
- $result_b64url = $d->b64udigest();
+Returns the digest encoded as a Base64 URL Safe string (no trailing C<=>).
+
+ my $result_b64url = $d->b64udigest();
 
 =head1 SEE ALSO
 

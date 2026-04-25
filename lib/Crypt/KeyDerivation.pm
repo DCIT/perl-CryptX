@@ -25,20 +25,38 @@ Crypt::KeyDerivation - PBKDF1, PBKDF2, HKDF, Bcrypt, Scrypt, Argon2 key derivati
 
   use Crypt::KeyDerivation ':all';
 
+  my $password = 'secret';
+  my $salt = '12345678';
+  my $iteration_count = 5000;
+  my $hash_name = 'SHA256';
+  my $len = 32;
+  my $keying_material = 'input keying material';
+  my $info = 'context';
+  my $rounds = 16;
+  my $N = 1024;
+  my $r = 8;
+  my $p = 1;
+  my $type = 'argon2id';
+  my $t_cost = 3;
+  my $m_factor = 65536;
+  my $parallelism = 1;
+  my $secret = '';
+  my $ad = '';
+
   ### PBKDF1/2
-  $derived_key1 = pbkdf1($password, $salt, $iteration_count, $hash_name, $len);
-  $derived_key2 = pbkdf1_openssl($password, $salt, $iteration_count, $hash_name, $len);
-  $derived_key3 = pbkdf2($password, $salt, $iteration_count, $hash_name, $len);
+  my $pbkdf1_key = pbkdf1($password, $salt, $iteration_count, $hash_name, $len);
+  my $openssl_pbkdf1_key = pbkdf1_openssl($password, $salt, $iteration_count, $hash_name, $len);
+  my $pbkdf2_key = pbkdf2($password, $salt, $iteration_count, $hash_name, $len);
 
   ### HKDF & co.
-  $derived_key4 = hkdf($keying_material, $salt, $hash_name, $len, $info);
-  $prk  = hkdf_extract($keying_material, $salt, $hash_name);
-  $okm1 = hkdf_expand($prk, $hash_name, $len, $info);
+  my $hkdf_okm = hkdf($keying_material, $salt, $hash_name, $len, $info);
+  my $prk = hkdf_extract($keying_material, $salt, $hash_name);
+  my $expanded_okm = hkdf_expand($prk, $hash_name, $len, $info);
 
   ### bcrypt / scrypt / argon2
-  $derived_key4 = bcrypt_pbkdf($password, $salt, $rounds, $hash_name, $len);
-  $derived_key5 = scrypt_pbkdf($password, $salt, $N, $r, $p, $len);
-  $derived_key6 = argon2_pbkdf($type, $password, $salt, $t_cost, $m_factor, $parallelism, $len, $secret, $ad);
+  my $bcrypt_key = bcrypt_pbkdf($password, $salt, $rounds, $hash_name, $len);
+  my $scrypt_key = scrypt_pbkdf($password, $salt, $N, $r, $p, $len);
+  my $argon2_key = argon2_pbkdf($type, $password, $salt, $t_cost, $m_factor, $parallelism, $len, $secret, $ad);
 
 =head1 DESCRIPTION
 
@@ -46,15 +64,17 @@ Provides an interface to key derivation functions:
 
 =over
 
-=item * PBKDF1 and PBKDF2 according to PKCS#5 v2.0 L<https://tools.ietf.org/html/rfc2898|https://tools.ietf.org/html/rfc2898>
+=item * PBKDF1 and PBKDF2 according to PKCS #5 v2.0
+L<https://www.rfc-editor.org/rfc/rfc2898>
 
-=item * HKDF (+ related) according to L<https://tools.ietf.org/html/rfc5869|https://tools.ietf.org/html/rfc5869>
+=item * HKDF (+ related) according to
+L<https://www.rfc-editor.org/rfc/rfc5869>
 
 =item * Bcrypt-PBKDF as defined by the OpenBSD project
 
-=item * Scrypt according to L<https://tools.ietf.org/html/rfc7914>
+=item * Scrypt according to L<https://www.rfc-editor.org/rfc/rfc7914>
 
-=item * Argon2 according to L<https://tools.ietf.org/html/rfc9106>
+=item * Argon2 according to L<https://www.rfc-editor.org/rfc/rfc9106>
 
 =back
 
@@ -62,25 +82,29 @@ While primarily designed for key derivation, the functions PBKDF2, Bcrypt, Scryp
 are also widely used for password hashing. In that use case the derived key serves as the
 stored password hash.
 
+All functions return raw bytes. Passing an output length of C<0> returns an
+empty string. Invalid hash names, invalid Argon2 type names, or parameter
+combinations rejected by the underlying library croak.
+
 =head1 FUNCTIONS
 
 =head2 pbkdf1
 
 B<BEWARE:> if you are not sure, do not use C<pbkdf1> but rather choose C<pbkdf2>.
 
-  $derived_key = pbkdf1($password, $salt, $iteration_count, $hash_name, $len);
+  my $derived_key = pbkdf1($password, $salt, $iteration_count, $hash_name, $len);
   #or
-  $derived_key = pbkdf1($password, $salt, $iteration_count, $hash_name);
+  my $derived_key = pbkdf1($password, $salt, $iteration_count, $hash_name);
   #or
-  $derived_key = pbkdf1($password, $salt, $iteration_count);
+  my $derived_key = pbkdf1($password, $salt, $iteration_count);
   #or
-  $derived_key = pbkdf1($password, $salt);
+  my $derived_key = pbkdf1($password, $salt);
 
-  # $password ......... input keying material  (password)
-  # $salt ............. salt/nonce (expected length: 8)
-  # $iteration_count .. optional, DEFAULT: 5000
-  # $hash_name ........ optional, DEFAULT: 'SHA256'
-  # $len .............. optional, derived key len, DEFAULT: 32
+  # $password ......... [binary string] input keying material (password)
+  # $salt ............. [binary string] salt/nonce (expected length: 8 bytes)
+  # $iteration_count .. [integer] optional, DEFAULT: 5000
+  # $hash_name ........ [string]  optional, DEFAULT: 'SHA256'
+  # $len .............. [integer] optional, derived key len in bytes, DEFAULT: 32
 
 =head2 pbkdf1_openssl
 
@@ -90,77 +114,85 @@ OpenSSL-compatible variant of PBKDF1 (implements C<EVP_BytesToKey>). Unlike stri
 C<pbkdf1>, the output length is not limited to the hash size -- it can be arbitrarily
 long by chaining hash blocks. OpenSSL defaults: C<MD5> hash, C<iteration_count=1>.
 
-  $derived_key = pbkdf1_openssl($password, $salt, $iteration_count, $hash_name, $len);
+  my $derived_key = pbkdf1_openssl($password, $salt, $iteration_count, $hash_name, $len);
   #or
-  $derived_key = pbkdf1_openssl($password, $salt, $iteration_count, $hash_name);
+  my $derived_key = pbkdf1_openssl($password, $salt, $iteration_count, $hash_name);
   #or
-  $derived_key = pbkdf1_openssl($password, $salt, $iteration_count);
+  my $derived_key = pbkdf1_openssl($password, $salt, $iteration_count);
   #or
-  $derived_key = pbkdf1_openssl($password, $salt);
+  my $derived_key = pbkdf1_openssl($password, $salt);
 
-  # $password ......... input keying material (password)
-  # $salt ............. salt/nonce (expected length: 8)
-  # $iteration_count .. optional, DEFAULT: 5000
-  # $hash_name ........ optional, DEFAULT: 'SHA256'
-  # $len .............. optional, derived key len, DEFAULT: 32
+  # $password ......... [binary string] input keying material (password)
+  # $salt ............. [binary string] salt/nonce (expected length: 8 bytes)
+  # $iteration_count .. [integer] optional, DEFAULT: 5000
+  # $hash_name ........ [string]  optional, DEFAULT: 'SHA256'
+  # $len .............. [integer] optional, derived key len in bytes, DEFAULT: 32
 
 =head2 pbkdf2
 
-  $derived_key = pbkdf2($password, $salt, $iteration_count, $hash_name, $len);
+  my $derived_key = pbkdf2($password, $salt, $iteration_count, $hash_name, $len);
   #or
-  $derived_key = pbkdf2($password, $salt, $iteration_count, $hash_name);
+  my $derived_key = pbkdf2($password, $salt, $iteration_count, $hash_name);
   #or
-  $derived_key = pbkdf2($password, $salt, $iteration_count);
+  my $derived_key = pbkdf2($password, $salt, $iteration_count);
   #or
-  $derived_key = pbkdf2($password, $salt);
+  my $derived_key = pbkdf2($password, $salt);
 
-  # $password ......... input keying material (password)
-  # $salt ............. salt/nonce
-  # $iteration_count .. optional, DEFAULT: 5000
-  # $hash_name ........ optional, DEFAULT: 'SHA256'
-  # $len .............. optional, derived key len, DEFAULT: 32
+  # $password ......... [binary string] input keying material (password)
+  # $salt ............. [binary string] salt/nonce (any length; longer is better)
+  # $iteration_count .. [integer] optional, DEFAULT: 5000
+  # $hash_name ........ [string]  optional, DEFAULT: 'SHA256'
+  # $len .............. [integer] optional, derived key len in bytes, DEFAULT: 32
 
 =head2 hkdf
 
-  $okm2 = hkdf($password, $salt, $hash_name, $len, $info);
+  my $okm = hkdf($password, $salt, $hash_name, $len, $info);
   #or
-  $okm2 = hkdf($password, $salt, $hash_name, $len);
+  my $okm = hkdf($password, $salt, $hash_name, $len);
   #or
-  $okm2 = hkdf($password, $salt, $hash_name);
+  my $okm = hkdf($password, $salt, $hash_name);
   #or
-  $okm2 = hkdf($password, $salt);
+  my $okm = hkdf($password, $salt);
 
-  # $password ... input keying material (password)
-  # $salt ....... salt/nonce, if undef defaults to HashLen zero octets
-  # $hash_name .. optional, DEFAULT: 'SHA256'
-  # $len ........ optional, derived key len, DEFAULT: 32
-  # $info ....... optional context and application specific information, DEFAULT: ''
+  # $password ... [binary string] input keying material
+  # $salt ....... [binary string | undef] salt; if undef defaults to HashLen zero octets
+  # $hash_name .. [string]  optional, DEFAULT: 'SHA256'
+  # $len ........ [integer] optional, derived key len in bytes, DEFAULT: 32
+  # $info ....... [binary string] optional context/application info, DEFAULT: ''
+
+Use C<hkdf> for one-shot extract+expand. For multi-step workflows, use
+C<hkdf_extract> followed by C<hkdf_expand>.
 
 =head2 hkdf_extract
 
-  $prk  = hkdf_extract($password, $salt, $hash_name);
+  my $prk = hkdf_extract($password, $salt, $hash_name);
   #or
-  $prk  = hkdf_extract($password, $salt, $hash_name);
+  my $prk = hkdf_extract($password, $salt);
 
-  # $password ... input keying material (password)
-  # $salt ....... salt/nonce, if undef defaults to HashLen zero octets
-  # $hash_name .. optional, DEFAULT: 'SHA256'
+  # $password ... [binary string] input keying material
+  # $salt ....... [binary string | undef] salt; if undef defaults to HashLen zero octets
+  # $hash_name .. [string]  optional, DEFAULT: 'SHA256'
+
+Returns the pseudorandom key (PRK). Its length is the digest size of the
+selected hash and it is intended to be passed to C<hkdf_expand>.
 
 
 =head2 hkdf_expand
 
-  $okm = hkdf_expand($pseudokey, $hash_name, $len, $info);
+  my $okm = hkdf_expand($pseudokey, $hash_name, $len, $info);
   #or
-  $okm = hkdf_expand($pseudokey, $hash_name, $len);
+  my $okm = hkdf_expand($pseudokey, $hash_name, $len);
   #or
-  $okm = hkdf_expand($pseudokey, $hash_name);
+  my $okm = hkdf_expand($pseudokey, $hash_name);
   #or
-  $okm = hkdf_expand($pseudokey);
+  my $okm = hkdf_expand($pseudokey);
 
-  # $pseudokey .. input keying material
-  # $hash_name .. optional, DEFAULT: 'SHA256'
-  # $len ........ optional, derived key len, DEFAULT: 32
-  # $info ....... optional context and application specific information, DEFAULT: ''
+  # $pseudokey .. [binary string] input keying material (normally from hkdf_extract)
+  # $hash_name .. [string]  optional, DEFAULT: 'SHA256'
+  # $len ........ [integer] optional, derived key len in bytes, DEFAULT: 32
+  # $info ....... [binary string] optional context/application info, DEFAULT: ''
+
+C<$pseudokey> is normally the PRK returned by C<hkdf_extract>.
 
 =head2 bcrypt_pbkdf
 
@@ -169,65 +201,73 @@ bcrypt-based key derivation as defined by the OpenBSD project.
 I<Since: CryptX-0.088>
 
 
-  $derived_key = bcrypt_pbkdf($password, $salt, $rounds, $hash_name, $len);
+  my $derived_key = bcrypt_pbkdf($password, $salt, $rounds, $hash_name, $len);
   #or
-  $derived_key = bcrypt_pbkdf($password, $salt, $rounds, $hash_name);
+  my $derived_key = bcrypt_pbkdf($password, $salt, $rounds, $hash_name);
   #or
-  $derived_key = bcrypt_pbkdf($password, $salt, $rounds);
+  my $derived_key = bcrypt_pbkdf($password, $salt, $rounds);
   #or
-  $derived_key = bcrypt_pbkdf($password, $salt);
+  my $derived_key = bcrypt_pbkdf($password, $salt);
 
-  # $password ... input keying material (password)
-  # $salt ....... salt/nonce
-  # $rounds ..... optional, number of rounds, DEFAULT: 16
-  # $hash_name .. optional, DEFAULT: 'SHA512'
-  # $len ........ optional, derived key len, DEFAULT: 32
+  # $password ... [binary string] input keying material (password)
+  # $salt ....... [binary string] salt/nonce
+  # $rounds ..... [integer] optional, number of rounds, DEFAULT: 16
+  # $hash_name .. [string]  optional, DEFAULT: 'SHA512'
+  # $len ........ [integer] optional, derived key len in bytes, DEFAULT: 32
+
+Larger C<$rounds> values increase CPU cost linearly.
 
 =head2 scrypt_pbkdf
 
-scrypt key derivation according to L<https://tools.ietf.org/html/rfc7914>.
+scrypt key derivation according to L<https://www.rfc-editor.org/rfc/rfc7914>.
 
 I<Since: CryptX-0.088>
 
 
-  $derived_key = scrypt_pbkdf($password, $salt, $N, $r, $p, $len);
+  my $derived_key = scrypt_pbkdf($password, $salt, $N, $r, $p, $len);
   #or
-  $derived_key = scrypt_pbkdf($password, $salt, $N, $r, $p);
+  my $derived_key = scrypt_pbkdf($password, $salt, $N, $r, $p);
   #or
-  $derived_key = scrypt_pbkdf($password, $salt, $N);
+  my $derived_key = scrypt_pbkdf($password, $salt, $N);
   #or
-  $derived_key = scrypt_pbkdf($password, $salt);
+  my $derived_key = scrypt_pbkdf($password, $salt);
 
-  # $password ... input keying material (password)
-  # $salt ....... salt/nonce
-  # $N .......... optional, CPU/memory cost parameter (power of 2), DEFAULT: 1024
-  # $r .......... optional, block size, DEFAULT: 8
-  # $p .......... optional, parallelization parameter, DEFAULT: 1
-  # $len ........ optional, derived key len, DEFAULT: 32
+  # $password ... [binary string] input keying material (password)
+  # $salt ....... [binary string] salt/nonce
+  # $N .......... [integer] optional, CPU/memory cost (must be power of 2), DEFAULT: 1024
+  # $r .......... [integer] optional, block size, DEFAULT: 8
+  # $p .......... [integer] optional, parallelization parameter, DEFAULT: 1
+  # $len ........ [integer] optional, derived key len in bytes, DEFAULT: 32
+
+Use only power-of-two values for C<$N>. Larger C<$N>, C<$r>, and C<$p>
+increase resource usage substantially; invalid combinations croak.
 
 =head2 argon2_pbkdf
 
-Argon2 key derivation according to L<https://tools.ietf.org/html/rfc9106>.
+Argon2 key derivation according to L<https://www.rfc-editor.org/rfc/rfc9106>.
 
 I<Since: CryptX-0.088>
 
 
-  $derived_key = argon2_pbkdf($type, $password, $salt, $t_cost, $m_factor, $parallelism, $len, $secret, $ad);
+  my $derived_key = argon2_pbkdf($type, $password, $salt, $t_cost, $m_factor, $parallelism, $len, $secret, $ad);
   #or
-  $derived_key = argon2_pbkdf($type, $password, $salt, $t_cost, $m_factor, $parallelism, $len);
+  my $derived_key = argon2_pbkdf($type, $password, $salt, $t_cost, $m_factor, $parallelism, $len);
   #or
-  $derived_key = argon2_pbkdf($type, $password, $salt, $t_cost, $m_factor, $parallelism);
+  my $derived_key = argon2_pbkdf($type, $password, $salt, $t_cost, $m_factor, $parallelism);
   #or
-  $derived_key = argon2_pbkdf($type, $password, $salt);
+  my $derived_key = argon2_pbkdf($type, $password, $salt);
 
-  # $type        ... one of 'argon2d', 'argon2i', 'argon2id'
-  # $password    ... input keying material (password)
-  # $salt        ... salt/nonce
-  # $t_cost      ... optional, time cost (number of iterations), DEFAULT: 3
-  # $m_factor    ... optional, memory cost in kibibytes, DEFAULT: 65536
-  # $parallelism ... optional, degree of parallelism, DEFAULT: 1
-  # $len         ... optional, derived key len, DEFAULT: 32
-  # $secret      ... optional, secret value, DEFAULT: ''
-  # $ad          ... optional, associated data, DEFAULT: ''
+  # $type        ... [string]  one of 'argon2d', 'argon2i', 'argon2id'
+  # $password    ... [binary string] input keying material (password)
+  # $salt        ... [binary string] salt/nonce (recommended: at least 16 bytes)
+  # $t_cost      ... [integer] optional, time cost (number of iterations), DEFAULT: 3
+  # $m_factor    ... [integer] optional, memory cost in kibibytes (1 KiB = 1024 B), DEFAULT: 65536 (= 64 MiB)
+  # $parallelism ... [integer] optional, degree of parallelism, DEFAULT: 1
+  # $len         ... [integer] optional, derived key len in bytes, DEFAULT: 32
+  # $secret      ... [binary string] optional, secret value, DEFAULT: ''
+  # $ad          ... [binary string] optional, associated data, DEFAULT: ''
+
+Increasing C<$t_cost>, C<$m_factor>, or C<$parallelism> increases work and
+memory requirements. Invalid combinations croak.
 
 =cut

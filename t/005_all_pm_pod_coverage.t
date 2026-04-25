@@ -20,7 +20,16 @@ for my $m (sort @files) {
 
   my $pc;
   if ($m eq 'Crypt::PK::DH') {
-    $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(decrypt|dh_decrypt|dh_encrypt|dh_sign_hash|dh_sign_message|dh_verify_hash|dh_verify_message|encrypt|sign_hash|sign_message|verify_hash|verify_message)$/] );
+    $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(decrypt|dh_decrypt|dh_encrypt|dh_shared_secret|dh_sign_hash|dh_sign_message|dh_verify_hash|dh_verify_message|encrypt|sign_hash|sign_message|verify_hash|verify_message)$/] );
+  }
+  elsif ($m eq 'Crypt::PK::DSA') {
+    $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(dsa_decrypt|dsa_encrypt|dsa_sign_hash|dsa_sign_message|dsa_verify_hash|dsa_verify_message)$/] );
+  }
+  elsif ($m eq 'Crypt::PK::ECC') {
+    $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(ecc_decrypt|ecc_encrypt|ecc_shared_secret|ecc_sign_hash|ecc_sign_message|ecc_verify_hash|ecc_verify_message)$/] );
+  }
+  elsif ($m eq 'Crypt::PK::RSA') {
+    $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(rsa_decrypt|rsa_encrypt|rsa_sign_hash|rsa_sign_message|rsa_verify_hash|rsa_verify_message)$/] );
   }
   elsif ($m eq 'Math::BigInt::LTM') {
     $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(STORABLE_thaw|STORABLE_freeze|api_version)$/] );
@@ -34,11 +43,8 @@ for my $m (sort @files) {
   elsif ($m eq 'Crypt::Mac') {
     $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(add|addfile)$/] );
   }
-  elsif ($m =~ /^Crypt::Mode::(CTR|CFB|OFB)$/) {
-    $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(finish)$/] );
-  }
   elsif ($m eq 'Crypt::AuthEnc::OCB') {
-    $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(blocksize|aad_add)$/] );
+    $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(aad_add)$/] );
   }
   elsif ($m eq 'Crypt::AuthEnc::EAX') {
     $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(header_add|aad_add)$/] );

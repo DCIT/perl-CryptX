@@ -87,34 +87,32 @@ Crypt::PRNG - Cryptographically secure random number generator
    use Crypt::PRNG qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u
                       random_string random_string_from rand irand);
 
-   $octets = random_bytes(45);
-   $hex_string = random_bytes_hex(45);
-   $base64_string = random_bytes_b64(45);
-   $base64url_string = random_bytes_b64u(45);
-   $alphanumeric_string = random_string(30);
-   $string = random_string_from('ACGT', 64);
-   $floating_point_number_0_to_1 = rand;
-   $floating_point_number_0_to_88 = rand(88);
-   $unsigned_32bit_int = irand;
+   my $octets = random_bytes(45);
+   my $hex_string = random_bytes_hex(45);
+   my $base64_string = random_bytes_b64(45);
+   my $base64url_string = random_bytes_b64u(45);
+   my $alphanumeric_string = random_string(30);
+   my $string = random_string_from('ACGT', 64);
+   my $floating_point_number_0_to_1 = rand;
+   my $floating_point_number_0_to_88 = rand(88);
+   my $unsigned_32bit_int = irand;
 
    ### OO interface:
    use Crypt::PRNG;
 
-   $prng = Crypt::PRNG->new;  # defaults to ChaCha20
-   #or
-   $prng = Crypt::PRNG->new("RC4");
-   #or
-   $prng = Crypt::PRNG->new("RC4", "some data used for seeding PRNG");
+   my $prng = Crypt::PRNG->new;  # defaults to ChaCha20
+   my $rc4_prng = Crypt::PRNG->new("RC4");
+   my $seeded_prng = Crypt::PRNG->new("RC4", "some data used for seeding PRNG");
 
-   $octets = $prng->bytes(45);
-   $hex_string = $prng->bytes_hex(45);
-   $base64_string = $prng->bytes_b64(45);
-   $base64url_string = $prng->bytes_b64u(45);
-   $alphanumeric_string = $prng->string(30);
-   $string = $prng->string_from('ACGT', 64);
-   $floating_point_number_0_to_1 = $prng->double;
-   $floating_point_number_0_to_88 = $prng->double(88);
-   $unsigned_32bit_int = $prng->int32;
+   my $octets = $prng->bytes(45);
+   my $hex_string = $prng->bytes_hex(45);
+   my $base64_string = $prng->bytes_b64(45);
+   my $base64url_string = $prng->bytes_b64u(45);
+   my $alphanumeric_string = $prng->string(30);
+   my $string = $prng->string_from('ACGT', 64);
+   my $floating_point_number_0_to_1 = $prng->double;
+   my $floating_point_number_0_to_88 = $prng->double(88);
+   my $unsigned_32bit_int = $prng->int32;
 
 =head1 DESCRIPTION
 
@@ -124,75 +122,89 @@ Provides an interface to the ChaCha20 based pseudo random number generator (thre
 
 =head2 random_bytes
 
-   $octets = random_bytes($length);
+   my $octets = random_bytes($length);
+   # $length .. [integer] number of random bytes to generate
 
-Returns C<$length> random octects.
+Returns C<$length> random octets as a binary string.
 
 =head2 random_bytes_hex
 
-   $hex_string = random_bytes_hex($length);
+   my $hex_string = random_bytes_hex($length);
+   # $length .. [integer] number of random bytes (output string will be 2x longer)
 
-Returns C<$length> random octects encoded as hexadecimal string.
+Returns C<$length> random octets encoded as a lowercase hexadecimal string.
 
 =head2 random_bytes_b64
 
-   $base64_string = random_bytes_b64($length);
+   my $base64_string = random_bytes_b64($length);
+   # $length .. [integer] number of random bytes to encode
 
-Returns C<$length> random octects Base64 encoded.
+Returns C<$length> random octets encoded as a Base64 string.
 
 =head2 random_bytes_b64u
 
-   $base64url_string = random_bytes_b64u($length);
+   my $base64url_string = random_bytes_b64u($length);
+   # $length .. [integer] number of random bytes to encode
 
-Returns C<$length> random octects Base64 URL Safe (RFC 4648 section 5) encoded.
+Returns C<$length> random octets encoded as a Base64 URL Safe string (RFC 4648 section 5).
 
 =head2 random_string_from
 
-   $string = random_string_from($range, $length);
+   my $string = random_string_from($range, $length);
+   # $range  .. [string] alphabet of allowed characters
+   # $length .. [integer] optional, number of characters (DEFAULT: 20)
    #e.g.
-   $string = random_string_from("ABCD", 10);
+   my $dna_string = random_string_from("ABCD", 10);
 
 Returns a random string made of C<$length> chars randomly chosen from C<$range> string.
 
 =head2 random_string
 
-   $alphanumeric_string = random_string($length);
+   my $alphanumeric_string = random_string($length);
+   # $length .. [integer] optional, number of characters (DEFAULT: 20)
    #or
-   $alphanumeric_string = random_string;  # default length = 20
+   my $default_alphanumeric_string = random_string;  # default length = 20
 
 Similar to random_string_from, only C<$range> is fixed to C<'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'>.
 
 =head2 rand
 
-   $n = rand;
+   my $n = rand;
    #or
-   $n = rand($limit);
+   my $limited_n = rand($limit);
+   # $limit .. [number] optional, upper bound (exclusive)
 
 Returns a random floating point number from range C<[0,1)> (if called without parameter) or C<[0,$limit)>.
 
 =head2 irand
 
-   $i = irand;
+   my $i = irand;
 
 Returns a random unsigned 32bit integer - range C<0 .. 0xFFFFFFFF>.
 
 =head1 METHODS
 
+Unless noted otherwise, assume C<$prng> is an existing PRNG object created via
+C<new>, for example:
+
+   my $prng = Crypt::PRNG->new;
+
 =head2 new
 
-   $prng = Crypt::PRNG->new;  # defaults to ChaCha20
+   my $prng = Crypt::PRNG->new;  # defaults to ChaCha20
    #or
-   $prng = Crypt::PRNG->new($alg);
+   my $prng = Crypt::PRNG->new($alg);
    #or
-   $prng = Crypt::PRNG->new($alg, $seed);
+   my $prng = Crypt::PRNG->new($alg, $seed);
 
-   # $alg  ... algorithm name 'ChaCha20' (DEFAULT), 'Fortuna', 'RC4', 'Sober128' or 'Yarrow'
-   # $seed ... will be used as an initial entropy for seeding PRNG
+   # $alg  ... [string] algorithm name: 'ChaCha20' (DEFAULT), 'Fortuna', 'RC4', 'Sober128' or 'Yarrow'
+   # $seed ... [binary string] optional, initial entropy for seeding the PRNG
 
 If C<$seed> is not specified the PRNG is automatically seeded with 32bytes random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32)
 
 =head2 add_entropy
 
+  my $prng = Crypt::PRNG->new;
   $prng->add_entropy($random_data);
   #or
   $prng->add_entropy();
@@ -203,58 +215,60 @@ B<BEWARE:> you probably do not need this function at all as the module does auto
 
 =head2 bytes
 
-   $octets = $prng->bytes($length);
+   my $octets = $prng->bytes($length);
 
 See L<random_bytes|/random_bytes>
 
 =head2 bytes_hex
 
-   $hex_string = $prng->bytes_hex($length);
+   my $hex_string = $prng->bytes_hex($length);
 
 See L<random_bytes_hex|/random_bytes_hex>
 
 =head2 bytes_b64
 
-   $base64_string = $prng->bytes_b64($length);
+   my $base64_string = $prng->bytes_b64($length);
 
 See L<random_bytes_b64|/random_bytes_b64>
 
 =head2 bytes_b64u
 
-   $base64url_string = $prng->bytes_b64u($length);
+   my $base64url_string = $prng->bytes_b64u($length);
 
 See L<random_bytes_b64u|/random_bytes_b64u>
 
 =head2 string
 
-   $alphanumeric_string = $prng->string($length);
+   my $alphanumeric_string = $prng->string($length);
    #or
-   $alphanumeric_string = $prng->string;
+   my $default_alphanumeric_string = $prng->string;  # default length = 20
 
 See L<random_string|/random_string>
 
 =head2 string_from
 
-   $string = $prng->string_from($range, $length);
+   my $string = $prng->string_from($range, $length);  # default length = 20
 
 See L<random_string_from|/random_string_from>
 
 =head2 double
 
-   $n = $prng->double;
+   my $n = $prng->double;
    #or
-   $n = $prng->double($limit);
+   my $limited_n = $prng->double($limit);
 
 See L<rand|/rand>
 
 =head2 int32
 
-   $i = $prng->int32;
+   my $i = $prng->int32;
 
 See L<irand|/irand>
 
 =head1 SEE ALSO
 
 L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::RC4>, L<Crypt::PRNG::Sober128>, L<Crypt::PRNG::Yarrow>
+
+For generating random UUIDs see L<Crypt::Misc/random_v4uuid> and L<Crypt::Misc/random_v7uuid>.
 
 =cut

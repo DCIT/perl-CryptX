@@ -51,21 +51,43 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 
 =head1 METHODS
 
+Unless noted otherwise, assume C<$c> is an existing cipher object created via
+C<new>, for example:
+
+ my $c = Crypt::Cipher::MULTI2->new($key);
+
 =head2 new
 
- $c = Crypt::Cipher::MULTI2->new($key);
+ my $c = Crypt::Cipher::MULTI2->new($key);
  #or
- $c = Crypt::Cipher::MULTI2->new($key, $rounds);
+ my $c = Crypt::Cipher::MULTI2->new($key, $rounds);
+
+ # $key .... [binary string] key of an accepted length (see keysize, min_keysize, max_keysize)
+ # $rounds . [integer] optional, number of rounds (if supported by the cipher; croaks on invalid value)
 
 =head2 encrypt
 
- $ciphertext = $c->encrypt($plaintext);
+Encrypts exactly one block of plaintext. The length of C<$plaintext> must
+equal L</blocksize>; croaks otherwise.
+
+
+
+ my $ciphertext = $c->encrypt($plaintext);
+
+Returns the encrypted block as a binary string (raw bytes).
 
 =head2 decrypt
 
- $plaintext = $c->decrypt($ciphertext);
+Decrypts exactly one block of ciphertext. The length of C<$ciphertext> must
+equal L</blocksize>; croaks otherwise.
+
+ my $plaintext = $c->decrypt($ciphertext);
+
+Returns the decrypted block as a binary string (raw bytes).
 
 =head2 keysize
+
+Returns the default key size (in bytes).
 
   $c->keysize;
   #or
@@ -75,6 +97,8 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 
 =head2 blocksize
 
+Returns the cipher block size (in bytes).
+
   $c->blocksize;
   #or
   Crypt::Cipher::MULTI2->blocksize;
@@ -82,6 +106,8 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
   Crypt::Cipher::MULTI2::blocksize;
 
 =head2 max_keysize
+
+Returns the maximum key size (in bytes).
 
   $c->max_keysize;
   #or
@@ -91,6 +117,8 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 
 =head2 min_keysize
 
+Returns the minimum key size (in bytes).
+
   $c->min_keysize;
   #or
   Crypt::Cipher::MULTI2->min_keysize;
@@ -98,6 +126,9 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
   Crypt::Cipher::MULTI2::min_keysize;
 
 =head2 default_rounds
+
+Returns the default number of rounds for the cipher, or C<0> if the
+number of rounds is fixed.
 
   $c->default_rounds;
   #or

@@ -30,4 +30,20 @@ sub _ssh_parse {
 
 Crypt::PK - [internal only]
 
+=head1 SYNOPSIS
+
+Do not use this module directly.
+
+Use a concrete public-key module such as L<Crypt::PK::RSA>,
+L<Crypt::PK::ECC>, or L<Crypt::PK::Ed25519>.
+
+=head1 DESCRIPTION
+
+Internal base/helper namespace for public-key modules.
+
+Do not use this module directly. Use a concrete implementation such as
+L<Crypt::PK::RSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DSA>, L<Crypt::PK::DH>,
+L<Crypt::PK::Ed25519>, L<Crypt::PK::X25519>, L<Crypt::PK::Ed448>, or
+L<Crypt::PK::X448>.
+
 =cut
