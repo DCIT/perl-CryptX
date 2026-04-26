@@ -26,6 +26,7 @@ new(Class, SV * key, SV * nonce, UV counter = 0, int rounds = 20)
 
         rv = salsa20_ivctr64(RETVAL, iv, (unsigned long)iv_len, (ulong64)counter);
         if (rv != CRYPT_OK) {
+          salsa20_done(RETVAL);
           Safefree(RETVAL);
           croak("FATAL: salsa20_ivctr64 failed: %s", error_to_string(rv));
         }
@@ -49,7 +50,7 @@ clone(Crypt::Stream::Salsa20 self)
         RETVAL
 
 SV *
-keystream(Crypt::Stream::Salsa20 self, STRLEN out_len)
+keystream(Crypt::Stream::Salsa20 self, unsigned long out_len)
     CODE:
     {
         int rv;
@@ -59,11 +60,12 @@ keystream(Crypt::Stream::Salsa20 self, STRLEN out_len)
           RETVAL = newSVpvn("", 0);
         }
         else {
+          if (out_len == ULONG_MAX) croak("FATAL: output length too large");
           RETVAL = NEWSV(0, out_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, out_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = salsa20_keystream(self, out_data, (unsigned long)out_len);
+          rv = salsa20_keystream(self, out_data, out_len);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: salsa20_keystream failed: %s", error_to_string(rv));

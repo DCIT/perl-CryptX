@@ -30,6 +30,7 @@ Test::Pod::Spelling->import(
                           TurboSHAKE SIV KangarooTwelve XSalsa XOF RSA
                           stringifiable
                           stringification
+                          stringified
                           RNG
                           CBC OFB ECB CFB
                           flexi MSB YY BER moduli SubjectPublicKeyInfo

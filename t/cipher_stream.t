@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 38;
 
 use Crypt::Stream::RC4;
 use Crypt::Stream::Sober128;
@@ -113,4 +113,108 @@ use Crypt::Stream::Rabbit;
   my $dec = Crypt::Stream::Rabbit->new($key, "")->crypt($ct);
   is(unpack("H*", $enc), unpack("H*", $ct), "Crypt::Stream::Rabbit encrypt (empty IV)");
   is(unpack("H*", $dec), unpack("H*", $pt), "Crypt::Stream::Rabbit decrypt (empty IV)");
+}
+
+### clone() tests
+{
+  my $key = pack("H*", "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
+  my $iv  = pack("H*", "000000000000004a00000000");
+  my $s = Crypt::Stream::ChaCha->new($key, $iv, 0, 20);
+  $s->crypt("advance the state");
+  my $c = $s->clone;
+  is($s->crypt("same input"), $c->crypt("same input"), "ChaCha clone produces same output");
+}
+{
+  my $key = pack("H*", "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
+  my $iv  = pack("H*", "000000000000004a");
+  my $s = Crypt::Stream::Salsa20->new($key, $iv, 0, 20);
+  $s->crypt("advance the state");
+  my $c = $s->clone;
+  is($s->crypt("same input"), $c->crypt("same input"), "Salsa20 clone produces same output");
+}
+{
+  my $key = pack("H*", "0123456789abcdef0123456789abcdef");
+  my $s = Crypt::Stream::RC4->new($key);
+  $s->crypt("advance");
+  my $c = $s->clone;
+  is($s->crypt("same input"), $c->crypt("same input"), "RC4 clone produces same output");
+}
+{
+  my $key = pack("H*", "74657374206b65792031323862697473");
+  my $iv  = pack("H*", "00000000");
+  my $s = Crypt::Stream::Sober128->new($key, $iv);
+  $s->crypt("advance");
+  my $c = $s->clone;
+  is($s->crypt("same input"), $c->crypt("same input"), "Sober128 clone produces same output");
+}
+{
+  my $key = pack("H*", "74657374206b65792031323862697473");
+  my $iv  = pack("H*", "11223344");
+  my $s = Crypt::Stream::Sosemanuk->new($key, $iv);
+  $s->crypt("advance");
+  my $c = $s->clone;
+  is($s->crypt("same input"), $c->crypt("same input"), "Sosemanuk clone produces same output");
+}
+{
+  my $key = pack("H*", "74657374206b65792031323862697473");
+  my $iv  = pack("H*", "1122334455");
+  my $s = Crypt::Stream::Rabbit->new($key, $iv);
+  $s->crypt("advance");
+  my $c = $s->clone;
+  is($s->crypt("same input"), $c->crypt("same input"), "Rabbit clone produces same output");
+}
+
+### keystream() tests
+{
+  my $key = pack("H*", "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
+  my $iv  = pack("H*", "000000000000004a00000000");
+  my $s1 = Crypt::Stream::ChaCha->new($key, $iv, 0, 20);
+  my $s2 = Crypt::Stream::ChaCha->new($key, $iv, 0, 20);
+  my $ks = $s1->keystream(32);
+  is(length($ks), 32, "ChaCha keystream length");
+  is($ks, $s2->crypt("\0" x 32), "ChaCha keystream matches crypt of zeros");
+}
+{
+  my $key = pack("H*", "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
+  my $iv  = pack("H*", "000000000000004a");
+  my $s1 = Crypt::Stream::Salsa20->new($key, $iv, 0, 20);
+  my $s2 = Crypt::Stream::Salsa20->new($key, $iv, 0, 20);
+  my $ks = $s1->keystream(32);
+  is(length($ks), 32, "Salsa20 keystream length");
+  is($ks, $s2->crypt("\0" x 32), "Salsa20 keystream matches crypt of zeros");
+}
+{
+  my $key = pack("H*", "0123456789abcdef0123456789abcdef");
+  my $s1 = Crypt::Stream::RC4->new($key);
+  my $s2 = Crypt::Stream::RC4->new($key);
+  my $ks = $s1->keystream(32);
+  is(length($ks), 32, "RC4 keystream length");
+  is($ks, $s2->crypt("\0" x 32), "RC4 keystream matches crypt of zeros");
+}
+{
+  my $key = pack("H*", "74657374206b65792031323862697473");
+  my $iv  = pack("H*", "00000000");
+  my $s1 = Crypt::Stream::Sober128->new($key, $iv);
+  my $s2 = Crypt::Stream::Sober128->new($key, $iv);
+  my $ks = $s1->keystream(32);
+  is(length($ks), 32, "Sober128 keystream length");
+  is($ks, $s2->crypt("\0" x 32), "Sober128 keystream matches crypt of zeros");
+}
+{
+  my $key = pack("H*", "74657374206b65792031323862697473");
+  my $iv  = pack("H*", "11223344");
+  my $s1 = Crypt::Stream::Sosemanuk->new($key, $iv);
+  my $s2 = Crypt::Stream::Sosemanuk->new($key, $iv);
+  my $ks = $s1->keystream(32);
+  is(length($ks), 32, "Sosemanuk keystream length");
+  is($ks, $s2->crypt("\0" x 32), "Sosemanuk keystream matches crypt of zeros");
+}
+{
+  my $key = pack("H*", "74657374206b65792031323862697473");
+  my $iv  = pack("H*", "1122334455");
+  my $s1 = Crypt::Stream::Rabbit->new($key, $iv);
+  my $s2 = Crypt::Stream::Rabbit->new($key, $iv);
+  my $ks = $s1->keystream(32);
+  is(length($ks), 32, "Rabbit keystream length");
+  is($ks, $s2->crypt("\0" x 32), "Rabbit keystream matches crypt of zeros");
 }

@@ -26,6 +26,7 @@ new(Class, SV * key, SV * nonce)
 
         rv = sober128_stream_setiv(RETVAL, iv, (unsigned long)iv_len);
         if (rv != CRYPT_OK) {
+          sober128_stream_done(RETVAL);
           Safefree(RETVAL);
           croak("FATAL: sober128_stream_setiv failed: %s", error_to_string(rv));
         }
@@ -49,7 +50,7 @@ clone(Crypt::Stream::Sober128 self)
         RETVAL
 
 SV *
-keystream(Crypt::Stream::Sober128 self, STRLEN out_len)
+keystream(Crypt::Stream::Sober128 self, unsigned long out_len)
     CODE:
     {
         int rv;
@@ -59,11 +60,12 @@ keystream(Crypt::Stream::Sober128 self, STRLEN out_len)
           RETVAL = newSVpvn("", 0);
         }
         else {
+          if (out_len == ULONG_MAX) croak("FATAL: output length too large");
           RETVAL = NEWSV(0, out_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, out_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = sober128_stream_keystream(self, out_data, (unsigned long)out_len);
+          rv = sober128_stream_keystream(self, out_data, out_len);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: sober128_stream_keystream failed: %s", error_to_string(rv));

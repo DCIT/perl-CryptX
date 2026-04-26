@@ -25,8 +25,14 @@ new(Class, SV * key, SV * nonce, UV counter = 0, int rounds = 20)
         }
 
         if (iv_len == 12) {
+          if (counter > (UV)0xFFFFFFFFUL) {
+            chacha_done(RETVAL);
+            Safefree(RETVAL);
+            croak("FATAL: chacha counter too large for 12-byte nonce");
+          }
           rv = chacha_ivctr32(RETVAL, iv, (unsigned long)iv_len, (ulong32)counter);
           if (rv != CRYPT_OK) {
+            chacha_done(RETVAL);
             Safefree(RETVAL);
             croak("FATAL: chacha_ivctr32 failed: %s", error_to_string(rv));
           }
@@ -34,11 +40,13 @@ new(Class, SV * key, SV * nonce, UV counter = 0, int rounds = 20)
         else if (iv_len == 8) {
           rv = chacha_ivctr64(RETVAL, iv, (unsigned long)iv_len, (ulong64)counter);
           if (rv != CRYPT_OK) {
+            chacha_done(RETVAL);
             Safefree(RETVAL);
             croak("FATAL: chacha_ivctr64 failed: %s", error_to_string(rv));
           }
         }
         else {
+          chacha_done(RETVAL);
           Safefree(RETVAL);
           croak("FATAL: chacha IV length must be 8 or 12 bytes");
         }
@@ -62,7 +70,7 @@ clone(Crypt::Stream::ChaCha self)
         RETVAL
 
 SV *
-keystream(Crypt::Stream::ChaCha self, STRLEN out_len)
+keystream(Crypt::Stream::ChaCha self, unsigned long out_len)
     CODE:
     {
         int rv;
@@ -72,11 +80,12 @@ keystream(Crypt::Stream::ChaCha self, STRLEN out_len)
           RETVAL = newSVpvn("", 0);
         }
         else {
+          if (out_len == ULONG_MAX) croak("FATAL: output length too large");
           RETVAL = NEWSV(0, out_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, out_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = chacha_keystream(self, out_data, (unsigned long)out_len);
+          rv = chacha_keystream(self, out_data, out_len);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: chacha_keystream failed: %s", error_to_string(rv));

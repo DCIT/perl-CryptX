@@ -23,10 +23,15 @@ new(Class, SV * key, SV * nonce=&PL_sv_undef)
         }
 
         if (SvOK(nonce)) {
-          if (!SvPOK_spec(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+          if (!SvPOK_spec(nonce)) {
+            rabbit_done(RETVAL);
+            Safefree(RETVAL);
+            croak("FATAL: nonce must be string/buffer scalar");
+          }
           iv = (unsigned char *)SvPVbyte(nonce, iv_len);
           rv = rabbit_setiv(RETVAL, iv, (unsigned long)iv_len);
           if (rv != CRYPT_OK) {
+            rabbit_done(RETVAL);
             Safefree(RETVAL);
             croak("FATAL: rabbit_setiv failed: %s", error_to_string(rv));
           }
@@ -52,7 +57,7 @@ clone(Crypt::Stream::Rabbit self)
         RETVAL
 
 SV *
-keystream(Crypt::Stream::Rabbit self, STRLEN out_len)
+keystream(Crypt::Stream::Rabbit self, unsigned long out_len)
     CODE:
     {
         int rv;
@@ -62,11 +67,12 @@ keystream(Crypt::Stream::Rabbit self, STRLEN out_len)
           RETVAL = newSVpvn("", 0);
         }
         else {
+          if (out_len == ULONG_MAX) croak("FATAL: output length too large");
           RETVAL = NEWSV(0, out_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, out_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = rabbit_keystream(self, out_data, (unsigned long)out_len);
+          rv = rabbit_keystream(self, out_data, out_len);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: rabbit_keystream failed: %s", error_to_string(rv));
