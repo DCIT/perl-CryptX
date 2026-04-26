@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::RIPEMD320 qw( ripemd320 ripemd320_hex ripemd320_b64 ripemd320_b64u ripemd320_file ripemd320_file_hex ripemd320_file_b64 ripemd320_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::RIPEMD320::hashsize, 40, 'hashsize/3');
 is( Crypt::Digest::RIPEMD320->hashsize, 40, 'hashsize/4');
 is( Crypt::Digest->new('RIPEMD320')->hashsize, 40, 'hashsize/5');
 is( Crypt::Digest::RIPEMD320->new->hashsize, 40, 'hashsize/6');
+{
+  my $d = Crypt::Digest::RIPEMD320->new;
+  isa_ok($d, 'Crypt::Digest::RIPEMD320', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::RIPEMD320', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::RIPEMD320->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "de4c01b3054f8930a79d09ae738e92301e5a17085beffdc1b8d116713e74f82fa942d64cdbc4682d", 'ripemd320 (clone/original-first/original)');
+  is($c->hexdigest, "de4c01b3054f8930a79d09ae738e92301e5a17085beffdc1b8d116713e74f82fa942d64cdbc4682d", 'ripemd320 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::RIPEMD320->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "de4c01b3054f8930a79d09ae738e92301e5a17085beffdc1b8d116713e74f82fa942d64cdbc4682d", 'ripemd320 (clone/clone-first/clone)');
+  is($d->hexdigest, "de4c01b3054f8930a79d09ae738e92301e5a17085beffdc1b8d116713e74f82fa942d64cdbc4682d", 'ripemd320 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::RIPEMD320->new->add("AAA");
+  is($d->digest, pack("H*","4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60"), 'ripemd320 (OO/digest/non-destructive)');
+  is($d->hexdigest, "4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60", 'ripemd320 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "TPNLKIfx3RVD+wzpUL8VX7fJPGPWGtxn6FjBCD/VTkp+HasbmzO6YA==", 'ripemd320 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "TPNLKIfx3RVD-wzpUL8VX7fJPGPWGtxn6FjBCD_VTkp-HasbmzO6YA", 'ripemd320 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "45baee1357504e3f6b37a431e70a9ef79b2073ea70c5c4fd2a276720162bdcb755937e72dc2f8097", 'ripemd320 (OO/add-after-digest)');
+}
 
 is( ripemd320("A","A","A"), pack("H*","4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60"), 'ripemd320 (raw/tripple_A)');
 is( ripemd320_hex("A","A","A"), "4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60", 'ripemd320 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::RIPEMD320->new->addfile('t/data/binary-test.file')->hexdigest
   is( Crypt::Digest::RIPEMD320->new->addfile($fh)->hexdigest, "115b4ee29a7a781323f35de1d9690d1c340f162463726e1b3206c139c700d65c92dc20497026a198", 'ripemd320 (OO/filehandle/1)');
   close($fh);
 }
-
 is( ripemd320_file('t/data/text-CR.file'), pack("H*","47afeaad7c965e2d4b2e579f33b079d3d9afc3cc910b154002fdf7b44f06ca6ebc746ade992b2645"), 'ripemd320 (raw/file/2)');
 is( ripemd320_file_hex('t/data/text-CR.file'), "47afeaad7c965e2d4b2e579f33b079d3d9afc3cc910b154002fdf7b44f06ca6ebc746ade992b2645", 'ripemd320 (hex/file/2)');
 is( ripemd320_file_b64('t/data/text-CR.file'), "R6/qrXyWXi1LLlefM7B509mvw8yRCxVAAv33tE8Gym68dGremSsmRQ==", 'ripemd320 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::RIPEMD320->new->addfile('t/data/text-CR.file')->hexdigest, "4
   is( Crypt::Digest::RIPEMD320->new->addfile($fh)->hexdigest, "47afeaad7c965e2d4b2e579f33b079d3d9afc3cc910b154002fdf7b44f06ca6ebc746ade992b2645", 'ripemd320 (OO/filehandle/2)');
   close($fh);
 }
-
 is( ripemd320_file('t/data/text-CRLF.file'), pack("H*","d400d2ea267ea39dd32b36db198aba246c20e20aa5c314d56d60efc582a10484925497ff428e6b26"), 'ripemd320 (raw/file/3)');
 is( ripemd320_file_hex('t/data/text-CRLF.file'), "d400d2ea267ea39dd32b36db198aba246c20e20aa5c314d56d60efc582a10484925497ff428e6b26", 'ripemd320 (hex/file/3)');
 is( ripemd320_file_b64('t/data/text-CRLF.file'), "1ADS6iZ+o53TKzbbGYq6JGwg4gqlwxTVbWDvxYKhBISSVJf/Qo5rJg==", 'ripemd320 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::RIPEMD320->new->addfile('t/data/text-CRLF.file')->hexdigest, 
   is( Crypt::Digest::RIPEMD320->new->addfile($fh)->hexdigest, "d400d2ea267ea39dd32b36db198aba246c20e20aa5c314d56d60efc582a10484925497ff428e6b26", 'ripemd320 (OO/filehandle/3)');
   close($fh);
 }
-
 is( ripemd320_file('t/data/text-LF.file'), pack("H*","ef55690d2ddd04a67763b871a6cce620eb2844583a4433137959cf4b8d7cbacb95d820f74e748055"), 'ripemd320 (raw/file/4)');
 is( ripemd320_file_hex('t/data/text-LF.file'), "ef55690d2ddd04a67763b871a6cce620eb2844583a4433137959cf4b8d7cbacb95d820f74e748055", 'ripemd320 (hex/file/4)');
 is( ripemd320_file_b64('t/data/text-LF.file'), "71VpDS3dBKZ3Y7hxpszmIOsoRFg6RDMTeVnPS418usuV2CD3TnSAVQ==", 'ripemd320 (base64/file/4)');

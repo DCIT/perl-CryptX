@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::Whirlpool qw( whirlpool whirlpool_hex whirlpool_b64 whirlpool_b64u whirlpool_file whirlpool_file_hex whirlpool_file_b64 whirlpool_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::Whirlpool::hashsize, 64, 'hashsize/3');
 is( Crypt::Digest::Whirlpool->hashsize, 64, 'hashsize/4');
 is( Crypt::Digest->new('Whirlpool')->hashsize, 64, 'hashsize/5');
 is( Crypt::Digest::Whirlpool->new->hashsize, 64, 'hashsize/6');
+{
+  my $d = Crypt::Digest::Whirlpool->new;
+  isa_ok($d, 'Crypt::Digest::Whirlpool', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::Whirlpool', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::Whirlpool->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "4e2448a4c6f486bb16b6562c73b4020bf3043e3a731bce721ae1b303d97e6d4c7181eebdb6c57e277d0e34957114cbd6c797fc9d95d8b582d225292076d4eef5", 'whirlpool (clone/original-first/original)');
+  is($c->hexdigest, "4e2448a4c6f486bb16b6562c73b4020bf3043e3a731bce721ae1b303d97e6d4c7181eebdb6c57e277d0e34957114cbd6c797fc9d95d8b582d225292076d4eef5", 'whirlpool (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::Whirlpool->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "4e2448a4c6f486bb16b6562c73b4020bf3043e3a731bce721ae1b303d97e6d4c7181eebdb6c57e277d0e34957114cbd6c797fc9d95d8b582d225292076d4eef5", 'whirlpool (clone/clone-first/clone)');
+  is($d->hexdigest, "4e2448a4c6f486bb16b6562c73b4020bf3043e3a731bce721ae1b303d97e6d4c7181eebdb6c57e277d0e34957114cbd6c797fc9d95d8b582d225292076d4eef5", 'whirlpool (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::Whirlpool->new->add("AAA");
+  is($d->digest, pack("H*","a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64"), 'whirlpool (OO/digest/non-destructive)');
+  is($d->hexdigest, "a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64", 'whirlpool (OO/hexdigest/repeatable)');
+  is($d->b64digest, "pN6jjHQ/MY23Fp4orCev8XOUK2e1b5iB2kZL2sSPR8xIHuKXRlV88BPRxUx6dpEsE4CxaCUd9xGCk1Ef2JqaZA==", 'whirlpool (OO/b64digest/repeatable)');
+  is($d->b64udigest, "pN6jjHQ_MY23Fp4orCev8XOUK2e1b5iB2kZL2sSPR8xIHuKXRlV88BPRxUx6dpEsE4CxaCUd9xGCk1Ef2JqaZA", 'whirlpool (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "139e0850c7b4e2b6d6c37fdaf42cd782b9582bde9a7a7d318351d87bf769a0d79ecce704d6995836a2721a83cfbcf9b8cbd5b69a79f18088c4b044181428b2e9", 'whirlpool (OO/add-after-digest)');
+}
 
 is( whirlpool("A","A","A"), pack("H*","a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64"), 'whirlpool (raw/tripple_A)');
 is( whirlpool_hex("A","A","A"), "a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64", 'whirlpool (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::Whirlpool->new->addfile('t/data/binary-test.file')->hexdigest
   is( Crypt::Digest::Whirlpool->new->addfile($fh)->hexdigest, "a84b35e702371d7a96c5332747d5210a425512d2d6c5ec5eb8851718d3939faf0b84d3c1c6b1071e6c6e54efc96ea7b3a46f9019554fabb0d4a2924ffa5dff8d", 'whirlpool (OO/filehandle/1)');
   close($fh);
 }
-
 is( whirlpool_file('t/data/text-CR.file'), pack("H*","2846f7f8c731fc77c085037b71bec091bdf772f4759c06760bea914ef6f1e0cfb24548828650bb7487d6a1e96ade543268bd01e90daec95dbe9ef817dc668bd0"), 'whirlpool (raw/file/2)');
 is( whirlpool_file_hex('t/data/text-CR.file'), "2846f7f8c731fc77c085037b71bec091bdf772f4759c06760bea914ef6f1e0cfb24548828650bb7487d6a1e96ade543268bd01e90daec95dbe9ef817dc668bd0", 'whirlpool (hex/file/2)');
 is( whirlpool_file_b64('t/data/text-CR.file'), "KEb3+Mcx/HfAhQN7cb7Akb33cvR1nAZ2C+qRTvbx4M+yRUiChlC7dIfWoelq3lQyaL0B6Q2uyV2+nvgX3GaL0A==", 'whirlpool (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::Whirlpool->new->addfile('t/data/text-CR.file')->hexdigest, "2
   is( Crypt::Digest::Whirlpool->new->addfile($fh)->hexdigest, "2846f7f8c731fc77c085037b71bec091bdf772f4759c06760bea914ef6f1e0cfb24548828650bb7487d6a1e96ade543268bd01e90daec95dbe9ef817dc668bd0", 'whirlpool (OO/filehandle/2)');
   close($fh);
 }
-
 is( whirlpool_file('t/data/text-CRLF.file'), pack("H*","5d09c8cbfe7f68f5e374aac357ee0ee6b3accbe794b1b826b8a72a4f6771f86cdb65604325e09c547f6eeb71a25e94d336186ec045255c152d52fb57d394d9cf"), 'whirlpool (raw/file/3)');
 is( whirlpool_file_hex('t/data/text-CRLF.file'), "5d09c8cbfe7f68f5e374aac357ee0ee6b3accbe794b1b826b8a72a4f6771f86cdb65604325e09c547f6eeb71a25e94d336186ec045255c152d52fb57d394d9cf", 'whirlpool (hex/file/3)');
 is( whirlpool_file_b64('t/data/text-CRLF.file'), "XQnIy/5/aPXjdKrDV+4O5rOsy+eUsbgmuKcqT2dx+GzbZWBDJeCcVH9u63GiXpTTNhhuwEUlXBUtUvtX05TZzw==", 'whirlpool (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::Whirlpool->new->addfile('t/data/text-CRLF.file')->hexdigest, 
   is( Crypt::Digest::Whirlpool->new->addfile($fh)->hexdigest, "5d09c8cbfe7f68f5e374aac357ee0ee6b3accbe794b1b826b8a72a4f6771f86cdb65604325e09c547f6eeb71a25e94d336186ec045255c152d52fb57d394d9cf", 'whirlpool (OO/filehandle/3)');
   close($fh);
 }
-
 is( whirlpool_file('t/data/text-LF.file'), pack("H*","05b2f5e28833a734dc8dc763e12030fb78dbac5fd9709bc30315ea81507d3b338697c1c58474abeb41f110444381000bffda176a0fa0b12b1b65ccfd9f6d19b0"), 'whirlpool (raw/file/4)');
 is( whirlpool_file_hex('t/data/text-LF.file'), "05b2f5e28833a734dc8dc763e12030fb78dbac5fd9709bc30315ea81507d3b338697c1c58474abeb41f110444381000bffda176a0fa0b12b1b65ccfd9f6d19b0", 'whirlpool (hex/file/4)');
 is( whirlpool_file_b64('t/data/text-LF.file'), "BbL14ogzpzTcjcdj4SAw+3jbrF/ZcJvDAxXqgVB9OzOGl8HFhHSr60HxEERDgQAL/9oXag+gsSsbZcz9n20ZsA==", 'whirlpool (base64/file/4)');

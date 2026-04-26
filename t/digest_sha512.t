@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA512 qw( sha512 sha512_hex sha512_b64 sha512_b64u sha512_file sha512_file_hex sha512_file_b64 sha512_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::SHA512::hashsize, 64, 'hashsize/3');
 is( Crypt::Digest::SHA512->hashsize, 64, 'hashsize/4');
 is( Crypt::Digest->new('SHA512')->hashsize, 64, 'hashsize/5');
 is( Crypt::Digest::SHA512->new->hashsize, 64, 'hashsize/6');
+{
+  my $d = Crypt::Digest::SHA512->new;
+  isa_ok($d, 'Crypt::Digest::SHA512', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::SHA512', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::SHA512->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f", 'sha512 (clone/original-first/original)');
+  is($c->hexdigest, "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f", 'sha512 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::SHA512->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f", 'sha512 (clone/clone-first/clone)');
+  is($d->hexdigest, "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f", 'sha512 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::SHA512->new->add("AAA");
+  is($d->digest, pack("H*","8d708d18b54df3962d696f069ad42dad7762b5d4d3c97ee5fa2dae0673ed46545164c078b8db3d59c4b96020e4316f17bb3d91bf1f6bc0896bbe75416eb8c385"), 'sha512 (OO/digest/non-destructive)');
+  is($d->hexdigest, "8d708d18b54df3962d696f069ad42dad7762b5d4d3c97ee5fa2dae0673ed46545164c078b8db3d59c4b96020e4316f17bb3d91bf1f6bc0896bbe75416eb8c385", 'sha512 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "jXCNGLVN85YtaW8GmtQtrXditdTTyX7l+i2uBnPtRlRRZMB4uNs9WcS5YCDkMW8Xuz2Rvx9rwIlrvnVBbrjDhQ==", 'sha512 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "jXCNGLVN85YtaW8GmtQtrXditdTTyX7l-i2uBnPtRlRRZMB4uNs9WcS5YCDkMW8Xuz2Rvx9rwIlrvnVBbrjDhQ", 'sha512 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "9bcb99c11c0e2a3272e1807bdcbd76a4906dc0e94f535a951f499d72379d59112d33b845794334e8d4d291a44dcac7c29c69fdb7b24716ed4e510d54d257c65d", 'sha512 (OO/add-after-digest)');
+}
 
 is( sha512("A","A","A"), pack("H*","8d708d18b54df3962d696f069ad42dad7762b5d4d3c97ee5fa2dae0673ed46545164c078b8db3d59c4b96020e4316f17bb3d91bf1f6bc0896bbe75416eb8c385"), 'sha512 (raw/tripple_A)');
 is( sha512_hex("A","A","A"), "8d708d18b54df3962d696f069ad42dad7762b5d4d3c97ee5fa2dae0673ed46545164c078b8db3d59c4b96020e4316f17bb3d91bf1f6bc0896bbe75416eb8c385", 'sha512 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::SHA512->new->addfile('t/data/binary-test.file')->hexdigest, "
   is( Crypt::Digest::SHA512->new->addfile($fh)->hexdigest, "f631652982f00556324d1fb9078d818efede0f6a3e042c736979543e2b0e4d44e29238fd0d441d4b2c2d16f8597df4912ed752f09438b1dd64efc723204d337a", 'sha512 (OO/filehandle/1)');
   close($fh);
 }
-
 is( sha512_file('t/data/text-CR.file'), pack("H*","cfea7a1ac356830a4e938f908e29de7efceab2b851f70722a464084ac83148de60f19b0e99de581b2fbb3da97b14cd05f06431d7fa12fe38369f3ffa10944a06"), 'sha512 (raw/file/2)');
 is( sha512_file_hex('t/data/text-CR.file'), "cfea7a1ac356830a4e938f908e29de7efceab2b851f70722a464084ac83148de60f19b0e99de581b2fbb3da97b14cd05f06431d7fa12fe38369f3ffa10944a06", 'sha512 (hex/file/2)');
 is( sha512_file_b64('t/data/text-CR.file'), "z+p6GsNWgwpOk4+QjinefvzqsrhR9wcipGQISsgxSN5g8ZsOmd5YGy+7Pal7FM0F8GQx1/oS/jg2nz/6EJRKBg==", 'sha512 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::SHA512->new->addfile('t/data/text-CR.file')->hexdigest, "cfea
   is( Crypt::Digest::SHA512->new->addfile($fh)->hexdigest, "cfea7a1ac356830a4e938f908e29de7efceab2b851f70722a464084ac83148de60f19b0e99de581b2fbb3da97b14cd05f06431d7fa12fe38369f3ffa10944a06", 'sha512 (OO/filehandle/2)');
   close($fh);
 }
-
 is( sha512_file('t/data/text-CRLF.file'), pack("H*","158f25d015e0295dc1978e0a5ddf981f6f99e62eb5c7b7c5ee9ec63f1e2869d26885e760da913ef608974954ae78ea9fbbeea8ce392162198b0fdcdda989a923"), 'sha512 (raw/file/3)');
 is( sha512_file_hex('t/data/text-CRLF.file'), "158f25d015e0295dc1978e0a5ddf981f6f99e62eb5c7b7c5ee9ec63f1e2869d26885e760da913ef608974954ae78ea9fbbeea8ce392162198b0fdcdda989a923", 'sha512 (hex/file/3)');
 is( sha512_file_b64('t/data/text-CRLF.file'), "FY8l0BXgKV3Bl44KXd+YH2+Z5i61x7fF7p7GPx4oadJohedg2pE+9giXSVSueOqfu+6ozjkhYhmLD9zdqYmpIw==", 'sha512 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::SHA512->new->addfile('t/data/text-CRLF.file')->hexdigest, "15
   is( Crypt::Digest::SHA512->new->addfile($fh)->hexdigest, "158f25d015e0295dc1978e0a5ddf981f6f99e62eb5c7b7c5ee9ec63f1e2869d26885e760da913ef608974954ae78ea9fbbeea8ce392162198b0fdcdda989a923", 'sha512 (OO/filehandle/3)');
   close($fh);
 }
-
 is( sha512_file('t/data/text-LF.file'), pack("H*","e127fc123059f0554dc1917aed076a9c889d171dc9cdbdfd705641fa368fde66af86e0f8d14a7d3e72571d2bfd25a060ef70e4a84c1d3bb1d0d7524ca8bfaa7a"), 'sha512 (raw/file/4)');
 is( sha512_file_hex('t/data/text-LF.file'), "e127fc123059f0554dc1917aed076a9c889d171dc9cdbdfd705641fa368fde66af86e0f8d14a7d3e72571d2bfd25a060ef70e4a84c1d3bb1d0d7524ca8bfaa7a", 'sha512 (hex/file/4)');
 is( sha512_file_b64('t/data/text-LF.file'), "4Sf8EjBZ8FVNwZF67QdqnIidFx3Jzb39cFZB+jaP3mavhuD40Up9PnJXHSv9JaBg73DkqEwdO7HQ11JMqL+qeg==", 'sha512 (base64/file/4)');

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::MD5 qw( md5 md5_hex md5_b64 md5_b64u md5_file md5_file_hex md5_file_b64 md5_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::MD5::hashsize, 16, 'hashsize/3');
 is( Crypt::Digest::MD5->hashsize, 16, 'hashsize/4');
 is( Crypt::Digest->new('MD5')->hashsize, 16, 'hashsize/5');
 is( Crypt::Digest::MD5->new->hashsize, 16, 'hashsize/6');
+{
+  my $d = Crypt::Digest::MD5->new;
+  isa_ok($d, 'Crypt::Digest::MD5', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::MD5', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::MD5->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "900150983cd24fb0d6963f7d28e17f72", 'md5 (clone/original-first/original)');
+  is($c->hexdigest, "900150983cd24fb0d6963f7d28e17f72", 'md5 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::MD5->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "900150983cd24fb0d6963f7d28e17f72", 'md5 (clone/clone-first/clone)');
+  is($d->hexdigest, "900150983cd24fb0d6963f7d28e17f72", 'md5 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::MD5->new->add("AAA");
+  is($d->digest, pack("H*","e1faffb3e614e6c2fba74296962386b7"), 'md5 (OO/digest/non-destructive)');
+  is($d->hexdigest, "e1faffb3e614e6c2fba74296962386b7", 'md5 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "4fr/s+YU5sL7p0KWliOGtw==", 'md5 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "4fr_s-YU5sL7p0KWliOGtw", 'md5 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "6c238631c546239b4ceffa78708501bb", 'md5 (OO/add-after-digest)');
+}
 
 is( md5("A","A","A"), pack("H*","e1faffb3e614e6c2fba74296962386b7"), 'md5 (raw/tripple_A)');
 is( md5_hex("A","A","A"), "e1faffb3e614e6c2fba74296962386b7", 'md5 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::MD5->new->addfile('t/data/binary-test.file')->hexdigest, "ca5
   is( Crypt::Digest::MD5->new->addfile($fh)->hexdigest, "ca56fa983a4b49e81c68167fe4a2e835", 'md5 (OO/filehandle/1)');
   close($fh);
 }
-
 is( md5_file('t/data/text-CR.file'), pack("H*","9e2beba516f19ee3d2b3cfcbfbf05fc2"), 'md5 (raw/file/2)');
 is( md5_file_hex('t/data/text-CR.file'), "9e2beba516f19ee3d2b3cfcbfbf05fc2", 'md5 (hex/file/2)');
 is( md5_file_b64('t/data/text-CR.file'), "nivrpRbxnuPSs8/L+/Bfwg==", 'md5 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::MD5->new->addfile('t/data/text-CR.file')->hexdigest, "9e2beba
   is( Crypt::Digest::MD5->new->addfile($fh)->hexdigest, "9e2beba516f19ee3d2b3cfcbfbf05fc2", 'md5 (OO/filehandle/2)');
   close($fh);
 }
-
 is( md5_file('t/data/text-CRLF.file'), pack("H*","d939ac2b17f6091bb062bb6f9190fc76"), 'md5 (raw/file/3)');
 is( md5_file_hex('t/data/text-CRLF.file'), "d939ac2b17f6091bb062bb6f9190fc76", 'md5 (hex/file/3)');
 is( md5_file_b64('t/data/text-CRLF.file'), "2TmsKxf2CRuwYrtvkZD8dg==", 'md5 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::MD5->new->addfile('t/data/text-CRLF.file')->hexdigest, "d939a
   is( Crypt::Digest::MD5->new->addfile($fh)->hexdigest, "d939ac2b17f6091bb062bb6f9190fc76", 'md5 (OO/filehandle/3)');
   close($fh);
 }
-
 is( md5_file('t/data/text-LF.file'), pack("H*","2c5b1996d510a6cc97fad5fbaa0b313f"), 'md5 (raw/file/4)');
 is( md5_file_hex('t/data/text-LF.file'), "2c5b1996d510a6cc97fad5fbaa0b313f", 'md5 (hex/file/4)');
 is( md5_file_b64('t/data/text-LF.file'), "LFsZltUQpsyX+tX7qgsxPw==", 'md5 (base64/file/4)');

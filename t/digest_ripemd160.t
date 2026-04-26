@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::RIPEMD160 qw( ripemd160 ripemd160_hex ripemd160_b64 ripemd160_b64u ripemd160_file ripemd160_file_hex ripemd160_file_b64 ripemd160_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::RIPEMD160::hashsize, 20, 'hashsize/3');
 is( Crypt::Digest::RIPEMD160->hashsize, 20, 'hashsize/4');
 is( Crypt::Digest->new('RIPEMD160')->hashsize, 20, 'hashsize/5');
 is( Crypt::Digest::RIPEMD160->new->hashsize, 20, 'hashsize/6');
+{
+  my $d = Crypt::Digest::RIPEMD160->new;
+  isa_ok($d, 'Crypt::Digest::RIPEMD160', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::RIPEMD160', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::RIPEMD160->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "8eb208f7e05d987a9b044a8e98c6b087f15a0bfc", 'ripemd160 (clone/original-first/original)');
+  is($c->hexdigest, "8eb208f7e05d987a9b044a8e98c6b087f15a0bfc", 'ripemd160 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::RIPEMD160->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "8eb208f7e05d987a9b044a8e98c6b087f15a0bfc", 'ripemd160 (clone/clone-first/clone)');
+  is($d->hexdigest, "8eb208f7e05d987a9b044a8e98c6b087f15a0bfc", 'ripemd160 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::RIPEMD160->new->add("AAA");
+  is($d->digest, pack("H*","e4e130acc1d2a5a63c17efb1eedbd02be28443d1"), 'ripemd160 (OO/digest/non-destructive)');
+  is($d->hexdigest, "e4e130acc1d2a5a63c17efb1eedbd02be28443d1", 'ripemd160 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "5OEwrMHSpaY8F++x7tvQK+KEQ9E=", 'ripemd160 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "5OEwrMHSpaY8F--x7tvQK-KEQ9E", 'ripemd160 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "bc2173218c998950f45b9d6ed91136cbc5e44da9", 'ripemd160 (OO/add-after-digest)');
+}
 
 is( ripemd160("A","A","A"), pack("H*","e4e130acc1d2a5a63c17efb1eedbd02be28443d1"), 'ripemd160 (raw/tripple_A)');
 is( ripemd160_hex("A","A","A"), "e4e130acc1d2a5a63c17efb1eedbd02be28443d1", 'ripemd160 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::RIPEMD160->new->addfile('t/data/binary-test.file')->hexdigest
   is( Crypt::Digest::RIPEMD160->new->addfile($fh)->hexdigest, "0bf6636068ef6d6a2af93d8ce220e8324ecdac2f", 'ripemd160 (OO/filehandle/1)');
   close($fh);
 }
-
 is( ripemd160_file('t/data/text-CR.file'), pack("H*","156e131e5e5e8216cad97fa880a7a54273179853"), 'ripemd160 (raw/file/2)');
 is( ripemd160_file_hex('t/data/text-CR.file'), "156e131e5e5e8216cad97fa880a7a54273179853", 'ripemd160 (hex/file/2)');
 is( ripemd160_file_b64('t/data/text-CR.file'), "FW4THl5eghbK2X+ogKelQnMXmFM=", 'ripemd160 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::RIPEMD160->new->addfile('t/data/text-CR.file')->hexdigest, "1
   is( Crypt::Digest::RIPEMD160->new->addfile($fh)->hexdigest, "156e131e5e5e8216cad97fa880a7a54273179853", 'ripemd160 (OO/filehandle/2)');
   close($fh);
 }
-
 is( ripemd160_file('t/data/text-CRLF.file'), pack("H*","cb374a83416fe4fc3ae04945b3a796f3b54c3b63"), 'ripemd160 (raw/file/3)');
 is( ripemd160_file_hex('t/data/text-CRLF.file'), "cb374a83416fe4fc3ae04945b3a796f3b54c3b63", 'ripemd160 (hex/file/3)');
 is( ripemd160_file_b64('t/data/text-CRLF.file'), "yzdKg0Fv5Pw64ElFs6eW87VMO2M=", 'ripemd160 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::RIPEMD160->new->addfile('t/data/text-CRLF.file')->hexdigest, 
   is( Crypt::Digest::RIPEMD160->new->addfile($fh)->hexdigest, "cb374a83416fe4fc3ae04945b3a796f3b54c3b63", 'ripemd160 (OO/filehandle/3)');
   close($fh);
 }
-
 is( ripemd160_file('t/data/text-LF.file'), pack("H*","34913b1862982366520f5e29d8a0a2d6e3d9a812"), 'ripemd160 (raw/file/4)');
 is( ripemd160_file_hex('t/data/text-LF.file'), "34913b1862982366520f5e29d8a0a2d6e3d9a812", 'ripemd160 (hex/file/4)');
 is( ripemd160_file_b64('t/data/text-LF.file'), "NJE7GGKYI2ZSD14p2KCi1uPZqBI=", 'ripemd160 (base64/file/4)');

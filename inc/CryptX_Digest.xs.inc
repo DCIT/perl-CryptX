@@ -29,7 +29,10 @@ new(char * cname, char * pname = NULL)
 void
 DESTROY(Crypt::Digest self)
     CODE:
+    {
+        zeromem(&self->state, sizeof(hash_state));
         Safefree(self);
+    }
 
 void
 reset(Crypt::Digest self)
@@ -46,7 +49,9 @@ clone(Crypt::Digest self)
     CODE:
         Newz(0, RETVAL, 1, struct digest_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct digest_struct);
+        Copy(self, RETVAL, 1, struct digest_struct);
+        /* Repair SHA1/SHA224/SHA256 internal state pointers after the copy. */
+        cryptx_internal_digest_fixup_state(RETVAL);
     OUTPUT:
         RETVAL
 
@@ -80,8 +85,12 @@ digest(Crypt::Digest self)
         unsigned long outlen;
         unsigned char hash[MAXBLOCKSIZE];
         char out[MAXBLOCKSIZE*2+1];
+        struct digest_struct state_copy;
 
-        rv = self->desc->done(&self->state, hash);
+        Copy(self, &state_copy, 1, struct digest_struct);
+        /* Finalize a fixed-up copy so digest accessors stay non-destructive. */
+        cryptx_internal_digest_fixup_state(&state_copy);
+        rv = state_copy.desc->done(&state_copy.state, hash);
         if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
 
         outlen = sizeof(out);
@@ -173,8 +182,9 @@ hashsize(SV * param, char * extra = NULL)
         }
         else {
           char *digest_name;
+          STRLEN plen;
           int rv, id;
-          digest_name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Digest") ? SvPVX(param) : extra;
+          digest_name = SvPOK_spec(param) && strcmp(SvPVbyte(param, plen), "Crypt::Digest") ? SvPVbyte(param, plen) : extra;
           id = cryptx_internal_find_hash(digest_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", digest_name);
           rv = hash_descriptor[id].hashsize;

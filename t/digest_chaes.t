@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::CHAES qw( chaes chaes_hex chaes_b64 chaes_b64u chaes_file chaes_file_hex chaes_file_b64 chaes_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::CHAES::hashsize, 16, 'hashsize/3');
 is( Crypt::Digest::CHAES->hashsize, 16, 'hashsize/4');
 is( Crypt::Digest->new('CHAES')->hashsize, 16, 'hashsize/5');
 is( Crypt::Digest::CHAES->new->hashsize, 16, 'hashsize/6');
+{
+  my $d = Crypt::Digest::CHAES->new;
+  isa_ok($d, 'Crypt::Digest::CHAES', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::CHAES', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::CHAES->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "1b2116641b6bc2152e42e1594fdb6a1c", 'chaes (clone/original-first/original)');
+  is($c->hexdigest, "1b2116641b6bc2152e42e1594fdb6a1c", 'chaes (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::CHAES->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "1b2116641b6bc2152e42e1594fdb6a1c", 'chaes (clone/clone-first/clone)');
+  is($d->hexdigest, "1b2116641b6bc2152e42e1594fdb6a1c", 'chaes (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::CHAES->new->add("AAA");
+  is($d->digest, pack("H*","f01416b4c3f6389816b2fcd0b4cf9e41"), 'chaes (OO/digest/non-destructive)');
+  is($d->hexdigest, "f01416b4c3f6389816b2fcd0b4cf9e41", 'chaes (OO/hexdigest/repeatable)');
+  is($d->b64digest, "8BQWtMP2OJgWsvzQtM+eQQ==", 'chaes (OO/b64digest/repeatable)');
+  is($d->b64udigest, "8BQWtMP2OJgWsvzQtM-eQQ", 'chaes (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "bcb6d335c458ff49d8f004892ced930d", 'chaes (OO/add-after-digest)');
+}
 
 is( chaes("A","A","A"), pack("H*","f01416b4c3f6389816b2fcd0b4cf9e41"), 'chaes (raw/tripple_A)');
 is( chaes_hex("A","A","A"), "f01416b4c3f6389816b2fcd0b4cf9e41", 'chaes (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::CHAES->new->addfile('t/data/binary-test.file')->hexdigest, "5
   is( Crypt::Digest::CHAES->new->addfile($fh)->hexdigest, "50390a2472d0dffe0323360b28cf8060", 'chaes (OO/filehandle/1)');
   close($fh);
 }
-
 is( chaes_file('t/data/text-CR.file'), pack("H*","f08c7838baa3dbdc02b6ac290db47609"), 'chaes (raw/file/2)');
 is( chaes_file_hex('t/data/text-CR.file'), "f08c7838baa3dbdc02b6ac290db47609", 'chaes (hex/file/2)');
 is( chaes_file_b64('t/data/text-CR.file'), "8Ix4OLqj29wCtqwpDbR2CQ==", 'chaes (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::CHAES->new->addfile('t/data/text-CR.file')->hexdigest, "f08c7
   is( Crypt::Digest::CHAES->new->addfile($fh)->hexdigest, "f08c7838baa3dbdc02b6ac290db47609", 'chaes (OO/filehandle/2)');
   close($fh);
 }
-
 is( chaes_file('t/data/text-CRLF.file'), pack("H*","b7874022b1a2558a2ffa384ca83bdd3f"), 'chaes (raw/file/3)');
 is( chaes_file_hex('t/data/text-CRLF.file'), "b7874022b1a2558a2ffa384ca83bdd3f", 'chaes (hex/file/3)');
 is( chaes_file_b64('t/data/text-CRLF.file'), "t4dAIrGiVYov+jhMqDvdPw==", 'chaes (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::CHAES->new->addfile('t/data/text-CRLF.file')->hexdigest, "b78
   is( Crypt::Digest::CHAES->new->addfile($fh)->hexdigest, "b7874022b1a2558a2ffa384ca83bdd3f", 'chaes (OO/filehandle/3)');
   close($fh);
 }
-
 is( chaes_file('t/data/text-LF.file'), pack("H*","e4a2674dc4123b3fa38dc01414ba58aa"), 'chaes (raw/file/4)');
 is( chaes_file_hex('t/data/text-LF.file'), "e4a2674dc4123b3fa38dc01414ba58aa", 'chaes (hex/file/4)');
 is( chaes_file_b64('t/data/text-LF.file'), "5KJnTcQSOz+jjcAUFLpYqg==", 'chaes (base64/file/4)');

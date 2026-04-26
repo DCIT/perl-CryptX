@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::BLAKE2b_256 qw( blake2b_256 blake2b_256_hex blake2b_256_b64 blake2b_256_b64u blake2b_256_file blake2b_256_file_hex blake2b_256_file_b64 blake2b_256_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::BLAKE2b_256::hashsize, 32, 'hashsize/3');
 is( Crypt::Digest::BLAKE2b_256->hashsize, 32, 'hashsize/4');
 is( Crypt::Digest->new('BLAKE2b_256')->hashsize, 32, 'hashsize/5');
 is( Crypt::Digest::BLAKE2b_256->new->hashsize, 32, 'hashsize/6');
+{
+  my $d = Crypt::Digest::BLAKE2b_256->new;
+  isa_ok($d, 'Crypt::Digest::BLAKE2b_256', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::BLAKE2b_256', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::BLAKE2b_256->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "bddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319", 'blake2b_256 (clone/original-first/original)');
+  is($c->hexdigest, "bddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319", 'blake2b_256 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::BLAKE2b_256->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "bddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319", 'blake2b_256 (clone/clone-first/clone)');
+  is($d->hexdigest, "bddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319", 'blake2b_256 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::BLAKE2b_256->new->add("AAA");
+  is($d->digest, pack("H*","cdc4339296753f930aa454700fd0ded6e1e08772dea849859e17dbbd85cae649"), 'blake2b_256 (OO/digest/non-destructive)');
+  is($d->hexdigest, "cdc4339296753f930aa454700fd0ded6e1e08772dea849859e17dbbd85cae649", 'blake2b_256 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "zcQzkpZ1P5MKpFRwD9De1uHgh3LeqEmFnhfbvYXK5kk=", 'blake2b_256 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "zcQzkpZ1P5MKpFRwD9De1uHgh3LeqEmFnhfbvYXK5kk", 'blake2b_256 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "fbe0db943f902736e3571856ee824ad07d254358a2e7d6464c78b93c90158e76", 'blake2b_256 (OO/add-after-digest)');
+}
 
 is( blake2b_256("A","A","A"), pack("H*","cdc4339296753f930aa454700fd0ded6e1e08772dea849859e17dbbd85cae649"), 'blake2b_256 (raw/tripple_A)');
 is( blake2b_256_hex("A","A","A"), "cdc4339296753f930aa454700fd0ded6e1e08772dea849859e17dbbd85cae649", 'blake2b_256 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::BLAKE2b_256->new->addfile('t/data/binary-test.file')->hexdige
   is( Crypt::Digest::BLAKE2b_256->new->addfile($fh)->hexdigest, "34cb287b359b0be0375ab6cfeefac9f87bf5770117cca950a5f2d66e45dbc77b", 'blake2b_256 (OO/filehandle/1)');
   close($fh);
 }
-
 is( blake2b_256_file('t/data/text-CR.file'), pack("H*","8dde4e0ca7633499c0913d7d5c6d3524307c4ee381931f4cc2c3d7030ab97ab3"), 'blake2b_256 (raw/file/2)');
 is( blake2b_256_file_hex('t/data/text-CR.file'), "8dde4e0ca7633499c0913d7d5c6d3524307c4ee381931f4cc2c3d7030ab97ab3", 'blake2b_256 (hex/file/2)');
 is( blake2b_256_file_b64('t/data/text-CR.file'), "jd5ODKdjNJnAkT19XG01JDB8TuOBkx9MwsPXAwq5erM=", 'blake2b_256 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::BLAKE2b_256->new->addfile('t/data/text-CR.file')->hexdigest, 
   is( Crypt::Digest::BLAKE2b_256->new->addfile($fh)->hexdigest, "8dde4e0ca7633499c0913d7d5c6d3524307c4ee381931f4cc2c3d7030ab97ab3", 'blake2b_256 (OO/filehandle/2)');
   close($fh);
 }
-
 is( blake2b_256_file('t/data/text-CRLF.file'), pack("H*","3e6dcddb9dbbf1ea39d55c980da01971c6b1bd2076e0bbc8c95ca49836926a22"), 'blake2b_256 (raw/file/3)');
 is( blake2b_256_file_hex('t/data/text-CRLF.file'), "3e6dcddb9dbbf1ea39d55c980da01971c6b1bd2076e0bbc8c95ca49836926a22", 'blake2b_256 (hex/file/3)');
 is( blake2b_256_file_b64('t/data/text-CRLF.file'), "Pm3N25278eo51VyYDaAZccaxvSB24LvIyVykmDaSaiI=", 'blake2b_256 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::BLAKE2b_256->new->addfile('t/data/text-CRLF.file')->hexdigest
   is( Crypt::Digest::BLAKE2b_256->new->addfile($fh)->hexdigest, "3e6dcddb9dbbf1ea39d55c980da01971c6b1bd2076e0bbc8c95ca49836926a22", 'blake2b_256 (OO/filehandle/3)');
   close($fh);
 }
-
 is( blake2b_256_file('t/data/text-LF.file'), pack("H*","2f103840304609a16bca2c734e3c604b723ff5164579b6a80825f838d7e0c67e"), 'blake2b_256 (raw/file/4)');
 is( blake2b_256_file_hex('t/data/text-LF.file'), "2f103840304609a16bca2c734e3c604b723ff5164579b6a80825f838d7e0c67e", 'blake2b_256 (hex/file/4)');
 is( blake2b_256_file_b64('t/data/text-LF.file'), "LxA4QDBGCaFryixzTjxgS3I/9RZFebaoCCX4ONfgxn4=", 'blake2b_256 (base64/file/4)');

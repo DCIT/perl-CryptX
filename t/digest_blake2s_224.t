@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::BLAKE2s_224 qw( blake2s_224 blake2s_224_hex blake2s_224_b64 blake2s_224_b64u blake2s_224_file blake2s_224_file_hex blake2s_224_file_b64 blake2s_224_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::BLAKE2s_224::hashsize, 28, 'hashsize/3');
 is( Crypt::Digest::BLAKE2s_224->hashsize, 28, 'hashsize/4');
 is( Crypt::Digest->new('BLAKE2s_224')->hashsize, 28, 'hashsize/5');
 is( Crypt::Digest::BLAKE2s_224->new->hashsize, 28, 'hashsize/6');
+{
+  my $d = Crypt::Digest::BLAKE2s_224->new;
+  isa_ok($d, 'Crypt::Digest::BLAKE2s_224', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::BLAKE2s_224', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::BLAKE2s_224->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "0b033fc226df7abde29f67a05d3dc62cf271ef3dfea4d387407fbd55", 'blake2s_224 (clone/original-first/original)');
+  is($c->hexdigest, "0b033fc226df7abde29f67a05d3dc62cf271ef3dfea4d387407fbd55", 'blake2s_224 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::BLAKE2s_224->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "0b033fc226df7abde29f67a05d3dc62cf271ef3dfea4d387407fbd55", 'blake2s_224 (clone/clone-first/clone)');
+  is($d->hexdigest, "0b033fc226df7abde29f67a05d3dc62cf271ef3dfea4d387407fbd55", 'blake2s_224 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::BLAKE2s_224->new->add("AAA");
+  is($d->digest, pack("H*","8c2738e18d0b9645870d7da4b52756cef46c5f3d185f4ea93c361006"), 'blake2s_224 (OO/digest/non-destructive)');
+  is($d->hexdigest, "8c2738e18d0b9645870d7da4b52756cef46c5f3d185f4ea93c361006", 'blake2s_224 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "jCc44Y0LlkWHDX2ktSdWzvRsXz0YX06pPDYQBg==", 'blake2s_224 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "jCc44Y0LlkWHDX2ktSdWzvRsXz0YX06pPDYQBg", 'blake2s_224 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "770ae85c9bd90e8806ba668e6c8000fa89d54bc9d50b05f912682afb", 'blake2s_224 (OO/add-after-digest)');
+}
 
 is( blake2s_224("A","A","A"), pack("H*","8c2738e18d0b9645870d7da4b52756cef46c5f3d185f4ea93c361006"), 'blake2s_224 (raw/tripple_A)');
 is( blake2s_224_hex("A","A","A"), "8c2738e18d0b9645870d7da4b52756cef46c5f3d185f4ea93c361006", 'blake2s_224 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::BLAKE2s_224->new->addfile('t/data/binary-test.file')->hexdige
   is( Crypt::Digest::BLAKE2s_224->new->addfile($fh)->hexdigest, "1084e796a3f44c7c06c3c89e03701c5c95226f92b01538a05a05eb04", 'blake2s_224 (OO/filehandle/1)');
   close($fh);
 }
-
 is( blake2s_224_file('t/data/text-CR.file'), pack("H*","d1596023cc333044ef7ab85e6686a436f00d1024c3cea980e9fd402c"), 'blake2s_224 (raw/file/2)');
 is( blake2s_224_file_hex('t/data/text-CR.file'), "d1596023cc333044ef7ab85e6686a436f00d1024c3cea980e9fd402c", 'blake2s_224 (hex/file/2)');
 is( blake2s_224_file_b64('t/data/text-CR.file'), "0VlgI8wzMETverheZoakNvANECTDzqmA6f1ALA==", 'blake2s_224 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::BLAKE2s_224->new->addfile('t/data/text-CR.file')->hexdigest, 
   is( Crypt::Digest::BLAKE2s_224->new->addfile($fh)->hexdigest, "d1596023cc333044ef7ab85e6686a436f00d1024c3cea980e9fd402c", 'blake2s_224 (OO/filehandle/2)');
   close($fh);
 }
-
 is( blake2s_224_file('t/data/text-CRLF.file'), pack("H*","c2898409fa3ea3b8e2859b944f89cfb4244ced2063872ebebd536796"), 'blake2s_224 (raw/file/3)');
 is( blake2s_224_file_hex('t/data/text-CRLF.file'), "c2898409fa3ea3b8e2859b944f89cfb4244ced2063872ebebd536796", 'blake2s_224 (hex/file/3)');
 is( blake2s_224_file_b64('t/data/text-CRLF.file'), "womECfo+o7jihZuUT4nPtCRM7SBjhy6+vVNnlg==", 'blake2s_224 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::BLAKE2s_224->new->addfile('t/data/text-CRLF.file')->hexdigest
   is( Crypt::Digest::BLAKE2s_224->new->addfile($fh)->hexdigest, "c2898409fa3ea3b8e2859b944f89cfb4244ced2063872ebebd536796", 'blake2s_224 (OO/filehandle/3)');
   close($fh);
 }
-
 is( blake2s_224_file('t/data/text-LF.file'), pack("H*","d8fa36e6ed267a07f871d71f50f9dbc48661260a5e6a1cde8c802b89"), 'blake2s_224 (raw/file/4)');
 is( blake2s_224_file_hex('t/data/text-LF.file'), "d8fa36e6ed267a07f871d71f50f9dbc48661260a5e6a1cde8c802b89", 'blake2s_224 (hex/file/4)');
 is( blake2s_224_file_b64('t/data/text-LF.file'), "2Po25u0megf4cdcfUPnbxIZhJgpeahzejIAriQ==", 'blake2s_224 (base64/file/4)');

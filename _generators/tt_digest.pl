@@ -109,6 +109,12 @@ for my $n (sort keys %list) {
                            base64    => Crypt::Digest::digest_data_b64($n, "AAA"),
                            base64url => Crypt::Digest::digest_data_b64u($n, "AAA"),
                          };
+    $data->{abc} = {
+                     hex => Crypt::Digest::digest_data_hex($n, "abc"),
+                   };
+    $data->{tripple_A_X} = {
+                            hex => Crypt::Digest::digest_data_hex($n, "AAAX"),
+                          };
 
     my $t_out = catfile($outdir_t, "digest_".lc($n).".t");
     my $t_tt = Template->new(ABSOLUTE=>1) || die $Template::ERROR, "\n";

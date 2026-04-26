@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::RIPEMD128 qw( ripemd128 ripemd128_hex ripemd128_b64 ripemd128_b64u ripemd128_file ripemd128_file_hex ripemd128_file_b64 ripemd128_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::RIPEMD128::hashsize, 16, 'hashsize/3');
 is( Crypt::Digest::RIPEMD128->hashsize, 16, 'hashsize/4');
 is( Crypt::Digest->new('RIPEMD128')->hashsize, 16, 'hashsize/5');
 is( Crypt::Digest::RIPEMD128->new->hashsize, 16, 'hashsize/6');
+{
+  my $d = Crypt::Digest::RIPEMD128->new;
+  isa_ok($d, 'Crypt::Digest::RIPEMD128', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::RIPEMD128', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::RIPEMD128->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "c14a12199c66e4ba84636b0f69144c77", 'ripemd128 (clone/original-first/original)');
+  is($c->hexdigest, "c14a12199c66e4ba84636b0f69144c77", 'ripemd128 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::RIPEMD128->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "c14a12199c66e4ba84636b0f69144c77", 'ripemd128 (clone/clone-first/clone)');
+  is($d->hexdigest, "c14a12199c66e4ba84636b0f69144c77", 'ripemd128 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::RIPEMD128->new->add("AAA");
+  is($d->digest, pack("H*","c2750c6ca0c35d367de2993c3f55e1df"), 'ripemd128 (OO/digest/non-destructive)');
+  is($d->hexdigest, "c2750c6ca0c35d367de2993c3f55e1df", 'ripemd128 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "wnUMbKDDXTZ94pk8P1Xh3w==", 'ripemd128 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "wnUMbKDDXTZ94pk8P1Xh3w", 'ripemd128 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "038afd5eb50eb4fb333b903bae2520cc", 'ripemd128 (OO/add-after-digest)');
+}
 
 is( ripemd128("A","A","A"), pack("H*","c2750c6ca0c35d367de2993c3f55e1df"), 'ripemd128 (raw/tripple_A)');
 is( ripemd128_hex("A","A","A"), "c2750c6ca0c35d367de2993c3f55e1df", 'ripemd128 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::RIPEMD128->new->addfile('t/data/binary-test.file')->hexdigest
   is( Crypt::Digest::RIPEMD128->new->addfile($fh)->hexdigest, "55f625a0de3efa776e784340384bf671", 'ripemd128 (OO/filehandle/1)');
   close($fh);
 }
-
 is( ripemd128_file('t/data/text-CR.file'), pack("H*","4c095a056f2fe18e00719a0209381054"), 'ripemd128 (raw/file/2)');
 is( ripemd128_file_hex('t/data/text-CR.file'), "4c095a056f2fe18e00719a0209381054", 'ripemd128 (hex/file/2)');
 is( ripemd128_file_b64('t/data/text-CR.file'), "TAlaBW8v4Y4AcZoCCTgQVA==", 'ripemd128 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::RIPEMD128->new->addfile('t/data/text-CR.file')->hexdigest, "4
   is( Crypt::Digest::RIPEMD128->new->addfile($fh)->hexdigest, "4c095a056f2fe18e00719a0209381054", 'ripemd128 (OO/filehandle/2)');
   close($fh);
 }
-
 is( ripemd128_file('t/data/text-CRLF.file'), pack("H*","eb35f79787dcd87b1fe02760922b0561"), 'ripemd128 (raw/file/3)');
 is( ripemd128_file_hex('t/data/text-CRLF.file'), "eb35f79787dcd87b1fe02760922b0561", 'ripemd128 (hex/file/3)');
 is( ripemd128_file_b64('t/data/text-CRLF.file'), "6zX3l4fc2Hsf4CdgkisFYQ==", 'ripemd128 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::RIPEMD128->new->addfile('t/data/text-CRLF.file')->hexdigest, 
   is( Crypt::Digest::RIPEMD128->new->addfile($fh)->hexdigest, "eb35f79787dcd87b1fe02760922b0561", 'ripemd128 (OO/filehandle/3)');
   close($fh);
 }
-
 is( ripemd128_file('t/data/text-LF.file'), pack("H*","05863440dba144d5d0fdce73cbc27535"), 'ripemd128 (raw/file/4)');
 is( ripemd128_file_hex('t/data/text-LF.file'), "05863440dba144d5d0fdce73cbc27535", 'ripemd128 (hex/file/4)');
 is( ripemd128_file_b64('t/data/text-LF.file'), "BYY0QNuhRNXQ/c5zy8J1NQ==", 'ripemd128 (base64/file/4)');

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::Tiger192 qw( tiger192 tiger192_hex tiger192_b64 tiger192_b64u tiger192_file tiger192_file_hex tiger192_file_b64 tiger192_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::Tiger192::hashsize, 24, 'hashsize/3');
 is( Crypt::Digest::Tiger192->hashsize, 24, 'hashsize/4');
 is( Crypt::Digest->new('Tiger192')->hashsize, 24, 'hashsize/5');
 is( Crypt::Digest::Tiger192->new->hashsize, 24, 'hashsize/6');
+{
+  my $d = Crypt::Digest::Tiger192->new;
+  isa_ok($d, 'Crypt::Digest::Tiger192', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::Tiger192', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::Tiger192->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "2aab1484e8c158f2bfb8c5ff41b57a525129131c957b5f93", 'tiger192 (clone/original-first/original)');
+  is($c->hexdigest, "2aab1484e8c158f2bfb8c5ff41b57a525129131c957b5f93", 'tiger192 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::Tiger192->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "2aab1484e8c158f2bfb8c5ff41b57a525129131c957b5f93", 'tiger192 (clone/clone-first/clone)');
+  is($d->hexdigest, "2aab1484e8c158f2bfb8c5ff41b57a525129131c957b5f93", 'tiger192 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::Tiger192->new->add("AAA");
+  is($d->digest, pack("H*","04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9"), 'tiger192 (OO/digest/non-destructive)');
+  is($d->hexdigest, "04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9", 'tiger192 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "BGgiU6zE5gkgFCKtUK1r4sUc8WmLCkHJ", 'tiger192 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "BGgiU6zE5gkgFCKtUK1r4sUc8WmLCkHJ", 'tiger192 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "dbf4b4e74e24db57e037fb97512b746673c304568bfb42ab", 'tiger192 (OO/add-after-digest)');
+}
 
 is( tiger192("A","A","A"), pack("H*","04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9"), 'tiger192 (raw/tripple_A)');
 is( tiger192_hex("A","A","A"), "04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9", 'tiger192 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::Tiger192->new->addfile('t/data/binary-test.file')->hexdigest,
   is( Crypt::Digest::Tiger192->new->addfile($fh)->hexdigest, "87fff912ca5497def55a1a7b5c705ad037a53660432e1d63", 'tiger192 (OO/filehandle/1)');
   close($fh);
 }
-
 is( tiger192_file('t/data/text-CR.file'), pack("H*","3ae7a1ed6473e8049fa12df17256e8f24578d68e9dce447a"), 'tiger192 (raw/file/2)');
 is( tiger192_file_hex('t/data/text-CR.file'), "3ae7a1ed6473e8049fa12df17256e8f24578d68e9dce447a", 'tiger192 (hex/file/2)');
 is( tiger192_file_b64('t/data/text-CR.file'), "Oueh7WRz6ASfoS3xclbo8kV41o6dzkR6", 'tiger192 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::Tiger192->new->addfile('t/data/text-CR.file')->hexdigest, "3a
   is( Crypt::Digest::Tiger192->new->addfile($fh)->hexdigest, "3ae7a1ed6473e8049fa12df17256e8f24578d68e9dce447a", 'tiger192 (OO/filehandle/2)');
   close($fh);
 }
-
 is( tiger192_file('t/data/text-CRLF.file'), pack("H*","1d33d392f100dce854ec1e6b71bf58b5724271a9ebfc7b83"), 'tiger192 (raw/file/3)');
 is( tiger192_file_hex('t/data/text-CRLF.file'), "1d33d392f100dce854ec1e6b71bf58b5724271a9ebfc7b83", 'tiger192 (hex/file/3)');
 is( tiger192_file_b64('t/data/text-CRLF.file'), "HTPTkvEA3OhU7B5rcb9YtXJCcanr/HuD", 'tiger192 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::Tiger192->new->addfile('t/data/text-CRLF.file')->hexdigest, "
   is( Crypt::Digest::Tiger192->new->addfile($fh)->hexdigest, "1d33d392f100dce854ec1e6b71bf58b5724271a9ebfc7b83", 'tiger192 (OO/filehandle/3)');
   close($fh);
 }
-
 is( tiger192_file('t/data/text-LF.file'), pack("H*","4f4b4a8577833926bec95b6f59d9be248411160593375ba0"), 'tiger192 (raw/file/4)');
 is( tiger192_file_hex('t/data/text-LF.file'), "4f4b4a8577833926bec95b6f59d9be248411160593375ba0", 'tiger192 (hex/file/4)');
 is( tiger192_file_b64('t/data/text-LF.file'), "T0tKhXeDOSa+yVtvWdm+JIQRFgWTN1ug", 'tiger192 (base64/file/4)');

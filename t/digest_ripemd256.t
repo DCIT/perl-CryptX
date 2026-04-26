@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::RIPEMD256 qw( ripemd256 ripemd256_hex ripemd256_b64 ripemd256_b64u ripemd256_file ripemd256_file_hex ripemd256_file_b64 ripemd256_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::RIPEMD256::hashsize, 32, 'hashsize/3');
 is( Crypt::Digest::RIPEMD256->hashsize, 32, 'hashsize/4');
 is( Crypt::Digest->new('RIPEMD256')->hashsize, 32, 'hashsize/5');
 is( Crypt::Digest::RIPEMD256->new->hashsize, 32, 'hashsize/6');
+{
+  my $d = Crypt::Digest::RIPEMD256->new;
+  isa_ok($d, 'Crypt::Digest::RIPEMD256', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::RIPEMD256', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::RIPEMD256->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "afbd6e228b9d8cbbcef5ca2d03e6dba10ac0bc7dcbe4680e1e42d2e975459b65", 'ripemd256 (clone/original-first/original)');
+  is($c->hexdigest, "afbd6e228b9d8cbbcef5ca2d03e6dba10ac0bc7dcbe4680e1e42d2e975459b65", 'ripemd256 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::RIPEMD256->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "afbd6e228b9d8cbbcef5ca2d03e6dba10ac0bc7dcbe4680e1e42d2e975459b65", 'ripemd256 (clone/clone-first/clone)');
+  is($d->hexdigest, "afbd6e228b9d8cbbcef5ca2d03e6dba10ac0bc7dcbe4680e1e42d2e975459b65", 'ripemd256 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::RIPEMD256->new->add("AAA");
+  is($d->digest, pack("H*","0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82"), 'ripemd256 (OO/digest/non-destructive)');
+  is($d->hexdigest, "0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82", 'ripemd256 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "DJdlgmMUNdT7xCR1gQWgWmIq4ncm85V3SFjX6isvXYI=", 'ripemd256 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "DJdlgmMUNdT7xCR1gQWgWmIq4ncm85V3SFjX6isvXYI", 'ripemd256 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "15e9bf841112d975a5390f242c3a39a34886738f30553cae5ab59f1499308cb3", 'ripemd256 (OO/add-after-digest)');
+}
 
 is( ripemd256("A","A","A"), pack("H*","0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82"), 'ripemd256 (raw/tripple_A)');
 is( ripemd256_hex("A","A","A"), "0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82", 'ripemd256 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::RIPEMD256->new->addfile('t/data/binary-test.file')->hexdigest
   is( Crypt::Digest::RIPEMD256->new->addfile($fh)->hexdigest, "04045c33e656c780c9fe908d819322fd031b5fc8e009c2d03bd2ba9fcc1ff8c8", 'ripemd256 (OO/filehandle/1)');
   close($fh);
 }
-
 is( ripemd256_file('t/data/text-CR.file'), pack("H*","9f4e9323acd154c0731e7e9f1b0c4af2c37831b1457c591cd4c19b3f79c930d4"), 'ripemd256 (raw/file/2)');
 is( ripemd256_file_hex('t/data/text-CR.file'), "9f4e9323acd154c0731e7e9f1b0c4af2c37831b1457c591cd4c19b3f79c930d4", 'ripemd256 (hex/file/2)');
 is( ripemd256_file_b64('t/data/text-CR.file'), "n06TI6zRVMBzHn6fGwxK8sN4MbFFfFkc1MGbP3nJMNQ=", 'ripemd256 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::RIPEMD256->new->addfile('t/data/text-CR.file')->hexdigest, "9
   is( Crypt::Digest::RIPEMD256->new->addfile($fh)->hexdigest, "9f4e9323acd154c0731e7e9f1b0c4af2c37831b1457c591cd4c19b3f79c930d4", 'ripemd256 (OO/filehandle/2)');
   close($fh);
 }
-
 is( ripemd256_file('t/data/text-CRLF.file'), pack("H*","687ec071c90af42e551a3df07196e9d27ec5c4e1744fe17a0e2eb27dc9109611"), 'ripemd256 (raw/file/3)');
 is( ripemd256_file_hex('t/data/text-CRLF.file'), "687ec071c90af42e551a3df07196e9d27ec5c4e1744fe17a0e2eb27dc9109611", 'ripemd256 (hex/file/3)');
 is( ripemd256_file_b64('t/data/text-CRLF.file'), "aH7AcckK9C5VGj3wcZbp0n7FxOF0T+F6Di6yfckQlhE=", 'ripemd256 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::RIPEMD256->new->addfile('t/data/text-CRLF.file')->hexdigest, 
   is( Crypt::Digest::RIPEMD256->new->addfile($fh)->hexdigest, "687ec071c90af42e551a3df07196e9d27ec5c4e1744fe17a0e2eb27dc9109611", 'ripemd256 (OO/filehandle/3)');
   close($fh);
 }
-
 is( ripemd256_file('t/data/text-LF.file'), pack("H*","ef8b4d7c754269584403b4672e5abe44972b36a4ddb66a2a489e11041cbe7413"), 'ripemd256 (raw/file/4)');
 is( ripemd256_file_hex('t/data/text-LF.file'), "ef8b4d7c754269584403b4672e5abe44972b36a4ddb66a2a489e11041cbe7413", 'ripemd256 (hex/file/4)');
 is( ripemd256_file_b64('t/data/text-LF.file'), "74tNfHVCaVhEA7RnLlq+RJcrNqTdtmoqSJ4RBBy+dBM=", 'ripemd256 (base64/file/4)');

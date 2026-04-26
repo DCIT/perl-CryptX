@@ -49,6 +49,7 @@ sub addfile {
     $self->add($buf)
   }
   croak "FATAL: read failed: $!" unless defined $n;
+  close($handle) if ref(\$file) eq 'SCALAR';
 
   return $self;
 }
@@ -133,6 +134,7 @@ Please note that all functions take as its first argument the algorithm name, su
  'RIPEMD256', 'RIPEMD320', 'SHA1', 'SHA224', 'SHA256',
  'SHA384', 'SHA512', 'SHA512_224', 'SHA512_256', 'Tiger192', 'Whirlpool',
  'SHA3_224', 'SHA3_256', 'SHA3_384', 'SHA3_512',
+ 'Keccak224', 'Keccak256', 'Keccak384', 'Keccak512',
  'BLAKE2b_160', 'BLAKE2b_256', 'BLAKE2b_384', 'BLAKE2b_512',
  'BLAKE2s_128', 'BLAKE2s_160', 'BLAKE2s_224', 'BLAKE2s_256'
 
@@ -283,17 +285,6 @@ The return value is the digest object itself.
 
 B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
 
-=head2 add_bits
-
-This method is available mostly for compatibility with other Digest::SOMETHING modules on CPAN, you are very unlikely to need it.
-The return value is the digest object itself.
-
- $d->add_bits($bit_string);   # e.g. $d->add_bits("111100001010");
- #or
- $d->add_bits($data, $nbits); # e.g. $d->add_bits("\xF0\xA0", 16);
-
-B<BEWARE:> It is not possible to add bits that are not a multiple of 8.
-
 =head2 hashsize
 
 Returns the length of calculated digest in bytes (e.g. 32 for SHA-256).
@@ -307,12 +298,15 @@ Returns the length of calculated digest in bytes (e.g. 32 for SHA-256).
 =head2 digest
 
 Returns the binary digest (raw bytes).
+This method does not alter the digest object state, so you can call it
+repeatedly and continue with C<add()> or C<addfile()> afterwards.
 
  my $result_raw = $d->digest();
 
 =head2 hexdigest
 
 Returns the digest encoded as a hexadecimal string.
+Like C<digest()>, this method does not alter the digest object state.
 
  my $result_hex = $d->hexdigest();
 
@@ -320,12 +314,14 @@ Returns the digest encoded as a hexadecimal string.
 
 Returns the digest encoded as a Base64 string, B<with> trailing '=' padding (B<BEWARE:> this padding
 style might differ from other Digest::<SOMETHING> modules on CPAN).
+Like C<digest()>, this method does not alter the digest object state.
 
  my $result_b64 = $d->b64digest();
 
 =head2 b64udigest
 
 Returns the digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Like C<digest()>, this method does not alter the digest object state.
 
  my $result_b64url = $d->b64udigest();
 

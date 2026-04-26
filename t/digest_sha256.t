@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA256 qw( sha256 sha256_hex sha256_b64 sha256_b64u sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::SHA256::hashsize, 32, 'hashsize/3');
 is( Crypt::Digest::SHA256->hashsize, 32, 'hashsize/4');
 is( Crypt::Digest->new('SHA256')->hashsize, 32, 'hashsize/5');
 is( Crypt::Digest::SHA256->new->hashsize, 32, 'hashsize/6');
+{
+  my $d = Crypt::Digest::SHA256->new;
+  isa_ok($d, 'Crypt::Digest::SHA256', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::SHA256', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::SHA256->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", 'sha256 (clone/original-first/original)');
+  is($c->hexdigest, "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", 'sha256 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::SHA256->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", 'sha256 (clone/clone-first/clone)');
+  is($d->hexdigest, "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", 'sha256 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::SHA256->new->add("AAA");
+  is($d->digest, pack("H*","cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358"), 'sha256 (OO/digest/non-destructive)');
+  is($d->hexdigest, "cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358", 'sha256 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "yxrSEZ2Pr7aVZlEO5xJmH58UuDOFAG75KuxH9SOjg1g=", 'sha256 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "yxrSEZ2Pr7aVZlEO5xJmH58UuDOFAG75KuxH9SOjg1g", 'sha256 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "2b33d46f7190b4780aba028480c589e53f5a2f74bb536bee42b338f09d064d82", 'sha256 (OO/add-after-digest)');
+}
 
 is( sha256("A","A","A"), pack("H*","cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358"), 'sha256 (raw/tripple_A)');
 is( sha256_hex("A","A","A"), "cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358", 'sha256 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::SHA256->new->addfile('t/data/binary-test.file')->hexdigest, "
   is( Crypt::Digest::SHA256->new->addfile($fh)->hexdigest, "eefc3172bcb45a8e99233f5f33faea312e50894885d9677d9ef530f734a3b343", 'sha256 (OO/filehandle/1)');
   close($fh);
 }
-
 is( sha256_file('t/data/text-CR.file'), pack("H*","00e46d5084204a794818df06df45e7cc4489fd7ada4762c958b3c19c86409193"), 'sha256 (raw/file/2)');
 is( sha256_file_hex('t/data/text-CR.file'), "00e46d5084204a794818df06df45e7cc4489fd7ada4762c958b3c19c86409193", 'sha256 (hex/file/2)');
 is( sha256_file_b64('t/data/text-CR.file'), "AORtUIQgSnlIGN8G30XnzESJ/XraR2LJWLPBnIZAkZM=", 'sha256 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::SHA256->new->addfile('t/data/text-CR.file')->hexdigest, "00e4
   is( Crypt::Digest::SHA256->new->addfile($fh)->hexdigest, "00e46d5084204a794818df06df45e7cc4489fd7ada4762c958b3c19c86409193", 'sha256 (OO/filehandle/2)');
   close($fh);
 }
-
 is( sha256_file('t/data/text-CRLF.file'), pack("H*","2c28030d9bd766d6ae023e34b3aa84245993f98436cd36db0f0ab2294ffe7b6f"), 'sha256 (raw/file/3)');
 is( sha256_file_hex('t/data/text-CRLF.file'), "2c28030d9bd766d6ae023e34b3aa84245993f98436cd36db0f0ab2294ffe7b6f", 'sha256 (hex/file/3)');
 is( sha256_file_b64('t/data/text-CRLF.file'), "LCgDDZvXZtauAj40s6qEJFmT+YQ2zTbbDwqyKU/+e28=", 'sha256 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::SHA256->new->addfile('t/data/text-CRLF.file')->hexdigest, "2c
   is( Crypt::Digest::SHA256->new->addfile($fh)->hexdigest, "2c28030d9bd766d6ae023e34b3aa84245993f98436cd36db0f0ab2294ffe7b6f", 'sha256 (OO/filehandle/3)');
   close($fh);
 }
-
 is( sha256_file('t/data/text-LF.file'), pack("H*","f8282483e6c484c95d26581056a406650c94b4cc7649e05beb0660aa578f345b"), 'sha256 (raw/file/4)');
 is( sha256_file_hex('t/data/text-LF.file'), "f8282483e6c484c95d26581056a406650c94b4cc7649e05beb0660aa578f345b", 'sha256 (hex/file/4)');
 is( sha256_file_b64('t/data/text-LF.file'), "+Cgkg+bEhMldJlgQVqQGZQyUtMx2SeBb6wZgqlePNFs=", 'sha256 (base64/file/4)');

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::Keccak224 qw( keccak224 keccak224_hex keccak224_b64 keccak224_b64u keccak224_file keccak224_file_hex keccak224_file_b64 keccak224_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::Keccak224::hashsize, 28, 'hashsize/3');
 is( Crypt::Digest::Keccak224->hashsize, 28, 'hashsize/4');
 is( Crypt::Digest->new('Keccak224')->hashsize, 28, 'hashsize/5');
 is( Crypt::Digest::Keccak224->new->hashsize, 28, 'hashsize/6');
+{
+  my $d = Crypt::Digest::Keccak224->new;
+  isa_ok($d, 'Crypt::Digest::Keccak224', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::Keccak224', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::Keccak224->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "c30411768506ebe1c2871b1ee2e87d38df342317300a9b97a95ec6a8", 'keccak224 (clone/original-first/original)');
+  is($c->hexdigest, "c30411768506ebe1c2871b1ee2e87d38df342317300a9b97a95ec6a8", 'keccak224 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::Keccak224->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "c30411768506ebe1c2871b1ee2e87d38df342317300a9b97a95ec6a8", 'keccak224 (clone/clone-first/clone)');
+  is($d->hexdigest, "c30411768506ebe1c2871b1ee2e87d38df342317300a9b97a95ec6a8", 'keccak224 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::Keccak224->new->add("AAA");
+  is($d->digest, pack("H*","92b9d2a25222d2a036c53bd4dd246b4073d100e0ae20ac7240f5b252"), 'keccak224 (OO/digest/non-destructive)');
+  is($d->hexdigest, "92b9d2a25222d2a036c53bd4dd246b4073d100e0ae20ac7240f5b252", 'keccak224 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "krnSolIi0qA2xTvU3SRrQHPRAOCuIKxyQPWyUg==", 'keccak224 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "krnSolIi0qA2xTvU3SRrQHPRAOCuIKxyQPWyUg", 'keccak224 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "1947b3e9bb1c6576c4e8013f55c22e92544c51afbe6527ad65808f1a", 'keccak224 (OO/add-after-digest)');
+}
 
 is( keccak224("A","A","A"), pack("H*","92b9d2a25222d2a036c53bd4dd246b4073d100e0ae20ac7240f5b252"), 'keccak224 (raw/tripple_A)');
 is( keccak224_hex("A","A","A"), "92b9d2a25222d2a036c53bd4dd246b4073d100e0ae20ac7240f5b252", 'keccak224 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::Keccak224->new->addfile('t/data/binary-test.file')->hexdigest
   is( Crypt::Digest::Keccak224->new->addfile($fh)->hexdigest, "8f1651ffab903619314a1b3d7c89aefbc1f8f541289b1889320b1a8e", 'keccak224 (OO/filehandle/1)');
   close($fh);
 }
-
 is( keccak224_file('t/data/text-CR.file'), pack("H*","28ff8a17382e1fa11c37cd6e2543bf257f914aae3760ef77073987c8"), 'keccak224 (raw/file/2)');
 is( keccak224_file_hex('t/data/text-CR.file'), "28ff8a17382e1fa11c37cd6e2543bf257f914aae3760ef77073987c8", 'keccak224 (hex/file/2)');
 is( keccak224_file_b64('t/data/text-CR.file'), "KP+KFzguH6EcN81uJUO/JX+RSq43YO93BzmHyA==", 'keccak224 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::Keccak224->new->addfile('t/data/text-CR.file')->hexdigest, "2
   is( Crypt::Digest::Keccak224->new->addfile($fh)->hexdigest, "28ff8a17382e1fa11c37cd6e2543bf257f914aae3760ef77073987c8", 'keccak224 (OO/filehandle/2)');
   close($fh);
 }
-
 is( keccak224_file('t/data/text-CRLF.file'), pack("H*","26659008759423cde44c4984748af6b61d7d4ea5c7e81be58fb72faa"), 'keccak224 (raw/file/3)');
 is( keccak224_file_hex('t/data/text-CRLF.file'), "26659008759423cde44c4984748af6b61d7d4ea5c7e81be58fb72faa", 'keccak224 (hex/file/3)');
 is( keccak224_file_b64('t/data/text-CRLF.file'), "JmWQCHWUI83kTEmEdIr2th19TqXH6Bvlj7cvqg==", 'keccak224 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::Keccak224->new->addfile('t/data/text-CRLF.file')->hexdigest, 
   is( Crypt::Digest::Keccak224->new->addfile($fh)->hexdigest, "26659008759423cde44c4984748af6b61d7d4ea5c7e81be58fb72faa", 'keccak224 (OO/filehandle/3)');
   close($fh);
 }
-
 is( keccak224_file('t/data/text-LF.file'), pack("H*","2021717d16f99f493960d0839a3cb2b01be8078c28b425d7f1c8662b"), 'keccak224 (raw/file/4)');
 is( keccak224_file_hex('t/data/text-LF.file'), "2021717d16f99f493960d0839a3cb2b01be8078c28b425d7f1c8662b", 'keccak224 (hex/file/4)');
 is( keccak224_file_b64('t/data/text-LF.file'), "ICFxfRb5n0k5YNCDmjyysBvoB4wotCXX8chmKw==", 'keccak224 (base64/file/4)');

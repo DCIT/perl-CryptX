@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::Keccak256 qw( keccak256 keccak256_hex keccak256_b64 keccak256_b64u keccak256_file keccak256_file_hex keccak256_file_b64 keccak256_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::Keccak256::hashsize, 32, 'hashsize/3');
 is( Crypt::Digest::Keccak256->hashsize, 32, 'hashsize/4');
 is( Crypt::Digest->new('Keccak256')->hashsize, 32, 'hashsize/5');
 is( Crypt::Digest::Keccak256->new->hashsize, 32, 'hashsize/6');
+{
+  my $d = Crypt::Digest::Keccak256->new;
+  isa_ok($d, 'Crypt::Digest::Keccak256', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::Keccak256', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::Keccak256->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 'keccak256 (clone/original-first/original)');
+  is($c->hexdigest, "4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 'keccak256 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::Keccak256->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 'keccak256 (clone/clone-first/clone)');
+  is($d->hexdigest, "4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 'keccak256 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::Keccak256->new->add("AAA");
+  is($d->digest, pack("H*","2070504003a07b4713d783ae7a6642ab3b959b7c575c6e4fa4f33eb743db631a"), 'keccak256 (OO/digest/non-destructive)');
+  is($d->hexdigest, "2070504003a07b4713d783ae7a6642ab3b959b7c575c6e4fa4f33eb743db631a", 'keccak256 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "IHBQQAOge0cT14OuemZCqzuVm3xXXG5PpPM+t0PbYxo=", 'keccak256 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "IHBQQAOge0cT14OuemZCqzuVm3xXXG5PpPM-t0PbYxo", 'keccak256 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "f829c06d9a5ad8f61ffe996f115bc161e765b48f3f94e233c504d81eccf2c1f2", 'keccak256 (OO/add-after-digest)');
+}
 
 is( keccak256("A","A","A"), pack("H*","2070504003a07b4713d783ae7a6642ab3b959b7c575c6e4fa4f33eb743db631a"), 'keccak256 (raw/tripple_A)');
 is( keccak256_hex("A","A","A"), "2070504003a07b4713d783ae7a6642ab3b959b7c575c6e4fa4f33eb743db631a", 'keccak256 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::Keccak256->new->addfile('t/data/binary-test.file')->hexdigest
   is( Crypt::Digest::Keccak256->new->addfile($fh)->hexdigest, "7046f5fad76cf793a1f44c159b656277ada3f428057ac8160d04fdcdc5b0fcb8", 'keccak256 (OO/filehandle/1)');
   close($fh);
 }
-
 is( keccak256_file('t/data/text-CR.file'), pack("H*","288d47897222a6fbd6d8593cd06796e6c3eb5637a6eaf8fc033dc9243ce01c18"), 'keccak256 (raw/file/2)');
 is( keccak256_file_hex('t/data/text-CR.file'), "288d47897222a6fbd6d8593cd06796e6c3eb5637a6eaf8fc033dc9243ce01c18", 'keccak256 (hex/file/2)');
 is( keccak256_file_b64('t/data/text-CR.file'), "KI1HiXIipvvW2Fk80GeW5sPrVjem6vj8Az3JJDzgHBg=", 'keccak256 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::Keccak256->new->addfile('t/data/text-CR.file')->hexdigest, "2
   is( Crypt::Digest::Keccak256->new->addfile($fh)->hexdigest, "288d47897222a6fbd6d8593cd06796e6c3eb5637a6eaf8fc033dc9243ce01c18", 'keccak256 (OO/filehandle/2)');
   close($fh);
 }
-
 is( keccak256_file('t/data/text-CRLF.file'), pack("H*","a44703b85d5ee7f35b3c0c21c646d695978d0ec5ea36a1a05a77427c5f964ee1"), 'keccak256 (raw/file/3)');
 is( keccak256_file_hex('t/data/text-CRLF.file'), "a44703b85d5ee7f35b3c0c21c646d695978d0ec5ea36a1a05a77427c5f964ee1", 'keccak256 (hex/file/3)');
 is( keccak256_file_b64('t/data/text-CRLF.file'), "pEcDuF1e5/NbPAwhxkbWlZeNDsXqNqGgWndCfF+WTuE=", 'keccak256 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::Keccak256->new->addfile('t/data/text-CRLF.file')->hexdigest, 
   is( Crypt::Digest::Keccak256->new->addfile($fh)->hexdigest, "a44703b85d5ee7f35b3c0c21c646d695978d0ec5ea36a1a05a77427c5f964ee1", 'keccak256 (OO/filehandle/3)');
   close($fh);
 }
-
 is( keccak256_file('t/data/text-LF.file'), pack("H*","188476c71de2afcb7eda9dbc560b5eb5e4e681a558568a41068eb6d738efa4f4"), 'keccak256 (raw/file/4)');
 is( keccak256_file_hex('t/data/text-LF.file'), "188476c71de2afcb7eda9dbc560b5eb5e4e681a558568a41068eb6d738efa4f4", 'keccak256 (hex/file/4)');
 is( keccak256_file_b64('t/data/text-LF.file'), "GIR2xx3ir8t+2p28VgteteTmgaVYVopBBo621zjvpPQ=", 'keccak256 (base64/file/4)');

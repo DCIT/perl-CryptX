@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::BLAKE2s_128 qw( blake2s_128 blake2s_128_hex blake2s_128_b64 blake2s_128_b64u blake2s_128_file blake2s_128_file_hex blake2s_128_file_b64 blake2s_128_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::BLAKE2s_128::hashsize, 16, 'hashsize/3');
 is( Crypt::Digest::BLAKE2s_128->hashsize, 16, 'hashsize/4');
 is( Crypt::Digest->new('BLAKE2s_128')->hashsize, 16, 'hashsize/5');
 is( Crypt::Digest::BLAKE2s_128->new->hashsize, 16, 'hashsize/6');
+{
+  my $d = Crypt::Digest::BLAKE2s_128->new;
+  isa_ok($d, 'Crypt::Digest::BLAKE2s_128', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::BLAKE2s_128', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::BLAKE2s_128->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "aa4938119b1dc7b87cbad0ffd200d0ae", 'blake2s_128 (clone/original-first/original)');
+  is($c->hexdigest, "aa4938119b1dc7b87cbad0ffd200d0ae", 'blake2s_128 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::BLAKE2s_128->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "aa4938119b1dc7b87cbad0ffd200d0ae", 'blake2s_128 (clone/clone-first/clone)');
+  is($d->hexdigest, "aa4938119b1dc7b87cbad0ffd200d0ae", 'blake2s_128 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::BLAKE2s_128->new->add("AAA");
+  is($d->digest, pack("H*","a2a5699c7579ee354f4d20fa75f09cb6"), 'blake2s_128 (OO/digest/non-destructive)');
+  is($d->hexdigest, "a2a5699c7579ee354f4d20fa75f09cb6", 'blake2s_128 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "oqVpnHV57jVPTSD6dfCctg==", 'blake2s_128 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "oqVpnHV57jVPTSD6dfCctg", 'blake2s_128 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "63bca051bc8e5d88c54e21d02359ca1d", 'blake2s_128 (OO/add-after-digest)');
+}
 
 is( blake2s_128("A","A","A"), pack("H*","a2a5699c7579ee354f4d20fa75f09cb6"), 'blake2s_128 (raw/tripple_A)');
 is( blake2s_128_hex("A","A","A"), "a2a5699c7579ee354f4d20fa75f09cb6", 'blake2s_128 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::BLAKE2s_128->new->addfile('t/data/binary-test.file')->hexdige
   is( Crypt::Digest::BLAKE2s_128->new->addfile($fh)->hexdigest, "b5a4e21a67fdd4f2d75ab779feb83bfc", 'blake2s_128 (OO/filehandle/1)');
   close($fh);
 }
-
 is( blake2s_128_file('t/data/text-CR.file'), pack("H*","b17af4ae04bd7412393fc958bd60fdb6"), 'blake2s_128 (raw/file/2)');
 is( blake2s_128_file_hex('t/data/text-CR.file'), "b17af4ae04bd7412393fc958bd60fdb6", 'blake2s_128 (hex/file/2)');
 is( blake2s_128_file_b64('t/data/text-CR.file'), "sXr0rgS9dBI5P8lYvWD9tg==", 'blake2s_128 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::BLAKE2s_128->new->addfile('t/data/text-CR.file')->hexdigest, 
   is( Crypt::Digest::BLAKE2s_128->new->addfile($fh)->hexdigest, "b17af4ae04bd7412393fc958bd60fdb6", 'blake2s_128 (OO/filehandle/2)');
   close($fh);
 }
-
 is( blake2s_128_file('t/data/text-CRLF.file'), pack("H*","5e7c030d5e05b0c8c34105634417770c"), 'blake2s_128 (raw/file/3)');
 is( blake2s_128_file_hex('t/data/text-CRLF.file'), "5e7c030d5e05b0c8c34105634417770c", 'blake2s_128 (hex/file/3)');
 is( blake2s_128_file_b64('t/data/text-CRLF.file'), "XnwDDV4FsMjDQQVjRBd3DA==", 'blake2s_128 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::BLAKE2s_128->new->addfile('t/data/text-CRLF.file')->hexdigest
   is( Crypt::Digest::BLAKE2s_128->new->addfile($fh)->hexdigest, "5e7c030d5e05b0c8c34105634417770c", 'blake2s_128 (OO/filehandle/3)');
   close($fh);
 }
-
 is( blake2s_128_file('t/data/text-LF.file'), pack("H*","72a2b42b4c947d3d3c479b3b0e596aae"), 'blake2s_128 (raw/file/4)');
 is( blake2s_128_file_hex('t/data/text-LF.file'), "72a2b42b4c947d3d3c479b3b0e596aae", 'blake2s_128 (hex/file/4)');
 is( blake2s_128_file_b64('t/data/text-LF.file'), "cqK0K0yUfT08R5s7Dllqrg==", 'blake2s_128 (base64/file/4)');

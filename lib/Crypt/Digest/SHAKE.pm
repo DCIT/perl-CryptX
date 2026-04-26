@@ -27,6 +27,7 @@ sub addfile {
     $self->add($buf)
   }
   croak "FATAL: read failed: $!" unless defined $n;
+  close($handle) if ref(\$file) eq 'SCALAR';
 
   return $self;
 }
@@ -107,15 +108,17 @@ Reads the file content and appends it to the message. Returns the object itself 
 
 Returns C<$len> bytes of output as a binary string. Can be called repeatedly
 to stream an unlimited amount of output from the same absorbed input. The
-C<$len> argument is required and must be a positive integer.
+C<$len> argument is required and must be a positive integer. Single
+C<done()> calls are limited to 1,000,000,000 bytes, but the recommended way
+to read large output is to call C<done()> repeatedly in 10 MB chunks.
 
 After the first C<done()> call the object is in output mode. Calling
-C<add()> in this state is not permitted; use C<reset()> or create a new
-object to hash a different message.
+C<add()> in this state croaks; use C<reset()> or create a new object to hash
+a different message.
 
  my $result_raw = $d->done($len);
  # can be called multiple times; $len is the number of output bytes to read
- # after the first done(), call reset() before hashing a new message
+ # after the first done(), add() croaks until you call reset()
 
 =head1 SEE ALSO
 

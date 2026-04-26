@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA512_256 qw( sha512_256 sha512_256_hex sha512_256_b64 sha512_256_b64u sha512_256_file sha512_256_file_hex sha512_256_file_b64 sha512_256_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::SHA512_256::hashsize, 32, 'hashsize/3');
 is( Crypt::Digest::SHA512_256->hashsize, 32, 'hashsize/4');
 is( Crypt::Digest->new('SHA512_256')->hashsize, 32, 'hashsize/5');
 is( Crypt::Digest::SHA512_256->new->hashsize, 32, 'hashsize/6');
+{
+  my $d = Crypt::Digest::SHA512_256->new;
+  isa_ok($d, 'Crypt::Digest::SHA512_256', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::SHA512_256', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::SHA512_256->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "53048e2681941ef99b2e29b76b4c7dabe4c2d0c634fc6d46e0e2f13107e7af23", 'sha512_256 (clone/original-first/original)');
+  is($c->hexdigest, "53048e2681941ef99b2e29b76b4c7dabe4c2d0c634fc6d46e0e2f13107e7af23", 'sha512_256 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::SHA512_256->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "53048e2681941ef99b2e29b76b4c7dabe4c2d0c634fc6d46e0e2f13107e7af23", 'sha512_256 (clone/clone-first/clone)');
+  is($d->hexdigest, "53048e2681941ef99b2e29b76b4c7dabe4c2d0c634fc6d46e0e2f13107e7af23", 'sha512_256 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::SHA512_256->new->add("AAA");
+  is($d->digest, pack("H*","b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4"), 'sha512_256 (OO/digest/non-destructive)');
+  is($d->hexdigest, "b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4", 'sha512_256 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "sopilp2LmwIpe6YVxIW+Lf/vkHykGcKklABAJtbEvfQ=", 'sha512_256 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "sopilp2LmwIpe6YVxIW-Lf_vkHykGcKklABAJtbEvfQ", 'sha512_256 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "a5e575cd0aa36ee5efe65ba1f794fd85d4ba5f172cc02dcfb5062db1fda262da", 'sha512_256 (OO/add-after-digest)');
+}
 
 is( sha512_256("A","A","A"), pack("H*","b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4"), 'sha512_256 (raw/tripple_A)');
 is( sha512_256_hex("A","A","A"), "b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4", 'sha512_256 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::SHA512_256->new->addfile('t/data/binary-test.file')->hexdiges
   is( Crypt::Digest::SHA512_256->new->addfile($fh)->hexdigest, "0b73f578749b73675a98d3d8daf3457c326db775b87a483d0c1245ede48467af", 'sha512_256 (OO/filehandle/1)');
   close($fh);
 }
-
 is( sha512_256_file('t/data/text-CR.file'), pack("H*","8f6b6338b4656ed2b71f044d1fddbc2e1d0470b328e1962f9cdb1152bdb33fbb"), 'sha512_256 (raw/file/2)');
 is( sha512_256_file_hex('t/data/text-CR.file'), "8f6b6338b4656ed2b71f044d1fddbc2e1d0470b328e1962f9cdb1152bdb33fbb", 'sha512_256 (hex/file/2)');
 is( sha512_256_file_b64('t/data/text-CR.file'), "j2tjOLRlbtK3HwRNH928Lh0EcLMo4ZYvnNsRUr2zP7s=", 'sha512_256 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::SHA512_256->new->addfile('t/data/text-CR.file')->hexdigest, "
   is( Crypt::Digest::SHA512_256->new->addfile($fh)->hexdigest, "8f6b6338b4656ed2b71f044d1fddbc2e1d0470b328e1962f9cdb1152bdb33fbb", 'sha512_256 (OO/filehandle/2)');
   close($fh);
 }
-
 is( sha512_256_file('t/data/text-CRLF.file'), pack("H*","432c9ddcbf8deb5ca160e3a0a7e06606b3baae39d6662b456ae3c36304eaed18"), 'sha512_256 (raw/file/3)');
 is( sha512_256_file_hex('t/data/text-CRLF.file'), "432c9ddcbf8deb5ca160e3a0a7e06606b3baae39d6662b456ae3c36304eaed18", 'sha512_256 (hex/file/3)');
 is( sha512_256_file_b64('t/data/text-CRLF.file'), "Qyyd3L+N61yhYOOgp+BmBrO6rjnWZitFauPDYwTq7Rg=", 'sha512_256 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::SHA512_256->new->addfile('t/data/text-CRLF.file')->hexdigest,
   is( Crypt::Digest::SHA512_256->new->addfile($fh)->hexdigest, "432c9ddcbf8deb5ca160e3a0a7e06606b3baae39d6662b456ae3c36304eaed18", 'sha512_256 (OO/filehandle/3)');
   close($fh);
 }
-
 is( sha512_256_file('t/data/text-LF.file'), pack("H*","26ce04b3a529a52b1435a348175723b78885b35e9805acb09bd433e163a0b8c2"), 'sha512_256 (raw/file/4)');
 is( sha512_256_file_hex('t/data/text-LF.file'), "26ce04b3a529a52b1435a348175723b78885b35e9805acb09bd433e163a0b8c2", 'sha512_256 (hex/file/4)');
 is( sha512_256_file_b64('t/data/text-LF.file'), "Js4Es6UppSsUNaNIF1cjt4iFs16YBaywm9Qz4WOguMI=", 'sha512_256 (base64/file/4)');

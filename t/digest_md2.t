@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 10 + 6;
+use Test::More tests => 8*3 + 9*4 + 21 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::MD2 qw( md2 md2_hex md2_b64 md2_b64u md2_file md2_file_hex md2_file_b64 md2_file_b64u );
@@ -14,6 +14,31 @@ is( Crypt::Digest::MD2::hashsize, 16, 'hashsize/3');
 is( Crypt::Digest::MD2->hashsize, 16, 'hashsize/4');
 is( Crypt::Digest->new('MD2')->hashsize, 16, 'hashsize/5');
 is( Crypt::Digest::MD2->new->hashsize, 16, 'hashsize/6');
+{
+  my $d = Crypt::Digest::MD2->new;
+  isa_ok($d, 'Crypt::Digest::MD2', 'new returns subclass instance');
+  isa_ok($d->clone, 'Crypt::Digest::MD2', 'clone returns subclass instance');
+}
+{
+  my $d = Crypt::Digest::MD2->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "da853b0d3f88d99b30283a69e6ded6bb", 'md2 (clone/original-first/original)');
+  is($c->hexdigest, "da853b0d3f88d99b30283a69e6ded6bb", 'md2 (clone/original-first/clone)');
+}
+{
+  my $d = Crypt::Digest::MD2->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "da853b0d3f88d99b30283a69e6ded6bb", 'md2 (clone/clone-first/clone)');
+  is($d->hexdigest, "da853b0d3f88d99b30283a69e6ded6bb", 'md2 (clone/clone-first/original)');
+}
+{
+  my $d = Crypt::Digest::MD2->new->add("AAA");
+  is($d->digest, pack("H*","8788c1729761fdad983b830f04b19e86"), 'md2 (OO/digest/non-destructive)');
+  is($d->hexdigest, "8788c1729761fdad983b830f04b19e86", 'md2 (OO/hexdigest/repeatable)');
+  is($d->b64digest, "h4jBcpdh/a2YO4MPBLGehg==", 'md2 (OO/b64digest/repeatable)');
+  is($d->b64udigest, "h4jBcpdh_a2YO4MPBLGehg", 'md2 (OO/b64udigest/repeatable)');
+  is($d->add("X")->hexdigest, "401b511dcef353d8d3134d726bce84c4", 'md2 (OO/add-after-digest)');
+}
 
 is( md2("A","A","A"), pack("H*","8788c1729761fdad983b830f04b19e86"), 'md2 (raw/tripple_A)');
 is( md2_hex("A","A","A"), "8788c1729761fdad983b830f04b19e86", 'md2 (hex/tripple_A)');
@@ -69,7 +94,6 @@ is( Crypt::Digest::MD2->new->addfile('t/data/binary-test.file')->hexdigest, "43f
   is( Crypt::Digest::MD2->new->addfile($fh)->hexdigest, "43fa4a403cf2b9826a72154d56bc09a7", 'md2 (OO/filehandle/1)');
   close($fh);
 }
-
 is( md2_file('t/data/text-CR.file'), pack("H*","aefb6839dad1aa061e231e9c3aeb7ad0"), 'md2 (raw/file/2)');
 is( md2_file_hex('t/data/text-CR.file'), "aefb6839dad1aa061e231e9c3aeb7ad0", 'md2 (hex/file/2)');
 is( md2_file_b64('t/data/text-CR.file'), "rvtoOdrRqgYeIx6cOut60A==", 'md2 (base64/file/2)');
@@ -84,7 +108,6 @@ is( Crypt::Digest::MD2->new->addfile('t/data/text-CR.file')->hexdigest, "aefb683
   is( Crypt::Digest::MD2->new->addfile($fh)->hexdigest, "aefb6839dad1aa061e231e9c3aeb7ad0", 'md2 (OO/filehandle/2)');
   close($fh);
 }
-
 is( md2_file('t/data/text-CRLF.file'), pack("H*","5c32665f8372b97aa1d8ed733d88f50e"), 'md2 (raw/file/3)');
 is( md2_file_hex('t/data/text-CRLF.file'), "5c32665f8372b97aa1d8ed733d88f50e", 'md2 (hex/file/3)');
 is( md2_file_b64('t/data/text-CRLF.file'), "XDJmX4NyuXqh2O1zPYj1Dg==", 'md2 (base64/file/3)');
@@ -99,7 +122,6 @@ is( Crypt::Digest::MD2->new->addfile('t/data/text-CRLF.file')->hexdigest, "5c326
   is( Crypt::Digest::MD2->new->addfile($fh)->hexdigest, "5c32665f8372b97aa1d8ed733d88f50e", 'md2 (OO/filehandle/3)');
   close($fh);
 }
-
 is( md2_file('t/data/text-LF.file'), pack("H*","0e4142ba5bdaa257e4c618f9b309784c"), 'md2 (raw/file/4)');
 is( md2_file_hex('t/data/text-LF.file'), "0e4142ba5bdaa257e4c618f9b309784c", 'md2 (hex/file/4)');
 is( md2_file_b64('t/data/text-LF.file'), "DkFCulvaolfkxhj5swl4TA==", 'md2 (base64/file/4)');

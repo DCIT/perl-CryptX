@@ -2,6 +2,8 @@ MODULE = CryptX         PACKAGE = Crypt::Digest::SHAKE
 
 PROTOTYPES: DISABLE
 
+#define CRYPTX_DIGEST_SHAKE_MAX_OUTPUT_LEN 1000000000UL
+
 Crypt::Digest::SHAKE
 new(Class, int num)
     CODE:
@@ -12,6 +14,7 @@ new(Class, int num)
         if (!RETVAL) croak("FATAL: Newz failed");
 
         RETVAL->num = num;
+        RETVAL->squeezing = 0;
         rv = sha3_shake_init(&RETVAL->state, RETVAL->num);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
@@ -33,6 +36,7 @@ reset(Crypt::Digest::SHAKE self)
         int rv;
         rv = sha3_shake_init(&self->state, self->num);
         if (rv != CRYPT_OK) croak("FATAL: sha3_shake_init failed: %s", error_to_string(rv));
+        self->squeezing = 0;
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -41,7 +45,7 @@ clone(Crypt::Digest::SHAKE self)
     CODE:
         Newz(0, RETVAL, 1, struct digest_shake_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct digest_shake_struct);
+        Copy(self, RETVAL, 1, struct digest_shake_struct);
     OUTPUT:
         RETVAL
 
@@ -52,6 +56,8 @@ add(Crypt::Digest::SHAKE self, ...)
         STRLEN inlen;
         int rv, i;
         unsigned char *in;
+
+        if (self->squeezing) croak("FATAL: cannot add after done; call reset first");
 
         for(i=1; i<items; i++) {
           in = (unsigned char *)SvPVbyte(ST(i), inlen);
@@ -64,26 +70,24 @@ add(Crypt::Digest::SHAKE self, ...)
     }
 
 SV *
-done(Crypt::Digest::SHAKE self, STRLEN out_len)
+done(Crypt::Digest::SHAKE self, unsigned long out_len)
     CODE:
     {
         int rv;
         unsigned char *out_data;
 
-        if (out_len == 0) {
-          RETVAL = newSVpvn("", 0);
+        if (out_len == 0) croak("FATAL: invalid output length");
+        if (out_len > CRYPTX_DIGEST_SHAKE_MAX_OUTPUT_LEN) croak("FATAL: output length too large");
+        RETVAL = NEWSV(0, out_len); /* avoid zero! */
+        SvPOK_only(RETVAL);
+        SvCUR_set(RETVAL, out_len);
+        out_data = (unsigned char *)SvPVX(RETVAL);
+        rv = sha3_shake_done(&self->state, out_data, out_len);
+        if (rv != CRYPT_OK) {
+          SvREFCNT_dec(RETVAL);
+          croak("FATAL: sha3_shake_done failed: %s", error_to_string(rv));
         }
-        else {
-          RETVAL = NEWSV(0, out_len); /* avoid zero! */
-          SvPOK_only(RETVAL);
-          SvCUR_set(RETVAL, out_len);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = sha3_shake_done(&self->state, out_data, (unsigned long)out_len);
-          if (rv != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            croak("FATAL: sha3_shake_done failed: %s", error_to_string(rv));
-          }
-        }
+        self->squeezing = 1;
     }
     OUTPUT:
         RETVAL
