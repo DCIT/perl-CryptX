@@ -1,11 +1,22 @@
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 22;
 
 use Crypt::PRNG::Sober128 qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand);
+use Crypt::PRNG;
 
 my $r = Crypt::PRNG::Sober128->new();
 ok($r, 'new');
+isa_ok($r, 'Crypt::PRNG::Sober128', 'new returns subclass instance');
+
+{
+  my $seed = "deterministic seed data 40chars!12345678";
+  my $sub  = Crypt::PRNG::Sober128->new($seed);
+  my $base = Crypt::PRNG->new("Sober128", $seed);
+  is(unpack('H*', $sub->bytes(16)), unpack('H*', $base->bytes(16)), "subclass uses Sober128 algorithm");
+  my $wrong = Crypt::PRNG->new("ChaCha20", $seed);
+  isnt(unpack('H*', Crypt::PRNG::Sober128->new($seed)->bytes(16)), unpack('H*', $wrong->bytes(16)), "subclass is not ChaCha20");
+}
 
 {
  my $sum = 0;

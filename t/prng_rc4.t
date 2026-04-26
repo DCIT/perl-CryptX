@@ -1,11 +1,22 @@
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 22;
 
 use Crypt::PRNG::RC4 qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand);
+use Crypt::PRNG;
 
 my $r = Crypt::PRNG::RC4->new();
 ok($r, 'new');
+isa_ok($r, 'Crypt::PRNG::RC4', 'new returns subclass instance');
+
+{
+  my $seed = "deterministic seed data 40chars!12345678";
+  my $sub  = Crypt::PRNG::RC4->new($seed);
+  my $base = Crypt::PRNG->new("RC4", $seed);
+  is(unpack('H*', $sub->bytes(16)), unpack('H*', $base->bytes(16)), "subclass uses RC4 algorithm");
+  my $wrong = Crypt::PRNG->new("ChaCha20", $seed);
+  isnt(unpack('H*', Crypt::PRNG::RC4->new($seed)->bytes(16)), unpack('H*', $wrong->bytes(16)), "subclass is not ChaCha20");
+}
 
 {
  my $sum = 0;

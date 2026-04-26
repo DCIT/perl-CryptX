@@ -11,6 +11,12 @@ our @EXPORT = qw();
 
 use CryptX;
 
+sub new {
+  my ($class, @args) = @_;
+  my $obj = Crypt::PRNG->new('RC4', @args);
+  return bless $obj, $class;
+}
+
 {
   ### stolen from Bytes::Random::Secure
   my $RNG_object = undef;
@@ -35,7 +41,7 @@ use CryptX;
 
 =head1 NAME
 
-Crypt::PRNG::RC4 - Cryptographically secure PRNG based on RC4 (stream cipher) algorithm
+Crypt::PRNG::RC4 - Legacy RC4-based PRNG wrapper
 
 =head1 SYNOPSIS
 
@@ -75,6 +81,9 @@ Provides an interface to the RC4-based pseudo-random number generator.
 This is a thin wrapper around L<Crypt::PRNG> with the algorithm fixed to RC4.
 All functions and methods accept the same arguments and return the same values
 as the corresponding L<Crypt::PRNG> entries.
+
+RC4 is provided for compatibility with legacy code only and is not recommended
+for new designs.
 
 =head1 FUNCTIONS
 
@@ -124,7 +133,9 @@ object created via C<new>.
  my $seeded_prng = Crypt::PRNG::RC4->new($seed);
 
 Creates a PRNG object using the RC4 algorithm. If C<$seed> is omitted, the
-object is automatically seeded by the underlying L<Crypt::PRNG> logic.
+object is automatically seeded by the underlying L<Crypt::PRNG> logic. If
+C<$seed> is provided it must be at least 5 bytes long; empty or shorter seeds
+fail during initialization.
 
 =head2 bytes
 

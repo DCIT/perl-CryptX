@@ -1,11 +1,22 @@
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 22;
 
 use Crypt::PRNG::Yarrow qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand);
+use Crypt::PRNG;
 
 my $r = Crypt::PRNG::Yarrow->new();
 ok($r, 'new');
+isa_ok($r, 'Crypt::PRNG::Yarrow', 'new returns subclass instance');
+
+{
+  my $seed = "deterministic seed data 40chars!12345678";
+  my $sub  = Crypt::PRNG::Yarrow->new($seed);
+  my $base = Crypt::PRNG->new("Yarrow", $seed);
+  is(unpack('H*', $sub->bytes(16)), unpack('H*', $base->bytes(16)), "subclass uses Yarrow algorithm");
+  my $wrong = Crypt::PRNG->new("ChaCha20", $seed);
+  isnt(unpack('H*', Crypt::PRNG::Yarrow->new($seed)->bytes(16)), unpack('H*', $wrong->bytes(16)), "subclass is not ChaCha20");
+}
 
 {
  my $sum = 0;

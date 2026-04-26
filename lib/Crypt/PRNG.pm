@@ -40,9 +40,13 @@ sub string_from {
 
   my $rv = '';
   my @r;
+  my $ri = 0;
   while (length $rv < $len) {
-    @r = unpack($upck, $self->bytes($l)) if scalar @r == 0;
-    my $i = (shift @r) & $mask;
+    if ($ri >= @r) {
+      @r = unpack($upck, $self->bytes($l));
+      $ri = 0;
+    }
+    my $i = $r[$ri++] & $mask;
     next if $i > $max_index;
     $rv .= $ch[$i];
   }
@@ -116,9 +120,13 @@ Crypt::PRNG - Cryptographically secure random number generator
 
 =head1 DESCRIPTION
 
-Provides an interface to the ChaCha20 based pseudo random number generator (thread-safe and fork-safe).
+Provides an interface to several pseudo random number generators (thread-safe
+and fork-safe). The default algorithm is ChaCha20.
 
 =head1 FUNCTIONS
+
+For all C<random_bytes*> functions and the corresponding C<bytes*> methods,
+C<$length> must not be greater than C<1000000000>.
 
 =head2 random_bytes
 
@@ -157,6 +165,8 @@ Returns C<$length> random octets encoded as a Base64 URL Safe string (RFC 4648 s
    my $dna_string = random_string_from("ABCD", 10);
 
 Returns a random string made of C<$length> chars randomly chosen from C<$range> string.
+The alphabet must contain between 1 and 65536 characters; longer alphabets
+return C<undef>.
 
 =head2 random_string
 
@@ -175,6 +185,7 @@ Similar to random_string_from, only C<$range> is fixed to C<'ABCDEFGHIJKLMNOPQRS
    # $limit .. [number] optional, upper bound (exclusive)
 
 Returns a random floating point number from range C<[0,1)> (if called without parameter) or C<[0,$limit)>.
+If C<$limit> is C<0>, behaves like no limit (returns C<[0,1)>), matching Perl's built-in C<rand>.
 
 =head2 irand
 
@@ -197,10 +208,15 @@ C<new>, for example:
    #or
    my $prng = Crypt::PRNG->new($alg, $seed);
 
-   # $alg  ... [string] algorithm name: 'ChaCha20' (DEFAULT), 'Fortuna', 'RC4', 'Sober128' or 'Yarrow'
+   # $alg  ... [string] algorithm name: 'ChaCha20' (DEFAULT), 'Fortuna', 'RC4' (legacy; compatibility only), 'Sober128' or 'Yarrow'
    # $seed ... [binary string] optional, initial entropy for seeding the PRNG
 
-If C<$seed> is not specified the PRNG is automatically seeded with 32bytes random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32)
+If C<$seed> is not specified the PRNG is automatically seeded with 40 bytes
+obtained via libtomcrypt's C<rng_get_bytes()> platform RNG logic.
+
+If C<$seed> is specified it must be non-empty for all algorithms. RC4 is
+provided for legacy compatibility only, is not recommended for new designs, and
+requires a seed of at least 5 bytes.
 
 =head2 add_entropy
 
@@ -209,7 +225,8 @@ If C<$seed> is not specified the PRNG is automatically seeded with 32bytes rando
   #or
   $prng->add_entropy();
 
-If called without parameter it uses 32bytes random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
+If called without parameter it uses 40 bytes obtained via libtomcrypt's
+C<rng_get_bytes()> platform RNG logic.
 
 B<BEWARE:> you probably do not need this function at all as the module does automatic seeding on initialization as well as reseeding after fork and thread creation.
 
@@ -267,7 +284,8 @@ See L<irand|/irand>
 
 =head1 SEE ALSO
 
-L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::RC4>, L<Crypt::PRNG::Sober128>, L<Crypt::PRNG::Yarrow>
+L<Crypt::PRNG::ChaCha20>, L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::RC4>,
+L<Crypt::PRNG::Sober128>, L<Crypt::PRNG::Yarrow>
 
 For generating random UUIDs see L<Crypt::Misc/random_v4uuid> and L<Crypt::Misc/random_v7uuid>.
 

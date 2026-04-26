@@ -11,6 +11,12 @@ our @EXPORT = qw();
 
 use CryptX;
 
+sub new {
+  my ($class, @args) = @_;
+  my $obj = Crypt::PRNG->new('Sober128', @args);
+  return bless $obj, $class;
+}
+
 {
   ### stolen from Bytes::Random::Secure
   my $RNG_object = undef;

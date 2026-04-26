@@ -241,6 +241,31 @@ STATIC void cryptx_internal_pk_prng_reseed(prng_state *state, int pindex, IV *la
   *last_pid = curpid;
 }
 
+STATIC void cryptx_internal_prng_done(struct prng_struct *prng) {
+  if (prng != NULL && prng->desc != NULL && prng->desc->done != NULL) {
+    (void)prng->desc->done(&prng->state);
+  }
+}
+
+STATIC void cryptx_internal_prng_reseed(struct prng_struct *prng) {
+  dTHX; /* fetch context */
+  IV curpid = (IV)PerlProc_getpid();
+  unsigned char entropy_buf[40];
+  int rv;
+
+  if (prng == NULL || prng->desc == NULL || prng->last_pid == curpid) return;
+
+  if (rng_get_bytes(entropy_buf, sizeof(entropy_buf), NULL) != sizeof(entropy_buf)) {
+    croak("FATAL: rng_get_bytes failed");
+  }
+  rv = prng->desc->add_entropy(entropy_buf, sizeof(entropy_buf), &prng->state);
+  zeromem(entropy_buf, sizeof(entropy_buf));
+  if (rv != CRYPT_OK) croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
+  rv = prng->desc->ready(&prng->state);
+  if (rv != CRYPT_OK) croak("FATAL: PRNG_ready failed: %s", error_to_string(rv));
+  prng->last_pid = curpid;
+}
+
 STATIC void cryptx_internal_password_cb_free(void *p) {
   dTHX; /* fetch context */
   Safefree(p);

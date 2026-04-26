@@ -2,6 +2,8 @@ MODULE = CryptX         PACKAGE = Crypt::PRNG
 
 PROTOTYPES: DISABLE
 
+#define CRYPTX_PRNG_MAX_OUTPUT_LEN 1000000000UL /* below ULONG_MAX/4, prevents base64 sizing overflow on 32bit */
+
 Crypt::PRNG
 new(char * class, ...)
     CODE:
@@ -12,14 +14,23 @@ new(char * class, ...)
         STRLEN ent_len=0;
         unsigned char entropy_buf[40];
         char *prng_name = (char *)"ChaCha20";
+        STRLEN prng_name_len = 0;
         SV *entropy = &PL_sv_undef;
+        SV *prng_name_sv = NULL;
 
         /* we need to handle:
            Crypt::PRNG->new('RC4');
            Crypt::Cipher::RC4->new();
          */
         idx = strcmp("Crypt::PRNG", class) == 0 ? 1 : 0;
-        if (idx + 1 <= items) prng_name = SvPVX(ST(idx));
+        if (idx == 1 && idx + 1 <= items) {
+          prng_name_sv = ST(idx);
+          if (!SvPOK_spec(prng_name_sv)) croak("FATAL: invalid PRNG name");
+          prng_name = SvPVbyte(prng_name_sv, prng_name_len);
+        }
+        else if (idx == 0) {
+          prng_name = class; /* cryptx_internal_find_prng strips the prefix */
+        }
         if (idx + 2 <= items) entropy = ST(idx + 1);
 
         Newz(0, RETVAL, 1, struct prng_struct);
@@ -43,23 +54,28 @@ new(char * class, ...)
           ent = (unsigned char *) SvPVbyte(entropy, ent_len);
           rv = RETVAL->desc->add_entropy(ent, (unsigned long)ent_len, &RETVAL->state);
           if (rv != CRYPT_OK) {
+            cryptx_internal_prng_done(RETVAL);
             Safefree(RETVAL);
             croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
           }
         }
         else {
           if (rng_get_bytes(entropy_buf, 40, NULL) != 40) {
+            cryptx_internal_prng_done(RETVAL);
             Safefree(RETVAL);
-            croak("FATAL: rng_get_bytes failed: %s", error_to_string(rv));
+            croak("FATAL: rng_get_bytes failed");
           }
           rv = RETVAL->desc->add_entropy(entropy_buf, 40, &RETVAL->state);
+          zeromem(entropy_buf, 40);
           if (rv != CRYPT_OK) {
+            cryptx_internal_prng_done(RETVAL);
             Safefree(RETVAL);
             croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
           }
         }
         rv = RETVAL->desc->ready(&RETVAL->state);
         if (rv != CRYPT_OK) {
+          cryptx_internal_prng_done(RETVAL);
           Safefree(RETVAL);
           croak("FATAL: PRNG_ready failed: %s", error_to_string(rv));
         }
@@ -70,7 +86,12 @@ new(char * class, ...)
 void
 DESTROY(Crypt::PRNG self)
     CODE:
-        Safefree(self);
+    {
+        if (self != NULL) {
+          cryptx_internal_prng_done(self);
+          Safefree(self);
+        }
+    }
 
 void
 add_entropy(Crypt::PRNG self, SV * entropy=&PL_sv_undef)
@@ -88,6 +109,7 @@ add_entropy(Crypt::PRNG self, SV * entropy=&PL_sv_undef)
         else {
           if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
           rv = self->desc->add_entropy(entropy_buf, 40, &self->state);
+          zeromem(entropy_buf, 40);
           if (rv != CRYPT_OK) croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
         }
         rv = self->desc->ready(&self->state);
@@ -102,29 +124,27 @@ bytes(Crypt::PRNG self, unsigned long output_len)
         bytes_b64u = 3
     CODE:
     {
-        IV curpid = (IV)PerlProc_getpid();
         int rv_len, rv;
-        unsigned long len;
-        unsigned char *tmp;
+        unsigned long len, chunks;
+        unsigned char *tmp = NULL;
         char *rdata;
-        unsigned char entropy_buf[40];
+
+        if (output_len > CRYPTX_PRNG_MAX_OUTPUT_LEN) croak("FATAL: output_len too large");
 
         if (output_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
-          if (self->last_pid != curpid) {
-            if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
-            self->desc->add_entropy(entropy_buf, 40, &self->state);
-            self->desc->ready(&self->state);
-            self->last_pid = curpid;
-          }
+          cryptx_internal_prng_reseed(self);
           if (ix == 1) {
             /* HEX */
             Newz(0, tmp, output_len, unsigned char);
             if (tmp == NULL) croak("FATAL: Newz failed");
             rv_len = (self->desc->read)(tmp, (unsigned long)output_len, &self->state);
-            if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
+            if ((UV)rv_len != output_len) {
+              Safefree(tmp);
+              croak("FATAL: PRNG_read failed");
+            }
             RETVAL = NEWSV(0, output_len * 2 + 1); /* avoid zero! */
             SvPOK_only(RETVAL);
             SvCUR_set(RETVAL, output_len * 2 + 1);
@@ -140,15 +160,19 @@ bytes(Crypt::PRNG self, unsigned long output_len)
           }
           else if (ix == 2 || ix == 3) {
             /* BASE64 or BASE64URL */
+            chunks = (output_len + 2) / 3;
             Newz(0, tmp, output_len, unsigned char);
             if (tmp == NULL) croak("FATAL: Newz failed");
             rv_len = (self->desc->read)(tmp, (unsigned long)output_len, &self->state);
-            if ((UV)rv_len != output_len) croak("FATAL: PRNG_read failed");
-            RETVAL = NEWSV(0, output_len * 2); /* avoid zero! */
+            if ((UV)rv_len != output_len) {
+              Safefree(tmp);
+              croak("FATAL: PRNG_read failed");
+            }
+            len = chunks * 4 + 1;
+            RETVAL = NEWSV(0, len); /* avoid zero! */
             SvPOK_only(RETVAL);
-            SvCUR_set(RETVAL, output_len * 2);
+            SvCUR_set(RETVAL, len);
             rdata = SvPVX(RETVAL);
-            len = output_len * 2;
             rv = ix == 3 ? base64url_encode(tmp, output_len, rdata, &len) :
                            base64_encode(tmp, output_len, rdata, &len);
             SvCUR_set(RETVAL, len);
@@ -179,17 +203,10 @@ UV
 int32(Crypt::PRNG self)
     CODE:
     {
-        IV curpid = (IV)PerlProc_getpid();
         int i;
         unsigned char rdata[4];
-        unsigned char entropy_buf[40];
 
-        if (self->last_pid != curpid) {
-          if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
-          self->desc->add_entropy(entropy_buf, 40, &self->state);
-          self->desc->ready(&self->state);
-          self->last_pid = curpid;
-        }
+        cryptx_internal_prng_reseed(self);
 
         i = (self->desc->read)(rdata, 4, &self->state);
         if (i != 4) croak("FATAL: PRNG_read failed");
@@ -202,18 +219,11 @@ NV
 double(Crypt::PRNG self, SV * limit_sv = NULL)
     CODE:
     {
-        IV curpid = (IV)PerlProc_getpid();
         int i;
         unsigned long a, b;     /* 32bit is enough */
         unsigned char rdata[7]; /* for double we need 53 bits */
-        unsigned char entropy_buf[40];
 
-        if (self->last_pid != curpid) {
-          if (rng_get_bytes(entropy_buf, 40, NULL) != 40) croak("FATAL: rng_get_bytes failed");
-          self->desc->add_entropy(entropy_buf, 40, &self->state);
-          self->desc->ready(&self->state);
-          self->last_pid = curpid;
-        }
+        cryptx_internal_prng_reseed(self);
 
         i = (self->desc->read)(rdata, 7, &self->state);
         if (i != 7) croak("FATAL: PRNG_read failed");

@@ -1,11 +1,20 @@
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 21;
 
 use Crypt::PRNG::ChaCha20 qw(random_bytes random_bytes_hex random_bytes_b64 random_bytes_b64u random_string random_string_from rand irand);
+use Crypt::PRNG;
 
 my $r = Crypt::PRNG::ChaCha20->new();
 ok($r, 'new');
+isa_ok($r, 'Crypt::PRNG::ChaCha20', 'new returns subclass instance');
+
+{
+  my $seed = "deterministic seed data 40chars!12345678";
+  my $sub  = Crypt::PRNG::ChaCha20->new($seed);
+  my $base = Crypt::PRNG->new("ChaCha20", $seed);
+  is(unpack('H*', $sub->bytes(16)), unpack('H*', $base->bytes(16)), "subclass uses ChaCha20 algorithm");
+}
 
 {
  my $sum = 0;
