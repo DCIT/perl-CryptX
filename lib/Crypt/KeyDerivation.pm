@@ -83,8 +83,15 @@ are also widely used for password hashing. In that use case the derived key serv
 stored password hash.
 
 All functions return raw bytes. Passing an output length of C<0> returns an
-empty string. Invalid hash names, invalid Argon2 type names, or parameter
-combinations rejected by the underlying library croak.
+empty string in this wrapper API. Argument validation still happens first:
+required password / input-keying-material arguments reject C<undef>, invalid
+hash names and invalid Argon2 type names are still rejected, and malformed
+optional scalar arguments still return C<undef> where applicable.
+
+This zero-length behavior is a C<Crypt::KeyDerivation> wrapper policy. The
+underlying libtomcrypt functions do not all behave the same way: some accept
+zero-length outputs, while others reject them with algorithm-specific checks.
+Code calling libtomcrypt directly should not assume the wrapper behavior.
 
 =head1 FUNCTIONS
 
@@ -106,13 +113,27 @@ B<BEWARE:> if you are not sure, do not use C<pbkdf1> but rather choose C<pbkdf2>
   # $hash_name ........ [string]  optional, DEFAULT: 'SHA256'
   # $len .............. [integer] optional, derived key len in bytes, DEFAULT: 32
 
+In strict PKCS #5 v1 mode, the derived key length must not exceed the selected
+hash output size. For example, C<SHA1> allows at most 20 bytes.
+
+The underlying algorithm uses only the first 8 bytes of C<$salt>. Shorter salts
+are rejected; longer salts are accepted but truncated to 8 bytes.
+
 =head2 pbkdf1_openssl
 
 I<Since: CryptX-0.088>
 
 OpenSSL-compatible variant of PBKDF1 (implements C<EVP_BytesToKey>). Unlike strict
 C<pbkdf1>, the output length is not limited to the hash size -- it can be arbitrarily
-long by chaining hash blocks. OpenSSL defaults: C<MD5> hash, C<iteration_count=1>.
+long by chaining hash blocks.
+
+B<Important:> this function implements the OpenSSL-compatible algorithm, but its
+default parameters do B<not> match the historical C<openssl enc> defaults.
+OpenSSL traditionally uses C<MD5> and C<iteration_count=1>, while this wrapper
+defaults to C<SHA256> and C<5000>. If you need output compatible with the
+traditional OpenSSL default behavior, pass both values explicitly:
+
+  my $derived_key = pbkdf1_openssl($password, $salt, 1, 'MD5', $len);
 
   my $derived_key = pbkdf1_openssl($password, $salt, $iteration_count, $hash_name, $len);
   #or
@@ -127,6 +148,9 @@ long by chaining hash blocks. OpenSSL defaults: C<MD5> hash, C<iteration_count=1
   # $iteration_count .. [integer] optional, DEFAULT: 5000
   # $hash_name ........ [string]  optional, DEFAULT: 'SHA256'
   # $len .............. [integer] optional, derived key len in bytes, DEFAULT: 32
+
+The underlying algorithm uses only the first 8 bytes of C<$salt>. Shorter salts
+are rejected; longer salts are accepted but truncated to 8 bytes.
 
 =head2 pbkdf2
 
@@ -162,6 +186,9 @@ long by chaining hash blocks. OpenSSL defaults: C<MD5> hash, C<iteration_count=1
 
 Use C<hkdf> for one-shot extract+expand. For multi-step workflows, use
 C<hkdf_extract> followed by C<hkdf_expand>.
+
+The input keying material / pseudokey arguments must be string or
+stringifiable scalars. Optional C<$salt> and C<$info> may be C<undef>.
 
 =head2 hkdf_extract
 
@@ -268,6 +295,7 @@ I<Since: CryptX-0.088>
   # $ad          ... [binary string] optional, associated data, DEFAULT: ''
 
 Increasing C<$t_cost>, C<$m_factor>, or C<$parallelism> increases work and
-memory requirements. Invalid combinations croak.
+memory requirements. Invalid combinations croak. Optional C<$secret> and
+C<$ad> may be C<undef>; otherwise they must be string or stringifiable scalars.
 
 =cut

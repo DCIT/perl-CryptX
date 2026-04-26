@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 38;
+use Test::More tests => 86;
 
 use Crypt::KeyDerivation qw(pbkdf1 pbkdf1_openssl pbkdf2 hkdf hkdf_expand hkdf_extract bcrypt_pbkdf scrypt_pbkdf argon2_pbkdf);
 
@@ -123,6 +123,107 @@ use Crypt::KeyDerivation qw(pbkdf1 pbkdf1_openssl pbkdf2 hkdf hkdf_expand hkdf_e
   is(unpack("H*", $okm2), $expected_okm, "OKM2 hkdf/7");
 }
 
+{ ### HKDF scalar handling
+  {
+    package Local::Stringify;
+    use overload '""' => sub { 'abc' }, fallback => 1;
+  }
+  {
+    package Local::StringifyPRK;
+    use overload '""' => sub { 'a' x 32 }, fallback => 1;
+  }
+  my $obj = bless {}, 'Local::Stringify';
+  my $prk = bless {}, 'Local::StringifyPRK';
+  is(unpack('H*', hkdf_extract($obj, "salt", 'SHA256')), unpack('H*', hkdf_extract("abc", "salt", 'SHA256')), 'hkdf_extract stringifies overloaded input');
+  is(unpack('H*', hkdf_expand($prk, 'SHA256', 16, "info")), unpack('H*', hkdf_expand('a' x 32, 'SHA256', 16, "info")), 'hkdf_expand stringifies overloaded input');
+  is(unpack('H*', hkdf($obj, "salt", 'SHA256', 16, "info")), unpack('H*', hkdf("abc", "salt", 'SHA256', 16, "info")), 'hkdf stringifies overloaded input');
+  is(hkdf_extract([], "salt", 'SHA256'), undef, 'hkdf_extract rejects non-stringifiable input');
+  is(hkdf_expand([], 'SHA256', 16, "info"), undef, 'hkdf_expand rejects non-stringifiable input');
+  is(hkdf([], "salt", 'SHA256', 16, "info"), undef, 'hkdf rejects non-stringifiable input');
+}
+
+{ ### required-input undef handling
+  my @cases = (
+    [ 'pbkdf1 rejects undef password',          sub { pbkdf1(undef, "12345678", 1, 'SHA1', 4) } ],
+    [ 'pbkdf1 rejects undef salt',              sub { pbkdf1("password", undef, 1, 'SHA1', 4) } ],
+    [ 'pbkdf1_openssl rejects undef password',  sub { pbkdf1_openssl(undef, "12345678", 1, 'SHA1', 4) } ],
+    [ 'pbkdf1_openssl rejects undef salt',      sub { pbkdf1_openssl("password", undef, 1, 'SHA1', 4) } ],
+    [ 'pbkdf2 rejects undef password',          sub { pbkdf2(undef, "salt", 1, 'SHA1', 4) } ],
+    [ 'pbkdf2 rejects undef salt',              sub { pbkdf2("password", undef, 1, 'SHA1', 4) } ],
+    [ 'hkdf_extract rejects undef ikm',         sub { hkdf_extract(undef, "salt", 'SHA256') } ],
+    [ 'hkdf_expand rejects undef prk',          sub { hkdf_expand(undef, 'SHA256', 16, "info") } ],
+    [ 'hkdf rejects undef ikm',                 sub { hkdf(undef, "salt", 'SHA256', 16, "info") } ],
+    [ 'bcrypt_pbkdf rejects undef password',    sub { bcrypt_pbkdf(undef, "salt", 4, 'SHA512', 16) } ],
+    [ 'bcrypt_pbkdf rejects undef salt',        sub { bcrypt_pbkdf("password", undef, 4, 'SHA512', 16) } ],
+    [ 'scrypt_pbkdf rejects undef password',    sub { scrypt_pbkdf(undef, "salt", 16, 1, 1, 16) } ],
+    [ 'scrypt_pbkdf rejects undef salt',        sub { scrypt_pbkdf("password", undef, 16, 1, 1, 16) } ],
+    [ 'argon2_pbkdf rejects undef password',    sub { argon2_pbkdf('argon2id', undef, "0123456789abcdef", 1, 32, 1, 16) } ],
+    [ 'argon2_pbkdf rejects undef salt',        sub { argon2_pbkdf('argon2id', "password", undef, 1, 32, 1, 16) } ],
+  );
+  for my $case (@cases) {
+    my ($name, $cb) = @$case;
+    is($cb->(), undef, $name);
+  }
+
+  my @empty_cases = (
+    [ 'pbkdf1 accepts empty password',         sub { pbkdf1("", "12345678", 1, 'SHA1', 4) }, 4 ],
+    [ 'pbkdf1_openssl accepts empty password', sub { pbkdf1_openssl("", "12345678", 1, 'SHA1', 4) }, 4 ],
+    [ 'pbkdf2 accepts empty password',         sub { pbkdf2("", "salt", 1, 'SHA1', 4) }, 4 ],
+    [ 'hkdf_extract accepts empty ikm',        sub { hkdf_extract("", "salt", 'SHA256') }, 32 ],
+    [ 'hkdf_expand accepts empty info',        sub { hkdf_expand('a' x 32, 'SHA256', 16, "") }, 16 ],
+    [ 'hkdf accepts empty ikm',                sub { hkdf("", "salt", 'SHA256', 16, "info") }, 16 ],
+    [ 'scrypt_pbkdf accepts empty password',   sub { scrypt_pbkdf("", "salt", 16, 1, 1, 16) }, 16 ],
+    [ 'argon2_pbkdf accepts empty password',   sub { argon2_pbkdf('argon2id', "", "0123456789abcdef", 1, 32, 1, 16) }, 16 ],
+  );
+  for my $case (@empty_cases) {
+    my ($name, $cb, $len) = @$case;
+    is(length($cb->()), $len, $name);
+  }
+
+  my @zero_len_cases = (
+    [ 'pbkdf1 rejects undef password even with len 0',         sub { pbkdf1(undef, "12345678", 1, 'SHA1', 0) } ],
+    [ 'pbkdf1_openssl rejects undef password even with len 0', sub { pbkdf1_openssl(undef, "12345678", 1, 'SHA1', 0) } ],
+    [ 'pbkdf2 rejects undef password even with len 0',         sub { pbkdf2(undef, "salt", 1, 'SHA1', 0) } ],
+    [ 'hkdf_expand rejects undef prk even with len 0',         sub { hkdf_expand(undef, 'SHA256', 0, "info") } ],
+    [ 'hkdf rejects undef ikm even with len 0',                sub { hkdf(undef, "salt", 'SHA256', 0, "info") } ],
+    [ 'bcrypt_pbkdf rejects undef password even with len 0',   sub { bcrypt_pbkdf(undef, "salt", 4, 'SHA512', 0) } ],
+    [ 'scrypt_pbkdf rejects undef password even with len 0',   sub { scrypt_pbkdf(undef, "salt", 16, 1, 1, 0) } ],
+    [ 'argon2_pbkdf rejects undef password even with len 0',   sub { argon2_pbkdf('argon2id', undef, "0123456789abcdef", 1, 32, 1, 0) } ],
+  );
+  for my $case (@zero_len_cases) {
+    my ($name, $cb) = @$case;
+    is($cb->(), undef, $name);
+  }
+
+  is(eval { pbkdf2("password", "salt", 1, 'NOPE', 0); 1 }, undef, 'pbkdf2 invalid hash still croaks with len 0');
+  like($@, qr/find_hash failed/, 'pbkdf2 invalid hash len 0 error');
+  is(eval { argon2_pbkdf('argon2nope', "password", "0123456789abcdef", 1, 32, 1, 0); 1 }, undef, 'argon2 invalid type still croaks with len 0');
+  like($@, qr/unknown argon2 type/, 'argon2 invalid type len 0 error');
+  }
+
+{ ### Argon2 optional scalar handling
+  {
+    package Local::StringifySecret;
+    use overload '""' => sub { 'sec' }, fallback => 1;
+  }
+  {
+    package Local::StringifyAD;
+    use overload '""' => sub { 'ad' }, fallback => 1;
+  }
+  my $secret_obj = bless {}, 'Local::StringifySecret';
+  my $ad_obj = bless {}, 'Local::StringifyAD';
+  is(unpack('H*', argon2_pbkdf('argon2id', 'password', '0123456789abcdef', 1, 32, 1, 16, $secret_obj, 'ad')),
+     unpack('H*', argon2_pbkdf('argon2id', 'password', '0123456789abcdef', 1, 32, 1, 16, 'sec', 'ad')),
+     'argon2_pbkdf stringifies overloaded secret');
+  is(unpack('H*', argon2_pbkdf('argon2id', 'password', '0123456789abcdef', 1, 32, 1, 16, 'sec', $ad_obj)),
+     unpack('H*', argon2_pbkdf('argon2id', 'password', '0123456789abcdef', 1, 32, 1, 16, 'sec', 'ad')),
+     'argon2_pbkdf stringifies overloaded ad');
+  is(argon2_pbkdf('argon2id', 'password', '0123456789abcdef', 1, 32, 1, 16, [], 'ad'), undef,
+     'argon2_pbkdf rejects non-stringifiable secret');
+  is(argon2_pbkdf('argon2id', 'password', '0123456789abcdef', 1, 32, 1, 16, 'sec', []), undef,
+     'argon2_pbkdf rejects non-stringifiable ad');
+}
+
 { ### bcrypt_pbkdf - OpenBSD test vectors (SHA512)
   # https://cvsweb.openbsd.org/cgi-bin/cvsweb/src/regress/lib/libutil/bcrypt_pbkdf/bcrypt_pbkdf_test.c
   is(unpack('H*', bcrypt_pbkdf("password",    "salt",     4, 'SHA512', 32)),
@@ -167,6 +268,10 @@ use Crypt::KeyDerivation qw(pbkdf1 pbkdf1_openssl pbkdf2 hkdf hkdf_expand hkdf_e
 
 { #PBKDF1
   is(unpack('H*', pbkdf1(unpack("H*", "012345678910111231415161717"), unpack("H*", "F7560045C70A96DB"), 12, 'SHA1', 20)), '59a9c8a32646428e6724cc9f43c72aa69a6edc1f', 'test pbkdf1 A');
+  is(unpack('H*', pbkdf1("password", "saltsalt", 1, 'SHA1', 4)), 'cab86dd6', 'test pbkdf1 B (len<hashsize)');
+  is(length(pbkdf1("password", "saltsalt", 1, 'SHA1', 4)), 4, 'test pbkdf1 C exact requested length');
+  my $err = eval { pbkdf1("password", "saltsalt", 1, 'SHA1', 21); undef };
+  like($@, qr/output_len cannot exceed hash size/, 'test pbkdf1 D rejects len>hashsize');
 }
 
 { #PBKDF1_OPENSSL
