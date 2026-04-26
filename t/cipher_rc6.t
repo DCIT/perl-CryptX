@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::RC6;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::RC6->default_rounds, 20, '->default_rounds');
 
 my $min_key = 'kkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::RC6->new($min_key)->isa('Crypt::Cipher::RC6'), 'RC6->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('RC6'), 16, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('RC6'), 128, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::RC6->new($max_key)->decrypt(pack('H*', $block_encrypted_max_k
 
 is( unpack('H*', Crypt::Cipher->new('RC6', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('RC6', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::KASUMI;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::KASUMI->default_rounds, 8, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::KASUMI->new($min_key)->isa('Crypt::Cipher::KASUMI'), 'KASUMI->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('KASUMI'), 8, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('KASUMI'), 16, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::KASUMI->new($max_key)->decrypt(pack('H*', $block_encrypted_ma
 
 is( unpack('H*', Crypt::Cipher->new('KASUMI', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('KASUMI', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

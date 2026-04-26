@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::Twofish;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::Twofish->default_rounds, 16, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::Twofish->new($min_key)->isa('Crypt::Cipher::Twofish'), 'Twofish->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('Twofish'), 16, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('Twofish'), 32, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::Twofish->new($max_key)->decrypt(pack('H*', $block_encrypted_m
 
 is( unpack('H*', Crypt::Cipher->new('Twofish', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('Twofish', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

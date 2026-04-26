@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::CAST5;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::CAST5->default_rounds, 16, '->default_rounds');
 
 my $min_key = 'kkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::CAST5->new($min_key)->isa('Crypt::Cipher::CAST5'), 'CAST5->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('CAST5'), 8, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('CAST5'), 16, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::CAST5->new($max_key)->decrypt(pack('H*', $block_encrypted_max
 
 is( unpack('H*', Crypt::Cipher->new('CAST5', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('CAST5', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

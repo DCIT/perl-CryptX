@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::Noekeon;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::Noekeon->default_rounds, 16, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::Noekeon->new($min_key)->isa('Crypt::Cipher::Noekeon'), 'Noekeon->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('Noekeon'), 16, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('Noekeon'), 16, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::Noekeon->new($max_key)->decrypt(pack('H*', $block_encrypted_m
 
 is( unpack('H*', Crypt::Cipher->new('Noekeon', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('Noekeon', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

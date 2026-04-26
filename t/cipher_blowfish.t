@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::Blowfish;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::Blowfish->default_rounds, 16, '->default_rounds');
 
 my $min_key = 'kkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::Blowfish->new($min_key)->isa('Crypt::Cipher::Blowfish'), 'Blowfish->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('Blowfish'), 8, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('Blowfish'), 72, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::Blowfish->new($max_key)->decrypt(pack('H*', $block_encrypted_
 
 is( unpack('H*', Crypt::Cipher->new('Blowfish', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('Blowfish', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::IDEA;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::IDEA->default_rounds, 8, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::IDEA->new($min_key)->isa('Crypt::Cipher::IDEA'), 'IDEA->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('IDEA'), 8, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('IDEA'), 16, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::IDEA->new($max_key)->decrypt(pack('H*', $block_encrypted_max_
 
 is( unpack('H*', Crypt::Cipher->new('IDEA', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('IDEA', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 42;
+use Test::More tests => 43;
 
 use Crypt::Cipher;
 use Crypt::Cipher::SAFER_SK128;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::SAFER_SK128->default_rounds, 10, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::SAFER_SK128->new($min_key)->isa('Crypt::Cipher::SAFER_SK128'), 'SAFER_SK128->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('SAFER_SK128'), 8, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('SAFER_SK128'), 16, 'Cipher->keysize');
@@ -73,3 +75,4 @@ is( Crypt::Cipher::SAFER_SK128->new($spec_key, $spec_rounds)->decrypt(pack('H*',
 
 is( unpack('H*', Crypt::Cipher->new('SAFER_SK128', $spec_key, $spec_rounds)->encrypt($block_plain)), $spec_block_encrypted_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('SAFER_SK128', $spec_key, $spec_rounds)->decrypt(pack('H*', $spec_block_encrypted_hex)), $block_plain, 'Cipher->decrypt');
+

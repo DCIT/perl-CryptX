@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::Camellia;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::Camellia->default_rounds, 18, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::Camellia->new($min_key)->isa('Crypt::Cipher::Camellia'), 'Camellia->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('Camellia'), 16, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('Camellia'), 32, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::Camellia->new($max_key)->decrypt(pack('H*', $block_encrypted_
 
 is( unpack('H*', Crypt::Cipher->new('Camellia', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('Camellia', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

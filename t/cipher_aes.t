@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::AES;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::AES->default_rounds, 10, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::AES->new($min_key)->isa('Crypt::Cipher::AES'), 'AES->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('AES'), 16, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('AES'), 32, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::AES->new($max_key)->decrypt(pack('H*', $block_encrypted_max_k
 
 is( unpack('H*', Crypt::Cipher->new('AES', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('AES', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::XTEA;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::XTEA->default_rounds, 32, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::XTEA->new($min_key)->isa('Crypt::Cipher::XTEA'), 'XTEA->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('XTEA'), 8, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('XTEA'), 16, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::XTEA->new($max_key)->decrypt(pack('H*', $block_encrypted_max_
 
 is( unpack('H*', Crypt::Cipher->new('XTEA', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('XTEA', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

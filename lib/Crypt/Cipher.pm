@@ -94,13 +94,17 @@ Constructor, returns a reference to the cipher object.
 
 =head2 encrypt
 
-Encrypts $plaintext and returns the $ciphertext where $plaintext and $ciphertext should be of B<blocksize> bytes.
+Encrypts C<$plaintext> and returns C<$ciphertext>. An empty string is
+accepted and returned unchanged; otherwise C<$plaintext> must be exactly
+B<blocksize> bytes long.
 
  my $ciphertext = $c->encrypt($plaintext);
 
 =head2 decrypt
 
-Decrypts $ciphertext and returns the $plaintext where $plaintext and $ciphertext should be of B<blocksize> bytes.
+Decrypts C<$ciphertext> and returns C<$plaintext>. An empty string is
+accepted and returned unchanged; otherwise C<$ciphertext> must be exactly
+B<blocksize> bytes long.
 
  my $plaintext = $c->decrypt($ciphertext);
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 42;
+use Test::More tests => 43;
 
 use Crypt::Cipher;
 use Crypt::Cipher::MULTI2;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::MULTI2->default_rounds, 128, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::MULTI2->new($min_key)->isa('Crypt::Cipher::MULTI2'), 'MULTI2->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('MULTI2'), 8, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('MULTI2'), 40, 'Cipher->keysize');
@@ -73,3 +75,4 @@ is( Crypt::Cipher::MULTI2->new($spec_key, $spec_rounds)->decrypt(pack('H*', $spe
 
 is( unpack('H*', Crypt::Cipher->new('MULTI2', $spec_key, $spec_rounds)->encrypt($block_plain)), $spec_block_encrypted_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('MULTI2', $spec_key, $spec_rounds)->decrypt(pack('H*', $spec_block_encrypted_hex)), $block_plain, 'Cipher->decrypt');
+

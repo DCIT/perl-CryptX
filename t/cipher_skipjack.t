@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::Skipjack;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::Skipjack->default_rounds, 32, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkk';
 my $max_key = 'KKKKKKKKKK';
+
+ok(Crypt::Cipher::Skipjack->new($min_key)->isa('Crypt::Cipher::Skipjack'), 'Skipjack->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('Skipjack'), 8, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('Skipjack'), 10, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::Skipjack->new($max_key)->decrypt(pack('H*', $block_encrypted_
 
 is( unpack('H*', Crypt::Cipher->new('Skipjack', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('Skipjack', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

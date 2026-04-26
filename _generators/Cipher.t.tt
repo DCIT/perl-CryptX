@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 [%- IF spec_rounds %]
-use Test::More tests => 42;
+use Test::More tests => 43;
 [%- ELSE %]
-use Test::More tests => 38;
+use Test::More tests => 39;
 [%- END %]
 
 use Crypt::Cipher;
@@ -26,6 +26,8 @@ is( Crypt::Cipher::[%orig_name%]->default_rounds, [%default_rounds%], '->default
 
 my $min_key = '[%min_key%]';
 my $max_key = '[%max_key%]';
+
+ok(Crypt::Cipher::[%orig_name%]->new($min_key)->isa('Crypt::Cipher::[%orig_name%]'), '[%orig_name%]->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('[%orig_name%]'), [%blocksize%], 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('[%orig_name%]'), [%keysize%], 'Cipher->keysize');

@@ -8,6 +8,12 @@ our $VERSION = '0.088_001';
 
 use base qw(Crypt::Cipher);
 
+sub new {
+  my ($class, @args) = @_;
+  my $obj = Crypt::Cipher->new('RC5', @args);
+  return bless $obj, $class;
+}
+
 sub blocksize      { Crypt::Cipher::blocksize('RC5')      }
 sub keysize        { Crypt::Cipher::keysize('RC5')        }
 sub max_keysize    { Crypt::Cipher::max_keysize('RC5')    }
@@ -68,7 +74,8 @@ C<new>, for example:
 =head2 encrypt
 
 Encrypts exactly one block of plaintext. The length of C<$plaintext> must
-equal L</blocksize>; croaks otherwise.
+equal L</blocksize>; croaks otherwise. An empty string is accepted and
+returned unchanged.
 
 
 
@@ -79,7 +86,8 @@ Returns the encrypted block as a binary string (raw bytes).
 =head2 decrypt
 
 Decrypts exactly one block of ciphertext. The length of C<$ciphertext> must
-equal L</blocksize>; croaks otherwise.
+equal L</blocksize>; croaks otherwise. An empty string is accepted and
+returned unchanged.
 
  my $plaintext = $c->decrypt($ciphertext);
 
@@ -87,7 +95,7 @@ Returns the decrypted block as a binary string (raw bytes).
 
 =head2 keysize
 
-Returns the default key size (in bytes).
+Just an alias for C<max_keysize>.
 
   $c->keysize;
   #or
@@ -127,8 +135,7 @@ Returns the minimum key size (in bytes).
 
 =head2 default_rounds
 
-Returns the default number of rounds for the cipher, or C<0> if the
-number of rounds is fixed.
+Returns the cipher's default round count.
 
   $c->default_rounds;
   #or

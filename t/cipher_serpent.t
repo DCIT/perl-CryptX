@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::Serpent;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::Serpent->default_rounds, 32, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::Serpent->new($min_key)->isa('Crypt::Cipher::Serpent'), 'Serpent->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('Serpent'), 16, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('Serpent'), 32, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::Serpent->new($max_key)->decrypt(pack('H*', $block_encrypted_m
 
 is( unpack('H*', Crypt::Cipher->new('Serpent', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('Serpent', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

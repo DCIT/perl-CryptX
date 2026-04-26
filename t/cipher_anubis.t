@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::Anubis;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::Anubis->default_rounds, 12, '->default_rounds');
 
 my $min_key = 'kkkkkkkkkkkkkkkk';
 my $max_key = 'KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK';
+
+ok(Crypt::Cipher::Anubis->new($min_key)->isa('Crypt::Cipher::Anubis'), 'Anubis->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('Anubis'), 16, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('Anubis'), 40, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::Anubis->new($max_key)->decrypt(pack('H*', $block_encrypted_ma
 
 is( unpack('H*', Crypt::Cipher->new('Anubis', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('Anubis', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 

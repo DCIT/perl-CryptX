@@ -6,27 +6,32 @@ Crypt::Cipher
 new(char * class, ...)
     CODE:
     {
+        STRLEN name_len;
         STRLEN key_len;
         unsigned char *key_data = NULL;
         SV *key;
+        SV *name_sv;
         char *cipher_name;
         int rv, id, rounds = 0, idx;
 
         /* we need to handle:
            Crypt::Cipher->new('AES');
            Crypt::Cipher::AES->new();
-         */
+        */
         idx = strcmp("Crypt::Cipher", class) == 0 ? 1 : 0;
         if (idx + 1 > items) croak("FATAL: missing argument");
-        cipher_name = SvPVX(ST(idx));
+        name_sv = ST(idx);
+        if (!SvPOK_spec(name_sv)) croak("FATAL: invalid cipher name");
+        cipher_name = SvPVbyte(name_sv, name_len);
+        if (idx + 2 > items) croak("FATAL: missing key argument");
         key = ST(idx + 1);
         if (idx + 3 <= items) rounds = (int)SvIV(ST(idx + 2));
 
-        if (!SvPOK (key)) croak("FATAL: key must be string scalar");
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
         key_data = (unsigned char *)SvPVbyte(key, key_len);
 
         id = cryptx_internal_find_cipher(cipher_name);
-        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
 
         Newz(0, RETVAL, 1, struct cipher_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
@@ -44,7 +49,10 @@ new(char * class, ...)
 void
 DESTROY(Crypt::Cipher self)
     CODE:
+    {
+        zeromem(&self->skey, sizeof(symmetric_key));
         Safefree(self);
+    }
 
 SV *
 encrypt(Crypt::Cipher self, SV * data)
@@ -52,7 +60,10 @@ encrypt(Crypt::Cipher self, SV * data)
     {
         int rv;
         STRLEN len;
-        void *plaintext = SvPVbyte(data, len);
+        unsigned char *plaintext;
+
+        if (!SvPOK_spec(data)) XSRETURN_UNDEF;
+        plaintext = (unsigned char *)SvPVbyte(data, len);
 
         if (len == 0) {
           RETVAL = newSVpvn("", 0);
@@ -61,7 +72,7 @@ encrypt(Crypt::Cipher self, SV * data)
           RETVAL = NEWSV(0, len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);
-          rv = self->desc->ecb_encrypt((unsigned char *)plaintext, (unsigned char *)SvPVX(RETVAL), &self->skey);
+          rv = self->desc->ecb_encrypt(plaintext, (unsigned char *)SvPVX(RETVAL), &self->skey);
           if (rv!=CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: encrypt failed: %s", error_to_string(rv));
@@ -80,7 +91,10 @@ decrypt(Crypt::Cipher self, SV * data)
     {
         int rv;
         STRLEN len;
-        void *ciphertext = SvPVbyte(data, len);
+        unsigned char *ciphertext;
+
+        if (!SvPOK_spec(data)) XSRETURN_UNDEF;
+        ciphertext = (unsigned char *)SvPVbyte(data, len);
 
         if (len == 0) {
           RETVAL = newSVpvn("", 0);
@@ -89,7 +103,7 @@ decrypt(Crypt::Cipher self, SV * data)
           RETVAL = NEWSV(0, len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);
-          rv = self->desc->ecb_decrypt((unsigned char *)ciphertext, (unsigned char *)SvPVX(RETVAL), &self->skey);
+          rv = self->desc->ecb_decrypt(ciphertext, (unsigned char *)SvPVX(RETVAL), &self->skey);
           if (rv!=CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: decrypt failed: %s", error_to_string(rv));
@@ -112,7 +126,8 @@ blocksize(SV * param, char * extra = NULL)
           RETVAL = obj->desc->block_length;
         }
         else {
-          char *name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Cipher") ? SvPVX(param) : extra;
+          STRLEN plen;
+          char *name = SvPOK_spec(param) && strcmp(SvPVbyte(param, plen), "Crypt::Cipher") ? SvPVbyte(param, plen) : extra;
           int rv, id = cryptx_internal_find_cipher(name);
           if (id == -1) croak("FATAL: find_cipher failed for '%s'", name);
           rv = cipher_descriptor[id].block_length;
@@ -133,7 +148,8 @@ max_keysize(SV * param, char * extra = NULL)
           RETVAL = obj->desc->max_key_length;
         }
         else {
-          char *name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Cipher") ? SvPVX(param) : extra;
+          STRLEN plen;
+          char *name = SvPOK_spec(param) && strcmp(SvPVbyte(param, plen), "Crypt::Cipher") ? SvPVbyte(param, plen) : extra;
           int rv, id = cryptx_internal_find_cipher(name);
           if (id == -1) croak("FATAL: find_cipher failed for '%s'", name);
           rv = cipher_descriptor[id].max_key_length;
@@ -154,7 +170,8 @@ min_keysize(SV * param, char * extra = NULL)
           RETVAL = obj->desc->min_key_length;
         }
         else {
-          char *name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Cipher") ? SvPVX(param) : extra;
+          STRLEN plen;
+          char *name = SvPOK_spec(param) && strcmp(SvPVbyte(param, plen), "Crypt::Cipher") ? SvPVbyte(param, plen) : extra;
           int rv, id = cryptx_internal_find_cipher(name);
           if (id == -1) croak("FATAL: find_cipher failed for '%s'", name);
           rv = cipher_descriptor[id].min_key_length;
@@ -175,7 +192,8 @@ default_rounds(SV * param, char * extra = NULL)
           RETVAL = obj->desc->default_rounds;
         }
         else {
-          char *name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Cipher") ? SvPVX(param) : extra;
+          STRLEN plen;
+          char *name = SvPOK_spec(param) && strcmp(SvPVbyte(param, plen), "Crypt::Cipher") ? SvPVbyte(param, plen) : extra;
           int rv, id = cryptx_internal_find_cipher(name);
           if (id == -1) croak("FATAL: find_cipher failed for '%s'", name);
           rv = cipher_descriptor[id].default_rounds;

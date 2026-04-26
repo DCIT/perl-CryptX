@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 42;
+use Test::More tests => 43;
 
 use Crypt::Cipher;
 use Crypt::Cipher::SAFER_K64;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::SAFER_K64->default_rounds, 6, '->default_rounds');
 
 my $min_key = 'kkkkkkkk';
 my $max_key = 'KKKKKKKK';
+
+ok(Crypt::Cipher::SAFER_K64->new($min_key)->isa('Crypt::Cipher::SAFER_K64'), 'SAFER_K64->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('SAFER_K64'), 8, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('SAFER_K64'), 8, 'Cipher->keysize');
@@ -73,3 +75,4 @@ is( Crypt::Cipher::SAFER_K64->new($spec_key, $spec_rounds)->decrypt(pack('H*', $
 
 is( unpack('H*', Crypt::Cipher->new('SAFER_K64', $spec_key, $spec_rounds)->encrypt($block_plain)), $spec_block_encrypted_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('SAFER_K64', $spec_key, $spec_rounds)->decrypt(pack('H*', $spec_block_encrypted_hex)), $block_plain, 'Cipher->decrypt');
+

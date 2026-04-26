@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 use Crypt::Cipher;
 use Crypt::Cipher::DES;
@@ -22,6 +22,8 @@ is( Crypt::Cipher::DES->default_rounds, 16, '->default_rounds');
 
 my $min_key = 'kkkkkkkk';
 my $max_key = 'KKKKKKKK';
+
+ok(Crypt::Cipher::DES->new($min_key)->isa('Crypt::Cipher::DES'), 'DES->new returns subclass instance');
 
 is( Crypt::Cipher::blocksize('DES'), 8, 'Cipher->blocksize');
 is( Crypt::Cipher::keysize('DES'), 8, 'Cipher->keysize');
@@ -62,4 +64,5 @@ is( Crypt::Cipher::DES->new($max_key)->decrypt(pack('H*', $block_encrypted_max_k
 
 is( unpack('H*', Crypt::Cipher->new('DES', $max_key)->encrypt($block_plain)), $block_encrypted_max_key_hex, 'Cipher->encrypt');
 is( Crypt::Cipher->new('DES', $max_key)->decrypt(pack('H*', $block_encrypted_max_key_hex)), $block_plain, 'Cipher->decrypt');
+
 
