@@ -145,6 +145,12 @@ Please note that all functions take as its first argument the algorithm name, su
 Logically joins all arguments into a single string, and returns the digest for
 the selected algorithm encoded as a binary string.
 
+Data arguments are converted to byte strings using Perl's usual scalar
+stringification. Defined scalars, including numbers and string-overloaded
+objects, are accepted. C<undef> is treated as an empty string and may emit
+Perl's usual "uninitialized value" warning. The same rules apply to
+C<digest_data_hex>, C<digest_data_b64>, and C<digest_data_b64u>.
+
  my $digest_raw = digest_data('SHA256', 'data string');
  #or
  my $digest_raw = digest_data('SHA256', 'any data', 'more data', 'even more data');
@@ -252,6 +258,11 @@ Reinitialize the digest object state and returns a reference to the digest objec
 
 All arguments are appended to the message we calculate digest for.
 The return value is the digest object itself.
+
+Each argument is converted to bytes using Perl's usual scalar stringification.
+Defined scalars, including numbers and string-overloaded objects, are
+accepted. C<undef> is treated as an empty string and may emit Perl's usual
+"uninitialized value" warning.
 
  $d->add('any data');
  #or

@@ -105,6 +105,13 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its Keccak384 digest encoded as a binary string.
 
+Data arguments for the functional helpers are converted to byte strings using
+Perl's usual scalar stringification. Defined scalars, including numbers and
+string-overloaded objects, are accepted. C<undef> is treated as an empty
+string and may emit Perl's usual "uninitialized value" warning. The same
+rules apply to C<keccak384_hex>, C<keccak384_b64>, and
+C<keccak384_b64u>.
+
  my $keccak384_raw = keccak384('data string');
  #or
  my $keccak384_raw = keccak384('any data', 'more data', 'even more data');
@@ -194,6 +201,11 @@ C<new>, for example:
 =head2 add
 
 Appends data to the message. Returns the object itself (for chaining).
+
+Each argument is converted to bytes using Perl's usual scalar stringification.
+Defined scalars, including numbers and string-overloaded objects, are
+accepted. C<undef> is treated as an empty string and may emit Perl's usual
+"uninitialized value" warning.
 
  $d->add('any data');
  #or

@@ -105,6 +105,13 @@ Or all of them at once:
 
 Logically joins all arguments into a single string, and returns its MD2 digest encoded as a binary string.
 
+Data arguments for the functional helpers are converted to byte strings using
+Perl's usual scalar stringification. Defined scalars, including numbers and
+string-overloaded objects, are accepted. C<undef> is treated as an empty
+string and may emit Perl's usual "uninitialized value" warning. The same
+rules apply to C<md2_hex>, C<md2_b64>, and
+C<md2_b64u>.
+
  my $md2_raw = md2('data string');
  #or
  my $md2_raw = md2('any data', 'more data', 'even more data');
@@ -194,6 +201,11 @@ C<new>, for example:
 =head2 add
 
 Appends data to the message. Returns the object itself (for chaining).
+
+Each argument is converted to bytes using Perl's usual scalar stringification.
+Defined scalars, including numbers and string-overloaded objects, are
+accepted. C<undef> is treated as an empty string and may emit Perl's usual
+"uninitialized value" warning.
 
  $d->add('any data');
  #or

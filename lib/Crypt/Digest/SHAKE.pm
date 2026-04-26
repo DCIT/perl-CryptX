@@ -91,6 +91,11 @@ C<new>, for example:
 
 Appends data to the message. Returns the object itself (for chaining).
 
+Each argument is converted to bytes using Perl's usual scalar stringification.
+Defined scalars, including numbers and string-overloaded objects, are
+accepted. C<undef> is treated as an empty string and may emit Perl's usual
+"uninitialized value" warning.
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
