@@ -35,10 +35,10 @@ Crypt::Mac::Poly1305 - Message authentication code Poly1305 (RFC 7539)
 
    my $d = Crypt::Mac::Poly1305->new($key);
    $d->add('any data');
-   my $result_raw  = $d->mac;     # raw bytes
-   my $result_hex  = $d->hexmac;  # hexadecimal form
-   my $result_b64  = $d->b64mac;  # Base64 form
-   my $result_b64u = $d->b64umac; # Base64 URL Safe form
+   my $result_hex = $d->hexmac;   # finalizes the object
+
+   # for another output encoding use a fresh object (or clone before finalizing)
+   my $result_b64u = Crypt::Mac::Poly1305->new($key)->add('any data')->b64umac;
 
    # or MAC a file instead
    my $file_result_raw = Crypt::Mac::Poly1305->new($key)->addfile('filename.dat')->mac;
@@ -64,6 +64,13 @@ Or all of them at once:
 =head2 poly1305
 
 Logically joins all arguments into a single string, and returns its Poly1305 message authentication code encoded as a binary string.
+
+Data arguments for the functional helpers are converted to byte strings using
+Perl's usual scalar stringification. Defined scalars, including numbers and
+string-overloaded objects, are accepted. C<undef> is treated as an empty
+string and may emit Perl's usual "uninitialized value" warning. The same
+rules apply to C<poly1305_hex>, C<poly1305_b64>, and
+C<poly1305_b64u>.
 
  my $poly1305_raw = poly1305($key, 'data buffer');
  #or
@@ -110,13 +117,16 @@ C<new>, for example:
 
  $d->clone();
 
-=head2 reset
-
- $d->reset();
-
 =head2 add
 
 Appends data to the message. Returns the object itself (for chaining).
+Croaks if the object has already been finalized by C<mac>, C<hexmac>,
+C<b64mac>, or C<b64umac>.
+
+Each argument is converted to bytes using Perl's usual scalar stringification.
+Defined scalars, including numbers and string-overloaded objects, are
+accepted. C<undef> is treated as an empty string and may emit Perl's usual
+"uninitialized value" warning.
 
  $d->add('any data');
  #or
@@ -124,7 +134,9 @@ Appends data to the message. Returns the object itself (for chaining).
 
 =head2 addfile
 
-Reads the file content and appends it to the message. Returns the object itself (for chaining).
+Reads the file content and appends it to the message. Returns the object itself
+(for chaining). Croaks if the object has already been finalized by C<mac>,
+C<hexmac>, C<b64mac>, or C<b64umac>.
 
  $d->addfile('filename.dat');
  #or
@@ -133,25 +145,33 @@ Reads the file content and appends it to the message. Returns the object itself 
 
 =head2 mac
 
-Returns the binary MAC (raw bytes).
+Returns the binary MAC (raw bytes) and finalizes the object. After the first
+call to C<mac>, C<hexmac>, C<b64mac>, or C<b64umac>, later calls to C<add>,
+C<addfile>, or any MAC getter croak.
 
  my $result_raw = $d->mac();
 
 =head2 hexmac
 
-Returns the MAC encoded as a lowercase hexadecimal string.
+Returns the MAC encoded as a lowercase hexadecimal string and finalizes the
+object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or C<b64umac>,
+later calls to C<add>, C<addfile>, or any MAC getter croak.
 
  my $result_hex = $d->hexmac();
 
 =head2 b64mac
 
-Returns the MAC encoded as a Base64 string with trailing C<=> padding.
+Returns the MAC encoded as a Base64 string with trailing C<=> padding and
+finalizes the object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or
+C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
  my $result_b64 = $d->b64mac();
 
 =head2 b64umac
 
-Returns the MAC encoded as a Base64 URL Safe string (no trailing C<=>).
+Returns the MAC encoded as a Base64 URL Safe string (no trailing C<=>) and
+finalizes the object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or
+C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
  my $result_b64url = $d->b64umac();
 

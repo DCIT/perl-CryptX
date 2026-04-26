@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 72 + 10;
+use Test::More tests => 72 + 13;
 
 use Crypt::Mac::F9 qw( f9 f9_hex f9_b64 f9_b64u );
 
@@ -90,3 +90,12 @@ is( unpack('H*', f9('AES', '1234567890123456',"A","A","A")), 'a30e9e0ee8cd9d7401
 is( f9_hex ('AES', '1234567890123456',"A","A","A"), 'a30e9e0ee8cd9d7401f9a9967e82b5a1',  'F9/func+hex/tripple_A');
 is( f9_b64 ('AES', '1234567890123456',"A","A","A"), 'ow6eDujNnXQB+amWfoK1oQ==',  'F9/func+b64/tripple_A');
 is( f9_b64u('AES', '1234567890123456',"A","A","A"), 'ow6eDujNnXQB-amWfoK1oQ', 'F9/func+b64u/tripple_A');
+
+my $d_repeat = Crypt::Mac::F9->new('AES', '1234567890123456')->add("A","A","A");
+is( $d_repeat->hexmac, 'a30e9e0ee8cd9d7401f9a9967e82b5a1', 'F9/oo+hex/finalize');
+my $err = '';
+eval { $d_repeat->hexmac; 1 } or $err = $@;
+like( $err, qr/already finalized/, 'F9/oo+hex/repeat_croaks');
+$err = '';
+eval { $d_repeat->add("B"); 1 } or $err = $@;
+like( $err, qr/already finalized/, 'F9/oo+hex/add_after_mac_croaks');

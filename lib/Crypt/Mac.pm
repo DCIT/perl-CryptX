@@ -11,23 +11,29 @@ use CryptX;
 sub addfile {
   my ($self, $file) = @_;
 
-  my $handle;
-  if (ref(\$file) eq 'SCALAR') {
-    open($handle, "<", $file) || die "FATAL: cannot open '$file': $!";
+  my ($handle, $close_handle);
+  if (ref($file) && eval { defined fileno($file) }) {
+    $handle = $file;
+  }
+  elsif (defined($file) && !ref($file)) {
+    open($handle, "<", $file) || croak "FATAL: cannot open '$file': $!";
     binmode($handle);
+    $close_handle = 1;
   }
   else {
-    $handle = $file
+    croak "FATAL: invalid handle";
   }
-  die "FATAL: invalid handle" unless defined $handle;
 
   my $n;
   my $buf = "";
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  while (($n = read($handle, $buf, 32*1024))) {
-    $self->add($buf);
+  {
+    local $SIG{__DIE__} = \&CryptX::_croak;
+    while (($n = read($handle, $buf, 32*1024))) {
+      $self->add($buf);
+    }
+    croak "FATAL: read failed: $!" unless defined $n;
   }
-  die "FATAL: read failed: $!" unless defined $n;
+  close($handle) if $close_handle;
 
   return $self;
 }

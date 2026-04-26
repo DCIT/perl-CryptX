@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 36 + 10;
+use Test::More tests => 36 + 13;
 
 use Crypt::Mac::Poly1305 qw( poly1305 poly1305_hex poly1305_b64 poly1305_b64u );
 
@@ -54,3 +54,12 @@ is( unpack('H*', poly1305('12345678901234561234567890123456',"A","A","A")), '7c1
 is( poly1305_hex ('12345678901234561234567890123456',"A","A","A"), '7c1e6c34ad72384ac4f52eb49f642abc',  'Poly1305/func+hex/tripple_A');
 is( poly1305_b64 ('12345678901234561234567890123456',"A","A","A"), 'fB5sNK1yOErE9S60n2QqvA==',  'Poly1305/func+b64/tripple_A');
 is( poly1305_b64u('12345678901234561234567890123456',"A","A","A"), 'fB5sNK1yOErE9S60n2QqvA', 'Poly1305/func+b64u/tripple_A');
+
+my $d_repeat = Crypt::Mac::Poly1305->new('12345678901234561234567890123456')->add("A","A","A");
+is( $d_repeat->hexmac, '7c1e6c34ad72384ac4f52eb49f642abc', 'Poly1305/oo+hex/finalize');
+my $err = '';
+eval { $d_repeat->hexmac; 1 } or $err = $@;
+like( $err, qr/already finalized/, 'Poly1305/oo+hex/repeat_croaks');
+$err = '';
+eval { $d_repeat->add("B"); 1 } or $err = $@;
+like( $err, qr/already finalized/, 'Poly1305/oo+hex/add_after_mac_croaks');

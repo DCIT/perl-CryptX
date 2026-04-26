@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 36 + 10;
+use Test::More tests => 36 + 13;
 
 use Crypt::Mac::BLAKE2b qw( blake2b blake2b_hex blake2b_b64 blake2b_b64u );
 
@@ -54,3 +54,12 @@ is( unpack('H*', blake2b(32, '12345678901234561234567890123456',"A","A","A")), '
 is( blake2b_hex (32, '12345678901234561234567890123456',"A","A","A"), '794a20cc22c1f9f278aa1219ded10105cc9cfd264e66a327f32fbc309b2d404f',  'BLAKE2b/func+hex/tripple_A');
 is( blake2b_b64 (32, '12345678901234561234567890123456',"A","A","A"), 'eUogzCLB+fJ4qhIZ3tEBBcyc/SZOZqMn8y+8MJstQE8=',  'BLAKE2b/func+b64/tripple_A');
 is( blake2b_b64u(32, '12345678901234561234567890123456',"A","A","A"), 'eUogzCLB-fJ4qhIZ3tEBBcyc_SZOZqMn8y-8MJstQE8', 'BLAKE2b/func+b64u/tripple_A');
+
+my $d_repeat = Crypt::Mac::BLAKE2b->new(32, '12345678901234561234567890123456')->add("A","A","A");
+is( $d_repeat->hexmac, '794a20cc22c1f9f278aa1219ded10105cc9cfd264e66a327f32fbc309b2d404f', 'BLAKE2b/oo+hex/finalize');
+my $err = '';
+eval { $d_repeat->hexmac; 1 } or $err = $@;
+like( $err, qr/already finalized/, 'BLAKE2b/oo+hex/repeat_croaks');
+$err = '';
+eval { $d_repeat->add("B"); 1 } or $err = $@;
+like( $err, qr/already finalized/, 'BLAKE2b/oo+hex/add_after_mac_croaks');

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 72 + 10;
+use Test::More tests => 72 + 13;
 
 use Crypt::Mac::HMAC qw( hmac hmac_hex hmac_b64 hmac_b64u );
 
@@ -90,3 +90,12 @@ is( unpack('H*', hmac('SHA1', 'secretkey',"A","A","A")), '99070fd56a6595bbb45874
 is( hmac_hex ('SHA1', 'secretkey',"A","A","A"), '99070fd56a6595bbb458747d63808344fed0b9c1',  'HMAC/func+hex/tripple_A');
 is( hmac_b64 ('SHA1', 'secretkey',"A","A","A"), 'mQcP1Wpllbu0WHR9Y4CDRP7QucE=',  'HMAC/func+b64/tripple_A');
 is( hmac_b64u('SHA1', 'secretkey',"A","A","A"), 'mQcP1Wpllbu0WHR9Y4CDRP7QucE', 'HMAC/func+b64u/tripple_A');
+
+my $d_repeat = Crypt::Mac::HMAC->new('SHA1', 'secretkey')->add("A","A","A");
+is( $d_repeat->hexmac, '99070fd56a6595bbb458747d63808344fed0b9c1', 'HMAC/oo+hex/finalize');
+my $err = '';
+eval { $d_repeat->hexmac; 1 } or $err = $@;
+like( $err, qr/already finalized/, 'HMAC/oo+hex/repeat_croaks');
+$err = '';
+eval { $d_repeat->add("B"); 1 } or $err = $@;
+like( $err, qr/already finalized/, 'HMAC/oo+hex/add_after_mac_croaks');

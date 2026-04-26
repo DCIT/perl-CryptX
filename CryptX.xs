@@ -61,15 +61,42 @@ typedef rabbit_state            *Crypt__Stream__Rabbit;
 typedef rc4_state               *Crypt__Stream__RC4;
 typedef sober128_state          *Crypt__Stream__Sober128;
 
-typedef f9_state                *Crypt__Mac__F9;
-typedef hmac_state              *Crypt__Mac__HMAC;
-typedef omac_state              *Crypt__Mac__OMAC;
-typedef pelican_state           *Crypt__Mac__Pelican;
-typedef pmac_state              *Crypt__Mac__PMAC;
-typedef xcbc_state              *Crypt__Mac__XCBC;
-typedef poly1305_state          *Crypt__Mac__Poly1305;
-typedef blake2smac_state        *Crypt__Mac__BLAKE2s;
-typedef blake2bmac_state        *Crypt__Mac__BLAKE2b;
+typedef struct cryptx_mac_f9_struct {
+  f9_state state;
+  int finalized;
+} *Crypt__Mac__F9;
+typedef struct cryptx_mac_hmac_struct {
+  hmac_state state;
+  int finalized;
+} *Crypt__Mac__HMAC;
+typedef struct cryptx_mac_omac_struct {
+  omac_state state;
+  int finalized;
+} *Crypt__Mac__OMAC;
+typedef struct cryptx_mac_pelican_struct {
+  pelican_state state;
+  int finalized;
+} *Crypt__Mac__Pelican;
+typedef struct cryptx_mac_pmac_struct {
+  pmac_state state;
+  int finalized;
+} *Crypt__Mac__PMAC;
+typedef struct cryptx_mac_xcbc_struct {
+  xcbc_state state;
+  int finalized;
+} *Crypt__Mac__XCBC;
+typedef struct cryptx_mac_poly1305_struct {
+  poly1305_state state;
+  int finalized;
+} *Crypt__Mac__Poly1305;
+typedef struct cryptx_mac_blake2s_struct {
+  blake2smac_state state;
+  int finalized;
+} *Crypt__Mac__BLAKE2s;
+typedef struct cryptx_mac_blake2b_struct {
+  blake2bmac_state state;
+  int finalized;
+} *Crypt__Mac__BLAKE2b;
 
 typedef struct cipher_struct {          /* used by Crypt::Cipher */
   symmetric_key skey;
@@ -102,6 +129,31 @@ STATIC void cryptx_internal_digest_fixup_state(Crypt__Digest digest) {
   if (strcmp(name, "sha224") == 0 || strcmp(name, "sha256") == 0) {
     value = PTR2UV(digest->state.sha256.state_buf);
     digest->state.sha256.state = INT2PTR(ulong32 *, (value + mask) & ~mask);
+    return;
+  }
+}
+
+/* HMAC embeds a hash_state directly, so copying hmac_state has the same
+ * internal-pointer problem for SHA1 and SHA224/SHA256 that affects
+ * Crypt::Digest state copies. */
+STATIC void cryptx_internal_hmac_fixup_state(hmac_state *hmac) {
+  const char *name;
+  const UV mask = (UV)16 - 1;
+  UV value;
+
+  if (hmac == NULL || hmac->hash < 0 || hmac->hash >= TAB_SIZE) return;
+  if (hash_descriptor[hmac->hash].name == NULL) return;
+  name = hash_descriptor[hmac->hash].name;
+
+  if (strcmp(name, "sha1") == 0) {
+    value = PTR2UV(hmac->md.sha1.state_buf);
+    hmac->md.sha1.state = INT2PTR(ulong32 *, (value + mask) & ~mask);
+    return;
+  }
+
+  if (strcmp(name, "sha224") == 0 || strcmp(name, "sha256") == 0) {
+    value = PTR2UV(hmac->md.sha256.state_buf);
+    hmac->md.sha256.state = INT2PTR(ulong32 *, (value + mask) & ~mask);
     return;
   }
 }

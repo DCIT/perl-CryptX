@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 [%- IF t_strings_count %]
-use Test::More tests => [%t_strings_count * 6%] + 10;
+use Test::More tests => [%t_strings_count * 6%] + 13;
 [%- ELSE %]
 use Test::More tests => 0;
 [%- END %]
@@ -30,3 +30,12 @@ is( unpack('H*', [%lc_name%]([%tripple_A.args%],"A","A","A")), '[%tripple_A.hexm
 is( [%lc_name%]_hex ([%tripple_A.args%],"A","A","A"), '[%tripple_A.hexmac%]',  '[%orig_name%]/func+hex/tripple_A');
 is( [%lc_name%]_b64 ([%tripple_A.args%],"A","A","A"), '[%tripple_A.b64mac%]',  '[%orig_name%]/func+b64/tripple_A');
 is( [%lc_name%]_b64u([%tripple_A.args%],"A","A","A"), '[%tripple_A.b64umac%]', '[%orig_name%]/func+b64u/tripple_A');
+
+my $d_repeat = Crypt::Mac::[%orig_name%]->new([%tripple_A.args%])->add("A","A","A");
+is( $d_repeat->hexmac, '[%tripple_A.hexmac%]', '[%orig_name%]/oo+hex/finalize');
+my $err = '';
+eval { $d_repeat->hexmac; 1 } or $err = $@;
+like( $err, qr/already finalized/, '[%orig_name%]/oo+hex/repeat_croaks');
+$err = '';
+eval { $d_repeat->add("B"); 1 } or $err = $@;
+like( $err, qr/already finalized/, '[%orig_name%]/oo+hex/add_after_mac_croaks');

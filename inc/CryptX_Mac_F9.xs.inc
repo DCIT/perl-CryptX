@@ -14,19 +14,20 @@ new(Class, char * cipher_name, SV * key)
         int id;
 
         id = cryptx_internal_find_cipher(cipher_name);
-        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
 
         if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        Newz(0, RETVAL, 1, f9_state);
+        Newz(0, RETVAL, 1, struct cryptx_mac_f9_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = f9_init(RETVAL, id, k, (unsigned long)k_len);
+        rv = f9_init(&RETVAL->state, id, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: f9_init failed: %s", error_to_string(rv));
         }
+        RETVAL->finalized = 0;
     }
     OUTPUT:
         RETVAL
@@ -34,14 +35,17 @@ new(Class, char * cipher_name, SV * key)
 void
 DESTROY(Crypt::Mac::F9 self)
     CODE:
+    {
+        zeromem(&self->state, sizeof(f9_state));
         Safefree(self);
+    }
 
 Crypt::Mac::F9
 clone(Crypt::Mac::F9 self)
     CODE:
-        Newz(0, RETVAL, 1, f9_state);
+        Newz(0, RETVAL, 1, struct cryptx_mac_f9_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(self, RETVAL, 1, f9_state);
+        Copy(self, RETVAL, 1, struct cryptx_mac_f9_struct);
     OUTPUT:
         RETVAL
 
@@ -53,10 +57,11 @@ add(Crypt::Mac::F9 self, ...)
         STRLEN in_data_len;
         unsigned char *in_data;
 
+        if (self->finalized) croak("FATAL: MAC object already finalized");
         for(i = 1; i < items; i++) {
           in_data = (unsigned char *)SvPVbyte(ST(i), in_data_len);
           if (in_data_len > 0) {
-            rv = f9_process(self, in_data, (unsigned long)in_data_len);
+            rv = f9_process(&self->state, in_data, (unsigned long)in_data_len);
             if (rv != CRYPT_OK) croak("FATAL: f9_process failed: %s", error_to_string(rv));
           }
         }
@@ -76,9 +81,11 @@ mac(Crypt::Mac::F9 self)
         int rv;
         char out[MAXBLOCKSIZE*2+1];
 
+        if (self->finalized) croak("FATAL: MAC object already finalized");
         maclen = sizeof(mac);
-        rv = f9_done(self, mac, &maclen);
+        rv = f9_done(&self->state, mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: f9_done failed: %s", error_to_string(rv));
+        self->finalized = 1;
         outlen = sizeof(out);
         if (ix == 3) {
           rv = base64url_encode(mac, maclen, out, &outlen);
@@ -112,11 +119,12 @@ f9(char * cipher_name, SV * key, ...)
     {
         STRLEN inlen, klen;
         unsigned char *in;
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
         unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
         int rv, i;
         unsigned char mac[MAXBLOCKSIZE];
         unsigned long len = sizeof(mac), outlen;
-        char out[MAXBLOCKSIZE*2];
+        char out[MAXBLOCKSIZE*2+1];
         f9_state st;
 
         int id = cryptx_internal_find_cipher(cipher_name);

@@ -15,14 +15,15 @@ new(Class, SV * key)
         if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        Newz(0, RETVAL, 1, poly1305_state);
+        Newz(0, RETVAL, 1, struct cryptx_mac_poly1305_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = poly1305_init(RETVAL, k, (unsigned long)k_len);
+        rv = poly1305_init(&RETVAL->state, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: poly1305_init failed: %s", error_to_string(rv));
         }
+        RETVAL->finalized = 0;
     }
     OUTPUT:
         RETVAL
@@ -30,14 +31,17 @@ new(Class, SV * key)
 void
 DESTROY(Crypt::Mac::Poly1305 self)
     CODE:
+    {
+        zeromem(&self->state, sizeof(poly1305_state));
         Safefree(self);
+    }
 
 Crypt::Mac::Poly1305
 clone(Crypt::Mac::Poly1305 self)
     CODE:
-        Newz(0, RETVAL, 1, poly1305_state);
+        Newz(0, RETVAL, 1, struct cryptx_mac_poly1305_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(self, RETVAL, 1, poly1305_state);
+        Copy(self, RETVAL, 1, struct cryptx_mac_poly1305_struct);
     OUTPUT:
         RETVAL
 
@@ -49,10 +53,11 @@ add(Crypt::Mac::Poly1305 self, ...)
         STRLEN in_data_len;
         unsigned char *in_data;
 
+        if (self->finalized) croak("FATAL: MAC object already finalized");
         for(i = 1; i < items; i++) {
           in_data = (unsigned char *)SvPVbyte(ST(i), in_data_len);
           if (in_data_len > 0) {
-            rv = poly1305_process(self, in_data, (unsigned long)in_data_len);
+            rv = poly1305_process(&self->state, in_data, (unsigned long)in_data_len);
             if (rv != CRYPT_OK) croak("FATAL: poly1305_process failed: %s", error_to_string(rv));
           }
         }
@@ -72,9 +77,11 @@ mac(Crypt::Mac::Poly1305 self)
         int rv;
         char out[MAXBLOCKSIZE*2+1];
 
+        if (self->finalized) croak("FATAL: MAC object already finalized");
         maclen = sizeof(mac);
-        rv = poly1305_done(self, mac, &maclen);
+        rv = poly1305_done(&self->state, mac, &maclen);
         if (rv != CRYPT_OK) croak("FATAL: poly1305_done failed: %s", error_to_string(rv));
+        self->finalized = 1;
         outlen = sizeof(out);
         if (ix == 3) {
           rv = base64url_encode(mac, maclen, out, &outlen);
@@ -108,11 +115,12 @@ poly1305(SV * key, ...)
     {
         STRLEN inlen, klen;
         unsigned char *in;
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
         unsigned char *k = (unsigned char *)SvPVbyte(key, klen);
         int rv, i;
         unsigned char mac[MAXBLOCKSIZE];
         unsigned long len = sizeof(mac), outlen;
-        char out[MAXBLOCKSIZE*2];
+        char out[MAXBLOCKSIZE*2+1];
         poly1305_state st;
 
         rv = poly1305_init(&st, k, (unsigned long)klen);

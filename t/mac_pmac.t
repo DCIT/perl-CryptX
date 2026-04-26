@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 72 + 10;
+use Test::More tests => 72 + 13;
 
 use Crypt::Mac::PMAC qw( pmac pmac_hex pmac_b64 pmac_b64u );
 
@@ -90,3 +90,12 @@ is( unpack('H*', pmac('AES', '1234567890123456',"A","A","A")), 'c46c52ff026e4e24
 is( pmac_hex ('AES', '1234567890123456',"A","A","A"), 'c46c52ff026e4e24837bc51a7e21f8cb',  'PMAC/func+hex/tripple_A');
 is( pmac_b64 ('AES', '1234567890123456',"A","A","A"), 'xGxS/wJuTiSDe8UafiH4yw==',  'PMAC/func+b64/tripple_A');
 is( pmac_b64u('AES', '1234567890123456',"A","A","A"), 'xGxS_wJuTiSDe8UafiH4yw', 'PMAC/func+b64u/tripple_A');
+
+my $d_repeat = Crypt::Mac::PMAC->new('AES', '1234567890123456')->add("A","A","A");
+is( $d_repeat->hexmac, 'c46c52ff026e4e24837bc51a7e21f8cb', 'PMAC/oo+hex/finalize');
+my $err = '';
+eval { $d_repeat->hexmac; 1 } or $err = $@;
+like( $err, qr/already finalized/, 'PMAC/oo+hex/repeat_croaks');
+$err = '';
+eval { $d_repeat->add("B"); 1 } or $err = $@;
+like( $err, qr/already finalized/, 'PMAC/oo+hex/add_after_mac_croaks');

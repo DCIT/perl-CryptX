@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 72 + 10;
+use Test::More tests => 72 + 13;
 
 use Crypt::Mac::XCBC qw( xcbc xcbc_hex xcbc_b64 xcbc_b64u );
 
@@ -90,3 +90,12 @@ is( unpack('H*', xcbc('AES', '1234567890123456',"A","A","A")), 'da243c0a133fc33c
 is( xcbc_hex ('AES', '1234567890123456',"A","A","A"), 'da243c0a133fc33cd1f96b872c0bec9b',  'XCBC/func+hex/tripple_A');
 is( xcbc_b64 ('AES', '1234567890123456',"A","A","A"), '2iQ8ChM/wzzR+WuHLAvsmw==',  'XCBC/func+b64/tripple_A');
 is( xcbc_b64u('AES', '1234567890123456',"A","A","A"), '2iQ8ChM_wzzR-WuHLAvsmw', 'XCBC/func+b64u/tripple_A');
+
+my $d_repeat = Crypt::Mac::XCBC->new('AES', '1234567890123456')->add("A","A","A");
+is( $d_repeat->hexmac, 'da243c0a133fc33cd1f96b872c0bec9b', 'XCBC/oo+hex/finalize');
+my $err = '';
+eval { $d_repeat->hexmac; 1 } or $err = $@;
+like( $err, qr/already finalized/, 'XCBC/oo+hex/repeat_croaks');
+$err = '';
+eval { $d_repeat->add("B"); 1 } or $err = $@;
+like( $err, qr/already finalized/, 'XCBC/oo+hex/add_after_mac_croaks');

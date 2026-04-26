@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 72 + 10;
+use Test::More tests => 72 + 13;
 
 use Crypt::Mac::OMAC qw( omac omac_hex omac_b64 omac_b64u );
 
@@ -90,3 +90,12 @@ is( unpack('H*', omac('AES', '1234567890123456',"A","A","A")), '49b745733f380fb4
 is( omac_hex ('AES', '1234567890123456',"A","A","A"), '49b745733f380fb4cdd8ce1ff1e52abc',  'OMAC/func+hex/tripple_A');
 is( omac_b64 ('AES', '1234567890123456',"A","A","A"), 'SbdFcz84D7TN2M4f8eUqvA==',  'OMAC/func+b64/tripple_A');
 is( omac_b64u('AES', '1234567890123456',"A","A","A"), 'SbdFcz84D7TN2M4f8eUqvA', 'OMAC/func+b64u/tripple_A');
+
+my $d_repeat = Crypt::Mac::OMAC->new('AES', '1234567890123456')->add("A","A","A");
+is( $d_repeat->hexmac, '49b745733f380fb4cdd8ce1ff1e52abc', 'OMAC/oo+hex/finalize');
+my $err = '';
+eval { $d_repeat->hexmac; 1 } or $err = $@;
+like( $err, qr/already finalized/, 'OMAC/oo+hex/repeat_croaks');
+$err = '';
+eval { $d_repeat->add("B"); 1 } or $err = $@;
+like( $err, qr/already finalized/, 'OMAC/oo+hex/add_after_mac_croaks');
