@@ -104,6 +104,11 @@ Returns checksum as unsigned 32bit integer.
  #or
  my $checksum_int = crc32_data_int('any data', 'more data', 'even more data');
 
+Each C<crc32_data*> function converts its data arguments to bytes using Perl's
+usual scalar stringification. Defined scalars, including numbers and
+string-overloaded objects, are accepted. C<undef> is treated as an empty string
+and may emit Perl's usual "uninitialized value" warning.
+
 =head2 crc32_file
 
 Returns the checksum as raw octets.
@@ -159,6 +164,11 @@ Reinitialize the checksum object state and returns a reference to the checksum o
 All arguments are appended to the message we calculate checksum for.
 The return value is the checksum object itself.
 
+Each argument is converted to bytes using Perl's usual scalar stringification.
+Defined scalars, including numbers and string-overloaded objects, are accepted.
+C<undef> is treated as an empty string and may emit Perl's usual
+"uninitialized value" warning.
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
@@ -178,18 +188,22 @@ B<BEWARE:> You have to make sure that the filehandle is in binary mode before yo
 =head2 digest
 
 Returns the binary checksum (raw bytes).
+This method does not alter the object state, so you can call it
+repeatedly and continue with C<add()> or C<addfile()> afterwards.
 
  my $result_raw = $d->digest();
 
 =head2 hexdigest
 
 Returns the checksum encoded as a hexadecimal string.
+Like C<digest()>, this method does not alter the object state.
 
  my $result_hex = $d->hexdigest();
 
 =head2 intdigest
 
 Returns the checksum encoded as unsigned 32bit integer.
+Like C<digest()>, this method does not alter the object state.
 
  my $result_int = $d->intdigest();
 
