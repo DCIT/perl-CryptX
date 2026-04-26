@@ -26,7 +26,6 @@ our %EXPORT_TAGS = ( all => [qw(encode_b64   decode_b64
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-use Carp 'carp';
 use CryptX;
 use Crypt::Digest 'digest_data';
 use Crypt::Mode::CBC;
@@ -40,7 +39,8 @@ use Time::HiRes (); # perl core module
 sub _encode_b58 {
   my ($bytes, $alphabet) = @_;
 
-  return '' if !defined $bytes || length($bytes) == 0;
+  return undef if !defined $bytes;
+  return '' if length($bytes) == 0;
 
   # handle leading zero-bytes
   my $base58 = '';
@@ -52,8 +52,9 @@ sub _encode_b58 {
   if (defined $alphabet) {
     my $default = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuv";
     return undef if $alphabet !~ /^[a-zA-Z0-9]{58}$/;
-    eval "\$base58 =~ tr/$default/$alphabet/"; # HACK: https://stackoverflow.com/questions/11415045/using-a-char-variable-in-tr
-    return undef if $@;
+    my %map;
+    @map{split //, $default} = split //, $alphabet;
+    $base58 = join '', map { $map{$_} } split //, $base58;
   }
 
   return $base58;
@@ -62,13 +63,15 @@ sub _encode_b58 {
 sub _decode_b58 {
   my ($base58, $alphabet) = @_;
 
-  return '' if !defined $base58 || length($base58) == 0;
+  return undef if !defined $base58;
+  return '' if length($base58) == 0;
 
   my $default = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuv";
   if (defined $alphabet) {
     return undef if $alphabet !~ /^[a-zA-Z0-9]{58}$/ || $base58 !~ /^[$alphabet]+$/;
-    eval "\$base58 =~ tr/$alphabet/$default/"; # HACK: https://stackoverflow.com/questions/11415045/using-a-char-variable-in-tr
-    return undef if $@;
+    my %map;
+    @map{split //, $alphabet} = split //, $default;
+    $base58 = join '', map { $map{$_} } split //, $base58;
   }
   return undef if $base58 !~ /^[$default]+$/;
 
@@ -102,8 +105,9 @@ sub pem_to_der {
   # first try to load KEY (e.g. EC pem files might contain more parts)
   ($begin, $obj1, $content, $end, $obj2) = $data =~ m/(----[- ]BEGIN ([^\r\n\-]+KEY)[ -]----)(.*?)(----[- ]END ([^\r\n\-]+)[ -]----)/s;
   # if failed then try to load anything
-  ($begin, $obj1, $content, $end, $obj2) = $data =~ m/(----[- ]BEGIN ([^\r\n\-]+)[ -]----)(.*?)(----[- ]END ([^\r\n\-]+)[ -]----)/s unless $content;
+  ($begin, $obj1, $content, $end, $obj2) = $data =~ m/(----[- ]BEGIN ([^\r\n\-]+)[ -]----)(.*?)(----[- ]END ([^\r\n\-]+)[ -]----)/s unless defined $content;
   return undef unless $content;
+  return undef if !defined($obj1) || !defined($obj2) || $obj1 ne $obj2;
 
   $content =~ s/^\s+//sg;
   $content =~ s/\s+$//sg;
@@ -135,10 +139,11 @@ sub pem_to_der {
 
 sub der_to_pem {
   my ($data, $header_name, $password, $cipher_name) = @_;
+  croak "FATAL: der_to_pem invalid header name" unless defined $header_name && $header_name =~ /^[0-9A-Za-z ]+$/;
   my $content = $data;
   my @headers;
 
-  if ($password) {
+  if (defined $password) {
     $cipher_name ||= 'AES-256-CBC';
     my ($mode, $klen, $ilen) = _name2mode($cipher_name);
     my $iv = random_bytes($ilen);
@@ -177,15 +182,7 @@ sub write_rawfile {
   return;
 }
 
-sub slow_eq {
-  my ($a, $b) = @_;
-  return unless defined $a && defined $b;
-  my $diff = length $a ^ length $b;
-  for(my $i = 0; $i < length $a && $i < length $b; $i++) {
-    $diff |= ord(substr $a, $i) ^ ord(substr $b, $i);
-  }
-  return $diff == 0;
-}
+### slow_eq() is implemented in XS (CryptX.xs) using libtomcrypt's mem_neq()
 
 sub random_v4uuid() {
   # Version 4 - random - UUID: xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx
@@ -202,7 +199,7 @@ sub random_v4uuid() {
   return $hex;
 }
 
-sub random_v7uuid {
+sub random_v7uuid() {
   # RFC 9562 §5.7 - Version 7 UUID (time-ordered)
   # Format: xxxxxxxx-xxxx-7xxx-[89ab]xxx-xxxxxxxxxxxx
   # Structure: 48-bit ms timestamp | 4-bit ver=7 | 12-bit rand | 2-bit var=10 | 62-bit rand
@@ -222,14 +219,14 @@ sub random_v7uuid {
 sub is_v4uuid($) {
   my $uuid = shift;
   return 0 if !$uuid;
-  return 1 if $uuid =~ /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return 1 if $uuid =~ /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return 0;
 }
 
 sub is_uuid($) {
   my $uuid = shift;
   return 0 if !$uuid;
-  return 1 if $uuid =~ /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return 1 if $uuid =~ /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return 0;
 }
 
@@ -325,6 +322,15 @@ string and return an ASCII string. All decoding functions (C<decode_b64>,
 C<decode_b58b>, etc.) accept an ASCII string and return a binary string, or
 C<undef> if the input is malformed.
 
+An empty string is considered valid input and decodes to an empty string.
+C<undef> is considered invalid input and results in C<undef>. Non-empty input
+with no actual payload, such as whitespace-only or padding-only input, is also
+considered malformed and results in C<undef>.
+
+The Base64 decoders C<decode_b64> and C<decode_b64u> also accept otherwise
+valid payload with embedded whitespace. The other decoder families in this
+module do not; for them, embedded whitespace is treated as malformed input.
+
 =head2  read_rawfile
 
 I<Since: 0.029>
@@ -360,8 +366,11 @@ I<Since: 0.029>
   $der_data = pem_to_der($pem_data, $password);
 
 Convert PEM to DER representation. Supports also password protected PEM data.
-Returns C<undef> if C<$pem_data> cannot be parsed (no valid PEM block found).
-Croaks if the PEM is encrypted but no C<$password> is provided.
+Returns C<undef> if C<$pem_data> cannot be parsed (no valid PEM block found)
+or if the C<BEGIN> / C<END> labels do not match. Croaks if the PEM is
+encrypted but no C<$password> is provided. If an encrypted PEM is supplied
+with the wrong password, decryption is expected to croak from the underlying
+cipher/padding layer.
 
 =head2  der_to_pem
 
@@ -377,7 +386,17 @@ I<Since: 0.029>
   # $cipher_name e.g. "DES-EDE3-CBC", "AES-256-CBC" (DEFAULT) ...
 
 Convert DER to PEM representation. Returns a PEM string (ASCII).
-Supports also password protected PEM data.
+Supports also password protected PEM data. Any defined C<$password>, including
+false-like values like C<''> or C<'0'>, enables PEM encryption.
+
+B<Security note>: do not use ECB-based ciphers (e.g. C<AES-256-ECB>) for PEM
+encryption - ECB encrypts each block independently, leaking plaintext structure.
+Use the default C<AES-256-CBC> or another chaining mode (CBC, CFB, OFB).
+
+B<Security note>: the traditional PEM encryption format uses a single-iteration
+MD5-based key derivation which is weak against brute-force. For new applications,
+prefer PKCS#8 encrypted keys (e.g. via L<Crypt::PK::RSA/export_key_pem>) or
+an independent encryption layer.
 
 =head2  random_v4uuid
 
@@ -397,7 +416,9 @@ I<Since: 0.031>
     ...
   }
 
-Checks the given C<$uuid> string whether it matches V4 UUID format and returns C<0> (mismatch) or C<1> (match).
+Checks the given C<$uuid> string whether it matches Version 4 UUID format with
+a relaxed variant policy. The variant nibble may be one of C<0>, C<8>, C<9>,
+C<A>, or C<B>. Returns C<0> (mismatch) or C<1> (match).
 
 =head2 random_v7uuid
 
@@ -407,7 +428,10 @@ I<Since: CryptX-0.088>
 
 Returns a cryptographically strong Version 7 time-ordered UUID: C<xxxxxxxx-xxxx-7xxx-Yxxx-xxxxxxxxxxxx>
 where the first 48 bits encode the current Unix time in milliseconds (making UUIDs sortable by
-generation time), followed by random bits. C<Y> is one of 8, 9, A, B (RFC 9562 variant).
+generation time), followed by random bits. Ordering is therefore coarse at
+millisecond granularity only; UUIDs generated within the same millisecond are
+not guaranteed to be lexicographically monotonic. C<Y> is one of 8, 9, A, B
+(RFC 9562 variant).
 
 =head2 is_uuid
 
@@ -418,7 +442,9 @@ I<Since: CryptX-0.088>
   }
 
 Checks whether C<$uuid> is a validly formatted UUID (any version) in the standard
-C<xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx> form. Returns C<1> (match) or C<0> (mismatch).
+C<xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx> form with a relaxed variant policy.
+The variant nibble may be one of C<0>, C<8>, C<9>, C<A>, or C<B>. Returns
+C<1> (match) or C<0> (mismatch).
 For a version-specific check see L</is_v4uuid>.
 
 =head2 increment_octets_le

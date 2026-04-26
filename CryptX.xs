@@ -25,6 +25,26 @@
 #include "tomcrypt.h"
 #include "tommath.h"
 
+STATIC int cryptx_internal_input_has_no_payload(const char *in, STRLEN len) {
+  STRLEN i;
+  int saw_formatting = 0;
+
+  if (in == NULL || len == 0) return 0;
+
+  for (i = 0; i < len; i++) {
+    if (in[i] == '=') {
+      saw_formatting = 1;
+      continue;
+    }
+    if (in[i] == ' ' || in[i] == '\t' || in[i] == '\n' || in[i] == '\r') {
+      saw_formatting = 1;
+      continue;
+    }
+    return 0;
+  }
+  return saw_formatting;
+}
+
 typedef adler32_state           *Crypt__Checksum__Adler32;
 typedef crc32_state             *Crypt__Checksum__CRC32;
 
@@ -474,19 +494,22 @@ MODULE = CryptX       PACKAGE = Crypt::Misc
 PROTOTYPES: DISABLE
 
 SV *
-_radix_to_bin(char *in, int radix)
+_radix_to_bin(SV *in, int radix)
     CODE:
     {
-        STRLEN len;
+        STRLEN in_len, len;
         unsigned char *out_data;
+        char *in_data;
         mp_int mpi;
 
-        if (in == NULL) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in) || radix < 2 || radix > 64) XSRETURN_UNDEF;
+        in_data = SvPVbyte(in, in_len);
+        if (in_len > 0 && memchr(in_data, '\0', in_len) != NULL) XSRETURN_UNDEF;
         if (mp_init(&mpi) != MP_OKAY) XSRETURN_UNDEF;
-        if (strlen(in) == 0) {
+        if (in_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
-        else if (mp_read_radix(&mpi, in, radix) == MP_OKAY) {
+        else if (mp_read_radix(&mpi, in_data, radix) == MP_OKAY) {
           len = mp_ubin_size(&mpi);
           if (len == 0) {
             RETVAL = newSVpvn("", 0);
@@ -522,7 +545,7 @@ _bin_to_radix(SV *in, int radix)
         mp_err merr;
         int digits = 0;
 
-        if (!SvPOK(in) || radix < 2 || radix > 64) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in) || radix < 2 || radix > 64) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, len);
         if (mp_init_multi(&mpi, &tmp, NULL) != MP_OKAY) XSRETURN_UNDEF;
         if (len == 0) {
@@ -575,7 +598,7 @@ encode_b64(SV * in)
         unsigned char *in_data;
         char *out_data;
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, in_len);
         if (in_len == 0) {
           RETVAL = newSVpvn("", 0);
@@ -611,12 +634,13 @@ decode_b64(SV * in)
         unsigned char *out_data;
         char *in_data;
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in)) XSRETURN_UNDEF;
         in_data = SvPVbyte(in, in_len);
         if (in_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
+          if (cryptx_internal_input_has_no_payload(in_data, in_len)) XSRETURN_UNDEF;
           out_len = (unsigned long)in_len;
           RETVAL = NEWSV(0, out_len); /* avoid zero! */
           SvPOK_only(RETVAL);
@@ -649,7 +673,7 @@ encode_b32r(SV *in)
         char *out_data;
         int id = -1, err;
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in)) XSRETURN_UNDEF;
         if (ix == 0) id = BASE32_RFC4648;
         if (ix == 1) id = BASE32_BASE32HEX;
         if (ix == 2) id = BASE32_ZBASE32;
@@ -689,7 +713,7 @@ decode_b32r(SV *in)
         char *in_data;
         int id = -1, err;
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in)) XSRETURN_UNDEF;
         if (ix == 0) id = BASE32_RFC4648;
         if (ix == 1) id = BASE32_BASE32HEX;
         if (ix == 2) id = BASE32_ZBASE32;
@@ -700,6 +724,7 @@ decode_b32r(SV *in)
           RETVAL = newSVpvn("", 0);
         }
         else {
+          if (cryptx_internal_input_has_no_payload(in_data, in_len)) XSRETURN_UNDEF;
           out_len = (unsigned long)in_len;
           RETVAL = NEWSV(0, out_len); /* avoid zero! */
           SvPOK_only(RETVAL);
@@ -722,7 +747,7 @@ increment_octets_le(SV * in)
         STRLEN len, i = 0;
         unsigned char *out_data, *in_data;
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *)SvPVbyte(in, len);
         if (len == 0) {
           RETVAL = newSVpvn("", 0);
@@ -754,7 +779,7 @@ increment_octets_be(SV * in)
         STRLEN len, i = 0;
         unsigned char *out_data, *in_data;
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *)SvPVbyte(in, len);
         if (len == 0) {
           RETVAL = newSVpvn("", 0);
@@ -775,6 +800,26 @@ increment_octets_be(SV * in)
             croak("FATAL: increment_octets_be overflow");
           }
         }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+slow_eq(SV *a, SV *b)
+    CODE:
+    {
+        STRLEN a_len, b_len;
+        unsigned char *a_data, *b_data;
+        const void *first;
+        int result = 0;
+
+        if (!SvPOK_spec(a) || !SvPOK_spec(b)) XSRETURN_UNDEF;
+        a_data = (unsigned char *)SvPVbyte(a, a_len);
+        b_data = (unsigned char *)SvPVbyte(b, b_len);
+        first = a_data;
+        if (a_len != b_len) { first = b_data; result = 1; }
+        result |= mem_neq(first, b_data, b_len);
+        RETVAL = newSViv(result == 0 ? 1 : 0);
     }
     OUTPUT:
         RETVAL

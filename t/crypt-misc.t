@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 693;
+use Test::More tests => 761;
 
 use Crypt::Misc qw( encode_b64   decode_b64
                     encode_b64u  decode_b64u
@@ -19,6 +19,11 @@ use Crypt::Misc qw( encode_b64   decode_b64
                     is_uuid random_v7uuid
                     increment_octets_be increment_octets_le
                   );
+
+{
+  package CryptMiscTest::Stringy;
+  use overload '""' => sub { 'abc' }, fallback => 1;
+}
 
 is(encode_b64(pack("H*","702fad4215a04a657f011d3ea5711879c696788c91d2")), "cC+tQhWgSmV/AR0+pXEYecaWeIyR0g==", "encode_b64");
 is(unpack("H*", decode_b64("cC+tQhWgSmV/AR0+pXEYecaWeIyR0g==")), "702fad4215a04a657f011d3ea5711879c696788c91d2", "decode_b64");
@@ -62,9 +67,107 @@ is(decode_b64u("Zm9vYmE="), "fooba",  "ltcu 5a");
 is(decode_b64u("Zm9vYmE" ), "fooba",  "ltcu 5b");
 is(decode_b64u("Zm9vYmFy"), "foobar", "ltcu 6");
 
+is(decode_b64("="),   undef, "decode_b64 rejects padding-only input 1");
+is(decode_b64("=="),  undef, "decode_b64 rejects padding-only input 2");
+is(decode_b64u("="),  undef, "decode_b64u rejects padding-only input");
+is(decode_b64(" \n\t"),  undef, "decode_b64 rejects whitespace-only input");
+is(decode_b64u(" \n\t"), undef, "decode_b64u rejects whitespace-only input");
+is(decode_b32r("="),  undef, "decode_b32r rejects padding-only input");
+is(decode_b32b("=="), undef, "decode_b32b rejects padding-only input");
+is(decode_b32c("==="), undef, "decode_b32c rejects padding-only input");
+is(decode_b32r(" \n\t"), undef, "decode_b32r rejects whitespace-only input");
+
+is(encode_b64(undef),   undef, "encode_b64 undef stays undef");
+is(decode_b64(undef),   undef, "decode_b64 undef stays undef");
+is(encode_b32r(undef),  undef, "encode_b32r undef stays undef");
+is(decode_b32r(undef),  undef, "decode_b32r undef stays undef");
+is(encode_b58b(undef),  undef, "encode_b58b undef stays undef");
+is(decode_b58b(undef),  undef, "decode_b58b undef stays undef");
+is(encode_b58b(""),     "",    "encode_b58b empty string stays empty");
+is(decode_b58b(""),     "",    "decode_b58b empty string stays empty");
+is(decode_b58b(" \n\t"), undef, "decode_b58b rejects whitespace-only input");
+
 write_rawfile("tmp.$$.file", "a\nb\r\nc\rd\te");
 ok(slow_eq(read_rawfile("tmp.$$.file"), "a\nb\r\nc\rd\te"), "slow_eq + read_rawfile + write_rawfile");
 unlink "tmp.$$.file";
+ok(slow_eq("abc", "abc"), "slow_eq equal strings");
+ok(!slow_eq("abc", "abd"), "slow_eq rejects same-length mismatch");
+ok(!slow_eq("abc", "ab"), "slow_eq rejects shorter mismatch");
+ok(!slow_eq("ab", "abc"), "slow_eq rejects longer mismatch");
+ok(slow_eq("", ""), "slow_eq accepts two empty strings");
+ok(!defined(slow_eq(undef, "")), "slow_eq returns undef on undef input");
+ok( slow_eq("a\x00b", "a\x00b"), "slow_eq: binary with embedded NUL");
+ok(!slow_eq("a\x00b", "a\x00c"), "slow_eq: binary NUL differ");
+
+{
+  my $obj = bless {}, 'CryptMiscTest::Stringy';
+  is(encode_b64($obj),           encode_b64("abc"),         "encode_b64 accepts overloaded string");
+  is(decode_b64($obj),           decode_b64("abc"),         "decode_b64 accepts overloaded string");
+  is(encode_b32r($obj),          encode_b32r("abc"),        "encode_b32r accepts overloaded string");
+  is(increment_octets_be($obj),  increment_octets_be("abc"), "increment_octets_be accepts overloaded string");
+}
+
+{ # increment_octets_be
+  is(unpack("H*", increment_octets_be("\x00")),         "01",       "inc_be: 0x00 -> 0x01");
+  is(unpack("H*", increment_octets_be("\x00\xfe")),     "00ff",     "inc_be: no carry");
+  is(unpack("H*", increment_octets_be("\x00\xff")),     "0100",     "inc_be: carry");
+  is(unpack("H*", increment_octets_be("\x00\xff\xff")), "010000",   "inc_be: multi-byte carry");
+  eval { increment_octets_be("\xff") };
+  like($@, qr/overflow/, "inc_be: single-byte overflow");
+  eval { increment_octets_be("\xff\xff\xff") };
+  like($@, qr/overflow/, "inc_be: multi-byte overflow");
+}
+
+{ # increment_octets_le
+  is(unpack("H*", increment_octets_le("\x00")),         "01",       "inc_le: 0x00 -> 0x01");
+  is(unpack("H*", increment_octets_le("\xfe\x00")),     "ff00",     "inc_le: no carry");
+  is(unpack("H*", increment_octets_le("\xff\x00")),     "0001",     "inc_le: carry");
+  is(unpack("H*", increment_octets_le("\xff\xff\x00")), "000001",   "inc_le: multi-byte carry");
+  eval { increment_octets_le("\xff") };
+  like($@, qr/overflow/, "inc_le: single-byte overflow");
+  eval { increment_octets_le("\xff\xff\xff") };
+  like($@, qr/overflow/, "inc_le: multi-byte overflow");
+}
+
+{
+  my $pem_zero = der_to_pem("abc", "TEST KEY", "0");
+  like($pem_zero, qr/^Proc-Type: 4,ENCRYPTED$/m, "der_to_pem encrypts with password '0'");
+  is(pem_to_der($pem_zero, "0"), "abc", "pem_to_der round-trips password '0'");
+
+  my $pem_empty = der_to_pem("abc", "TEST KEY", "");
+  like($pem_empty, qr/^Proc-Type: 4,ENCRYPTED$/m, "der_to_pem encrypts with empty password");
+  is(pem_to_der($pem_empty, ""), "abc", "pem_to_der round-trips empty password");
+
+  my $enc_pem = read_rawfile("t/data/rsa-aes256.pem");
+  my $bad_end = $enc_pem;
+  $bad_end =~ s/END RSA PRIVATE KEY/END PUBLIC KEY/;
+  is(pem_to_der($bad_end, "secret"), undef, "pem_to_der rejects mismatched END label");
+
+  my $bad_begin = $enc_pem;
+  $bad_begin =~ s/BEGIN RSA PRIVATE KEY/BEGIN PUBLIC KEY/;
+  is(pem_to_der($bad_begin, "secret"), undef, "pem_to_der rejects mismatched BEGIN label");
+
+  my $wrong = eval { pem_to_der($enc_pem, "wrong") };
+  ok(!defined($wrong), "pem_to_der returns no value for wrong password");
+  like($@, qr/padding_depad failed|Invalid input packet/, "pem_to_der wrong password croaks");
+
+  eval { der_to_pem("data", "BAD\nHEADER") };
+  like($@, qr/invalid header name/, "der_to_pem rejects header with newline");
+  eval { der_to_pem("data", "BAD--HEADER") };
+  like($@, qr/invalid header name/, "der_to_pem rejects header with dashes");
+  eval { der_to_pem("data", undef) };
+  like($@, qr/invalid header name/, "der_to_pem rejects undef header");
+  eval { der_to_pem("data", "") };
+  like($@, qr/invalid header name/, "der_to_pem rejects empty header");
+
+  eval { Crypt::Misc::_name2mode("INVALID-CIPHER") };
+  like($@, qr/unsupported cipher/, "_name2mode rejects invalid cipher");
+
+  for my $c (qw(DES-EDE3-CBC DES-CBC AES-128-CBC AES-256-OFB AES-256-CFB CAMELLIA-256-CBC SEED-CBC)) {
+    my $pem = der_to_pem("test", "TEST KEY", "pw", $c);
+    is(pem_to_der($pem, "pw"), "test", "PEM roundtrip with $c");
+  }
+}
 
 my $uuid = random_v4uuid;
 ok($uuid,            'random_v4uuid');
@@ -88,9 +191,16 @@ ok(is_uuid($uuid),   'is_uuid: accepts v4');
   ok( is_uuid('f47ac10b-58cc-4372-a567-0e02b2c3d479'), 'is_uuid: v4 lowercase');
   ok( is_uuid('F47AC10B-58CC-4372-A567-0E02B2C3D479'), 'is_uuid: uppercase');
   ok( is_uuid('017f22e2-79b0-7cc3-98c4-dc0c0c07398f'), 'is_uuid: v7 example');
+  ok( is_uuid('f47ac10b-58cc-4372-0567-0e02b2c3d479'), 'is_uuid: relaxed variant 0');
   ok(!is_uuid(''),                                     'is_uuid: rejects empty');
   ok(!is_uuid('not-a-uuid'),                           'is_uuid: rejects garbage');
   ok(!is_uuid('f47ac10b-58cc-4372-a567-0e02b2c3d47'),  'is_uuid: rejects short');
+  ok(!is_uuid('f47ac10b-58cc-4372-7567-0e02b2c3d479'), 'is_uuid: rejects invalid variant 7');
+  ok(!is_uuid('f47ac10b-58cc-4372-c567-0e02b2c3d479'), 'is_uuid: rejects invalid variant c');
+
+  ok( is_v4uuid('f47ac10b-58cc-4372-0567-0e02b2c3d479'), 'is_v4uuid: relaxed variant 0');
+  ok(!is_v4uuid('f47ac10b-58cc-4372-7567-0e02b2c3d479'), 'is_v4uuid: rejects invalid variant 7');
+  ok(!is_v4uuid('f47ac10b-58cc-4372-c567-0e02b2c3d479'), 'is_v4uuid: rejects invalid variant c');
 }
 
 my @hex = (qw/fb
