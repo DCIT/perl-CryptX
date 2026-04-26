@@ -89,12 +89,20 @@ C<new>, for example:
 =head2 encrypt
 
 Encrypts the plaintext in a single call. Returns the ciphertext as a binary string.
+The plaintext scalar is converted to bytes using Perl's usual scalar
+stringification. Defined scalars, including numbers and string-overloaded
+objects, are accepted. C<undef> is treated as an empty string and may emit
+Perl's usual "uninitialized value" warning.
 
    my $ciphertext = $m->encrypt($plaintext, $key, $iv);
 
 =head2 decrypt
 
 Decrypts the ciphertext in a single call. Returns the plaintext as a binary string.
+The ciphertext scalar is converted to bytes using Perl's usual scalar
+stringification. Defined scalars, including numbers and string-overloaded
+objects, are accepted. C<undef> is treated as an empty string and may emit
+Perl's usual "uninitialized value" warning.
 
    my $plaintext = $m->decrypt($ciphertext, $key, $iv);
 
@@ -113,6 +121,11 @@ Initializes decryption mode. Returns the object itself.
 =head2 add
 
 Feeds data to the encryption or decryption stream. Returns a binary string.
+
+Each argument is converted to bytes using Perl's usual scalar stringification.
+Defined scalars, including numbers and string-overloaded objects, are
+accepted. C<undef> is treated as an empty string and may emit Perl's usual
+"uninitialized value" warning.
 
    # in encrypt mode
    my $ciphertext = $m->add($plaintext);

@@ -17,7 +17,7 @@ new(Class, char * cipher_name, int padding=1, int rounds=0)
         RETVAL->cipher_id = cryptx_internal_find_cipher(cipher_name);
         if (RETVAL->cipher_id == -1) {
           Safefree(RETVAL);
-          croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+          croak("FATAL: find_cipher failed for '%s'", cipher_name);
         }
     }
     OUTPUT:
@@ -26,7 +26,11 @@ new(Class, char * cipher_name, int padding=1, int rounds=0)
 void
 DESTROY(Crypt::Mode::[%orig_name%] self)
     CODE:
+    {
+        zeromem(&self->state, sizeof(symmetric_[%orig_name%]));
+        zeromem(self->pad, sizeof(self->pad));
         Safefree(self);
+    }
 
 void
 [%-IF lc_name == 'cbc' %]
@@ -57,9 +61,9 @@ start_decrypt(_XXX_XXX_XXX_)
         if (i_len != (STRLEN)cipher_descriptor[self->cipher_id].block_length) {
           croak ("FATAL: sizeof(iv) should be equal to blocksize (%d)", cipher_descriptor[self->cipher_id].block_length);
         }
-        rv = [%lc_name%]_start(self->cipher_id, i, k, (unsigned long)k_len, self->cipher_rounds, &self->state);
+        rv = [%lc_name%]_start(self->cipher_id, i, k, (int)k_len, self->cipher_rounds, &self->state);
 [%-ELSE%]
-        rv = [%lc_name%]_start(self->cipher_id, k, (unsigned long)k_len, self->cipher_rounds, &self->state);
+        rv = [%lc_name%]_start(self->cipher_id, k, (int)k_len, self->cipher_rounds, &self->state);
 [%-END%]
         if (rv != CRYPT_OK) {
           croak("FATAL: [%lc_name%]_start failed: %s", error_to_string(rv));
@@ -214,7 +218,7 @@ add(Crypt::Mode::[%orig_name%] self, ...)
             }
             else {
               SvREFCNT_dec(RETVAL);
-              croak("FATAL: call start_decryt or start_encrpyt first (%d)", self->direction);
+              croak("FATAL: call start_decrypt or start_encrypt first (%d)", self->direction);
             }
           }
         }
@@ -277,7 +281,7 @@ finish(Crypt::Mode::[%orig_name%] self)
           }
         }
         else {
-           croak("FATAL: invalid direction");
+           croak("FATAL: mode not active; call start_decrypt or start_encrypt first");
         }
 
         self->direction = 0;
@@ -334,7 +338,7 @@ finish(Crypt::Mode::[%orig_name%] self)
           }
         }
         else {
-           croak("FATAL: invalid direction");
+           croak("FATAL: mode not active; call start_decrypt or start_encrypt first");
         }
 
         self->direction = 0;

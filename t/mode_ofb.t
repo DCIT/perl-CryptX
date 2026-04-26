@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 15;
 use Crypt::Mode::OFB;
 
 my @tests = (
@@ -25,4 +25,19 @@ for (@tests) {
   ok($pt, "plain text");
   is(unpack("H*",$ct), $_->{ct}, 'cipher text match');
   is(unpack("H*",$pt), $_->{pt}, 'plain text match');
+}
+
+{
+  my $key = pack("H*", '2b7e151628aed2a6abf7158809cf4f3c');
+  my $iv  = pack("H*", '000102030405060708090a0b0c0d0e0f');
+  my $m   = Crypt::Mode::OFB->new('AES');
+
+  eval { $m->add("x") };
+  like($@, qr/call start_encrypt or start_decrypt first/, 'add() before start croaks');
+
+  {
+    local $SIG{__WARN__} = sub { };
+    is(Crypt::Mode::OFB->new('AES')->encrypt(undef, $key, $iv), '', 'encrypt(undef) returns empty string');
+    is(Crypt::Mode::OFB->new('AES')->decrypt(undef, $key, $iv), '', 'decrypt(undef) returns empty string');
+  }
 }

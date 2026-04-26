@@ -15,7 +15,7 @@ new(Class, char * cipher_name, int rounds=0)
         RETVAL->cipher_id = cryptx_internal_find_cipher(cipher_name);
         if (RETVAL->cipher_id == -1) {
           Safefree(RETVAL);
-          croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+          croak("FATAL: find_cipher failed for '%s'", cipher_name);
         }
     }
     OUTPUT:
@@ -24,7 +24,10 @@ new(Class, char * cipher_name, int rounds=0)
 void
 DESTROY(Crypt::Mode::OFB self)
     CODE:
+    {
+        zeromem(&self->state, sizeof(symmetric_OFB));
         Safefree(self);
+    }
 
 void
 start_decrypt(Crypt::Mode::OFB self, SV * key, SV * iv)

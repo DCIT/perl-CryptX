@@ -17,7 +17,7 @@ new(Class, char * cipher_name, int padding=1, int rounds=0)
         RETVAL->cipher_id = cryptx_internal_find_cipher(cipher_name);
         if (RETVAL->cipher_id == -1) {
           Safefree(RETVAL);
-          croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+          croak("FATAL: find_cipher failed for '%s'", cipher_name);
         }
     }
     OUTPUT:
@@ -26,7 +26,11 @@ new(Class, char * cipher_name, int padding=1, int rounds=0)
 void
 DESTROY(Crypt::Mode::ECB self)
     CODE:
+    {
+        zeromem(&self->state, sizeof(symmetric_ECB));
+        zeromem(self->pad, sizeof(self->pad));
         Safefree(self);
+    }
 
 void
 start_decrypt(Crypt::Mode::ECB self, SV * key)
@@ -41,7 +45,7 @@ start_decrypt(Crypt::Mode::ECB self, SV * key)
         if (!SvPOK_spec(key))   croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
 
-        rv = ecb_start(self->cipher_id, k, (unsigned long)k_len, self->cipher_rounds, &self->state);
+        rv = ecb_start(self->cipher_id, k, (int)k_len, self->cipher_rounds, &self->state);
         if (rv != CRYPT_OK) {
           croak("FATAL: ecb_start failed: %s", error_to_string(rv));
         }
@@ -191,7 +195,7 @@ add(Crypt::Mode::ECB self, ...)
             }
             else {
               SvREFCNT_dec(RETVAL);
-              croak("FATAL: call start_decryt or start_encrpyt first (%d)", self->direction);
+              croak("FATAL: call start_decrypt or start_encrypt first (%d)", self->direction);
             }
           }
         }
@@ -253,7 +257,7 @@ finish(Crypt::Mode::ECB self)
           }
         }
         else {
-           croak("FATAL: invalid direction");
+           croak("FATAL: mode not active; call start_decrypt or start_encrypt first");
         }
 
         self->direction = 0;

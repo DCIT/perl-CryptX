@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 266;
+use Test::More tests => 270;
 use Crypt::Mode::ECB;
 
 my @tests;
@@ -81,5 +81,22 @@ for (@tests) {
       }
 
     }
+  }
+}
+
+{
+  my $key = pack("H*", '2b7e151628aed2a6abf7158809cf4f3c');
+  my $m   = Crypt::Mode::ECB->new('AES');
+
+  eval { $m->add("x") };
+  like($@, qr/call start_decrypt or start_encrypt first/, 'add() before start croaks');
+
+  eval { $m->finish };
+  like($@, qr/mode not active; call start_decrypt or start_encrypt first/, 'finish() before start croaks');
+
+  {
+    local $SIG{__WARN__} = sub { };
+    is(length(Crypt::Mode::ECB->new('AES')->encrypt(undef, $key)), 16, 'encrypt(undef) uses empty plaintext with padding');
+    is(Crypt::Mode::ECB->new('AES')->decrypt(undef, $key), '', 'decrypt(undef) returns empty string');
   }
 }
