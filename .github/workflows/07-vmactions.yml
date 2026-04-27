@@ -150,8 +150,6 @@ jobs:
           usesh: true
           sync: scp
           copyback: false
-          prepare: |
-            set -eu
       - name: Info
         shell: openbsd {0}
         run: |
