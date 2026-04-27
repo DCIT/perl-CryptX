@@ -41,6 +41,7 @@ use Crypt::Cipher::SAFER_K64;
 use Crypt::Cipher::SAFER_SK128;
 use Crypt::Cipher::SAFER_SK64;
 use Crypt::Cipher::SEED;
+use Crypt::Cipher::SM4;
 use Crypt::Cipher::Serpent;
 use Crypt::Cipher::Skipjack;
 use Crypt::Cipher::Twofish;

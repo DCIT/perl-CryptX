@@ -60,6 +60,8 @@ my %list = (
                          spec_rounds=>9, spec_key=>'S' x 8 }, # 6..13
         SEED        => { info=>'Symmetric cipher SEED, key size: 128 bits', urls=>['https://en.wikipedia.org/wiki/SEED'],
                          spec_rounds=>0, spec_key=>'XXX-ROUNDS-FIXED' },
+        SM4         => { info=>'Symmetric cipher SM4, key size: 128 bits', urls=>['https://en.wikipedia.org/wiki/SM4_(cipher)'],
+                         spec_rounds=>0, spec_key=>'XXX-ROUNDS-FIXED' },
         Skipjack    => { info=>'Symmetric cipher Skipjack, key size: 80 bits', urls=>['https://en.wikipedia.org/wiki/Skipjack_(cipher)'],
                          spec_rounds=>0, spec_key=>'XXX-ROUNDS-FIXED' },
         Twofish     => { info=>'Symmetric cipher Twofish, key size: 128/192/256 bits', urls=>['https://en.wikipedia.org/wiki/Twofish'],

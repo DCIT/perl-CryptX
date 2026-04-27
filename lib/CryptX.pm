@@ -260,7 +260,7 @@ or the wrong key/nonce was used.
 L<Crypt::Cipher::AES>, L<Crypt::Cipher::Anubis>, L<Crypt::Cipher::Blowfish>, L<Crypt::Cipher::Camellia>, L<Crypt::Cipher::CAST5>, L<Crypt::Cipher::DES>,
 L<Crypt::Cipher::DES_EDE>, L<Crypt::Cipher::IDEA>, L<Crypt::Cipher::KASUMI>, L<Crypt::Cipher::Khazad>, L<Crypt::Cipher::MULTI2>, L<Crypt::Cipher::Noekeon>,
 L<Crypt::Cipher::RC2>, L<Crypt::Cipher::RC5>, L<Crypt::Cipher::RC6>, L<Crypt::Cipher::SAFERP>, L<Crypt::Cipher::SAFER_K128>, L<Crypt::Cipher::SAFER_K64>,
-L<Crypt::Cipher::SAFER_SK128>, L<Crypt::Cipher::SAFER_SK64>, L<Crypt::Cipher::SEED>, L<Crypt::Cipher::Serpent>, L<Crypt::Cipher::Skipjack>,
+L<Crypt::Cipher::SAFER_SK128>, L<Crypt::Cipher::SAFER_SK64>, L<Crypt::Cipher::SEED>, L<Crypt::Cipher::SM4>, L<Crypt::Cipher::Serpent>, L<Crypt::Cipher::Skipjack>,
 L<Crypt::Cipher::Twofish>, L<Crypt::Cipher::XTEA>
 
 =item * Block cipher modes
