@@ -25,6 +25,10 @@
 #include "tomcrypt.h"
 #include "tommath.h"
 
+#ifndef LTC_ALIGN_BUF
+#define LTC_ALIGN_BUF(buf, align) ((void*)(((UV)&((unsigned char*)(buf))[(align) - 1]) & ~((UV)(align) - 1)))
+#endif
+
 STATIC int cryptx_internal_input_has_no_payload(const char *in, STRLEN len) {
   STRLEN i;
   int saw_formatting = 0;
@@ -131,21 +135,17 @@ typedef struct digest_struct {          /* used by Crypt::Digest */
  * the copied storage before using the clone/state copy. */
 STATIC void cryptx_internal_digest_fixup_state(Crypt__Digest digest) {
   const char *name;
-  const UV mask = (UV)16 - 1;
-  UV value;
 
   if (digest == NULL || digest->desc == NULL || digest->desc->name == NULL) return;
   name = digest->desc->name;
 
   if (strcmp(name, "sha1") == 0) {
-    value = PTR2UV(digest->state.sha1.state_buf);
-    digest->state.sha1.state = INT2PTR(ulong32 *, (value + mask) & ~mask);
+    digest->state.sha1.state = (ulong32 *)LTC_ALIGN_BUF(digest->state.sha1.state_buf, 16);
     return;
   }
 
   if (strcmp(name, "sha224") == 0 || strcmp(name, "sha256") == 0) {
-    value = PTR2UV(digest->state.sha256.state_buf);
-    digest->state.sha256.state = INT2PTR(ulong32 *, (value + mask) & ~mask);
+    digest->state.sha256.state = (ulong32 *)LTC_ALIGN_BUF(digest->state.sha256.state_buf, 16);
     return;
   }
 }
@@ -155,22 +155,18 @@ STATIC void cryptx_internal_digest_fixup_state(Crypt__Digest digest) {
  * Crypt::Digest state copies. */
 STATIC void cryptx_internal_hmac_fixup_state(hmac_state *hmac) {
   const char *name;
-  const UV mask = (UV)16 - 1;
-  UV value;
 
   if (hmac == NULL || hmac->hash < 0 || hmac->hash >= TAB_SIZE) return;
   if (hash_descriptor[hmac->hash].name == NULL) return;
   name = hash_descriptor[hmac->hash].name;
 
   if (strcmp(name, "sha1") == 0) {
-    value = PTR2UV(hmac->md.sha1.state_buf);
-    hmac->md.sha1.state = INT2PTR(ulong32 *, (value + mask) & ~mask);
+    hmac->md.sha1.state = (ulong32 *)LTC_ALIGN_BUF(hmac->md.sha1.state_buf, 16);
     return;
   }
 
   if (strcmp(name, "sha224") == 0 || strcmp(name, "sha256") == 0) {
-    value = PTR2UV(hmac->md.sha256.state_buf);
-    hmac->md.sha256.state = INT2PTR(ulong32 *, (value + mask) & ~mask);
+    hmac->md.sha256.state = (ulong32 *)LTC_ALIGN_BUF(hmac->md.sha256.state_buf, 16);
     return;
   }
 }
