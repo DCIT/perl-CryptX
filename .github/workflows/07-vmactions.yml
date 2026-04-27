@@ -145,7 +145,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: vmactions/openbsd-vm@v1
         with:
-          release: ${{ matrix.relver }}
+          release: "${{ matrix.relver }}"
           arch: aarch64
           usesh: true
           sync: scp
