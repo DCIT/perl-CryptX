@@ -198,6 +198,8 @@ sub import_key_raw {
     $p = $param->{p} or croak "FATAL: 'p' param not specified";
     $g =~ s/^0x//;
     $p =~ s/^0x//;
+    croak "FATAL: 'g' param is empty after stripping '0x' prefix" unless length $g;
+    croak "FATAL: 'p' param is empty after stripping '0x' prefix" unless length $p;
   } elsif (my $dhparam = $DH_PARAMS{$param}) {
     $g = $dhparam->{g};
     $p = $dhparam->{p};
@@ -219,11 +221,14 @@ sub import_key_raw {
 sub generate_key {
   my ($self, $param) = @_;
 
+  if (!defined $param) {
+    croak "FATAL: DH generate_key - invalid args";
+  }
   if (!ref $param) {
     # group name
-    return $self->_generate_key_gp($DH_PARAMS{$param}{g}, $DH_PARAMS{$param}{p}) if $DH_PARAMS{$param};
+    return $self->_generate_key_gp($DH_PARAMS{$param}{g}, $DH_PARAMS{$param}{p}) if exists $DH_PARAMS{$param};
     # size
-    return $self->_generate_key_size($param) if $param && $param =~ /^[0-9]+/;
+    return $self->_generate_key_size($param) if $param =~ /^[0-9]+\z/;
   }
   elsif (ref $param eq 'SCALAR') {
     my $data = $$param;
@@ -237,6 +242,8 @@ sub generate_key {
     my $p = $param->{p} or croak "FATAL: 'p' param not specified";
     $g =~ s/^0x//;
     $p =~ s/^0x//;
+    croak "FATAL: 'g' param is empty after stripping '0x' prefix" unless length $g;
+    croak "FATAL: 'p' param is empty after stripping '0x' prefix" unless length $p;
     return $self->_generate_key_gp($g, $p);
   }
   croak "FATAL: DH generate_key - invalid args";
@@ -248,8 +255,8 @@ sub dh_shared_secret { # legacy/obsolete
   my ($privkey, $pubkey) = @_;
   $privkey = __PACKAGE__->new($privkey) unless ref $privkey;
   $pubkey  = __PACKAGE__->new($pubkey)  unless ref $pubkey;
-  carp "FATAL: invalid 'privkey' param" unless ref($privkey) eq __PACKAGE__ && $privkey->is_private;
-  carp "FATAL: invalid 'pubkey' param"  unless ref($pubkey)  eq __PACKAGE__;
+  croak "FATAL: invalid 'privkey' param" unless ref($privkey) eq __PACKAGE__ && $privkey->is_private;
+  croak "FATAL: invalid 'pubkey' param"  unless ref($pubkey)  eq __PACKAGE__;
   return $privkey->shared_secret($pubkey);
 }
 
@@ -281,7 +288,7 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
 
  #Key generation
  my $pk = Crypt::PK::DH->new();
- $pk->generate_key(128);
+ $pk->generate_key(256);
  my $private = $pk->export_key('private');
  my $public = $pk->export_key('public');
 
@@ -327,8 +334,7 @@ immediately import the key material into the new object.
 
 =head2 generate_key
 
-Uses Yarrow-based cryptographically strong random number generator seeded with
-random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
+Uses the bundled C<chacha20> PRNG via libtomcrypt's C<rng_make_prng>.
 Returns the object itself (for chaining).
 
  $pk->generate_key($groupsize);
@@ -359,6 +365,8 @@ The following variants are available since CryptX-0.032
  $pk->generate_key($param_hash)
  # $param_hash is { g => $g, p => $p }
  # where $g is the generator (base) in a hex string and $p is the prime in a hex string
+ # practical current limit: custom p/g values must fit into the current XS buffers
+ # (roughly up to the built-in 8192-bit group sizes)
 
  $pk->generate_key(\$dh_param)
  # $dh_param is the content of DER or PEM file with DH parameters

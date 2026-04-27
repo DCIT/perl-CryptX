@@ -13,11 +13,13 @@ _new(Class)
         RETVAL->pindex = find_prng("chacha20");
         RETVAL->last_pid = (IV)PerlProc_getpid();
         if (RETVAL->pindex == -1) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: find_prng('chacha20') failed");
         }
         rv = rng_make_prng(320, RETVAL->pindex, &RETVAL->pstate, NULL); /* 320bits = 40bytes */
         if (rv != CRYPT_OK) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
         }
@@ -31,6 +33,7 @@ _generate_key_size(Crypt::PK::DH self, int groupsize=256)
     {
         int rv;
         cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
+        if (self->key.type != -1) { dh_free(&self->key); self->key.type = -1; }
         rv = dh_set_pg_groupsize(groupsize, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dh_set_pg_groupsize failed: %s", error_to_string(rv));
         rv = dh_generate_key(&self->pstate, self->pindex, &self->key);
@@ -43,9 +46,10 @@ _generate_key_gp(Crypt::PK::DH self, char *g, char *p)
     PPCODE:
     {
         int rv;
-        unsigned char pbin[1024], gbin[512];
+        unsigned char pbin[1536], gbin[512]; /* 1536 = headroom above 8192-bit (1024-byte) groups */
         unsigned long plen=sizeof(pbin), glen=sizeof(gbin);
         cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
+        if (self->key.type != -1) { dh_free(&self->key); self->key.type = -1; }
 
         if (p && strlen(p) > 0 && g && strlen(g) > 0) {
           rv = radix_to_bin(p, 16, pbin, &plen);
@@ -57,6 +61,9 @@ _generate_key_gp(Crypt::PK::DH self, char *g, char *p)
           if (rv != CRYPT_OK) croak("FATAL: dh_set_pg failed: %s", error_to_string(rv));
           rv = dh_generate_key(&self->pstate, self->pindex, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: dh_generate_key failed: %s", error_to_string(rv));
+        }
+        else {
+          croak("FATAL: generate_key: invalid g or p");
         }
 
         XPUSHs(ST(0)); /* return self */
@@ -70,6 +77,7 @@ _generate_key_dhparam(Crypt::PK::DH self, SV * dhparam)
         unsigned char *data=NULL;
         STRLEN data_len=0;
         cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
+        if (self->key.type != -1) { dh_free(&self->key); self->key.type = -1; }
         data = (unsigned char *)SvPVbyte(dhparam, data_len);
         /* load d p q */
         rv = dh_set_pg_dhparam(data, (unsigned long)data_len, &self->key);
@@ -102,7 +110,7 @@ _import_raw(Crypt::PK::DH self, SV * raw_key, int type, char * g, char * p)
         int rv;
         unsigned char *data=NULL;
         STRLEN data_len=0;
-        unsigned char pbin[1024], gbin[512];
+        unsigned char pbin[1536], gbin[512]; /* 1536 = headroom above 8192-bit (1024-byte) groups */
         unsigned long plen=sizeof(pbin), glen=sizeof(gbin);
 
         data = (unsigned char *)SvPVbyte(raw_key, data_len);
@@ -130,6 +138,9 @@ _import_raw(Crypt::PK::DH self, SV * raw_key, int type, char * g, char * p)
           else {
             croak("FATAL: import_raw invalid type '%d'", type);
           }
+        }
+        else {
+          croak("FATAL: import_raw: invalid g or p");
         }
 
         XPUSHs(ST(0)); /* return self */
@@ -223,7 +234,7 @@ SV*
 params2hash(Crypt::PK::DH self)
     PREINIT:
         HV *rv_hash;
-        long siz;
+        size_t siz;
         char buf[20001];
         SV **not_used;
     CODE:
@@ -232,7 +243,7 @@ params2hash(Crypt::PK::DH self)
         /* p */
         siz = (self->key.prime) ? mp_ubin_size(self->key.prime) : 0;
         if (siz>10000) {
-          croak("FATAL: key2hash failed - 'p' too big number");
+          croak("FATAL: params2hash failed - 'p' too big number");
         }
         if (siz>0) {
           cryptx_internal_mp2hex_with_leading_zero(self->key.prime, buf, 20000, 0);
@@ -245,7 +256,7 @@ params2hash(Crypt::PK::DH self)
         /* g */
         siz = (self->key.base) ? mp_ubin_size(self->key.base) : 0;
         if (siz>10000) {
-          croak("FATAL: key2hash failed - 'g' too big number");
+          croak("FATAL: params2hash failed - 'g' too big number");
         }
         if (siz>0) {
           cryptx_internal_mp2hex_with_leading_zero(self->key.base, buf, 20000, 0);
@@ -268,19 +279,20 @@ export_key(Crypt::PK::DH self, char * type)
         unsigned char out[4096];
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
-        if (strnEQ(type, "private", 7)) {
+        if (strEQ(type, "private")) {
           rv = dh_export(out, &out_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: dh_export(PK_PRIVATE) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
-        else if (strnEQ(type, "public", 6)) {
+        else if (strEQ(type, "public")) {
           rv = dh_export(out, &out_len, PK_PUBLIC, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: dh_export(PK_PUBLIC) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
-          croak("FATAL: export_key_der invalid type '%s'", type);
+          croak("FATAL: export_key invalid type '%s'", type);
         }
+        zeromem(out, sizeof(out));
     }
     OUTPUT:
         RETVAL
@@ -290,12 +302,13 @@ shared_secret(Crypt::PK::DH self, Crypt::PK::DH pubkey)
     CODE:
     {
         int rv;
-        unsigned long buffer_len = 1024;
-        unsigned char buffer[1024];
+        unsigned char buffer[1536]; /* headroom above 8192-bit (1024-byte) groups */
+        unsigned long buffer_len = sizeof(buffer);
 
         rv = dh_shared_secret(&self->key, &pubkey->key, buffer, &buffer_len);
         if (rv != CRYPT_OK) croak("FATAL: dh_shared_secret failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
     }
     OUTPUT:
         RETVAL
@@ -305,23 +318,24 @@ export_key_raw(Crypt::PK::DH self, char * type)
     CODE:
     {
         int rv;
-        unsigned char out[1024];
-        unsigned long out_len = 1024;
+        unsigned char out[1536]; /* headroom above 8192-bit (1024-byte) groups */
+        unsigned long out_len = sizeof(out);
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
-        if (strnEQ(type, "private", 7)) {
+        if (strEQ(type, "private")) {
           rv = dh_export_key(out, &out_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: dh_export_key(PK_PRIVATE) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
-        else if (strnEQ(type, "public", 6)) {
+        else if (strEQ(type, "public")) {
           rv = dh_export_key(out, &out_len, PK_PUBLIC, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: dh_export_key(PK_PUBLIC) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
           croak("FATAL: export_key_raw: invalid type '%s'", type);
         }
+        zeromem(out, sizeof(out));
     }
     OUTPUT:
         RETVAL
@@ -330,4 +344,8 @@ void
 DESTROY(Crypt::PK::DH self)
     CODE:
         if (self->key.type != -1) { dh_free(&self->key); self->key.type = -1; }
+        if (self->pindex >= 0 && prng_is_valid(self->pindex) == CRYPT_OK && prng_descriptor[self->pindex].done) {
+          prng_descriptor[self->pindex].done(&self->pstate);
+        }
+        zeromem(self, sizeof(*self));
         Safefree(self);

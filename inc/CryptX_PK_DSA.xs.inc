@@ -441,4 +441,8 @@ void
 DESTROY(Crypt::PK::DSA self)
     CODE:
         if (self->key.type != -1) { dsa_free(&self->key); self->key.type = -1; }
+        if (self->pindex >= 0 && prng_is_valid(self->pindex) == CRYPT_OK && prng_descriptor[self->pindex].done) {
+          prng_descriptor[self->pindex].done(&self->pstate);
+        }
+        zeromem(self, sizeof(*self));
         Safefree(self);

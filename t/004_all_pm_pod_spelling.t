@@ -31,7 +31,7 @@ Test::Pod::Spelling->import(
                           stringifiable
                           stringification
                           stringified
-                          RNG
+                          RNG PRNG
                           CBC OFB ECB CFB
                           flexi MSB YY BER moduli SubjectPublicKeyInfo
                         )]

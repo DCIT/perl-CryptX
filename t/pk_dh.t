@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 60;
+use Test::More tests => 74;
 
 use Crypt::Misc 'decode_b64';
 use Crypt::PK::DH qw(dh_shared_secret);
@@ -187,6 +187,18 @@ MARKER
 
 {
   my $k = Crypt::PK::DH->new;
+  $k->generate_key('ike2048');
+  is($k->size, 256, 'generate_key reuse first groupsize');
+  my $first_pub = $k->export_key_raw('public');
+
+  $k->generate_key('ike3072');
+  is($k->size, 384, 'generate_key reuse second groupsize');
+  ok($k->is_private, 'generate_key reuse stays private');
+  isnt($k->export_key_raw('public'), $first_pub, 'generate_key reuse replaces prior public key');
+}
+
+{
+  my $k = Crypt::PK::DH->new;
   $k->generate_key({g => 2, p => 'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE65381FFFFFFFFFFFFFFFF'});
   ok($k, 'generate_key');
   ok($k->is_private, 'is_private');
@@ -201,6 +213,46 @@ MARKER
   ok($k->is_private, 'is_private');
   ok($k->export_key('private'), 'export_key_pem pri ike2048');
   ok($k->export_key('public'), 'export_key_pem pub ike2048');
+}
+
+{
+  my $warn = '';
+  local $SIG{__WARN__} = sub { $warn .= $_[0] };
+
+  my $k = Crypt::PK::DH->new;
+  eval { $k->generate_key(10.9) };
+  like($@, qr/^FATAL: DH generate_key - invalid args\b/, 'generate_key rejects float-ish scalar');
+  is($warn, '', 'generate_key float-ish scalar emits no warning');
+
+  $warn = '';
+  $k = Crypt::PK::DH->new;
+  eval { $k->generate_key('1e2') };
+  like($@, qr/^FATAL: DH generate_key - invalid args\b/, 'generate_key rejects scientific notation');
+  is($warn, '', 'generate_key scientific notation emits no warning');
+
+  $warn = '';
+  $k = Crypt::PK::DH->new;
+  eval { $k->generate_key(undef) };
+  like($@, qr/^FATAL: DH generate_key - invalid args\b/, 'generate_key rejects undef');
+  is($warn, '', 'generate_key undef emits no warning');
+
+  $warn = '';
+  $k = Crypt::PK::DH->new;
+  eval { $k->generate_key('') };
+  like($@, qr/^FATAL: DH generate_key - invalid args\b/, 'generate_key rejects empty string');
+  is($warn, '', 'generate_key empty string emits no warning');
+}
+
+{
+  eval { dh_shared_secret('t/data/cryptx_pub_dh1.bin', 't/data/cryptx_pub_dh2.bin') };
+  like($@, qr/^FATAL: invalid 'privkey' param\b/, 'legacy dh_shared_secret rejects public key as private key');
+}
+
+{
+  my $k = Crypt::PK::DH->new;
+  my $too_big_p = 'F' x 3073; # exceeds 1536-byte pbin buffer
+  eval { $k->generate_key({ g => '2', p => $too_big_p }) };
+  like($@, qr/^FATAL: radix_to_bin\(p\) failed: Buffer overflow\./, 'generate_key rejects over-limit custom DH params cleanly');
 }
 
 {

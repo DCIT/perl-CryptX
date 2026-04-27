@@ -331,6 +331,7 @@ STATIC void cryptx_internal_pk_prng_reseed(prng_state *state, int pindex, IV *la
   if (rv != CRYPT_OK) croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
   rv = prng_descriptor[pindex].ready(state);
   if (rv != CRYPT_OK) croak("FATAL: PRNG_ready failed: %s", error_to_string(rv));
+  zeromem(entropy_buf, sizeof(entropy_buf));
   *last_pid = curpid;
 }
 
