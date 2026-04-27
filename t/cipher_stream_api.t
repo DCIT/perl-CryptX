@@ -84,8 +84,9 @@ sub child_croaks_cleanly {
 
   is($? & 127, 0, "$label does not crash with a signal");
   is($? >> 8, 0, "$label exits after croak");
-  unlike($msg // '', qr/^NOERROR\z/, "$label croaks");
-  like($msg // '', $pattern, "$label croak message");
+  my $msg_text = defined($msg) ? $msg : '';
+  unlike($msg_text, qr/^NOERROR\z/, "$label croaks");
+  like($msg_text, $pattern, "$label croak message");
 }
 
 for my $case (@cases) {
