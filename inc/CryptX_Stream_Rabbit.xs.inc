@@ -45,6 +45,7 @@ void
 DESTROY(Crypt::Stream::Rabbit self)
     CODE:
         rabbit_done(self);
+        zeromem(self, sizeof(*self));
         Safefree(self);
 
 Crypt::Stream::Rabbit

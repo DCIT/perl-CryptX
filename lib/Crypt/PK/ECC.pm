@@ -133,8 +133,10 @@ sub export_key_pem {
   local $SIG{__DIE__} = \&CryptX::_croak;
   my $key = $self->export_key_der($type||'');
   return unless $key;
-  return der_to_pem($key, "EC PRIVATE KEY", $password, $cipher) if substr($type, 0, 7) eq 'private';
-  return der_to_pem($key, "PUBLIC KEY") if substr($type,0, 6) eq 'public';
+  # private, private_short, private_compressed all use the same PEM header
+  return der_to_pem($key, "EC PRIVATE KEY", $password, $cipher) if $type =~ /\Aprivate(?:_short|_compressed)?\z/;
+  # public, public_short, public_compressed all use the same PEM header
+  return der_to_pem($key, "PUBLIC KEY") if $type =~ /\Apublic(?:_short|_compressed)?\z/;
 }
 
 sub export_key_jwk {
@@ -280,7 +282,7 @@ sub ecc_encrypt { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->encrypt(@_);
 }
 
@@ -288,7 +290,7 @@ sub ecc_decrypt { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->decrypt(@_);
 }
 
@@ -296,7 +298,7 @@ sub ecc_sign_message { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_message(@_);
 }
 
@@ -304,7 +306,7 @@ sub ecc_verify_message { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_message(@_);
 }
 
@@ -312,7 +314,7 @@ sub ecc_sign_hash { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_hash(@_);
 }
 
@@ -320,7 +322,7 @@ sub ecc_verify_hash { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_hash(@_);
 }
 
@@ -329,8 +331,8 @@ sub ecc_shared_secret { # legacy/obsolete
   local $SIG{__DIE__} = \&CryptX::_croak;
   $privkey = __PACKAGE__->new($privkey) unless ref $privkey;
   $pubkey  = __PACKAGE__->new($pubkey)  unless ref $pubkey;
-  carp "FATAL: invalid 'privkey' param" unless ref($privkey) eq __PACKAGE__ && $privkey->is_private;
-  carp "FATAL: invalid 'pubkey' param"  unless ref($pubkey)  eq __PACKAGE__;
+  croak "FATAL: invalid 'privkey' param" unless ref($privkey) eq __PACKAGE__ && $privkey->is_private;
+  croak "FATAL: invalid 'pubkey' param"  unless ref($pubkey)  eq __PACKAGE__;
   return $privkey->shared_secret($pubkey);
 }
 

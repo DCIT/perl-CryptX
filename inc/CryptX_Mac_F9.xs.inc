@@ -105,6 +105,7 @@ mac(Crypt::Mac::F9 self)
         else {
           RETVAL = newSVpvn((char * )mac, maclen);
         }
+        zeromem(mac, sizeof(mac));
     }
     OUTPUT:
         RETVAL
@@ -160,6 +161,7 @@ f9(char * cipher_name, SV * key, ...)
         else {
           RETVAL = newSVpvn((char *) mac, len);
         }
+        zeromem(mac, sizeof(mac));
     }
     OUTPUT:
         RETVAL

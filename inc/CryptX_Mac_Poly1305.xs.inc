@@ -101,6 +101,7 @@ mac(Crypt::Mac::Poly1305 self)
         else {
           RETVAL = newSVpvn((char * )mac, maclen);
         }
+        zeromem(mac, sizeof(mac));
     }
     OUTPUT:
         RETVAL
@@ -154,6 +155,7 @@ poly1305(SV * key, ...)
         else {
           RETVAL = newSVpvn((char *) mac, len);
         }
+        zeromem(mac, sizeof(mac));
     }
     OUTPUT:
         RETVAL

@@ -101,6 +101,7 @@ mac(Crypt::Mac::BLAKE2s self)
         else {
           RETVAL = newSVpvn((char * )mac, maclen);
         }
+        zeromem(mac, sizeof(mac));
     }
     OUTPUT:
         RETVAL
@@ -155,6 +156,7 @@ blake2s(unsigned long size, SV * key, ...)
         else {
           RETVAL = newSVpvn((char *) mac, len);
         }
+        zeromem(mac, sizeof(mac));
     }
     OUTPUT:
         RETVAL

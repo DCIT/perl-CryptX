@@ -29,6 +29,7 @@ void
 DESTROY(Crypt::Stream::RC4 self)
     CODE:
         rc4_stream_done(self);
+        zeromem(self, sizeof(*self));
         Safefree(self);
 
 Crypt::Stream::RC4

@@ -27,6 +27,7 @@ new(Class, int num)
 void
 DESTROY(Crypt::Digest::SHAKE self)
     CODE:
+        zeromem(self, sizeof(*self));
         Safefree(self);
 
 void

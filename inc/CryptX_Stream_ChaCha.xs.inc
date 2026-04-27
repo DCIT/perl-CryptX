@@ -58,6 +58,7 @@ void
 DESTROY(Crypt::Stream::ChaCha self)
     CODE:
         chacha_done(self);
+        zeromem(self, sizeof(*self));
         Safefree(self);
 
 Crypt::Stream::ChaCha

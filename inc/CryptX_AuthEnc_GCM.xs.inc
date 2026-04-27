@@ -171,6 +171,7 @@ encrypt_done(Crypt::AuthEnc::GCM self)
         if (rv != CRYPT_OK) croak("FATAL: gcm_done failed: %s", error_to_string(rv));
         self->finalized = 1;
         XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
+        zeromem(tag, sizeof(tag));
     }
 
 void
@@ -189,7 +190,8 @@ decrypt_done(Crypt::AuthEnc::GCM self, ...)
         self->finalized = 1;
         if (items == 1) {
           XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
-        }
+            zeromem(tag, sizeof(tag));
+    }
         else {
           if (!SvPOK_spec(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
           expected_tag = (unsigned char *) SvPVbyte(ST(1), expected_tag_len);
@@ -225,7 +227,8 @@ gcm_encrypt_authenticate(char *cipher_name, SV *key, SV *nonce, SV *header = NUL
         if (header && SvOK(header)) {
           if (!SvPOK_spec(header)) croak("FATAL: header must be string/buffer scalar");
           h = (unsigned char *) SvPVbyte(header, h_len);
-        }
+            zeromem(tag, sizeof(tag));
+    }
 
         id = cryptx_internal_find_cipher(cipher_name);
         if(id==-1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
@@ -266,7 +269,8 @@ gcm_decrypt_verify(char *cipher_name, SV *key, SV *nonce, SV *header, SV *cipher
         if (header && SvOK(header)) {
           if (!SvPOK_spec(header)) croak("FATAL: header must be string/buffer scalar");
           h = (unsigned char *) SvPVbyte(header, h_len);
-        }
+            zeromem(tag, sizeof(tag));
+    }
 
         id = cryptx_internal_find_cipher(cipher_name);
         if(id==-1) croak("FATAL: find_cipher failed for '%s'", cipher_name);

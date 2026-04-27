@@ -32,6 +32,7 @@ void
 DESTROY(Crypt::Stream::XChaCha self)
     CODE:
         chacha_done(self);
+        zeromem(self, sizeof(*self));
         Safefree(self);
 
 Crypt::Stream::XChaCha

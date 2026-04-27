@@ -172,6 +172,7 @@ encrypt_done(Crypt::AuthEnc::ChaCha20Poly1305 self)
         if (rv != CRYPT_OK) croak("FATAL: chacha20poly1305_done failed: %s", error_to_string(rv));
         self->finalized = 1;
         XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
+        zeromem(tag, sizeof(tag));
     }
 
 void
@@ -190,7 +191,8 @@ decrypt_done(Crypt::AuthEnc::ChaCha20Poly1305 self, ...)
         self->finalized = 1;
         if (items == 1) {
           XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
-        }
+            zeromem(tag, sizeof(tag));
+    }
         else {
           if (!SvPOK_spec(ST(1))) croak("FATAL: expected_tag must be string/buffer scalar");
           expected_tag = (unsigned char *) SvPVbyte(ST(1), expected_tag_len);
@@ -226,7 +228,8 @@ chacha20poly1305_encrypt_authenticate(SV *key, SV *nonce, SV *header, SV *plaint
         if (header && SvOK(header)) {
           if (!SvPOK_spec(header)) croak("FATAL: header must be string/buffer scalar");
           h = (unsigned char *) SvPVbyte(header, h_len);
-        }
+            zeromem(tag, sizeof(tag));
+    }
 
         output = NEWSV(0, pt_len > 0 ? pt_len : 1); /* avoid zero! */
         SvPOK_only(output);
@@ -266,7 +269,8 @@ chacha20poly1305_decrypt_verify(SV *key, SV *nonce, SV *header, SV *ciphertext, 
         if (header && SvOK(header)) {
           if (!SvPOK_spec(header)) croak("FATAL: header must be string/buffer scalar");
           h = (unsigned char *) SvPVbyte(header, h_len);
-        }
+            zeromem(tag, sizeof(tag));
+    }
 
         output = NEWSV(0, ct_len > 0 ? ct_len : 1); /* avoid zero! */
         SvPOK_only(output);

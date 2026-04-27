@@ -38,6 +38,7 @@ void
 DESTROY(Crypt::Stream::Sober128 self)
     CODE:
         sober128_stream_done(self);
+        zeromem(self, sizeof(*self));
         Safefree(self);
 
 Crypt::Stream::Sober128

@@ -38,6 +38,7 @@ void
 DESTROY(Crypt::Stream::Salsa20 self)
     CODE:
         salsa20_done(self);
+        zeromem(self, sizeof(*self));
         Safefree(self);
 
 Crypt::Stream::Salsa20

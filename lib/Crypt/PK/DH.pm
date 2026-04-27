@@ -11,7 +11,6 @@ our @EXPORT = qw();
 
 use Carp;
 use CryptX;
-use Crypt::Digest 'digest_data';
 use Crypt::Misc qw(read_rawfile pem_to_der);
 
 my %DH_PARAMS = (

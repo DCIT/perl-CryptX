@@ -48,6 +48,7 @@ void
 DESTROY(Crypt::Stream::Sosemanuk self)
     CODE:
         sosemanuk_done(self);
+        zeromem(self, sizeof(*self));
         Safefree(self);
 
 Crypt::Stream::Sosemanuk
