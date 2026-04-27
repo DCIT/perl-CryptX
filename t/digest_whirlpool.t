@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::Whirlpool qw( whirlpool whirlpool_hex whirlpool_b64 whirlpool_b64u whirlpool_file whirlpool_file_hex whirlpool_file_b64 whirlpool_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('Whirlpool'), 64, 'hashsize/1');
 is( Crypt::Digest->hashsize('Whirlpool'), 64, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::Whirlpool->new->hashsize, 64, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::Whirlpool->new->add("AAA");
-  is($d->digest, pack("H*","a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64"), 'whirlpool (OO/digest/non-destructive)');
-  is($d->hexdigest, "a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64", 'whirlpool (OO/hexdigest/repeatable)');
-  is($d->b64digest, "pN6jjHQ/MY23Fp4orCev8XOUK2e1b5iB2kZL2sSPR8xIHuKXRlV88BPRxUx6dpEsE4CxaCUd9xGCk1Ef2JqaZA==", 'whirlpool (OO/b64digest/repeatable)');
-  is($d->b64udigest, "pN6jjHQ_MY23Fp4orCev8XOUK2e1b5iB2kZL2sSPR8xIHuKXRlV88BPRxUx6dpEsE4CxaCUd9xGCk1Ef2JqaZA", 'whirlpool (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "139e0850c7b4e2b6d6c37fdaf42cd782b9582bde9a7a7d318351d87bf769a0d79ecce704d6995836a2721a83cfbcf9b8cbd5b69a79f18088c4b044181428b2e9", 'whirlpool (OO/add-after-digest)');
+  is($d->digest, pack("H*","a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64"), 'whirlpool (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'whirlpool (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'whirlpool (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "139e0850c7b4e2b6d6c37fdaf42cd782b9582bde9a7a7d318351d87bf769a0d79ecce704d6995836a2721a83cfbcf9b8cbd5b69a79f18088c4b044181428b2e9", 'whirlpool (OO/reset-after-digest)');
+  $d = Crypt::Digest::Whirlpool->new->add("AAA");
+  is($d->hexdigest, "a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64", 'whirlpool (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'whirlpool (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::Whirlpool->new->add("AAA");
+  is($d->b64digest, "pN6jjHQ/MY23Fp4orCev8XOUK2e1b5iB2kZL2sSPR8xIHuKXRlV88BPRxUx6dpEsE4CxaCUd9xGCk1Ef2JqaZA==", 'whirlpool (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::Whirlpool->new->add("AAA");
+  is($d->b64udigest, "pN6jjHQ_MY23Fp4orCev8XOUK2e1b5iB2kZL2sSPR8xIHuKXRlV88BPRxUx6dpEsE4CxaCUd9xGCk1Ef2JqaZA", 'whirlpool (OO/b64udigest/finalizes)');
 }
 
 is( whirlpool("A","A","A"), pack("H*","a4dea38c743f318db7169e28ac27aff173942b67b56f9881da464bdac48f47cc481ee29746557cf013d1c54c7a76912c1380b168251df7118293511fd89a9a64"), 'whirlpool (raw/tripple_A)');

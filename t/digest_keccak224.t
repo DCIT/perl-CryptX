@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::Keccak224 qw( keccak224 keccak224_hex keccak224_b64 keccak224_b64u keccak224_file keccak224_file_hex keccak224_file_b64 keccak224_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('Keccak224'), 28, 'hashsize/1');
 is( Crypt::Digest->hashsize('Keccak224'), 28, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::Keccak224->new->hashsize, 28, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::Keccak224->new->add("AAA");
-  is($d->digest, pack("H*","92b9d2a25222d2a036c53bd4dd246b4073d100e0ae20ac7240f5b252"), 'keccak224 (OO/digest/non-destructive)');
-  is($d->hexdigest, "92b9d2a25222d2a036c53bd4dd246b4073d100e0ae20ac7240f5b252", 'keccak224 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "krnSolIi0qA2xTvU3SRrQHPRAOCuIKxyQPWyUg==", 'keccak224 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "krnSolIi0qA2xTvU3SRrQHPRAOCuIKxyQPWyUg", 'keccak224 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "1947b3e9bb1c6576c4e8013f55c22e92544c51afbe6527ad65808f1a", 'keccak224 (OO/add-after-digest)');
+  is($d->digest, pack("H*","92b9d2a25222d2a036c53bd4dd246b4073d100e0ae20ac7240f5b252"), 'keccak224 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'keccak224 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'keccak224 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "1947b3e9bb1c6576c4e8013f55c22e92544c51afbe6527ad65808f1a", 'keccak224 (OO/reset-after-digest)');
+  $d = Crypt::Digest::Keccak224->new->add("AAA");
+  is($d->hexdigest, "92b9d2a25222d2a036c53bd4dd246b4073d100e0ae20ac7240f5b252", 'keccak224 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'keccak224 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::Keccak224->new->add("AAA");
+  is($d->b64digest, "krnSolIi0qA2xTvU3SRrQHPRAOCuIKxyQPWyUg==", 'keccak224 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::Keccak224->new->add("AAA");
+  is($d->b64udigest, "krnSolIi0qA2xTvU3SRrQHPRAOCuIKxyQPWyUg", 'keccak224 (OO/b64udigest/finalizes)');
 }
 
 is( keccak224("A","A","A"), pack("H*","92b9d2a25222d2a036c53bd4dd246b4073d100e0ae20ac7240f5b252"), 'keccak224 (raw/tripple_A)');

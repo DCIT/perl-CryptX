@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA256 qw( sha256 sha256_hex sha256_b64 sha256_b64u sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('SHA256'), 32, 'hashsize/1');
 is( Crypt::Digest->hashsize('SHA256'), 32, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::SHA256->new->hashsize, 32, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::SHA256->new->add("AAA");
-  is($d->digest, pack("H*","cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358"), 'sha256 (OO/digest/non-destructive)');
-  is($d->hexdigest, "cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358", 'sha256 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "yxrSEZ2Pr7aVZlEO5xJmH58UuDOFAG75KuxH9SOjg1g=", 'sha256 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "yxrSEZ2Pr7aVZlEO5xJmH58UuDOFAG75KuxH9SOjg1g", 'sha256 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "2b33d46f7190b4780aba028480c589e53f5a2f74bb536bee42b338f09d064d82", 'sha256 (OO/add-after-digest)');
+  is($d->digest, pack("H*","cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358"), 'sha256 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'sha256 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'sha256 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "2b33d46f7190b4780aba028480c589e53f5a2f74bb536bee42b338f09d064d82", 'sha256 (OO/reset-after-digest)');
+  $d = Crypt::Digest::SHA256->new->add("AAA");
+  is($d->hexdigest, "cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358", 'sha256 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'sha256 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::SHA256->new->add("AAA");
+  is($d->b64digest, "yxrSEZ2Pr7aVZlEO5xJmH58UuDOFAG75KuxH9SOjg1g=", 'sha256 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::SHA256->new->add("AAA");
+  is($d->b64udigest, "yxrSEZ2Pr7aVZlEO5xJmH58UuDOFAG75KuxH9SOjg1g", 'sha256 (OO/b64udigest/finalizes)');
 }
 
 is( sha256("A","A","A"), pack("H*","cb1ad2119d8fafb69566510ee712661f9f14b83385006ef92aec47f523a38358"), 'sha256 (raw/tripple_A)');

@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::RIPEMD256 qw( ripemd256 ripemd256_hex ripemd256_b64 ripemd256_b64u ripemd256_file ripemd256_file_hex ripemd256_file_b64 ripemd256_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('RIPEMD256'), 32, 'hashsize/1');
 is( Crypt::Digest->hashsize('RIPEMD256'), 32, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::RIPEMD256->new->hashsize, 32, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::RIPEMD256->new->add("AAA");
-  is($d->digest, pack("H*","0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82"), 'ripemd256 (OO/digest/non-destructive)');
-  is($d->hexdigest, "0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82", 'ripemd256 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "DJdlgmMUNdT7xCR1gQWgWmIq4ncm85V3SFjX6isvXYI=", 'ripemd256 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "DJdlgmMUNdT7xCR1gQWgWmIq4ncm85V3SFjX6isvXYI", 'ripemd256 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "15e9bf841112d975a5390f242c3a39a34886738f30553cae5ab59f1499308cb3", 'ripemd256 (OO/add-after-digest)');
+  is($d->digest, pack("H*","0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82"), 'ripemd256 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'ripemd256 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'ripemd256 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "15e9bf841112d975a5390f242c3a39a34886738f30553cae5ab59f1499308cb3", 'ripemd256 (OO/reset-after-digest)');
+  $d = Crypt::Digest::RIPEMD256->new->add("AAA");
+  is($d->hexdigest, "0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82", 'ripemd256 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'ripemd256 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::RIPEMD256->new->add("AAA");
+  is($d->b64digest, "DJdlgmMUNdT7xCR1gQWgWmIq4ncm85V3SFjX6isvXYI=", 'ripemd256 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::RIPEMD256->new->add("AAA");
+  is($d->b64udigest, "DJdlgmMUNdT7xCR1gQWgWmIq4ncm85V3SFjX6isvXYI", 'ripemd256 (OO/b64udigest/finalizes)');
 }
 
 is( ripemd256("A","A","A"), pack("H*","0c976582631435d4fbc424758105a05a622ae27726f395774858d7ea2b2f5d82"), 'ripemd256 (raw/tripple_A)');

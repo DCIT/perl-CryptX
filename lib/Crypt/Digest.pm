@@ -315,15 +315,16 @@ Returns the length of calculated digest in bytes (e.g. 32 for SHA-256).
 =head2 digest
 
 Returns the binary digest (raw bytes).
-This method does not alter the digest object state, so you can call it
-repeatedly and continue with C<add()> or C<addfile()> afterwards.
+The first call finalizes the digest object. Any later C<add()>,
+C<addfile()>, C<digest()>, C<hexdigest()>, C<b64digest()>, or
+C<b64udigest()> call will fail until you call C<reset()>.
 
  my $result_raw = $d->digest();
 
 =head2 hexdigest
 
 Returns the digest encoded as a hexadecimal string.
-Like C<digest()>, this method does not alter the digest object state.
+Like C<digest()>, the first call finalizes the digest object.
 
  my $result_hex = $d->hexdigest();
 
@@ -331,14 +332,14 @@ Like C<digest()>, this method does not alter the digest object state.
 
 Returns the digest encoded as a Base64 string, B<with> trailing '=' padding (B<BEWARE:> this padding
 style might differ from other Digest::<SOMETHING> modules on CPAN).
-Like C<digest()>, this method does not alter the digest object state.
+Like C<digest()>, the first call finalizes the digest object.
 
  my $result_b64 = $d->b64digest();
 
 =head2 b64udigest
 
 Returns the digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
-Like C<digest()>, this method does not alter the digest object state.
+Like C<digest()>, the first call finalizes the digest object.
 
  my $result_b64url = $d->b64udigest();
 

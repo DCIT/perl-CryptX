@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::RIPEMD320 qw( ripemd320 ripemd320_hex ripemd320_b64 ripemd320_b64u ripemd320_file ripemd320_file_hex ripemd320_file_b64 ripemd320_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('RIPEMD320'), 40, 'hashsize/1');
 is( Crypt::Digest->hashsize('RIPEMD320'), 40, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::RIPEMD320->new->hashsize, 40, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::RIPEMD320->new->add("AAA");
-  is($d->digest, pack("H*","4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60"), 'ripemd320 (OO/digest/non-destructive)');
-  is($d->hexdigest, "4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60", 'ripemd320 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "TPNLKIfx3RVD+wzpUL8VX7fJPGPWGtxn6FjBCD/VTkp+HasbmzO6YA==", 'ripemd320 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "TPNLKIfx3RVD-wzpUL8VX7fJPGPWGtxn6FjBCD_VTkp-HasbmzO6YA", 'ripemd320 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "45baee1357504e3f6b37a431e70a9ef79b2073ea70c5c4fd2a276720162bdcb755937e72dc2f8097", 'ripemd320 (OO/add-after-digest)');
+  is($d->digest, pack("H*","4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60"), 'ripemd320 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'ripemd320 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'ripemd320 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "45baee1357504e3f6b37a431e70a9ef79b2073ea70c5c4fd2a276720162bdcb755937e72dc2f8097", 'ripemd320 (OO/reset-after-digest)');
+  $d = Crypt::Digest::RIPEMD320->new->add("AAA");
+  is($d->hexdigest, "4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60", 'ripemd320 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'ripemd320 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::RIPEMD320->new->add("AAA");
+  is($d->b64digest, "TPNLKIfx3RVD+wzpUL8VX7fJPGPWGtxn6FjBCD/VTkp+HasbmzO6YA==", 'ripemd320 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::RIPEMD320->new->add("AAA");
+  is($d->b64udigest, "TPNLKIfx3RVD-wzpUL8VX7fJPGPWGtxn6FjBCD_VTkp-HasbmzO6YA", 'ripemd320 (OO/b64udigest/finalizes)');
 }
 
 is( ripemd320("A","A","A"), pack("H*","4cf34b2887f1dd1543fb0ce950bf155fb7c93c63d61adc67e858c1083fd54e4a7e1dab1b9b33ba60"), 'ripemd320 (raw/tripple_A)');

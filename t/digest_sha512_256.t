@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA512_256 qw( sha512_256 sha512_256_hex sha512_256_b64 sha512_256_b64u sha512_256_file sha512_256_file_hex sha512_256_file_b64 sha512_256_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('SHA512_256'), 32, 'hashsize/1');
 is( Crypt::Digest->hashsize('SHA512_256'), 32, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::SHA512_256->new->hashsize, 32, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::SHA512_256->new->add("AAA");
-  is($d->digest, pack("H*","b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4"), 'sha512_256 (OO/digest/non-destructive)');
-  is($d->hexdigest, "b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4", 'sha512_256 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "sopilp2LmwIpe6YVxIW+Lf/vkHykGcKklABAJtbEvfQ=", 'sha512_256 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "sopilp2LmwIpe6YVxIW-Lf_vkHykGcKklABAJtbEvfQ", 'sha512_256 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "a5e575cd0aa36ee5efe65ba1f794fd85d4ba5f172cc02dcfb5062db1fda262da", 'sha512_256 (OO/add-after-digest)');
+  is($d->digest, pack("H*","b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4"), 'sha512_256 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'sha512_256 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'sha512_256 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "a5e575cd0aa36ee5efe65ba1f794fd85d4ba5f172cc02dcfb5062db1fda262da", 'sha512_256 (OO/reset-after-digest)');
+  $d = Crypt::Digest::SHA512_256->new->add("AAA");
+  is($d->hexdigest, "b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4", 'sha512_256 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'sha512_256 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::SHA512_256->new->add("AAA");
+  is($d->b64digest, "sopilp2LmwIpe6YVxIW+Lf/vkHykGcKklABAJtbEvfQ=", 'sha512_256 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::SHA512_256->new->add("AAA");
+  is($d->b64udigest, "sopilp2LmwIpe6YVxIW-Lf_vkHykGcKklABAJtbEvfQ", 'sha512_256 (OO/b64udigest/finalizes)');
 }
 
 is( sha512_256("A","A","A"), pack("H*","b28a62969d8b9b02297ba615c485be2dffef907ca419c2a494004026d6c4bdf4"), 'sha512_256 (raw/tripple_A)');

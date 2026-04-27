@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA384 qw( sha384 sha384_hex sha384_b64 sha384_b64u sha384_file sha384_file_hex sha384_file_b64 sha384_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('SHA384'), 48, 'hashsize/1');
 is( Crypt::Digest->hashsize('SHA384'), 48, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::SHA384->new->hashsize, 48, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::SHA384->new->add("AAA");
-  is($d->digest, pack("H*","8a5b7c19bcd1704d521f86b9618d86de0ed48fa29711ad4d16230f7d26b36111beaf7fefe8b3be7a17ce0e140ca002fe"), 'sha384 (OO/digest/non-destructive)');
-  is($d->hexdigest, "8a5b7c19bcd1704d521f86b9618d86de0ed48fa29711ad4d16230f7d26b36111beaf7fefe8b3be7a17ce0e140ca002fe", 'sha384 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "ilt8GbzRcE1SH4a5YY2G3g7Uj6KXEa1NFiMPfSazYRG+r3/v6LO+ehfODhQMoAL+", 'sha384 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "ilt8GbzRcE1SH4a5YY2G3g7Uj6KXEa1NFiMPfSazYRG-r3_v6LO-ehfODhQMoAL-", 'sha384 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "121f1510d035fc57d77f83545f26a80c9f87973b9df2b7fbdae422c31fee63c9c409de967b862dff27c98acf969ae0a0", 'sha384 (OO/add-after-digest)');
+  is($d->digest, pack("H*","8a5b7c19bcd1704d521f86b9618d86de0ed48fa29711ad4d16230f7d26b36111beaf7fefe8b3be7a17ce0e140ca002fe"), 'sha384 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'sha384 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'sha384 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "121f1510d035fc57d77f83545f26a80c9f87973b9df2b7fbdae422c31fee63c9c409de967b862dff27c98acf969ae0a0", 'sha384 (OO/reset-after-digest)');
+  $d = Crypt::Digest::SHA384->new->add("AAA");
+  is($d->hexdigest, "8a5b7c19bcd1704d521f86b9618d86de0ed48fa29711ad4d16230f7d26b36111beaf7fefe8b3be7a17ce0e140ca002fe", 'sha384 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'sha384 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::SHA384->new->add("AAA");
+  is($d->b64digest, "ilt8GbzRcE1SH4a5YY2G3g7Uj6KXEa1NFiMPfSazYRG+r3/v6LO+ehfODhQMoAL+", 'sha384 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::SHA384->new->add("AAA");
+  is($d->b64udigest, "ilt8GbzRcE1SH4a5YY2G3g7Uj6KXEa1NFiMPfSazYRG-r3_v6LO-ehfODhQMoAL-", 'sha384 (OO/b64udigest/finalizes)');
 }
 
 is( sha384("A","A","A"), pack("H*","8a5b7c19bcd1704d521f86b9618d86de0ed48fa29711ad4d16230f7d26b36111beaf7fefe8b3be7a17ce0e140ca002fe"), 'sha384 (raw/tripple_A)');

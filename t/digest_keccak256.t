@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::Keccak256 qw( keccak256 keccak256_hex keccak256_b64 keccak256_b64u keccak256_file keccak256_file_hex keccak256_file_b64 keccak256_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('Keccak256'), 32, 'hashsize/1');
 is( Crypt::Digest->hashsize('Keccak256'), 32, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::Keccak256->new->hashsize, 32, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::Keccak256->new->add("AAA");
-  is($d->digest, pack("H*","2070504003a07b4713d783ae7a6642ab3b959b7c575c6e4fa4f33eb743db631a"), 'keccak256 (OO/digest/non-destructive)');
-  is($d->hexdigest, "2070504003a07b4713d783ae7a6642ab3b959b7c575c6e4fa4f33eb743db631a", 'keccak256 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "IHBQQAOge0cT14OuemZCqzuVm3xXXG5PpPM+t0PbYxo=", 'keccak256 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "IHBQQAOge0cT14OuemZCqzuVm3xXXG5PpPM-t0PbYxo", 'keccak256 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "f829c06d9a5ad8f61ffe996f115bc161e765b48f3f94e233c504d81eccf2c1f2", 'keccak256 (OO/add-after-digest)');
+  is($d->digest, pack("H*","2070504003a07b4713d783ae7a6642ab3b959b7c575c6e4fa4f33eb743db631a"), 'keccak256 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'keccak256 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'keccak256 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "f829c06d9a5ad8f61ffe996f115bc161e765b48f3f94e233c504d81eccf2c1f2", 'keccak256 (OO/reset-after-digest)');
+  $d = Crypt::Digest::Keccak256->new->add("AAA");
+  is($d->hexdigest, "2070504003a07b4713d783ae7a6642ab3b959b7c575c6e4fa4f33eb743db631a", 'keccak256 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'keccak256 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::Keccak256->new->add("AAA");
+  is($d->b64digest, "IHBQQAOge0cT14OuemZCqzuVm3xXXG5PpPM+t0PbYxo=", 'keccak256 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::Keccak256->new->add("AAA");
+  is($d->b64udigest, "IHBQQAOge0cT14OuemZCqzuVm3xXXG5PpPM-t0PbYxo", 'keccak256 (OO/b64udigest/finalizes)');
 }
 
 is( keccak256("A","A","A"), pack("H*","2070504003a07b4713d783ae7a6642ab3b959b7c575c6e4fa4f33eb743db631a"), 'keccak256 (raw/tripple_A)');

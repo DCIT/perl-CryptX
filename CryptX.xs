@@ -123,12 +123,13 @@ typedef struct cipher_struct {          /* used by Crypt::Cipher */
 typedef struct digest_struct {          /* used by Crypt::Digest */
   hash_state state;
   struct ltc_hash_descriptor *desc;
+  int finalized;
 } *Crypt__Digest;
 
 /* SHA1 and SHA224/SHA256 keep their working state behind an internal pointer
  * that is aligned into state_buf during init. After copying the struct, that
  * pointer still targets the original object's buffer, so we must rebind it to
- * the copied storage before using the clone/state copy. */
+ * the copied storage before using the clone. */
 STATIC void cryptx_internal_digest_fixup_state(Crypt__Digest digest) {
   const char *name;
   const UV mask = (UV)16 - 1;

@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::SHA1 qw( sha1 sha1_hex sha1_b64 sha1_b64u sha1_file sha1_file_hex sha1_file_b64 sha1_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('SHA1'), 20, 'hashsize/1');
 is( Crypt::Digest->hashsize('SHA1'), 20, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::SHA1->new->hashsize, 20, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::SHA1->new->add("AAA");
-  is($d->digest, pack("H*","606ec6e9bd8a8ff2ad14e5fade3f264471e82251"), 'sha1 (OO/digest/non-destructive)');
-  is($d->hexdigest, "606ec6e9bd8a8ff2ad14e5fade3f264471e82251", 'sha1 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "YG7G6b2Kj/KtFOX63j8mRHHoIlE=", 'sha1 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "YG7G6b2Kj_KtFOX63j8mRHHoIlE", 'sha1 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "1a36e67f2fe19ece769934ff0172687790ce838e", 'sha1 (OO/add-after-digest)');
+  is($d->digest, pack("H*","606ec6e9bd8a8ff2ad14e5fade3f264471e82251"), 'sha1 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'sha1 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'sha1 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "1a36e67f2fe19ece769934ff0172687790ce838e", 'sha1 (OO/reset-after-digest)');
+  $d = Crypt::Digest::SHA1->new->add("AAA");
+  is($d->hexdigest, "606ec6e9bd8a8ff2ad14e5fade3f264471e82251", 'sha1 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'sha1 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::SHA1->new->add("AAA");
+  is($d->b64digest, "YG7G6b2Kj/KtFOX63j8mRHHoIlE=", 'sha1 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::SHA1->new->add("AAA");
+  is($d->b64udigest, "YG7G6b2Kj_KtFOX63j8mRHHoIlE", 'sha1 (OO/b64udigest/finalizes)');
 }
 
 is( sha1("A","A","A"), pack("H*","606ec6e9bd8a8ff2ad14e5fade3f264471e82251"), 'sha1 (raw/tripple_A)');

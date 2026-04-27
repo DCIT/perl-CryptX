@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::MD5 qw( md5 md5_hex md5_b64 md5_b64u md5_file md5_file_hex md5_file_b64 md5_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('MD5'), 16, 'hashsize/1');
 is( Crypt::Digest->hashsize('MD5'), 16, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::MD5->new->hashsize, 16, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::MD5->new->add("AAA");
-  is($d->digest, pack("H*","e1faffb3e614e6c2fba74296962386b7"), 'md5 (OO/digest/non-destructive)');
-  is($d->hexdigest, "e1faffb3e614e6c2fba74296962386b7", 'md5 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "4fr/s+YU5sL7p0KWliOGtw==", 'md5 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "4fr_s-YU5sL7p0KWliOGtw", 'md5 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "6c238631c546239b4ceffa78708501bb", 'md5 (OO/add-after-digest)');
+  is($d->digest, pack("H*","e1faffb3e614e6c2fba74296962386b7"), 'md5 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'md5 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'md5 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "6c238631c546239b4ceffa78708501bb", 'md5 (OO/reset-after-digest)');
+  $d = Crypt::Digest::MD5->new->add("AAA");
+  is($d->hexdigest, "e1faffb3e614e6c2fba74296962386b7", 'md5 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'md5 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::MD5->new->add("AAA");
+  is($d->b64digest, "4fr/s+YU5sL7p0KWliOGtw==", 'md5 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::MD5->new->add("AAA");
+  is($d->b64udigest, "4fr_s-YU5sL7p0KWliOGtw", 'md5 (OO/b64udigest/finalizes)');
 }
 
 is( md5("A","A","A"), pack("H*","e1faffb3e614e6c2fba74296962386b7"), 'md5 (raw/tripple_A)');

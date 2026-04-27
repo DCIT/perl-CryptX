@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::RIPEMD160 qw( ripemd160 ripemd160_hex ripemd160_b64 ripemd160_b64u ripemd160_file ripemd160_file_hex ripemd160_file_b64 ripemd160_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('RIPEMD160'), 20, 'hashsize/1');
 is( Crypt::Digest->hashsize('RIPEMD160'), 20, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::RIPEMD160->new->hashsize, 20, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::RIPEMD160->new->add("AAA");
-  is($d->digest, pack("H*","e4e130acc1d2a5a63c17efb1eedbd02be28443d1"), 'ripemd160 (OO/digest/non-destructive)');
-  is($d->hexdigest, "e4e130acc1d2a5a63c17efb1eedbd02be28443d1", 'ripemd160 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "5OEwrMHSpaY8F++x7tvQK+KEQ9E=", 'ripemd160 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "5OEwrMHSpaY8F--x7tvQK-KEQ9E", 'ripemd160 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "bc2173218c998950f45b9d6ed91136cbc5e44da9", 'ripemd160 (OO/add-after-digest)');
+  is($d->digest, pack("H*","e4e130acc1d2a5a63c17efb1eedbd02be28443d1"), 'ripemd160 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'ripemd160 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'ripemd160 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "bc2173218c998950f45b9d6ed91136cbc5e44da9", 'ripemd160 (OO/reset-after-digest)');
+  $d = Crypt::Digest::RIPEMD160->new->add("AAA");
+  is($d->hexdigest, "e4e130acc1d2a5a63c17efb1eedbd02be28443d1", 'ripemd160 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'ripemd160 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::RIPEMD160->new->add("AAA");
+  is($d->b64digest, "5OEwrMHSpaY8F++x7tvQK+KEQ9E=", 'ripemd160 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::RIPEMD160->new->add("AAA");
+  is($d->b64udigest, "5OEwrMHSpaY8F--x7tvQK-KEQ9E", 'ripemd160 (OO/b64udigest/finalizes)');
 }
 
 is( ripemd160("A","A","A"), pack("H*","e4e130acc1d2a5a63c17efb1eedbd02be28443d1"), 'ripemd160 (raw/tripple_A)');

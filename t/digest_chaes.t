@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::CHAES qw( chaes chaes_hex chaes_b64 chaes_b64u chaes_file chaes_file_hex chaes_file_b64 chaes_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('CHAES'), 16, 'hashsize/1');
 is( Crypt::Digest->hashsize('CHAES'), 16, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::CHAES->new->hashsize, 16, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::CHAES->new->add("AAA");
-  is($d->digest, pack("H*","f01416b4c3f6389816b2fcd0b4cf9e41"), 'chaes (OO/digest/non-destructive)');
-  is($d->hexdigest, "f01416b4c3f6389816b2fcd0b4cf9e41", 'chaes (OO/hexdigest/repeatable)');
-  is($d->b64digest, "8BQWtMP2OJgWsvzQtM+eQQ==", 'chaes (OO/b64digest/repeatable)');
-  is($d->b64udigest, "8BQWtMP2OJgWsvzQtM-eQQ", 'chaes (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "bcb6d335c458ff49d8f004892ced930d", 'chaes (OO/add-after-digest)');
+  is($d->digest, pack("H*","f01416b4c3f6389816b2fcd0b4cf9e41"), 'chaes (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'chaes (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'chaes (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "bcb6d335c458ff49d8f004892ced930d", 'chaes (OO/reset-after-digest)');
+  $d = Crypt::Digest::CHAES->new->add("AAA");
+  is($d->hexdigest, "f01416b4c3f6389816b2fcd0b4cf9e41", 'chaes (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'chaes (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::CHAES->new->add("AAA");
+  is($d->b64digest, "8BQWtMP2OJgWsvzQtM+eQQ==", 'chaes (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::CHAES->new->add("AAA");
+  is($d->b64udigest, "8BQWtMP2OJgWsvzQtM-eQQ", 'chaes (OO/b64udigest/finalizes)');
 }
 
 is( chaes("A","A","A"), pack("H*","f01416b4c3f6389816b2fcd0b4cf9e41"), 'chaes (raw/tripple_A)');

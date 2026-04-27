@@ -35,6 +35,7 @@ Test::Pod::Spelling->import(
                           CBC OFB ECB CFB
                           flexi MSB YY BER moduli SubjectPublicKeyInfo
                           rarr UTCTime TLV
+                          OpenSSH codecs
                           undef adata
                         )]
                     },

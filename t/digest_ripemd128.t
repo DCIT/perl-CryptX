@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::RIPEMD128 qw( ripemd128 ripemd128_hex ripemd128_b64 ripemd128_b64u ripemd128_file ripemd128_file_hex ripemd128_file_b64 ripemd128_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('RIPEMD128'), 16, 'hashsize/1');
 is( Crypt::Digest->hashsize('RIPEMD128'), 16, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::RIPEMD128->new->hashsize, 16, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::RIPEMD128->new->add("AAA");
-  is($d->digest, pack("H*","c2750c6ca0c35d367de2993c3f55e1df"), 'ripemd128 (OO/digest/non-destructive)');
-  is($d->hexdigest, "c2750c6ca0c35d367de2993c3f55e1df", 'ripemd128 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "wnUMbKDDXTZ94pk8P1Xh3w==", 'ripemd128 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "wnUMbKDDXTZ94pk8P1Xh3w", 'ripemd128 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "038afd5eb50eb4fb333b903bae2520cc", 'ripemd128 (OO/add-after-digest)');
+  is($d->digest, pack("H*","c2750c6ca0c35d367de2993c3f55e1df"), 'ripemd128 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'ripemd128 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'ripemd128 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "038afd5eb50eb4fb333b903bae2520cc", 'ripemd128 (OO/reset-after-digest)');
+  $d = Crypt::Digest::RIPEMD128->new->add("AAA");
+  is($d->hexdigest, "c2750c6ca0c35d367de2993c3f55e1df", 'ripemd128 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'ripemd128 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::RIPEMD128->new->add("AAA");
+  is($d->b64digest, "wnUMbKDDXTZ94pk8P1Xh3w==", 'ripemd128 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::RIPEMD128->new->add("AAA");
+  is($d->b64udigest, "wnUMbKDDXTZ94pk8P1Xh3w", 'ripemd128 (OO/b64udigest/finalizes)');
 }
 
 is( ripemd128("A","A","A"), pack("H*","c2750c6ca0c35d367de2993c3f55e1df"), 'ripemd128 (raw/tripple_A)');

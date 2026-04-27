@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::Tiger192 qw( tiger192 tiger192_hex tiger192_b64 tiger192_b64u tiger192_file tiger192_file_hex tiger192_file_b64 tiger192_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('Tiger192'), 24, 'hashsize/1');
 is( Crypt::Digest->hashsize('Tiger192'), 24, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::Tiger192->new->hashsize, 24, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::Tiger192->new->add("AAA");
-  is($d->digest, pack("H*","04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9"), 'tiger192 (OO/digest/non-destructive)');
-  is($d->hexdigest, "04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9", 'tiger192 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "BGgiU6zE5gkgFCKtUK1r4sUc8WmLCkHJ", 'tiger192 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "BGgiU6zE5gkgFCKtUK1r4sUc8WmLCkHJ", 'tiger192 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "dbf4b4e74e24db57e037fb97512b746673c304568bfb42ab", 'tiger192 (OO/add-after-digest)');
+  is($d->digest, pack("H*","04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9"), 'tiger192 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'tiger192 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'tiger192 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "dbf4b4e74e24db57e037fb97512b746673c304568bfb42ab", 'tiger192 (OO/reset-after-digest)');
+  $d = Crypt::Digest::Tiger192->new->add("AAA");
+  is($d->hexdigest, "04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9", 'tiger192 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'tiger192 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::Tiger192->new->add("AAA");
+  is($d->b64digest, "BGgiU6zE5gkgFCKtUK1r4sUc8WmLCkHJ", 'tiger192 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::Tiger192->new->add("AAA");
+  is($d->b64udigest, "BGgiU6zE5gkgFCKtUK1r4sUc8WmLCkHJ", 'tiger192 (OO/b64udigest/finalizes)');
 }
 
 is( tiger192("A","A","A"), pack("H*","04682253acc4e609201422ad50ad6be2c51cf1698b0a41c9"), 'tiger192 (raw/tripple_A)');

@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::BLAKE2b_256 qw( blake2b_256 blake2b_256_hex blake2b_256_b64 blake2b_256_b64u blake2b_256_file blake2b_256_file_hex blake2b_256_file_b64 blake2b_256_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('BLAKE2b_256'), 32, 'hashsize/1');
 is( Crypt::Digest->hashsize('BLAKE2b_256'), 32, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::BLAKE2b_256->new->hashsize, 32, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::BLAKE2b_256->new->add("AAA");
-  is($d->digest, pack("H*","cdc4339296753f930aa454700fd0ded6e1e08772dea849859e17dbbd85cae649"), 'blake2b_256 (OO/digest/non-destructive)');
-  is($d->hexdigest, "cdc4339296753f930aa454700fd0ded6e1e08772dea849859e17dbbd85cae649", 'blake2b_256 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "zcQzkpZ1P5MKpFRwD9De1uHgh3LeqEmFnhfbvYXK5kk=", 'blake2b_256 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "zcQzkpZ1P5MKpFRwD9De1uHgh3LeqEmFnhfbvYXK5kk", 'blake2b_256 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "fbe0db943f902736e3571856ee824ad07d254358a2e7d6464c78b93c90158e76", 'blake2b_256 (OO/add-after-digest)');
+  is($d->digest, pack("H*","cdc4339296753f930aa454700fd0ded6e1e08772dea849859e17dbbd85cae649"), 'blake2b_256 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'blake2b_256 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'blake2b_256 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "fbe0db943f902736e3571856ee824ad07d254358a2e7d6464c78b93c90158e76", 'blake2b_256 (OO/reset-after-digest)');
+  $d = Crypt::Digest::BLAKE2b_256->new->add("AAA");
+  is($d->hexdigest, "cdc4339296753f930aa454700fd0ded6e1e08772dea849859e17dbbd85cae649", 'blake2b_256 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'blake2b_256 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::BLAKE2b_256->new->add("AAA");
+  is($d->b64digest, "zcQzkpZ1P5MKpFRwD9De1uHgh3LeqEmFnhfbvYXK5kk=", 'blake2b_256 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::BLAKE2b_256->new->add("AAA");
+  is($d->b64udigest, "zcQzkpZ1P5MKpFRwD9De1uHgh3LeqEmFnhfbvYXK5kk", 'blake2b_256 (OO/b64udigest/finalizes)');
 }
 
 is( blake2b_256("A","A","A"), pack("H*","cdc4339296753f930aa454700fd0ded6e1e08772dea849859e17dbbd85cae649"), 'blake2b_256 (raw/tripple_A)');

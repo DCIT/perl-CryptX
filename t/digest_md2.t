@@ -3,10 +3,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8*3 + 9*4 + 21 + 6;
+use Test::More tests => 8*3 + 9*4 + 24 + 6;
 
 use Crypt::Digest qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u );
 use Crypt::Digest::MD2 qw( md2 md2_hex md2_b64 md2_b64u md2_file md2_file_hex md2_file_b64 md2_file_b64u );
+
+sub dies_like {
+  my ($code, $re, $name) = @_;
+  my $err = eval { $code->(); '' };
+  $err = $@ if $@;
+  like($err, $re, $name);
+}
 
 is( Crypt::Digest::hashsize('MD2'), 16, 'hashsize/1');
 is( Crypt::Digest->hashsize('MD2'), 16, 'hashsize/2');
@@ -33,11 +40,17 @@ is( Crypt::Digest::MD2->new->hashsize, 16, 'hashsize/6');
 }
 {
   my $d = Crypt::Digest::MD2->new->add("AAA");
-  is($d->digest, pack("H*","8788c1729761fdad983b830f04b19e86"), 'md2 (OO/digest/non-destructive)');
-  is($d->hexdigest, "8788c1729761fdad983b830f04b19e86", 'md2 (OO/hexdigest/repeatable)');
-  is($d->b64digest, "h4jBcpdh/a2YO4MPBLGehg==", 'md2 (OO/b64digest/repeatable)');
-  is($d->b64udigest, "h4jBcpdh_a2YO4MPBLGehg", 'md2 (OO/b64udigest/repeatable)');
-  is($d->add("X")->hexdigest, "401b511dcef353d8d3134d726bce84c4", 'md2 (OO/add-after-digest)');
+  is($d->digest, pack("H*","8788c1729761fdad983b830f04b19e86"), 'md2 (OO/digest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'md2 (OO/hexdigest/after-digest-croaks)');
+  dies_like(sub { $d->add("X") }, qr/already finalized/, 'md2 (OO/add-after-digest-croaks)');
+  is($d->reset->add("AAA","X")->hexdigest, "401b511dcef353d8d3134d726bce84c4", 'md2 (OO/reset-after-digest)');
+  $d = Crypt::Digest::MD2->new->add("AAA");
+  is($d->hexdigest, "8788c1729761fdad983b830f04b19e86", 'md2 (OO/hexdigest/finalizes)');
+  dies_like(sub { $d->hexdigest }, qr/already finalized/, 'md2 (OO/hexdigest/repeat-croaks)');
+  $d = Crypt::Digest::MD2->new->add("AAA");
+  is($d->b64digest, "h4jBcpdh/a2YO4MPBLGehg==", 'md2 (OO/b64digest/finalizes)');
+  $d = Crypt::Digest::MD2->new->add("AAA");
+  is($d->b64udigest, "h4jBcpdh_a2YO4MPBLGehg", 'md2 (OO/b64udigest/finalizes)');
 }
 
 is( md2("A","A","A"), pack("H*","8788c1729761fdad983b830f04b19e86"), 'md2 (raw/tripple_A)');
