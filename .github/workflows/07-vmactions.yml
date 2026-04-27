@@ -134,26 +134,44 @@ jobs:
 
   openbsd-aarch64:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        relver:
+          - 7.3
+          - 7.5
+          - 7.8
     steps:
       - uses: actions/checkout@v6
       - uses: vmactions/openbsd-vm@v1
         with:
-          release: "7.7"
-          arch: "aarch64"
+          release: ${{ matrix.relver }}
+          arch: aarch64
           usesh: true
           sync: scp
           copyback: false
-          run: |
-            uname -a
-            pkg_add curl p5-JSON
-            perl -V
-            egcc -v || gcc -v || cc -v || echo unknown-cc
-            curl -L https://cpanmin.us/ -o cpanm
-            chmod +x cpanm
-            ./cpanm -n --installdeps .
-            env AUTHOR_MODE=0 perl Makefile.PL
-            make -j2
-            env AUTHOR_MODE=0 prove -b t
+    - name: Info
+      shell: openbsd {0}
+      run: |
+        set -eu
+        uname -a
+        perl -V
+        cc -v || echo unknown-cc
+    - name: Build
+      shell: openbsd {0}
+      run: |
+        set -eu
+        pkg_add curl p5-JSON
+        curl -L https://cpanmin.us/ -o cpanm
+        chmod +x cpanm
+        ./cpanm -n --installdeps .
+        env AUTHOR_MODE=0 perl Makefile.PL
+        make -j2
+    - name: Test
+      shell: openbsd {0}
+      run: |
+        set -eu
+        env AUTHOR_MODE=0 prove -j2 -b t
 
   haiku-x86_64:
     runs-on: ubuntu-latest
