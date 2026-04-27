@@ -150,28 +150,28 @@ jobs:
           usesh: true
           sync: scp
           copyback: false
-    - name: Info
-      shell: openbsd {0}
-      run: |
-        set -eu
-        uname -a
-        perl -V
-        cc -v || echo unknown-cc
-    - name: Build
-      shell: openbsd {0}
-      run: |
-        set -eu
-        pkg_add curl p5-JSON
-        curl -L https://cpanmin.us/ -o cpanm
-        chmod +x cpanm
-        ./cpanm -n --installdeps .
-        env AUTHOR_MODE=0 perl Makefile.PL
-        make -j2
-    - name: Test
-      shell: openbsd {0}
-      run: |
-        set -eu
-        env AUTHOR_MODE=0 prove -j2 -b t
+      - name: Info
+        shell: openbsd {0}
+        run: |
+          set -eu
+          uname -a
+          perl -V
+          cc -v || echo unknown-cc
+      - name: Build
+        shell: openbsd {0}
+        run: |
+          set -eu
+          pkg_add curl p5-JSON
+          curl -L https://cpanmin.us/ -o cpanm
+          chmod +x cpanm
+          ./cpanm -n --installdeps .
+          env AUTHOR_MODE=0 perl Makefile.PL
+          make -j2
+      - name: Test
+        shell: openbsd {0}
+        run: |
+          set -eu
+          env AUTHOR_MODE=0 prove -j2 -b t
 
   haiku-x86_64:
     runs-on: ubuntu-latest
