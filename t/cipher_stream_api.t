@@ -2,6 +2,8 @@ use strict;
 use warnings;
 
 use Test::More;
+use Data::Dumper ();
+use File::Temp qw(tempfile);
 
 use Crypt::Stream::ChaCha;
 use Crypt::Stream::Salsa20;
@@ -55,35 +57,25 @@ sub fresh_stream {
   return $class->new(@{ $case->{args} });
 }
 
+sub run_stream_child {
+  my ($code) = @_;
+  my ($script_fh, $script_path) = tempfile('cipher-stream-XXXX', SUFFIX => '.pl', UNLINK => 1);
+  print {$script_fh} "use strict;\nuse warnings;\n$code\n"
+    or die "cannot write child script: $!";
+  close($script_fh) or die "cannot close child script: $!";
+  open(my $fh, '-|', $^X, '-Mblib', $script_path) or die "cannot run child: $!";
+  local $/;
+  my $out = <$fh>;
+  close($fh);
+  my $status = $?;
+  return ($out, $status >> 8, $status & 127);
+}
+
 sub child_croaks_cleanly {
   my ($label, $code, $pattern) = @_;
-  pipe(my $reader, my $writer) or die "pipe failed: $!";
-
-  my $pid = fork();
-  die "fork failed: $!" if !defined $pid;
-
-  if ($pid == 0) {
-    close $reader;
-    local $SIG{__WARN__} = sub { };
-    my $ok = eval { $code->(); 1 };
-    if ($ok) {
-      print {$writer} "NOERROR";
-      close $writer;
-      exit 1;
-    }
-    print {$writer} $@;
-    close $writer;
-    exit 0;
-  }
-
-  close $writer;
-  local $/;
-  my $msg = <$reader>;
-  close $reader;
-  waitpid($pid, 0);
-
-  is($? & 127, 0, "$label does not crash with a signal");
-  is($? >> 8, 0, "$label exits after croak");
+  my ($msg, $exit, $signal) = run_stream_child($code);
+  is($signal, 0, "$label does not crash with a signal");
+  is($exit, 0, "$label exits after croak");
   my $msg_text = defined($msg) ? $msg : '';
   unlike($msg_text, qr/^NOERROR\z/, "$label croaks");
   like($msg_text, $pattern, "$label croak message");
@@ -92,6 +84,7 @@ sub child_croaks_cleanly {
 for my $case (@cases) {
   my $name = $case->{name};
   my $class = $case->{class};
+  my $args_src = Data::Dumper->new([$case->{args}])->Terse(1)->Indent(0)->Dump;
 
   is($class->CLONE_SKIP, 1, "$name CLONE_SKIP");
 
@@ -140,13 +133,13 @@ for my $case (@cases) {
 
   child_croaks_cleanly(
     "$name keystream(-1)",
-    sub { fresh_stream($case)->keystream(-1) },
+    qq{use $class; my \$args = $args_src; local \$SIG{__WARN__} = sub { }; my \$ok = eval { $class->new(\@{\$args})->keystream(-1); 1 }; my \$err = \$@; \$err =~ s/\\n\\z//; print \$ok ? "NOERROR" : \$err;},
     qr/^FATAL: output length too large\b/,
   );
 
   child_croaks_cleanly(
     "$name keystream(huge numeric string)",
-    sub { fresh_stream($case)->keystream('999999999999999999999999999999') },
+    qq{use $class; my \$args = $args_src; local \$SIG{__WARN__} = sub { }; my \$ok = eval { $class->new(\@{\$args})->keystream('999999999999999999999999999999'); 1 }; my \$err = \$@; \$err =~ s/\\n\\z//; print \$ok ? "NOERROR" : \$err;},
     qr/^FATAL: output length too large\b/,
   );
 }

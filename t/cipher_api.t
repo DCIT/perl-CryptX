@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use File::Temp qw(tempfile);
 use Test::More;
 
 use Crypt::Cipher;
@@ -10,7 +11,11 @@ use Crypt::Cipher::RC5;
 
 sub run_child {
   my ($code) = @_;
-  open(my $fh, '-|', $^X, '-Mblib', '-we', $code) or die "cannot run child: $!";
+  my ($script_fh, $script_path) = tempfile('cipher-api-XXXX', SUFFIX => '.pl', UNLINK => 1);
+  print {$script_fh} "use strict;\nuse warnings;\n$code\n"
+    or die "cannot write child script: $!";
+  close($script_fh) or die "cannot close child script: $!";
+  open(my $fh, '-|', $^X, '-Mblib', $script_path) or die "cannot run child: $!";
   local $/;
   my $out = <$fh>;
   close($fh);
