@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 16;
 
 use Crypt::Mac::BLAKE2b qw(blake2b_hex);
 use Crypt::Mac::HMAC qw(hmac_hex);
@@ -118,5 +118,3 @@ dies_like(
   qr/invalid handle/,
   'HMAC addfile invalid ref rejected',
 );
-
-done_testing;
