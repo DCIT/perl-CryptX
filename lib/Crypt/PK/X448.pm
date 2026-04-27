@@ -86,8 +86,8 @@ sub export_key_pem {
   local $SIG{__DIE__} = \&CryptX::_croak;
   my $key = $self->export_key_der($type||'');
   return unless $key;
-  return der_to_pem($key, "PRIVATE KEY", $password, $cipher) if substr($type, 0, 7) eq 'private';
-  return der_to_pem($key, "PUBLIC KEY") if substr($type,0, 6) eq 'public';
+  return der_to_pem($key, "PRIVATE KEY", $password, $cipher) if $type eq 'private';
+  return der_to_pem($key, "PUBLIC KEY") if $type eq 'public';
 }
 
 sub export_key_jwk {

@@ -104,8 +104,8 @@ sub export_key_pem {
   local $SIG{__DIE__} = \&CryptX::_croak;
   my $key = $self->export_key_der($type||'');
   return unless $key;
-  return der_to_pem($key, "PRIVATE KEY", $password, $cipher) if substr($type, 0, 7) eq 'private';
-  return der_to_pem($key, "PUBLIC KEY") if substr($type,0, 6) eq 'public';
+  return der_to_pem($key, "PRIVATE KEY", $password, $cipher) if $type eq 'private';
+  return der_to_pem($key, "PUBLIC KEY") if $type eq 'public';
 }
 
 sub export_key_jwk {
@@ -182,8 +182,8 @@ immediately import the key material into the new object.
 
 =head2 generate_key
 
-Uses Yarrow-based cryptographically strong random number generator seeded with
-random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
+Uses the bundled C<chacha20> PRNG via C<rng_make_prng()>. The exact OS entropy
+source is handled by the underlying LibTomCrypt RNG setup.
 Returns the object itself (for chaining).
 
  $pk->generate_key;

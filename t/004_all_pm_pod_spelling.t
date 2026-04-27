@@ -35,11 +35,12 @@ Test::Pod::Spelling->import(
                           CBC OFB ECB CFB
                           flexi MSB YY BER moduli SubjectPublicKeyInfo
                           rarr UTCTime TLV
+                          undef adata
                         )]
                     },
 );
 
-plan tests => 118;
+plan tests => 119;
 
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');

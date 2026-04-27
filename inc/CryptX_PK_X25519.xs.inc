@@ -13,11 +13,13 @@ _new(Class)
         RETVAL->pindex = find_prng("chacha20");
         RETVAL->last_pid = (IV)PerlProc_getpid();
         if (RETVAL->pindex == -1) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: find_prng('chacha20') failed");
         }
         rv = rng_make_prng(320, RETVAL->pindex, &RETVAL->pstate, NULL); /* 320bits = 40bytes */
         if (rv != CRYPT_OK) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
         }
@@ -193,19 +195,20 @@ export_key_der(Crypt::PK::X25519 self, char * type)
         unsigned long int out_len = sizeof(out);
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
-        if (strnEQ(type, "private", 7)) {
+        if (strEQ(type, "private")) {
           rv = x25519_export(out, &out_len, PK_PRIVATE|PK_STD, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: x25519_export(PK_PRIVATE|PK_STD) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
-        else if (strnEQ(type, "public", 6)) {
+        else if (strEQ(type, "public")) {
           rv = x25519_export(out, &out_len, PK_PUBLIC|PK_STD, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: x25519_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
           croak("FATAL: export_key_der invalid type '%s'", type);
         }
+        zeromem(out, sizeof(out));
     }
     OUTPUT:
         RETVAL
@@ -219,19 +222,20 @@ export_key_raw(Crypt::PK::X25519 self, char * type)
         unsigned long int out_len = sizeof(out);
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
-        if (strnEQ(type, "private", 7)) {
+        if (strEQ(type, "private")) {
           rv = x25519_export(out, &out_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: x25519_export(PK_PRIVATE) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
-        else if (strnEQ(type, "public", 6)) {
+        else if (strEQ(type, "public")) {
           rv = x25519_export(out, &out_len, PK_PUBLIC, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: x25519_export(PK_PUBLIC) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
           croak("FATAL: export_key_raw invalid type '%s'", type);
         }
+        zeromem(out, sizeof(out));
     }
     OUTPUT:
         RETVAL
@@ -247,6 +251,7 @@ shared_secret(Crypt::PK::X25519 self, Crypt::PK::X25519 pubkey)
         rv = x25519_shared_secret(&self->key, &pubkey->key, buffer, &buffer_len);
         if (rv != CRYPT_OK) croak("FATAL: x25519_shared_secret failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
     }
     OUTPUT:
         RETVAL

@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 
 plan skip_all => "JSON module not installed" unless eval { require JSON };
-plan tests => 79;
+plan tests => 81;
 
 use Crypt::PK::Ed25519;
 use Crypt::Misc qw(read_rawfile);
@@ -218,4 +218,10 @@ use Crypt::Misc qw(read_rawfile);
     is(unpack("H*", $pkx), $tv->{PUBLICKEY}, 'public key');
     ok($p->verify_message($sig, $msg), 'verify');
   }
+}
+
+{
+  my $pk = Crypt::PK::Ed25519->new->import_key_raw(pack("H*", "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a"), 'public');
+  is($pk->verify_message("not-a-valid-signature-at-all!", "message"), 0, 'verify_message rejects invalid signature');
+  is($pk->verify_message(pack("H*", "00" x 64), "message"), 0, 'verify_message rejects zeroed signature');
 }
