@@ -510,7 +510,7 @@ STATIC int cryptx_internal_ecc_set_curve_from_SV(ecc_key *key, SV *curve)
 
   if (!SvOK(curve)) croak("FATAL: undefined curve");
 
-  if (SvPOK(curve)) {
+  if (SvPOK_spec(curve)) {
     /* string */
     ptr_crv = SvPV(curve, len_crv);
     if ((hc = get_hv("Crypt::PK::ECC::curve", 0)) == NULL) croak("FATAL: no curve register");
@@ -530,7 +530,7 @@ STATIC int cryptx_internal_ecc_set_curve_from_SV(ecc_key *key, SV *curve)
     croak("FATAL: curve has to be a string or a hashref");
   }
 
-  if (SvPOK(sv_crv)) {
+  if (SvPOK_spec(sv_crv)) {
     /* string - curve name */
     const ltc_ecc_curve *cu;
     ptr_crv = SvPV(sv_crv, len_crv);
