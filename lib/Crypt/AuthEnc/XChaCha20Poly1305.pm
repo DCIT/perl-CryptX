@@ -12,18 +12,21 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use Crypt::AuthEnc::ChaCha20Poly1305 ();
+use overload ();
 
 sub _check_nonce {
   my ($nonce) = @_;
   croak "FATAL: undefined nonce" unless defined $nonce;
-  croak "FATAL: nonce must be string/buffer scalar" if ref($nonce);
+  croak "FATAL: nonce must be string/buffer scalar"
+    if ref($nonce) && !overload::Method($nonce, q{""});
   croak "FATAL: XChaCha20Poly1305 nonce length must be 24 bytes" unless length($nonce) == 24;
 }
 
 sub _check_key {
   my ($key) = @_;
   croak "FATAL: undefined key" unless defined $key;
-  croak "FATAL: key must be string/buffer scalar" if ref($key);
+  croak "FATAL: key must be string/buffer scalar"
+    if ref($key) && !overload::Method($key, q{""});
   croak "FATAL: XChaCha20Poly1305 key length must be 32 bytes" unless length($key) == 32;
 }
 
@@ -125,6 +128,9 @@ Use a fresh object per message. If you construct with C<new($key)> you must
 call C<set_iv($nonce)> before adding AAD or processing plaintext/ciphertext.
 When verifying, C<decrypt_done($expected_tag)> is the safer one-step form;
 C<decrypt_done()> without arguments only returns the calculated tag.
+The first C<encrypt_done> / C<decrypt_done> call finalizes the object. After that,
+further C<set_iv>, C<adata_add>, C<encrypt_add>, C<decrypt_add>,
+C<encrypt_done>, and C<decrypt_done> calls croak.
 
 =head1 EXPORT
 
@@ -150,15 +156,17 @@ I<Since: CryptX-0.100>
  # $adata ... [binary string] additional authenticated data (optional)
 
 Invalid key or nonce lengths croak.
+String-overloaded objects are accepted for C<$key> and C<$nonce>.
 
 =head2 xchacha20poly1305_decrypt_verify
 
 I<Since: CryptX-0.100>
 
- my $plaintext = xchacha20poly1305_decrypt_verify($key, $nonce, $adata, $ciphertext, $tag);
+my $plaintext = xchacha20poly1305_decrypt_verify($key, $nonce, $adata, $ciphertext, $tag);
  # on error returns undef
 
 Invalid key or nonce lengths croak.
+String-overloaded objects are accepted for C<$key> and C<$nonce>.
 
 =head1 METHODS
 
@@ -200,6 +208,7 @@ Returns a binary string of ciphertext (raw bytes).
 I<Since: CryptX-0.100>
 
 Returns the authentication tag as a binary string (raw bytes).
+This call finalizes the current message.
 
  my $tag = $ae->encrypt_done();                 # returns $tag value
 
@@ -216,6 +225,7 @@ Returns a binary string of plaintext (raw bytes).
 I<Since: CryptX-0.100>
 
 Without argument returns the computed tag as a binary string. With C<$tag> argument returns C<1> (success) or C<0> (failure).
+This call finalizes the current message.
 
  my $tag = $ae->decrypt_done;           # returns $tag value
  #or

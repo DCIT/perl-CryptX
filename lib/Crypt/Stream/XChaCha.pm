@@ -6,6 +6,8 @@ our $VERSION = '0.088_001';
 
 use CryptX;
 
+sub CLONE_SKIP { 1 } # prevent cloning
+
 1;
 
 =pod
@@ -61,6 +63,10 @@ I<Since: CryptX-0.100>
 Encrypts or decrypts data. The output has the same length as the input.
 Returns a binary string (raw bytes).
 
+The input is converted using Perl's usual scalar stringification. Passing
+C<undef> is treated as an empty string with the usual warning, and numeric
+scalars are stringified before processing.
+
  my $ciphertext = $stream->crypt($plaintext);
  #or
  my $plaintext = $stream->crypt($ciphertext);
@@ -70,6 +76,9 @@ Returns a binary string (raw bytes).
 I<Since: CryptX-0.100>
 
 Returns C<$length> bytes of raw keystream as a binary string.
+
+The length is taken using Perl's usual numeric coercion. Values that coerce to
+an oversized unsigned length are rejected as too large.
 
  my $random_bytes = $stream->keystream($length);
 

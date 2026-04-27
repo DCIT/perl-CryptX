@@ -71,9 +71,9 @@ I<Since: CryptX-0.100>
   my $ciphertext = siv_encrypt_authenticate($cipher, $key, $plaintext, [$ad1, $ad2, ...]);
 
   # $cipher    ... [string] cipher name (e.g. 'AES')
-  # $key       ... [string/buffer scalar] key (must be double the cipher's standard key length)
-  # $plaintext ... [string/buffer scalar] plaintext to encrypt
-  # $adata     ... [string/buffer scalar | arrayref] optional associated data: a scalar string or an arrayref of up to 126 string/buffer scalars
+  # $key       ... [binary string] key (must be double the cipher's standard key length)
+  # $plaintext ... [binary string] plaintext to encrypt
+  # $adata     ... [binary string | arrayref] optional associated data: a scalar string or an arrayref of up to 126 string/buffer scalars
 
 Returns a string of C<length($plaintext) + 16> bytes (16-byte SIV tag prepended to ciphertext).
 
@@ -93,9 +93,9 @@ I<Since: CryptX-0.100>
   my $plaintext = siv_decrypt_verify($cipher, $key, $ciphertext, [$ad1, $ad2, ...]);
 
   # $cipher     ... [string] cipher name (e.g. 'AES')
-  # $key        ... [string/buffer scalar] key (must be double the cipher's standard key length)
-  # $ciphertext ... [string/buffer scalar] ciphertext with 16-byte SIV tag prepended
-  # $adata      ... [string/buffer scalar | arrayref] optional associated data: a scalar string or an arrayref of up to 126 string/buffer scalars
+  # $key        ... [binary string] key (must be double the cipher's standard key length)
+  # $ciphertext ... [binary string] ciphertext with 16-byte SIV tag prepended
+  # $adata      ... [binary string | arrayref] optional associated data: a scalar string or an arrayref of up to 126 string/buffer scalars
 
 Returns the plaintext on success, or C<undef> if authentication fails.
 Malformed ciphertext shorter than 16 bytes croaks because it cannot contain the required
