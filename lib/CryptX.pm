@@ -77,7 +77,7 @@ use one of the concrete modules listed below.
 
 =head2 Algorithm Selection Guide
 
-=head3 Symmetric Encryption (AEAD)
+=head3 Authenticated Encryption (AEAD)
 
 For new designs, prefer authenticated encryption (AEAD) over bare cipher modes:
 
@@ -103,6 +103,24 @@ no nonce-length restrictions.
 
 =item * B<AES-CCM> (L<Crypt::AuthEnc::CCM>) - Used in WiFi (WPA2) and Bluetooth. Requires
 knowing the plaintext length in advance.
+
+=back
+
+=head3 Cryptographically Secure Randomness and UUIDs
+
+=over
+
+=item * B<Random bytes / strings> (L<Crypt::PRNG>) - Use this for salts, keys, nonces, tokens,
+and any other secret random values. The functional helpers
+C<random_bytes>, C<random_bytes_hex>, C<random_bytes_b64>, C<random_bytes_b64u>,
+C<random_string>, and C<random_string_from> cover most use cases. The OO API
+and the algorithm-specific wrappers (L<Crypt::PRNG::ChaCha20>, L<Crypt::PRNG::Fortuna>, etc.)
+are mainly for deterministic streams or interoperability with a specific PRNG.
+
+=item * B<UUIDs> (L<Crypt::Misc/random_v4uuid>, L<Crypt::Misc/random_v7uuid>) - Use C<random_v4uuid>
+for opaque random identifiers. Use C<random_v7uuid> when you want roughly time-ordered identifiers
+that sort by creation time at millisecond granularity. UUIDs are identifiers, not replacements for
+secret random bytes.
 
 =back
 
@@ -215,7 +233,7 @@ preferred. Prefer OAEP for encryption and PSS for signatures.
 
 =back
 
-=head3 Key Derivation
+=head3 Key Derivation / Password hashing
 
 =over
 
@@ -225,10 +243,17 @@ keys from shared secrets (e.g. after ECDH).
 =item * B<Argon2> (L<Crypt::KeyDerivation/argon2_pbkdf>) - Memory-hard password hashing. The
 recommended choice for password storage.
 
+=item * B<Bcrypt> (L<Crypt::KeyDerivation/bcrypt_pbkdf>) - Use mainly for compatibility
+with formats and protocols that specifically require bcrypt-based key derivation (for example
+some OpenSSH workflows). Prefer Argon2 for new password-storage designs.
+
 =item * B<Scrypt> (L<Crypt::KeyDerivation/scrypt_pbkdf>) - Memory-hard KDF. Use Argon2 if available.
 
 =item * B<PBKDF2> (L<Crypt::KeyDerivation/pbkdf2>) - Widely supported but CPU-only hardness.
 Use Argon2 or Scrypt when possible.
+
+=item * B<PBKDF1> (L<Crypt::KeyDerivation/pbkdf1>, L<Crypt::KeyDerivation/pbkdf1_openssl>) - Legacy
+derivation only. Keep this for interoperability with older formats; do not use it for new designs.
 
 =back
 
@@ -251,11 +276,17 @@ L<Crypt::AuthEnc::SIV/siv_decrypt_verify>).
 These return C<undef> when authentication fails, indicating the ciphertext was tampered with
 or the wrong key/nonce was used.
 
-=head2 Available Modules
+=head2 Module Map
 
 =over
 
-=item * Symmetric ciphers - see L<Crypt::Cipher> and related modules
+=item * Top-level family modules
+
+L<Crypt::Cipher>, L<Crypt::Mode>, L<Crypt::AuthEnc>,
+L<Crypt::Digest>, L<Crypt::Mac>, L<Crypt::Checksum>, L<Crypt::PRNG>,
+L<Crypt::PK>, L<Crypt::KeyDerivation>, L<Crypt::Misc>, L<Crypt::ASN1>
+
+=item * Symmetric ciphers
 
 L<Crypt::Cipher::AES>, L<Crypt::Cipher::Anubis>, L<Crypt::Cipher::Blowfish>, L<Crypt::Cipher::Camellia>, L<Crypt::Cipher::CAST5>, L<Crypt::Cipher::DES>,
 L<Crypt::Cipher::DES_EDE>, L<Crypt::Cipher::IDEA>, L<Crypt::Cipher::KASUMI>, L<Crypt::Cipher::Khazad>, L<Crypt::Cipher::MULTI2>, L<Crypt::Cipher::Noekeon>,
@@ -276,7 +307,7 @@ L<Crypt::Stream::Sober128>, L<Crypt::Stream::Sosemanuk>, L<Crypt::Stream::Rabbit
 
 L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::OCB>, L<Crypt::AuthEnc::ChaCha20Poly1305>, L<Crypt::AuthEnc::XChaCha20Poly1305>, L<Crypt::AuthEnc::SIV>
 
-=item * Hash Functions - see L<Crypt::Digest> and related modules
+=item * Hash functions
 
 L<Crypt::Digest::BLAKE2b_160>, L<Crypt::Digest::BLAKE2b_256>, L<Crypt::Digest::BLAKE2b_384>, L<Crypt::Digest::BLAKE2b_512>,
 L<Crypt::Digest::BLAKE2s_128>, L<Crypt::Digest::BLAKE2s_160>, L<Crypt::Digest::BLAKE2s_224>, L<Crypt::Digest::BLAKE2s_256>,
@@ -291,20 +322,20 @@ L<Crypt::Digest::TurboSHAKE>, L<Crypt::Digest::KangarooTwelve>
 
 L<Crypt::Checksum::Adler32>, L<Crypt::Checksum::CRC32>
 
-=item * Message Authentication Codes
+=item * Message authentication codes
 
 L<Crypt::Mac::BLAKE2b>, L<Crypt::Mac::BLAKE2s>, L<Crypt::Mac::F9>, L<Crypt::Mac::HMAC>, L<Crypt::Mac::OMAC>,
 L<Crypt::Mac::Pelican>, L<Crypt::Mac::PMAC>, L<Crypt::Mac::XCBC>, L<Crypt::Mac::Poly1305>
 
-=item * Public key cryptography
+=item * Public-key cryptography
 
 L<Crypt::PK::RSA>, L<Crypt::PK::DSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DH>, L<Crypt::PK::Ed25519>, L<Crypt::PK::X25519>, L<Crypt::PK::Ed448>, L<Crypt::PK::X448>
 
-=item * Cryptographically secure random number generators - see L<Crypt::PRNG> and related modules
+=item * Cryptographically secure random number generators
 
 L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::Yarrow>, L<Crypt::PRNG::RC4>, L<Crypt::PRNG::Sober128>, L<Crypt::PRNG::ChaCha20>
 
-=item * Key derivation functions - PBKDF1, PBKDF2, HKDF, Bcrypt, Scrypt, Argon2
+=item * Key derivation functions
 
 L<Crypt::KeyDerivation>
 
@@ -312,9 +343,9 @@ L<Crypt::KeyDerivation>
 
 L<Crypt::ASN1>
 
-=item * Other handy functions related to cryptography
+=item * Miscellaneous helpers
 
-L<Crypt::Misc>
+L<Crypt::Misc> (base64/base32/base58 codecs, PEM helpers, constant-time compare, UUID generation, octet increment helpers, and related utility functions)
 
 =back
 
