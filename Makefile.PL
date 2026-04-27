@@ -44,6 +44,10 @@ else {
     }
   }
 
+  #XXX-HACK
+  $mycflags .= " -DLTC_NO_ACCEL";
+  $extrainc .= " -DLTC_NO_ACCEL";
+
   #FIX: this is particularly useful for Debian https://github.com/DCIT/perl-CryptX/pull/39
   $mycflags .= " $ENV{CFLAGS} "   if $ENV{CFLAGS};
   $mycflags .= " $ENV{CPPFLAGS} " if $ENV{CPPFLAGS};
