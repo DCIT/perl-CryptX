@@ -1,8 +1,9 @@
 use strict;
 use warnings;
-use Test::More tests => 66;
+use Test::More tests => 80;
 
 use Crypt::PK::DSA qw(dsa_encrypt dsa_decrypt dsa_sign_message dsa_verify_message dsa_sign_hash dsa_verify_hash);
+use Crypt::PK::DH;
 use Crypt::Misc 'decode_b64';
 
 {
@@ -255,6 +256,15 @@ MARKER
 }
 
 {
+  my $k = Crypt::PK::DSA->new;
+  ok(eval { $k->generate_key(20, 128) }, 'generate_key reuse first');
+  is($k->size, 128, 'generate_key reuse first p size');
+  is($k->size_q, 20, 'generate_key reuse first q size');
+  ok(eval { $k->generate_key(32, 256) }, 'generate_key reuse second');
+  is($k->size_q, 32, 'generate_key reuse second q size');
+}
+
+{
   my $ct = eval { dsa_encrypt('t/data/cryptx_pub_dsa1.der', 'test string') };
   diag("$@") if $@;
   ok($ct, 'dsa_encrypt');
@@ -274,4 +284,42 @@ MARKER
   $ver = eval { dsa_verify_hash('t/data/cryptx_pub_dsa1.der', $sig, $hash) };
   diag("$@") if $@;
   ok($ver, 'dsa_verify_hash');
+}
+
+{
+  my $wrong = Crypt::PK::DH->new('t/data/cryptx_pub_dh1.bin');
+  eval { dsa_encrypt($wrong, 'x') };
+  like($@, qr/^FATAL: invalid 'key' param\b/, 'dsa_encrypt rejects wrong object type cleanly');
+}
+
+{
+  # L4: export_key_pem('public_x509')
+  my $k = Crypt::PK::DSA->new;
+  $k->generate_key(20, 128);
+  my $pem = $k->export_key_pem('public_x509');
+  like($pem, qr/-----BEGIN PUBLIC KEY-----/, 'export_key_pem public_x509 uses correct header');
+}
+
+{
+  # L5: key2hash round-trip via import_key($hashref)
+  my $k = Crypt::PK::DSA->new('t/data/cryptx_priv_dsa1.der');
+  my $h = $k->key2hash;
+  is($h->{size}, $k->size, 'key2hash size matches size() method');
+  my $k2 = Crypt::PK::DSA->new($h);
+  ok($k2->is_private, 'key2hash round-trip preserves private');
+  is($k2->key2hash->{x}, $h->{x}, 'key2hash round-trip preserves x');
+
+  # also test public-only round-trip
+  my $pub = Crypt::PK::DSA->new('t/data/cryptx_pub_dsa1.der');
+  my $ph = $pub->key2hash;
+  my $pub2 = Crypt::PK::DSA->new($ph);
+  ok(!$pub2->is_private, 'key2hash round-trip preserves public');
+  is($pub2->key2hash->{y}, $ph->{y}, 'key2hash round-trip preserves y');
+}
+
+{
+  # L6: signature verification failure
+  my $pub = Crypt::PK::DSA->new('t/data/cryptx_pub_dsa1.der');
+  is($pub->verify_message("not-a-valid-signature", "message"), 0, 'verify_message rejects invalid signature');
+  is($pub->verify_hash("not-a-valid-signature", pack("H*","04624fae618e9ad0c5e479f62e1420c71fff34dd")), 0, 'verify_hash rejects invalid signature');
 }

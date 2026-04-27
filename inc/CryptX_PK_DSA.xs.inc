@@ -13,11 +13,13 @@ _new(Class)
         RETVAL->pindex = find_prng("chacha20");
         RETVAL->last_pid = (IV)PerlProc_getpid();
         if (RETVAL->pindex == -1) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: find_prng('chacha20') failed");
         }
         rv = rng_make_prng(320, RETVAL->pindex, &RETVAL->pstate, NULL); /* 320bits = 40bytes */
         if (rv != CRYPT_OK) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
         }
@@ -31,6 +33,7 @@ _generate_key_size(Crypt::PK::DSA self, int group_size=30, int modulus_size=256)
     {
         int rv;
         cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
+        if (self->key.type != -1) { dsa_free(&self->key); self->key.type = -1; }
         /* gen the key */
         rv = dsa_make_key(&self->pstate, self->pindex, group_size, modulus_size, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dsa_make_key failed: %s", error_to_string(rv));
@@ -45,6 +48,7 @@ _generate_key_dsaparam(Crypt::PK::DSA self, SV * dsaparam)
         unsigned char *data=NULL;
         STRLEN data_len=0;
         cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
+        if (self->key.type != -1) { dsa_free(&self->key); self->key.type = -1; }
         data = (unsigned char *)SvPVbyte(dsaparam, data_len);
         /* load d p q */
         rv = dsa_set_pqg_dsaparam(data, (unsigned long)data_len, &self->key);
@@ -63,6 +67,7 @@ _generate_key_pqg_hex(Crypt::PK::DSA self, char *p, char *q, char *g)
         unsigned char pbin[512], qbin[512], gbin[512];
         unsigned long plen=sizeof(pbin), qlen=sizeof(qbin), glen=sizeof(gbin);
         cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
+        if (self->key.type != -1) { dsa_free(&self->key); self->key.type = -1; }
         if (!p || !strlen(p) || !q || !strlen(q) || !g || !strlen(g)) {
           croak("FATAL: generate_key_pqg_hex incomplete args");
         }
@@ -200,6 +205,9 @@ _import_hex(Crypt::PK::DSA self, char *p, char *q, char *g, char *x, char *y)
             if (rv != CRYPT_OK) croak("FATAL: dsa_set_key failed: %s", error_to_string(rv));
           }
         }
+        else {
+          croak("FATAL: import_hex: invalid or incomplete key parameters");
+        }
 
         XPUSHs(ST(0)); /* return self */
     }
@@ -300,8 +308,8 @@ key2hash(Crypt::PK::DSA self)
         else{
           not_used = hv_store(rv_hash, "y", 1, newSVpv("", 0), 0);
         }
-        /* size */
-        not_used = hv_store(rv_hash, "size", 4, newSViv(qsize), 0);
+        /* size - byte length of p, consistent with size() method */
+        not_used = hv_store(rv_hash, "size", 4, newSViv(psize), 0);
         /* type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
         LTC_UNUSED_PARAM(not_used);
@@ -318,19 +326,20 @@ export_key_der(Crypt::PK::DSA self, char * type)
         unsigned long int out_len = 4096;
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
-        if (strnEQ(type, "private", 7)) {
+        if (strEQ(type, "private")) {
           rv = dsa_export(out, &out_len, PK_PRIVATE|PK_STD, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: dsa_export(PK_PRIVATE|PK_STD) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
-        else if (strnEQ(type, "public", 6)) {
+        else if (strEQ(type, "public") || strEQ(type, "public_x509")) {
           rv = dsa_export(out, &out_len, PK_PUBLIC|PK_STD, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: dsa_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
           croak("FATAL: export_key_der invalid type '%s'", type);
         }
+        zeromem(out, sizeof(out));
     }
     OUTPUT:
         RETVAL
@@ -355,6 +364,7 @@ encrypt(Crypt::PK::DSA self, SV * data, const char * hash_name = "SHA1")
                              hash_id, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: dsa_encrypt_key failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
     }
     OUTPUT:
         RETVAL
@@ -372,8 +382,9 @@ decrypt(Crypt::PK::DSA self, SV * data)
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
         rv = dsa_decrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: dsa_decrypt_key_ex failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) croak("FATAL: dsa_decrypt_key failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
     }
     OUTPUT:
         RETVAL
@@ -402,8 +413,10 @@ sign_hash(Crypt::PK::DSA self, SV * data, const char * hash_name = "SHA1")
         rv = dsa_sign_hash(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                            &self->pstate, self->pindex,
                            &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: dsa_sign_hash_ex failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) croak("FATAL: dsa_sign_hash failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
+        zeromem(tmp, sizeof(tmp));
     }
     OUTPUT:
         RETVAL

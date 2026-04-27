@@ -12,8 +12,7 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-use Crypt::Digest 'digest_data';
-use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pem_to_der der_to_pem);
+use Crypt::Misc qw(read_rawfile encode_b64 decode_b64 pem_to_der der_to_pem);
 use Crypt::PK;
 
 sub new {
@@ -32,6 +31,9 @@ sub generate_key {
     $p =~ s/^0x//;
     $q =~ s/^0x//;
     $g =~ s/^0x//;
+    croak "FATAL: 'p' param is empty after stripping '0x' prefix" unless length $p;
+    croak "FATAL: 'q' param is empty after stripping '0x' prefix" unless length $q;
+    croak "FATAL: 'g' param is empty after stripping '0x' prefix" unless length $g;
     return $self->_generate_key_pqg_hex($p, $q, $g);
   }
   elsif (@_ == 1 && ref $_[0] eq 'SCALAR') {
@@ -46,7 +48,9 @@ sub generate_key {
 
 sub export_key_pem {
   my ($self, $type, $password, $cipher) = @_;
-  my $key = $self->export_key_der($type||'');
+  # public_x509 uses the same DER as public, just different PEM header
+  my $der_type = ($type || '') eq 'public_x509' ? 'public' : ($type || '');
+  my $key = $self->export_key_der($der_type);
   return unless $key;
   return der_to_pem($key, "DSA PRIVATE KEY", $password, $cipher) if $type eq 'private';
   return der_to_pem($key, "DSA PUBLIC KEY") if $type eq 'public';
@@ -107,7 +111,7 @@ sub dsa_encrypt { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->encrypt(@_);
 }
 
@@ -115,7 +119,7 @@ sub dsa_decrypt { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->decrypt(@_);
 }
 
@@ -123,7 +127,7 @@ sub dsa_sign_message { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_message(@_);
 }
 
@@ -131,7 +135,7 @@ sub dsa_verify_message { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_message(@_);
 }
 
@@ -139,7 +143,7 @@ sub dsa_sign_hash { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_hash(@_);
 }
 
@@ -147,7 +151,7 @@ sub dsa_verify_hash { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_hash(@_);
 }
 
@@ -207,14 +211,17 @@ immediately import the key material into the new object.
 
 =head2 generate_key
 
-Uses Yarrow-based cryptographically strong random number generator seeded with
-random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
+Uses the bundled C<chacha20> PRNG via libtomcrypt's C<rng_make_prng>.
 Returns the object itself (for chaining).
 
  $pk->generate_key($group_size, $modulus_size);
  # $group_size  ... [integer] size of the subgroup (q) in bytes; must satisfy: 15 < $group_size < 1024
  # $modulus_size .. [integer] size of the prime (p) in bytes; must satisfy: ($modulus_size - $group_size) < 512
  #                  $modulus_size must be >= $group_size
+ #
+ # The two-integer form uses Perl's usual numeric-to-integer coercion before
+ # the XS call. Callers should therefore pass exact integers; values like
+ # C<10.9> or C<"1e1"> will be coerced according to Perl's integer conversion.
 
  ### Common parameter pairs (group_size, modulus_size) => security level:
  # generate_key(20, 128)   => 80-bit security  (1024-bit p, 160-bit q)
