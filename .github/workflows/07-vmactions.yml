@@ -41,27 +41,61 @@ jobs:
             make -j4
             env AUTHOR_MODE=0 prove -b t
 
-  freebsd-aarch64:
+  freebsd-arm64:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        relver:
+          - 13.3
+          - 14.4
+          - 15.0
     steps:
       - uses: actions/checkout@v6
-      - uses: vmactions/freebsd-vm@v1
+      - name: Start VM
+        uses: vmactions/freebsd-vm@v1
         with:
-          release: "14.4"
-          arch: "aarch64"
+          release: "${{matrix.relver}}"
+          arch: arm64
           usesh: true
           sync: scp
           copyback: false
-          run: |
-            uname -a
-            pkg update
-            pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
-            perl -V
-            gcc -v
-            cpanm -n --installdeps .
-            env AUTHOR_MODE=0 perl Makefile.PL
-            make -j4
-            env AUTHOR_MODE=0 prove -b t
+      - name: Info
+        shell: freebsd {0}
+        run: |
+          set -eu
+          uname -a
+          whoami
+          sysctl hw.model
+          sysctl hw.ncpu
+          sysctl hw.physmem
+          sysctl hw.usermem
+          pwd
+          ls -lah
+          cc -v || true
+          gcc -v || true
+      - name: Prereqs
+        shell: freebsd {0}
+        run: |
+          set -eu
+          pkg update
+          pkg install -y curl perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
+          curl -L https://cpanmin.us/ -o cpanm
+          chmod +x cpanm
+          ./cpanm -n --installdeps .
+          ./cpanm -n JSON
+          perl -V
+      - name: Build
+        shell: freebsd {0}
+        run: |
+          set -eu
+          env AUTHOR_MODE=0 perl Makefile.PL
+          make -j2
+      - name: Test
+        shell: freebsd {0}
+        run: |
+          set -eu
+          env AUTHOR_MODE=0 prove -j2 -b t
 
   netbsd-x86_64:
     runs-on: ubuntu-latest
@@ -93,7 +127,6 @@ jobs:
       matrix:
         relver:
           - 10.1
-          - 10.0
     steps:
       - uses: actions/checkout@v6
       - name: Start VM
@@ -117,7 +150,6 @@ jobs:
           pwd
           ls -lah
           cc -v || true
-          perl -V
       - name: Prereqs
         shell: netbsd {0}
         run: |
@@ -127,6 +159,7 @@ jobs:
           chmod +x cpanm
           ./cpanm -n --installdeps .
           ./cpanm -n JSON
+          perl -V
       - name: Build
         shell: netbsd {0}
         run: |
@@ -169,9 +202,7 @@ jobs:
       matrix:
         relver:
           - 7.4
-          - 7.5
           - 7.6
-          - 7.7
           - 7.8
     steps:
       - uses: actions/checkout@v6
@@ -196,7 +227,6 @@ jobs:
           pwd
           ls -lah
           cc -v || true
-          perl -V
       - name: Prereqs
         shell: openbsd {0}
         run: |
@@ -209,6 +239,7 @@ jobs:
           chmod +x cpanm
           ./cpanm -n --installdeps .
           ./cpanm -n JSON
+          perl -V
       - name: Build
         shell: openbsd {0}
         run: |
