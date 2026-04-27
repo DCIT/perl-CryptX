@@ -24,7 +24,9 @@ sub new {
 sub export_key_pem {
   my ($self, $type, $password, $cipher) = @_;
   local $SIG{__DIE__} = \&CryptX::_croak;
-  my $key = $self->export_key_der($type||'');
+  # public_x509 uses the same DER as public, just different PEM header
+  my $der_type = ($type || '') eq 'public_x509' ? 'public' : ($type || '');
+  my $key = $self->export_key_der($der_type);
   return unless $key;
 
   # PKCS#1 RSAPrivateKey**           (PEM header: BEGIN RSA PRIVATE KEY)
@@ -142,9 +144,9 @@ sub import_key {
     }
   }
   elsif ($data =~ /ssh-rsa\s+(\S+)/) {
-  $data = decode_b64("$1");
-    my ($typ, $N, $e) = Crypt::PK::_ssh_parse($data);
-    return $self->_import_hex(unpack("H*", $e), unpack("H*", $N)) if $typ && $e && $N && $typ eq 'ssh-rsa';
+    $data = decode_b64("$1");
+    my ($typ, $e, $N) = Crypt::PK::_ssh_parse($data);
+    return $self->_import_hex(unpack("H*", $N), unpack("H*", $e)) if $typ && $e && $N && $typ eq 'ssh-rsa';
   }
   else {
     # DER format
@@ -161,7 +163,7 @@ sub rsa_encrypt { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->encrypt(@_);
 }
 
@@ -169,7 +171,7 @@ sub rsa_decrypt { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->decrypt(@_);
 }
 
@@ -177,7 +179,7 @@ sub rsa_sign_hash { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_hash(@_);
 }
 
@@ -185,7 +187,7 @@ sub rsa_verify_hash { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_hash(@_);
 }
 
@@ -193,7 +195,7 @@ sub rsa_sign_message { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_message(@_);
 }
 
@@ -201,7 +203,7 @@ sub rsa_verify_message { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_message(@_);
 }
 
@@ -261,13 +263,16 @@ immediately import the key material into the new object.
 
 =head2 generate_key
 
-Uses Yarrow-based cryptographically strong random number generator seeded with
-random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
+Uses the bundled C<chacha20> PRNG via libtomcrypt's C<rng_make_prng>.
 Returns the object itself (for chaining).
 
  $pk->generate_key($size, $e);
  # $size .. [integer] key size: 128-512 bytes (DEFAULT is 256)
  # $e ..... [integer] exponent: 3, 17, 257 or 65537 (DEFAULT is 65537)
+
+The C<$size> and C<$e> arguments use Perl's usual numeric-to-integer coercion
+before reaching the XS layer. Pass exact integers; values like C<10.9> or
+C<"1e2"> are coerced rather than rejected.
 
 =head2 import_key
 

@@ -13,11 +13,13 @@ _new(Class)
         RETVAL->pindex = find_prng("chacha20");
         RETVAL->last_pid = (IV)PerlProc_getpid();
         if (RETVAL->pindex == -1) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: find_prng('chacha20') failed");
         }
         rv = rng_make_prng(320, RETVAL->pindex, &RETVAL->pstate, NULL); /* 320bits = 40bytes */
         if (rv != CRYPT_OK) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
         }
@@ -32,6 +34,7 @@ generate_key(Crypt::PK::RSA self, int key_size=256, long key_e=65537)
         /* key_size is in octets */
         int rv;
         cryptx_internal_pk_prng_reseed(&self->pstate, self->pindex, &self->last_pid);
+        if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
         /* gen the key */
         rv = rsa_make_key(&self->pstate, self->pindex, key_size, key_e, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: rsa_make_key failed: %s", error_to_string(rv));
@@ -151,6 +154,7 @@ _import_hex(Crypt::PK::RSA self, char *N, char *e, char *d=NULL, char *p=NULL, c
         if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(N) failed: %s", error_to_string(rv));
         rv = radix_to_bin(e,  16,  ebin,  &elen);
         if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(e) failed: %s", error_to_string(rv));
+        if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
 
         if (d && strlen(d) > 0) {
           /* private */
@@ -331,19 +335,20 @@ export_key_der(Crypt::PK::RSA self, char * type)
         unsigned long out_len = 4096;
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
-        if (strnEQ(type, "private", 7)) {
+        if (strEQ(type, "private")) {
           rv = rsa_export(out, &out_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_export(PK_PRIVATE) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
-        else if (strnEQ(type, "public", 6)) {
+        else if (strEQ(type, "public")) {
           rv = rsa_export(out, &out_len, PK_PUBLIC|PK_STD, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
           croak("FATAL: export_key_der invalid type '%s'", type);
         }
+        zeromem(out, sizeof(out));
     }
     OUTPUT:
         RETVAL
@@ -386,7 +391,7 @@ encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
           rsa_oparams.params.saltlen = 0;
           rv = rsa_encrypt_key_v2(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &rsa_oparams, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_encrypt_key_v2/oaep failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)buffer, buffer_len);
+          sv_setpvn(RETVAL, (char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
           rsa_oparams.prng = &self->pstate;
@@ -399,17 +404,18 @@ encrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
           rsa_oparams.params.saltlen = 0;            /* PSS only */
           rv = rsa_encrypt_key_v2(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &rsa_oparams, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_encrypt_key_v2/v1.5 failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)buffer, buffer_len);
+          sv_setpvn(RETVAL, (char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "none", 4)) {
           /* raw RSA */
           rv = ltc_mp.rsa_me(data_ptr, (unsigned long)data_len, buffer, &buffer_len, PK_PUBLIC, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_me failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)buffer, buffer_len);
+          sv_setpvn(RETVAL, (char*)buffer, buffer_len);
         }
         else {
           croak("FATAL: rsa_encrypt invalid padding '%s'", padding);
         }
+        zeromem(buffer, sizeof(buffer));
     }
     OUTPUT:
         RETVAL
@@ -453,7 +459,7 @@ decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
           rv = rsa_decrypt_key_v2(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &rsa_oparams, &stat, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_decrypt_key_v2 failed: %s", error_to_string(rv));
           if (stat != 1) croak("FATAL: rsa_decrypt - not valid OAEP packet");
-          RETVAL = newSVpvn((char*)buffer, buffer_len);
+          sv_setpvn(RETVAL, (char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "v1.5", 4)) {
           rsa_oparams.prng = &self->pstate;
@@ -467,17 +473,18 @@ decrypt(Crypt::PK::RSA self, SV * data, const char * padding = "oaep", const cha
           rv = rsa_decrypt_key_v2(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &rsa_oparams, &stat, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_decrypt_key_v2 failed: %s", error_to_string(rv));
           if (stat != 1) croak("FATAL: rsa_decrypt - invalid");
-          RETVAL = newSVpvn((char*)buffer, buffer_len);
+          sv_setpvn(RETVAL, (char*)buffer, buffer_len);
         }
         else if (strnEQ(padding, "none", 4)) {
           /* raw RSA */
           rv = ltc_mp.rsa_me(data_ptr, (unsigned long)data_len, buffer, &buffer_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_me failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)buffer, buffer_len);
+          sv_setpvn(RETVAL, (char*)buffer, buffer_len);
         }
         else {
-          croak("FATAL: rsa_encrypt invalid padding '%s'", padding);
+          croak("FATAL: rsa_decrypt invalid padding '%s'", padding);
         }
+        zeromem(buffer, sizeof(buffer));
     }
     OUTPUT:
         RETVAL
@@ -548,6 +555,8 @@ sign_hash(Crypt::PK::RSA self, SV * data, const char * hash_name = "SHA1", const
         else {
           croak("FATAL: rsa_sign invalid padding '%s'", padding);
         }
+        zeromem(buffer, sizeof(buffer));
+        zeromem(tmp, sizeof(tmp));
     }
     OUTPUT:
         RETVAL

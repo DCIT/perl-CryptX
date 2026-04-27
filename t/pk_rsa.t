@@ -1,8 +1,9 @@
 use strict;
 use warnings;
-use Test::More tests => 55;
+use Test::More tests => 61;
 
 use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_message rsa_sign_hash rsa_verify_hash);
+use Crypt::PK::DH;
 
 {
   my $k;
@@ -135,6 +136,12 @@ use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_messag
   $exp = eval { $k->export_key_der('public') };
   diag("$@") if $@;
   ok($exp, 'export_key_der pub');
+
+  my $first_n = $k->key2hash->{N};
+  eval { $k->generate_key(384, 65537) };
+  diag("$@") if $@;
+  is($k->size, 384, 'generate_key reuse size');
+  isnt($k->key2hash->{N}, $first_n, 'generate_key reuse changes modulus');
 }
 
 {
@@ -157,6 +164,30 @@ use Crypt::PK::RSA qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_messag
   $ver = eval { rsa_verify_hash('t/data/cryptx_pub_rsa1.der', $sig, $hash, 'SHA1') };
   diag("$@") if $@;
   ok($ver, 'rsa_verify_hash');
+}
+
+{
+  my $k1 = Crypt::PK::RSA->new('t/data/cryptx_priv_rsa1.der');
+  my $k2 = Crypt::PK::RSA->new('t/data/cryptx_priv_rsa2.der');
+  my $h1 = $k1->key2hash;
+  my $h2 = $k2->key2hash;
+  my $k = Crypt::PK::RSA->new;
+  eval { $k->import_key($h1) };
+  diag("$@") if $@;
+  my $first_n = $k->key2hash->{N};
+  eval { $k->import_key($h2) };
+  diag("$@") if $@;
+  ok($k->is_private, 'import_key hash reuse keeps private key');
+  isnt($k->key2hash->{N}, $first_n, 'import_key hash reuse changes modulus');
+}
+
+{
+  my $wrong = Crypt::PK::DH->new;
+  $wrong->generate_key('ike2048');
+  eval { rsa_encrypt($wrong, 'x') };
+  like($@, qr/^FATAL: invalid 'key' param\b/, 'rsa_encrypt rejects wrong object type cleanly');
+  eval { rsa_sign_message($wrong, 'x') };
+  like($@, qr/^FATAL: invalid 'key' param\b/, 'rsa_sign_message rejects wrong object type cleanly');
 }
 
 {

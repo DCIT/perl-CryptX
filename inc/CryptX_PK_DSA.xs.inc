@@ -331,7 +331,7 @@ export_key_der(Crypt::PK::DSA self, char * type)
           if (rv != CRYPT_OK) croak("FATAL: dsa_export(PK_PRIVATE|PK_STD) failed: %s", error_to_string(rv));
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
-        else if (strEQ(type, "public") || strEQ(type, "public_x509")) {
+        else if (strEQ(type, "public")) {
           rv = dsa_export(out, &out_len, PK_PUBLIC|PK_STD, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: dsa_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
           sv_setpvn(RETVAL, (char*)out, out_len);
