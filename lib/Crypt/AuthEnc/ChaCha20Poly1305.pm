@@ -78,6 +78,9 @@ Use a fresh object per message. If you construct with C<new($key)> you must
 call C<set_iv($iv)> before adding AAD or processing plaintext/ciphertext.
 When verifying, C<decrypt_done($expected_tag)> is the safer one-step form;
 C<decrypt_done()> without arguments only returns the calculated tag.
+The first C<encrypt_done> / C<decrypt_done> call finalizes the object. After that,
+further C<set_iv>, C<set_iv_rfc7905>, C<adata_add>, C<encrypt_add>,
+C<decrypt_add>, C<encrypt_done>, and C<decrypt_done> calls croak.
 
 =head1 EXPORT
 
@@ -135,6 +138,7 @@ Returns a binary string of ciphertext (raw bytes).
 =head2 encrypt_done
 
 Returns the authentication tag as a binary string (raw bytes).
+This call finalizes the current message.
 
  my $tag = $ae->encrypt_done();                 # returns $tag value
 
@@ -147,6 +151,7 @@ Returns a binary string of plaintext (raw bytes).
 =head2 decrypt_done
 
 Without argument returns the computed tag as a binary string. With C<$tag> argument returns C<1> (success) or C<0> (failure).
+This call finalizes the current message.
 
  my $tag = $ae->decrypt_done;           # returns $tag value
  #or

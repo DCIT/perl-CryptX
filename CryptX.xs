@@ -48,11 +48,26 @@ STATIC int cryptx_internal_input_has_no_payload(const char *in, STRLEN len) {
 typedef adler32_state           *Crypt__Checksum__Adler32;
 typedef crc32_state             *Crypt__Checksum__CRC32;
 
-typedef ccm_state               *Crypt__AuthEnc__CCM;
-typedef eax_state               *Crypt__AuthEnc__EAX;
-typedef gcm_state               *Crypt__AuthEnc__GCM;
-typedef chacha20poly1305_state  *Crypt__AuthEnc__ChaCha20Poly1305;
-typedef ocb3_state              *Crypt__AuthEnc__OCB;
+typedef struct cryptx_authenc_ccm_struct {
+  ccm_state state;
+  int finalized;
+} *Crypt__AuthEnc__CCM;
+typedef struct cryptx_authenc_eax_struct {
+  eax_state state;
+  int finalized;
+} *Crypt__AuthEnc__EAX;
+typedef struct cryptx_authenc_gcm_struct {
+  gcm_state state;
+  int finalized;
+} *Crypt__AuthEnc__GCM;
+typedef struct cryptx_authenc_chacha20poly1305_struct {
+  chacha20poly1305_state state;
+  int finalized;
+} *Crypt__AuthEnc__ChaCha20Poly1305;
+typedef struct cryptx_authenc_ocb_struct {
+  ocb3_state state;
+  int finalized;
+} *Crypt__AuthEnc__OCB;
 
 typedef chacha_state            *Crypt__Stream__ChaCha;
 typedef salsa20_state           *Crypt__Stream__Salsa20;

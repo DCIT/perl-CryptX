@@ -24,13 +24,14 @@ new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata=&PL_sv_undef)
         }
 
         id = cryptx_internal_find_cipher(cipher_name);
-        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
 
-        Newz(0, RETVAL, 1, eax_state);
+        Newz(0, RETVAL, 1, struct cryptx_authenc_eax_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = eax_init(RETVAL, id, k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len);
+        rv = eax_init(&RETVAL->state, id, k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len);
         if (rv != CRYPT_OK) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: eax setup failed: %s", error_to_string(rv));
         }
@@ -41,14 +42,17 @@ new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata=&PL_sv_undef)
 void
 DESTROY(Crypt::AuthEnc::EAX self)
     CODE:
-        Safefree(self);
+        if (self) {
+          zeromem(self, sizeof(*self));
+          Safefree(self);
+        }
 
 Crypt::AuthEnc::EAX
 clone(Crypt::AuthEnc::EAX self)
     CODE:
-        Newz(0, RETVAL, 1, eax_state);
+        Newz(0, RETVAL, 1, struct cryptx_authenc_eax_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(self, RETVAL, 1, eax_state);
+        Copy(self, RETVAL, 1, struct cryptx_authenc_eax_struct);
     OUTPUT:
         RETVAL
 
@@ -60,6 +64,7 @@ encrypt_add(Crypt::AuthEnc::EAX self, SV * data)
         STRLEN in_data_len;
         unsigned char *in_data, *out_data;
 
+        if (self->finalized) croak("FATAL: AEAD object already finalized");
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
         if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
@@ -69,7 +74,7 @@ encrypt_add(Crypt::AuthEnc::EAX self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = eax_encrypt(self, in_data, out_data, (unsigned long)in_data_len);
+          rv = eax_encrypt(&self->state, in_data, out_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: eax_encrypt failed: %s", error_to_string(rv));
@@ -87,6 +92,7 @@ decrypt_add(Crypt::AuthEnc::EAX self, SV * data)
         STRLEN in_data_len;
         unsigned char *in_data, *out_data;
 
+        if (self->finalized) croak("FATAL: AEAD object already finalized");
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
         if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
@@ -96,7 +102,7 @@ decrypt_add(Crypt::AuthEnc::EAX self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = eax_decrypt(self, in_data, out_data, (unsigned long)in_data_len);
+          rv = eax_decrypt(&self->state, in_data, out_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: eax_decrypt failed: %s", error_to_string(rv));
@@ -114,8 +120,10 @@ encrypt_done(Crypt::AuthEnc::EAX self)
         unsigned char tag[MAXBLOCKSIZE];
         unsigned long tag_len = sizeof(tag);
 
-        rv = eax_done(self, tag, &tag_len);
+        if (self->finalized) croak("FATAL: AEAD object already finalized");
+        rv = eax_done(&self->state, tag, &tag_len);
         if (rv != CRYPT_OK) croak("FATAL: eax_done failed: %s", error_to_string(rv));
+        self->finalized = 1;
         XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
     }
 
@@ -129,8 +137,10 @@ decrypt_done(Crypt::AuthEnc::EAX self, ...)
         STRLEN expected_tag_len;
         unsigned char *expected_tag;
 
-        rv = eax_done(self, tag, &tag_len);
+        if (self->finalized) croak("FATAL: AEAD object already finalized");
+        rv = eax_done(&self->state, tag, &tag_len);
         if (rv != CRYPT_OK) croak("FATAL: eax_done failed: %s", error_to_string(rv));
+        self->finalized = 1;
         if (items == 1) {
           XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
         }
@@ -140,7 +150,7 @@ decrypt_done(Crypt::AuthEnc::EAX self, ...)
           if (expected_tag_len!=tag_len) {
             XPUSHs(sv_2mortal(newSViv(0))); /* false */
           }
-          else if (memNE(expected_tag, tag, tag_len)) {
+          else if (mem_neq(expected_tag, tag, tag_len)) {
             XPUSHs(sv_2mortal(newSViv(0))); /* false */
           }
           else {
@@ -156,8 +166,9 @@ adata_add(Crypt::AuthEnc::EAX self, SV * adata)
         STRLEN h_len;
         int rv;
         unsigned char *h;
+        if (self->finalized) croak("FATAL: AEAD object already finalized");
         h = (unsigned char *)SvPVbyte(adata, h_len);
-        rv = eax_addheader(self, h, (unsigned long)h_len);
+        rv = eax_addheader(&self->state, h, (unsigned long)h_len);
         if (rv != CRYPT_OK) croak("FATAL: eax_addheader failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
@@ -173,13 +184,19 @@ eax_encrypt_authenticate(char *cipher_name, SV *key, SV *nonce, SV *header, SV *
         unsigned long tag_len = sizeof(tag);
         SV *output;
 
-        if (SvPOK(key))       k  = (unsigned char *) SvPVbyte(key, k_len);
-        if (SvPOK(nonce))     n  = (unsigned char *) SvPVbyte(nonce, n_len);
-        if (SvPOK(plaintext)) pt = (unsigned char *) SvPVbyte(plaintext, pt_len);
-        if (SvPOK(header))    h  = (unsigned char *) SvPVbyte(header, h_len);
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
+        k  = (unsigned char *) SvPVbyte(key, k_len);
+        if (!SvPOK_spec(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+        n  = (unsigned char *) SvPVbyte(nonce, n_len);
+        if (!SvPOK_spec(plaintext)) croak("FATAL: plaintext must be string/buffer scalar");
+        pt = (unsigned char *) SvPVbyte(plaintext, pt_len);
+        if (header && SvOK(header)) {
+          if (!SvPOK_spec(header)) croak("FATAL: header must be string/buffer scalar");
+          h = (unsigned char *) SvPVbyte(header, h_len);
+        }
 
         id = cryptx_internal_find_cipher(cipher_name);
-        if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if(id==-1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
         output = NEWSV(0, pt_len > 0 ? pt_len : 1); /* avoid zero! */
         SvPOK_only(output);
         SvCUR_set(output, pt_len);
@@ -190,7 +207,7 @@ eax_encrypt_authenticate(char *cipher_name, SV *key, SV *nonce, SV *header, SV *
 
         if (rv != CRYPT_OK) {
           SvREFCNT_dec(output);
-          croak("FATAL: ccm_memory failed: %s", error_to_string(rv));
+          croak("FATAL: eax_encrypt_authenticate_memory failed: %s", error_to_string(rv));
         }
         XPUSHs(sv_2mortal(output));
         XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
@@ -207,19 +224,29 @@ eax_decrypt_verify(char *cipher_name, SV *key, SV *nonce, SV *header, SV *cipher
         unsigned long tag_len;
         SV *output;
 
-        if (SvPOK(key))        k  = (unsigned char *) SvPVbyte(key, k_len);
-        if (SvPOK(nonce))      n  = (unsigned char *) SvPVbyte(nonce, n_len);
-        if (SvPOK(ciphertext)) ct = (unsigned char *) SvPVbyte(ciphertext, ct_len);
-        if (SvPOK(tagsv))      t  = (unsigned char *) SvPVbyte(tagsv, t_len);
-        if (SvPOK(header))     h  = (unsigned char *) SvPVbyte(header, h_len);
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
+        k  = (unsigned char *) SvPVbyte(key, k_len);
+        if (!SvPOK_spec(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+        n  = (unsigned char *) SvPVbyte(nonce, n_len);
+        if (!SvPOK_spec(ciphertext)) croak("FATAL: ciphertext must be string/buffer scalar");
+        ct = (unsigned char *) SvPVbyte(ciphertext, ct_len);
+        if (!SvPOK_spec(tagsv)) croak("FATAL: tag must be string/buffer scalar");
+        t  = (unsigned char *) SvPVbyte(tagsv, t_len);
+        if (header && SvOK(header)) {
+          if (!SvPOK_spec(header)) croak("FATAL: header must be string/buffer scalar");
+          h = (unsigned char *) SvPVbyte(header, h_len);
+        }
 
         id = cryptx_internal_find_cipher(cipher_name);
-        if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if(id==-1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
         output = NEWSV(0, ct_len > 0 ? ct_len : 1); /* avoid zero! */
         SvPOK_only(output);
         SvCUR_set(output, ct_len);
-        tag_len = (unsigned long)t_len;
-        Copy(t, tag, t_len, unsigned char);
+        /* Clamp malformed tags to the stack buffer size before copying. */
+        tag_len = (unsigned long)(t_len > sizeof(tag) ? sizeof(tag) : t_len);
+        if (tag_len > 0) {
+          Copy(t, tag, tag_len, unsigned char);
+        }
 
         rv = eax_decrypt_verify_memory(id, k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len,
                                        ct, (unsigned long)ct_len, (unsigned char *)SvPVX(output), tag, tag_len, &stat);

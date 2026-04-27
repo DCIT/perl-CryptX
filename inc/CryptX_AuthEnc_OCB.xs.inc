@@ -18,13 +18,14 @@ new(Class, char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
         n = (unsigned char *) SvPVbyte(nonce, n_len);
 
         id = cryptx_internal_find_cipher(cipher_name);
-        if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
 
-        Newz(0, RETVAL, 1, ocb3_state);
+        Newz(0, RETVAL, 1, struct cryptx_authenc_ocb_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = ocb3_init(RETVAL, id, k, (unsigned long)k_len, n, (unsigned long)n_len, taglen);
+        rv = ocb3_init(&RETVAL->state, id, k, (unsigned long)k_len, n, (unsigned long)n_len, taglen);
         if (rv != CRYPT_OK) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: ocb setup failed: %s", error_to_string(rv));
         }
@@ -35,14 +36,17 @@ new(Class, char * cipher_name, SV * key, SV * nonce, unsigned long taglen)
 void
 DESTROY(Crypt::AuthEnc::OCB self)
     CODE:
-        Safefree(self);
+        if (self) {
+          zeromem(self, sizeof(*self));
+          Safefree(self);
+        }
 
 Crypt::AuthEnc::OCB
 clone(Crypt::AuthEnc::OCB self)
     CODE:
-        Newz(0, RETVAL, 1, ocb3_state);
+        Newz(0, RETVAL, 1, struct cryptx_authenc_ocb_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(self, RETVAL, 1, ocb3_state);
+        Copy(self, RETVAL, 1, struct cryptx_authenc_ocb_struct);
     OUTPUT:
         RETVAL
 
@@ -54,10 +58,11 @@ adata_add(Crypt::AuthEnc::OCB self, SV * data)
         STRLEN in_data_len;
         unsigned char *in_data;
 
+        if (self->finalized) croak("FATAL: AEAD object already finalized");
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
 
         if (in_data_len>0) {
-          rv = ocb3_add_aad(self, in_data, (unsigned long)in_data_len);
+          rv = ocb3_add_aad(&self->state, in_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) croak("FATAL: ocb3_add_aad failed: %s", error_to_string(rv));
         }
         XPUSHs(ST(0)); /* return self */
@@ -71,6 +76,7 @@ encrypt_add(Crypt::AuthEnc::OCB self, SV * data)
         STRLEN in_data_len;
         unsigned char *in_data, *out_data;
 
+        if (self->finalized) croak("FATAL: AEAD object already finalized");
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
         if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
@@ -83,7 +89,7 @@ encrypt_add(Crypt::AuthEnc::OCB self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = ocb3_encrypt(self, in_data, (unsigned long)in_data_len, out_data);
+          rv = ocb3_encrypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: ocb3_encrypt failed: %s", error_to_string(rv));
@@ -101,9 +107,10 @@ encrypt_last(Crypt::AuthEnc::OCB self, SV * data)
         STRLEN in_data_len;
         unsigned char *in_data, *out_data;
 
+        if (self->finalized) croak("FATAL: AEAD object already finalized");
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
         if (in_data_len == 0) {
-          rv = ocb3_encrypt_last(self, in_data, 0, NULL);
+          rv = ocb3_encrypt_last(&self->state, in_data, 0, NULL);
           if (rv != CRYPT_OK) {
             croak("FATAL: ocb3_encrypt_last failed: %s", error_to_string(rv));
           }
@@ -114,7 +121,7 @@ encrypt_last(Crypt::AuthEnc::OCB self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = ocb3_encrypt_last(self, in_data, (unsigned long)in_data_len, out_data);
+          rv = ocb3_encrypt_last(&self->state, in_data, (unsigned long)in_data_len, out_data);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: ocb3_encrypt_last failed: %s", error_to_string(rv));
@@ -132,6 +139,7 @@ decrypt_add(Crypt::AuthEnc::OCB self, SV * data)
         STRLEN in_data_len;
         unsigned char *in_data, *out_data;
 
+        if (self->finalized) croak("FATAL: AEAD object already finalized");
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
         if (in_data_len == 0) {
           RETVAL = newSVpvn("", 0);
@@ -144,7 +152,7 @@ decrypt_add(Crypt::AuthEnc::OCB self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = ocb3_decrypt(self, in_data, (unsigned long)in_data_len, out_data);
+          rv = ocb3_decrypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: ocb3_decrypt failed: %s", error_to_string(rv));
@@ -162,11 +170,12 @@ decrypt_last(Crypt::AuthEnc::OCB self, SV * data)
         STRLEN in_data_len;
         unsigned char *in_data, *out_data;
 
+        if (self->finalized) croak("FATAL: AEAD object already finalized");
         in_data = (unsigned char *)SvPVbyte(data, in_data_len);
         if (in_data_len == 0) {
-          rv = ocb3_decrypt_last(self, in_data, 0, NULL);
+          rv = ocb3_decrypt_last(&self->state, in_data, 0, NULL);
           if (rv != CRYPT_OK) {
-            croak("FATAL: ocb3_encrypt_last failed: %s", error_to_string(rv));
+            croak("FATAL: ocb3_decrypt_last failed: %s", error_to_string(rv));
           }
           RETVAL = newSVpvn("", 0);
         }
@@ -175,10 +184,10 @@ decrypt_last(Crypt::AuthEnc::OCB self, SV * data)
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = ocb3_decrypt_last(self, in_data, (unsigned long)in_data_len, out_data);
+          rv = ocb3_decrypt_last(&self->state, in_data, (unsigned long)in_data_len, out_data);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
-            croak("FATAL: ocb3_encrypt_last failed: %s", error_to_string(rv));
+            croak("FATAL: ocb3_decrypt_last failed: %s", error_to_string(rv));
           }
         }
     }
@@ -193,8 +202,10 @@ encrypt_done(Crypt::AuthEnc::OCB self)
         unsigned char tag[MAXBLOCKSIZE];
         unsigned long tag_len = sizeof(tag);
 
-        rv = ocb3_done(self, tag, &tag_len);
+        if (self->finalized) croak("FATAL: AEAD object already finalized");
+        rv = ocb3_done(&self->state, tag, &tag_len);
         if (rv != CRYPT_OK) croak("FATAL: ocb3_done_encrypt failed: %s", error_to_string(rv));
+        self->finalized = 1;
 
         XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
     }
@@ -209,8 +220,10 @@ decrypt_done(Crypt::AuthEnc::OCB self, ...)
         STRLEN expected_tag_len;
         unsigned char *expected_tag;
 
-        rv = ocb3_done(self, tag, &tag_len);
+        if (self->finalized) croak("FATAL: AEAD object already finalized");
+        rv = ocb3_done(&self->state, tag, &tag_len);
         if (rv != CRYPT_OK) croak("FATAL: ocb3_done_decrypt failed: %s", error_to_string(rv));
+        self->finalized = 1;
         if (items == 1) {
           XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
         }
@@ -220,7 +233,7 @@ decrypt_done(Crypt::AuthEnc::OCB self, ...)
           if (expected_tag_len!=tag_len) {
             XPUSHs(sv_2mortal(newSViv(0))); /* false */
           }
-          else if (memNE(expected_tag, tag, tag_len)) {
+          else if (mem_neq(expected_tag, tag, tag_len)) {
             XPUSHs(sv_2mortal(newSViv(0))); /* false */
           }
           else {
@@ -239,13 +252,19 @@ ocb_encrypt_authenticate(char *cipher_name, SV *key, SV *nonce, SV *header, unsi
         unsigned char tag[MAXBLOCKSIZE];
         SV *output;
 
-        if (SvPOK(key))       k  = (unsigned char *) SvPVbyte(key, k_len);
-        if (SvPOK(nonce))     n  = (unsigned char *) SvPVbyte(nonce, n_len);
-        if (SvPOK(plaintext)) pt = (unsigned char *) SvPVbyte(plaintext, pt_len);
-        if (SvPOK(header))    h  = (unsigned char *) SvPVbyte(header, h_len);
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
+        k  = (unsigned char *) SvPVbyte(key, k_len);
+        if (!SvPOK_spec(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+        n  = (unsigned char *) SvPVbyte(nonce, n_len);
+        if (!SvPOK_spec(plaintext)) croak("FATAL: plaintext must be string/buffer scalar");
+        pt = (unsigned char *) SvPVbyte(plaintext, pt_len);
+        if (header && SvOK(header)) {
+          if (!SvPOK_spec(header)) croak("FATAL: header must be string/buffer scalar");
+          h = (unsigned char *) SvPVbyte(header, h_len);
+        }
 
         id = cryptx_internal_find_cipher(cipher_name);
-        if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if(id==-1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
         output = NEWSV(0, pt_len > 0 ? pt_len : 1); /* avoid zero! */
         SvPOK_only(output);
         SvCUR_set(output, pt_len);
@@ -257,7 +276,7 @@ ocb_encrypt_authenticate(char *cipher_name, SV *key, SV *nonce, SV *header, unsi
 
         if (rv != CRYPT_OK) {
           SvREFCNT_dec(output);
-          croak("FATAL: ccm_memory failed: %s", error_to_string(rv));
+          croak("FATAL: ocb3_encrypt_authenticate_memory failed: %s", error_to_string(rv));
         }
         XPUSHs(sv_2mortal(output));
         XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
@@ -272,14 +291,21 @@ ocb_decrypt_verify(char *cipher_name, SV *key, SV *nonce, SV *header, SV *cipher
         int rv, id, stat = 0;
         SV *output;
 
-        if (SvPOK(key))        k  = (unsigned char *) SvPVbyte(key, k_len);
-        if (SvPOK(nonce))      n  = (unsigned char *) SvPVbyte(nonce, n_len);
-        if (SvPOK(ciphertext)) ct = (unsigned char *) SvPVbyte(ciphertext, ct_len);
-        if (SvPOK(tagsv))      t  = (unsigned char *) SvPVbyte(tagsv, t_len);
-        if (SvPOK(header))     h  = (unsigned char *) SvPVbyte(header, h_len);
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
+        k  = (unsigned char *) SvPVbyte(key, k_len);
+        if (!SvPOK_spec(nonce)) croak("FATAL: nonce must be string/buffer scalar");
+        n  = (unsigned char *) SvPVbyte(nonce, n_len);
+        if (!SvPOK_spec(ciphertext)) croak("FATAL: ciphertext must be string/buffer scalar");
+        ct = (unsigned char *) SvPVbyte(ciphertext, ct_len);
+        if (!SvPOK_spec(tagsv)) croak("FATAL: tag must be string/buffer scalar");
+        t  = (unsigned char *) SvPVbyte(tagsv, t_len);
+        if (header && SvOK(header)) {
+          if (!SvPOK_spec(header)) croak("FATAL: header must be string/buffer scalar");
+          h = (unsigned char *) SvPVbyte(header, h_len);
+        }
 
         id = cryptx_internal_find_cipher(cipher_name);
-        if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        if(id==-1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
         output = NEWSV(0, ct_len > 0 ? ct_len : 1); /* avoid zero! */
         SvPOK_only(output);
         SvCUR_set(output, ct_len);

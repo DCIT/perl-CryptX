@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 16;
 
 use Crypt::AuthEnc::ChaCha20Poly1305 qw( chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify );
 
@@ -44,6 +44,8 @@ my $key   = "12345678901234561234567890123456";
   is(unpack('H*', $tag), "d081beb3c3fe560c77f6c4e0da1d0dac", "chacha20poly1305_encrypt_authenticate: tag (no header)");
   my $pt = chacha20poly1305_decrypt_verify($key, "123456789012", "", $ct, $tag);
   is($pt, "plain_halfplain_half", "chacha20poly1305_decrypt_verify: plaintext (no header)");
+  $pt = chacha20poly1305_decrypt_verify($key, "123456789012", "", $ct, $tag . ("A" x 200));
+  is($pt, undef, "chacha20poly1305_decrypt_verify: plaintext (no header) / oversized tag");
   substr($tag, 0, 1) = pack("H2", "AA");
   $pt = chacha20poly1305_decrypt_verify($key, "123456789012", "", $ct, $tag);
   is($pt, undef, "chacha20poly1305_decrypt_verify: plaintext (no header) / bad tag");
@@ -55,6 +57,8 @@ my $key   = "12345678901234561234567890123456";
   is(unpack('H*', $tag), "e6f20b492b7bf34c914c72717af6f232", "chacha20poly1305_encrypt_authenticate: tag (no header)");
   my $pt = chacha20poly1305_decrypt_verify($key, "123456789012", "adata-123456789012", $ct, $tag);
   is($pt, "plain_halfplain_half", "chacha20poly1305_decrypt_verify: plaintext (no header)");
+  $pt = chacha20poly1305_decrypt_verify($key, "123456789012", "adata-123456789012", $ct, $tag . ("A" x 200));
+  is($pt, undef, "chacha20poly1305_decrypt_verify: plaintext (no header) / oversized tag");
   substr($tag, 0, 1) = pack("H2", "AA");
   $pt = chacha20poly1305_decrypt_verify($key, "123456789012", "adata-123456789012", $ct, $tag);
   is($pt, undef, "chacha20poly1305_decrypt_verify: plaintext (no header) / bad tag");

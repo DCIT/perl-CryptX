@@ -72,6 +72,9 @@ Galois/Counter Mode (GCM) - provides encryption and authentication.
 Use a fresh object per message unless you intentionally reuse the same key via C<reset>.
 The normal call order is: C<new>, one or more C<iv_add> calls, optional C<adata_add> calls,
 zero or more C<encrypt_add> / C<decrypt_add> calls, then C<encrypt_done> / C<decrypt_done>.
+The first C<encrypt_done> / C<decrypt_done> call finalizes the object. After that,
+further C<iv_add>, C<adata_add>, C<encrypt_add>, C<decrypt_add>, C<encrypt_done>,
+and C<decrypt_done> calls croak until you call C<reset>.
 
 If you construct with C<new($cipher, $key)>, you must provide the IV via C<iv_add> before
 adding authenticated data or payload data. After C<reset>, start a new message with the same
@@ -148,6 +151,7 @@ Returns a binary string of ciphertext (raw bytes).
 =head2 encrypt_done
 
 Returns the authentication tag as a binary string (raw bytes).
+This call finalizes the current message.
 
  my $tag = $ae->encrypt_done();                # returns $tag value
 
@@ -160,6 +164,7 @@ Returns a binary string of plaintext (raw bytes).
 =head2 decrypt_done
 
 Without argument returns the computed tag as a binary string. With C<$tag> argument returns C<1> (success) or C<0> (failure).
+This call finalizes the current message.
 
  my $tag = $ae->decrypt_done;           # returns $tag value
  #or
@@ -173,7 +178,8 @@ returns the computed tag.
  $ae->reset;
 
 Start a new message with the same key. After C<reset>, call C<iv_add> again, then
-C<adata_add> if needed, before processing payload data.
+C<adata_add> if needed, before processing payload data. C<reset> also clears the
+finalized state set by C<encrypt_done> / C<decrypt_done>.
 
 =head2 clone
 
