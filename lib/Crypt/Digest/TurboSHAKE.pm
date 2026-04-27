@@ -11,22 +11,29 @@ use CryptX;
 sub addfile {
   my ($self, $file) = @_;
 
-  my $handle;
-  if (ref(\$file) eq 'SCALAR') {        #filename
+  my ($handle, $close_handle);
+  if (ref($file) && eval { defined fileno($file) }) {
+    $handle = $file;
+  }
+  elsif (defined($file) && !ref($file)) {
     open($handle, "<", $file) || croak "FATAL: cannot open '$file': $!";
     binmode($handle);
+    $close_handle = 1;
   }
-  else {                                #handle
-    $handle = $file
+  else {
+    croak "FATAL: invalid handle";
   }
-  croak "FATAL: invalid handle" unless defined $handle;
 
   my $n;
   my $buf = "";
-  while (($n = read($handle, $buf, 32*1024))) {
-    $self->add($buf)
+  {
+    local $SIG{__DIE__} = \&CryptX::_croak;
+    while (($n = read($handle, $buf, 32*1024))) {
+      $self->add($buf)
+    }
+    croak "FATAL: read failed: $!" unless defined $n;
   }
-  croak "FATAL: read failed: $!" unless defined $n;
+  close($handle) if $close_handle;
 
   return $self;
 }
@@ -101,6 +108,11 @@ I<Since: CryptX-0.100>
 
 Appends data to the message. Returns the object itself (for chaining).
 
+Each argument is converted to bytes using Perl's usual scalar stringification.
+Defined scalars, including numbers and string-overloaded objects, are
+accepted. C<undef> is treated as an empty string and may emit Perl's usual
+"uninitialized value" warning.
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
@@ -122,15 +134,17 @@ I<Since: CryptX-0.100>
 
 Returns C<$len> bytes of output as a binary string. Can be called repeatedly
 to stream an unlimited amount of output from the same absorbed input. The
-C<$len> argument is required and must be a positive integer.
+C<$len> argument is required and must be a positive integer. Single
+C<done()> calls are limited to 1,000,000,000 bytes, but the recommended way
+to read large output is to call C<done()> repeatedly in 10 MB chunks.
 
 After the first C<done()> call the object is in output mode. Calling
-C<add()> in this state is not permitted; use C<reset()> or create a new
-object to hash a different message.
+C<add()> in this state croaks; use C<reset()> or create a new object to hash
+a different message.
 
  my $result_raw = $d->done($len);
- # can be called multiple times for streaming output
- # after the first done(), call reset() before hashing a new message
+ # can be called multiple times; $len is the number of output bytes to read
+ # after the first done(), add() croaks until you call reset()
 
 =head1 SEE ALSO
 

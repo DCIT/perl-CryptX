@@ -2,6 +2,8 @@ MODULE = CryptX         PACKAGE = Crypt::Digest::KangarooTwelve
 
 PROTOTYPES: DISABLE
 
+#define CRYPTX_DIGEST_KANGAROOTWELVE_MAX_OUTPUT_LEN 1000000000UL
+
 Crypt::Digest::KangarooTwelve
 new(Class, int num)
     CODE:
@@ -12,6 +14,7 @@ new(Class, int num)
         if (!RETVAL) croak("FATAL: Newz failed");
 
         RETVAL->num = num;
+        RETVAL->squeezing = 0;
         rv = kangaroo_twelve_init(&RETVAL->state, RETVAL->num);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
@@ -33,6 +36,7 @@ reset(Crypt::Digest::KangarooTwelve self)
         int rv;
         rv = kangaroo_twelve_init(&self->state, self->num);
         if (rv != CRYPT_OK) croak("FATAL: kangaroo_twelve_init failed: %s", error_to_string(rv));
+        self->squeezing = 0;
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -53,6 +57,8 @@ add(Crypt::Digest::KangarooTwelve self, ...)
         int rv, i;
         unsigned char *in;
 
+        if (self->squeezing) croak("FATAL: cannot add after done; call reset first");
+
         for(i=1; i<items; i++) {
           in = (unsigned char *)SvPVbyte(ST(i), inlen);
           if (inlen>0) {
@@ -71,6 +77,8 @@ customization(Crypt::Digest::KangarooTwelve self, ...)
         int rv, i;
         unsigned char *in;
 
+        if (self->squeezing) croak("FATAL: cannot add after done; call reset first");
+
         for(i=1; i<items; i++) {
           in = (unsigned char *)SvPVbyte(ST(i), inlen);
           if (inlen>0) {
@@ -82,26 +90,24 @@ customization(Crypt::Digest::KangarooTwelve self, ...)
     }
 
 SV *
-done(Crypt::Digest::KangarooTwelve self, STRLEN out_len)
+done(Crypt::Digest::KangarooTwelve self, unsigned long out_len)
     CODE:
     {
         int rv;
         unsigned char *out_data;
 
-        if (out_len == 0) {
-          RETVAL = newSVpvn("", 0);
+        if (out_len == 0) croak("FATAL: invalid output length");
+        if (out_len > CRYPTX_DIGEST_KANGAROOTWELVE_MAX_OUTPUT_LEN) croak("FATAL: output length too large");
+        RETVAL = NEWSV(0, out_len); /* avoid zero! */
+        SvPOK_only(RETVAL);
+        SvCUR_set(RETVAL, out_len);
+        out_data = (unsigned char *)SvPVX(RETVAL);
+        rv = kangaroo_twelve_done(&self->state, out_data, out_len);
+        if (rv != CRYPT_OK) {
+          SvREFCNT_dec(RETVAL);
+          croak("FATAL: kangaroo_twelve_done failed: %s", error_to_string(rv));
         }
-        else {
-          RETVAL = NEWSV(0, out_len); /* avoid zero! */
-          SvPOK_only(RETVAL);
-          SvCUR_set(RETVAL, out_len);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = kangaroo_twelve_done(&self->state, out_data, (unsigned long)out_len);
-          if (rv != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            croak("FATAL: kangaroo_twelve_done failed: %s", error_to_string(rv));
-          }
-        }
+        self->squeezing = 1;
     }
     OUTPUT:
         RETVAL

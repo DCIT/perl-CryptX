@@ -1,9 +1,15 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 13;
 
 use Crypt::AuthEnc::SIV qw( siv_encrypt_authenticate siv_decrypt_verify );
+
+{
+  package Local::SIVStringy;
+  use overload q{""} => sub { $_[0]->{value} }, fallback => 1;
+  sub new { bless { value => $_[1] }, $_[0] }
+}
 
 { ### RFC 5297 - A.1. Deterministic Authenticated Encryption Example
   my $key = pack("H*", "fffefdfcfbfaf9f8f7f6f5f4f3f2f1f0f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff");
@@ -51,4 +57,35 @@ use Crypt::AuthEnc::SIV qw( siv_encrypt_authenticate siv_decrypt_verify );
   my $ct = siv_encrypt_authenticate('AES', $key, $pt, $ad0);
   eval { siv_decrypt_verify('AES', $key, $ct, \@ad) };
   like($@, qr/too many associated data components/, "decrypt rejects more than 126 AD components");
+}
+
+{
+  my $key = pack("H*", "fffefdfcfbfaf9f8f7f6f5f4f3f2f1f0f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff");
+  my $ad  = pack("H*", "101112131415161718191a1b1c1d1e1f2021222324252627");
+  my $pt  = pack("H*", "112233445566778899aabbccddee");
+
+  my $ct_plain = siv_encrypt_authenticate('AES', $key, $pt, $ad);
+  my $ct_over  = siv_encrypt_authenticate('AES',
+                    Local::SIVStringy->new($key),
+                    Local::SIVStringy->new($pt),
+                    Local::SIVStringy->new($ad));
+  is($ct_over, $ct_plain, "overloaded key/plaintext/adata scalar matches plain values");
+
+  my $pt_over = siv_decrypt_verify('AES',
+                Local::SIVStringy->new($key),
+                Local::SIVStringy->new($ct_plain),
+                Local::SIVStringy->new($ad));
+  is($pt_over, $pt, "overloaded key/ciphertext/adata scalar decrypts");
+
+  my $ct_array = siv_encrypt_authenticate('AES', $key, $pt, [Local::SIVStringy->new($ad)]);
+  is($ct_array, $ct_plain, "overloaded arrayref AD component matches plain scalar AD");
+
+  eval { siv_encrypt_authenticate('AES', [], $pt, $ad) };
+  like($@, qr/key must be string\/buffer scalar/, 'rejects non-string key');
+
+  eval { siv_encrypt_authenticate('AES', $key, $pt, [[]]) };
+  like($@, qr/associated data component must be string\/buffer scalar/, 'rejects invalid arrayref AD component');
+
+  eval { siv_decrypt_verify('AES', $key, [], $ad) };
+  like($@, qr/ciphertext must be string\/buffer scalar/, 'rejects non-string ciphertext');
 }

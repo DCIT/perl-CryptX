@@ -18,7 +18,9 @@ siv_encrypt_authenticate(char *cipher_name, SV *key, SV *plaintext, SV *aad = &P
         id = cryptx_internal_find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
 
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
         k  = (unsigned char *)SvPVbyte(key, k_len);
+        if (!SvPOK_spec(plaintext)) croak("FATAL: plaintext must be string/buffer scalar");
         pt = (unsigned char *)SvPVbyte(plaintext, pt_len);
 
         if (SvOK(aad)) {
@@ -29,12 +31,14 @@ siv_encrypt_authenticate(char *cipher_name, SV *key, SV *plaintext, SV *aad = &P
                     SV **svp = av_fetch(av, i, 0);
                     if (svp && SvOK(*svp)) {
                         if (n_ad >= 126) croak("FATAL: too many associated data components (max 126)");
+                        if (!SvPOK_spec(*svp)) croak("FATAL: associated data component must be string/buffer scalar");
                         ad_ptrs[n_ad] = (const unsigned char *)SvPVbyte(*svp, tmp);
                         ad_lens[n_ad] = (unsigned long)tmp;
                         n_ad++;
                     }
                 }
-            } else if (SvPOK(aad)) {
+            } else {
+                if (!SvPOK_spec(aad)) croak("FATAL: associated data must be string/buffer scalar or arrayref");
                 ad_ptrs[0] = (const unsigned char *)SvPVbyte(aad, tmp);
                 ad_lens[0] = (unsigned long)tmp;
                 n_ad = 1;
@@ -77,7 +81,9 @@ siv_decrypt_verify(char *cipher_name, SV *key, SV *ciphertext, SV *aad = &PL_sv_
         id = cryptx_internal_find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipher failed for '%s'", cipher_name);
 
+        if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
         k  = (unsigned char *)SvPVbyte(key, k_len);
+        if (!SvPOK_spec(ciphertext)) croak("FATAL: ciphertext must be string/buffer scalar");
         ct = (unsigned char *)SvPVbyte(ciphertext, ct_len);
         if (ct_len < 16) croak("FATAL: ciphertext too short");
 
@@ -89,12 +95,14 @@ siv_decrypt_verify(char *cipher_name, SV *key, SV *ciphertext, SV *aad = &PL_sv_
                     SV **svp = av_fetch(av, i, 0);
                     if (svp && SvOK(*svp)) {
                         if (n_ad >= 126) croak("FATAL: too many associated data components (max 126)");
+                        if (!SvPOK_spec(*svp)) croak("FATAL: associated data component must be string/buffer scalar");
                         ad_ptrs[n_ad] = (const unsigned char *)SvPVbyte(*svp, tmp);
                         ad_lens[n_ad] = (unsigned long)tmp;
                         n_ad++;
                     }
                 }
-            } else if (SvPOK(aad)) {
+            } else {
+                if (!SvPOK_spec(aad)) croak("FATAL: associated data must be string/buffer scalar or arrayref");
                 ad_ptrs[0] = (const unsigned char *)SvPVbyte(aad, tmp);
                 ad_lens[0] = (unsigned long)tmp;
                 n_ad = 1;
