@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 6;
 
 use Crypt::Digest qw(digest_file_hex);
 use Crypt::Digest::SHAKE;
@@ -58,5 +58,3 @@ dies_like(
   qr/invalid handle/,
   'SHAKE addfile invalid ref rejected',
 );
-
-done_testing;

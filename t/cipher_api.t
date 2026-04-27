@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use File::Temp qw(tempfile);
-use Test::More;
+use Test::More tests => 14;
 
 use Crypt::Cipher;
 use Crypt::Cipher::AES;
@@ -74,5 +74,3 @@ for my $class (qw(Crypt::Cipher::AES Crypt::Cipher::Blowfish Crypt::Cipher::RC5)
   my $obj = $class->new($key);
   isa_ok($obj, $class, "$class->new returns subclass instance");
 }
-
-done_testing;

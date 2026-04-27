@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 99;
 use Data::Dumper ();
 use File::Temp qw(tempfile);
 
@@ -143,5 +143,3 @@ for my $case (@cases) {
     qr/^FATAL: output length too large\b/,
   );
 }
-
-done_testing;

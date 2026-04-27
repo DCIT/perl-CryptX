@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 20;
 
 use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate);
 use Crypt::AuthEnc::EAX;
@@ -106,5 +106,3 @@ my $aad       = "adata-123456789012";
   is($ct2,  $ct1,  "ChaCha20Poly1305 functional helper accepts overloaded key/nonce");
   is($tag2, $tag1, "ChaCha20Poly1305 functional helper overloaded output matches plain scalars");
 }
-
-done_testing();
