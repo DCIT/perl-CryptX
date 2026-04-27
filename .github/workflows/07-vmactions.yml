@@ -19,44 +19,47 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  freebsd-x86_64:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: vmactions/freebsd-vm@v1
-        with:
-          release: "14.4"
-          arch: "x86_64"
-          usesh: true
-          sync: scp
-          copyback: false
-          run: |
-            uname -a
-            pkg update
-            pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
-            perl -V
-            gcc -v
-            cpanm -n --installdeps .
-            env AUTHOR_MODE=0 perl Makefile.PL
-            make -j4
-            env AUTHOR_MODE=0 prove -b t
+#  freebsd-x86_64:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v6
+#      - uses: vmactions/freebsd-vm@v1
+#        with:
+#          release: "14.4"
+#          arch: "x86_64"
+#          usesh: true
+#          sync: scp
+#          copyback: false
+#          run: |
+#            uname -a
+#            pkg update
+#            pkg install -y git gmake gcc perl5 p5-App-cpanminus p5-Math-BigInt p5-JSON
+#            perl -V
+#            gcc -v
+#            cpanm -n --installdeps .
+#            env AUTHOR_MODE=0 perl Makefile.PL
+#            make -j4
+#            env AUTHOR_MODE=0 prove -b t
 
-  freebsd-arm64:
+  freebsd:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        hwarch:
+          - "arm64"
+          - "x86_64"
         relver:
-          - 13.3
-          - 14.4
-          - 15.0
+          - "13.3"
+          - "14.4"
+          - "15.0"
     steps:
       - uses: actions/checkout@v6
       - name: Start VM
         uses: vmactions/freebsd-vm@v1
         with:
           release: "${{matrix.relver}}"
-          arch: arm64
+          arch: "${{matrix.hwarch}}"
           usesh: true
           sync: scp
           copyback: false
@@ -172,34 +175,37 @@ jobs:
           set -eu
           env AUTHOR_MODE=0 prove -j2 -b t
 
-  openbsd-x86_64:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: vmactions/openbsd-vm@v1
-        with:
-          release: "7.7"
-          arch: "x86_64"
-          usesh: true
-          sync: scp
-          copyback: false
-          run: |
-            uname -a
-            pkg_add curl p5-JSON
-            perl -V
-            egcc -v || gcc -v || cc -v || echo unknown-cc
-            curl -L https://cpanmin.us/ -o cpanm
-            chmod +x cpanm
-            ./cpanm -n --installdeps .
-            env AUTHOR_MODE=0 perl Makefile.PL
-            make -j4
-            env AUTHOR_MODE=0 prove -b t
+#  openbsd-x86_64:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v6
+#      - uses: vmactions/openbsd-vm@v1
+#        with:
+#          release: "7.7"
+#          arch: "x86_64"
+#          usesh: true
+#          sync: scp
+#          copyback: false
+#          run: |
+#            uname -a
+#            pkg_add curl p5-JSON
+#            perl -V
+#            egcc -v || gcc -v || cc -v || echo unknown-cc
+#            curl -L https://cpanmin.us/ -o cpanm
+#            chmod +x cpanm
+#            ./cpanm -n --installdeps .
+#            env AUTHOR_MODE=0 perl Makefile.PL
+#            make -j4
+#            env AUTHOR_MODE=0 prove -b t
 
-  openbsd-arm64:
+  openbsd:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        hwarch:
+          - "arm64"
+          - "x86_64"
         relver:
           - 7.4
           - 7.6
@@ -210,7 +216,7 @@ jobs:
         uses: vmactions/openbsd-vm@v1
         with:
           release: "${{matrix.relver}}"
-          arch: arm64
+          arch: "${{matrix.hwarch}}"
           usesh: true
           sync: scp
           copyback: false
