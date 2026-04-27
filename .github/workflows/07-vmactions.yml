@@ -132,21 +132,22 @@ jobs:
             make -j4
             env AUTHOR_MODE=0 prove -b t
 
-  openbsd-aarch64:
+  openbsd-arm64:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         relver:
-          - 7.4
+          - 7.3
           - 7.6
           - 7.8
     steps:
       - uses: actions/checkout@v6
-      - uses: vmactions/openbsd-vm@v1
+      - name: Start VM
+        uses: vmactions/openbsd-vm@v1
         with:
           release: "${{matrix.relver}}"
-          arch: aarch64
+          arch: arm64
           usesh: true
           sync: scp
           copyback: false
@@ -167,13 +168,16 @@ jobs:
           egcc -v || true
           clang -v || true
           curl --version || true
+          wget --version || true
           cpanm --version || true
+          lwp-download || true
           perl -V
       - name: Prereqs
         shell: openbsd {0}
         run: |
           set -eu
           cat /etc/installurl || true
+          echo "https://ftp.eu.openbsd.org/pub/OpenBSD" > /etc/installurl
           pkg_add -u
           pkg_add curl
           curl -L https://cpanmin.us/ -o cpanm
@@ -185,12 +189,12 @@ jobs:
         run: |
           set -eu
           env AUTHOR_MODE=0 perl Makefile.PL
-          make -j3
+          make -j2
       - name: Test
         shell: openbsd {0}
         run: |
           set -eu
-          env AUTHOR_MODE=0 prove -j3 -b t
+          env AUTHOR_MODE=0 prove -j2 -b t
 
   haiku-x86_64:
     runs-on: ubuntu-latest
