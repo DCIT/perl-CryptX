@@ -152,26 +152,44 @@ jobs:
           copyback: false
           prepare: |
             set -eu
-            pkg_add curl
-            curl -L https://cpanmin.us/ -o cpanm
-            chmod +x cpanm
-            ./cpanm -n --installdeps .
-            ./cpanm -n JSON
       - name: Info
+        shell: openbsd {0}
         run: |
           set -eu
           uname -a
+          whoami
+          sysctl hw.model
+          sysctl hw.ncpu
+          sysctl hw.physmem
+          sysctl hw.usermem
+          pwd
+          ls -lah
           cc -v || true
           gcc -v || true
           egcc -v || true
           clang -v || true
+          curl --version || true
+          cpanm --version || true
           perl -V
+      - name: Prereqs
+        shell: openbsd {0}
+        run: |
+          set -eu
+          cat /etc/installurl || true
+          pkg_add -u
+          pkg_add curl
+          curl -L https://cpanmin.us/ -o cpanm
+          chmod +x cpanm
+          ./cpanm -n --installdeps .
+          ./cpanm -n JSON
       - name: Build
+        shell: openbsd {0}
         run: |
           set -eu
           env AUTHOR_MODE=0 perl Makefile.PL
           make -j3
       - name: Test
+        shell: openbsd {0}
         run: |
           set -eu
           env AUTHOR_MODE=0 prove -j3 -b t
