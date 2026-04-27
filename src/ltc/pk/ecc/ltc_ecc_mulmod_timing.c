@@ -40,6 +40,10 @@ int ltc_ecc_mulmod(const void *k, const ecc_point *G, ecc_point *R, const void *
       /* return the point at infinity */
       return ltc_ecc_set_point_xyz(1, 1, 0, R);
    }
+   if (ltc_mp_iszero(k) == LTC_MP_YES) {
+      /* 0 * G is the point at infinity */
+      return ltc_ecc_set_point_xyz(1, 1, 0, R);
+   }
 
    /* init montgomery reduction */
    if ((err = ltc_mp_montgomery_setup(modulus, &mp)) != CRYPT_OK)        { goto error; }

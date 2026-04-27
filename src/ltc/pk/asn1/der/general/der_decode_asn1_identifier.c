@@ -79,7 +79,7 @@ int der_decode_asn1_identifier(const unsigned char *in, unsigned long *inlen, lt
    if (id->tag == 0x1f) {
       id->tag = 0;
       do {
-         if (*inlen < tag_len) {
+         if (*inlen <= tag_len) {
             /* break the loop and trigger the BOF error-code */
             tmp = 0xff;
             break;

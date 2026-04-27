@@ -62,6 +62,12 @@ int ltc_ecc_projective_dbl_point(const ecc_point *P, ecc_point *R, const void *m
       goto done;
    }
 
+   /* Y == 0 or Z == 0 doubles to infinity */
+   if (ltc_mp_iszero(R->y) || ltc_mp_iszero(R->z)) {
+      err = ltc_ecc_set_point_xyz(1, 1, 0, R);
+      goto done;
+   }
+
    /* t1 = Z * Z */
    if ((err = ltc_mp_sqr(R->z, t1)) != CRYPT_OK)                                      { goto done; }
    if ((err = ltc_mp_montgomery_reduce(t1, modulus, mp)) != CRYPT_OK)                 { goto done; }

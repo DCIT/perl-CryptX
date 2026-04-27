@@ -1224,6 +1224,11 @@ int ltc_ecc_fp_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulu
    int   idx, err;
    void *mp, *mu;
 
+   if (ltc_mp_iszero(k) == LTC_MP_YES) {
+      /* 0 * G is the point at infinity */
+      return ltc_ecc_set_point_xyz(1, 1, 0, R);
+   }
+
    mp = NULL;
    mu = NULL;
    LTC_MUTEX_LOCK(&ltc_ecc_fp_lock);
