@@ -1,5 +1,24 @@
 Changes for CryptX
 
+NEXT    2026-MM-DD
+        - new: Crypt::ASN1
+        - new: Crypt::AuthEnc::SIV
+        - new: Crypt::AuthEnc::XChaCha20Poly1305
+        - new: Crypt::Cipher::SM4
+        - new: Crypt::Digest::TurboSHAKE
+        - new: Crypt::Digest::KangarooTwelve
+        - new: Crypt::PK::Ed448
+        - new: Crypt::PK::X448
+        - new: Crypt::Stream::XChaCha
+        - new: Crypt::Stream::XSalsa20
+        - Crypt::Digest: object digest accessors now finalize the object; use reset() before reuse
+        - Crypt::Mac + Crypt::AuthEnc: finalized-object lifecycle is now enforced consistently
+        - security/hardening fixes across Digest/Mac/AuthEnc/Mode/Stream/PK/PRNG cleanup paths and XS scalar handling
+        - fix malformed oversized AEAD tag handling in functional decrypt_verify helpers
+        - improved API consistency, POD accuracy, and edge-case test coverage across the distribution
+        - bundled libtomcrypt update branch:develop (commit: 0a46eb2e 2026-04-27)
+        - bundled libtommath update branch:develop (commit: ae40a87 2026-04-20)
+
 0.088   2026-04-23
         - Crypt::KeyDerivation - new functions: pbkdf1_openssl, bcrypt_pbkdf, scrypt_pbkdf, argon2_pbkdf
         - Crypt::Misc - new functions: random_v7uuid, is_uuid
