@@ -2,23 +2,8 @@ use strict;
 use warnings;
 
 use Test::More tests => 28;
-use File::Temp qw(tempfile);
 
 use Crypt::Digest::SHAKE;
-
-sub run_shake_child {
-  my ($code) = @_;
-  my ($script_fh, $script_path) = tempfile('digest-shake-XXXX', SUFFIX => '.pl', UNLINK => 1);
-  print {$script_fh} "use strict;\nuse warnings;\n$code\n"
-    or die "cannot write child script: $!";
-  close($script_fh) or die "cannot close child script: $!";
-  open(my $fh, '-|', $^X, '-Mblib', $script_path) or die "cannot run child: $!";
-  local $/;
-  my $out = <$fh>;
-  close($fh);
-  my $status = $?;
-  return ($out, $status >> 8, $status & 127);
-}
 
 
 my $sh128 = Crypt::Digest::SHAKE->new(128);
@@ -71,40 +56,47 @@ is(unpack("H*", Crypt::Digest::SHAKE->new(256)->add("A" x 307)->done(69)), "dbf9
   my @cases = (
     {
       label => 'done(-1)',
-      check => 'croaks cleanly',
-      code => 'use Crypt::Digest::SHAKE; my $ok = eval { Crypt::Digest::SHAKE->new(128)->done(-1); 1 }; my $err = $@; $err =~ s/\n\z//; print $ok ? "ok\n" : "error=$err\n";',
-      re => qr/^error=FATAL: output length too large\b/,
+      check => 'croaks',
+      action => sub { Crypt::Digest::SHAKE->new(128)->done(-1) },
+      re => qr/^FATAL: output length too large\b/,
     },
     {
       label => 'done(oversized string)',
-      check => 'croaks cleanly',
-      code => 'use Crypt::Digest::SHAKE; my $ok = eval { Crypt::Digest::SHAKE->new(128)->done("18446744073709551615"); 1 }; my $err = $@; $err =~ s/\n\z//; print $ok ? "ok\n" : "error=$err\n";',
-      re => qr/^error=FATAL: output length too large\b/,
+      check => 'croaks',
+      action => sub { Crypt::Digest::SHAKE->new(128)->done("18446744073709551615") },
+      re => qr/^FATAL: output length too large\b/,
     },
     {
       label => 'done(1000000001)',
-      check => 'rejects over per-call cap',
-      code => 'use Crypt::Digest::SHAKE; my $ok = eval { Crypt::Digest::SHAKE->new(128)->done(1000000001); 1 }; my $err = $@; $err =~ s/\n\z//; print $ok ? "ok\n" : "error=$err\n";',
-      re => qr/^error=FATAL: output length too large\b/,
+      check => 'croaks',
+      action => sub { Crypt::Digest::SHAKE->new(128)->done(1000000001) },
+      re => qr/^FATAL: output length too large\b/,
     },
     {
       label => 'done(0)',
-      check => 'croaks cleanly',
-      code => 'use Crypt::Digest::SHAKE; my $ok = eval { Crypt::Digest::SHAKE->new(128)->done(0); 1 }; my $err = $@; $err =~ s/\n\z//; print $ok ? "ok\n" : "error=$err\n";',
-      re => qr/^error=FATAL: invalid output length\b/,
+      check => 'croaks',
+      action => sub { Crypt::Digest::SHAKE->new(128)->done(0) },
+      re => qr/^FATAL: invalid output length\b/,
     },
     {
       label => 'done(1.5)',
       check => 'coerces via unsigned long',
-      code => 'use Crypt::Digest::SHAKE; my $ok = eval { my $out = Crypt::Digest::SHAKE->new(128)->done(1.5); print "ok len=", length($out), "\n"; 1 }; my $err = $@; $err =~ s/\n\z//; print "error=$err\n" if !$ok;',
-      re => qr/^ok len=1$/,
+      action => sub { Crypt::Digest::SHAKE->new(128)->done(1.5) },
+      len => 1,
     },
   );
 
   for my $case (@cases) {
-    my ($out, $exit, $signal) = run_shake_child($case->{code});
-    is($signal, 0, "$case->{label} does not crash");
-    like($out, $case->{re}, "$case->{label} $case->{check}");
+    my $out;
+    my $ok = eval { $out = $case->{action}->(); 1 };
+    if (exists $case->{len}) {
+      ok($ok, "$case->{label} succeeds");
+      is(length($out), $case->{len}, "$case->{label} $case->{check}");
+    }
+    else {
+      ok(!$ok, "$case->{label} $case->{check}");
+      like($@, $case->{re}, "$case->{label} croak text");
+    }
   }
 }
 

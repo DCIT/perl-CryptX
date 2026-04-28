@@ -1,9 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 99;
+use Test::More tests => 75;
 use Data::Dumper ();
-use File::Temp qw(tempfile);
 
 use Crypt::Stream::ChaCha;
 use Crypt::Stream::Salsa20;
@@ -57,28 +56,15 @@ sub fresh_stream {
   return $class->new(@{ $case->{args} });
 }
 
-sub run_stream_child {
-  my ($code) = @_;
-  my ($script_fh, $script_path) = tempfile('cipher-stream-XXXX', SUFFIX => '.pl', UNLINK => 1);
-  print {$script_fh} "use strict;\nuse warnings;\n$code\n"
-    or die "cannot write child script: $!";
-  close($script_fh) or die "cannot close child script: $!";
-  open(my $fh, '-|', $^X, '-Mblib', $script_path) or die "cannot run child: $!";
-  local $/;
-  my $out = <$fh>;
-  close($fh);
-  my $status = $?;
-  return ($out, $status >> 8, $status & 127);
-}
-
-sub child_croaks_cleanly {
+sub stream_croaks_like {
   my ($label, $code, $pattern) = @_;
-  my ($msg, $exit, $signal) = run_stream_child($code);
-  is($signal, 0, "$label does not crash with a signal");
-  is($exit, 0, "$label exits after croak");
-  my $msg_text = defined($msg) ? $msg : '';
-  unlike($msg_text, qr/^NOERROR\z/, "$label croaks");
-  like($msg_text, $pattern, "$label croak message");
+  my $ok;
+  {
+    local $SIG{__WARN__} = sub { };
+    $ok = eval $code;
+  }
+  ok(!$ok, "$label croaks");
+  like($@, $pattern, "$label croak message");
 }
 
 for my $case (@cases) {
@@ -131,15 +117,15 @@ for my $case (@cases) {
     ok($wide_counter_ok, 'ChaCha still accepts wide counter for 8-byte nonce');
   }
 
-  child_croaks_cleanly(
+  stream_croaks_like(
     "$name keystream(-1)",
-    qq{use $class; my \$args = $args_src; local \$SIG{__WARN__} = sub { }; my \$ok = eval { $class->new(\@{\$args})->keystream(-1); 1 }; my \$err = \$@; \$err =~ s/\\n\\z//; print \$ok ? "NOERROR" : \$err;},
+    qq{use $class; my \$args = $args_src; $class->new(\@{\$args})->keystream(-1); 1;},
     qr/^FATAL: output length too large\b/,
   );
 
-  child_croaks_cleanly(
+  stream_croaks_like(
     "$name keystream(huge numeric string)",
-    qq{use $class; my \$args = $args_src; local \$SIG{__WARN__} = sub { }; my \$ok = eval { $class->new(\@{\$args})->keystream('999999999999999999999999999999'); 1 }; my \$err = \$@; \$err =~ s/\\n\\z//; print \$ok ? "NOERROR" : \$err;},
+    qq{use $class; my \$args = $args_src; $class->new(\@{\$args})->keystream('999999999999999999999999999999'); 1;},
     qr/^FATAL: output length too large\b/,
   );
 }

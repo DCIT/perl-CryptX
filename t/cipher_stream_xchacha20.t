@@ -2,25 +2,10 @@ use strict;
 use warnings;
 
 use Test::More;
-use File::Temp qw(tempfile);
 use Crypt::Digest::SHA256 qw(sha256_hex);
 use Crypt::Stream::XChaCha;
 
-plan tests => 11;
-
-sub run_stream_child {
-  my ($code) = @_;
-  my ($script_fh, $script_path) = tempfile('cipher-stream-xchacha-XXXX', SUFFIX => '.pl', UNLINK => 1);
-  print {$script_fh} "use strict;\nuse warnings;\n$code\n"
-    or die "cannot write child script: $!";
-  close($script_fh) or die "cannot close child script: $!";
-  open(my $fh, '-|', $^X, '-Mblib', $script_path) or die "cannot run child: $!";
-  local $/;
-  my $out = <$fh>;
-  close($fh);
-  my $status = $?;
-  return ($out, $status >> 8, $status & 127);
-}
+plan tests => 10;
 
 my $key   = pack("H*", "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
 my $nonce = pack("H*", "000102030405060708090a0b0c0d0e0f1011121314151617");
@@ -65,12 +50,11 @@ my $nonce = pack("H*", "000102030405060708090a0b0c0d0e0f1011121314151617");
 }
 
 {
-  my $key_hex = unpack('H*', $key);
-  my $nonce_hex = unpack('H*', $nonce);
-  my ($out, $exit, $signal) = run_stream_child(
-    "use Crypt::Stream::XChaCha; local \$SIG{__WARN__} = sub { }; my \$ok = eval { Crypt::Stream::XChaCha->new(pack('H*', '$key_hex'), pack('H*', '$nonce_hex'))->keystream(-1); 1 }; my \$err = \$@; \$err =~ s/\\n\\z//; print \$ok ? \"NOERROR\" : \$err;"
-  );
-  is($signal, 0, 'keystream(-1) does not crash');
-  is($exit, 0, 'keystream(-1) exits after croak');
-  like($out, qr/^FATAL: output length too large\b/, 'keystream(-1) croaks cleanly');
+  my $ok;
+  {
+    local $SIG{__WARN__} = sub { };
+    $ok = eval { Crypt::Stream::XChaCha->new($key, $nonce)->keystream(-1); 1 };
+  }
+  ok(!$ok, 'keystream(-1) croaks');
+  like($@, qr/^FATAL: output length too large\b/, 'keystream(-1) croak text');
 }

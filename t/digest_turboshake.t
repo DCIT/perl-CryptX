@@ -2,26 +2,11 @@ use strict;
 use warnings;
 
 use Test::More tests => 18;
-use File::Temp qw(tempfile);
 use Crypt::Digest::TurboSHAKE;
 
 # RFC 9861 test vectors - https://www.rfc-editor.org/rfc/rfc9861
 # Input pattern: ptn(n) = bytes 0x00, 0x01, ..., 0x(n-1) (each mod 0xfb)
 sub ptn { join("", map { chr($_ % 0xfb) } 0..$_[0]-1) }
-
-sub run_turboshake_child {
-  my ($code) = @_;
-  my ($script_fh, $script_path) = tempfile('digest-turboshake-XXXX', SUFFIX => '.pl', UNLINK => 1);
-  print {$script_fh} "use strict;\nuse warnings;\n$code\n"
-    or die "cannot write child script: $!";
-  close($script_fh) or die "cannot close child script: $!";
-  open(my $fh, '-|', $^X, '-Mblib', $script_path) or die "cannot run child: $!";
-  local $/;
-  my $out = <$fh>;
-  close($fh);
-  my $status = $?;
-  return ($out, $status >> 8, $status & 127);
-}
 
 { ### TurboSHAKE128
   is(unpack('H*', Crypt::Digest::TurboSHAKE->new(128)->done(32)),
@@ -76,29 +61,36 @@ sub run_turboshake_child {
   my @cases = (
     {
       label => 'done(-1)',
-      code => 'use Crypt::Digest::TurboSHAKE; my $ok = eval { Crypt::Digest::TurboSHAKE->new(128)->done(-1); 1 }; my $err = $@; $err =~ s/\n\z//; print $ok ? "ok\n" : "error=$err\n";',
-      re => qr/^error=FATAL: output length too large\b/,
+      action => sub { Crypt::Digest::TurboSHAKE->new(128)->done(-1) },
+      re => qr/^FATAL: output length too large\b/,
     },
     {
       label => 'done(1000000001)',
-      code => 'use Crypt::Digest::TurboSHAKE; my $ok = eval { Crypt::Digest::TurboSHAKE->new(128)->done(1000000001); 1 }; my $err = $@; $err =~ s/\n\z//; print $ok ? "ok\n" : "error=$err\n";',
-      re => qr/^error=FATAL: output length too large\b/,
+      action => sub { Crypt::Digest::TurboSHAKE->new(128)->done(1000000001) },
+      re => qr/^FATAL: output length too large\b/,
     },
     {
       label => 'done(0)',
-      code => 'use Crypt::Digest::TurboSHAKE; my $ok = eval { Crypt::Digest::TurboSHAKE->new(128)->done(0); 1 }; my $err = $@; $err =~ s/\n\z//; print $ok ? "ok\n" : "error=$err\n";',
-      re => qr/^error=FATAL: invalid output length\b/,
+      action => sub { Crypt::Digest::TurboSHAKE->new(128)->done(0) },
+      re => qr/^FATAL: invalid output length\b/,
     },
     {
       label => 'done(1.5)',
-      code => 'use Crypt::Digest::TurboSHAKE; my $ok = eval { my $out = Crypt::Digest::TurboSHAKE->new(128)->done(1.5); print "ok len=", length($out), "\n"; 1 }; my $err = $@; $err =~ s/\n\z//; print "error=$err\n" if !$ok;',
-      re => qr/^ok len=1$/,
+      action => sub { Crypt::Digest::TurboSHAKE->new(128)->done(1.5) },
+      len => 1,
     },
   );
 
   for my $case (@cases) {
-    my ($out, $exit, $signal) = run_turboshake_child($case->{code});
-    is($signal, 0, "$case->{label} does not crash");
-    like($out, $case->{re}, "$case->{label} behaves as documented");
+    my $out;
+    my $ok = eval { $out = $case->{action}->(); 1 };
+    if (exists $case->{len}) {
+      ok($ok, "$case->{label} succeeds");
+      is(length($out), $case->{len}, "$case->{label} output length");
+    }
+    else {
+      ok(!$ok, "$case->{label} croaks");
+      like($@, $case->{re}, "$case->{label} croak text");
+    }
   }
 }

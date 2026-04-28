@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 
-use File::Temp qw(tempfile);
 use Test::More tests => 14;
 
 use Crypt::Cipher;
@@ -9,43 +8,29 @@ use Crypt::Cipher::AES;
 use Crypt::Cipher::Blowfish;
 use Crypt::Cipher::RC5;
 
-sub run_child {
-  my ($code) = @_;
-  my ($script_fh, $script_path) = tempfile('cipher-api-XXXX', SUFFIX => '.pl', UNLINK => 1);
-  print {$script_fh} "use strict;\nuse warnings;\n$code\n"
-    or die "cannot write child script: $!";
-  close($script_fh) or die "cannot close child script: $!";
-  open(my $fh, '-|', $^X, '-Mblib', $script_path) or die "cannot run child: $!";
-  local $/;
-  my $out = <$fh>;
-  close($fh);
-  my $status = $?;
-  return ($out, $status >> 8, $status & 127);
-}
-
 {
   my @cases = (
     {
       label => 'new(1, $key)',
-      code  => 'use Crypt::Cipher; my $ok = eval { Crypt::Cipher->new(1, "1234567890123456"); 1 }; my $err = $@; $err =~ s/\n\z//; print $ok ? "ok\n" : "error=$err\n";',
+      action => sub { Crypt::Cipher->new(1, "1234567890123456") },
       re    => qr/^error=FATAL: find_cipher failed for '1'/,
     },
     {
       label => 'new([], $key)',
-      code  => 'use Crypt::Cipher; my $ok = eval { Crypt::Cipher->new([], "1234567890123456"); 1 }; my $err = $@; $err =~ s/\n\z//; print $ok ? "ok\n" : "error=$err\n";',
+      action => sub { Crypt::Cipher->new([], "1234567890123456") },
       re    => qr/^error=FATAL: invalid cipher name\b/,
     },
     {
       label => 'new({}, $key)',
-      code  => 'use Crypt::Cipher; my $ok = eval { Crypt::Cipher->new({}, "1234567890123456"); 1 }; my $err = $@; $err =~ s/\n\z//; print $ok ? "ok\n" : "error=$err\n";',
+      action => sub { Crypt::Cipher->new({}, "1234567890123456") },
       re    => qr/^error=FATAL: invalid cipher name\b/,
     },
   );
 
   for my $case (@cases) {
-    my ($out, $exit, $signal) = run_child($case->{code});
-    is($signal, 0, "$case->{label} does not crash");
-    like($out, $case->{re}, "$case->{label} croaks cleanly");
+    my $ok = eval { $case->{action}->(); 1 };
+    ok(!$ok, "$case->{label} croaks");
+    like("error=$@", $case->{re}, "$case->{label} croak text");
   }
 }
 
