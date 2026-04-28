@@ -43,26 +43,52 @@ CryptX - Cryptographic toolkit
 
 =head1 SYNOPSIS
 
- CryptX is the distribution entry point. In normal code, load one of the
- concrete modules listed below.
+CryptX is the distribution entry point. In normal code, load one of the concrete modules listed below.
 
+ ## one-shot hashing
  use Crypt::Digest qw(digest_data_hex);
- my $data = 'hello world';
- my $sha256 = digest_data_hex('SHA256', $data);
+ my $sha256 = digest_data_hex('SHA256', 'hello world');
 
- use Crypt::Cipher::AES;
- my $key = '1234567890abcdef';
- my $plaintext_block = '1234567890123456';
- my $aes = Crypt::Cipher::AES->new($key);
- my $block = $aes->encrypt($plaintext_block);
+ ## classic AES-CBC encryption with padding
+ use Crypt::Mode::CBC;
+ my $cbc = Crypt::Mode::CBC->new('AES');
+ my $iv = random_bytes(16); # 16-byte AES block-size IV
+ my $cbc_ciphertext = $cbc->encrypt('hello world', $key, $iv);
 
- use Crypt::AuthEnc::ChaCha20Poly1305 qw(chacha20poly1305_encrypt_authenticate);
- my $chacha_key = '1234567890abcdef1234567890abcdef'; # 32 bytes
- my $nonce = '123456789012';                          # 12 bytes
- my $adata = 'header';
- my $plaintext = 'hello world';
- my ($ciphertext, $tag) = chacha20poly1305_encrypt_authenticate($chacha_key, $nonce, $adata, $plaintext);
+ ## classic authenticated encryption (AEAD) with AES
+ use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate);
+ my $key = random_bytes(32);   # 32-byte AES-256 key
+ my $nonce = random_bytes(12); # 12-byte unique nonce
+ my ($ciphertext, $tag) = gcm_encrypt_authenticate('AES', $key, $nonce, 'header', 'hello world');
 
+ ## classic message authentication
+ use Crypt::Mac::HMAC qw(hmac_hex);
+ my $mac = hmac_hex('SHA256', $key, 'hello world');
+
+ ## secure random data + UUID helpers
+ use Crypt::PRNG qw(random_bytes random_string);
+ use Crypt::Misc qw(random_v4uuid random_v7uuid);
+ my $salt = random_bytes(16);
+ my $token = random_string(24);
+ my $uuid4 = random_v4uuid();
+ my $uuid7 = random_v7uuid();
+
+ ## classic password-based key derivation
+ use Crypt::KeyDerivation qw(pbkdf2);
+ my $dk = pbkdf2('password', $salt, 100_000, 'SHA256', 32);
+
+ ## bare stream cipher (authenticate separately)
+ use Crypt::Stream::ChaCha;
+ my $stream = Crypt::Stream::ChaCha->new($key, $nonce);
+ my $stream_ciphertext = $stream->crypt('hello world');
+
+ ## modern signatures
+ use Crypt::PK::Ed25519;
+ my $signer = Crypt::PK::Ed25519->new->generate_key;
+ my $sig = $signer->sign_message('hello world');
+ my $ok = $signer->verify_message($sig, 'hello world');
+
+ ## key agreement
  use Crypt::PK::X25519;
  my $alice = Crypt::PK::X25519->new->generate_key;
  my $bob = Crypt::PK::X25519->new->generate_key;
@@ -70,7 +96,10 @@ CryptX - Cryptographic toolkit
 
 =head1 DESCRIPTION
 
-Perl modules providing a cryptography based on L<LibTomCrypt|https://github.com/libtom/libtomcrypt> library.
+Perl cryptographic modules built on the bundled L<LibTomCrypt|https://github.com/libtom/libtomcrypt> library.
+The distribution also includes L<Math::BigInt::LTM>, a L<Math::BigInt> backend
+built on the bundled L<LibTomMath|https://www.libtom.net/LibTomMath/> library
+used internally by LibTomCrypt.
 
 This module mainly serves as the top-level distribution/documentation page. For actual work,
 use one of the concrete modules listed below.
@@ -146,8 +175,8 @@ interoperability (e.g. NaCl/libsodium).
 =item * B<RC4> (L<Crypt::Stream::RC4>) - B<Broken; do not use for new designs.> Provided for
 legacy interoperability only.
 
-=item * B<Rabbit>, B<Sober128>, B<Sosemanuk> - Niche ciphers from the eSTREAM portfolio.
-Use ChaCha unless a specific protocol requires one of these.
+=item * B<Rabbit>, B<Sober128>, B<Sosemanuk> (L<Crypt::Stream::Rabbit>, L<Crypt::Stream::Sober128>, L<Crypt::Stream::Sosemanuk>) -
+Niche ciphers from the eSTREAM portfolio. Use ChaCha unless a specific protocol requires one of these.
 
 =back
 
@@ -188,6 +217,14 @@ in software. BLAKE2b for 64-bit platforms, BLAKE2s for 32-bit.
 Use when you need variable-length output.
 
 =back
+
+=head3 Checksums
+
+Use L<Crypt::Checksum::CRC32> and L<Crypt::Checksum::Adler32> only for
+non-adversarial integrity checks such as accidental corruption detection.
+They are not cryptographic integrity or authenticity mechanisms. For
+cryptographic use, prefer L<Crypt::Digest>, L<Crypt::Mac>, or an AEAD mode
+from L<Crypt::AuthEnc>.
 
 =head3 Message Authentication Codes
 
@@ -259,13 +296,14 @@ derivation only. Keep this for interoperability with older formats; do not use i
 
 =head2 Error Handling
 
-All CryptX modules report errors by calling C<croak> (from L<Carp>). Invalid parameters,
-unsupported algorithms, wrong key sizes, malformed input, and internal library failures all
-croak with a descriptive message. There are no error codes; catch exceptions with C<eval>
-or L<Try::Tiny>.
+Most CryptX modules report errors by calling C<croak> (from L<Carp>).
+Invalid parameters, unsupported algorithms, wrong key sizes, malformed
+input, and internal library failures usually croak with a descriptive
+message. Catch exceptions with C<eval> or L<Try::Tiny>.
 
-The only methods that return C<undef> on failure instead of croaking are the C<*_decrypt_verify>
-functions in the authenticated encryption modules
+Some validation-style helpers use a return value instead of croaking. The
+most important examples are the C<*_decrypt_verify> functions in the
+authenticated encryption modules
 (L<Crypt::AuthEnc::GCM/gcm_decrypt_verify>,
 L<Crypt::AuthEnc::CCM/ccm_decrypt_verify>,
 L<Crypt::AuthEnc::EAX/eax_decrypt_verify>,
@@ -274,7 +312,9 @@ L<Crypt::AuthEnc::ChaCha20Poly1305/chacha20poly1305_decrypt_verify>,
 L<Crypt::AuthEnc::XChaCha20Poly1305/xchacha20poly1305_decrypt_verify>,
 L<Crypt::AuthEnc::SIV/siv_decrypt_verify>).
 These return C<undef> when authentication fails, indicating the ciphertext was tampered with
-or the wrong key/nonce was used.
+or the wrong key/nonce was used. Some parser/decoder helpers in other modules
+also return C<undef> or false for malformed input, so check the concrete
+module POD when you need exact failure semantics.
 
 =head2 Module Map
 
@@ -343,6 +383,9 @@ L<Crypt::KeyDerivation>
 
 L<Crypt::ASN1>
 
+Use C<Crypt::ASN1> only when you need custom ASN.1 / DER parsing or encoding.
+Most common key and certificate formats are already handled by the PK modules.
+
 =item * Miscellaneous helpers
 
 L<Crypt::Misc> (base64/base32/base58 codecs, PEM helpers, constant-time compare, UUID generation, octet increment helpers, and related utility functions)
@@ -375,6 +418,12 @@ Returns the name of the math provider back-end in use.
  # e.g. 60
 
 Returns the number of bits per digit used by the math provider.
+
+=head2 Math::BigInt backend
+
+L<Math::BigInt::LTM> is L<Math::BigInt> backend based on the bundled LibTomMath library.
+This is separate from the cryptographic APIs above, but it ships in the same
+distribution and uses the same big-integer engine that LibTomCrypt relies on.
 
 =head1 LICENSE
 
