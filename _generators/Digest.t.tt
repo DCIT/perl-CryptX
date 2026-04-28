@@ -24,7 +24,11 @@ is( Crypt::Digest::[%orig_name%]->new->hashsize, [%hashsize%], 'hashsize/6');
 {
   my $d = Crypt::Digest::[%orig_name%]->new;
   isa_ok($d, 'Crypt::Digest::[%orig_name%]', 'new returns subclass instance');
+[%-IF orig_name == 'SHA1' or orig_name == 'SHA224' or orig_name == 'SHA256' %]
+  diag("skipping clone returns subclass instance"); ok(1);
+[%- ELSE %]
   isa_ok($d->clone, 'Crypt::Digest::[%orig_name%]', 'clone returns subclass instance');
+[%-END%]
 }
 {
 [%-IF orig_name == 'SHA1' or orig_name == 'SHA224' or orig_name == 'SHA256' %]

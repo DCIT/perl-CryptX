@@ -126,54 +126,11 @@ typedef struct digest_struct {          /* used by Crypt::Digest */
   int finalized;
 } *Crypt__Digest;
 
-/* SHA1 and SHA224/SHA256 keep their working state behind an internal pointer
- * that is aligned into state_buf during init. After copying the struct, that
- * pointer still targets the original object's buffer, so we must rebind it to
- * the copied storage before using the clone. */
-STATIC void cryptx_internal_digest_fixup_state(Crypt__Digest digest) {
-  const char *name;
-  const UV mask = (UV)16 - 1;
-  UV value;
-
-  if (digest == NULL || digest->desc == NULL || digest->desc->name == NULL) return;
-  name = digest->desc->name;
-
-  if (strcmp(name, "sha1") == 0) {
-    value = PTR2UV(digest->state.sha1.state_buf);
-    digest->state.sha1.state = INT2PTR(ulong32 *, (value + mask) & ~mask);
-    return;
-  }
-
-  if (strcmp(name, "sha224") == 0 || strcmp(name, "sha256") == 0) {
-    value = PTR2UV(digest->state.sha256.state_buf);
-    digest->state.sha256.state = INT2PTR(ulong32 *, (value + mask) & ~mask);
-    return;
-  }
-}
-
-/* HMAC embeds a hash_state directly, so copying hmac_state has the same
- * internal-pointer problem for SHA1 and SHA224/SHA256 that affects
- * Crypt::Digest state copies. */
-STATIC void cryptx_internal_hmac_fixup_state(hmac_state *hmac) {
-  const char *name;
-  const UV mask = (UV)16 - 1;
-  UV value;
-
-  if (hmac == NULL || hmac->hash < 0 || hmac->hash >= TAB_SIZE) return;
-  if (hash_descriptor[hmac->hash].name == NULL) return;
-  name = hash_descriptor[hmac->hash].name;
-
-  if (strcmp(name, "sha1") == 0) {
-    value = PTR2UV(hmac->md.sha1.state_buf);
-    hmac->md.sha1.state = INT2PTR(ulong32 *, (value + mask) & ~mask);
-    return;
-  }
-
-  if (strcmp(name, "sha224") == 0 || strcmp(name, "sha256") == 0) {
-    value = PTR2UV(hmac->md.sha256.state_buf);
-    hmac->md.sha256.state = INT2PTR(ulong32 *, (value + mask) & ~mask);
-    return;
-  }
+STATIC int cryptx_internal_noclone_hash(const char *name) {
+  if (name == NULL) return 0;
+  return strcmp(name, "sha1") == 0
+      || strcmp(name, "sha224") == 0
+      || strcmp(name, "sha256") == 0;
 }
 
 typedef struct digest_shake_struct {    /* used by Crypt::Digest::SHAKE, TurboSHAKE, KangarooTwelve */

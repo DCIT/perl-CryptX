@@ -43,10 +43,12 @@ DESTROY(Crypt::Mac::HMAC self)
 Crypt::Mac::HMAC
 clone(Crypt::Mac::HMAC self)
     CODE:
+        if (self->state.hash >= 0 && self->state.hash < TAB_SIZE && cryptx_internal_noclone_hash(hash_descriptor[self->state.hash].name)) {
+          croak("FATAL: clone is not supported for given hash state");
+        }
         Newz(0, RETVAL, 1, struct cryptx_mac_hmac_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         Copy(self, RETVAL, 1, struct cryptx_mac_hmac_struct);
-        cryptx_internal_hmac_fixup_state(&RETVAL->state);
     OUTPUT:
         RETVAL
 
