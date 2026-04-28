@@ -55,13 +55,13 @@ CryptX is the distribution entry point. In normal code, load one of the concrete
  my $iv = random_bytes(16); # 16-byte AES block-size IV
  my $cbc_ciphertext = $cbc->encrypt('hello world', $key, $iv);
 
- ## classic authenticated encryption (AEAD) with AES
+ ## authenticated encryption (AEAD) with AES
  use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate);
  my $key = random_bytes(32);   # 32-byte AES-256 key
  my $nonce = random_bytes(12); # 12-byte unique nonce
  my ($ciphertext, $tag) = gcm_encrypt_authenticate('AES', $key, $nonce, 'header', 'hello world');
 
- ## classic message authentication
+ ## message authentication
  use Crypt::Mac::HMAC qw(hmac_hex);
  my $mac = hmac_hex('SHA256', $key, 'hello world');
 
@@ -303,14 +303,7 @@ message. Catch exceptions with C<eval> or L<Try::Tiny>.
 
 Some validation-style helpers use a return value instead of croaking. The
 most important examples are the C<*_decrypt_verify> functions in the
-authenticated encryption modules
-(L<Crypt::AuthEnc::GCM/gcm_decrypt_verify>,
-L<Crypt::AuthEnc::CCM/ccm_decrypt_verify>,
-L<Crypt::AuthEnc::EAX/eax_decrypt_verify>,
-L<Crypt::AuthEnc::OCB/ocb_decrypt_verify>,
-L<Crypt::AuthEnc::ChaCha20Poly1305/chacha20poly1305_decrypt_verify>,
-L<Crypt::AuthEnc::XChaCha20Poly1305/xchacha20poly1305_decrypt_verify>,
-L<Crypt::AuthEnc::SIV/siv_decrypt_verify>).
+authenticated encryption modules C<Crypt::AuthEnc::*>.
 These return C<undef> when authentication fails, indicating the ciphertext was tampered with
 or the wrong key/nonce was used. Some parser/decoder helpers in other modules
 also return C<undef> or false for malformed input, so check the concrete
@@ -421,9 +414,10 @@ Returns the number of bits per digit used by the math provider.
 
 =head2 Math::BigInt backend
 
-L<Math::BigInt::LTM> is L<Math::BigInt> backend based on the bundled LibTomMath library.
-This is separate from the cryptographic APIs above, but it ships in the same
-distribution and uses the same big-integer engine that LibTomCrypt relies on.
+Part of CryptX is L<Math::BigInt::LTM>, a L<Math::BigInt> backend based on
+the bundled LibTomMath library. It is separate from the cryptographic APIs
+above, but it ships in the same distribution and uses the same big-integer
+engine that LibTomCrypt relies on.
 
 =head1 LICENSE
 

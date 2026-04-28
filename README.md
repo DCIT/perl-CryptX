@@ -16,13 +16,13 @@ CryptX is the distribution entry point. In normal code, load one of the concrete
     my $iv = random_bytes(16); # 16-byte AES block-size IV
     my $cbc_ciphertext = $cbc->encrypt('hello world', $key, $iv);
 
-    ## classic authenticated encryption (AEAD) with AES
+    ## authenticated encryption (AEAD) with AES
     use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate);
     my $key = random_bytes(32);   # 32-byte AES-256 key
     my $nonce = random_bytes(12); # 12-byte unique nonce
     my ($ciphertext, $tag) = gcm_encrypt_authenticate('AES', $key, $nonce, 'header', 'hello world');
 
-    ## classic message authentication
+    ## message authentication
     use Crypt::Mac::HMAC qw(hmac_hex);
     my $mac = hmac_hex('SHA256', $key, 'hello world');
 
@@ -201,14 +201,7 @@ message. Catch exceptions with `eval` or [Try::Tiny](https://metacpan.org/pod/Tr
 
 Some validation-style helpers use a return value instead of croaking. The
 most important examples are the `*_decrypt_verify` functions in the
-authenticated encryption modules
-(["gcm\_decrypt\_verify" in Crypt::AuthEnc::GCM](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AGCM#gcm_decrypt_verify),
-["ccm\_decrypt\_verify" in Crypt::AuthEnc::CCM](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3ACCM#ccm_decrypt_verify),
-["eax\_decrypt\_verify" in Crypt::AuthEnc::EAX](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AEAX#eax_decrypt_verify),
-["ocb\_decrypt\_verify" in Crypt::AuthEnc::OCB](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AOCB#ocb_decrypt_verify),
-["chacha20poly1305\_decrypt\_verify" in Crypt::AuthEnc::ChaCha20Poly1305](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AChaCha20Poly1305#chacha20poly1305_decrypt_verify),
-["xchacha20poly1305\_decrypt\_verify" in Crypt::AuthEnc::XChaCha20Poly1305](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AXChaCha20Poly1305#xchacha20poly1305_decrypt_verify),
-["siv\_decrypt\_verify" in Crypt::AuthEnc::SIV](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3ASIV#siv_decrypt_verify)).
+authenticated encryption modules `Crypt::AuthEnc::*`.
 These return `undef` when authentication fails, indicating the ciphertext was tampered with
 or the wrong key/nonce was used. Some parser/decoder helpers in other modules
 also return `undef` or false for malformed input, so check the concrete
@@ -315,9 +308,10 @@ Returns the number of bits per digit used by the math provider.
 
 ## Math::BigInt backend
 
-[Math::BigInt::LTM](https://metacpan.org/pod/Math%3A%3ABigInt%3A%3ALTM) is [Math::BigInt](https://metacpan.org/pod/Math%3A%3ABigInt) backend based on the bundled LibTomMath library.
-This is separate from the cryptographic APIs above, but it ships in the same
-distribution and uses the same big-integer engine that LibTomCrypt relies on.
+Part of CryptX is [Math::BigInt::LTM](https://metacpan.org/pod/Math%3A%3ABigInt%3A%3ALTM), a [Math::BigInt](https://metacpan.org/pod/Math%3A%3ABigInt) backend based on
+the bundled LibTomMath library. It is separate from the cryptographic APIs
+above, but it ships in the same distribution and uses the same big-integer
+engine that LibTomCrypt relies on.
 
 # LICENSE
 
