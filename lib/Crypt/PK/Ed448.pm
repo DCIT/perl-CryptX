@@ -140,8 +140,6 @@ I<Since: CryptX-0.100>
 
 =head2 new
 
-I<Since: CryptX-0.100>
-
  my $source = Crypt::PK::Ed448->new();
  $source->generate_key;
 
@@ -156,15 +154,11 @@ immediately import the key material into the new object.
 
 =head2 generate_key
 
-I<Since: CryptX-0.100>
-
 Returns the object itself (for chaining).
 
  $pk->generate_key;
 
 =head2 import_key
-
-I<Since: CryptX-0.100>
 
 Loads Ed448 private or public keys from DER, PEM, PKCS#8, X.509 certificates, SubjectPublicKeyInfo, or JWK.
 
@@ -193,8 +187,6 @@ The same method also accepts filenames instead of buffers.
 
 =head2 import_key_raw
 
-I<Since: CryptX-0.100>
-
 Import raw public/private key bytes.
 
  $pk->import_key_raw($key, 'public');
@@ -204,16 +196,12 @@ The raw key must be exactly 57 bytes long.
 
 =head2 export_key_der
 
-I<Since: CryptX-0.100>
-
 Returns the key as a binary DER-encoded string.
 
  my $der = $pk->export_key_der('private');
  my $der = $pk->export_key_der('public');
 
 =head2 export_key_pem
-
-I<Since: CryptX-0.100>
 
 Returns the key as a PEM-encoded string (ASCII).
 
@@ -223,16 +211,12 @@ Returns the key as a PEM-encoded string (ASCII).
 
 =head2 export_key_jwk
 
-I<Since: CryptX-0.100>
-
 Returns a JSON string, or a hashref if the optional second argument is true.
 
  my $json = $pk->export_key_jwk('private');
  my $hash = $pk->export_key_jwk('public', 1);
 
 =head2 export_key_raw
-
-I<Since: CryptX-0.100>
 
 Returns the raw key as a binary string.
 
@@ -241,8 +225,6 @@ Returns the raw key as a binary string.
 
 =head2 sign_message
 
-I<Since: CryptX-0.100>
-
 Returns the signature as a binary string. Ed448 uses a fixed hash internally
 (SHAKE256); unlike RSA or ECDSA there is no C<$hash_name> parameter.
 
@@ -250,21 +232,15 @@ Returns the signature as a binary string. Ed448 uses a fixed hash internally
 
 =head2 verify_message
 
-I<Since: CryptX-0.100>
-
 Returns C<1> if the signature is valid, C<0> otherwise.
 
  my $valid = $pub->verify_message($signature, $message);
 
 =head2 is_private
 
-I<Since: CryptX-0.100>
-
  my $rv = $pk->is_private;
 
 =head2 key2hash
-
-I<Since: CryptX-0.100>
 
 Returns a hashref with the key components, or C<undef> if no key is loaded.
 

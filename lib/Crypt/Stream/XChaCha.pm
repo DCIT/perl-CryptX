@@ -46,8 +46,6 @@ via C<new>, for example:
 
 =head2 new
 
-I<Since: CryptX-0.100>
-
  my $stream = Crypt::Stream::XChaCha->new($key, $nonce);
  #or
  my $stream = Crypt::Stream::XChaCha->new($key, $nonce, $rounds);
@@ -57,8 +55,6 @@ I<Since: CryptX-0.100>
  # $rounds .. [integer] optional, rounds (DEFAULT: 20)
 
 =head2 crypt
-
-I<Since: CryptX-0.100>
 
 Encrypts or decrypts data. The output has the same length as the input.
 Returns a binary string (raw bytes).
@@ -73,8 +69,6 @@ scalars are stringified before processing.
 
 =head2 keystream
 
-I<Since: CryptX-0.100>
-
 Returns C<$length> bytes of raw keystream as a binary string.
 
 The length is taken using Perl's usual numeric coercion. Values that coerce to
@@ -83,8 +77,6 @@ an oversized unsigned length are rejected as too large.
  my $random_bytes = $stream->keystream($length);
 
 =head2 clone
-
-I<Since: CryptX-0.100>
 
 Returns a copy of the stream cipher object in its current state.
 

@@ -90,26 +90,18 @@ created via C<new>, for example:
 
 =head2 new
 
-I<Since: CryptX-0.100>
-
  my $d = Crypt::Digest::KangarooTwelve->new($num);
  # $num ... [integer] 128 or 256 (security level in bits)
 
 =head2 clone
 
-I<Since: CryptX-0.100>
-
  my $d2 = $d->clone;
 
 =head2 reset
 
-I<Since: CryptX-0.100>
-
  $d->reset;
 
 =head2 add
-
-I<Since: CryptX-0.100>
 
 Appends data to the message. Returns the object itself (for chaining).
 
@@ -124,8 +116,6 @@ accepted. C<undef> is treated as an empty string and may emit Perl's usual
 
 =head2 addfile
 
-I<Since: CryptX-0.100>
-
 Reads the file content and appends it to the message. Returns the object itself (for chaining).
 
  $d->addfile('filename.dat');
@@ -135,8 +125,6 @@ Reads the file content and appends it to the message. Returns the object itself 
 
 =head2 customization
 
-I<Since: CryptX-0.100>
-
  $d->customization('context string');  # optional; call after add(), before done()
 
 Each argument is converted to bytes using Perl's usual scalar stringification.
@@ -145,8 +133,6 @@ accepted. C<undef> is treated as an empty string and may emit Perl's usual
 "uninitialized value" warning.
 
 =head2 done
-
-I<Since: CryptX-0.100>
 
 Returns C<$len> bytes of output as a binary string. Can be called repeatedly
 to stream an unlimited amount of output from the same absorbed input. The

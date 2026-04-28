@@ -147,8 +147,6 @@ You can export selected functions:
 
 =head2 xchacha20poly1305_encrypt_authenticate
 
-I<Since: CryptX-0.100>
-
  my ($ciphertext, $tag) = xchacha20poly1305_encrypt_authenticate($key, $nonce, $adata, $plaintext);
 
  # $key ..... [binary string] encryption key (256 bits / 32 bytes)
@@ -159,8 +157,6 @@ Invalid key or nonce lengths croak.
 String-overloaded objects are accepted for C<$key> and C<$nonce>.
 
 =head2 xchacha20poly1305_decrypt_verify
-
-I<Since: CryptX-0.100>
 
 my $plaintext = xchacha20poly1305_decrypt_verify($key, $nonce, $adata, $ciphertext, $tag);
  # on error returns undef
@@ -177,8 +173,6 @@ C<new>, for example:
 
 =head2 new
 
-I<Since: CryptX-0.100>
-
  my $ae = Crypt::AuthEnc::XChaCha20Poly1305->new($key, $nonce);
  my $ae = Crypt::AuthEnc::XChaCha20Poly1305->new($key);
 
@@ -186,8 +180,6 @@ I<Since: CryptX-0.100>
  # $nonce ... [binary string] extended nonce (192 bits / 24 bytes)
 
 =head2 adata_add
-
-I<Since: CryptX-0.100>
 
 Add B<additional authenticated data>.
 Can be called only before the first C<encrypt_add> or C<decrypt_add>.
@@ -197,15 +189,11 @@ Returns the object itself (for chaining).
 
 =head2 encrypt_add
 
-I<Since: CryptX-0.100>
-
 Returns a binary string of ciphertext (raw bytes).
 
  my $ciphertext = $ae->encrypt_add($data);      # can be called multiple times
 
 =head2 encrypt_done
-
-I<Since: CryptX-0.100>
 
 Returns the authentication tag as a binary string (raw bytes).
 This call finalizes the current message.
@@ -214,15 +202,11 @@ This call finalizes the current message.
 
 =head2 decrypt_add
 
-I<Since: CryptX-0.100>
-
 Returns a binary string of plaintext (raw bytes).
 
  my $plaintext = $ae->decrypt_add($ciphertext); # can be called multiple times
 
 =head2 decrypt_done
-
-I<Since: CryptX-0.100>
 
 Without argument returns the computed tag as a binary string. With C<$tag> argument returns C<1> (success) or C<0> (failure).
 This call finalizes the current message.
@@ -233,8 +217,6 @@ This call finalizes the current message.
 
 =head2 set_iv
 
-I<Since: CryptX-0.100>
-
  my $ae = Crypt::AuthEnc::XChaCha20Poly1305->new($key)->set_iv($nonce);
  # $nonce ... [binary string] extended nonce (192 bits / 24 bytes)
 
@@ -242,8 +224,6 @@ Call C<set_iv> before the first C<adata_add>, C<encrypt_add>, or C<decrypt_add>
 for a message.
 
 =head2 clone
-
-I<Since: CryptX-0.100>
 
 Returns a copy of the AEAD object in its current state.
 

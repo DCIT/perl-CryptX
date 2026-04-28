@@ -62,8 +62,6 @@ You can export selected functions:
 
 =head2 siv_encrypt_authenticate
 
-I<Since: CryptX-0.100>
-
   my $ciphertext = siv_encrypt_authenticate($cipher, $key, $plaintext);
   #or
   my $ciphertext = siv_encrypt_authenticate($cipher, $key, $plaintext, $adata);
@@ -83,8 +81,6 @@ it is given as an arrayref, each defined element must be a string/buffer scalar.
 String-overloaded objects are accepted.
 
 =head2 siv_decrypt_verify
-
-I<Since: CryptX-0.100>
 
   my $plaintext = siv_decrypt_verify($cipher, $key, $ciphertext);
   #or
