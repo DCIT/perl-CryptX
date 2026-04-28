@@ -276,6 +276,94 @@ verify_message(Crypt::PK::Ed448 self, SV * sig, SV * data)
     OUTPUT:
         RETVAL
 
+SV *
+sign_message_ctx(Crypt::PK::Ed448 self, SV * data, SV * ctx)
+    CODE:
+    {
+        int rv;
+        unsigned char buffer[114], *data_ptr = NULL, *ctx_ptr = NULL;
+        unsigned long buffer_len = sizeof(buffer);
+        STRLEN data_len = 0, ctx_len = 0;
+
+        data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        ctx_ptr = (unsigned char *)SvPVbyte(ctx, ctx_len);
+        if (ctx_len > 255) croak("FATAL: context must be at most 255 bytes");
+        rv = ed448ctx_sign(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
+                           ctx_ptr, (unsigned long)ctx_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: ed448ctx_sign failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
+    }
+    OUTPUT:
+        RETVAL
+
+int
+verify_message_ctx(Crypt::PK::Ed448 self, SV * sig, SV * data, SV * ctx)
+    CODE:
+    {
+        int rv, stat;
+        unsigned char *data_ptr = NULL, *sig_ptr = NULL, *ctx_ptr = NULL;
+        STRLEN data_len = 0, sig_len = 0, ctx_len = 0;
+
+        data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
+        ctx_ptr = (unsigned char *)SvPVbyte(ctx, ctx_len);
+        if (ctx_len > 255) croak("FATAL: context must be at most 255 bytes");
+        RETVAL = 0;
+        stat = 0;
+        rv = ed448ctx_verify(data_ptr, (unsigned long)data_len, sig_ptr, (unsigned long)sig_len,
+                             ctx_ptr, (unsigned long)ctx_len, &stat, &self->key);
+        if (rv == CRYPT_OK && stat == 1) RETVAL = 1;
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+sign_message_ph(Crypt::PK::Ed448 self, SV * data, ...)
+    CODE:
+    {
+        int rv;
+        unsigned char buffer[114], *data_ptr = NULL, *ctx_ptr = NULL;
+        unsigned long buffer_len = sizeof(buffer);
+        STRLEN data_len = 0, ctx_len = 0;
+
+        data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        if (items > 2 && SvOK(ST(2))) {
+            ctx_ptr = (unsigned char *)SvPVbyte(ST(2), ctx_len);
+            if (ctx_len > 255) croak("FATAL: context must be at most 255 bytes");
+        }
+        rv = ed448ph_sign(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
+                          ctx_ptr, (unsigned long)ctx_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: ed448ph_sign failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
+    }
+    OUTPUT:
+        RETVAL
+
+int
+verify_message_ph(Crypt::PK::Ed448 self, SV * sig, SV * data, ...)
+    CODE:
+    {
+        int rv, stat;
+        unsigned char *data_ptr = NULL, *sig_ptr = NULL, *ctx_ptr = NULL;
+        STRLEN data_len = 0, sig_len = 0, ctx_len = 0;
+
+        data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
+        if (items > 3 && SvOK(ST(3))) {
+            ctx_ptr = (unsigned char *)SvPVbyte(ST(3), ctx_len);
+            if (ctx_len > 255) croak("FATAL: context must be at most 255 bytes");
+        }
+        RETVAL = 0;
+        stat = 0;
+        rv = ed448ph_verify(data_ptr, (unsigned long)data_len, sig_ptr, (unsigned long)sig_len,
+                            ctx_ptr, (unsigned long)ctx_len, &stat, &self->key);
+        if (rv == CRYPT_OK && stat == 1) RETVAL = 1;
+    }
+    OUTPUT:
+        RETVAL
+
 void
 DESTROY(Crypt::PK::Ed448 self)
     CODE:

@@ -398,6 +398,47 @@ Returns C<1> if the signature is valid, C<0> otherwise.
 
  my $valid = $pub->verify_message($signature, $message);
 
+=head2 sign_message_ctx
+
+I<Since: CryptX-0.100>
+
+Signs a message using Ed25519ctx (RFC 8032 Section 5.1), which includes a
+mandatory context string (at most 255 bytes). The context string makes the
+signature domain-separated: the same key signing the same message with a
+different context produces a different (and incompatible) signature.
+
+ my $signature = $priv->sign_message_ctx($message, $context);
+
+=head2 verify_message_ctx
+
+I<Since: CryptX-0.100>
+
+Verifies a signature produced by L</sign_message_ctx>.
+
+ my $valid = $pub->verify_message_ctx($signature, $message, $context);
+
+=head2 sign_message_ph
+
+I<Since: CryptX-0.100>
+
+Signs a message using Ed25519ph (RFC 8032 Section 5.1), the "pre-hashed"
+variant. The message is first hashed with SHA-512 internally before signing.
+This is useful when signing very large messages or when only a hash of the
+message is available. An optional context string (at most 255 bytes) can be
+provided; it defaults to the empty string if omitted.
+
+ my $signature = $priv->sign_message_ph($message);
+ my $signature = $priv->sign_message_ph($message, $context);
+
+=head2 verify_message_ph
+
+I<Since: CryptX-0.100>
+
+Verifies a signature produced by L</sign_message_ph>.
+
+ my $valid = $pub->verify_message_ph($signature, $message);
+ my $valid = $pub->verify_message_ph($signature, $message, $context);
+
 =head2 is_private
 
  my $rv = $pk->is_private;

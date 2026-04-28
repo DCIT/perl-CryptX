@@ -11,6 +11,7 @@ NEXT    2026-MM-DD
         - new: Crypt::PK::X448
         - new: Crypt::Stream::XChaCha
         - new: Crypt::Stream::XSalsa20
+        - Crypt::PK::Ed25519 - new functions: sign_message_ctx, verify_message_ctx, sign_message_ph, verify_message_ph
         - Crypt::Digest: object digest accessors now finalize the object; use reset() before reuse
         - Crypt::Mac + Crypt::AuthEnc: finalized-object lifecycle is now enforced consistently
         - security/hardening fixes across Digest/Mac/AuthEnc/Mode/Stream/PK/PRNG cleanup paths and XS scalar handling

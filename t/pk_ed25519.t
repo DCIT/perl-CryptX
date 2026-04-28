@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 
 plan skip_all => "JSON module not installed" unless eval { require JSON };
-plan tests => 81;
+plan tests => 98;
 
 use Crypt::PK::Ed25519;
 use Crypt::Misc qw(read_rawfile);
@@ -224,4 +224,91 @@ use Crypt::Misc qw(read_rawfile);
   my $pk = Crypt::PK::Ed25519->new->import_key_raw(pack("H*", "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a"), 'public');
   is($pk->verify_message("not-a-valid-signature-at-all!", "message"), 0, 'verify_message rejects invalid signature');
   is($pk->verify_message(pack("H*", "00" x 64), "message"), 0, 'verify_message rejects zeroed signature');
+}
+
+# Ed25519ctx test vectors from RFC 8032 Section 7.2
+{
+  my $sk = Crypt::PK::Ed25519->new->import_key_raw(pack("H*", "0305334e381af78f141cb666f6199f57bc3495335a256a95bd2a55bf546663f6"), 'private');
+  my $pk = Crypt::PK::Ed25519->new->import_key_raw(pack("H*", "dfc9425e4f968f7f0c29f0259cf5f9aed6851c2bb4ad8bfb860cfee0ab248292"), 'public');
+
+  # ctx test 1: context="foo"
+  {
+    my $msg = pack("H*", "f726936d19c800494e3fdaff20b276a8");
+    my $ctx = "foo";
+    my $expected_sig = "55a4cc2f70a54e04288c5f4cd1e45a7b"
+                     . "b520b36292911876cada7323198dd87a"
+                     . "8b36950b95130022907a7fb7c4e9b2d5"
+                     . "f6cca685a587b4b21f4b888e4e7edb0d";
+    my $sig = $sk->sign_message_ctx($msg, $ctx);
+    is(unpack("H*", $sig), $expected_sig, 'ed25519ctx sign test 1');
+    ok($pk->verify_message_ctx($sig, $msg, $ctx), 'ed25519ctx verify test 1');
+    ok(!$pk->verify_message_ctx($sig, $msg, "bar"), 'ed25519ctx verify rejects wrong context');
+  }
+
+  # ctx test 2: context="bar"
+  {
+    my $msg = pack("H*", "f726936d19c800494e3fdaff20b276a8");
+    my $ctx = "bar";
+    my $expected_sig = "fc60d5872fc46b3aa69f8b5b4351d580"
+                     . "8f92bcc044606db097abab6dbcb1aee3"
+                     . "216c48e8b3b66431b5b186d1d28f8ee1"
+                     . "5a5ca2df6668346291c2043d4eb3e90d";
+    my $sig = $sk->sign_message_ctx($msg, $ctx);
+    is(unpack("H*", $sig), $expected_sig, 'ed25519ctx sign test 2');
+    ok($pk->verify_message_ctx($sig, $msg, $ctx), 'ed25519ctx verify test 2');
+  }
+
+  # ctx test 3: message=0x508e9e6882b979fea900f62adceaca35, context="foo"
+  {
+    my $msg = pack("H*", "508e9e6882b979fea900f62adceaca35");
+    my $ctx = "foo";
+    my $expected_sig = "8b70c1cc8310e1de20ac53ce28ae6e72"
+                     . "07f33c3295e03bb5c0732a1d20dc6490"
+                     . "8922a8b052cf99b7c4fe107a5abb5b2c"
+                     . "4085ae75890d02df26269d8945f84b0b";
+    my $sig = $sk->sign_message_ctx($msg, $ctx);
+    is(unpack("H*", $sig), $expected_sig, 'ed25519ctx sign test 3');
+    ok($pk->verify_message_ctx($sig, $msg, $ctx), 'ed25519ctx verify test 3');
+  }
+}
+
+# Ed25519ph test vector from RFC 8032 Section 7.2
+{
+  my $sk = Crypt::PK::Ed25519->new->import_key_raw(pack("H*", "833fe62409237b9d62ec77587520911e9a759cec1d19755b7da901b96dca3d42"), 'private');
+  my $pk = Crypt::PK::Ed25519->new->import_key_raw(pack("H*", "ec172b93ad5e563bf4932c70e1245034c35467ef2efd4d64ebf819683467e2bf"), 'public');
+
+  my $msg = pack("H*", "616263"); # "abc"
+  my $expected_sig = "98a70222f0b8121aa9d30f813d683f80"
+                   . "9e462b469c7ff87639499bb94e6dae41"
+                   . "31f85042463c2a355a2003d062adf5aa"
+                   . "a10b8c61e636062aaad11c2a26083406";
+  my $sig = $sk->sign_message_ph($msg);
+  is(unpack("H*", $sig), $expected_sig, 'ed25519ph sign (no context)');
+  ok($pk->verify_message_ph($sig, $msg), 'ed25519ph verify (no context)');
+  ok(!$pk->verify_message_ph($sig, "wrong"), 'ed25519ph verify rejects wrong message');
+}
+
+# Ed25519ctx/ph roundtrip with generated key
+{
+  my $sk = Crypt::PK::Ed25519->new->generate_key;
+  my $pk = Crypt::PK::Ed25519->new->import_key_raw($sk->export_key_raw('public'), 'public');
+
+  # ctx roundtrip
+  my $sig_ctx = $sk->sign_message_ctx("hello", "mycontext");
+  ok($pk->verify_message_ctx($sig_ctx, "hello", "mycontext"), 'ed25519ctx roundtrip');
+  ok(!$pk->verify_message_ctx($sig_ctx, "hello", "other"), 'ed25519ctx roundtrip wrong ctx');
+
+  # ph roundtrip without context
+  my $sig_ph = $sk->sign_message_ph("hello");
+  ok($pk->verify_message_ph($sig_ph, "hello"), 'ed25519ph roundtrip no ctx');
+
+  # ph roundtrip with context
+  my $sig_ph_ctx = $sk->sign_message_ph("hello", "myctx");
+  ok($pk->verify_message_ph($sig_ph_ctx, "hello", "myctx"), 'ed25519ph roundtrip with ctx');
+  ok(!$pk->verify_message_ph($sig_ph_ctx, "hello"), 'ed25519ph roundtrip ctx mismatch');
+
+  # cross-scheme: plain vs ctx vs ph signatures are not interchangeable
+  my $sig_plain = $sk->sign_message("hello");
+  ok(!$pk->verify_message_ctx($sig_plain, "hello", ""), 'plain sig not valid as ctx');
+  ok(!$pk->verify_message_ph($sig_plain, "hello"), 'plain sig not valid as ph');
 }

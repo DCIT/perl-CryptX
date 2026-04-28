@@ -37,6 +37,7 @@ Test::Pod::Spelling->import(
                           rarr UTCTime TLV
                           OpenSSH codecs
                           undef adata
+                          pre Edctx Edph
                         )]
                     },
 );
