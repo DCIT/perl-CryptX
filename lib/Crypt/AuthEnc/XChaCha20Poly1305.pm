@@ -2,7 +2,7 @@ package Crypt::AuthEnc::XChaCha20Poly1305;
 
 use strict;
 use warnings;
-our $VERSION = '0.088_002';
+our $VERSION = '0.088_003';
 
 require Exporter; our @ISA = qw(Exporter Crypt::AuthEnc::ChaCha20Poly1305); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( xchacha20poly1305_encrypt_authenticate xchacha20poly1305_decrypt_verify )] );
