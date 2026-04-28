@@ -333,8 +333,13 @@ sub tlv { my ($tag, $val) = @_; pack("CC", $tag, length($val)) . $val }
   eval { asn1_encode_der([{ type => 'UTCTIME', value => '1949-12-31T23:59:59Z' }]) };
   like($@, qr/UTCTIME year out of range/, 'encode UTCTIME rejects RFC3339 year below 1950');
 
-  eval { asn1_encode_der([{ type => 'UTCTIME', format => 'epoch', value => 2524608000 }]) };
-  like($@, qr/UTCTIME year out of range/, 'encode UTCTIME rejects epoch above 2049');
+  SKIP: {
+    require Config;
+    skip 'requires 64-bit Perl integers', 1 if ($Config::Config{ivsize} || 0) < 8;
+
+    eval { asn1_encode_der([{ type => 'UTCTIME', format => 'epoch', value => 2524608000 }]) };
+    like($@, qr/UTCTIME year out of range/, 'encode UTCTIME rejects epoch above 2049');
+  }
 
   eval { asn1_encode_der([{ type => 'UTCTIME', value => 'junk' }]) };
   like($@, qr/invalid UTCTIME value/, 'encode UTCTIME rejects arbitrary raw string');

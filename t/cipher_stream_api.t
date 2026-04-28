@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use Config ();
 use Test::More tests => 75;
 use Data::Dumper ();
 
@@ -109,9 +110,13 @@ for my $case (@cases) {
   like($@, qr/^FATAL:/, "$name invalid constructor croak text");
 
   if ($name eq 'ChaCha') {
-    my $overflow_ok = eval { $class->new("K" x 32, "N" x 12, 4294967296); 1 };
-    ok(!$overflow_ok, 'ChaCha rejects oversized counter for 12-byte nonce');
-    like($@, qr/^FATAL: chacha counter too large for 12-byte nonce\b/, 'ChaCha oversized counter croak text');
+    SKIP: {
+      skip 'requires 64-bit Perl integers', 2 if ($Config::Config{ivsize} || 0) < 8;
+
+      my $overflow_ok = eval { $class->new("K" x 32, "N" x 12, 4294967296); 1 };
+      ok(!$overflow_ok, 'ChaCha rejects oversized counter for 12-byte nonce');
+      like($@, qr/^FATAL: chacha counter too large for 12-byte nonce\b/, 'ChaCha oversized counter croak text');
+    }
 
     my $wide_counter_ok = eval { $class->new("K" x 32, "N" x 8, 4294967296); 1 };
     ok($wide_counter_ok, 'ChaCha still accepts wide counter for 8-byte nonce');
