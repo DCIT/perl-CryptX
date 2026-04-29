@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 318;
+use Test::More tests => 319;
 use Crypt::Mode::CBC;
 
 my @tests;
@@ -111,6 +111,8 @@ for (@tests) {
   {
     local $SIG{__WARN__} = sub { };
     is(length(Crypt::Mode::CBC->new('AES')->encrypt(undef, $key, $iv)), 16, 'encrypt(undef) uses empty plaintext with padding');
-    is(Crypt::Mode::CBC->new('AES')->decrypt(undef, $key, $iv), '', 'decrypt(undef) returns empty string');
+    eval { Crypt::Mode::CBC->new('AES')->decrypt('', $key, $iv) };
+    like($@, qr/at least one block with padding/, 'decrypt(empty) rejects empty padded ciphertext');
+    is(Crypt::Mode::CBC->new('AES', 0)->decrypt('', $key, $iv), '', 'decrypt(empty) without padding returns empty string');
   }
 }

@@ -260,6 +260,7 @@ finish(Crypt::Mode::CBC self)
             }
           }
           else {
+            if (self->padding_mode != 0) croak("FATAL: cipher text length has to be at least one block with padding");
             blen = 0;
           }
         }
