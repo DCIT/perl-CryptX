@@ -953,10 +953,6 @@ sub handle_rsa_oaep_decrypt {
       unsupported_group($file, $doc, $group, 'unsupported RSA OAEP hash');
       next;
     }
-    if ($hash ne $mgf_hash) {
-      unsupported_group($file, $doc, $group, 'RSA OAEP distinct MGF hash not exposed by CryptX API');
-      next;
-    }
     my $pk = eval { Crypt::PK::RSA->new(\$group->{privateKeyPem}) };
     if (!$pk) {
       unsupported_group($file, $doc, $group, 'unsupported RSA private key');
@@ -966,7 +962,7 @@ sub handle_rsa_oaep_decrypt {
       mark_tc();
       my $ct = hex_to_bin($test->{ct});
       my $label = hex_to_bin($test->{label});
-      my ($ok, $pt) = eval_scalar(sub { $pk->decrypt($ct, 'oaep', $hash, $label) });
+      my ($ok, $pt) = eval_scalar(sub { $pk->decrypt($ct, 'oaep', $mgf_hash, $label, $hash) });
       $pt = undef unless $ok;
       check_exact_hex($file, $doc, $group, $test, $pt, $test->{msg}, 'RSA OAEP decrypt');
     }
