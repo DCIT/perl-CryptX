@@ -222,7 +222,11 @@ sub import_key {
 
   if ($data =~ /(-----BEGIN (PUBLIC|EC PRIVATE|PRIVATE|ENCRYPTED PRIVATE) KEY-----(.+?)-----END (PUBLIC|EC PRIVATE|PRIVATE|ENCRYPTED PRIVATE) KEY-----)/s) {
     my $pem = $1;
-    my $rv = eval { $self->_import_pem($pem, $password) } || eval { $self->_import_old(pem_to_der($pem, $password)) };
+    my $rv = eval { $self->_import_pem($pem, $password) };
+    if (!$rv) {
+      my $der = pem_to_der($pem, $password);
+      $rv = eval { $self->_import_old($der) } if defined $der;
+    }
     return $rv if $rv;
   }
   elsif ($data =~ /-----BEGIN CERTIFICATE-----(.+?)-----END CERTIFICATE-----/s) {

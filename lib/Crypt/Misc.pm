@@ -119,7 +119,7 @@ sub pem_to_der {
   return undef unless $b64;
 
   my $binary = decode_b64($b64);
-  return undef unless $binary;
+  return undef unless defined $binary;
 
   my ($ptype, $cipher_name, $iv_hex);
   for my $h (split /\n/, ($headers||'')) {
