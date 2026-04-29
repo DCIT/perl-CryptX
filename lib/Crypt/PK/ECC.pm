@@ -82,6 +82,7 @@ our %curve_oid2name = ( # must be "our" as we use it from XS code
   "1.3.36.3.3.2.8.1.1.12" => "brainpoolp384t1",
   "1.3.36.3.3.2.8.1.1.13" => "brainpoolp512r1",
   "1.3.36.3.3.2.8.1.1.14" => "brainpoolp512t1",
+  "1.2.250.1.223.101.256.1" => "frp256v1",
 );
 
 my %curve2jwk = (
@@ -425,6 +426,8 @@ The following predefined C<$curve_name> values are supported:
  'brainpoolp320r1'
  'brainpoolp384r1'
  'brainpoolp512r1'
+ # curve from https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000024668816
+ 'frp256v1'
  # curves from https://www.secg.org/sec2-v2.pdf
  'secp112r1'
  'secp112r2'
