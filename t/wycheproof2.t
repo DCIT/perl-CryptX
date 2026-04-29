@@ -5,8 +5,10 @@ use Test::More;
 use File::Basename qw(basename);
 
 my $TV_DIR = 't/wycheproof-repo/testvectors_v1';
+my $AUTHOR_MODE = defined $ENV{AUTHOR_MODE} ? $ENV{AUTHOR_MODE} : '';
+my $STRICT_ACCEPTABLE = $AUTHOR_MODE eq '3' ? 1 : 0;
 
-plan skip_all => 'set AUTHOR_MODE=2 to run Project Wycheproof tests' unless $ENV{AUTHOR_MODE} && $ENV{AUTHOR_MODE} == 2;
+plan skip_all => 'set AUTHOR_MODE=2 (relaxed) or AUTHOR_MODE=3 (strict) to run Project Wycheproof tests' unless $AUTHOR_MODE eq '2' || $AUTHOR_MODE eq '3';
 plan skip_all => "Project Wycheproof checkout not found at $TV_DIR" unless -d $TV_DIR;
 plan skip_all => 'JSON::PP module not installed' unless eval { require JSON::PP; JSON::PP->import(); 1 };
 
@@ -92,6 +94,7 @@ if (defined $ENV{CRYPTX_WYCHEPROOF_FILE} && length $ENV{CRYPTX_WYCHEPROOF_FILE})
 
 plan skip_all => "no Wycheproof JSON files found in $TV_DIR" unless @files;
 plan 'no_plan';
+diag 'wycheproof2 mode: strict (acceptable vectors must be rejected)' if $STRICT_ACCEPTABLE;
 
 for my $path (@files) {
   my $file = basename($path);
@@ -430,7 +433,7 @@ sub check_exact_hex {
     is($got_hex, $want_hex, $name);
   }
   elsif ($result eq 'acceptable') {
-    ok(!defined($got) || $got_hex eq $want_hex, $name);
+    ok($STRICT_ACCEPTABLE ? !defined($got) : (!defined($got) || $got_hex eq $want_hex), $name);
   }
   elsif ($result eq 'invalid') {
     ok(!defined($got) || $got_hex ne $want_hex, $name);
@@ -448,7 +451,7 @@ sub check_exact_bin {
     is($got, $want, $name);
   }
   elsif ($result eq 'acceptable') {
-    ok(!defined($got) || $got eq $want, $name);
+    ok($STRICT_ACCEPTABLE ? !defined($got) : (!defined($got) || $got eq $want), $name);
   }
   elsif ($result eq 'invalid') {
     ok(!defined($got) || $got ne $want, $name);
@@ -466,7 +469,7 @@ sub check_verify_bool {
     ok($valid, $name);
   }
   elsif ($result eq 'acceptable') {
-    ok(1, $name);
+    ok($STRICT_ACCEPTABLE ? !$valid : 1, $name);
   }
   elsif ($result eq 'invalid') {
     ok(!$valid, $name);
@@ -486,7 +489,7 @@ sub check_auth_tag {
     is($got_hex, $want_hex, $name);
   }
   elsif ($result eq 'acceptable') {
-    ok(!defined($got) || $got_hex eq $want_hex, $name);
+    ok($STRICT_ACCEPTABLE ? !defined($got) : (!defined($got) || $got_hex eq $want_hex), $name);
   }
   elsif ($result eq 'invalid') {
     ok(!defined($got_hex) || $got_hex ne $want_hex, $name);
@@ -1061,7 +1064,7 @@ sub handle_ec_curve_test {
         ok(!@mismatch, $name);
       }
       elsif ($result eq 'acceptable') {
-        ok(!$ok_key || !@mismatch, $name);
+        ok($STRICT_ACCEPTABLE ? (!$ok_key || @mismatch) : (!$ok_key || !@mismatch), $name);
       }
       elsif ($result eq 'invalid') {
         ok(!$ok_key || @mismatch, $name);

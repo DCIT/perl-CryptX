@@ -1,11 +1,75 @@
-To run the Project Wycheproof tests:
+Project Wycheproof instructions for t/wycheproof2.t
 
-1/ Create directory: t/wycheproof-repo/
+Prerequisites
 
-2/ Check out repository https://github.com/C2SP/wycheproof into that directory
+1/ Build CryptX first. Use prove -b so the test suite loads the matching built
+   modules from blib/.
 
-3/ Make sure the test files are available as t/wycheproof-repo/testvectors_v1/*.json
+2/ Create directory: t/wycheproof-repo/
 
-4/ Run the tests with:
+3/ Check out repository https://github.com/C2SP/wycheproof into that
+   directory.
 
-AUTHOR_MODE=2 prove -b t/wycheproof2.t
+4/ Make sure the test vectors exist as:
+   t/wycheproof-repo/testvectors_v1/*.json
+
+Run modes
+
+1/ Relaxed mode:
+
+   AUTHOR_MODE=2 prove -b t/wycheproof2.t
+
+   This is the default author-mode run for Wycheproof.
+   valid vectors must pass.
+   invalid vectors must be rejected.
+   acceptable vectors are handled permissively.
+
+2/ Strict mode:
+
+   AUTHOR_MODE=3 prove -b t/wycheproof2.t
+
+   This is the same test adapter, but acceptable vectors are treated strictly.
+   In practice this means acceptable vectors must be rejected instead of being
+   tolerated.
+
+Run only a subset of Wycheproof files
+
+Use CRYPTX_WYCHEPROOF_FILE with a regex matched against the JSON basename.
+
+Examples:
+
+AUTHOR_MODE=2 CRYPTX_WYCHEPROOF_FILE='^rsa_oaep_.*_test\.json$' prove -b t/wycheproof2.t
+
+AUTHOR_MODE=3 CRYPTX_WYCHEPROOF_FILE='^ecdh_.*secp256r1.*_test\.json$' prove -b t/wycheproof2.t
+
+How to read the output
+
+1/ Real test failures are emitted as normal TAP failures and include the JSON
+   filename and tcId.
+
+2/ The final summary reports:
+   files total/tested/unsupported
+   testcases total/run/unsupported
+
+3/ "unsupported" counters are skips, not failures. They mean the current
+   adapter intentionally did not run those vectors because the construction is
+   not exposed by CryptX yet, is not implemented, or is not wired into the
+   adapter yet.
+
+Typical unsupported examples
+
+1/ AES-GCM-SIV: CryptX currently has AES-SIV-CMAC, not AES-GCM-SIV.
+
+2/ Some RSA-PSS SHAKE vectors: CryptX has SHAKE objects, but the generic RSA
+   hash lookup path does not currently accept SHAKE hash names there.
+
+3/ Some RSA key families: for example multi-prime private keys or RSA-PSS
+   parameterized public keys may be unsupported at the wrapper/import layer.
+
+Notes
+
+1/ If AUTHOR_MODE is not 2 or 3, the whole test file is skipped.
+
+2/ If the Wycheproof checkout is missing, the whole test file is skipped.
+
+3/ run "make rebuild" if you changed any.c/.xs files before re-running "prove -b ..."
