@@ -1,0 +1,11 @@
+To run the Project Wycheproof tests:
+
+1/ Create directory: t/wycheproof-repo/
+
+2/ Check out repository https://github.com/C2SP/wycheproof into that directory
+
+3/ Make sure the test files are available as t/wycheproof-repo/testvectors_v1/*.json
+
+4/ Run the tests with:
+
+AUTHOR_MODE=2 prove -b t/wycheproof2.t

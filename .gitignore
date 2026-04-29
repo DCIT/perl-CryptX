@@ -36,4 +36,5 @@ CryptX-*
 /t/openssl/*.data
 /t/openssl/*.sig
 /t/openssl/*.rsa
+/t/wycheproof-repo/
 /Makefile
