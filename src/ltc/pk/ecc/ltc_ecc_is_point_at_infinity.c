@@ -14,6 +14,12 @@ int ltc_ecc_is_point_at_infinity(const ecc_point *P, const void *modulus, int *r
    int err;
    void  *x3, *y2;
 
+   /* affine points in the fixed-point cache omit z entirely */
+   if (P->z == NULL) {
+      *retval = 0;
+      return CRYPT_OK;
+   }
+
    /* trivial case */
    if (!ltc_mp_iszero(P->z)) {
       *retval = 0;
