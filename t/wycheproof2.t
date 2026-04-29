@@ -91,6 +91,7 @@ if (defined $ENV{CRYPTX_WYCHEPROOF_FILE} && length $ENV{CRYPTX_WYCHEPROOF_FILE})
 }
 
 plan skip_all => "no Wycheproof JSON files found in $TV_DIR" unless @files;
+plan 'no_plan';
 
 for my $path (@files) {
   my $file = basename($path);
@@ -126,8 +127,6 @@ diag sprintf(
 for my $reason (sort keys %UNSUPPORTED) {
   diag sprintf('wycheproof2 unsupported: %6d  %s', $UNSUPPORTED{$reason}, $reason);
 }
-
-done_testing;
 
 sub read_file {
   my ($path) = @_;
@@ -1050,9 +1049,14 @@ sub handle_ec_curve_test {
             if !defined($want) || !defined($got) || $got ne $want;
         }
 
-        push @mismatch, 'h got=' . ($h->{curve_cofactor} // '(undef)') . ' want=' . ($test->{h} // '(undef)')
+        my $got_h = defined $h->{curve_cofactor} ? $h->{curve_cofactor} : '(undef)';
+        my $want_h = defined $test->{h} ? $test->{h} : '(undef)';
+        push @mismatch, "h got=$got_h want=$want_h"
           if !defined($h->{curve_cofactor}) || !defined($test->{h}) || $h->{curve_cofactor} != $test->{h};
-        push @mismatch, 'oid got=' . ($h->{curve_oid} // '(undef)') . ' want=' . ($test->{oid} // '(undef)')
+
+        my $got_oid = defined $h->{curve_oid} ? $h->{curve_oid} : '(undef)';
+        my $want_oid = defined $test->{oid} ? $test->{oid} : '(undef)';
+        push @mismatch, "oid got=$got_oid want=$want_oid"
           if !defined($h->{curve_oid}) || !defined($test->{oid}) || $h->{curve_oid} ne $test->{oid};
       }
 
