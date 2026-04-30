@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More;
 use File::Basename qw(basename);
+use Math::BigInt ();
 
 my $TV_DIR = 't/wycheproof-repo/testvectors_v1';
 my $AUTHOR_MODE = defined $ENV{AUTHOR_MODE} ? $ENV{AUTHOR_MODE} : '';
@@ -24,6 +25,7 @@ for my $module (
     Crypt::Cipher
     Crypt::Digest
     Crypt::KeyDerivation
+    Crypt::Misc
     Crypt::Mac::HMAC
     Crypt::Mac::OMAC
     Crypt::Mode::CBC
@@ -46,13 +48,17 @@ my %STATS = (
   tc_total          => 0,
   tc_run            => 0,
   tc_unsupported    => 0,
+  acceptable_rejected  => 0,
+  acceptable_tolerated => 0,
 );
 my %UNSUPPORTED;
 my %HASH_OK;
 my %CIPHER_OK;
+my %ROCA_ALLOWED_RESIDUES;
 
 my $SECP256K1_ORDER      = 'fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141';
 my $SECP256K1_HALF_ORDER = '7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0';
+my @ROCA_PRIMES          = (11, 13, 37, 97, 229);
 
 my %HANDLER = (
   aead_test_schema_v1_json                         => \&handle_aead,
@@ -70,6 +76,7 @@ my %HANDLER = (
   ecdh_webcrypto_test_schema_v1_json               => \&handle_ecdh,
   hkdf_test_schema_v1_json                         => \&handle_hkdf,
   ind_cpa_test_schema_v1_json                      => \&handle_ind_cpa,
+  json_web_key_schema_v1_json                      => \&handle_json_web_key,
   mac_test_schema_v1_json                          => \&handle_mac,
   mac_with_iv_test_schema_v1_json                  => \&handle_mac_with_iv,
   pbe_test_schema_json                             => \&handle_pbe,
@@ -124,8 +131,8 @@ for my $path (@files) {
 }
 
 diag sprintf(
-  'wycheproof2 summary: files total=%d tested=%d unsupported=%d; testcases total=%d run=%d unsupported=%d',
-  @STATS{qw(files_total files_tested files_unsupported tc_total tc_run tc_unsupported)}
+  'wycheproof2 summary: files total=%d tested=%d unsupported=%d; testcases total=%d run=%d unsupported=%d; acceptable.rejected=%d acceptable.tolerated=%d',
+  @STATS{qw(files_total files_tested files_unsupported tc_total tc_run tc_unsupported acceptable_rejected acceptable_tolerated)}
 );
 for my $reason (sort keys %UNSUPPORTED) {
   diag sprintf('wycheproof2 unsupported: %6d  %s', $UNSUPPORTED{$reason}, $reason);
@@ -177,6 +184,16 @@ sub unsupported_group {
 
 sub mark_tc {
   $STATS{tc_run}++;
+}
+
+sub mark_acceptable {
+  my ($tolerated) = @_;
+  if ($tolerated) {
+    $STATS{acceptable_tolerated}++;
+  }
+  else {
+    $STATS{acceptable_rejected}++;
+  }
 }
 
 sub name_for {
@@ -308,6 +325,212 @@ sub curve_field_bytes {
   return undef;
 }
 
+sub bin_bit_length {
+  my ($bin) = @_;
+  return 0 unless defined $bin && length $bin;
+  my $bits = unpack('B*', $bin);
+  $bits =~ s/^0+//;
+  return length $bits;
+}
+
+sub bigint_from_bin {
+  my ($bin) = @_;
+  return undef unless defined $bin && length $bin;
+  return Math::BigInt->from_hex('0x' . unpack('H*', $bin));
+}
+
+sub jws_hash_for_alg {
+  my ($alg) = @_;
+  return 'SHA256' if defined $alg && $alg =~ /^(?:HS|RS|ES)256$/;
+  return 'SHA384' if defined $alg && $alg =~ /^(?:HS|RS|ES)384$/;
+  return 'SHA512' if defined $alg && $alg =~ /^(?:HS|RS|ES)512$/;
+  return undef;
+}
+
+sub jws_kty_for_alg {
+  my ($alg) = @_;
+  return 'oct' if defined $alg && $alg =~ /^HS\d+$/;
+  return 'RSA' if defined $alg && $alg =~ /^RS\d+$/;
+  return 'EC'  if defined $alg && $alg =~ /^ES\d+$/;
+  return undef;
+}
+
+sub jws_curve_for_alg {
+  my ($alg) = @_;
+  return 'P-256' if defined $alg && $alg eq 'ES256';
+  return 'P-384' if defined $alg && $alg eq 'ES384';
+  return 'P-521' if defined $alg && $alg eq 'ES512';
+  return undef;
+}
+
+sub jws_hmac_min_key_bytes {
+  my ($alg) = @_;
+  return 32 if defined $alg && $alg eq 'HS256';
+  return 48 if defined $alg && $alg eq 'HS384';
+  return 64 if defined $alg && $alg eq 'HS512';
+  return undef;
+}
+
+sub jws_parse_compact {
+  my ($jws) = @_;
+  return () unless defined $jws;
+
+  my @parts = split /\./, $jws, -1;
+  return () unless @parts == 3;
+
+  my ($header_b64, $payload_b64, $sig_b64) = @parts;
+  my $header_json = Crypt::Misc::decode_b64u($header_b64);
+  my $sig = Crypt::Misc::decode_b64u($sig_b64);
+  return () unless defined $header_json && defined $sig;
+
+  my $header = eval { JSON::PP->new->decode($header_json) };
+  return () unless $header && ref($header) eq 'HASH';
+
+  return ($header, $header_b64 . '.' . $payload_b64, $sig);
+}
+
+sub jwk_keyset_is_mixed_symmetric {
+  my ($keys) = @_;
+  my ($has_oct, $has_other);
+  for my $jwk (@$keys) {
+    my $kty = $jwk->{kty};
+    $has_oct = 1 if defined $kty && $kty eq 'oct';
+    $has_other = 1 if !defined($kty) || $kty ne 'oct';
+  }
+  return $has_oct && $has_other ? 1 : 0;
+}
+
+sub jwk_keyset_has_duplicate_kid {
+  my ($keys) = @_;
+  my %seen;
+  for my $jwk (@$keys) {
+    my $kid = $jwk->{kid};
+    next unless defined $kid;
+    return 1 if $seen{$kid}++;
+  }
+  return 0;
+}
+
+sub roca_allowed_residues {
+  my ($prime) = @_;
+  return $ROCA_ALLOWED_RESIDUES{$prime} if exists $ROCA_ALLOWED_RESIDUES{$prime};
+
+  my @subgroup;
+  my %seen;
+  my $value = 1 % $prime;
+  while (!$seen{$value}) {
+    $seen{$value} = 1;
+    push @subgroup, $value;
+    $value = ($value * 65537) % $prime;
+  }
+
+  my %allowed;
+  for my $left (@subgroup) {
+    for my $right (@subgroup) {
+      $allowed{($left * $right) % $prime} = 1;
+    }
+  }
+
+  $ROCA_ALLOWED_RESIDUES{$prime} = \%allowed;
+  return $ROCA_ALLOWED_RESIDUES{$prime};
+}
+
+sub rsa_roca_like_modulus {
+  my ($n_bin) = @_;
+  return 0 unless defined $n_bin && length $n_bin;
+
+  my $n = bigint_from_bin($n_bin);
+  return 0 unless $n;
+
+  for my $prime (@ROCA_PRIMES) {
+    my $mod = 0 + $n->copy->bmod($prime);
+    return 0 unless roca_allowed_residues($prime)->{$mod};
+  }
+  return 1;
+}
+
+sub rsa_jwk_policy_ok {
+  my ($jwk) = @_;
+  return 0 unless $jwk && ref($jwk) eq 'HASH';
+
+  my $n_bin = Crypt::Misc::decode_b64u($jwk->{n});
+  my $e_bin = Crypt::Misc::decode_b64u($jwk->{e});
+  return 0 unless defined $n_bin && defined $e_bin && length($n_bin) && length($e_bin);
+  return 0 if bin_bit_length($n_bin) < 2048;
+  return 0 if rsa_roca_like_modulus($n_bin);
+
+  my $e = bigint_from_bin($e_bin);
+  return 0 unless $e;
+  return 0 if $e <= 1;
+  return 0 unless ord(substr($e_bin, -1, 1)) & 1;
+  return 1;
+}
+
+sub select_jws_keyset {
+  my ($group, $alg) = @_;
+  return $group->{private} if defined $alg && $alg =~ /^HS\d+$/;
+  return $group->{public} if $group->{public} && ref($group->{public}) eq 'HASH';
+  return $group->{private};
+}
+
+sub select_jws_candidates {
+  my ($keyset, $header) = @_;
+  return () unless $keyset && ref($keyset) eq 'HASH';
+
+  my $keys = $keyset->{keys};
+  return () unless $keys && ref($keys) eq 'ARRAY' && @$keys;
+  return () if jwk_keyset_is_mixed_symmetric($keys);
+  return () if jwk_keyset_has_duplicate_kid($keys);
+
+  my @candidates = @$keys;
+  if (defined $header->{kid}) {
+    @candidates = grep { defined $_->{kid} && $_->{kid} eq $header->{kid} } @candidates;
+  }
+
+  my $want_kty = jws_kty_for_alg($header->{alg});
+  @candidates = grep { defined($_->{kty}) && $_->{kty} eq $want_kty } @candidates if defined $want_kty;
+  @candidates = grep { !defined($_->{use}) || $_->{use} eq 'sig' } @candidates;
+  @candidates = grep { !defined($_->{alg}) || $_->{alg} eq $header->{alg} } @candidates;
+
+  return () if !defined($header->{kid}) && @candidates != 1;
+  return @candidates;
+}
+
+sub verify_jws_with_jwk {
+  my ($jwk, $alg, $signing_input, $sig) = @_;
+  return 0 unless $jwk && ref($jwk) eq 'HASH';
+  return 0 unless defined $alg && defined $signing_input && defined $sig;
+
+  my $hash = jws_hash_for_alg($alg);
+  return 0 unless defined $hash && hash_supported($hash);
+
+  if ($alg =~ /^HS\d+$/) {
+    my $min_len = jws_hmac_min_key_bytes($alg);
+    my $key = Crypt::Misc::decode_b64u($jwk->{k});
+    return 0 unless defined $min_len && defined $key;
+    return 0 if length($key) < $min_len;
+    return Crypt::Mac::HMAC::hmac($hash, $key, $signing_input) eq $sig ? 1 : 0;
+  }
+
+  if ($alg =~ /^RS\d+$/) {
+    return 0 unless rsa_jwk_policy_ok($jwk);
+    my $pk = eval { Crypt::PK::RSA->new($jwk) };
+    return 0 unless $pk;
+    return $pk->verify_message($sig, $signing_input, $hash, 'v1.5') ? 1 : 0;
+  }
+
+  if ($alg =~ /^ES\d+$/) {
+    my $curve = jws_curve_for_alg($alg);
+    return 0 unless defined $curve;
+    return 0 unless defined($jwk->{crv}) && $jwk->{crv} eq $curve;
+    my $pk = eval { Crypt::PK::ECC->new($jwk) };
+    return 0 unless $pk;
+    return $pk->verify_message_rfc7518($sig, $signing_input, $hash) ? 1 : 0;
+  }
+
+  return 0;
+}
+
 sub ec_bigint_to_scalar {
   my ($hex, $curve) = @_;
   $hex = '' unless defined $hex;
@@ -433,6 +656,7 @@ sub check_exact_hex {
     is($got_hex, $want_hex, $name);
   }
   elsif ($result eq 'acceptable') {
+    mark_acceptable(defined $got ? 1 : 0);
     ok($STRICT_ACCEPTABLE ? !defined($got) : (!defined($got) || $got_hex eq $want_hex), $name);
   }
   elsif ($result eq 'invalid') {
@@ -451,6 +675,7 @@ sub check_exact_bin {
     is($got, $want, $name);
   }
   elsif ($result eq 'acceptable') {
+    mark_acceptable(defined $got ? 1 : 0);
     ok($STRICT_ACCEPTABLE ? !defined($got) : (!defined($got) || $got eq $want), $name);
   }
   elsif ($result eq 'invalid') {
@@ -469,6 +694,7 @@ sub check_verify_bool {
     ok($valid, $name);
   }
   elsif ($result eq 'acceptable') {
+    mark_acceptable($valid ? 1 : 0);
     ok($STRICT_ACCEPTABLE ? !$valid : 1, $name);
   }
   elsif ($result eq 'invalid') {
@@ -489,6 +715,7 @@ sub check_auth_tag {
     is($got_hex, $want_hex, $name);
   }
   elsif ($result eq 'acceptable') {
+    mark_acceptable(defined $got ? 1 : 0);
     ok($STRICT_ACCEPTABLE ? !defined($got) : (!defined($got) || $got_hex eq $want_hex), $name);
   }
   elsif ($result eq 'invalid') {
@@ -724,6 +951,30 @@ sub handle_ind_cpa {
       my ($ok, $pt) = eval_scalar(sub { Crypt::Mode::CBC->new($cipher, 1)->decrypt($ct, $key, $iv) });
       $pt = undef unless $ok;
       check_exact_hex($file, $doc, $group, $test, $pt, $test->{msg}, 'CBC-PKCS5 decrypt');
+    }
+  }
+}
+
+sub handle_json_web_key {
+  my ($file, $doc) = @_;
+  for my $group (@{ $doc->{testGroups} || [] }) {
+    for my $test (@{ $group->{tests} || [] }) {
+      mark_tc();
+
+      my ($header, $signing_input, $sig) = jws_parse_compact($test->{jws});
+      my $valid = 0;
+      if ($header) {
+        my $keyset = select_jws_keyset($group, $header->{alg});
+        my @candidates = select_jws_candidates($keyset, $header);
+        for my $jwk (@candidates) {
+          if (verify_jws_with_jwk($jwk, $header->{alg}, $signing_input, $sig)) {
+            $valid = 1;
+            last;
+          }
+        }
+      }
+
+      check_verify_bool($file, $doc, $group, $test, $valid, 'JWK/JWS verify');
     }
   }
 }
@@ -1064,6 +1315,7 @@ sub handle_ec_curve_test {
         ok(!@mismatch, $name);
       }
       elsif ($result eq 'acceptable') {
+        mark_acceptable($ok_key && !@mismatch ? 1 : 0);
         ok($STRICT_ACCEPTABLE ? (!$ok_key || @mismatch) : (!$ok_key || !@mismatch), $name);
       }
       elsif ($result eq 'invalid') {

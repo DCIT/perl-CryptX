@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 187;
+use Test::More tests => 188;
 
 use Crypt::PK::ECC qw(ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret);
 use Crypt::Misc qw(read_rawfile);
@@ -249,6 +249,17 @@ for my $pub (qw/openssl_ec-short.pub.pem openssl_ec-short.pub.der/) {
   ok($rk->recovery_pub_rfc7518($sig, $hash, 1), 'recovery pub rfc7518 with 1 bit ok');
   my $pub1 = $rk->export_key_raw('public');
   ok($pub0 eq $pub || $pub1 eq $pub, 'recovery rfc7518 pub key matched');
+}
+
+{
+  my $der = pack('H*',
+    '3052301406072a8648ce3d020106092b2403030208010105033a8004'
+  . 'd7ba2df581b454d83c6bb8650fc3a1f13521881fa2ea52061d9e3af54e'
+  . '820e75fb8622183b699d868789bf3682889d7021798a3e4ba27b71'
+  );
+  my $ok = eval { Crypt::PK::ECC->new(\$der); 1 };
+  ok(!$ok,
+     'ecdh_brainpoolP224r1_test.json tcId=787 rejects invalid SPKI BIT STRING unused bits');
 }
 
 ### RFC6979 deterministic signature tests
