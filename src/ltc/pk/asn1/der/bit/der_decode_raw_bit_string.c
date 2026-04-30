@@ -24,7 +24,7 @@
 int der_decode_raw_bit_string(const unsigned char *in,  unsigned long inlen,
                                 unsigned char *out, unsigned long *outlen)
 {
-   unsigned long dlen, blen, x, y;
+   unsigned long dlen, blen, x, y, unused;
    int err;
 
    LTC_ARGCHK(in     != NULL);
@@ -55,8 +55,19 @@ int der_decode_raw_bit_string(const unsigned char *in,  unsigned long inlen,
        return CRYPT_INVALID_PACKET;
    }
 
-   /* get padding count */
-   blen = ((dlen - 1) << 3) - (in[x++] & 7);
+   /* DER permits 0..7 unused bits, and any declared padding bits must be zero. */
+   unused = in[x];
+   if (unused > 7) {
+      return CRYPT_INVALID_PACKET;
+   }
+   if ((dlen == 1) && (unused != 0)) {
+      return CRYPT_INVALID_PACKET;
+   }
+   if ((unused != 0) && ((in[x + dlen - 1] & ((1uL << unused) - 1uL)) != 0)) {
+      return CRYPT_INVALID_PACKET;
+   }
+   x++;
+   blen = ((dlen - 1) << 3) - unused;
 
    /* too many bits? */
    if (blen > *outlen) {

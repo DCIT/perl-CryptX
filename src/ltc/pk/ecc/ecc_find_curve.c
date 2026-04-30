@@ -179,6 +179,11 @@ static const struct {
       "1.3.36.3.3.2.8.1.1.14", { "BRAINPOOLP512T1", NULL }
    },
 #endif
+#ifdef LTC_ECC_FRP256V1
+   {
+      "1.2.250.1.223.101.256.1", { "FRP256V1", NULL }
+   },
+#endif
    {
       NULL, { NULL }
    }

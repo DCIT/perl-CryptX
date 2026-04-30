@@ -24,7 +24,7 @@ int ltc_ecc_projective_add_point(const ecc_point *P, const ecc_point *Q, ecc_poi
                                  const void *ma, const void *modulus, void *mp)
 {
    void  *t1, *t2, *x, *y, *z;
-   int    err, inf, x_or_y_is_zero;
+   int    err, inf;
 
    LTC_ARGCHK(P       != NULL);
    LTC_ARGCHK(Q       != NULL);
@@ -116,6 +116,13 @@ dbl_point:
    if ((err = ltc_mp_mul(Q->y, t1, t1)) != CRYPT_OK)                               { goto done; }
    if ((err = ltc_mp_montgomery_reduce(t1, modulus, mp)) != CRYPT_OK)              { goto done; }
 
+   /* Same-affine dispatch: A==B means P,Q share affine x; dispatch to dbl or O before the formulas */
+   if (ltc_mp_cmp(x, t2) == LTC_MP_EQ) {
+      if (ltc_mp_cmp(y, t1) == LTC_MP_EQ) goto dbl_point;
+      err = ltc_ecc_set_point_xyz(1, 1, 0, R);
+      goto done;
+   }
+
    /* Y = Y - T1 */
    if ((err = ltc_mp_sub(y, t1, y)) != CRYPT_OK)                                   { goto done; }
    if (ltc_mp_cmp_d(y, 0) == LTC_MP_LT) {
@@ -179,7 +186,6 @@ dbl_point:
    if (ltc_mp_cmp_d(x, 0) == LTC_MP_LT) {
       if ((err = ltc_mp_add(x, modulus, x)) != CRYPT_OK)                           { goto done; }
    }
-   x_or_y_is_zero = ltc_mp_cmp_d(x, 0) == LTC_MP_EQ;
 
    /* T2 = T2 - X */
    if ((err = ltc_mp_sub(t2, x, t2)) != CRYPT_OK)                                  { goto done; }
@@ -204,11 +210,6 @@ dbl_point:
       if ((err = ltc_mp_add(y, modulus, y)) != CRYPT_OK)                           { goto done; }
    }
    if ((err = ltc_mp_div_2(y, y)) != CRYPT_OK)                                     { goto done; }
-   x_or_y_is_zero |= ltc_mp_cmp_d(y, 0) == LTC_MP_EQ;
-
-   if (x_or_y_is_zero) {
-      goto dbl_point;
-   }
 
    if ((err = ltc_mp_copy(x, R->x)) != CRYPT_OK)                                   { goto done; }
    if ((err = ltc_mp_copy(y, R->y)) != CRYPT_OK)                                   { goto done; }

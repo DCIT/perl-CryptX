@@ -27,6 +27,13 @@ int padding_depad(const unsigned char *data, unsigned long *length, unsigned lon
 
    type = mode & LTC_PAD_MASK;
 
+   /* LTC_PAD_ZERO is the only mode where padding_pad() can produce a 0-byte output.
+      Every other mode always emits at least one padding byte, so a 0-byte buffer is malformed.
+   */
+   if (padded_length == 0 && type != LTC_PAD_ZERO) {
+      return CRYPT_INVALID_PACKET;
+   }
+
    if (type < LTC_PAD_ONE_AND_ZERO) {
       pad = data[padded_length - 1];
 

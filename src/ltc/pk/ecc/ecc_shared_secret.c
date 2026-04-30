@@ -36,6 +36,20 @@ int ecc_shared_secret(const ecc_key *private_key, const ecc_key *public_key,
       return CRYPT_PK_NOT_PRIVATE;
    }
 
+   /* Domain-parameter check: both keys must be on the same curve. Otherwise the scalar mul
+      below would silently use the private key's prime/A against a public point that lives
+      in a different group (scenarion from Wycheproof ecdh_*WrongCurve).
+   */
+   if (ltc_mp_cmp(private_key->dp.prime,  public_key->dp.prime)  != LTC_MP_EQ ||
+       ltc_mp_cmp(private_key->dp.order,  public_key->dp.order)  != LTC_MP_EQ ||
+       ltc_mp_cmp(private_key->dp.A,      public_key->dp.A)      != LTC_MP_EQ ||
+       ltc_mp_cmp(private_key->dp.B,      public_key->dp.B)      != LTC_MP_EQ ||
+       ltc_mp_cmp(private_key->dp.base.x, public_key->dp.base.x) != LTC_MP_EQ ||
+       ltc_mp_cmp(private_key->dp.base.y, public_key->dp.base.y) != LTC_MP_EQ ||
+       private_key->dp.cofactor != public_key->dp.cofactor) {
+      return CRYPT_PK_TYPE_MISMATCH;
+   }
+
    /* make new point */
    result = ltc_ecc_new_point();
    if (result == NULL) {

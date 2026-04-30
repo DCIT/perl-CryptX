@@ -237,22 +237,35 @@ static LTC_INLINE void s_gf448_sub(gf448 o, const gf448 a, const gf448 b)
 */
 static void s_gf448_mul(gf448 o, const gf448 a, const gf448 b)
 {
-   long64 i, j;
+   long64 i, j, c;
    long64 t[31];
    for (i = 0; i < 31; ++i) t[i] = 0;
    for (i = 0; i < 16; ++i)
       for (j = 0; j < 16; ++j)
          t[i + j] += a[i] * b[j];
 
-   /* reduce t[16..30] */
-   for (i = 14; i >= 0; --i) {
+   /* Normalize product limbs before reduction to avoid signed long64 overflow
+      Inputs can have limbs near 2^29 after add/sub operations in the X448 ladder,
+      making some t[k] values approach 2^62. The Goldilocks wrap can add up to 4
+      contributions into t[8..14], overflowing signed long64. A carry pass over
+      t[0..29] bounds limbs to 2^28; t[30] carries the overflow and is folded as
+      2^(28*30) == 2^393 + 2^168 (mod p), adding into limbs 14 (twice) and 6.
+   */
+   for (i = 0; i < 30; ++i) {
+      c = t[i] >> 28;
+      t[i+1] += c;
+      t[i] -= c << 28;
+   }
+   t[14] += 2 * t[30];
+   t[6]  += t[30];
+   t[30]  = 0;
+
+   /* reduce t[16..29] using 2^448 == 2^224 + 1 */
+   for (i = 13; i >= 0; --i) {
       t[i]     += t[i + 16];
       t[i + 8] += t[i + 16];
       t[i + 16] = 0;
    }
-   /* Now t[0..15] holds the result, but t[8..15] may have gotten extra from
-      t[16..23] additions.  t[15] overflow wraps via Goldilocks
-   */
    for (i = 0; i < 16; ++i) o[i] = t[i];
    s_gf448_carry(o);
    s_gf448_carry(o);
@@ -466,6 +479,13 @@ static int s_ed448_point_decode(gf448 r[4], const unsigned char p[57])
 {
    gf448 y2, num, den, den_inv, x2, x_cand, chk;
    unsigned char sign_bit;
+
+   /* RFC 8032 5.2.2: bits 0..6 of byte 56 must be zero in a canonical
+      encoding. Without this check a modified R that flips one of those
+      bits decodes to the same point as the canonical R and the signature
+      would still verify.
+   */
+   if ((p[56] & 0x7F) != 0) return -1;
 
    /* y from the first 56 bytes (448 bits) */
    s_gf448_decode(r[1], p);
