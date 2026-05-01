@@ -280,7 +280,7 @@ Crypt::Misc - miscellaneous functions related to (or used by) CryptX
  my $str1 = 'same';
  my $str2 = 'same';
 
- # Base64 and Base64/URL-safe functions
+ # Base64 and Base64 URL-safe functions
  my $base64    = encode_b64($rawbytes);
  my $rawbytes2 = decode_b64($base64);
  my $base64url = encode_b64u($rawbytes);
@@ -299,23 +299,25 @@ Crypt::Misc - miscellaneous functions related to (or used by) CryptX
 
 =head1 DESCRIPTION
 
-This module contains a collection of mostly unsorted functions loosely-related to CryptX distribution but not implementing cryptography.
+This module contains a collection of helper functions related to CryptX, but it
+does not implement cryptography itself.
 
-Most of them are also available in other perl modules but once you utilize CryptX you might avoid dependencies on other modules by using
-functions from Crypt::Misc.
+Most of them are also available in other Perl modules. If you already use
+CryptX, these helpers can reduce extra dependencies.
 
-By default, Crypt::Misc doesn't import any function. You can import individual functions
-or use the C<:all> tag.
+=head1 EXPORT
+
+Nothing is exported by default.
+
+You can export selected functions:
+
+  use Crypt::Misc qw(read_rawfile write_rawfile slow_eq);
+
+Or all of them at once:
+
+  use Crypt::Misc ':all';
 
 =head1 FUNCTIONS
-
-By default, Crypt::Misc doesn't import any function. You can import individual functions like this:
-
- use Crypt::Misc qw(read_rawfile);
-
-Or import all available functions:
-
- use Crypt::Misc ':all';
 
 All encoding functions (C<encode_b64>, C<encode_b58b>, etc.) accept a binary
 string and return an ASCII string. All decoding functions (C<decode_b64>,
@@ -331,50 +333,51 @@ The Base64 decoders C<decode_b64> and C<decode_b64u> also accept otherwise
 valid payload with embedded whitespace. The other decoder families in this
 module do not; for them, embedded whitespace is treated as malformed input.
 
-=head2  read_rawfile
+=head2 read_rawfile
 
-I<Since: 0.029>
+I<Since: CryptX-0.029>
 
  $rawdata = read_rawfile($filename);
 
-Read file C<$filename> into a scalar as a binary data (without decoding/transformation).
+Reads file C<$filename> into a scalar as binary data, without decoding or
+transformation.
 
-=head2  write_rawfile
+=head2 write_rawfile
 
-I<Since: 0.029>
+I<Since: CryptX-0.029>
 
  write_rawfile($filename, $rawdata);
 
-Write C<$rawdata> to file C<$filename> as binary data.
+Writes C<$rawdata> to file C<$filename> as binary data.
 
-=head2  slow_eq
+=head2 slow_eq
 
-I<Since: 0.029>
+I<Since: CryptX-0.029>
 
  if (slow_eq($data1, $data2)) { ... }
 
-Constant time compare (to avoid timing side-channel). Returns C<1> if the
-strings are equal, C<0> if they differ, or C<undef> if either argument is
-C<undef>.
+Compares two strings in constant time to reduce timing side channels. Returns
+C<1> if the strings are equal, C<0> if they differ, or C<undef> if either
+argument is C<undef>.
 
-=head2  pem_to_der
+=head2 pem_to_der
 
-I<Since: 0.029>
+I<Since: CryptX-0.029>
 
   $der_data = pem_to_der($pem_data);
   #or
   $der_data = pem_to_der($pem_data, $password);
 
-Convert PEM to DER representation. Supports also password protected PEM data.
+Converts PEM to DER. Also supports password-protected PEM data.
 Returns C<undef> if C<$pem_data> cannot be parsed (no valid PEM block found)
 or if the C<BEGIN> / C<END> labels do not match. Croaks if the PEM is
 encrypted but no C<$password> is provided. If an encrypted PEM is supplied
 with the wrong password, decryption is expected to croak from the underlying
 cipher/padding layer.
 
-=head2  der_to_pem
+=head2 der_to_pem
 
-I<Since: 0.029>
+I<Since: CryptX-0.029>
 
   $pem_data = der_to_pem($der_data, $header_name);
   #or
@@ -385,8 +388,8 @@ I<Since: 0.029>
   # $header_name e.g. "PUBLIC KEY", "RSA PRIVATE KEY" ...
   # $cipher_name e.g. "DES-EDE3-CBC", "AES-256-CBC" (DEFAULT) ...
 
-Convert DER to PEM representation. Returns a PEM string (ASCII).
-Supports also password protected PEM data. Any defined C<$password>, including
+Converts DER to PEM. Returns an ASCII PEM string. Also supports
+password-protected PEM data. Any defined C<$password>, including
 false-like values like C<''> or C<'0'>, enables PEM encryption.
 
 B<Security note>: do not use ECB-based ciphers (e.g. C<AES-256-ECB>) for PEM
@@ -398,26 +401,27 @@ MD5-based key derivation which is weak against brute-force. For new applications
 prefer PKCS#8 encrypted keys (e.g. via L<Crypt::PK::RSA/export_key_pem>) or
 an independent encryption layer.
 
-=head2  random_v4uuid
+=head2 random_v4uuid
 
-I<Since: 0.031>
+I<Since: CryptX-0.031>
 
  my $uuid = random_v4uuid();
 
-Returns cryptographically strong Version 4 random UUID: C<xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx>
+Returns a cryptographically strong version 4 random UUID:
+C<xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx>
 where C<x> is any hexadecimal digit and C<Y> is one of 8, 9, A, B (1000, 1001, 1010, 1011)
 e.g. C<f47ac10b-58cc-4372-a567-0e02b2c3d479>.
 
-=head2  is_v4uuid
+=head2 is_v4uuid
 
-I<Since: 0.031>
+I<Since: CryptX-0.031>
 
   if (is_v4uuid($uuid)) {
     ...
   }
 
-Checks the given C<$uuid> string whether it matches Version 4 UUID format with
-a relaxed variant policy. The variant nibble may be one of C<0>, C<8>, C<9>,
+Checks whether the given C<$uuid> string matches version 4 UUID format with a
+relaxed variant policy. The variant nibble may be one of C<0>, C<8>, C<9>,
 C<A>, or C<B>. Returns C<0> (mismatch) or C<1> (match).
 
 =head2 random_v7uuid
@@ -426,7 +430,8 @@ I<Since: CryptX-0.088>
 
  my $uuid = random_v7uuid();
 
-Returns a cryptographically strong Version 7 time-ordered UUID: C<xxxxxxxx-xxxx-7xxx-Yxxx-xxxxxxxxxxxx>
+Returns a cryptographically strong version 7 time-ordered UUID:
+C<xxxxxxxx-xxxx-7xxx-Yxxx-xxxxxxxxxxxx>
 where the first 48 bits encode the current Unix time in milliseconds (making UUIDs sortable by
 generation time), followed by random bits. Ordering is therefore coarse at
 millisecond granularity only; UUIDs generated within the same millisecond are
@@ -449,191 +454,192 @@ For a version-specific check see L</is_v4uuid>.
 
 =head2 increment_octets_le
 
-I<Since: 0.048>
+I<Since: CryptX-0.048>
 
  $octets = increment_octets_le($octets);
 
-Treat input C<$octets> as a little-endian big number and return the incremented value.
+Treats C<$octets> as a little-endian big number and returns the incremented
+value.
 
 =head2 increment_octets_be
 
-I<Since: 0.048>
+I<Since: CryptX-0.048>
 
  $octets = increment_octets_be($octets);
 
-Treat input C<$octets> as a big-endian big number and return the incremented value.
+Treats C<$octets> as a big-endian big number and returns the incremented value.
 
 =head2 encode_b64
 
-I<Since: 0.029>
+I<Since: CryptX-0.029>
 
  $base64string = encode_b64($rawdata);
 
-Encode $rawbytes into Base64 string, no line-endings in the output string.
+Encodes C<$rawdata> as a Base64 string. No line endings are added.
 
 =head2 decode_b64
 
-I<Since: 0.029>
+I<Since: CryptX-0.029>
 
  $rawdata = decode_b64($base64string);
 
-Decode a Base64 string.
+Decodes a Base64 string.
 
-=head2  encode_b64u
+=head2 encode_b64u
 
-I<Since: 0.029>
+I<Since: CryptX-0.029>
 
  $base64url_string = encode_b64u($rawdata);
 
-Encode $rawbytes into Base64/URL-Safe string, no line-endings in the output string.
+Encodes C<$rawdata> as a Base64 URL-safe string. No line endings are added.
 
-=head2  decode_b64u
+=head2 decode_b64u
 
-I<Since: 0.029>
+I<Since: CryptX-0.029>
 
  $rawdata = decode_b64u($base64url_string);
 
-Decode a Base64/URL-Safe string.
+Decodes a Base64 URL-safe string.
 
-=head2  encode_b32r
+=head2 encode_b32r
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $string = encode_b32r($rawdata);
 
 Encode bytes into Base32 (rfc4648 alphabet) string, without "=" padding.
 
-=head2  decode_b32r
+=head2 decode_b32r
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $rawdata = decode_b32r($string);
 
 Decode a Base32 (rfc4648 alphabet) string into bytes.
 
-=head2  encode_b32b
+=head2 encode_b32b
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $string = encode_b32b($rawdata);
 
 Encode bytes into Base32 (base32hex alphabet) string, without "=" padding.
 
-=head2  decode_b32b
+=head2 decode_b32b
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $rawdata = decode_b32b($string);
 
 Decode a Base32 (base32hex alphabet) string into bytes.
 
-=head2  encode_b32z
+=head2 encode_b32z
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $string = encode_b32z($rawdata);
 
 Encode bytes into Base32 (zbase32 alphabet) string.
 
-=head2  decode_b32z
+=head2 decode_b32z
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $rawdata = decode_b32z($string);
 
 Decode a Base32 (zbase32 alphabet) string into bytes.
 
-=head2  encode_b32c
+=head2 encode_b32c
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $string = encode_b32c($rawdata);
 
 Encode bytes into Base32 (crockford alphabet) string.
 
-=head2  decode_b32c
+=head2 decode_b32c
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $rawdata = decode_b32c($string);
 
 Decode a Base32 (crockford alphabet) string into bytes.
 
-=head2  encode_b58b
+=head2 encode_b58b
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $string = encode_b58b($rawdata);
 
 Encode bytes into Base58 (Bitcoin alphabet) string.
 
-=head2  decode_b58b
+=head2 decode_b58b
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $rawdata = decode_b58b($string);
 
 Decode a Base58 (Bitcoin alphabet) string into bytes.
 
-=head2  encode_b58f
+=head2 encode_b58f
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $string = encode_b58f($rawdata);
 
 Encode bytes into Base58 (Flickr alphabet) string.
 
-=head2  decode_b58f
+=head2 decode_b58f
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $rawdata = decode_b58f($string);
 
 Decode a Base58 (Flickr alphabet) string into bytes.
 
-=head2  encode_b58r
+=head2 encode_b58r
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $string = encode_b58r($rawdata);
 
 Encode bytes into Base58 (Ripple alphabet) string.
 
-=head2  decode_b58r
+=head2 decode_b58r
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $rawdata = decode_b58r($string);
 
 Decode a Base58 (Ripple alphabet) string into bytes.
 
-=head2  encode_b58t
+=head2 encode_b58t
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $string = encode_b58t($rawdata);
 
 Encode bytes into Base58 (Tipple alphabet) string.
 
-=head2  decode_b58t
+=head2 decode_b58t
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $rawdata = decode_b58t($string);
 
 Decode a Base58 (Tipple alphabet) string into bytes.
 
-=head2  encode_b58s
+=head2 encode_b58s
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $string = encode_b58s($rawdata);
 
 Encode bytes into Base58 (Stellar alphabet) string.
 
-=head2  decode_b58s
+=head2 decode_b58s
 
-I<Since: 0.049>
+I<Since: CryptX-0.049>
 
  $rawdata = decode_b58s($string);
 
@@ -643,7 +649,7 @@ Decode a Base58 (Stellar alphabet) string into bytes.
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 
 =back
 

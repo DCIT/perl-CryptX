@@ -475,6 +475,18 @@ structure described below.  When given a tree produced by the decoder, the
 encoder does its best to produce the same ASN.1 that was originally parsed,
 regardless of what decode options were used.
 
+=head1 EXPORT
+
+Nothing is exported by default.
+
+You can export selected functions:
+
+  use Crypt::ASN1 qw(asn1_decode_der asn1_encode_der);
+
+Or all of them at once:
+
+  use Crypt::ASN1 ':all';
+
 =head1 NODE HASH STRUCTURE
 
 Both the decoder and encoder operate on the same data structure: an B<arrayref
@@ -487,7 +499,7 @@ Every node has three keys:
 
 =over
 
-=item C<type> (string, B<required>)
+=item C<type> (string, required)
 
 The ASN.1 type name.  Built-in values include:
 

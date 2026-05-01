@@ -82,6 +82,18 @@ This is a thin wrapper around L<Crypt::PRNG> with the algorithm fixed to
 Sober128. All functions and methods accept the same arguments and return the
 same values as the corresponding L<Crypt::PRNG> entries.
 
+=head1 EXPORT
+
+Nothing is exported by default.
+
+You can export selected functions:
+
+  use Crypt::PRNG::Sober128 qw(random_bytes random_string);
+
+Or all of them at once:
+
+  use Crypt::PRNG::Sober128 ':all';
+
 =head1 FUNCTIONS
 
 All functions below behave exactly like the corresponding L<Crypt::PRNG>
@@ -170,7 +182,7 @@ See L<Crypt::PRNG/int32>.
 
 =item * L<Crypt::PRNG>
 
-=item * L<https://en.wikipedia.org/wiki/SOBER-128|https://en.wikipedia.org/wiki/SOBER-128>
+=item * L<https://en.wikipedia.org/wiki/SOBER-128>
 
 =back
 

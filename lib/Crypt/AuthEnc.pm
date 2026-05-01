@@ -18,15 +18,18 @@ Crypt::AuthEnc - [internal only]
 
 Do not use this module directly.
 
-Use a concrete authenticated-encryption module such as L<Crypt::AuthEnc::GCM>
-or L<Crypt::AuthEnc::ChaCha20Poly1305>.
+Use a concrete authenticated-encryption module instead.
 
-=head1 DESCRIPTION
+=head1 SEE ALSO
 
-Internal namespace placeholder for authenticated-encryption modules.
+=over
 
-Do not use this module directly. Use a concrete implementation such as
-L<Crypt::AuthEnc::ChaCha20Poly1305>, L<Crypt::AuthEnc::XChaCha20Poly1305>,
-L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, or L<Crypt::AuthEnc::OCB>.
+=item * L<CryptX>
+
+=item * L<Crypt::AuthEnc::ChaCha20Poly1305>, L<Crypt::AuthEnc::XChaCha20Poly1305>
+
+=item * L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::OCB>, L<Crypt::AuthEnc::SIV>
+
+=back
 
 =cut

@@ -263,7 +263,7 @@ Loads private or public key in DER or PEM format.
 
 The same method also accepts filenames instead of buffers.
 
-Loading private or public keys form perl hash:
+Loading private or public keys from a Perl HASH:
 
  $pk->import_key($hashref);
 
@@ -573,7 +573,7 @@ Load keys (Perl code):
 
 =over
 
-=item * L<https://en.wikipedia.org/wiki/Digital_Signature_Algorithm|https://en.wikipedia.org/wiki/Digital_Signature_Algorithm>
+=item * L<https://en.wikipedia.org/wiki/Digital_Signature_Algorithm>
 
 =back
 

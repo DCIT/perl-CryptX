@@ -22,7 +22,7 @@ Crypt::Mac::BLAKE2s - Message authentication code BLAKE2s MAC (RFC 7693)
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Mac::BLAKE2s qw( blake2s blake2s_hex );
+   use Crypt::Mac::BLAKE2s qw( blake2s blake2s_hex blake2s_b64 blake2s_b64u );
 
    # calculate MAC from string/buffer
    my $blake2s_raw  = blake2s($size, $key, 'data buffer');
@@ -53,7 +53,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Mac::BLAKE2s qw(blake2s blake2s_hex );
+  use Crypt::Mac::BLAKE2s qw( blake2s blake2s_hex blake2s_b64 blake2s_b64u );
 
 Or all of them at once:
 
@@ -63,7 +63,7 @@ Or all of them at once:
 
 =head2 blake2s
 
-Logically joins all arguments into a single string, and returns its BLAKE2s message authentication code encoded as a binary string.
+Joins all arguments into a single string and returns its BLAKE2s message authentication code encoded as a binary string.
 
 Data arguments for the functional helpers are converted to byte strings using
 Perl's usual scalar stringification. Defined scalars, including numbers and
@@ -78,7 +78,7 @@ C<blake2s_b64u>.
 
 =head2 blake2s_hex
 
-Logically joins all arguments into a single string, and returns its BLAKE2s message authentication code encoded as a hexadecimal string.
+Joins all arguments into a single string and returns its BLAKE2s message authentication code encoded as a hexadecimal string.
 
  my $blake2s_hex = blake2s_hex($size, $key, 'data buffer');
  #or
@@ -86,7 +86,7 @@ Logically joins all arguments into a single string, and returns its BLAKE2s mess
 
 =head2 blake2s_b64
 
-Logically joins all arguments into a single string, and returns its BLAKE2s message authentication code encoded as a Base64 string.
+Joins all arguments into a single string and returns its BLAKE2s message authentication code encoded as a Base64 string.
 
  my $blake2s_b64 = blake2s_b64($size, $key, 'data buffer');
  #or
@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its BLAKE2s mess
 
 =head2 blake2s_b64u
 
-Logically joins all arguments into a single string, and returns its BLAKE2s message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Joins all arguments into a single string and returns its BLAKE2s message authentication code encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
  my $blake2s_b64url = blake2s_b64u($size, $key, 'data buffer');
  #or
@@ -170,7 +170,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =head2 b64umac
 
-Returns the MAC encoded as a Base64 URL Safe string (no trailing C<=>) and
+Returns the MAC encoded as a Base64 URL-safe string (no trailing C<=>) and
 finalizes the object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or
 C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
@@ -180,7 +180,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 
 =item * L<https://www.rfc-editor.org/rfc/rfc7693>
 

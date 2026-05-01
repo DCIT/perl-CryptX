@@ -53,7 +53,7 @@ Crypt::Checksum::Adler32 - Compute Adler32 checksum
    $d->add('another data');
    my $checksum_raw  = $d->digest;     # raw 4 bytes
    my $checksum_hex  = $d->hexdigest;  # hexadecimal form
-   my $checksum_int  = $d->intdigest;  # 32bit unsigned integer
+   my $checksum_int  = $d->intdigest;  # 32-bit unsigned integer
 
    # or checksum a file instead
    my $checksum_file_raw = Crypt::Checksum::Adler32->new->addfile('filename.dat')->digest;
@@ -96,7 +96,7 @@ Returns checksum as a hexadecimal string.
 
 =head2 adler32_data_int
 
-Returns checksum as unsigned 32bit integer.
+Returns checksum as unsigned 32-bit integer.
 
  my $checksum_int = adler32_data_int('data string');
  #or
@@ -127,7 +127,7 @@ Returns checksum as a hexadecimal string.
 
 =head2 adler32_file_int
 
-Returns checksum as unsigned 32bit integer.
+Returns checksum as unsigned 32-bit integer.
 
  my $checksum_int = adler32_file_int('filename.dat');
  #or
@@ -178,7 +178,7 @@ The return value is the checksum object itself.
  my $filehandle = ...; # existing binary-mode filehandle
  $d->addfile($filehandle);
 
-B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
+B<Note:> The filehandle must be in binary mode before you pass it to C<addfile()>.
 
 =head2 digest
 
@@ -197,7 +197,7 @@ Like C<digest()>, this method does not alter the object state.
 
 =head2 intdigest
 
-Returns the checksum encoded as unsigned 32bit integer.
+Returns the checksum encoded as unsigned 32-bit integer.
 Like C<digest()>, this method does not alter the object state.
 
  my $result_int = $d->intdigest();
@@ -206,7 +206,7 @@ Like C<digest()>, this method does not alter the object state.
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 
 =item * L<https://en.wikipedia.org/wiki/Adler-32>
 

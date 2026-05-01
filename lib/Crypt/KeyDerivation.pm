@@ -88,16 +88,32 @@ required password / input-keying-material arguments reject C<undef>, invalid
 hash names and invalid Argon2 type names are still rejected, and malformed
 optional scalar arguments still return C<undef> where applicable.
 
-This zero-length behavior is a C<Crypt::KeyDerivation> wrapper policy. The
+This zero-length behaviour is a C<Crypt::KeyDerivation> wrapper policy. The
 underlying libtomcrypt functions do not all behave the same way: some accept
 zero-length outputs, while others reject them with algorithm-specific checks.
-Code calling libtomcrypt directly should not assume the wrapper behavior.
+Code calling libtomcrypt directly should not assume the wrapper behaviour.
+
+=head1 EXPORT
+
+Nothing is exported by default.
+
+You can export selected functions:
+
+  use Crypt::KeyDerivation qw(
+    pbkdf1 pbkdf1_openssl pbkdf2
+    hkdf hkdf_expand hkdf_extract
+    bcrypt_pbkdf scrypt_pbkdf argon2_pbkdf
+  );
+
+Or all of them at once:
+
+  use Crypt::KeyDerivation ':all';
 
 =head1 FUNCTIONS
 
 =head2 pbkdf1
 
-B<BEWARE:> if you are not sure, do not use C<pbkdf1> but rather choose C<pbkdf2>.
+B<BEWARE:> If you are not sure, do not use C<pbkdf1> - choose C<pbkdf2> instead.
 
   my $derived_key = pbkdf1($password, $salt, $iteration_count, $hash_name, $len);
   #or
@@ -131,7 +147,7 @@ B<Important:> this function implements the OpenSSL-compatible algorithm, but its
 default parameters do B<not> match the historical C<openssl enc> defaults.
 OpenSSL traditionally uses C<MD5> and C<iteration_count=1>, while this wrapper
 defaults to C<SHA256> and C<5000>. If you need output compatible with the
-traditional OpenSSL default behavior, pass both values explicitly:
+traditional OpenSSL default behaviour, pass both values explicitly:
 
   my $derived_key = pbkdf1_openssl($password, $salt, 1, 'MD5', $len);
 
@@ -297,5 +313,23 @@ I<Since: CryptX-0.088>
 Increasing C<$t_cost>, C<$m_factor>, or C<$parallelism> increases work and
 memory requirements. Invalid combinations croak. Optional C<$secret> and
 C<$ad> may be C<undef>; otherwise they must be string or stringifiable scalars.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<CryptX>
+
+=item * L<Crypt::Digest>, L<Crypt::Mac>, L<Crypt::PRNG>
+
+=item * L<https://www.rfc-editor.org/rfc/rfc2898>
+
+=item * L<https://www.rfc-editor.org/rfc/rfc5869>
+
+=item * L<https://www.rfc-editor.org/rfc/rfc7914>
+
+=item * L<https://www.rfc-editor.org/rfc/rfc9106>
+
+=back
 
 =cut

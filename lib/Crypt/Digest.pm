@@ -110,7 +110,7 @@ Crypt::Digest - Generic interface to hash/digest functions
    my $result_raw  = $d->digest;     # raw bytes
    my $result_hex  = $d->hexdigest;  # hexadecimal form
    my $result_b64  = $d->b64digest;  # Base64 form
-   my $result_b64u = $d->b64udigest; # Base64 URL Safe form
+   my $result_b64u = $d->b64udigest; # Base64 URL-safe form
 
 =head1 DESCRIPTION
 
@@ -134,7 +134,8 @@ Or all of them at once:
 
 =head1 FUNCTIONS
 
-Please note that all functions take as its first argument the algorithm name, supported values are:
+All functions take the algorithm name as the first argument. Supported values
+are:
 
  'CHAES', 'MD2', 'MD4', 'MD5', 'RIPEMD128', 'RIPEMD160',
  'RIPEMD256', 'RIPEMD320', 'SHA1', 'SHA224', 'SHA256',
@@ -144,11 +145,11 @@ Please note that all functions take as its first argument the algorithm name, su
  'BLAKE2b_160', 'BLAKE2b_256', 'BLAKE2b_384', 'BLAKE2b_512',
  'BLAKE2s_128', 'BLAKE2s_160', 'BLAKE2s_224', 'BLAKE2s_256'
 
- (simply any <NAME> for which there is Crypt::Digest::<NAME> module)
+ (or any <NAME> for which there is a Crypt::Digest::<NAME> module)
 
 =head2 digest_data
 
-Logically joins all arguments into a single string, and returns the digest for
+Joins all arguments into a single string and returns the digest for
 the selected algorithm encoded as a binary string.
 
 Data arguments are converted to byte strings using Perl's usual scalar
@@ -163,7 +164,7 @@ C<digest_data_hex>, C<digest_data_b64>, and C<digest_data_b64u>.
 
 =head2 digest_data_hex
 
-Logically joins all arguments into a single string, and returns the digest for
+Joins all arguments into a single string and returns the digest for
 the selected algorithm encoded as a hexadecimal string.
 
  my $digest_hex = digest_data_hex('SHA256', 'data string');
@@ -172,7 +173,7 @@ the selected algorithm encoded as a hexadecimal string.
 
 =head2 digest_data_b64
 
-Logically joins all arguments into a single string, and returns the digest for
+Joins all arguments into a single string and returns the digest for
 the selected algorithm encoded as a Base64 string, B<with> trailing '=' padding.
 
  my $digest_b64 = digest_data_b64('SHA256', 'data string');
@@ -181,8 +182,8 @@ the selected algorithm encoded as a Base64 string, B<with> trailing '=' padding.
 
 =head2 digest_data_b64u
 
-Logically joins all arguments into a single string, and returns the digest for
-the selected algorithm encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Joins all arguments into a single string and returns the digest for
+the selected algorithm encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
  my $digest_b64url = digest_data_b64u('SHA256', 'data string');
  #or
@@ -190,7 +191,7 @@ the selected algorithm encoded as a Base64 URL Safe string (see RFC 4648 section
 
 =head2 digest_file
 
-Reads file (defined by filename or filehandle) content, and returns its digest encoded as a binary string.
+Reads a file given by a filename or filehandle and returns its digest encoded as a binary string.
 
  my $digest_raw = digest_file('SHA256', 'filename.dat');
  #or
@@ -199,18 +200,18 @@ Reads file (defined by filename or filehandle) content, and returns its digest e
 
 =head2 digest_file_hex
 
-Reads file (defined by filename or filehandle) content, and returns its digest encoded as a hexadecimal string.
+Reads a file given by a filename or filehandle and returns its digest encoded as a hexadecimal string.
 
  my $digest_hex = digest_file_hex('SHA256', 'filename.dat');
  #or
  my $filehandle = ...; # existing binary-mode filehandle
  my $digest_hex = digest_file_hex('SHA256', $filehandle);
 
-B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
+B<Note:> The filehandle must be in binary mode before you pass it to C<addfile()>.
 
 =head2 digest_file_b64
 
-Reads file (defined by filename or filehandle) content, and returns its digest encoded as a Base64 string, B<with> trailing '=' padding.
+Reads a file given by a filename or filehandle and returns its digest encoded as a Base64 string, B<with> trailing '=' padding.
 
  my $digest_b64 = digest_file_b64('SHA256', 'filename.dat');
  #or
@@ -219,7 +220,7 @@ Reads file (defined by filename or filehandle) content, and returns its digest e
 
 =head2 digest_file_b64u
 
-Reads file (defined by filename or filehandle) content, and returns its digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Reads a file given by a filename or filehandle and returns its digest encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
  my $digest_b64url = digest_file_b64u('SHA256', 'filename.dat');
  #or
@@ -246,7 +247,7 @@ Constructor, returns a reference to the digest object.
  #                 'BLAKE2b_512', 'BLAKE2s_128', 'BLAKE2s_160', 'BLAKE2s_224',
  #                 'BLAKE2s_256', 'Tiger192', 'Whirlpool'
  #
- # simply any <FUNCNAME> for which there is Crypt::Digest::<FUNCNAME> module
+ # or any <FUNCNAME> for which there is a Crypt::Digest::<FUNCNAME> module
 
 =head2 clone
 
@@ -256,14 +257,13 @@ Creates a copy of the digest object state and returns a reference to the copy.
 
 =head2 reset
 
-Reinitialize the digest object state and returns a reference to the digest object.
+Resets the digest object state and returns the digest object itself.
 
  $d->reset();
 
 =head2 add
 
-All arguments are appended to the message we calculate digest for.
-The return value is the digest object itself.
+Appends all arguments to the message. Returns the digest object itself.
 
 Each argument is converted to bytes using Perl's usual scalar stringification.
 Defined scalars, including numbers and string-overloaded objects, are
@@ -292,15 +292,15 @@ Note that all the following cases are equivalent:
 
 =head2 addfile
 
-The content of the file (or filehandle) is appended to the message we calculate digest for.
-The return value is the digest object itself.
+Reads a file or filehandle and appends its content to the message. Returns the
+digest object itself.
 
  $d->addfile('filename.dat');
  #or
  my $filehandle = ...; # existing binary-mode filehandle
  $d->addfile($filehandle);
 
-B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
+B<Note:> The filehandle must be in binary mode before you pass it to C<addfile()>.
 
 =head2 hashsize
 
@@ -330,15 +330,16 @@ Like C<digest()>, the first call finalizes the digest object.
 
 =head2 b64digest
 
-Returns the digest encoded as a Base64 string, B<with> trailing '=' padding (B<BEWARE:> this padding
-style might differ from other Digest::<SOMETHING> modules on CPAN).
+Returns the digest encoded as a Base64 string with trailing C<=> padding.
+B<Note:> This padding style might differ from other C<Digest::*> modules on
+CPAN.
 Like C<digest()>, the first call finalizes the digest object.
 
  my $result_b64 = $d->b64digest();
 
 =head2 b64udigest
 
-Returns the digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Returns the digest encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 Like C<digest()>, the first call finalizes the digest object.
 
  my $result_b64url = $d->b64udigest();
@@ -347,11 +348,11 @@ Like C<digest()>, the first call finalizes the digest object.
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 
-=item * L<Crypt::Digest|Crypt::Digest> tries to be compatible with L<Digest|Digest> interface.
+=item * L<Crypt::Digest> tries to be compatible with the L<Digest> interface.
 
-=item * Check subclasses like L<Crypt::Digest::SHA1|Crypt::Digest::SHA1>, L<Crypt::Digest::MD5|Crypt::Digest::MD5>, ...
+=item * Check subclasses like L<Crypt::Digest::SHA1>, L<Crypt::Digest::MD5>, ...
 
 =back
 

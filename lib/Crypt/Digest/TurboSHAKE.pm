@@ -138,7 +138,7 @@ a different message.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest::SHAKE|Crypt::Digest::SHAKE>, L<Crypt::Digest::KangarooTwelve|Crypt::Digest::KangarooTwelve>
+=item * L<CryptX>, L<Crypt::Digest::SHAKE>, L<Crypt::Digest::KangarooTwelve>
 
 =item * L<RFC 9861|https://www.rfc-editor.org/rfc/rfc9861>
 

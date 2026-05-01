@@ -57,7 +57,7 @@ Crypt::Mode::[%orig_name%] - [%info%]
    my $chunk2 = 'plaintext';
 [%-END%]
 
-   #(en|de)crypt at once
+   # encrypt or decrypt in one call
 [%-IF lc_name == 'ecb' %]
    my $single_ciphertext = $m->encrypt($plaintext, $key);
    my $single_plaintext = $m->decrypt($single_ciphertext, $key);
@@ -66,7 +66,7 @@ Crypt::Mode::[%orig_name%] - [%info%]
    my $single_plaintext = $m->decrypt($single_ciphertext, $key, $iv);
 [%-END%]
 
-   #encrypt more chunks
+   # encrypt more chunks
 [%-IF lc_name == 'ecb' %]
    $m->start_encrypt($key);
 [%-ELSE%]
@@ -79,7 +79,7 @@ Crypt::Mode::[%orig_name%] - [%info%]
    $chunked_ciphertext .= $m->finish;
 [%-END%]
 
-   #decrypt more chunks
+   # decrypt more chunks
 [%-IF lc_name == 'ecb' %]
    $m->start_decrypt($key);
 [%-ELSE%]
@@ -115,13 +115,13 @@ C<new>, for example:
  #                 'KASUMI', 'Khazad', 'MULTI2', 'Noekeon', 'RC2', 'RC5', 'RC6',
  #                 'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
  #                 'SEED', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
- #                 simply any <NAME> for which there exists Crypt::Cipher::<NAME>
+ #                 or any <NAME> for which there is a Crypt::Cipher::<NAME> module
  # $ctr_mode ..... [integer] CTR_COUNTER_LITTLE_ENDIAN    (0) - little-endian counter (DEFAULT)
  #                 CTR_COUNTER_BIG_ENDIAN       (1) - big-endian counter
  #                 CTR_COUNTER_LITTLE_ENDIAN | 2 (2) - little-endian + RFC 3686 initial-counter-incrementing
  #                 CTR_COUNTER_BIG_ENDIAN | 2    (3) - big-endian + RFC 3686 initial-counter-incrementing
  # $ctr_width .... [integer] counter width in bytes (DEFAULT = full block width, e.g. 16 for AES)
- # $cipher_rounds ... [integer] optional, num of rounds for given cipher
+ # $cipher_rounds ... [integer] optional, number of rounds for given cipher
 [%-ELSIF lc_name == 'ecb' or lc_name == 'cbc' %]
  my $m = Crypt::Mode::[%orig_name%]->new($name);
  #or
@@ -133,14 +133,14 @@ C<new>, for example:
  #               'KASUMI', 'Khazad', 'MULTI2', 'Noekeon', 'RC2', 'RC5', 'RC6',
  #               'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
  #               'SEED', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
- #               simply any <NAME> for which there exists Crypt::Cipher::<NAME>
+ #               or any <NAME> for which there is a Crypt::Cipher::<NAME> module
  # $padding .... [integer] 0 no padding (plaintext size has to be multiple of block length)
  #               1 PKCS5 padding, Crypt::CBC's "standard" - DEFAULT
  #               2 Crypt::CBC's "oneandzeroes"
  #               3 ANSI X.923 padding
  #               4 zero padding
  #               5 zero padding (+a block of zeros if the output length is divisible by the blocksize)
- # $cipher_rounds ... [integer] optional, num of rounds for given cipher
+ # $cipher_rounds ... [integer] optional, number of rounds for given cipher
 [%-ELSE%]
  my $m = Crypt::Mode::[%orig_name%]->new($name);
  #or
@@ -150,8 +150,8 @@ C<new>, for example:
  #                    'KASUMI', 'Khazad', 'MULTI2', 'Noekeon', 'RC2', 'RC5', 'RC6',
  #                    'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
  #                    'SEED', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
- #                    simply any <NAME> for which there exists Crypt::Cipher::<NAME>
- # $cipher_rounds ... [integer] optional, num of rounds for given cipher
+ #                    or any <NAME> for which there is a Crypt::Cipher::<NAME> module
+ # $cipher_rounds ... [integer] optional, number of rounds for given cipher
 [%-END%]
 
 =head2 encrypt
@@ -220,7 +220,11 @@ accepted. C<undef> is treated as an empty string and may emit Perl's usual
 [%-IF lc_name == 'ecb' or lc_name == 'cbc' %]
 =head2 finish
 
-   #encrypt more chunks
+Finalizes the stream. In encryption mode, pads and encrypts the final block;
+in decryption mode, decrypts and removes padding from the final block.
+Returns the result as a binary string (may be empty if there is no data to flush).
+
+   # encrypt more chunks
 [%-IF lc_name == 'ecb' %]
    $m->start_encrypt($key);
 [%-ELSE%]
@@ -233,7 +237,7 @@ accepted. C<undef> is treated as an empty string and may emit Perl's usual
    $ciphertext .= $m->add($chunk2);
    $ciphertext .= $m->finish;
 
-   #decrypt more chunks
+   # decrypt more chunks
 [%-IF lc_name == 'ecb' %]
    $m->start_decrypt($key);
 [%-ELSE%]
@@ -261,7 +265,7 @@ L<Crypt::Mode::ECB> and may be safely called or omitted.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Cipher>
+=item * L<CryptX>, L<Crypt::Cipher>
 
 =item * L<Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish>, ...
 [% FOREACH v IN urls %]

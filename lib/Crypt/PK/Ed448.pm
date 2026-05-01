@@ -127,10 +127,16 @@ Crypt::PK::Ed448 - Digital signature based on Ed448
  $verifier->verify_message($signature, $message) or die "ERROR";
 
  my $pk = Crypt::PK::Ed448->new;
- $pk->import_key_raw(pack("H*", "1b0055aad3b239a0fa1ed1ea8023151a5791d0bb556435299da6cf1aaa272d858b0238822654bc15f64adbab97f1bb9ec848d72cd8ad856800"), "public");
+ $pk->import_key_raw(
+   pack("H*", "1b0055aad3b239a0fa1ed1ea8023151a5791d0bb556435299da6cf1aaa272d858b0238822654bc15f64adbab97f1bb9ec848d72cd8ad856800"),
+   "public",
+ );
 
  my $sk = Crypt::PK::Ed448->new;
- $sk->import_key_raw(pack("H*", "f82bd65291965de46d87c7447863924e8efb8da36993618a784cd3b69a6d66e61cdc0a48a31e66bd8e81e4d77cedc311aa0f72a322ef3e4fad"), "private");
+ $sk->import_key_raw(
+   pack("H*", "f82bd65291965de46d87c7447863924e8efb8da36993618a784cd3b69a6d66e61cdc0a48a31e66bd8e81e4d77cedc311aa0f72a322ef3e4fad"),
+   "private",
+ );
 
 =head1 DESCRIPTION
 

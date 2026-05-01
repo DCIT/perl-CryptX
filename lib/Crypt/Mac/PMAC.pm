@@ -22,7 +22,7 @@ Crypt::Mac::PMAC - Message authentication code PMAC
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Mac::PMAC qw( pmac pmac_hex );
+   use Crypt::Mac::PMAC qw( pmac pmac_hex pmac_b64 pmac_b64u );
 
    # calculate MAC from string/buffer
    my $pmac_raw  = pmac($cipher_name, $key, 'data buffer');
@@ -53,7 +53,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Mac::PMAC qw(pmac pmac_hex );
+  use Crypt::Mac::PMAC qw( pmac pmac_hex pmac_b64 pmac_b64u );
 
 Or all of them at once:
 
@@ -63,7 +63,7 @@ Or all of them at once:
 
 =head2 pmac
 
-Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a binary string.
+Joins all arguments into a single string and returns its PMAC message authentication code encoded as a binary string.
 
 Data arguments for the functional helpers are converted to byte strings using
 Perl's usual scalar stringification. Defined scalars, including numbers and
@@ -78,7 +78,7 @@ C<pmac_b64u>.
 
 =head2 pmac_hex
 
-Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a hexadecimal string.
+Joins all arguments into a single string and returns its PMAC message authentication code encoded as a hexadecimal string.
 
  my $pmac_hex = pmac_hex($cipher_name, $key, 'data buffer');
  #or
@@ -86,7 +86,7 @@ Logically joins all arguments into a single string, and returns its PMAC message
 
 =head2 pmac_b64
 
-Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a Base64 string.
+Joins all arguments into a single string and returns its PMAC message authentication code encoded as a Base64 string.
 
  my $pmac_b64 = pmac_b64($cipher_name, $key, 'data buffer');
  #or
@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its PMAC message
 
 =head2 pmac_b64u
 
-Logically joins all arguments into a single string, and returns its PMAC message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Joins all arguments into a single string and returns its PMAC message authentication code encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
  my $pmac_b64url = pmac_b64u($cipher_name, $key, 'data buffer');
  #or
@@ -112,7 +112,7 @@ C<new>, for example:
  my $d = Crypt::Mac::PMAC->new($cipher_name, $key);
 
  # $cipher_name .. [string] one of 'AES', 'Camellia', 'Twofish', 'Serpent', etc.
- #                 any <NAME> for which there exists Crypt::Cipher::<NAME>
+ #                 any <NAME> for which there is a Crypt::Cipher::<NAME> module
  # $key .......... [binary string] key of valid length for the chosen cipher (e.g. 16/24/32 bytes for AES)
 
 =head2 clone
@@ -171,7 +171,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =head2 b64umac
 
-Returns the MAC encoded as a Base64 URL Safe string (no trailing C<=>) and
+Returns the MAC encoded as a Base64 URL-safe string (no trailing C<=>) and
 finalizes the object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or
 C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
@@ -181,7 +181,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 
 =item * L<https://en.wikipedia.org/wiki/PMAC_%28cryptography%29>
 

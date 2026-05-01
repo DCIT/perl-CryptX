@@ -67,7 +67,7 @@ Crypt::AuthEnc::CCM - Authenticated encryption in CCM mode
 
 =head1 DESCRIPTION
 
-CCM is a encrypt+authenticate mode that is centered around using AES (or any 16-byte cipher) as a primitive.
+CCM is an encrypt+authenticate mode that is built around using AES (or any 16-byte cipher) as a primitive.
 Unlike EAX and OCB mode, it is only meant for packet mode where the length of the input is known in advance.
 
 Use a fresh object per message. The OO constructor requires all per-message parameters
@@ -96,7 +96,7 @@ You can export selected functions:
  my ($ciphertext, $tag) = ccm_encrypt_authenticate($cipher, $key, $nonce, $adata, $tag_len, $plaintext);
 
  # $cipher .. [string] 'AES' or name of any other cipher with 16-byte block len
- # $key ..... [binary string] key of proper length (e.g. 128/192/256bits for AES)
+ # $key ..... [binary string] key of proper length (e.g. 128/192/256 bits for AES)
  # $nonce ... [binary string] unique nonce/salt (no need to keep it secret)
  # $adata ... [binary string] additional authenticated data (C<undef> is treated the same as C<''>)
  # $tag_len . [integer] required length of output tag
@@ -127,7 +127,7 @@ C<new>, for example:
  my $ae = Crypt::AuthEnc::CCM->new($cipher, $key, $nonce, $adata, $tag_len, $pt_len);
 
  # $cipher .. [string] 'AES' or name of any other cipher with 16-byte block len
- # $key ..... [binary string] key of proper length (e.g. 128/192/256bits for AES)
+ # $key ..... [binary string] key of proper length (e.g. 128/192/256 bits for AES)
  # $nonce ... [binary string] unique nonce/salt (no need to keep it secret)
  # $adata ... [binary string] additional authenticated data; must be a defined string scalar, use C<''> if none
  # $tag_len . [integer] tag length in bytes, validated as 1..16
@@ -174,9 +174,9 @@ Returns a copy of the AEAD object in its current state.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::AuthEnc::EAX|Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM|Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::OCB|Crypt::AuthEnc::OCB>
+=item * L<CryptX>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::OCB>
 
-=item * L<https://en.wikipedia.org/wiki/CCM_mode|https://en.wikipedia.org/wiki/CCM_mode>
+=item * L<https://en.wikipedia.org/wiki/CCM_mode>
 
 =back
 

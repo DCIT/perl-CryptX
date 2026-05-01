@@ -1036,7 +1036,7 @@ Math::BigInt::LTM - Use the libtommath library for Math::BigInt routines
 
 =head1 DESCRIPTION
 
-Provides support for big integer calculations by means of the libtommath c-library.
+Provides big integer calculations using the libtommath C library.
 
 I<Since: CryptX-0.029>
 

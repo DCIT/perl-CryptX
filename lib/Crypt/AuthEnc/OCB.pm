@@ -105,7 +105,7 @@ You can export selected functions:
  my ($ciphertext, $tag) = ocb_encrypt_authenticate($cipher, $key, $nonce, $adata, $tag_len, $plaintext);
 
  # $cipher .. [string] 'AES' or name of any other cipher with 16-byte block len
- # $key ..... [binary string] AES key of proper length (128/192/256bits)
+ # $key ..... [binary string] AES key of proper length (128/192/256 bits)
  # $nonce ... [binary string] unique nonce/salt (no need to keep it secret)
  # $adata ... [binary string] additional authenticated data
  # $tag_len . [integer] required length of output tag
@@ -130,7 +130,7 @@ C<new>, for example:
  my $ae = Crypt::AuthEnc::OCB->new($cipher, $key, $nonce, $tag_len);
 
  # $cipher .. [string] 'AES' or name of any other cipher with 16-byte block len
- # $key ..... [binary string] AES key of proper length (128/192/256bits)
+ # $key ..... [binary string] AES key of proper length (128/192/256 bits)
  # $nonce ... [binary string] unique nonce/salt (no need to keep it secret)
  # $tag_len . [integer] required length of output tag
 
@@ -148,7 +148,7 @@ Returns a binary string of ciphertext (raw bytes).
 
  my $ciphertext = $ae->encrypt_add($data);      # can be called multiple times
 
- #BEWARE: size of $data has to be multiple of blocklen (16 for AES)
+ # note: \ must be a multiple of the block length (16 for AES)
 
 =head2 encrypt_last
 
@@ -167,7 +167,7 @@ Returns a binary string of plaintext (raw bytes).
 
  my $plaintext = $ae->decrypt_add($ciphertext); # can be called multiple times
 
- #BEWARE: size of $ciphertext has to be multiple of blocklen (16 for AES)
+ # note: \ must be a multiple of the block length (16 for AES)
 
 =head2 decrypt_last
 
@@ -199,7 +199,7 @@ Returns a copy of the AEAD object in its current state.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::AuthEnc::CCM|Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::GCM|Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::EAX|Crypt::AuthEnc::EAX>
+=item * L<CryptX>, L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::EAX>
 
 =item * L<https://en.wikipedia.org/wiki/OCB_mode>
 

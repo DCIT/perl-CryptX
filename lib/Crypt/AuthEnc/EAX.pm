@@ -102,7 +102,7 @@ You can export selected functions:
  my ($ciphertext, $tag) = eax_encrypt_authenticate($cipher, $key, $nonce, $adata, $plaintext);
 
  # $cipher .. [string] 'AES' or name of any other cipher with 16-byte block len
- # $key ..... [binary string] AES key of proper length (128/192/256bits)
+ # $key ..... [binary string] AES key of proper length (128/192/256 bits)
  # $nonce ... [binary string] unique nonce (no need to keep it secret)
  # $adata ... [binary string] additional authenticated data
 
@@ -125,7 +125,7 @@ C<new>, for example:
  my $ae = Crypt::AuthEnc::EAX->new($cipher, $key, $nonce, $adata);
 
  # $cipher .. [string] 'AES' or name of any other cipher with 16-byte block len
- # $key ..... [binary string] AES key of proper length (128/192/256bits)
+ # $key ..... [binary string] AES key of proper length (128/192/256 bits)
  # $nonce ... [binary string] unique nonce (no need to keep it secret)
  # $adata ... [binary string] additional authenticated data (optional)
 
@@ -174,9 +174,9 @@ Returns a copy of the AEAD object in its current state.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::AuthEnc::CCM|Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::GCM|Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::OCB|Crypt::AuthEnc::OCB>
+=item * L<CryptX>, L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::OCB>
 
-=item * L<https://en.wikipedia.org/wiki/EAX_mode|https://en.wikipedia.org/wiki/EAX_mode>
+=item * L<https://en.wikipedia.org/wiki/EAX_mode>
 
 =item * L<https://web.cs.ucdavis.edu/~rogaway/papers/eax.pdf>
 

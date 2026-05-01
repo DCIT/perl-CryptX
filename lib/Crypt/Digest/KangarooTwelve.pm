@@ -152,7 +152,7 @@ C<reset()> or create a new object to hash a different message.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest::SHAKE|Crypt::Digest::SHAKE>, L<Crypt::Digest::TurboSHAKE|Crypt::Digest::TurboSHAKE>
+=item * L<CryptX>, L<Crypt::Digest::SHAKE>, L<Crypt::Digest::TurboSHAKE>
 
 =item * L<RFC 9861|https://www.rfc-editor.org/rfc/rfc9861>
 

@@ -85,6 +85,18 @@ as the corresponding L<Crypt::PRNG> entries.
 RC4 is provided for compatibility with legacy code only and is not recommended
 for new designs.
 
+=head1 EXPORT
+
+Nothing is exported by default.
+
+You can export selected functions:
+
+  use Crypt::PRNG::RC4 qw(random_bytes random_string);
+
+Or all of them at once:
+
+  use Crypt::PRNG::RC4 ':all';
+
 =head1 FUNCTIONS
 
 All functions below behave exactly like the corresponding L<Crypt::PRNG>
@@ -175,7 +187,7 @@ See L<Crypt::PRNG/int32>.
 
 =item * L<Crypt::PRNG>
 
-=item * L<https://en.wikipedia.org/wiki/RC4_cipher|https://en.wikipedia.org/wiki/RC4_cipher>
+=item * L<https://en.wikipedia.org/wiki/RC4_cipher>
 
 =back
 

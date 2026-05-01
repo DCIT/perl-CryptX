@@ -135,7 +135,7 @@ a different message.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest|Crypt::Digest>
+=item * L<CryptX>, L<Crypt::Digest>
 
 =item * L<https://csrc.nist.gov/pubs/fips/202/final>
 

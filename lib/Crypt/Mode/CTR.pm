@@ -40,24 +40,24 @@ Crypt::Mode::CTR - Block cipher mode CTR [Counter mode]
    my $chunk1 = 'example ';
    my $chunk2 = 'plaintext';
 
-   #(en|de)crypt at once
+   # encrypt or decrypt in one call
    my $single_ciphertext = $m->encrypt($plaintext, $key, $iv);
    my $single_plaintext = $m->decrypt($single_ciphertext, $key, $iv);
 
-   #encrypt more chunks
+   # encrypt more chunks
    $m->start_encrypt($key, $iv);
    my $chunked_ciphertext = '';
    $chunked_ciphertext .= $m->add($chunk1);
    $chunked_ciphertext .= $m->add($chunk2);
 
-   #decrypt more chunks
+   # decrypt more chunks
    $m->start_decrypt($key, $iv);
    my $chunked_plaintext = '';
    $chunked_plaintext .= $m->add($chunked_ciphertext);
 
 =head1 DESCRIPTION
 
-This module implements CTR cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).
+This module implements CTR cipher mode. B<Note:> It works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).
 
 =head1 METHODS
 
@@ -78,13 +78,13 @@ C<new>, for example:
  #                 'KASUMI', 'Khazad', 'MULTI2', 'Noekeon', 'RC2', 'RC5', 'RC6',
  #                 'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
  #                 'SEED', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
- #                 simply any <NAME> for which there exists Crypt::Cipher::<NAME>
+ #                 or any <NAME> for which there is a Crypt::Cipher::<NAME> module
  # $ctr_mode ..... [integer] CTR_COUNTER_LITTLE_ENDIAN    (0) - little-endian counter (DEFAULT)
  #                 CTR_COUNTER_BIG_ENDIAN       (1) - big-endian counter
  #                 CTR_COUNTER_LITTLE_ENDIAN | 2 (2) - little-endian + RFC 3686 initial-counter-incrementing
  #                 CTR_COUNTER_BIG_ENDIAN | 2    (3) - big-endian + RFC 3686 initial-counter-incrementing
  # $ctr_width .... [integer] counter width in bytes (DEFAULT = full block width, e.g. 16 for AES)
- # $cipher_rounds ... [integer] optional, num of rounds for given cipher
+ # $cipher_rounds ... [integer] optional, number of rounds for given cipher
 
 =head2 encrypt
 
@@ -149,7 +149,7 @@ L<Crypt::Mode::ECB> and may be safely called or omitted.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Cipher>
+=item * L<CryptX>, L<Crypt::Cipher>
 
 =item * L<Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish>, ...
 

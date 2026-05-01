@@ -122,10 +122,16 @@ Crypt::PK::X448 - Asymmetric cryptography based on X448
  die "ERROR" unless $alice_secret eq $bob_secret;
 
  my $pk = Crypt::PK::X448->new;
- $pk->import_key_raw(pack("H*", "cf807ab0fc3efa03108469f29e499db2eefefeb12544d8d4e711f187385aaf31b4f38c8f84a3dd9e43da309fd410c3816a50e644b5500c05"), "public");
+ $pk->import_key_raw(
+   pack("H*", "cf807ab0fc3efa03108469f29e499db2eefefeb12544d8d4e711f187385aaf31b4f38c8f84a3dd9e43da309fd410c3816a50e644b5500c05"),
+   "public",
+ );
 
  my $sk = Crypt::PK::X448->new;
- $sk->import_key_raw(pack("H*", "10d418b111401956abc5a92c2fbb8406d1d646ba930fdefa2108efe68f2000973755aa952be018f640947c05135fbf9925ebd4da828d86ec"), "private");
+ $sk->import_key_raw(
+   pack("H*", "10d418b111401956abc5a92c2fbb8406d1d646ba930fdefa2108efe68f2000973755aa952be018f640947c05135fbf9925ebd4da828d86ec"),
+   "private",
+ );
 
  my $generated = Crypt::PK::X448->new->generate_key;
  my $private_der = $generated->export_key_der('private');

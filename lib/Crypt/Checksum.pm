@@ -70,15 +70,18 @@ Crypt::Checksum - [internal only]
 
 =head1 SYNOPSIS
 
-Do not use this module directly in new code.
+Do not use this module directly.
 
-Use L<Crypt::Checksum::CRC32> or L<Crypt::Checksum::Adler32> instead.
+Use a concrete checksum module instead.
 
-=head1 DESCRIPTION
+=head1 SEE ALSO
 
-Compatibility wrapper for the checksum modules.
+=over
 
-Do not use this module directly in new code. Use
-L<Crypt::Checksum::CRC32> or L<Crypt::Checksum::Adler32> instead.
+=item * L<CryptX>
+
+=item * L<Crypt::Checksum::Adler32>, L<Crypt::Checksum::CRC32>
+
+=back
 
 =cut

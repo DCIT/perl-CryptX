@@ -33,7 +33,7 @@ Crypt::Cipher::SAFER_K64 - Symmetric cipher SAFER_K64, key size: 64 bits
   ### example 1
   use Crypt::Mode::CBC;
 
-  my $key = '...'; # length has to be valid key size for this cipher
+  my $key = '...'; # length must be a valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('SAFER_K64');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
@@ -42,18 +42,18 @@ Crypt::Cipher::SAFER_K64 - Symmetric cipher SAFER_K64, key size: 64 bits
   use Crypt::CBC;
   use Crypt::Cipher::SAFER_K64;
 
-  my $key = '...'; # length has to be valid key size for this cipher
+  my $key = '...'; # length must be a valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::SAFER_K64', -key=>$key, -iv=>$iv );
   my $ciphertext = $cbc->encrypt("secret data");
 
 =head1 DESCRIPTION
 
-This module implements the SAFER_K64 cipher. Provided interface is compliant with L<Crypt::CBC|Crypt::CBC> module.
+This module implements the SAFER_K64 cipher. Its interface is compatible with L<Crypt::CBC>.
 
-B<BEWARE:> This module implements just elementary "one-block-(en|de)cryption" operation - if you want to
-encrypt/decrypt generic data you have to use some of the cipher block modes - check for example
-L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC> (which will be slower).
+B<Note:> This module only implements single-block encryption and decryption.
+For general data, use a block mode such as
+L<Crypt::Mode::CBC>, L<Crypt::Mode::CTR>, or L<Crypt::CBC> (which is slower).
 
 =head1 METHODS
 
@@ -76,8 +76,6 @@ C<new>, for example:
 Encrypts exactly one block of plaintext. The length of C<$plaintext> must
 equal L</blocksize>; croaks otherwise. An empty string is accepted and
 returned unchanged.
-
-
 
  my $ciphertext = $c->encrypt($plaintext);
 
@@ -147,7 +145,7 @@ Returns the cipher's default round count.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Cipher>
+=item * L<CryptX>, L<Crypt::Cipher>
 
 =item * L<https://en.wikipedia.org/wiki/SAFER>
 

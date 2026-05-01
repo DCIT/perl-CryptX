@@ -205,7 +205,7 @@ Loads private or public key in DER or PEM format.
 
 The same method also accepts filenames instead of buffers.
 
-Loading private or public keys form perl hash:
+Loading private or public keys from a Perl HASH:
 
  $pk->import_key($hashref);
 
@@ -367,7 +367,7 @@ Exports public/private keys as a JSON Web Key (JWK).
  #or
  my $public_json_text = $pk->export_key_jwk('public');
 
-Also exports public/private keys as a perl HASH with JWK structure.
+Also exports public/private keys as a Perl HASH with JWK structure.
 
  my $jwk_hash = $pk->export_key_jwk('private', 1);
  #or

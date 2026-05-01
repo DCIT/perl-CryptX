@@ -291,7 +291,7 @@ Loads private or public key in DER or PEM format.
 
 The same method also accepts filenames instead of buffers.
 
-Loading private or public keys form perl hash:
+Loading private or public keys from a Perl HASH:
 
  $pk->import_key($hashref);
 
@@ -309,7 +309,6 @@ Loading private or public keys form perl hash:
 
  # or a hash with items corresponding to JWK (JSON Web Key)
  $pk->import_key({
- {
    kty => "RSA",
    n   => "0vx7agoebGcQSuuPiLJXZpt...eZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw",
    e   => "AQAB",
@@ -538,7 +537,7 @@ Exports public/private keys as a JSON Web Key (JWK).
  #or
  my $public_json_text = $pk->export_key_jwk('public');
 
-Also exports public/private keys as a perl HASH with JWK structure.
+Also exports public/private keys as a Perl HASH with JWK structure.
 
  my $jwk_hash = $pk->export_key_jwk('private', 1);
  #or
@@ -813,7 +812,7 @@ Load keys (Perl code):
 
 =over
 
-=item * L<https://en.wikipedia.org/wiki/RSA_%28algorithm%29|https://en.wikipedia.org/wiki/RSA_%28algorithm%29>
+=item * L<https://en.wikipedia.org/wiki/RSA_%28algorithm%29>
 
 =back
 

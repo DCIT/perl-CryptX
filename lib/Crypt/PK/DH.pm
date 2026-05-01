@@ -452,7 +452,7 @@ Returns a hashref with the key components, or C<undef> if no key is loaded.
    y => "AB9AAA40774D3CD476B52F82E7EE2D8A8D40CD88BF4...", #public key
    g => "2", # generator/base
    p => "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80D...", # prime
-}
+ }
 
 =head2 params2hash
 
@@ -464,13 +464,13 @@ I<Since: CryptX-0.032>
  {
    g => "2", # generator/base
    p => "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80D...", # prime
-}
+ }
 
 =head1 SEE ALSO
 
 =over
 
-=item * L<https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange|https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange>
+=item * L<https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange>
 
 =item * L<https://www.rfc-editor.org/rfc/rfc3526>
 

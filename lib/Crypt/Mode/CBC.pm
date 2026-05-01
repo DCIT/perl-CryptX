@@ -40,18 +40,18 @@ Crypt::Mode::CBC - Block cipher mode CBC [Cipher-block chaining]
    my $chunk1 = 'example ';
    my $chunk2 = 'plaintext';
 
-   #(en|de)crypt at once
+   # encrypt or decrypt in one call
    my $single_ciphertext = $m->encrypt($plaintext, $key, $iv);
    my $single_plaintext = $m->decrypt($single_ciphertext, $key, $iv);
 
-   #encrypt more chunks
+   # encrypt more chunks
    $m->start_encrypt($key, $iv);
    my $chunked_ciphertext = '';
    $chunked_ciphertext .= $m->add($chunk1);
    $chunked_ciphertext .= $m->add($chunk2);
    $chunked_ciphertext .= $m->finish;
 
-   #decrypt more chunks
+   # decrypt more chunks
    $m->start_decrypt($key, $iv);
    my $chunked_plaintext = '';
    $chunked_plaintext .= $m->add($chunked_ciphertext);
@@ -59,7 +59,7 @@ Crypt::Mode::CBC - Block cipher mode CBC [Cipher-block chaining]
 
 =head1 DESCRIPTION
 
-This module implements CBC cipher mode. B<NOTE:> it works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).
+This module implements CBC cipher mode. B<Note:> It works only with ciphers from L<CryptX> (Crypt::Cipher::NNNN).
 
 =head1 METHODS
 
@@ -80,14 +80,14 @@ C<new>, for example:
  #               'KASUMI', 'Khazad', 'MULTI2', 'Noekeon', 'RC2', 'RC5', 'RC6',
  #               'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
  #               'SEED', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
- #               simply any <NAME> for which there exists Crypt::Cipher::<NAME>
+ #               or any <NAME> for which there is a Crypt::Cipher::<NAME> module
  # $padding .... [integer] 0 no padding (plaintext size has to be multiple of block length)
  #               1 PKCS5 padding, Crypt::CBC's "standard" - DEFAULT
  #               2 Crypt::CBC's "oneandzeroes"
  #               3 ANSI X.923 padding
  #               4 zero padding
  #               5 zero padding (+a block of zeros if the output length is divisible by the blocksize)
- # $cipher_rounds ... [integer] optional, num of rounds for given cipher
+ # $cipher_rounds ... [integer] optional, number of rounds for given cipher
 
 =head2 encrypt
 
@@ -138,7 +138,11 @@ accepted. C<undef> is treated as an empty string and may emit Perl's usual
 
 =head2 finish
 
-   #encrypt more chunks
+Finalizes the stream. In encryption mode, pads and encrypts the final block;
+in decryption mode, decrypts and removes padding from the final block.
+Returns the result as a binary string (may be empty if there is no data to flush).
+
+   # encrypt more chunks
    $m->start_encrypt($key, $iv);
    my $chunk1 = 'example ';
    my $chunk2 = 'plaintext';
@@ -147,7 +151,7 @@ accepted. C<undef> is treated as an empty string and may emit Perl's usual
    $ciphertext .= $m->add($chunk2);
    $ciphertext .= $m->finish;
 
-   #decrypt more chunks
+   # decrypt more chunks
    $m->start_decrypt($key, $iv);
    my $plaintext = '';
    $plaintext .= $m->add($ciphertext);
@@ -157,7 +161,7 @@ accepted. C<undef> is treated as an empty string and may emit Perl's usual
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Cipher>
+=item * L<CryptX>, L<Crypt::Cipher>
 
 =item * L<Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish>, ...
 

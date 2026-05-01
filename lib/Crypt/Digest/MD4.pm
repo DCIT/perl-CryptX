@@ -77,7 +77,7 @@ Crypt::Digest::MD4 - Hash function MD4 [size: 128 bits]
    my $result_raw  = $d->digest;     # raw bytes
    my $result_hex  = $d->hexdigest;  # hexadecimal form
    my $result_b64  = $d->b64digest;  # Base64 form
-   my $result_b64u = $d->b64udigest; # Base64 URL Safe form
+   my $result_b64u = $d->b64udigest; # Base64 URL-safe form
 
    # or hash a file instead
    my $file_result_raw = Crypt::Digest::MD4->new->addfile('filename.dat')->digest;
@@ -103,7 +103,7 @@ Or all of them at once:
 
 =head2 md4
 
-Logically joins all arguments into a single string, and returns its MD4 digest encoded as a binary string.
+Joins all arguments into a single string and returns its MD4 digest encoded as a binary string.
 
 Data arguments for the functional helpers are converted to byte strings using
 Perl's usual scalar stringification. Defined scalars, including numbers and
@@ -118,7 +118,7 @@ C<md4_b64u>.
 
 =head2 md4_hex
 
-Logically joins all arguments into a single string, and returns its MD4 digest encoded as a hexadecimal string.
+Joins all arguments into a single string and returns its MD4 digest encoded as a hexadecimal string.
 
  my $md4_hex = md4_hex('data string');
  #or
@@ -126,7 +126,7 @@ Logically joins all arguments into a single string, and returns its MD4 digest e
 
 =head2 md4_b64
 
-Logically joins all arguments into a single string, and returns its MD4 digest encoded as a Base64 string, B<with> trailing '=' padding.
+Joins all arguments into a single string and returns its MD4 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
  my $md4_b64 = md4_b64('data string');
  #or
@@ -134,7 +134,7 @@ Logically joins all arguments into a single string, and returns its MD4 digest e
 
 =head2 md4_b64u
 
-Logically joins all arguments into a single string, and returns its MD4 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Joins all arguments into a single string and returns its MD4 digest encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
  my $md4_b64url = md4_b64u('data string');
  #or
@@ -142,7 +142,7 @@ Logically joins all arguments into a single string, and returns its MD4 digest e
 
 =head2 md4_file
 
-Reads file (defined by filename or filehandle) content, and returns its MD4 digest encoded as a binary string.
+Reads a file given by a filename or filehandle and returns its MD4 digest encoded as a binary string.
 
  my $md4_raw = md4_file('filename.dat');
  #or
@@ -151,18 +151,18 @@ Reads file (defined by filename or filehandle) content, and returns its MD4 dige
 
 =head2 md4_file_hex
 
-Reads file (defined by filename or filehandle) content, and returns its MD4 digest encoded as a hexadecimal string.
+Reads a file given by a filename or filehandle and returns its MD4 digest encoded as a hexadecimal string.
 
  my $md4_hex = md4_file_hex('filename.dat');
  #or
  my $filehandle = ...; # existing binary-mode filehandle
  my $md4_hex = md4_file_hex($filehandle);
 
-B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
+B<Note:> The filehandle must be in binary mode before you pass it to C<addfile()>.
 
 =head2 md4_file_b64
 
-Reads file (defined by filename or filehandle) content, and returns its MD4 digest encoded as a Base64 string, B<with> trailing '=' padding.
+Reads a file given by a filename or filehandle and returns its MD4 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
  my $md4_b64 = md4_file_b64('filename.dat');
  #or
@@ -171,7 +171,7 @@ Reads file (defined by filename or filehandle) content, and returns its MD4 dige
 
 =head2 md4_file_b64u
 
-Reads file (defined by filename or filehandle) content, and returns its MD4 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Reads a file given by a filename or filehandle and returns its MD4 digest encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
  my $md4_b64url = md4_file_b64u('filename.dat');
  #or
@@ -253,7 +253,7 @@ Like C<digest()>, the first call finalizes the digest object.
 
 =head2 b64udigest
 
-Returns the digest encoded as a Base64 URL Safe string (no trailing C<=>).
+Returns the digest encoded as a Base64 URL-safe string (no trailing C<=>).
 Like C<digest()>, the first call finalizes the digest object.
 
  my $result_b64url = $d->b64udigest();
@@ -262,7 +262,7 @@ Like C<digest()>, the first call finalizes the digest object.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest>
+=item * L<CryptX>, L<Crypt::Digest>
 
 =item * L<https://en.wikipedia.org/wiki/MD4>
 

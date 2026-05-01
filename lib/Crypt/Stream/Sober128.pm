@@ -81,7 +81,7 @@ Returns a copy of the stream cipher object in its current state.
 
 =item * L<Crypt::Stream::RC4>, L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sosemanuk>
 
-=item * L<https://en.wikipedia.org/wiki/SOBER-128|https://en.wikipedia.org/wiki/SOBER-128>
+=item * L<https://en.wikipedia.org/wiki/SOBER-128>
 
 =back
 

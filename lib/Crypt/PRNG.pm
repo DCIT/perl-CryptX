@@ -120,8 +120,20 @@ Crypt::PRNG - Cryptographically secure random number generator
 
 =head1 DESCRIPTION
 
-Provides an interface to several pseudo random number generators (thread-safe
+Provides an interface to several pseudo-random number generators (thread-safe
 and fork-safe). The default algorithm is ChaCha20.
+
+=head1 EXPORT
+
+Nothing is exported by default.
+
+You can export selected functions:
+
+  use Crypt::PRNG qw(random_bytes random_string);
+
+Or all of them at once:
+
+  use Crypt::PRNG ':all';
 
 =head1 FUNCTIONS
 
@@ -154,7 +166,7 @@ Returns C<$length> random octets encoded as a Base64 string.
    my $base64url_string = random_bytes_b64u($length);
    # $length .. [integer] number of random bytes to encode
 
-Returns C<$length> random octets encoded as a Base64 URL Safe string (RFC 4648 section 5).
+Returns C<$length> random octets encoded as a Base64 URL-safe string (RFC 4648 section 5).
 
 =head2 random_string_from
 
@@ -164,7 +176,7 @@ Returns C<$length> random octets encoded as a Base64 URL Safe string (RFC 4648 s
    #e.g.
    my $dna_string = random_string_from("ABCD", 10);
 
-Returns a random string made of C<$length> chars randomly chosen from C<$range> string.
+Returns a random string of C<$length> characters chosen from C<$range>.
 The alphabet must contain between 1 and 65536 characters; longer alphabets
 return C<undef>.
 
@@ -175,7 +187,8 @@ return C<undef>.
    #or
    my $default_alphanumeric_string = random_string;  # default length = 20
 
-Similar to random_string_from, only C<$range> is fixed to C<'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'>.
+Like C<random_string_from>, but C<$range> is fixed to
+C<'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'>.
 
 =head2 rand
 
@@ -184,14 +197,16 @@ Similar to random_string_from, only C<$range> is fixed to C<'ABCDEFGHIJKLMNOPQRS
    my $limited_n = rand($limit);
    # $limit .. [number] optional, upper bound (exclusive)
 
-Returns a random floating point number from range C<[0,1)> (if called without parameter) or C<[0,$limit)>.
-If C<$limit> is C<0>, behaves like no limit (returns C<[0,1)>), matching Perl's built-in C<rand>.
+Returns a random floating-point number in the range C<[0,1)> if called without
+an argument, or C<[0,$limit)> if C<$limit> is given.
+If C<$limit> is C<0>, this behaves as if no limit was given and returns a
+value in C<[0,1)>, matching Perl's built-in C<rand>.
 
 =head2 irand
 
    my $i = irand;
 
-Returns a random unsigned 32bit integer - range C<0 .. 0xFFFFFFFF>.
+Returns a random unsigned 32-bit integer in the range C<0 .. 0xFFFFFFFF>.
 
 =head1 METHODS
 
@@ -211,7 +226,7 @@ C<new>, for example:
    # $alg  ... [string] algorithm name: 'ChaCha20' (DEFAULT), 'Fortuna', 'RC4' (legacy; compatibility only), 'Sober128' or 'Yarrow'
    # $seed ... [binary string] optional, initial entropy for seeding the PRNG
 
-If C<$seed> is not specified the PRNG is automatically seeded with 40 bytes
+If C<$seed> is not given, the PRNG is automatically seeded with 40 bytes
 obtained via libtomcrypt's C<rng_get_bytes()> platform RNG logic.
 
 If C<$seed> is specified it must be non-empty for all algorithms. RC4 is
@@ -228,7 +243,8 @@ requires a seed of at least 5 bytes.
 If called without parameter it uses 40 bytes obtained via libtomcrypt's
 C<rng_get_bytes()> platform RNG logic.
 
-B<BEWARE:> you probably do not need this function at all as the module does automatic seeding on initialization as well as reseeding after fork and thread creation.
+B<Note:> You probably do not need this function. The module seeds itself on
+initialization and reseeds after fork and thread creation.
 
 =head2 bytes
 

@@ -98,7 +98,7 @@ You can export selected functions:
  my ($ciphertext, $tag) = gcm_encrypt_authenticate($cipher, $key, $iv, $adata, $plaintext);
 
  # $cipher .. [string] 'AES' or name of any other cipher with 16-byte block len
- # $key ..... [binary string] AES key of proper length (128/192/256bits)
+ # $key ..... [binary string] AES key of proper length (128/192/256 bits)
  # $iv ...... [binary string] initialization vector
  # $adata ... [binary string] additional authenticated data
 
@@ -191,7 +191,7 @@ Returns a copy of the AEAD object in its current state.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::AuthEnc::CCM|Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX|Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::OCB|Crypt::AuthEnc::OCB>
+=item * L<CryptX>, L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::OCB>
 
 =item * L<https://en.wikipedia.org/wiki/Galois/Counter_Mode>
 

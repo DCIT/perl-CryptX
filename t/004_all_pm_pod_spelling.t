@@ -38,6 +38,7 @@ Test::Pod::Spelling->import(
                           OpenSSH codecs
                           undef adata
                           pre Edctx Edph
+                          behaviour reseeds
                         )]
                     },
 );

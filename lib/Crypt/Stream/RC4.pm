@@ -79,7 +79,7 @@ Returns a copy of the stream cipher object in its current state.
 
 =item * L<Crypt::Stream::ChaCha>, L<Crypt::Stream::Sober128>, L<Crypt::Stream::Salsa20>, L<Crypt::Stream::Sosemanuk>
 
-=item * L<https://en.wikipedia.org/wiki/RC4_cipher|https://en.wikipedia.org/wiki/RC4_cipher>
+=item * L<https://en.wikipedia.org/wiki/RC4_cipher>
 
 =back
 

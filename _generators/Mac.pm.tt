@@ -22,7 +22,7 @@ Crypt::Mac::[%orig_name%] - [%info%]
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Mac::[%orig_name%] qw( [%lc_name%] [%lc_name%]_hex );
+   use Crypt::Mac::[%orig_name%] qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_b64 [%lc_name%]_b64u );
 
    # calculate MAC from string/buffer
 [%-IF lc_name == 'hmac' %]
@@ -94,7 +94,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Mac::[%orig_name%] qw([%lc_name%] [%lc_name%]_hex );
+  use Crypt::Mac::[%orig_name%] qw( [%lc_name%] [%lc_name%]_hex [%lc_name%]_b64 [%lc_name%]_b64u );
 
 Or all of them at once:
 
@@ -104,7 +104,7 @@ Or all of them at once:
 
 =head2 [%lc_name%]
 
-Logically joins all arguments into a single string, and returns its [%orig_name%] message authentication code encoded as a binary string.
+Joins all arguments into a single string and returns its [%orig_name%] message authentication code encoded as a binary string.
 
 Data arguments for the functional helpers are converted to byte strings using
 Perl's usual scalar stringification. Defined scalars, including numbers and
@@ -118,7 +118,7 @@ C<[%lc_name%]_b64u>.
  #or
  my $[%lc_name%]_raw = [%lc_name%]($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $hash_name ... [string] any <NAME> for which there is a Crypt::Digest::<NAME> module
  # $key ......... [binary string] the key (octets/bytes)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
  my $[%lc_name%]_raw = [%lc_name%]($size, $key, 'data buffer');
@@ -136,14 +136,14 @@ C<[%lc_name%]_b64u>.
 
 =head2 [%lc_name%]_hex
 
-Logically joins all arguments into a single string, and returns its [%orig_name%] message authentication code encoded as a hexadecimal string.
+Joins all arguments into a single string and returns its [%orig_name%] message authentication code encoded as a hexadecimal string.
 
 [%-IF lc_name == 'hmac' %]
  my $[%lc_name%]_hex = [%lc_name%]_hex($hash_name, $key, 'data buffer');
  #or
  my $[%lc_name%]_hex = [%lc_name%]_hex($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $hash_name ... [string] any <NAME> for which there is a Crypt::Digest::<NAME> module
  # $key ......... [binary string] the key (not hex!)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
  my $[%lc_name%]_hex = [%lc_name%]_hex($size, $key, 'data buffer');
@@ -161,14 +161,14 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 =head2 [%lc_name%]_b64
 
-Logically joins all arguments into a single string, and returns its [%orig_name%] message authentication code encoded as a Base64 string.
+Joins all arguments into a single string and returns its [%orig_name%] message authentication code encoded as a Base64 string.
 
 [%-IF lc_name == 'hmac' %]
  my $[%lc_name%]_b64 = [%lc_name%]_b64($hash_name, $key, 'data buffer');
  #or
  my $[%lc_name%]_b64 = [%lc_name%]_b64($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $hash_name ... [string] any <NAME> for which there is a Crypt::Digest::<NAME> module
  # $key ......... [binary string] the key (not Base64!)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
  my $[%lc_name%]_b64 = [%lc_name%]_b64($size, $key, 'data buffer');
@@ -186,14 +186,14 @@ Logically joins all arguments into a single string, and returns its [%orig_name%
 
 =head2 [%lc_name%]_b64u
 
-Logically joins all arguments into a single string, and returns its [%orig_name%] message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Joins all arguments into a single string and returns its [%orig_name%] message authentication code encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
 [%-IF lc_name == 'hmac' %]
  my $[%lc_name%]_b64url = [%lc_name%]_b64u($hash_name, $key, 'data buffer');
  #or
  my $[%lc_name%]_b64url = [%lc_name%]_b64u($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $hash_name ... [string] any <NAME> for which there is a Crypt::Digest::<NAME> module
  # $key ......... [binary string] the key (not Base64url!)
 [%-ELSIF lc_name == 'blake2s' || lc_name == 'blake2b' %]
  my $[%lc_name%]_b64url = [%lc_name%]_b64u($size, $key, 'data buffer');
@@ -233,7 +233,7 @@ C<new>, for example:
  my $d = Crypt::Mac::[%orig_name%]->new($hash_name, $key);
 
  # $hash_name ... [string] one of 'SHA256', 'SHA384', 'SHA512', 'SHA1', 'SHA3_256', 'BLAKE2b_256',
- #                'RIPEMD160', etc. - any <NAME> for which there exists Crypt::Digest::<NAME>
+ #                'RIPEMD160', etc. - any <NAME> for which there is a Crypt::Digest::<NAME> module
  # $key ......... [binary string] the key (any length - internally padded/hashed as per RFC 2104)
 [%-ELSIF lc_name == 'blake2b' %]
  my $d = Crypt::Mac::[%orig_name%]->new($size, $key);
@@ -257,7 +257,7 @@ C<new>, for example:
  my $d = Crypt::Mac::[%orig_name%]->new($cipher_name, $key);
 
  # $cipher_name .. [string] one of 'AES', 'Camellia', 'Twofish', 'Serpent', etc.
- #                 any <NAME> for which there exists Crypt::Cipher::<NAME>
+ #                 any <NAME> for which there is a Crypt::Cipher::<NAME> module
  # $key .......... [binary string] key of valid length for the chosen cipher (e.g. 16/24/32 bytes for AES)
 [%-END%]
 
@@ -317,7 +317,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =head2 b64umac
 
-Returns the MAC encoded as a Base64 URL Safe string (no trailing C<=>) and
+Returns the MAC encoded as a Base64 URL-safe string (no trailing C<=>) and
 finalizes the object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or
 C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
@@ -327,7 +327,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 [% FOREACH v IN urls %]
 =item * L<[%v%]>
 [% END %]

@@ -44,12 +44,12 @@ via C<new>, for example:
 =head2 new
 
  my $stream = Crypt::Stream::Rabbit->new($key, $iv);
- # $key .. [binary string] keylen must be up to 16 bytes
- # $iv  .. [binary string] ivlen must be up to 8 bytes
+ # $key .. [binary string] key length must be at most 16 bytes
+ # $iv  .. [binary string] IV length must be at most 8 bytes
 
  my $stream = Crypt::Stream::Rabbit->new($key);
- #BEWARE: new($key) skips IV setup entirely, while new($key, "") performs
- #        IV setup with a zero-length IV - these produce different keystreams
+ # note: new($key) skips IV setup entirely, while new($key, "") performs
+ #       IV setup with a zero-length IV. These produce different keystreams.
 
 =head2 crypt
 

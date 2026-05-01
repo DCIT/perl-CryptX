@@ -106,7 +106,7 @@ must be a string/buffer scalar. String-overloaded objects are accepted.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::AuthEnc::EAX|Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM|Crypt::AuthEnc::GCM>
+=item * L<CryptX>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>
 
 =item * L<RFC 5297|https://www.rfc-editor.org/rfc/rfc5297>
 

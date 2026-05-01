@@ -22,7 +22,7 @@ Crypt::Mac::XCBC - Message authentication code XCBC (RFC 3566)
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Mac::XCBC qw( xcbc xcbc_hex );
+   use Crypt::Mac::XCBC qw( xcbc xcbc_hex xcbc_b64 xcbc_b64u );
 
    # calculate MAC from string/buffer
    my $xcbc_raw  = xcbc($cipher_name, $key, 'data buffer');
@@ -53,7 +53,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Mac::XCBC qw(xcbc xcbc_hex );
+  use Crypt::Mac::XCBC qw( xcbc xcbc_hex xcbc_b64 xcbc_b64u );
 
 Or all of them at once:
 
@@ -63,7 +63,7 @@ Or all of them at once:
 
 =head2 xcbc
 
-Logically joins all arguments into a single string, and returns its XCBC message authentication code encoded as a binary string.
+Joins all arguments into a single string and returns its XCBC message authentication code encoded as a binary string.
 
 Data arguments for the functional helpers are converted to byte strings using
 Perl's usual scalar stringification. Defined scalars, including numbers and
@@ -78,7 +78,7 @@ C<xcbc_b64u>.
 
 =head2 xcbc_hex
 
-Logically joins all arguments into a single string, and returns its XCBC message authentication code encoded as a hexadecimal string.
+Joins all arguments into a single string and returns its XCBC message authentication code encoded as a hexadecimal string.
 
  my $xcbc_hex = xcbc_hex($cipher_name, $key, 'data buffer');
  #or
@@ -86,7 +86,7 @@ Logically joins all arguments into a single string, and returns its XCBC message
 
 =head2 xcbc_b64
 
-Logically joins all arguments into a single string, and returns its XCBC message authentication code encoded as a Base64 string.
+Joins all arguments into a single string and returns its XCBC message authentication code encoded as a Base64 string.
 
  my $xcbc_b64 = xcbc_b64($cipher_name, $key, 'data buffer');
  #or
@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its XCBC message
 
 =head2 xcbc_b64u
 
-Logically joins all arguments into a single string, and returns its XCBC message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Joins all arguments into a single string and returns its XCBC message authentication code encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
  my $xcbc_b64url = xcbc_b64u($cipher_name, $key, 'data buffer');
  #or
@@ -112,7 +112,7 @@ C<new>, for example:
  my $d = Crypt::Mac::XCBC->new($cipher_name, $key);
 
  # $cipher_name .. [string] one of 'AES', 'Camellia', 'Twofish', 'Serpent', etc.
- #                 any <NAME> for which there exists Crypt::Cipher::<NAME>
+ #                 any <NAME> for which there is a Crypt::Cipher::<NAME> module
  # $key .......... [binary string] key of valid length for the chosen cipher (e.g. 16/24/32 bytes for AES)
 
 =head2 clone
@@ -171,7 +171,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =head2 b64umac
 
-Returns the MAC encoded as a Base64 URL Safe string (no trailing C<=>) and
+Returns the MAC encoded as a Base64 URL-safe string (no trailing C<=>) and
 finalizes the object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or
 C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
@@ -181,7 +181,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 
 =item * L<https://www.rfc-editor.org/rfc/rfc3566>
 

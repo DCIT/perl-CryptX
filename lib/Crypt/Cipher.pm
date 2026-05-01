@@ -64,9 +64,9 @@ Crypt::Cipher - Generic interface to cipher functions
 
 Provides an interface to various symmetric cipher algorithms.
 
-B<BEWARE:> This module implements just elementary "one-block-(en|de)cryption" operation - if you want to
-encrypt/decrypt generic data you have to use some of the cipher block modes - check for example
-L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC> (which will be slower).
+B<Note:> This module only implements single-block encryption and decryption.
+For general data, use a block mode such as
+L<Crypt::Mode::CBC>, L<Crypt::Mode::CTR>, or L<Crypt::CBC> (which is slower).
 
 =head1 METHODS
 
@@ -77,7 +77,7 @@ C<new>, for example:
 
 =head2 new
 
-Constructor, returns a reference to the cipher object.
+Constructor. Returns a reference to the cipher object.
 
  ## basic scenario
  my $c = Crypt::Cipher->new($name, $key);
@@ -85,7 +85,7 @@ Constructor, returns a reference to the cipher object.
  #                'KASUMI', 'Khazad', 'MULTI2', 'Noekeon', 'RC2', 'RC5', 'RC6',
  #                'SAFERP', 'SAFER_K128', 'SAFER_K64', 'SAFER_SK128', 'SAFER_SK64',
  #                'SEED', 'SM4', 'Skipjack', 'Twofish', 'XTEA', 'IDEA', 'Serpent'
- #                simply any <NAME> for which there exists Crypt::Cipher::<NAME>
+ #                or any <NAME> for which there is a Crypt::Cipher::<NAME> module
  # $key = binary key (keysize should comply with selected cipher requirements)
 
  ## some of the ciphers (e.g. MULTI2, RC5, SAFER) allow one to set number of rounds
@@ -110,11 +110,11 @@ B<blocksize> bytes long.
 
 =head2 keysize
 
-Just an alias for B<max_keysize> (needed for L<Crypt::CBC|Crypt::CBC> compatibility).
+Just an alias for B<max_keysize> (needed for L<Crypt::CBC> compatibility).
 
 =head2 max_keysize
 
-Returns the maximal allowed key size (in bytes) for given cipher.
+Returns the maximum allowed key size in bytes for the given cipher.
 
  $c->max_keysize;
  #or
@@ -124,7 +124,7 @@ Returns the maximal allowed key size (in bytes) for given cipher.
 
 =head2 min_keysize
 
-Returns the minimal allowed key size (in bytes) for given cipher.
+Returns the minimum allowed key size in bytes for the given cipher.
 
  $c->min_keysize;
  #or
@@ -134,7 +134,7 @@ Returns the minimal allowed key size (in bytes) for given cipher.
 
 =head2 blocksize
 
-Returns block size (in bytes) for given cipher.
+Returns the block size in bytes for the given cipher.
 
  $c->blocksize;
  #or
@@ -144,7 +144,8 @@ Returns block size (in bytes) for given cipher.
 
 =head2 default_rounds
 
-Returns default number of rounds for given cipher. NOTE: only some ciphers (e.g. MULTI2, RC5, SAFER) allow one to set number of rounds via new().
+Returns the default number of rounds for the given cipher. Only some ciphers,
+such as MULTI2, RC5, and SAFER, let you set the number of rounds via C<new()>.
 
  $c->default_rounds;
  #or
@@ -156,9 +157,9 @@ Returns default number of rounds for given cipher. NOTE: only some ciphers (e.g.
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 
-=item * Check subclasses like L<Crypt::Cipher::AES|Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish|Crypt::Cipher::Blowfish>, ...
+=item * See subclasses such as L<Crypt::Cipher::AES>, L<Crypt::Cipher::Blowfish>, ...
 
 =back
 

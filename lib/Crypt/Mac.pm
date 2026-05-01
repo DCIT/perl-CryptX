@@ -52,15 +52,18 @@ Crypt::Mac - [internal only]
 
 Do not use this module directly.
 
-Use a concrete MAC module such as L<Crypt::Mac::HMAC> or
-L<Crypt::Mac::Poly1305>.
+Use a concrete MAC module instead.
 
-=head1 DESCRIPTION
+=head1 SEE ALSO
 
-Internal base class for MAC implementations.
+=over
 
-Do not use this module directly. Use a concrete implementation such as
-L<Crypt::Mac::HMAC>, L<Crypt::Mac::Poly1305>, L<Crypt::Mac::BLAKE2b>, or
-another C<Crypt::Mac::*> module.
+=item * L<CryptX>
+
+=item * L<Crypt::Mac::HMAC>, L<Crypt::Mac::Poly1305>, L<Crypt::Mac::BLAKE2b>, L<Crypt::Mac::BLAKE2s>
+
+=item * L<Crypt::Mac::OMAC>, L<Crypt::Mac::PMAC>, L<Crypt::Mac::XCBC>, L<Crypt::Mac::F9>, L<Crypt::Mac::Pelican>
+
+=back
 
 =cut

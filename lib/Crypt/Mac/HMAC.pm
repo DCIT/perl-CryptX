@@ -22,7 +22,7 @@ Crypt::Mac::HMAC - Message authentication code HMAC
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Mac::HMAC qw( hmac hmac_hex );
+   use Crypt::Mac::HMAC qw( hmac hmac_hex hmac_b64 hmac_b64u );
 
    # calculate MAC from string/buffer
    my $hmac_raw  = hmac('SHA256', $key, 'data buffer');
@@ -53,7 +53,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Mac::HMAC qw(hmac hmac_hex );
+  use Crypt::Mac::HMAC qw( hmac hmac_hex hmac_b64 hmac_b64u );
 
 Or all of them at once:
 
@@ -63,7 +63,7 @@ Or all of them at once:
 
 =head2 hmac
 
-Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a binary string.
+Joins all arguments into a single string and returns its HMAC message authentication code encoded as a binary string.
 
 Data arguments for the functional helpers are converted to byte strings using
 Perl's usual scalar stringification. Defined scalars, including numbers and
@@ -76,40 +76,40 @@ C<hmac_b64u>.
  #or
  my $hmac_raw = hmac($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $hash_name ... [string] any <NAME> for which there is a Crypt::Digest::<NAME> module
  # $key ......... [binary string] the key (octets/bytes)
 
 =head2 hmac_hex
 
-Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a hexadecimal string.
+Joins all arguments into a single string and returns its HMAC message authentication code encoded as a hexadecimal string.
 
  my $hmac_hex = hmac_hex($hash_name, $key, 'data buffer');
  #or
  my $hmac_hex = hmac_hex($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $hash_name ... [string] any <NAME> for which there is a Crypt::Digest::<NAME> module
  # $key ......... [binary string] the key (not hex!)
 
 =head2 hmac_b64
 
-Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a Base64 string.
+Joins all arguments into a single string and returns its HMAC message authentication code encoded as a Base64 string.
 
  my $hmac_b64 = hmac_b64($hash_name, $key, 'data buffer');
  #or
  my $hmac_b64 = hmac_b64($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $hash_name ... [string] any <NAME> for which there is a Crypt::Digest::<NAME> module
  # $key ......... [binary string] the key (not Base64!)
 
 =head2 hmac_b64u
 
-Logically joins all arguments into a single string, and returns its HMAC message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Joins all arguments into a single string and returns its HMAC message authentication code encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
  my $hmac_b64url = hmac_b64u($hash_name, $key, 'data buffer');
  #or
  my $hmac_b64url = hmac_b64u($hash_name, $key, 'any data', 'more data', 'even more data');
 
- # $hash_name ... [string] any <NAME> for which there exists Crypt::Digest::<NAME>
+ # $hash_name ... [string] any <NAME> for which there is a Crypt::Digest::<NAME> module
  # $key ......... [binary string] the key (not Base64url!)
 
 =head1 METHODS
@@ -124,7 +124,7 @@ C<new>, for example:
  my $d = Crypt::Mac::HMAC->new($hash_name, $key);
 
  # $hash_name ... [string] one of 'SHA256', 'SHA384', 'SHA512', 'SHA1', 'SHA3_256', 'BLAKE2b_256',
- #                'RIPEMD160', etc. - any <NAME> for which there exists Crypt::Digest::<NAME>
+ #                'RIPEMD160', etc. - any <NAME> for which there is a Crypt::Digest::<NAME> module
  # $key ......... [binary string] the key (any length - internally padded/hashed as per RFC 2104)
 
 =head2 clone
@@ -183,7 +183,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =head2 b64umac
 
-Returns the MAC encoded as a Base64 URL Safe string (no trailing C<=>) and
+Returns the MAC encoded as a Base64 URL-safe string (no trailing C<=>) and
 finalizes the object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or
 C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
@@ -193,7 +193,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 
 =item * L<https://en.wikipedia.org/wiki/Hmac>
 

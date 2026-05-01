@@ -34,16 +34,18 @@ Crypt::PK - [internal only]
 
 Do not use this module directly.
 
-Use a concrete public-key module such as L<Crypt::PK::RSA>,
-L<Crypt::PK::ECC>, or L<Crypt::PK::Ed25519>.
+Use a concrete public-key module instead.
 
-=head1 DESCRIPTION
+=head1 SEE ALSO
 
-Internal base/helper namespace for public-key modules.
+=over
 
-Do not use this module directly. Use a concrete implementation such as
-L<Crypt::PK::RSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DSA>, L<Crypt::PK::DH>,
-L<Crypt::PK::Ed25519>, L<Crypt::PK::X25519>, L<Crypt::PK::Ed448>, or
-L<Crypt::PK::X448>.
+=item * L<CryptX>
+
+=item * L<Crypt::PK::RSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DSA>, L<Crypt::PK::DH>
+
+=item * L<Crypt::PK::Ed25519>, L<Crypt::PK::Ed448>, L<Crypt::PK::X25519>, L<Crypt::PK::X448>
+
+=back
 
 =cut

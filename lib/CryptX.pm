@@ -119,7 +119,7 @@ widely deployed (TLS 1.3, WireGuard, SSH). Use this as the default AEAD choice.
 variant. Prefer over ChaCha20-Poly1305 when nonces are generated randomly.
 
 =item * B<AES-GCM> (L<Crypt::AuthEnc::GCM>) - The standard AEAD mode for AES. Hardware-accelerated
-on modern CPUs. Requires unique nonces; nonce reuse is catastrophic.
+on modern CPUs. Requires unique nonces; nonce reuse breaks the security entirely.
 
 =item * B<AES-SIV> (L<Crypt::AuthEnc::SIV>) - Deterministic AEAD, nonce-misuse resistant.
 Slightly slower but safer when nonce uniqueness cannot be guaranteed.
@@ -261,7 +261,7 @@ default choice for key exchange.
 =item * B<ECDSA> (L<Crypt::PK::ECC>) - Widely used (TLS, Bitcoin). Prefer Ed25519 for new
 designs unless ECDSA is required for interoperability.
 
-=item * B<RSA> (L<Crypt::PK::RSA>) - Legacy but ubiquitous. Use 2048-bit keys minimum, 4096-bit
+=item * B<RSA> (L<Crypt::PK::RSA>) - Legacy but very widely used. Use 2048-bit keys minimum, 4096-bit
 preferred. Prefer OAEP for encryption and PSS for signatures.
 
 =item * B<DSA> (L<Crypt::PK::DSA>) - Legacy. Prefer Ed25519 or ECDSA.

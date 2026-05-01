@@ -22,7 +22,7 @@ Crypt::Mac::Pelican - Message authentication code Pelican (AES based MAC)
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Mac::Pelican qw( pelican pelican_hex );
+   use Crypt::Mac::Pelican qw( pelican pelican_hex pelican_b64 pelican_b64u );
 
    # calculate MAC from string/buffer
    my $pelican_raw  = pelican($key, 'data buffer');
@@ -53,7 +53,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Mac::Pelican qw(pelican pelican_hex );
+  use Crypt::Mac::Pelican qw( pelican pelican_hex pelican_b64 pelican_b64u );
 
 Or all of them at once:
 
@@ -63,7 +63,7 @@ Or all of them at once:
 
 =head2 pelican
 
-Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a binary string.
+Joins all arguments into a single string and returns its Pelican message authentication code encoded as a binary string.
 
 Data arguments for the functional helpers are converted to byte strings using
 Perl's usual scalar stringification. Defined scalars, including numbers and
@@ -78,7 +78,7 @@ C<pelican_b64u>.
 
 =head2 pelican_hex
 
-Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a hexadecimal string.
+Joins all arguments into a single string and returns its Pelican message authentication code encoded as a hexadecimal string.
 
  my $pelican_hex = pelican_hex($key, 'data buffer');
  #or
@@ -86,7 +86,7 @@ Logically joins all arguments into a single string, and returns its Pelican mess
 
 =head2 pelican_b64
 
-Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a Base64 string.
+Joins all arguments into a single string and returns its Pelican message authentication code encoded as a Base64 string.
 
  my $pelican_b64 = pelican_b64($key, 'data buffer');
  #or
@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its Pelican mess
 
 =head2 pelican_b64u
 
-Logically joins all arguments into a single string, and returns its Pelican message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Joins all arguments into a single string and returns its Pelican message authentication code encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
  my $pelican_b64url = pelican_b64u($key, 'data buffer');
  #or
@@ -169,7 +169,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =head2 b64umac
 
-Returns the MAC encoded as a Base64 URL Safe string (no trailing C<=>) and
+Returns the MAC encoded as a Base64 URL-safe string (no trailing C<=>) and
 finalizes the object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or
 C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
@@ -179,7 +179,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 
 =item * L<https://eprint.iacr.org/2005/088.pdf>
 

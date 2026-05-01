@@ -22,7 +22,7 @@ Crypt::Mac::Poly1305 - Message authentication code Poly1305 (RFC 7539)
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Mac::Poly1305 qw( poly1305 poly1305_hex );
+   use Crypt::Mac::Poly1305 qw( poly1305 poly1305_hex poly1305_b64 poly1305_b64u );
 
    # calculate MAC from string/buffer
    my $poly1305_raw  = poly1305($key, 'data buffer');
@@ -53,7 +53,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Mac::Poly1305 qw(poly1305 poly1305_hex );
+  use Crypt::Mac::Poly1305 qw( poly1305 poly1305_hex poly1305_b64 poly1305_b64u );
 
 Or all of them at once:
 
@@ -63,7 +63,7 @@ Or all of them at once:
 
 =head2 poly1305
 
-Logically joins all arguments into a single string, and returns its Poly1305 message authentication code encoded as a binary string.
+Joins all arguments into a single string and returns its Poly1305 message authentication code encoded as a binary string.
 
 Data arguments for the functional helpers are converted to byte strings using
 Perl's usual scalar stringification. Defined scalars, including numbers and
@@ -78,7 +78,7 @@ C<poly1305_b64u>.
 
 =head2 poly1305_hex
 
-Logically joins all arguments into a single string, and returns its Poly1305 message authentication code encoded as a hexadecimal string.
+Joins all arguments into a single string and returns its Poly1305 message authentication code encoded as a hexadecimal string.
 
  my $poly1305_hex = poly1305_hex($key, 'data buffer');
  #or
@@ -86,7 +86,7 @@ Logically joins all arguments into a single string, and returns its Poly1305 mes
 
 =head2 poly1305_b64
 
-Logically joins all arguments into a single string, and returns its Poly1305 message authentication code encoded as a Base64 string.
+Joins all arguments into a single string and returns its Poly1305 message authentication code encoded as a Base64 string.
 
  my $poly1305_b64 = poly1305_b64($key, 'data buffer');
  #or
@@ -94,7 +94,7 @@ Logically joins all arguments into a single string, and returns its Poly1305 mes
 
 =head2 poly1305_b64u
 
-Logically joins all arguments into a single string, and returns its Poly1305 message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Joins all arguments into a single string and returns its Poly1305 message authentication code encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
  my $poly1305_b64url = poly1305_b64u($key, 'data buffer');
  #or
@@ -169,7 +169,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =head2 b64umac
 
-Returns the MAC encoded as a Base64 URL Safe string (no trailing C<=>) and
+Returns the MAC encoded as a Base64 URL-safe string (no trailing C<=>) and
 finalizes the object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or
 C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
@@ -179,7 +179,7 @@ C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 
 =item * L<https://www.rfc-editor.org/rfc/rfc7539>
 

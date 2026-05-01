@@ -171,7 +171,7 @@ See L<RFC 7905|https://www.rfc-editor.org/rfc/rfc7905>.
 
  my $ae = Crypt::AuthEnc::ChaCha20Poly1305->new($key)->set_iv_rfc7905($nonce, $seqnum);
  # $nonce ... [binary string] nonce (96 bits / 12 bytes)
- # $seqnum .. [integer] 64bit integer (sequence number)
+ # $seqnum .. [integer] 64-bit integer (sequence number)
 
 =head2 clone
 
@@ -183,7 +183,7 @@ Returns a copy of the AEAD object in its current state.
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::AuthEnc::XChaCha20Poly1305|Crypt::AuthEnc::XChaCha20Poly1305>, L<Crypt::AuthEnc::GCM|Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::CCM|Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX|Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::OCB|Crypt::AuthEnc::OCB>
+=item * L<CryptX>, L<Crypt::AuthEnc::XChaCha20Poly1305>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::OCB>
 
 =item * L<https://www.rfc-editor.org/rfc/rfc7539>
 
