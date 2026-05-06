@@ -36,6 +36,7 @@ Crypt::Mac::XCBC        T_PTROBJ
 Crypt::Mac::Poly1305    T_PTROBJ
 Crypt::Mac::BLAKE2s     T_PTROBJ
 Crypt::Mac::BLAKE2b     T_PTROBJ
+Crypt::Mac::KMAC        T_PTROBJ
 
 Crypt::Mode::CBC        T_PTROBJ
 Crypt::Mode::CFB        T_PTROBJ
