@@ -462,6 +462,11 @@
 /* Ed448 & X448 */
 #define LTC_CURVE448
 
+/* Post-Quantum Cryptography */
+#define LTC_MLKEM
+#define LTC_MLDSA
+#define LTC_SLHDSA
+
 /* ECC */
 #define LTC_MECC
 
@@ -753,6 +758,26 @@
 
 #if defined(LTC_KANGAROO_TWELVE) && !defined(LTC_TURBO_SHAKE)
    #error LTC_KANGAROO_TWELVE requires LTC_TURBO_SHAKE
+#endif
+
+#if defined(LTC_MLKEM) && !defined(LTC_SHA3)
+   #error LTC_MLKEM requires LTC_SHA3
+#endif
+
+#if defined(LTC_MLDSA) && !defined(LTC_SHA3)
+   #error LTC_MLDSA requires LTC_SHA3
+#endif
+
+#if defined(LTC_SLHDSA) && !defined(LTC_SHA3)
+   #error LTC_SLHDSA requires LTC_SHA3
+#endif
+
+#if defined(LTC_SLHDSA) && !defined(LTC_HASH_HELPERS)
+   #error LTC_SLHDSA requires LTC_HASH_HELPERS
+#endif
+
+#if defined(LTC_SLHDSA) && !defined(LTC_HMAC)
+   #error LTC_SLHDSA requires LTC_HMAC
 #endif
 
 #if defined(LTC_NO_MATH) && (defined(LTM_DESC) || defined(TFM_DESC) || defined(GMP_DESC))

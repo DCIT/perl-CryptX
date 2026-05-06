@@ -50,12 +50,12 @@ ltc/mac/poly1305/poly1305_memory.obj ltc/mac/poly1305/poly1305_memory_multi.obj 
 ltc/mac/xcbc/xcbc_file.obj ltc/mac/xcbc/xcbc_init.obj ltc/mac/xcbc/xcbc_memory.obj \
 ltc/mac/xcbc/xcbc_memory_multi.obj ltc/mac/xcbc/xcbc_process.obj ltc/math/fp/ltc_ecc_fp_mulmod.obj \
 ltc/math/ltm_desc.obj ltc/math/multi.obj ltc/math/radix_to_bin.obj ltc/math/rand_bn.obj \
-ltc/math/rand_prime.obj ltc/math/tfm_desc.obj ltc/misc/adler32.obj ltc/misc/argon2/argon2.obj \
-ltc/misc/base16/base16_decode.obj ltc/misc/base16/base16_encode.obj ltc/misc/base32/base32_decode.obj \
-ltc/misc/base32/base32_encode.obj ltc/misc/base64/base64_decode.obj ltc/misc/base64/base64_encode.obj \
-ltc/misc/bcrypt/bcrypt.obj ltc/misc/burn_stack.obj ltc/misc/compare_testvector.obj \
-ltc/misc/copy_or_zeromem.obj ltc/misc/crc32.obj ltc/misc/crypt/crypt.obj ltc/misc/crypt/crypt_argchk.obj \
-ltc/misc/crypt/crypt_cipher_descriptor.obj ltc/misc/crypt/crypt_cipher_is_valid.obj \
+ltc/math/rand_prime.obj ltc/math/tfm_desc.obj ltc/misc/adler32.obj ltc/misc/algname_match.obj \
+ltc/misc/argon2/argon2.obj ltc/misc/base16/base16_decode.obj ltc/misc/base16/base16_encode.obj \
+ltc/misc/base32/base32_decode.obj ltc/misc/base32/base32_encode.obj ltc/misc/base64/base64_decode.obj \
+ltc/misc/base64/base64_encode.obj ltc/misc/bcrypt/bcrypt.obj ltc/misc/burn_stack.obj \
+ltc/misc/compare_testvector.obj ltc/misc/copy_or_zeromem.obj ltc/misc/crc32.obj ltc/misc/crypt/crypt.obj \
+ltc/misc/crypt/crypt_argchk.obj ltc/misc/crypt/crypt_cipher_descriptor.obj ltc/misc/crypt/crypt_cipher_is_valid.obj \
 ltc/misc/crypt/crypt_constants.obj ltc/misc/crypt/crypt_find_cipher.obj ltc/misc/crypt/crypt_find_cipher_any.obj \
 ltc/misc/crypt/crypt_find_cipher_id.obj ltc/misc/crypt/crypt_find_hash.obj ltc/misc/crypt/crypt_find_hash_any.obj \
 ltc/misc/crypt/crypt_find_hash_id.obj ltc/misc/crypt/crypt_find_hash_oid.obj ltc/misc/crypt/crypt_find_prng.obj \
@@ -160,6 +160,11 @@ ltc/pk/x25519/x25519_import_pkcs8.obj ltc/pk/x25519/x25519_import_raw.obj ltc/pk
 ltc/pk/x25519/x25519_make_key.obj ltc/pk/x25519/x25519_shared_secret.obj ltc/pk/x448/x448_export.obj \
 ltc/pk/x448/x448_import.obj ltc/pk/x448/x448_import_pkcs8.obj ltc/pk/x448/x448_import_raw.obj \
 ltc/pk/x448/x448_import_x509.obj ltc/pk/x448/x448_make_key.obj ltc/pk/x448/x448_shared_secret.obj \
+ltc/pqc/mldsa/mldsa.obj ltc/pqc/mldsa/mldsa_export.obj ltc/pqc/mldsa/mldsa_import.obj \
+ltc/pqc/mldsa/mldsa_import_pkcs8.obj ltc/pqc/mldsa/mldsa_import_x509.obj ltc/pqc/mlkem/mlkem.obj \
+ltc/pqc/mlkem/mlkem_export.obj ltc/pqc/mlkem/mlkem_import.obj ltc/pqc/mlkem/mlkem_import_pkcs8.obj \
+ltc/pqc/mlkem/mlkem_import_x509.obj ltc/pqc/slhdsa/slhdsa.obj ltc/pqc/slhdsa/slhdsa_export.obj \
+ltc/pqc/slhdsa/slhdsa_import.obj ltc/pqc/slhdsa/slhdsa_import_pkcs8.obj ltc/pqc/slhdsa/slhdsa_import_x509.obj \
 ltc/prngs/chacha20.obj ltc/prngs/fortuna.obj ltc/prngs/rc4.obj ltc/prngs/rng_get_bytes.obj \
 ltc/prngs/rng_make_prng.obj ltc/prngs/sober128.obj ltc/prngs/sprng.obj ltc/prngs/yarrow.obj \
 ltc/stream/chacha/chacha_crypt.obj ltc/stream/chacha/chacha_done.obj ltc/stream/chacha/chacha_ivctr32.obj \

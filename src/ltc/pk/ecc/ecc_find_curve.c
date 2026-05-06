@@ -189,28 +189,6 @@ static const struct {
    }
 };
 
-/* case-insensitive match + ignore '-', '_', ' ' */
-static int s_name_match(const char *left, const char *right)
-{
-   char lc_r, lc_l;
-
-   while ((*left != '\0') && (*right != '\0')) {
-      while ((*left  == ' ') || (*left  == '-') || (*left  == '_')) left++;
-      while ((*right == ' ') || (*right == '-') || (*right == '_')) right++;
-      if (*left == '\0' || *right == '\0') break;
-      lc_r = *right;
-      lc_l = *left;
-      if ((lc_r >= 'A') && (lc_r <= 'Z')) lc_r += 32;
-      if ((lc_l >= 'A') && (lc_l <= 'Z')) lc_l += 32;
-      if (lc_l != lc_r) return 0;
-      left++;
-      right++;
-   }
-
-   if ((*left == '\0') && (*right == '\0')) return 1;
-   return 0;
-}
-
 int ecc_get_curve_names(const char *oid, const char * const **names)
 {
    unsigned long i;
@@ -241,7 +219,7 @@ int ecc_find_curve(const char *name_or_oid, const ltc_ecc_curve **cu)
          OID = s_curve_names[i].OID;
       }
       for (j = 0; s_curve_names[i].names[j] != NULL && !OID; j++) {
-         if (s_name_match(s_curve_names[i].names[j], name_or_oid)) {
+         if (ltc_algname_match(s_curve_names[i].names[j], name_or_oid)) {
             OID = s_curve_names[i].OID;
          }
       }
