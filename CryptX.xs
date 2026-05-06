@@ -809,6 +809,37 @@ typedef struct x448_struct {            /* used by Crypt::PK::X448 */
   int initialized;
 } *Crypt__PK__X448;
 
+#ifdef LTC_MLKEM
+typedef struct cryptx_pq_mlkem_struct {  /* used by Crypt::PQ::MLKEM */
+  prng_state pstate;
+  int pindex;
+  IV last_pid;
+  mlkem_key key;
+  int initialized;
+} *Crypt__PQ__MLKEM;
+
+#endif /* LTC_MLKEM */
+
+#ifdef LTC_MLDSA
+typedef struct cryptx_pq_mldsa_struct {  /* used by Crypt::PQ::MLDSA */
+  prng_state pstate;
+  int pindex;
+  IV last_pid;
+  mldsa_key key;
+  int initialized;
+} *Crypt__PQ__MLDSA;
+#endif /* LTC_MLDSA */
+
+#ifdef LTC_SLHDSA
+typedef struct cryptx_pq_slhdsa_struct {  /* used by Crypt::PQ::SLHDSA */
+  prng_state pstate;
+  int pindex;
+  IV last_pid;
+  slhdsa_key key;
+  int initialized;
+} *Crypt__PQ__SLHDSA;
+#endif /* LTC_SLHDSA */
+
 STATIC int cryptx_internal_password_cb_getpw(void **p, unsigned long *l, void *u) {
   dTHX; /* fetch context */
   SV *passwd = u;
@@ -1525,6 +1556,10 @@ INCLUDE: inc/CryptX_PK_Ed25519.xs.inc
 INCLUDE: inc/CryptX_PK_X25519.xs.inc
 INCLUDE: inc/CryptX_PK_Ed448.xs.inc
 INCLUDE: inc/CryptX_PK_X448.xs.inc
+
+INCLUDE: inc/CryptX_PQ_MLKEM.xs.inc
+INCLUDE: inc/CryptX_PQ_MLDSA.xs.inc
+INCLUDE: inc/CryptX_PQ_SLHDSA.xs.inc
 
 INCLUDE: inc/CryptX_KeyDerivation.xs.inc
 

@@ -36,6 +36,9 @@ for my $module (
     Crypt::PK::RSA
     Crypt::PK::X25519
     Crypt::PK::X448
+    Crypt::PQ::MLDSA
+    Crypt::PQ::MLKEM
+    Crypt::PQ::SLHDSA
   )
 ) {
   plan skip_all => "$module module not available" unless eval "require $module; 1";
@@ -59,6 +62,9 @@ my %ROCA_ALLOWED_RESIDUES;
 my $SECP256K1_ORDER      = 'fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141';
 my $SECP256K1_HALF_ORDER = '7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0';
 my @ROCA_PRIMES          = (11, 13, 37, 97, 229);
+
+my %MLDSA_PARAM_OK = map { $_ => 1 } qw(ML-DSA-44 ML-DSA-65 ML-DSA-87);
+my %MLKEM_PARAM_OK = map { $_ => 1 } qw(ML-KEM-512 ML-KEM-768 ML-KEM-1024);
 
 my %HANDLER = (
   aead_test_schema_v1_json                         => \&handle_aead,
@@ -87,6 +93,13 @@ my %HANDLER = (
   rsassa_pkcs1_verify_schema_v1_json               => \&handle_rsa_pkcs1_verify,
   rsassa_pss_verify_schema_v1_json                 => \&handle_rsa_pss_verify,
   rsassa_pss_with_parameters_verify_schema_json    => \&handle_rsa_pss_verify,
+  mldsa_verify_schema_json                         => \&handle_mldsa_verify,
+  mldsa_sign_noseed_schema_json                    => \&handle_mldsa_sign,
+  mldsa_sign_seed_schema_json                      => \&handle_mldsa_sign,
+  mlkem_test_schema_json                           => \&handle_mlkem_kat,
+  mlkem_keygen_seed_test_schema_json               => \&handle_mlkem_keygen,
+  mlkem_semi_expanded_decaps_test_schema_json      => \&handle_mlkem_decaps,
+  mlkem_encaps_test_schema_json                    => \&handle_mlkem_encaps,
   xdh_asn_comp_schema_v1_json                      => \&handle_xdh,
   xdh_comp_schema_v1_json                          => \&handle_xdh,
   xdh_jwk_comp_schema_v1_json                      => \&handle_xdh,
@@ -1513,6 +1526,221 @@ sub handle_xdh {
         $shared = $ok ? $got : undef;
       }
       check_exact_hex($file, $doc, $group, $test, $shared, $test->{shared}, 'XDH shared');
+    }
+  }
+}
+
+# --- ML-DSA (FIPS 204) -------------------------------------------------------
+
+sub mldsa_param {
+  my ($g, $doc) = @_;
+  return $g->{parameterSet} if $MLDSA_PARAM_OK{ $g->{parameterSet} || '' };
+  my $alg = $doc->{algorithm} || '';
+  return $alg if $MLDSA_PARAM_OK{$alg};
+  return undef;
+}
+
+sub handle_mldsa_verify {
+  my ($file, $doc) = @_;
+  for my $group (@{ $doc->{testGroups} || [] }) {
+    my $alg = mldsa_param($group, $doc);
+    if (!$alg) {
+      unsupported_group($file, $doc, $group, 'unsupported ML-DSA parameter set ' . ($group->{parameterSet} || $doc->{algorithm} || '(none)'));
+      next;
+    }
+    my $pub_hex = $group->{publicKey};
+    if (!defined $pub_hex || !length $pub_hex) {
+      unsupported_group($file, $doc, $group, 'ML-DSA group missing publicKey');
+      next;
+    }
+    my $pk_bin = hex_to_bin($pub_hex);
+    my $verifier = eval { Crypt::PQ::MLDSA->new->import_key_raw($pk_bin, 'public', $alg) };
+    # An invalid-length public key per the spec: groups will exercise that as
+    # one-test groups carrying IncorrectPublicKeyLength flag. We let the
+    # invalid result be tolerated either way.
+    for my $test (@{ $group->{tests} || [] }) {
+      mark_tc();
+      my $sig = hex_to_bin($test->{sig});
+      my $msg = hex_to_bin($test->{msg});
+      my $ctx = defined $test->{ctx} ? hex_to_bin($test->{ctx}) : undef;
+      my $valid = 0;
+      if ($verifier) {
+        my ($ok, $v) = eval_scalar(sub {
+          defined $ctx ? $verifier->verify_message($sig, $msg, $ctx)
+                       : $verifier->verify_message($sig, $msg);
+        });
+        $valid = ($ok && $v) ? 1 : 0;
+      }
+      check_verify_bool($file, $doc, $group, $test, $valid, 'ML-DSA verify');
+    }
+  }
+}
+
+sub handle_mldsa_sign {
+  my ($file, $doc) = @_;
+  for my $group (@{ $doc->{testGroups} || [] }) {
+    my $alg = mldsa_param($group, $doc);
+    if (!$alg) {
+      unsupported_group($file, $doc, $group, 'unsupported ML-DSA parameter set ' . ($group->{parameterSet} || $doc->{algorithm} || '(none)'));
+      next;
+    }
+    my ($signer, $verifier);
+    if (defined $group->{privateKey} && length $group->{privateKey}) {
+      my $sk_bin = hex_to_bin($group->{privateKey});
+      $signer = eval { Crypt::PQ::MLDSA->new->import_key_raw($sk_bin, 'private', $alg) };
+    }
+    elsif (defined $group->{privateSeed} && length $group->{privateSeed}) {
+      my $seed = hex_to_bin($group->{privateSeed});
+      $signer = eval { Crypt::PQ::MLDSA->new->make_key_from_seed($seed, $alg) };
+    }
+    if (defined $group->{publicKey} && length $group->{publicKey}) {
+      my $pk_bin = hex_to_bin($group->{publicKey});
+      $verifier = eval { Crypt::PQ::MLDSA->new->import_key_raw($pk_bin, 'public', $alg) };
+    }
+    my $rnd_zero = "\0" x 32;
+    for my $test (@{ $group->{tests} || [] }) {
+      mark_tc();
+      my $msg = hex_to_bin($test->{msg});
+      my $ctx = defined $test->{ctx} ? hex_to_bin($test->{ctx}) : undef;
+      my $is_internal = grep { $_ eq 'Internal' } @{ $test->{flags} || [] };
+      # The "Internal" flag marks tests whose mu was generated externally
+      # rather than derived from msg+ctx, so the msg-path can never
+      # reproduce the reference sig and only the mu-path is meaningful.
+      if (!$is_internal) {
+        # Byte-exact compare via the msg path: deterministic sign with
+        # rnd = 0^32 reproduces the test's reference signature.
+        my $sig_msg;
+        if ($signer) {
+          my ($ok, $s) = eval_scalar(sub { $signer->sign_message_ex($msg, $ctx, $rnd_zero) });
+          $sig_msg = $ok ? $s : undef;
+        }
+        check_exact_hex($file, $doc, $group, $test, $sig_msg, $test->{sig}, 'ML-DSA sign_ex');
+      }
+      # Cross-check via the external-mu path when the test supplies mu.
+      if (defined $test->{mu}) {
+        my $mu = hex_to_bin($test->{mu});
+        my $sig_mu;
+        if ($signer) {
+          my ($ok, $s) = eval_scalar(sub { $signer->sign_message_ex_mu($mu, $rnd_zero) });
+          $sig_mu = $ok ? $s : undef;
+        }
+        check_exact_hex($file, $doc, $group, $test, $sig_mu, $test->{sig}, 'ML-DSA sign_ex_mu');
+      }
+    }
+  }
+}
+
+# --- ML-KEM (FIPS 203) -------------------------------------------------------
+
+sub mlkem_param {
+  my ($g, $doc) = @_;
+  return $g->{parameterSet} if $MLKEM_PARAM_OK{ $g->{parameterSet} || '' };
+  my $alg = $doc->{algorithm} || '';
+  return $alg if $MLKEM_PARAM_OK{$alg};
+  return undef;
+}
+
+sub handle_mlkem_kat {
+  my ($file, $doc) = @_;
+  for my $group (@{ $doc->{testGroups} || [] }) {
+    my $alg = mlkem_param($group, $doc);
+    if (!$alg) {
+      unsupported_group($file, $doc, $group, 'unsupported ML-KEM parameter set ' . ($group->{parameterSet} || $doc->{algorithm} || '(none)'));
+      next;
+    }
+    for my $test (@{ $group->{tests} || [] }) {
+      mark_tc();
+      my $seed = hex_to_bin($test->{seed});
+      my $kem = eval { Crypt::PQ::MLKEM->new->make_key_from_seed($seed, $alg) };
+      # The seed -> ek derivation is deterministic and the expected ek is
+      # always the canonical output regardless of the test's overall
+      # result (which only describes the decap step).
+      my $ek_hex = $kem ? bin_to_hex(eval { $kem->export_key_raw('public') }) : undef;
+      is($ek_hex, lc_hex($test->{ek}), name_for($file, $doc, $group, $test, 'ML-KEM keygen ek'));
+      my $K;
+      if ($kem) {
+        my ($ok, $val) = eval_scalar(sub { $kem->decapsulate(hex_to_bin($test->{c})) });
+        $K = $ok ? $val : undef;
+      }
+      # Note: ML-KEM does implicit rejection of well-formed-but-wrong
+      # ciphertexts by returning a pseudorandom value. Malformed
+      # ciphertexts (wrong length etc.) cause decapsulate to throw.
+      check_exact_hex($file, $doc, $group, $test, $K, $test->{K}, 'ML-KEM decaps K');
+    }
+  }
+}
+
+sub handle_mlkem_keygen {
+  my ($file, $doc) = @_;
+  for my $group (@{ $doc->{testGroups} || [] }) {
+    my $alg = mlkem_param($group, $doc);
+    if (!$alg) {
+      unsupported_group($file, $doc, $group, 'unsupported ML-KEM parameter set ' . ($group->{parameterSet} || $doc->{algorithm} || '(none)'));
+      next;
+    }
+    for my $test (@{ $group->{tests} || [] }) {
+      mark_tc();
+      my $seed = hex_to_bin($test->{seed});
+      my $kem = eval { Crypt::PQ::MLKEM->new->make_key_from_seed($seed, $alg) };
+      my $ek = $kem ? eval { $kem->export_key_raw('public') }  : undef;
+      my $dk = $kem ? eval { $kem->export_key_raw('private') } : undef;
+      check_exact_hex($file, $doc, $group, $test, $ek, $test->{ek}, 'ML-KEM keygen ek');
+      check_exact_hex($file, $doc, $group, $test, $dk, $test->{dk}, 'ML-KEM keygen dk');
+    }
+  }
+}
+
+sub handle_mlkem_decaps {
+  my ($file, $doc) = @_;
+  for my $group (@{ $doc->{testGroups} || [] }) {
+    my $alg = mlkem_param($group, $doc);
+    if (!$alg) {
+      unsupported_group($file, $doc, $group, 'unsupported ML-KEM parameter set ' . ($group->{parameterSet} || $doc->{algorithm} || '(none)'));
+      next;
+    }
+    for my $test (@{ $group->{tests} || [] }) {
+      mark_tc();
+      my $dk_bin = hex_to_bin($test->{dk});
+      my $c_bin  = hex_to_bin($test->{c});
+      my $kem = eval { Crypt::PQ::MLKEM->new->import_key_raw($dk_bin, 'private', $alg) };
+      my $valid = 0;
+      if ($kem) {
+        my ($ok, $K) = eval_scalar(sub { $kem->decapsulate($c_bin) });
+        $valid = ($ok && defined $K && length($K) == 32) ? 1 : 0;
+      }
+      # ML-KEM "decaps validation" tests check that a malformed dk (e.g.
+      # mismatched H(ek) digest, wrong length) is rejected. A well-formed
+      # dk + any ciphertext succeeds (implicit rejection on bad ciphertext).
+      check_verify_bool($file, $doc, $group, $test, $valid, 'ML-KEM decaps validation');
+    }
+  }
+}
+
+sub handle_mlkem_encaps {
+  my ($file, $doc) = @_;
+  for my $group (@{ $doc->{testGroups} || [] }) {
+    my $alg = mlkem_param($group, $doc);
+    if (!$alg) {
+      unsupported_group($file, $doc, $group, 'unsupported ML-KEM parameter set ' . ($group->{parameterSet} || $doc->{algorithm} || '(none)'));
+      next;
+    }
+    for my $test (@{ $group->{tests} || [] }) {
+      mark_tc();
+      my $ek_bin = hex_to_bin($test->{ek});
+      my $m_bin  = hex_to_bin($test->{m});
+      my $kem = eval { Crypt::PQ::MLKEM->new->import_key_raw($ek_bin, 'public', $alg) };
+      my ($ct, $K);
+      if ($kem) {
+        my ($ok, $r) = eval_list(sub { $kem->encapsulate_ex($m_bin) });
+        if ($ok && @$r == 2) {
+          ($ct, $K) = @$r;
+        }
+      }
+      # Use exact byte match for both ct and K. For "invalid" vectors the
+      # malformed ek must be rejected by import_key_raw (or, e.g.
+      # ModulusOverflow vectors, must produce ciphertext != expected).
+      check_exact_hex($file, $doc, $group, $test, $ct, $test->{c}, 'ML-KEM encaps_ex c');
+      check_exact_hex($file, $doc, $group, $test, $K,  $test->{K}, 'ML-KEM encaps_ex K');
     }
   }
 }

@@ -9,6 +9,9 @@ NEXT    2026-MM-DD
         - new: Crypt::Digest::KangarooTwelve
         - new: Crypt::PK::Ed448
         - new: Crypt::PK::X448
+        - new: Crypt::PQ::MLKEM (FIPS 203, ML-KEM)
+        - new: Crypt::PQ::MLDSA (FIPS 204, ML-DSA)
+        - new: Crypt::PQ::SLHDSA (FIPS 205, SLH-DSA)
         - new: Crypt::Stream::XChaCha
         - new: Crypt::Stream::XSalsa20
         - Crypt::PK::Ed25519 - new functions: sign_message_ctx, verify_message_ctx, sign_message_ph, verify_message_ph
