@@ -39,6 +39,9 @@ enum ltc_pka_id {
    LTC_PKA_EC,
    LTC_PKA_X25519,
    LTC_PKA_ED25519,
+   LTC_PKA_MLDSA,
+   LTC_PKA_SLHDSA,
+   LTC_PKA_MLKEM,
    LTC_PKA_DH,
    LTC_PKA_RSA_PSS,
    LTC_PKA_X448,
@@ -794,6 +797,8 @@ int dsa_shared_secret(void          *private_key, void *base,
  * LibTomCrypt tagged-union for holding a Public Key
  */
 
+#include "tomcrypt_pqc.h"
+
 typedef struct {
    union {
 #ifdef LTC_CURVE25519
@@ -815,6 +820,15 @@ typedef struct {
 #endif
 #ifdef LTC_MRSA
       rsa_key rsa;
+#endif
+#ifdef LTC_MLKEM
+      mlkem_key mlkem;
+#endif
+#ifdef LTC_MLDSA
+      mldsa_key mldsa;
+#endif
+#ifdef LTC_SLHDSA
+      slhdsa_key slhdsa;
 #endif
       char dummy;
    } u;

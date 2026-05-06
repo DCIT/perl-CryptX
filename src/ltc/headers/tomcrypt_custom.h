@@ -457,6 +457,11 @@
 /* Ed448 & X448 */
 #define LTC_CURVE448
 
+/* Post-Quantum Cryptography */
+#define LTC_MLKEM
+#define LTC_MLDSA
+#define LTC_SLHDSA
+
 /* ECC */
 #define LTC_MECC
 

@@ -148,7 +148,11 @@ ltc/pk/x25519/x25519_import.o ltc/pk/x25519/x25519_import_pkcs8.o ltc/pk/x25519/
 ltc/pk/x25519/x25519_import_x509.o ltc/pk/x25519/x25519_make_key.o ltc/pk/x25519/x25519_shared_secret.o \
 ltc/pk/x448/x448_export.o ltc/pk/x448/x448_import.o ltc/pk/x448/x448_import_pkcs8.o \
 ltc/pk/x448/x448_import_raw.o ltc/pk/x448/x448_import_x509.o ltc/pk/x448/x448_make_key.o \
-ltc/pk/x448/x448_shared_secret.o ltc/prngs/chacha20.o ltc/prngs/fortuna.o ltc/prngs/rc4.o \
+ltc/pk/x448/x448_shared_secret.o ltc/pqc/mldsa.o ltc/pqc/mldsa_export.o ltc/pqc/mldsa_import.o \
+ltc/pqc/mldsa_import_pkcs8.o ltc/pqc/mldsa_import_x509.o ltc/pqc/mlkem.o ltc/pqc/mlkem_export.o \
+ltc/pqc/mlkem_import.o ltc/pqc/mlkem_import_pkcs8.o ltc/pqc/mlkem_import_x509.o ltc/pqc/pqc_algname_match.o \
+ltc/pqc/slhdsa.o ltc/pqc/slhdsa_export.o ltc/pqc/slhdsa_import.o ltc/pqc/slhdsa_import_pkcs8.o \
+ltc/pqc/slhdsa_import_x509.o ltc/prngs/chacha20.o ltc/prngs/fortuna.o ltc/prngs/rc4.o \
 ltc/prngs/rng_get_bytes.o ltc/prngs/rng_make_prng.o ltc/prngs/sober128.o ltc/prngs/sprng.o \
 ltc/prngs/yarrow.o ltc/stream/chacha/chacha_crypt.o ltc/stream/chacha/chacha_done.o \
 ltc/stream/chacha/chacha_ivctr32.o ltc/stream/chacha/chacha_ivctr64.o ltc/stream/chacha/chacha_keystream.o \

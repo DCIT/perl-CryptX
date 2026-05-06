@@ -65,6 +65,36 @@ enum ltc_oid_id {
    LTC_OID_RSA_OAEP,
    LTC_OID_RSA_MGF1,
    LTC_OID_RSA_PSS,
+   LTC_OID_MLKEM_512,
+   LTC_OID_MLKEM_768,
+   LTC_OID_MLKEM_1024,
+   LTC_OID_MLDSA_44,
+   LTC_OID_MLDSA_65,
+   LTC_OID_MLDSA_87,
+   LTC_OID_SLHDSA_SHA2_128S,
+   LTC_OID_SLHDSA_SHA2_128F,
+   LTC_OID_SLHDSA_SHA2_192S,
+   LTC_OID_SLHDSA_SHA2_192F,
+   LTC_OID_SLHDSA_SHA2_256S,
+   LTC_OID_SLHDSA_SHA2_256F,
+   LTC_OID_SLHDSA_SHAKE_128S,
+   LTC_OID_SLHDSA_SHAKE_128F,
+   LTC_OID_SLHDSA_SHAKE_192S,
+   LTC_OID_SLHDSA_SHAKE_192F,
+   LTC_OID_SLHDSA_SHAKE_256S,
+   LTC_OID_SLHDSA_SHAKE_256F,
+   LTC_OID_HASH_SLHDSA_SHA2_128S_WITH_SHA256,
+   LTC_OID_HASH_SLHDSA_SHA2_128F_WITH_SHA256,
+   LTC_OID_HASH_SLHDSA_SHA2_192S_WITH_SHA512,
+   LTC_OID_HASH_SLHDSA_SHA2_192F_WITH_SHA512,
+   LTC_OID_HASH_SLHDSA_SHA2_256S_WITH_SHA512,
+   LTC_OID_HASH_SLHDSA_SHA2_256F_WITH_SHA512,
+   LTC_OID_HASH_SLHDSA_SHAKE_128S_WITH_SHAKE128,
+   LTC_OID_HASH_SLHDSA_SHAKE_128F_WITH_SHAKE128,
+   LTC_OID_HASH_SLHDSA_SHAKE_192S_WITH_SHAKE256,
+   LTC_OID_HASH_SLHDSA_SHAKE_192F_WITH_SHAKE256,
+   LTC_OID_HASH_SLHDSA_SHAKE_256S_WITH_SHAKE256,
+   LTC_OID_HASH_SLHDSA_SHAKE_256F_WITH_SHAKE256,
    LTC_OID_NUM
 };
 
@@ -456,6 +486,13 @@ int pk_get_oid_from_asn1(const ltc_asn1_list *oid, enum ltc_oid_id *id);
 int pk_oid_str_to_num(const char *OID, unsigned long *oid, unsigned long *oidlen);
 int pk_oid_num_to_str(const unsigned long *oid, unsigned long oidlen, char *OID, unsigned long *outlen);
 
+#if defined(LTC_MLKEM) || defined(LTC_MLDSA) || defined(LTC_SLHDSA)
+/* Case-insensitive ASCII compare that also ignores '-' and '_'.
+   Returns 1 on match, 0 otherwise. Shared by mlkem_find_alg, mldsa_find_alg,
+   and slhdsa_find_alg. */
+int ltc_pqc_algname_match(const char *left, const char *right);
+#endif
+
 int pk_oid_cmp_with_ulong(const char *o1, const unsigned long *o2, unsigned long o2size);
 
 /* ---- RSA Routines ---- */
@@ -741,6 +778,16 @@ int ec448_scalarmult_base_internal(unsigned char *out, const unsigned char *scal
 int ed448_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key,
                             curve448_key *key);
 #endif /* LTC_CURVE448 */
+
+#ifdef LTC_MLKEM
+int mlkem_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key, mlkem_key *key);
+#endif
+#ifdef LTC_MLDSA
+int mldsa_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key, mldsa_key *key);
+#endif
+#ifdef LTC_SLHDSA
+int slhdsa_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key, slhdsa_key *key);
+#endif
 
 #ifdef LTC_DER
 
