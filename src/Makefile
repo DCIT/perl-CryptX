@@ -34,6 +34,7 @@ ltc/mac/blake2/blake2smac_memory.o ltc/mac/blake2/blake2smac_memory_multi.o ltc/
 ltc/mac/f9/f9_file.o ltc/mac/f9/f9_init.o ltc/mac/f9/f9_memory.o ltc/mac/f9/f9_memory_multi.o \
 ltc/mac/f9/f9_process.o ltc/mac/hmac/hmac_done.o ltc/mac/hmac/hmac_file.o ltc/mac/hmac/hmac_init.o \
 ltc/mac/hmac/hmac_memory.o ltc/mac/hmac/hmac_memory_multi.o ltc/mac/hmac/hmac_process.o \
+ltc/mac/kmac/kmac.o ltc/mac/kmac/kmac_file.o ltc/mac/kmac/kmac_memory.o ltc/mac/kmac/kmac_memory_multi.o \
 ltc/mac/omac/omac_done.o ltc/mac/omac/omac_file.o ltc/mac/omac/omac_init.o ltc/mac/omac/omac_memory.o \
 ltc/mac/omac/omac_memory_multi.o ltc/mac/omac/omac_process.o ltc/mac/pelican/pelican.o \
 ltc/mac/pelican/pelican_memory.o ltc/mac/pmac/pmac_done.o ltc/mac/pmac/pmac_file.o \

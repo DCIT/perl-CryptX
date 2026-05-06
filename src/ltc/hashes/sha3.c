@@ -446,6 +446,13 @@ int sha3_shake_done(hash_state *md, unsigned char *out, unsigned long outlen)
    return s_sha3_shake_done(&md->sha3, out, outlen, 0x1f, s_keccakf);
 }
 
+#ifdef LTC_KMAC
+int sha3_shake_done_ex(hash_state *md, unsigned char *out, unsigned long outlen, unsigned char domain)
+{
+   return s_sha3_shake_done(&md->sha3, out, outlen, domain, s_keccakf);
+}
+#endif
+
 int sha3_shake128_done(hash_state *md, unsigned char *out)
 {
    return sha3_shake_done(md, out, 32);

@@ -300,6 +300,7 @@
 #define LTC_POLY1305
 #define LTC_BLAKE2SMAC
 #define LTC_BLAKE2BMAC
+#define LTC_KMAC
 
 /* ---> Encrypt + Authenticate Modes <--- */
 
@@ -732,6 +733,10 @@
 
 #if defined(LTC_BLAKE2BMAC) && !defined(LTC_BLAKE2B)
    #error LTC_BLAKE2BMAC requires LTC_BLAKE2B
+#endif
+
+#if defined(LTC_KMAC) && !defined(LTC_SHA3)
+   #error LTC_KMAC requires LTC_SHA3
 #endif
 
 #if defined(LTC_SPRNG) && !defined(LTC_RNG_GET_BYTES)

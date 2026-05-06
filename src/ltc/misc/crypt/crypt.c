@@ -285,6 +285,9 @@ const char *crypt_build_settings =
 #if defined(LTC_BLAKE2BMAC)
     "   BLAKE2B MAC\n"
 #endif
+#if defined(LTC_KMAC)
+    "   KMAC\n"
+#endif
 
     "\nENC + AUTH modes:\n"
 #if defined(LTC_EAX_MODE)
