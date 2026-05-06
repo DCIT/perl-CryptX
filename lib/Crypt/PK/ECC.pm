@@ -830,6 +830,14 @@ Returns the signature as a binary string.
 
  # $hash_name .. [string] 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
+For ECDSA with SHAKE per L<RFC 8702|https://www.rfc-editor.org/rfc/rfc8702>
+use C<'SHAKE128'> (output 32 bytes) or C<'SHAKE256'> (output 64 bytes); the
+fixed output sizes match the ones required by the ecdsa-with-shake128 and
+ecdsa-with-shake256 OIDs.
+
+ my $sig = $pk->sign_message($message, 'SHAKE128');   # ecdsa-with-shake128
+ my $sig = $pk->sign_message($message, 'SHAKE256');   # ecdsa-with-shake256
+
 =head2 sign_message_rfc7518
 
 I<Since: CryptX-0.024>

@@ -602,6 +602,14 @@ Returns the signature as a binary string.
  # $padding ................. [string] 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
  # $saltlen (only for pss) .. [integer] DEFAULT is 12
 
+For RSASSA-PSS with SHAKE per L<RFC 8702|https://www.rfc-editor.org/rfc/rfc8702>
+use C<'SHAKE128'> (output 32 bytes, C<$saltlen> = 32) or C<'SHAKE256'> (output
+64 bytes, C<$saltlen> = 64); both the message hash and the internal MGF use
+SHAKE directly as defined by RFC 8702.
+
+ my $sig = $pk->sign_message($message, 'SHAKE128', 'pss', 32);  # id-RSASSA-PSS-SHAKE128
+ my $sig = $pk->sign_message($message, 'SHAKE256', 'pss', 64);  # id-RSASSA-PSS-SHAKE256
+
 =head2 verify_message
 
 Returns C<1> if the signature is valid, C<0> otherwise.

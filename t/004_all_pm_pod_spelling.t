@@ -39,6 +39,7 @@ Test::Pod::Spelling->import(
                           undef adata
                           pre Edctx Edph
                           behaviour reseeds
+                          OIDs MGF RSASSA
                         )]
                     },
 );

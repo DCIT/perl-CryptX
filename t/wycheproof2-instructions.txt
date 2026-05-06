@@ -60,10 +60,7 @@ Typical unsupported examples
 
 1/ AES-GCM-SIV: CryptX currently has AES-SIV-CMAC, not AES-GCM-SIV.
 
-2/ Some RSA-PSS SHAKE vectors: CryptX has SHAKE objects, but the generic RSA
-   hash lookup path does not currently accept SHAKE hash names there.
-
-3/ Some RSA key families: for example multi-prime private keys or RSA-PSS
+2/ Some RSA key families: for example multi-prime private keys or RSA-PSS
    parameterized public keys may be unsupported at the wrapper/import layer.
 
 Notes

@@ -96,7 +96,7 @@ _import_pem(Crypt::PK::RSA self, SV * key_data, SV * passwd)
           rv = pem_decode_pkcs(data, (unsigned long)data_len, &key_from_pem, NULL);
         }
         if (rv != CRYPT_OK) croak("FATAL: pem_decode_pkcs failed: %s", error_to_string(rv));
-        if (key_from_pem.id != LTC_PKA_RSA) croak("FATAL: pem_decode_pkcs decoded non-RSA key");
+        if (key_from_pem.id != LTC_PKA_RSA && key_from_pem.id != LTC_PKA_RSA_PSS) croak("FATAL: pem_decode_pkcs decoded non-RSA key");
         self->key = key_from_pem.u.rsa;
         XPUSHs(ST(0)); /* return self */
     }
@@ -121,7 +121,7 @@ _import_openssh(Crypt::PK::RSA self, SV * key_data, SV * passwd)
           rv = pem_decode_openssh(data, (unsigned long)data_len, &key_from_pem, NULL);
         }
         if (rv != CRYPT_OK) croak("FATAL: pem_decode_openssh failed: %s", error_to_string(rv));
-        if (key_from_pem.id != LTC_PKA_RSA) croak("FATAL: pem_decode_openssh decoded non-RSA key");
+        if (key_from_pem.id != LTC_PKA_RSA && key_from_pem.id != LTC_PKA_RSA_PSS) croak("FATAL: pem_decode_openssh decoded non-RSA key");
         self->key = key_from_pem.u.rsa;
         XPUSHs(ST(0)); /* return self */
     }

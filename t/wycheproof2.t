@@ -272,6 +272,8 @@ sub norm_hash {
   return 'SHA256'     if $hash =~ /^SHA-?256$/i;
   return 'SHA384'     if $hash =~ /^SHA-?384$/i;
   return 'SHA512'     if $hash =~ /^SHA-?512$/i;
+  return 'SHAKE128'   if $hash =~ /^SHAKE-?128$/i;
+  return 'SHAKE256'   if $hash =~ /^SHAKE-?256$/i;
   return undef;
 }
 
@@ -1152,6 +1154,11 @@ sub handle_rsa_pss_verify {
   for my $group (@{ $doc->{testGroups} || [] }) {
     my $hash = norm_hash($group->{sha});
     my $mgf_hash = norm_hash($group->{mgfSha});
+    # RFC 8702: RSASSA-PSS-SHAKE128/256 — mgfSha is empty in the test vectors,
+    # MGF is SHAKE itself (libtomcrypt handles this as a special case).
+    if (!$mgf_hash && $hash && ($hash eq 'SHAKE128' || $hash eq 'SHAKE256')) {
+      $mgf_hash = $hash;
+    }
     if (!$hash || !$mgf_hash || !hash_supported($hash) || !hash_supported($mgf_hash)) {
       unsupported_group($file, $doc, $group, 'unsupported RSA PSS hash');
       next;
