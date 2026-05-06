@@ -27,6 +27,7 @@ for my $module (
     Crypt::KeyDerivation
     Crypt::Misc
     Crypt::Mac::HMAC
+    Crypt::Mac::KMAC
     Crypt::Mac::OMAC
     Crypt::Mode::CBC
     Crypt::PK::DSA
@@ -998,20 +999,30 @@ sub handle_mac {
     return unsupported_file($file, $doc, "unsupported MAC algorithm $alg")
       unless $param && cipher_supported($param);
   }
+  elsif ($alg eq 'KMAC128' || $alg eq 'KMAC256') {
+    $kind = 'KMAC';
+    $param = $alg;  # KMAC variant string for kmac()
+  }
   else {
     return unsupported_file($file, $doc, "unsupported MAC algorithm $alg");
   }
 
   for my $group (@{ $doc->{testGroups} || [] }) {
     my $tag_len = int(($group->{tagSize} || 0) / 8);
+    my $cust    = exists $group->{customization} ? hex_to_bin($group->{customization}) : '';
     for my $test (@{ $group->{tests} || [] }) {
       mark_tc();
       my $key = hex_to_bin($test->{key});
       my $msg = hex_to_bin($test->{msg});
       my ($ok, $tag) = eval_scalar(sub {
-        return $kind eq 'HMAC'
-          ? Crypt::Mac::HMAC::hmac($param, $key, $msg)
-          : Crypt::Mac::OMAC::omac($param, $key, $msg);
+        if ($kind eq 'HMAC') {
+          return Crypt::Mac::HMAC::hmac($param, $key, $msg);
+        }
+        elsif ($kind eq 'CMAC') {
+          return Crypt::Mac::OMAC::omac($param, $key, $msg);
+        }
+        # KMAC: tagSize is the requested output length (committed for fixed mode)
+        return Crypt::Mac::KMAC::kmac($param, $tag_len, $key, $cust, $msg);
       });
       $tag = undef unless $ok;
       check_auth_tag($file, $doc, $group, $test, $tag, $test->{tag}, $tag_len, "$kind tag");

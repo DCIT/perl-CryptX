@@ -90,6 +90,7 @@ use Crypt::Mac::BLAKE2b;
 use Crypt::Mac::BLAKE2s;
 use Crypt::Mac::F9;
 use Crypt::Mac::HMAC;
+use Crypt::Mac::KMAC;
 use Crypt::Mac::OMAC;
 use Crypt::Mac::Pelican;
 use Crypt::Mac::PMAC;
