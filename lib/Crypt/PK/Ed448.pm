@@ -244,8 +244,6 @@ Returns C<1> if the signature is valid, C<0> otherwise.
 
 =head2 sign_message_ctx
 
-I<Since: CryptX-0.100>
-
 Signs a message using Ed448ctx (RFC 8032 Section 5.2), which includes a
 mandatory context string (at most 255 bytes). The context string makes the
 signature domain-separated: the same key signing the same message with a
@@ -259,15 +257,11 @@ context produce the same signature.
 
 =head2 verify_message_ctx
 
-I<Since: CryptX-0.100>
-
 Verifies a signature produced by L</sign_message_ctx>.
 
  my $valid = $pub->verify_message_ctx($signature, $message, $context);
 
 =head2 sign_message_ph
-
-I<Since: CryptX-0.100>
 
 Signs a message using Ed448ph (RFC 8032 Section 5.2), the "pre-hashed"
 variant. The message is first hashed with SHAKE256 internally before signing.
@@ -279,8 +273,6 @@ provided; it defaults to the empty string if omitted.
  my $signature = $priv->sign_message_ph($message, $context);
 
 =head2 verify_message_ph
-
-I<Since: CryptX-0.100>
 
 Verifies a signature produced by L</sign_message_ph>.
 
