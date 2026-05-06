@@ -56,12 +56,14 @@ static const unsigned char qord[4][5] = {
 };
 #endif /* LTC_TWOFISH_SMALL */
 
+#define sbox s_twofish_sbox
+
 #ifdef LTC_TWOFISH_TABLES
 
 #define LTC_TWOFISH_TAB_C
 #include "twofish_tab.c"
 
-#define sbox(i, x) ((ulong32)SBOX[i][(x)&255])
+#define s_twofish_sbox(i, x) ((ulong32)SBOX[i][(x)&255])
 
 #else
 
@@ -276,10 +278,14 @@ static void h_func(const unsigned char *in, unsigned char *out, const unsigned c
 #endif
 
 /* the G function */
-#define g_func(x, dum)  (S1[LTC_BYTE(x,0)] ^ S2[LTC_BYTE(x,1)] ^ S3[LTC_BYTE(x,2)] ^ S4[LTC_BYTE(x,3)])
-#define g1_func(x, dum) (S2[LTC_BYTE(x,0)] ^ S3[LTC_BYTE(x,1)] ^ S4[LTC_BYTE(x,2)] ^ S1[LTC_BYTE(x,3)])
+#define s_twofish_g_func(x, dum)  (S1[LTC_BYTE(x,0)] ^ S2[LTC_BYTE(x,1)] ^ S3[LTC_BYTE(x,2)] ^ S4[LTC_BYTE(x,3)])
+#define s_twofish_g1_func(x, dum) (S2[LTC_BYTE(x,0)] ^ S3[LTC_BYTE(x,1)] ^ S4[LTC_BYTE(x,2)] ^ S1[LTC_BYTE(x,3)])
+#define g_func s_twofish_g_func
+#define g1_func s_twofish_g1_func
 
 #else
+
+#define g_func s_twofish_g_func
 
 #ifdef LTC_CLEAN_STACK
 static ulong32 s_g_func(ulong32 x, const symmetric_key *key)
@@ -710,6 +716,8 @@ int twofish_keysize(int *keysize)
 #undef S2
 #undef S3
 #undef S4
+#undef s_twofish_g_func
+#undef s_twofish_g1_func
 #undef g_func
 #undef g1_func
 

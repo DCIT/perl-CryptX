@@ -339,6 +339,14 @@ typedef unsigned long ltc_mp_digit;
    #endif
 #endif
 
+#if defined(__aarch64__) || defined(_M_ARM64)
+   #define LTC_ARCH_AARCH64
+   #if !defined(LTC_NO_GCM_PMULL)
+      #define LTC_GCM_PMULL
+      #undef LTC_GCM_TABLES
+   #endif
+#endif
+
 #if defined(__GNUC__)
    #define LTC_ALIGN_MSVC(n)
    #define LTC_ALIGN(n) __attribute__((aligned(n)))
@@ -395,21 +403,20 @@ typedef unsigned long ltc_mp_digit;
 #endif
 #endif
 
+#ifndef __has_attribute
+#  define __has_attribute(x) 0
+#endif
 #if defined(__GNUC__) || defined(__clang__)
 #  define LTC_ATTRIBUTE(x) __attribute__(x)
 #else
 #  define LTC_ATTRIBUTE(x)
 #endif
 
-#if !defined(LTC_NO_GCM_PMULL) && (defined(__aarch64__) || defined(_M_ARM64))
-#define LTC_GCM_PMULL
-#undef LTC_GCM_TABLES
+#if __has_attribute(target)
+#  define LTC_TARGET(x) LTC_ATTRIBUTE((target(x)))
 #endif
-
-#if defined(LTC_GCM_PMULL) && (defined(__clang__) || defined(__GNUC__))
-#define LTC_GCM_PMULL_TARGET __attribute__((target("+crypto")))
-#else
-#define LTC_GCM_PMULL_TARGET
+#ifndef LTC_TARGET
+#  define LTC_TARGET(x)
 #endif
 
 #endif /* TOMCRYPT_CFG_H */

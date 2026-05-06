@@ -6,7 +6,7 @@
    LTC_WHIRLPOOL tables, Tom St Denis
 */
 
-#ifdef LTC_WHIRLTAB_C
+#if defined(LTC_WHIRLPOOL) && defined(LTC_WHIRLTAB_C)
 
 static const ulong64 sbox0[] = {
 CONST64(0x18186018c07830d8), CONST64(0x23238c2305af4626), CONST64(0xc6c63fc67ef991b8), CONST64(0xe8e887e8136fcdfb),

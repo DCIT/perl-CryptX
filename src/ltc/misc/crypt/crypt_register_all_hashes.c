@@ -29,6 +29,8 @@ int register_all_hashes(void)
    REGISTER_HASH(&sha3_384_desc);
    REGISTER_HASH(&sha3_256_desc);
    REGISTER_HASH(&sha3_224_desc);
+   REGISTER_HASH(&shake128_desc);
+   REGISTER_HASH(&shake256_desc);
 #endif
 #ifdef LTC_SHA512_256
    REGISTER_HASH(&sha512_256_desc);

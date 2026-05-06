@@ -266,6 +266,68 @@ int sha3_512_test(void)
 #endif
 }
 
+int sha3_shake256_test(void)
+{
+#ifndef LTC_TEST
+   return CRYPT_NOP;
+#else
+   unsigned char hash[64];
+   int err;
+   hash_state c;
+   const unsigned char msg[] = "abc";
+
+   /* Fixed-size descriptor API: RFC 8702 uses SHAKE256 with 64-byte output. */
+   const unsigned char shake256_abc[64] = {
+      0x48, 0x33, 0x66, 0x60, 0x13, 0x60, 0xa8, 0x77,
+      0x1c, 0x68, 0x63, 0x08, 0x0c, 0xc4, 0x11, 0x4d,
+      0x8d, 0xb4, 0x45, 0x30, 0xf8, 0xf1, 0xe1, 0xee,
+      0x4f, 0x94, 0xea, 0x37, 0xe7, 0x8b, 0x57, 0x39,
+      0xd5, 0xa1, 0x5b, 0xef, 0x18, 0x6a, 0x53, 0x86,
+      0xc7, 0x57, 0x44, 0xc0, 0x52, 0x7e, 0x1f, 0xaa,
+      0x9f, 0x87, 0x26, 0xe4, 0x62, 0xa1, 0x2a, 0x4f,
+      0xeb, 0x06, 0xbd, 0x88, 0x01, 0xe7, 0x51, 0xe4
+   };
+
+   if ((err = sha3_shake256_init(&c)) != CRYPT_OK) return err;
+   if ((err = sha3_shake256_process(&c, msg, 3)) != CRYPT_OK) return err;
+   if ((err = sha3_shake256_done(&c, hash)) != CRYPT_OK) return err;
+   if (ltc_compare_testvector(hash, sizeof(hash), shake256_abc, sizeof(shake256_abc), "SHAKE256", 0)) {
+      return CRYPT_FAIL_TESTVECTOR;
+   }
+
+   return CRYPT_OK;
+#endif
+}
+
+int sha3_shake128_test(void)
+{
+#ifndef LTC_TEST
+   return CRYPT_NOP;
+#else
+   unsigned char hash[32];
+   int err;
+   hash_state c;
+   const unsigned char msg[] = "abc";
+
+   /* Fixed-size descriptor API: RFC 8702 uses SHAKE128 with 32-byte output. */
+   const unsigned char shake128_abc[32] = {
+      0x58, 0x81, 0x09, 0x2d, 0xd8, 0x18, 0xbf, 0x5c,
+      0xf8, 0xa3, 0xdd, 0xb7, 0x93, 0xfb, 0xcb, 0xa7,
+      0x40, 0x97, 0xd5, 0xc5, 0x26, 0xa6, 0xd3, 0x5f,
+      0x97, 0xb8, 0x33, 0x51, 0x94, 0x0f, 0x2c, 0xc8
+   };
+
+   if ((err = sha3_shake128_init(&c)) != CRYPT_OK) return err;
+   if ((err = sha3_shake128_process(&c, msg, 3)) != CRYPT_OK) return err;
+   if ((err = sha3_shake128_done(&c, hash)) != CRYPT_OK) return err;
+   if (ltc_compare_testvector(hash, sizeof(hash), shake128_abc, sizeof(shake128_abc), "SHAKE128", 0)) {
+      return CRYPT_FAIL_TESTVECTOR;
+   }
+
+   return CRYPT_OK;
+#endif
+}
+
 int sha3_shake_test(void)
 {
 #ifndef LTC_TEST
@@ -419,7 +481,7 @@ static LTC_INLINE int s_turbo_shake_test_one(const turbo_shake_test_case *testca
    unsigned long offset;
    unsigned long rem;
    unsigned long count;
-   unsigned char input[1024];
+   unsigned char input[1024] = {0};
    unsigned char digest[64];
    const char *expected_hex;
    unsigned char expected_digest_bin[sizeof(digest)];
@@ -523,7 +585,7 @@ static LTC_INLINE int s_kangaroo_twelve_test_one(const kangaroo_twelve_test_case
    unsigned long offset;
    unsigned long rem;
    unsigned long count;
-   unsigned char input[1024];
+   unsigned char input[1024] = {0};
    unsigned char digest[64];
    const char *expected_hex;
    unsigned char expected_digest_bin[sizeof(digest)];

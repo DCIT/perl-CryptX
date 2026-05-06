@@ -6,7 +6,7 @@
   Tables for LTC_SAFER block ciphers
 */
 
-#ifdef LTC_SAFER_TAB_C
+#if defined(LTC_SAFER) && defined(LTC_SAFER_TAB_C)
 
 /* This is the box defined by ebox[x] = 45^x mod 257.
  * Its assumed that the value "256" corresponds to zero. */

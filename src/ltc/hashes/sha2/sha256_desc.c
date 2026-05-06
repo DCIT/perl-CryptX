@@ -141,8 +141,8 @@ int sha256_test(void)
 int sha256_test_desc(const struct ltc_hash_descriptor *desc, const char *name)
 {
 #ifndef LTC_TEST
-   (void)desc;
-   (void)name;
+   LTC_UNUSED_PARAM(desc);
+   LTC_UNUSED_PARAM(name);
    return CRYPT_NOP;
 #else
    static const struct {

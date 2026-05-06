@@ -32,7 +32,7 @@ const struct ltc_cipher_descriptor aesni_desc =
 #pragma GCC diagnostic pop
 #endif
 
-#define setup_mix(t, c) _mm_extract_epi32(_mm_aeskeygenassist_si128(t, 0), c)
+#define aesni_setup_mix(t, c) _mm_extract_epi32(_mm_aeskeygenassist_si128(t, 0), c)
 #define temp_load(k) _mm_loadu_si128((__m128i*)(k))
 #define temp_update(t, k) _mm_insert_epi32(t, k, 3)
 #define temp_invert(k) _mm_aesimc_si128(*((__m128i*)(k)))
@@ -84,7 +84,7 @@ int aesni_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_
    if (keylen == 16) {
       temp = temp_load(key);
       for (;;) {
-         rk[4] = rk[0] ^ setup_mix(temp, 3) ^ rcon[i];
+         rk[4] = rk[0] ^ aesni_setup_mix(temp, 3) ^ rcon[i];
          rk[5] = rk[1] ^ rk[4];
          rk[6] = rk[2] ^ rk[5];
          rk[7] = rk[3] ^ rk[6];
@@ -99,7 +99,7 @@ int aesni_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_
       LOAD32L(rk[5], key + 20);
       temp = temp_load(key + 8);
       for (;;) {
-         rk[6] = rk[0] ^ setup_mix(temp, 3) ^ rcon[i];
+         rk[6] = rk[0] ^ aesni_setup_mix(temp, 3) ^ rcon[i];
          rk[7] = rk[1] ^ rk[6];
          rk[8] = rk[2] ^ rk[7];
          rk[9] = rk[3] ^ rk[8];
@@ -118,7 +118,7 @@ int aesni_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_
       LOAD32L(rk[7], key + 28);
       temp = temp_load(key + 16);
       for (;;) {
-         rk[8] = rk[0] ^ setup_mix(temp, 3) ^ rcon[i];
+         rk[8] = rk[0] ^ aesni_setup_mix(temp, 3) ^ rcon[i];
          rk[9] = rk[1] ^ rk[8];
          rk[10] = rk[2] ^ rk[9];
          rk[11] = rk[3] ^ rk[10];
@@ -126,7 +126,7 @@ int aesni_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_
             break;
          }
          temp = temp_update(temp, rk[11]);
-         rk[12] = rk[4] ^ setup_mix(temp, 2);
+         rk[12] = rk[4] ^ aesni_setup_mix(temp, 2);
          rk[13] = rk[5] ^ rk[12];
          rk[14] = rk[6] ^ rk[13];
          rk[15] = rk[7] ^ rk[14];
@@ -377,6 +377,10 @@ int aesni_keysize(int *keysize)
    return CRYPT_OK;
 }
 
+#undef aesni_setup_mix
+#undef temp_load
+#undef temp_update
+#undef temp_invert
 #undef rcon
 
 #endif

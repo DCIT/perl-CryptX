@@ -21,6 +21,9 @@ int x25519_shared_secret(const    curve25519_key *private_key,
                          const    curve25519_key *public_key,
                                unsigned char *out, unsigned long *outlen)
 {
+   unsigned char nonzero = 0;
+   unsigned long x;
+
    LTC_ARGCHK(private_key        != NULL);
    LTC_ARGCHK(public_key         != NULL);
    LTC_ARGCHK(out                != NULL);
@@ -36,6 +39,10 @@ int x25519_shared_secret(const    curve25519_key *private_key,
 
    tweetnacl_crypto_scalarmult(out, private_key->priv, public_key->pub);
    *outlen = 32uL;
+
+   /* Reject all-zero shared secrets; RFC 7748 Section 6.1 says peers MAY check for this */
+   for (x = 0; x < *outlen; ++x) nonzero |= out[x];
+   if (nonzero == 0) return CRYPT_INVALID_PACKET;
 
    return CRYPT_OK;
 }

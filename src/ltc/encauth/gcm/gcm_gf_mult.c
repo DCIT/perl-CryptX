@@ -10,7 +10,7 @@
 #if defined(LTC_GCM_MODE) || defined(LTC_LRW_MODE)
 #if defined(LTC_GCM_PCLMUL)
 
-#define LTC_GCM_PCLMUL_TARGET LTC_ATTRIBUTE((__target__("pclmul,ssse3")))
+#define LTC_GCM_PCLMUL_TARGET LTC_TARGET("pclmul,ssse3")
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -135,6 +135,9 @@ static void s_gcm_gf_mult_pclmul(const unsigned char *a, const unsigned char *b,
 #endif /* defined(LTC_GCM_PCLMUL) */
 
 #if defined(LTC_GCM_PMULL)
+
+#define LTC_GCM_PMULL_TARGET LTC_TARGET("+crypto")
+
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wbad-function-cast"
@@ -488,4 +491,15 @@ void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *
 
 
 #endif
+
+int gcm_hw_pmul_is_supported(void)
+{
+#if defined(LTC_GCM_PCLMUL_TARGET)
+   return s_pclmul_is_supported();
+#elif defined(LTC_GCM_PMULL_TARGET)
+   return s_pmull_is_supported();
+#else
+   return 0;
+#endif
+}
 

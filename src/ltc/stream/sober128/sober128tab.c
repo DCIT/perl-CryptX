@@ -6,7 +6,7 @@
    SOBER-128 Tables
 */
 
-#ifdef LTC_SOBER128TAB_C
+#if defined(LTC_SOBER128) && defined(LTC_SOBER128TAB_C)
 
 /* $ID$ */
 /* @(#)TuringMultab.h   1.3 (QUALCOMM) 02/09/03 */

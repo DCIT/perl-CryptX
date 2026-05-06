@@ -34,6 +34,8 @@ static LTC_INLINE void s_x86_cpuid(int* regs, int leaf)
 }
 #endif /* LTC_S_X86_CPUID */
 
+#if !defined (LTC_S_AESNI_IS_SUPPORTED)
+#define LTC_S_AESNI_IS_SUPPORTED
 static LTC_INLINE int s_aesni_is_supported(void)
 {
    static int initialized = 0, is_supported = 0;
@@ -50,6 +52,7 @@ static LTC_INLINE int s_aesni_is_supported(void)
 
    return is_supported;
 }
+#endif /* LTC_S_AESNI_IS_SUPPORTED */
 #endif /* LTC_ARCH_X86 */
 
 #ifndef ENCRYPT_ONLY
@@ -270,4 +273,11 @@ int AES_KS(int *keysize)
 }
 
 #endif
+
+#undef AES_SETUP
+#undef AES_ENC
+#undef AES_DEC
+#undef AES_DONE
+#undef AES_TEST
+#undef AES_KS
 

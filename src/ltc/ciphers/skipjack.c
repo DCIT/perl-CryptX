@@ -23,6 +23,7 @@ const struct ltc_cipher_descriptor skipjack_desc =
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
 
+#define sbox s_skipjack_sbox
 static const unsigned char sbox[256] = {
    0xa3,0xd7,0x09,0x83,0xf8,0x48,0xf6,0xf4,0xb3,0x21,0x15,0x78,0x99,0xb1,0xaf,0xf9,
    0xe7,0x2d,0x4d,0x8a,0xce,0x4c,0xca,0x2e,0x52,0x95,0xd9,0x1e,0x4e,0x38,0x44,0x28,
@@ -101,6 +102,7 @@ int skipjack_setup(const unsigned char *key, int keylen, int num_rounds, symmetr
    w2  = tmp ^ w3 ^ x;                            \
    w3  = w4; w4 = w1; w1 = tmp;
 
+#define g_func s_skipjack_g_func
 static unsigned g_func(unsigned w, int *kp, const unsigned char *key)
 {
    unsigned char g1,g2;
@@ -113,6 +115,7 @@ static unsigned g_func(unsigned w, int *kp, const unsigned char *key)
    return ((unsigned)g1<<8)|(unsigned)g2;
 }
 
+#define ig_func s_skipjack_ig_func
 static unsigned ig_func(unsigned w, int *kp, const unsigned char *key)
 {
    unsigned char g1,g2;
@@ -331,9 +334,12 @@ int skipjack_keysize(int *keysize)
    return CRYPT_OK;
 }
 
+#undef g_func
+#undef ig_func
 #undef RULE_A
 #undef RULE_B
 #undef RULE_A1
 #undef RULE_B1
+#undef sbox
 
 #endif

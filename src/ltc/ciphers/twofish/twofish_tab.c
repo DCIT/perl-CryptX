@@ -6,7 +6,7 @@
     Twofish tables, Tom St Denis
  */
 #ifdef LTC_TWOFISH_TABLES
-#ifdef LTC_TWOFISH_TAB_C
+#if defined(LTC_TWOFISH) && defined(LTC_TWOFISH_TAB_C)
 
 /* pre generated 8x8 tables from the four 4x4s */
 static const unsigned char SBOX[2][256] = {

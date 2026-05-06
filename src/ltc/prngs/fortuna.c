@@ -528,5 +528,10 @@ int fortuna_test(void)
 #endif
 }
 
-#endif
+#undef AES_SETUP
+#undef AES_ENC
+#undef AES_DONE
+#undef AES_TEST
+
+#endif /* LTC_FORTUNA */
 

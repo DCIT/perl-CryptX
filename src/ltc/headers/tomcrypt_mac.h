@@ -403,6 +403,7 @@ int ccm_test(void);
 void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *c);
 #endif
 
+int gcm_hw_pmul_is_supported(void);
 
 /* table shared between GCM and LRW */
 #if defined(LTC_GCM_TABLES) || defined(LTC_LRW_TABLES) || ((defined(LTC_GCM_MODE) || defined(LTC_GCM_MODE)) && defined(LTC_FAST))

@@ -17,6 +17,9 @@
    @param mask        [out] The destination
    @param masklen     The length of the mask desired
    @return CRYPT_OK if successful
+
+   BEWARE: When hash_idx selects shake128 or shake256, this uses
+   SHAKE directly instead of MGF1(SHAKE), as required by RFC 8702.
 */
 int ltc_pkcs_1_mgf1(int                  hash_idx,
                     const unsigned char *seed, unsigned long seedlen,
@@ -35,6 +38,15 @@ int ltc_pkcs_1_mgf1(int                  hash_idx,
    if ((err = hash_is_valid(hash_idx)) != CRYPT_OK) {
       return err;
    }
+
+#ifdef LTC_SHA3
+   if (hash_descriptor[hash_idx].ID == shake128_desc.ID
+         || hash_descriptor[hash_idx].ID == shake256_desc.ID) {
+      /* The output hashsize is double the announced SHAKE bitsize
+       * and given in octets, so only multiply by 4 to arrive at 128 resp. 256. */
+      return sha3_shake_memory(hash_descriptor[hash_idx].hashsize * 4, seed, seedlen, mask, &masklen);
+   }
+#endif
 
    /* get hash output size */
    hLen = hash_descriptor[hash_idx].hashsize;

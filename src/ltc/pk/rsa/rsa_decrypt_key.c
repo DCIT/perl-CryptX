@@ -25,6 +25,7 @@ int rsa_decrypt_key_v2(const unsigned char *in,             unsigned long  inlen
                              int           *stat,     const rsa_key       *key)
 {
   int           err;
+  unsigned char zero, one;
   unsigned char *tmp;
   unsigned long modulus_bitlen, modulus_bytelen, x;
   ltc_rsa_op_checked op_checked = ltc_rsa_op_checked_init(key, params);
@@ -49,6 +50,20 @@ int rsa_decrypt_key_v2(const unsigned char *in,             unsigned long  inlen
   modulus_bytelen = ltc_mp_unsigned_bin_size( (key->N));
   if (modulus_bytelen != inlen) {
      return CRYPT_INVALID_PACKET;
+  }
+
+  /* SP 800-56B Rev. 2 Section 7.1.2.1 says to reject ciphertext values 0 and 1 */
+  if (params->padding == LTC_PKCS_1_OAEP) {
+     zero = one = 0;
+     for (x = 0; x < inlen; ++x) {
+        zero |= in[x];
+        if (x == inlen - 1) {
+           one |= (unsigned char)(in[x] ^ 0x01);
+        } else {
+           one |= in[x];
+        }
+     }
+     if (zero == 0 || one == 0) return CRYPT_INVALID_PACKET;
   }
 
   /* allocate ram */

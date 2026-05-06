@@ -67,6 +67,10 @@ const struct ltc_cipher_descriptor rijndael_enc_desc =
 #include "aes_tab.c"
 #endif
 
+#define setup_mix rijndael_setup_mix
+
+#ifndef RIJNDAEL_SETUP_MIX
+#define RIJNDAEL_SETUP_MIX
 static ulong32 setup_mix(ulong32 temp)
 {
    return (Te4_3[LTC_BYTE(temp, 2)]) ^
@@ -74,9 +78,9 @@ static ulong32 setup_mix(ulong32 temp)
           (Te4_1[LTC_BYTE(temp, 0)]) ^
           (Te4_0[LTC_BYTE(temp, 3)]);
 }
+#endif /* RIJNDAEL_SETUP_MIX */
 
-#ifndef ENCRYPT_ONLY
-#ifdef LTC_SMALL_CODE
+#if !defined(ENCRYPT_ONLY) && defined(LTC_SMALL_CODE)
 static ulong32 setup_mix2(ulong32 temp)
 {
    return Td0(255 & Te4[LTC_BYTE(temp, 3)]) ^
@@ -84,7 +88,6 @@ static ulong32 setup_mix2(ulong32 temp)
           Td2(255 & Te4[LTC_BYTE(temp, 1)]) ^
           Td3(255 & Te4[LTC_BYTE(temp, 0)]);
 }
-#endif
 #endif
 
  /**
@@ -728,6 +731,7 @@ int ECB_KS(int *keysize)
    return CRYPT_OK;
 }
 
+#undef setup_mix
 #undef SETUP
 #undef ECB_ENC
 #undef ECB_DEC
