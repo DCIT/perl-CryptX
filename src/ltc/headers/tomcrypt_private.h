@@ -197,6 +197,10 @@ int sha224_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
 int sha256_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
 #endif
 
+#ifdef LTC_KMAC
+int sha3_shake_done_ex(hash_state *md, unsigned char *out, unsigned long outlen, unsigned char domain);
+#endif
+
 /* tomcrypt_mac.h */
 
 int ocb3_int_ntz(unsigned long x);

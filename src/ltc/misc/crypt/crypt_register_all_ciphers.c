@@ -100,5 +100,8 @@ int register_all_ciphers(void)
 #ifdef LTC_TEA
    REGISTER_CIPHER(&tea_desc);
 #endif
+#ifdef LTC_ARIA
+   REGISTER_CIPHER(&aria_desc);
+#endif
    return CRYPT_OK;
 }

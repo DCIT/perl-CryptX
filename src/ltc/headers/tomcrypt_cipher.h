@@ -184,6 +184,13 @@ struct tea_key {
 };
 #endif
 
+#ifdef LTC_ARIA
+struct aria_key {
+   unsigned char ek[17 * 16], dk[17 * 16];
+   int R;
+};
+#endif
+
 typedef union Symmetric_key {
 #ifdef LTC_DES
    struct des_key des;
@@ -255,6 +262,9 @@ typedef union Symmetric_key {
 #endif
 #ifdef LTC_TEA
    struct tea_key      tea;
+#endif
+#ifdef LTC_ARIA
+   struct aria_key     aria;
 #endif
    void   *data;
 } symmetric_key;
@@ -896,6 +906,16 @@ int tea_test(void);
 void tea_done(symmetric_key *skey);
 int tea_keysize(int *keysize);
 extern const struct ltc_cipher_descriptor tea_desc;
+#endif
+
+#ifdef LTC_ARIA
+int aria_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_key *skey);
+int aria_ecb_encrypt(const unsigned char *pt, unsigned char *ct, const symmetric_key *skey);
+int aria_ecb_decrypt(const unsigned char *ct, unsigned char *pt, const symmetric_key *skey);
+int aria_test(void);
+void aria_done(symmetric_key *skey);
+int aria_keysize(int *keysize);
+extern const struct ltc_cipher_descriptor aria_desc;
 #endif
 
 #ifdef LTC_ECB_MODE

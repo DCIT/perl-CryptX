@@ -135,6 +135,42 @@ int blake2smac_file(const char *fname, const unsigned char *key, unsigned long k
 int blake2smac_test(void);
 #endif /* LTC_BLAKE2SMAC */
 
+#ifdef LTC_KMAC
+/* values for the `variant` argument of kmac_init() and friends */
+#define LTC_KMAC128       1
+#define LTC_KMAC256       2
+#define LTC_KMAC128_XOF   3
+#define LTC_KMAC256_XOF   4
+
+typedef struct Kmac_state {
+   hash_state sha3;
+   int        xof;
+} kmac_state;
+
+int kmac_init(kmac_state *st, int variant,
+              const unsigned char *key,  unsigned long keylen,
+              const unsigned char *cust, unsigned long custlen);
+int kmac_process(kmac_state *st, const unsigned char *in, unsigned long inlen);
+int kmac_done(kmac_state *st, unsigned char *out, unsigned long *outlen);
+int kmac_memory(int variant,
+                const unsigned char *key,  unsigned long keylen,
+                const unsigned char *cust, unsigned long custlen,
+                const unsigned char *in,   unsigned long inlen,
+                      unsigned char *out,  unsigned long *outlen);
+int kmac_memory_multi(int variant,
+                      const unsigned char *key,  unsigned long keylen,
+                      const unsigned char *cust, unsigned long custlen,
+                            unsigned char *out,  unsigned long *outlen,
+                      const unsigned char *in,   unsigned long inlen, ...)
+                      LTC_NULL_TERMINATED;
+int kmac_file(int variant,
+              const unsigned char *key,  unsigned long keylen,
+              const unsigned char *cust, unsigned long custlen,
+                       const char *fname,
+                    unsigned char *out,  unsigned long *outlen);
+int kmac_test(void);
+#endif /* LTC_KMAC */
+
 #ifdef LTC_BLAKE2BMAC
 typedef hash_state blake2bmac_state;
 int blake2bmac_init(blake2bmac_state *st, unsigned long outlen, const unsigned char *key, unsigned long keylen);
@@ -399,14 +435,14 @@ int ccm_test(void);
 
 #endif /* LTC_CCM_MODE */
 
-#if defined(LTC_LRW_MODE) || defined(LTC_GCM_MODE)
+#if defined(LTC_LRW_MODE) || defined(LTC_GCM_MODE) || defined(LTC_GCM_SIV_MODE)
 void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *c);
 #endif
 
 int gcm_hw_pmul_is_supported(void);
 
 /* table shared between GCM and LRW */
-#if defined(LTC_GCM_TABLES) || defined(LTC_LRW_TABLES) || ((defined(LTC_GCM_MODE) || defined(LTC_GCM_MODE)) && defined(LTC_FAST))
+#if defined(LTC_GCM_TABLES) || defined(LTC_LRW_TABLES) || ((defined(LTC_GCM_MODE) || defined(LTC_GCM_SIV_MODE)) && defined(LTC_FAST))
 extern const unsigned char gcm_shift_table[];
 #endif
 
@@ -526,3 +562,15 @@ int siv_test(void);
 
 #endif
 
+#ifdef LTC_GCM_SIV_MODE
+/* RFC 8452 - AES-GCM-SIV */
+int gcm_siv_memory(                int  cipher,
+                   const unsigned char *key,    unsigned long  keylen,
+                   const unsigned char *nonce,  unsigned long  noncelen,
+                   const unsigned char *aad,    unsigned long  aadlen,
+                         unsigned char *in,     unsigned long  inlen,
+                         unsigned char *out,
+                         unsigned char *tag,    unsigned long *taglen,
+                                   int  direction);
+int gcm_siv_test(void);
+#endif

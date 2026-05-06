@@ -99,6 +99,9 @@ int register_all_hashes(void)
 #ifdef LTC_MD4
    REGISTER_HASH(&md4_desc);
 #endif
+#ifdef LTC_SM3
+   REGISTER_HASH(&sm3_desc);
+#endif
 #ifdef LTC_CHC_HASH
    {
       int aes_index = find_cipher_any("aes", 8, 16);

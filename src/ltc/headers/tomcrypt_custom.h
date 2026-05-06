@@ -216,6 +216,7 @@
 #define LTC_IDEA
 #define LTC_SERPENT
 #define LTC_TEA
+#define LTC_ARIA
 
 /* stream ciphers */
 #define LTC_CHACHA
@@ -282,6 +283,7 @@
 #define LTC_RIPEMD320
 #define LTC_BLAKE2S
 #define LTC_BLAKE2B
+#define LTC_SM3
 
 #define LTC_HASH_HELPERS
 
@@ -300,6 +302,7 @@
 #define LTC_POLY1305
 #define LTC_BLAKE2SMAC
 #define LTC_BLAKE2BMAC
+#define LTC_KMAC
 
 /* ---> Encrypt + Authenticate Modes <--- */
 
@@ -310,6 +313,7 @@
 #define LTC_GCM_MODE
 #define LTC_CHACHA20POLY1305_MODE
 #define LTC_SIV_MODE
+#define LTC_GCM_SIV_MODE
 
 /* Use 64KiB tables */
 #ifndef LTC_NO_TABLES
@@ -732,6 +736,10 @@
 
 #if defined(LTC_BLAKE2BMAC) && !defined(LTC_BLAKE2B)
    #error LTC_BLAKE2BMAC requires LTC_BLAKE2B
+#endif
+
+#if defined(LTC_KMAC) && !defined(LTC_SHA3)
+   #error LTC_KMAC requires LTC_SHA3
 #endif
 
 #if defined(LTC_SPRNG) && !defined(LTC_RNG_GET_BYTES)

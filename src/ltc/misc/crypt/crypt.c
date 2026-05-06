@@ -130,6 +130,9 @@ const char *crypt_build_settings =
 #if defined(LTC_TEA)
    "   TEA\n"
 #endif
+#if defined(LTC_ARIA)
+   "   ARIA\n"
+#endif
    "Stream ciphers built-in:\n"
 #if defined(LTC_CHACHA)
    "   ChaCha\n"
@@ -223,6 +226,9 @@ const char *crypt_build_settings =
 #if defined(LTC_BLAKE2B)
    "   BLAKE2B\n"
 #endif
+#if defined(LTC_SM3)
+   "   SM3\n"
+#endif
 #if defined(LTC_CHC_HASH)
    "   CHC_HASH\n"
 #endif
@@ -285,6 +291,9 @@ const char *crypt_build_settings =
 #if defined(LTC_BLAKE2BMAC)
     "   BLAKE2B MAC\n"
 #endif
+#if defined(LTC_KMAC)
+    "   KMAC\n"
+#endif
 
     "\nENC + AUTH modes:\n"
 #if defined(LTC_EAX_MODE)
@@ -314,6 +323,9 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_SIV_MODE)
     "   SIV\n"
+#endif
+#if defined(LTC_GCM_SIV_MODE)
+    "   GCM-SIV\n"
 #endif
 
     "\nPRNG:\n"

@@ -131,6 +131,14 @@ struct chc_state {
 };
 #endif
 
+#ifdef LTC_SM3
+struct sm3_state {
+    ulong64 length;
+    ulong32 state[8], curlen;
+    unsigned char buf[64];
+};
+#endif
+
 #ifdef LTC_BLAKE2S
 struct blake2s_state {
     ulong32 h[8];
@@ -207,6 +215,9 @@ typedef union Hash_state {
 #endif
 #ifdef LTC_BLAKE2B
     struct blake2b_state blake2b;
+#endif
+#ifdef LTC_SM3
+    struct sm3_state sm3;
 #endif
 
     void *data;
@@ -500,6 +511,14 @@ int blake2b_160_test(void);
 int blake2b_init(hash_state * md, unsigned long outlen, const unsigned char *key, unsigned long keylen);
 int blake2b_process(hash_state * md, const unsigned char *in, unsigned long inlen);
 int blake2b_done(hash_state * md, unsigned char *out);
+#endif
+
+#ifdef LTC_SM3
+int sm3_init(hash_state * md);
+int sm3_process(hash_state * md, const unsigned char *in, unsigned long inlen);
+int sm3_done(hash_state * md, unsigned char *out);
+int sm3_test(void);
+extern const struct ltc_hash_descriptor sm3_desc;
 #endif
 
 #ifdef LTC_MD5

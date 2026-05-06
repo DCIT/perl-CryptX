@@ -1,6 +1,6 @@
 OBJS=ltc/ciphers/aes/aes.o ltc/ciphers/aes/aes_desc.o ltc/ciphers/aes/aesni.o ltc/ciphers/anubis.o \
-ltc/ciphers/blowfish.o ltc/ciphers/camellia.o ltc/ciphers/cast5.o ltc/ciphers/des.o \
-ltc/ciphers/idea.o ltc/ciphers/kasumi.o ltc/ciphers/khazad.o ltc/ciphers/kseed.o \
+ltc/ciphers/aria.o ltc/ciphers/blowfish.o ltc/ciphers/camellia.o ltc/ciphers/cast5.o \
+ltc/ciphers/des.o ltc/ciphers/idea.o ltc/ciphers/kasumi.o ltc/ciphers/khazad.o ltc/ciphers/kseed.o \
 ltc/ciphers/multi2.o ltc/ciphers/noekeon.o ltc/ciphers/rc2.o ltc/ciphers/rc5.o ltc/ciphers/rc6.o \
 ltc/ciphers/safer/safer.o ltc/ciphers/safer/saferp.o ltc/ciphers/serpent.o ltc/ciphers/skipjack.o \
 ltc/ciphers/sm4.o ltc/ciphers/tea.o ltc/ciphers/twofish/twofish.o ltc/ciphers/xtea.o \
@@ -15,8 +15,8 @@ ltc/encauth/eax/eax_done.o ltc/encauth/eax/eax_encrypt.o ltc/encauth/eax/eax_enc
 ltc/encauth/eax/eax_init.o ltc/encauth/gcm/gcm_add_aad.o ltc/encauth/gcm/gcm_add_iv.o \
 ltc/encauth/gcm/gcm_done.o ltc/encauth/gcm/gcm_gf_mult.o ltc/encauth/gcm/gcm_init.o \
 ltc/encauth/gcm/gcm_memory.o ltc/encauth/gcm/gcm_mult_h.o ltc/encauth/gcm/gcm_process.o \
-ltc/encauth/gcm/gcm_reset.o ltc/encauth/ocb3/ocb3_add_aad.o ltc/encauth/ocb3/ocb3_decrypt.o \
-ltc/encauth/ocb3/ocb3_decrypt_last.o ltc/encauth/ocb3/ocb3_decrypt_verify_memory.o \
+ltc/encauth/gcm/gcm_reset.o ltc/encauth/gcm_siv/gcm_siv.o ltc/encauth/ocb3/ocb3_add_aad.o \
+ltc/encauth/ocb3/ocb3_decrypt.o ltc/encauth/ocb3/ocb3_decrypt_last.o ltc/encauth/ocb3/ocb3_decrypt_verify_memory.o \
 ltc/encauth/ocb3/ocb3_done.o ltc/encauth/ocb3/ocb3_encrypt.o ltc/encauth/ocb3/ocb3_encrypt_authenticate_memory.o \
 ltc/encauth/ocb3/ocb3_encrypt_last.o ltc/encauth/ocb3/ocb3_init.o ltc/encauth/ocb3/ocb3_int_ntz.o \
 ltc/encauth/ocb3/ocb3_int_xor_blocks.o ltc/encauth/siv/siv.o ltc/hashes/blake2b.o \
@@ -27,13 +27,14 @@ ltc/hashes/rmd320.o ltc/hashes/sha1.o ltc/hashes/sha1_desc.o ltc/hashes/sha1_x86
 ltc/hashes/sha2/sha224.o ltc/hashes/sha2/sha224_desc.o ltc/hashes/sha2/sha224_x86.o \
 ltc/hashes/sha2/sha256.o ltc/hashes/sha2/sha256_desc.o ltc/hashes/sha2/sha256_x86.o \
 ltc/hashes/sha2/sha384.o ltc/hashes/sha2/sha512.o ltc/hashes/sha2/sha512_224.o ltc/hashes/sha2/sha512_256.o \
-ltc/hashes/sha3.o ltc/hashes/sha3_test.o ltc/hashes/tiger.o ltc/hashes/whirl/whirl.o \
+ltc/hashes/sha3.o ltc/hashes/sha3_test.o ltc/hashes/sm3.o ltc/hashes/tiger.o ltc/hashes/whirl/whirl.o \
 ltc/mac/blake2/blake2bmac.o ltc/mac/blake2/blake2bmac_file.o ltc/mac/blake2/blake2bmac_memory.o \
 ltc/mac/blake2/blake2bmac_memory_multi.o ltc/mac/blake2/blake2smac.o ltc/mac/blake2/blake2smac_file.o \
 ltc/mac/blake2/blake2smac_memory.o ltc/mac/blake2/blake2smac_memory_multi.o ltc/mac/f9/f9_done.o \
 ltc/mac/f9/f9_file.o ltc/mac/f9/f9_init.o ltc/mac/f9/f9_memory.o ltc/mac/f9/f9_memory_multi.o \
 ltc/mac/f9/f9_process.o ltc/mac/hmac/hmac_done.o ltc/mac/hmac/hmac_file.o ltc/mac/hmac/hmac_init.o \
 ltc/mac/hmac/hmac_memory.o ltc/mac/hmac/hmac_memory_multi.o ltc/mac/hmac/hmac_process.o \
+ltc/mac/kmac/kmac.o ltc/mac/kmac/kmac_file.o ltc/mac/kmac/kmac_memory.o ltc/mac/kmac/kmac_memory_multi.o \
 ltc/mac/omac/omac_done.o ltc/mac/omac/omac_file.o ltc/mac/omac/omac_init.o ltc/mac/omac/omac_memory.o \
 ltc/mac/omac/omac_memory_multi.o ltc/mac/omac/omac_process.o ltc/mac/pelican/pelican.o \
 ltc/mac/pelican/pelican_memory.o ltc/mac/pmac/pmac_done.o ltc/mac/pmac/pmac_file.o \
