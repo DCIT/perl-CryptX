@@ -63,7 +63,7 @@ Crypt::Digest::TurboSHAKE - XOF (extendable output) hash functions TurboSHAKE128
 
 =head1 DESCRIPTION
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.089>
 
 Provides an interface to TurboSHAKE128 and TurboSHAKE256 as defined in
 L<RFC 9861|https://www.rfc-editor.org/rfc/rfc9861>.

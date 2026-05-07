@@ -400,7 +400,7 @@ Returns C<1> if the signature is valid, C<0> otherwise.
 
 =head2 sign_message_ctx
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.089>
 
 Signs a message using Ed25519ctx (RFC 8032 Section 5.1), which includes a
 mandatory context string (at most 255 bytes). The context string makes the
@@ -411,7 +411,7 @@ different context produces a different (and incompatible) signature.
 
 =head2 verify_message_ctx
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.089>
 
 Verifies a signature produced by L</sign_message_ctx>.
 
@@ -419,7 +419,7 @@ Verifies a signature produced by L</sign_message_ctx>.
 
 =head2 sign_message_ph
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.089>
 
 Signs a message using Ed25519ph (RFC 8032 Section 5.1), the "pre-hashed"
 variant. The message is first hashed with SHA-512 internally before signing.
@@ -432,7 +432,7 @@ provided; it defaults to the empty string if omitted.
 
 =head2 verify_message_ph
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.089>
 
 Verifies a signature produced by L</sign_message_ph>.
 

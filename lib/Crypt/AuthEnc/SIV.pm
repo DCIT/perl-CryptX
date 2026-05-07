@@ -35,7 +35,7 @@ Crypt::AuthEnc::SIV - Authenticated encryption in SIV mode
 
 =head1 DESCRIPTION
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.089>
 
 SIV (Synthetic IV) is a deterministic authenticated encryption scheme defined in
 L<RFC 5297|https://www.rfc-editor.org/rfc/rfc5297>. Unlike nonce-based modes, SIV derives

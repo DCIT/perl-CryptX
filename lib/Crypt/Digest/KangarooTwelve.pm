@@ -65,7 +65,7 @@ Crypt::Digest::KangarooTwelve - XOF (extendable output) hash function KangarooTw
 
 =head1 DESCRIPTION
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.089>
 
 Provides an interface to KangarooTwelve (K12) as defined in
 L<RFC 9861|https://www.rfc-editor.org/rfc/rfc9861>.

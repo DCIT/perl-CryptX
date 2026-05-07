@@ -115,7 +115,7 @@ Crypt::AuthEnc::XChaCha20Poly1305 - Authenticated encryption in XChaCha20-Poly13
 
 =head1 DESCRIPTION
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.089>
 
 Provides encryption and authentication based on XChaCha20 + Poly1305 using
 the extended 192-bit (24-byte) nonce variant of ChaCha20-Poly1305.

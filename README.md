@@ -76,7 +76,7 @@ widely deployed (TLS 1.3, WireGuard, SSH). Use this as the default AEAD choice.
 - **XChaCha20-Poly1305** ([Crypt::AuthEnc::XChaCha20Poly1305](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AXChaCha20Poly1305)) - Extended 24-byte nonce
 variant. Prefer over ChaCha20-Poly1305 when nonces are generated randomly.
 - **AES-GCM** ([Crypt::AuthEnc::GCM](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AGCM)) - The standard AEAD mode for AES. Hardware-accelerated
-on modern CPUs. Requires unique nonces; nonce reuse is catastrophic.
+on modern CPUs. Requires unique nonces; nonce reuse breaks the security entirely.
 - **AES-SIV** ([Crypt::AuthEnc::SIV](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3ASIV)) - Deterministic AEAD, nonce-misuse resistant.
 Slightly slower but safer when nonce uniqueness cannot be guaranteed.
 - **AES-OCB** ([Crypt::AuthEnc::OCB](https://metacpan.org/pod/Crypt%3A%3AAuthEnc%3A%3AOCB)) - Very fast single-pass AEAD. Check patent status
@@ -172,7 +172,7 @@ default choice for key exchange.
 - **X448** ([Crypt::PK::X448](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AX448)) - Higher security margin than X25519.
 - **ECDSA** ([Crypt::PK::ECC](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AECC)) - Widely used (TLS, Bitcoin). Prefer Ed25519 for new
 designs unless ECDSA is required for interoperability.
-- **RSA** ([Crypt::PK::RSA](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ARSA)) - Legacy but ubiquitous. Use 2048-bit keys minimum, 4096-bit
+- **RSA** ([Crypt::PK::RSA](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ARSA)) - Legacy but very widely used. Use 2048-bit keys minimum, 4096-bit
 preferred. Prefer OAEP for encryption and PSS for signatures.
 - **DSA** ([Crypt::PK::DSA](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ADSA)) - Legacy. Prefer Ed25519 or ECDSA.
 - **DH** ([Crypt::PK::DH](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ADH)) - Classic Diffie-Hellman. Prefer X25519 for new designs.

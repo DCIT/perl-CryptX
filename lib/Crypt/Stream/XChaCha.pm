@@ -32,7 +32,7 @@ Crypt::Stream::XChaCha - Stream cipher XChaCha20
 
 =head1 DESCRIPTION
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.089>
 
 Provides an interface to the XChaCha20 stream cipher, an extended-nonce
 variant of ChaCha20 using a 192-bit (24-byte) nonce.

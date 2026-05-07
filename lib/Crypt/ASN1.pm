@@ -464,7 +464,7 @@ Crypt::ASN1 - DER ASN.1 parser and encoder based on libtomcrypt
 
 =head1 DESCRIPTION
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.089>
 
 Parses DER-encoded ASN.1 data into a Perl data structure without requiring
 any schema, and encodes Perl data structures back to DER.

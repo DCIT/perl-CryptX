@@ -32,7 +32,7 @@ Crypt::Stream::XSalsa20 - Stream cipher XSalsa20
 
 =head1 DESCRIPTION
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.089>
 
 Provides an interface to the XSalsa20 stream cipher, an extended-nonce
 variant of Salsa20 with a 192-bit (24-byte) nonce. The larger nonce

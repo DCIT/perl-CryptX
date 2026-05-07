@@ -1,6 +1,6 @@
 Changes for CryptX
 
-NEXT    2026-MM-DD
+0.089   2026-MM-DD
         - new: Crypt::ASN1
         - new: Crypt::AuthEnc::SIV
         - new: Crypt::AuthEnc::XChaCha20Poly1305
@@ -14,11 +14,12 @@ NEXT    2026-MM-DD
         - Crypt::PK::Ed25519 - new functions: sign_message_ctx, verify_message_ctx, sign_message_ph, verify_message_ph
         - Crypt::Digest: object digest accessors now finalize the object; use reset() before reuse
         - Crypt::Mac + Crypt::AuthEnc: finalized-object lifecycle is now enforced consistently
-        - security/hardening fixes across Digest/Mac/AuthEnc/Mode/Stream/PK/PRNG cleanup paths and XS scalar handling
-        - fix malformed oversized AEAD tag handling in functional decrypt_verify helpers
-        - improved API consistency, POD accuracy, and edge-case test coverage across the distribution
-        - bundled libtomcrypt update branch:develop (commit: 0a46eb2e 2026-04-27)
-        - bundled libtommath update branch:develop (commit: ae40a87 2026-04-20)
+        - security/hardening fixes across Digest/Mac/AuthEnc/Mode/Stream/PK/PRNG
+        - fixes related to wycheproof test suite
+        - documentation cleanup & improvements
+        - support for RFC 8702 RSA-PSS-SHAKE128/256 and ECDSA-SHAKE128/256
+        - support for FRP256v1 elliptic-curve
+        - bundled libtomcrypt update branch:develop (commit: 8b5af49b 2026-05-06)
 
 0.088   2026-04-23
         - Crypt::KeyDerivation - new functions: pbkdf1_openssl, bcrypt_pbkdf, scrypt_pbkdf, argon2_pbkdf

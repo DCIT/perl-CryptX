@@ -140,7 +140,7 @@ Crypt::PK::X448 - Asymmetric cryptography based on X448
 
 =head1 DESCRIPTION
 
-I<Since: CryptX-0.100>
+I<Since: CryptX-0.089>
 
 =head1 METHODS
 
