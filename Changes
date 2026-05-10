@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.089   2026-MM-DD
+0.089   2026-05-10
         - new: Crypt::ASN1
         - new: Crypt::AuthEnc::SIV
         - new: Crypt::AuthEnc::XChaCha20Poly1305
