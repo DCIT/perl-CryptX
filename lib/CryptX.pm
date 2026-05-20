@@ -124,6 +124,9 @@ on modern CPUs. Requires unique nonces; nonce reuse breaks the security entirely
 =item * B<AES-SIV> (L<Crypt::AuthEnc::SIV>) - Deterministic AEAD, nonce-misuse resistant.
 Slightly slower but safer when nonce uniqueness cannot be guaranteed.
 
+=item * B<AES-GCM-SIV> (L<Crypt::AuthEnc::GCMSIV>) - Nonce-misuse-resistant AEAD (RFC 8452).
+Faster than AES-SIV; pick this when you need GCM-like performance with nonce-reuse safety.
+
 =item * B<AES-OCB> (L<Crypt::AuthEnc::OCB>) - Very fast single-pass AEAD. Check patent status
 for your jurisdiction.
 
@@ -338,7 +341,7 @@ L<Crypt::Stream::Sober128>, L<Crypt::Stream::Sosemanuk>, L<Crypt::Stream::Rabbit
 
 =item * Authenticated encryption modes
 
-L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::OCB>, L<Crypt::AuthEnc::ChaCha20Poly1305>, L<Crypt::AuthEnc::XChaCha20Poly1305>, L<Crypt::AuthEnc::SIV>
+L<Crypt::AuthEnc::CCM>, L<Crypt::AuthEnc::EAX>, L<Crypt::AuthEnc::GCM>, L<Crypt::AuthEnc::GCMSIV>, L<Crypt::AuthEnc::OCB>, L<Crypt::AuthEnc::ChaCha20Poly1305>, L<Crypt::AuthEnc::XChaCha20Poly1305>, L<Crypt::AuthEnc::SIV>
 
 =item * Hash functions
 

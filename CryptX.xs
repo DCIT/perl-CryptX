@@ -1491,6 +1491,7 @@ INCLUDE: inc/CryptX_AuthEnc_OCB.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_CCM.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_ChaCha20Poly1305.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_SIV.xs.inc
+INCLUDE: inc/CryptX_AuthEnc_GCMSIV.xs.inc
 
 INCLUDE: inc/CryptX_Stream_ChaCha.xs.inc
 INCLUDE: inc/CryptX_Stream_XChaCha.xs.inc

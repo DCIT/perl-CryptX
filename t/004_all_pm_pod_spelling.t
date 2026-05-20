@@ -45,7 +45,7 @@ Test::Pod::Spelling->import(
                     },
 );
 
-plan tests => 121;
+plan tests => 122;
 
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');

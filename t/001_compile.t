@@ -13,6 +13,7 @@ use Crypt::AuthEnc::CCM;
 use Crypt::AuthEnc::ChaCha20Poly1305;
 use Crypt::AuthEnc::XChaCha20Poly1305;
 use Crypt::AuthEnc::SIV;
+use Crypt::AuthEnc::GCMSIV;
 use Crypt::AuthEnc::EAX;
 use Crypt::AuthEnc::GCM;
 use Crypt::AuthEnc::OCB;
