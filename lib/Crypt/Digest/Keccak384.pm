@@ -84,6 +84,8 @@ Crypt::Digest::Keccak384 - Hash function Keccak-384 [size: 384 bits]
 
 =head1 DESCRIPTION
 
+I<Since: CryptX-0.059>
+
 Provides an interface to the Keccak384 digest algorithm.
 
 =head1 EXPORT

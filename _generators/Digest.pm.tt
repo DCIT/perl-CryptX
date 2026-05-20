@@ -83,7 +83,9 @@ Crypt::Digest::[%orig_name%] - [%info%]
    my $file_result_raw = Crypt::Digest::[%orig_name%]->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
-
+[% IF since %]
+I<Since: CryptX-[%since%]>
+[% END %]
 Provides an interface to the [%orig_name%] digest algorithm.
 
 =head1 EXPORT

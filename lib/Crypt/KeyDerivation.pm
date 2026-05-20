@@ -239,10 +239,9 @@ C<$pseudokey> is normally the PRK returned by C<hkdf_extract>.
 
 =head2 bcrypt_pbkdf
 
-bcrypt-based key derivation as defined by the OpenBSD project.
-
 I<Since: CryptX-0.088>
 
+bcrypt-based key derivation as defined by the OpenBSD project.
 
   my $derived_key = bcrypt_pbkdf($password, $salt, $rounds, $hash_name, $len);
   #or
@@ -262,10 +261,9 @@ Larger C<$rounds> values increase CPU cost linearly.
 
 =head2 scrypt_pbkdf
 
-scrypt key derivation according to L<https://www.rfc-editor.org/rfc/rfc7914>.
-
 I<Since: CryptX-0.088>
 
+scrypt key derivation according to L<https://www.rfc-editor.org/rfc/rfc7914>.
 
   my $derived_key = scrypt_pbkdf($password, $salt, $N, $r, $p, $len);
   #or
@@ -287,10 +285,9 @@ increase resource usage substantially; invalid combinations croak.
 
 =head2 argon2_pbkdf
 
-Argon2 key derivation according to L<https://www.rfc-editor.org/rfc/rfc9106>.
-
 I<Since: CryptX-0.088>
 
+Argon2 key derivation according to L<https://www.rfc-editor.org/rfc/rfc9106>.
 
   my $derived_key = argon2_pbkdf($type, $password, $salt, $t_cost, $m_factor, $parallelism, $len, $secret, $ad);
   #or

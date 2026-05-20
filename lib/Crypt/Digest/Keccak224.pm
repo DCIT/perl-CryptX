@@ -84,6 +84,8 @@ Crypt::Digest::Keccak224 - Hash function Keccak-224 [size: 224 bits]
 
 =head1 DESCRIPTION
 
+I<Since: CryptX-0.059>
+
 Provides an interface to the Keccak224 digest algorithm.
 
 =head1 EXPORT

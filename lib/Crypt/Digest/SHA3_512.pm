@@ -84,6 +84,8 @@ Crypt::Digest::SHA3_512 - Hash function SHA3-512 [size: 512 bits]
 
 =head1 DESCRIPTION
 
+I<Since: CryptX-0.048>
+
 Provides an interface to the SHA3_512 digest algorithm.
 
 =head1 EXPORT

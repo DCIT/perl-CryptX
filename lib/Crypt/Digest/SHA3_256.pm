@@ -84,6 +84,8 @@ Crypt::Digest::SHA3_256 - Hash function SHA3-256 [size: 256 bits]
 
 =head1 DESCRIPTION
 
+I<Since: CryptX-0.048>
+
 Provides an interface to the SHA3_256 digest algorithm.
 
 =head1 EXPORT

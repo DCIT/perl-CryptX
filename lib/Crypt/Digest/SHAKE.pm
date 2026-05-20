@@ -65,6 +65,8 @@ Crypt::Digest::SHAKE - Hash functions SHAKE128, SHAKE256 from SHA3 family
 
 =head1 DESCRIPTION
 
+I<Since: CryptX-0.048>
+
 Provides an interface to the SHA3's sponge function SHAKE.
 
 This is an XOF (extendable output function). Feed input with C<add()> /

@@ -84,6 +84,8 @@ Crypt::Digest::SHA512_224 - Hash function SHA-512/224 [size: 224 bits]
 
 =head1 DESCRIPTION
 
+I<Since: CryptX-0.022>
+
 Provides an interface to the SHA512_224 digest algorithm.
 
 =head1 EXPORT

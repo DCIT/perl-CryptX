@@ -882,7 +882,7 @@ Returns the signature as a binary string.
  #      in most cases it will be the same as used to create $message_hash, if not provided non-deterministic
  #      signature will be created
 
-I<Since: CryptX-0.081>
+I<Since: CryptX-0.081> - the optional C<$deterministic_hash_name> argument enabling RFC 6979 deterministic signatures.
 
 =head2 sign_hash_eth
 

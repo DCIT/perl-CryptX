@@ -84,6 +84,8 @@ Crypt::Digest::SHA3_384 - Hash function SHA3-384 [size: 384 bits]
 
 =head1 DESCRIPTION
 
+I<Since: CryptX-0.048>
+
 Provides an interface to the SHA3_384 digest algorithm.
 
 =head1 EXPORT

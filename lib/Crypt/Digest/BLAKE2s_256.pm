@@ -84,6 +84,8 @@ Crypt::Digest::BLAKE2s_256 - Hash function BLAKE2s [size: 256 bits]
 
 =head1 DESCRIPTION
 
+I<Since: CryptX-0.048>
+
 Provides an interface to the BLAKE2s_256 digest algorithm.
 
 =head1 EXPORT

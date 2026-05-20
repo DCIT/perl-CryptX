@@ -43,6 +43,8 @@ Crypt::Mac::KMAC - Message authentication code KMAC (NIST SP 800-185)
 
 =head1 DESCRIPTION
 
+I<Since: CryptX-0.090>
+
 Provides an interface to KMAC, the keyed message authentication code based on
 cSHAKE (NIST SP 800-185 section4). Four variants are exposed:
 
