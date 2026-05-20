@@ -79,6 +79,7 @@ use Crypt::Digest::SHA512;
 use Crypt::Digest::SHA512_224;
 use Crypt::Digest::SHA512_256;
 use Crypt::Digest::SHAKE;
+use Crypt::Digest::SM3;
 use Crypt::Digest::TurboSHAKE;
 use Crypt::Digest::KangarooTwelve;
 use Crypt::Digest::Tiger192;

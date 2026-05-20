@@ -40,12 +40,12 @@ Test::Pod::Spelling->import(
                           pre Edctx Edph
                           behaviour reseeds
                           OIDs MGF RSASSA
-                          NIST SP KMACXOF cSHAKE TupleHash ParallelHash
+                          NIST SP KMACXOF cSHAKE TupleHash ParallelHash SM
                         )]
                     },
 );
 
-plan tests => 120;
+plan tests => 121;
 
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');
