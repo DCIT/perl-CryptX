@@ -4,7 +4,7 @@ package Crypt::Digest::SM3;
 
 use strict;
 use warnings;
-our $VERSION = '0.089_001';
+our $VERSION = '0.089_002';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( sm3 sm3_hex sm3_b64 sm3_b64u sm3_file sm3_file_hex sm3_file_b64 sm3_file_b64u )] );
