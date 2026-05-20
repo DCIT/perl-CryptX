@@ -49,6 +49,8 @@ Crypt::Cipher::IDEA - Symmetric cipher IDEA, key size: 128 bits
 
 =head1 DESCRIPTION
 
+I<Since: CryptX-0.055>
+
 This module implements the IDEA cipher. Its interface is compatible with L<Crypt::CBC>.
 
 B<Note:> This module only implements single-block encryption and decryption.
