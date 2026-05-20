@@ -245,7 +245,7 @@ module POD when you need exact failure semantics.
     [Crypt::Digest::SHA512](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA512), [Crypt::Digest::SHA512\_224](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA512_224), [Crypt::Digest::SHA512\_256](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA512_256), [Crypt::Digest::Tiger192](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ATiger192), [Crypt::Digest::Whirlpool](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AWhirlpool),
     [Crypt::Digest::Keccak224](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AKeccak224), [Crypt::Digest::Keccak256](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AKeccak256), [Crypt::Digest::Keccak384](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AKeccak384), [Crypt::Digest::Keccak512](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AKeccak512),
     [Crypt::Digest::SHA3\_224](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA3_224), [Crypt::Digest::SHA3\_256](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA3_256), [Crypt::Digest::SHA3\_384](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA3_384), [Crypt::Digest::SHA3\_512](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHA3_512), [Crypt::Digest::SHAKE](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASHAKE),
-    [Crypt::Digest::TurboSHAKE](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ATurboSHAKE), [Crypt::Digest::KangarooTwelve](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AKangarooTwelve)
+    [Crypt::Digest::TurboSHAKE](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ATurboSHAKE), [Crypt::Digest::KangarooTwelve](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3AKangarooTwelve), [Crypt::Digest::SM3](https://metacpan.org/pod/Crypt%3A%3ADigest%3A%3ASM3)
 
 - Checksums
 
@@ -253,8 +253,8 @@ module POD when you need exact failure semantics.
 
 - Message authentication codes
 
-    [Crypt::Mac::BLAKE2b](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3ABLAKE2b), [Crypt::Mac::BLAKE2s](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3ABLAKE2s), [Crypt::Mac::F9](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AF9), [Crypt::Mac::HMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AHMAC), [Crypt::Mac::OMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AOMAC),
-    [Crypt::Mac::Pelican](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3APelican), [Crypt::Mac::PMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3APMAC), [Crypt::Mac::XCBC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AXCBC), [Crypt::Mac::Poly1305](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3APoly1305)
+    [Crypt::Mac::BLAKE2b](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3ABLAKE2b), [Crypt::Mac::BLAKE2s](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3ABLAKE2s), [Crypt::Mac::F9](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AF9), [Crypt::Mac::HMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AHMAC), [Crypt::Mac::KMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AKMAC),
+    [Crypt::Mac::OMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AOMAC), [Crypt::Mac::Pelican](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3APelican), [Crypt::Mac::PMAC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3APMAC), [Crypt::Mac::XCBC](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3AXCBC), [Crypt::Mac::Poly1305](https://metacpan.org/pod/Crypt%3A%3AMac%3A%3APoly1305)
 
 - Public-key cryptography
 

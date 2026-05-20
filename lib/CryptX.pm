@@ -349,7 +349,7 @@ L<Crypt::Digest::RIPEMD256>, L<Crypt::Digest::RIPEMD320>, L<Crypt::Digest::SHA1>
 L<Crypt::Digest::SHA512>, L<Crypt::Digest::SHA512_224>, L<Crypt::Digest::SHA512_256>, L<Crypt::Digest::Tiger192>, L<Crypt::Digest::Whirlpool>,
 L<Crypt::Digest::Keccak224>, L<Crypt::Digest::Keccak256>, L<Crypt::Digest::Keccak384>, L<Crypt::Digest::Keccak512>,
 L<Crypt::Digest::SHA3_224>, L<Crypt::Digest::SHA3_256>, L<Crypt::Digest::SHA3_384>, L<Crypt::Digest::SHA3_512>, L<Crypt::Digest::SHAKE>,
-L<Crypt::Digest::TurboSHAKE>, L<Crypt::Digest::KangarooTwelve>
+L<Crypt::Digest::TurboSHAKE>, L<Crypt::Digest::KangarooTwelve>, L<Crypt::Digest::SM3>
 
 =item * Checksums
 
