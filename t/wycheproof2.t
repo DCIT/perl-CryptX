@@ -20,6 +20,7 @@ for my $module (
     Crypt::AuthEnc::ChaCha20Poly1305
     Crypt::AuthEnc::EAX
     Crypt::AuthEnc::GCM
+    Crypt::AuthEnc::GCMSIV
     Crypt::AuthEnc::SIV
     Crypt::AuthEnc::XChaCha20Poly1305
     Crypt::Cipher
@@ -275,6 +276,7 @@ sub norm_hash {
   return 'SHA512'     if $hash =~ /^SHA-?512$/i;
   return 'SHAKE128'   if $hash =~ /^SHAKE-?128$/i;
   return 'SHAKE256'   if $hash =~ /^SHAKE-?256$/i;
+  return 'SM3'        if $hash =~ /^SM3$/i;
   return undef;
 }
 
@@ -293,6 +295,7 @@ sub norm_cipher {
   $cipher = uc $cipher;
   $cipher =~ s/[-_]//g;
   return 'AES'      if $cipher eq 'AES';
+  return 'ARIA'     if $cipher eq 'ARIA';
   return 'Camellia' if $cipher eq 'CAMELLIA';
   return 'SEED'     if $cipher eq 'SEED';
   return 'SM4'      if $cipher eq 'SM4';
@@ -739,6 +742,9 @@ sub handle_aead {
   if ($alg eq 'AEAD-AES-SIV-CMAC') {
     return handle_aead_siv($file, $doc);
   }
+  if ($alg eq 'AES-GCM-SIV') {
+    return handle_aead_gcm_siv($file, $doc);
+  }
   if ($alg eq 'CHACHA20-POLY1305') {
     return handle_aead_chacha($file, $doc, 0);
   }
@@ -859,6 +865,42 @@ sub handle_aead_siv {
       my ($ok, $pt) = eval_scalar(sub { Crypt::AuthEnc::SIV::siv_decrypt_verify('AES', $key, $full_ct, $ad) });
       $pt = undef unless $ok;
       check_exact_hex($file, $doc, $group, $test, $pt, $test->{msg}, 'AES-SIV decrypt');
+    }
+  }
+}
+
+sub handle_aead_gcm_siv {
+  my ($file, $doc) = @_;
+  for my $group (@{ $doc->{testGroups} || [] }) {
+    my $tag_len = int(($group->{tagSize} || 128) / 8);
+    for my $test (@{ $group->{tests} || [] }) {
+      mark_tc();
+      my $key = hex_to_bin($test->{key});
+      my $iv  = hex_to_bin($test->{iv});
+      my $aad = hex_to_bin($test->{aad});
+      my $msg = hex_to_bin($test->{msg});
+      my $ct  = hex_to_bin($test->{ct});
+      my $tag = hex_to_bin($test->{tag});
+
+      if (($test->{result} || '') ne 'invalid') {
+        my ($ok, $got) = eval_scalar(sub {
+          Crypt::AuthEnc::GCMSIV::gcm_siv_encrypt_authenticate('AES', $key, $iv, $aad, $msg);
+        });
+        my ($got_ct, $got_tag);
+        if ($ok && defined $got && length($got) >= $tag_len) {
+          $got_ct  = substr($got, 0, length($got) - $tag_len);
+          $got_tag = substr($got, length($got) - $tag_len);
+        }
+        check_exact_hex($file, $doc, $group, $test, $got_ct,  $test->{ct},  'AES-GCM-SIV encrypt ct');
+        check_exact_hex($file, $doc, $group, $test, $got_tag, $test->{tag}, 'AES-GCM-SIV encrypt tag');
+      }
+
+      my $full_ct = $ct . $tag;
+      my ($ok, $pt) = eval_scalar(sub {
+        Crypt::AuthEnc::GCMSIV::gcm_siv_decrypt_verify('AES', $key, $iv, $aad, $full_ct);
+      });
+      $pt = undef unless $ok;
+      check_exact_hex($file, $doc, $group, $test, $pt, $test->{msg}, 'AES-GCM-SIV decrypt');
     }
   }
 }
