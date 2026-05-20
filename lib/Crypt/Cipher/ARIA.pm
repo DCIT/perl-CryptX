@@ -1,24 +1,24 @@
-package Crypt::Cipher::[%orig_name%];
+package Crypt::Cipher::ARIA;
 
-[%comment%]
+### BEWARE - GENERATED FILE, DO NOT EDIT MANUALLY!
 
 use strict;
 use warnings;
-our $VERSION = '[%(pmver || "0.000")%]';
+our $VERSION = '0.089_001';
 
 use base qw(Crypt::Cipher);
 
 sub new {
   my ($class, @args) = @_;
-  my $obj = Crypt::Cipher->new('[%orig_name%]', @args);
+  my $obj = Crypt::Cipher->new('ARIA', @args);
   return bless $obj, $class;
 }
 
-sub blocksize      { Crypt::Cipher::blocksize('[%orig_name%]')      }
-sub keysize        { Crypt::Cipher::keysize('[%orig_name%]')        }
-sub max_keysize    { Crypt::Cipher::max_keysize('[%orig_name%]')    }
-sub min_keysize    { Crypt::Cipher::min_keysize('[%orig_name%]')    }
-sub default_rounds { Crypt::Cipher::default_rounds('[%orig_name%]') }
+sub blocksize      { Crypt::Cipher::blocksize('ARIA')      }
+sub keysize        { Crypt::Cipher::keysize('ARIA')        }
+sub max_keysize    { Crypt::Cipher::max_keysize('ARIA')    }
+sub min_keysize    { Crypt::Cipher::min_keysize('ARIA')    }
+sub default_rounds { Crypt::Cipher::default_rounds('ARIA') }
 
 1;
 
@@ -26,7 +26,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('[%orig_name%]') }
 
 =head1 NAME
 
-Crypt::Cipher::[%orig_name%] - [%info%]
+Crypt::Cipher::ARIA - Symmetric cipher ARIA, key size: 128/192/256 bits
 
 =head1 SYNOPSIS
 
@@ -35,23 +35,23 @@ Crypt::Cipher::[%orig_name%] - [%info%]
 
   my $key = '...'; # length must be a valid key size for this cipher
   my $iv = '...';  # 16 bytes
-  my $cbc = Crypt::Mode::CBC->new('[%orig_name%]');
+  my $cbc = Crypt::Mode::CBC->new('ARIA');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
   ### example 2 (slower)
   use Crypt::CBC;
-  use Crypt::Cipher::[%orig_name%];
+  use Crypt::Cipher::ARIA;
 
   my $key = '...'; # length must be a valid key size for this cipher
   my $iv = '...';  # 16 bytes
-  my $cbc = Crypt::CBC->new( -cipher=>'Cipher::[%orig_name%]', -key=>$key, -iv=>$iv );
+  my $cbc = Crypt::CBC->new( -cipher=>'Cipher::ARIA', -key=>$key, -iv=>$iv );
   my $ciphertext = $cbc->encrypt("secret data");
 
 =head1 DESCRIPTION
-[% IF since %]
-I<Since: CryptX-[%since%]>
-[% END %]
-This module implements the [%orig_name%] cipher. Its interface is compatible with L<Crypt::CBC>.
+
+I<Since: CryptX-0.090>
+
+This module implements the ARIA cipher. Its interface is compatible with L<Crypt::CBC>.
 
 B<Note:> This module only implements single-block encryption and decryption.
 For general data, use a block mode such as
@@ -62,13 +62,13 @@ L<Crypt::Mode::CBC>, L<Crypt::Mode::CTR>, or L<Crypt::CBC> (which is slower).
 Unless noted otherwise, assume C<$c> is an existing cipher object created via
 C<new>, for example:
 
- my $c = Crypt::Cipher::[%orig_name%]->new($key);
+ my $c = Crypt::Cipher::ARIA->new($key);
 
 =head2 new
 
- my $c = Crypt::Cipher::[%orig_name%]->new($key);
+ my $c = Crypt::Cipher::ARIA->new($key);
  #or
- my $c = Crypt::Cipher::[%orig_name%]->new($key, $rounds);
+ my $c = Crypt::Cipher::ARIA->new($key, $rounds);
 
  # $key .... [binary string] key of an accepted length (see keysize, min_keysize, max_keysize)
  # $rounds . [integer] optional, number of rounds (if supported by the cipher; croaks on invalid value)
@@ -99,9 +99,9 @@ Just an alias for C<max_keysize>.
 
   $c->keysize;
   #or
-  Crypt::Cipher::[%orig_name%]->keysize;
+  Crypt::Cipher::ARIA->keysize;
   #or
-  Crypt::Cipher::[%orig_name%]::keysize;
+  Crypt::Cipher::ARIA::keysize;
 
 =head2 blocksize
 
@@ -109,9 +109,9 @@ Returns the cipher block size (in bytes).
 
   $c->blocksize;
   #or
-  Crypt::Cipher::[%orig_name%]->blocksize;
+  Crypt::Cipher::ARIA->blocksize;
   #or
-  Crypt::Cipher::[%orig_name%]::blocksize;
+  Crypt::Cipher::ARIA::blocksize;
 
 =head2 max_keysize
 
@@ -119,9 +119,9 @@ Returns the maximum key size (in bytes).
 
   $c->max_keysize;
   #or
-  Crypt::Cipher::[%orig_name%]->max_keysize;
+  Crypt::Cipher::ARIA->max_keysize;
   #or
-  Crypt::Cipher::[%orig_name%]::max_keysize;
+  Crypt::Cipher::ARIA::max_keysize;
 
 =head2 min_keysize
 
@@ -129,9 +129,9 @@ Returns the minimum key size (in bytes).
 
   $c->min_keysize;
   #or
-  Crypt::Cipher::[%orig_name%]->min_keysize;
+  Crypt::Cipher::ARIA->min_keysize;
   #or
-  Crypt::Cipher::[%orig_name%]::min_keysize;
+  Crypt::Cipher::ARIA::min_keysize;
 
 =head2 default_rounds
 
@@ -139,18 +139,20 @@ Returns the cipher's default round count.
 
   $c->default_rounds;
   #or
-  Crypt::Cipher::[%orig_name%]->default_rounds;
+  Crypt::Cipher::ARIA->default_rounds;
   #or
-  Crypt::Cipher::[%orig_name%]::default_rounds;
+  Crypt::Cipher::ARIA::default_rounds;
 
 =head1 SEE ALSO
 
 =over
 
 =item * L<CryptX>, L<Crypt::Cipher>
-[% FOREACH v IN urls %]
-=item * L<[%v%]>
-[% END %]
+
+=item * L<https://en.wikipedia.org/wiki/ARIA_(cipher)>
+
+=item * L<https://www.rfc-editor.org/rfc/rfc5794>
+
 =back
 
 =cut

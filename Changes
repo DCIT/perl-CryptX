@@ -2,6 +2,7 @@ Changes for CryptX
 
 0.090   2026-NEXT
         - new: Crypt::AuthEnc::GCMSIV
+        - new: Crypt::Cipher::ARIA
         - new: Crypt::Digest::SM3
         - new: Crypt::Mac::KMAC
         - bundled libtomcrypt update branch:develop (commit: a68fa19b 2026-05-19)

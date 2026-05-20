@@ -23,6 +23,7 @@ use Crypt::Checksum::CRC32;
 use Crypt::Checksum;
 use Crypt::Cipher::AES;
 use Crypt::Cipher::Anubis;
+use Crypt::Cipher::ARIA;
 use Crypt::Cipher::Blowfish;
 use Crypt::Cipher::Camellia;
 use Crypt::Cipher::CAST5;
