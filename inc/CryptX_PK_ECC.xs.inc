@@ -112,7 +112,10 @@ _import_pem(Crypt::PK::ECC self, SV * key_data, SV * passwd)
           rv = pem_decode_pkcs(data, (unsigned long)data_len, &key_from_pem, NULL);
         }
         if (rv != CRYPT_OK) croak("FATAL: pem_decode_pkcs failed: %s", error_to_string(rv));
-        if (key_from_pem.id != LTC_PKA_EC) croak("FATAL: pem_decode_pkcs decoded non-ECC key");
+        if (key_from_pem.id != LTC_PKA_EC) {
+          pka_key_free(&key_from_pem);
+          croak("FATAL: pem_decode_pkcs decoded non-ECC key");
+        }
         self->key = key_from_pem.u.ecc;
         XPUSHs(ST(0)); /* return self */
     }
@@ -136,7 +139,10 @@ _import_openssh(Crypt::PK::ECC self, SV * key_data, SV * passwd)
           rv = pem_decode_openssh(data, (unsigned long)data_len, &key_from_pem, NULL);
         }
         if (rv != CRYPT_OK) croak("FATAL: pem_decode_openssh failed: %s", error_to_string(rv));
-        if (key_from_pem.id != LTC_PKA_EC) croak("FATAL: pem_decode_openssh decoded non-ECC key");
+        if (key_from_pem.id != LTC_PKA_EC) {
+          pka_key_free(&key_from_pem);
+          croak("FATAL: pem_decode_openssh decoded non-ECC key");
+        }
         self->key = key_from_pem.u.ecc;
         XPUSHs(ST(0)); /* return self */
     }

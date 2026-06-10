@@ -97,7 +97,10 @@ _import_pem(Crypt::PK::X448 self, SV * key_data, SV * passwd)
           rv = pem_decode_pkcs(data, (unsigned long)data_len, &key_from_pem, NULL);
        }
         if (rv != CRYPT_OK) croak("FATAL: pem_decode_pkcs failed: %s", error_to_string(rv));
-        if (key_from_pem.id != LTC_PKA_X448) croak("FATAL: pem_decode_pkcs decoded non-X448 key");
+        if (key_from_pem.id != LTC_PKA_X448) {
+          pka_key_free(&key_from_pem);
+          croak("FATAL: pem_decode_pkcs decoded non-X448 key");
+        }
         self->key = key_from_pem.u.x448;
         self->initialized = 1;
         XPUSHs(ST(0)); /* return self */

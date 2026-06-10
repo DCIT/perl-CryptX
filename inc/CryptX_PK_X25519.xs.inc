@@ -97,7 +97,10 @@ _import_pem(Crypt::PK::X25519 self, SV * key_data, SV * passwd)
           rv = pem_decode_pkcs(data, (unsigned long)data_len, &key_from_pem, NULL);
        }
         if (rv != CRYPT_OK) croak("FATAL: pem_decode_pkcs failed: %s", error_to_string(rv));
-        if (key_from_pem.id != LTC_PKA_X25519) croak("FATAL: pem_decode_pkcs decoded non-X25519 key");
+        if (key_from_pem.id != LTC_PKA_X25519) {
+          pka_key_free(&key_from_pem);
+          croak("FATAL: pem_decode_pkcs decoded non-X25519 key");
+        }
         self->key = key_from_pem.u.x25519;
         self->initialized = 1;
         XPUSHs(ST(0)); /* return self */

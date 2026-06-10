@@ -141,7 +141,10 @@ _import_pem(Crypt::PK::DSA self, SV * key_data, SV * passwd)
           rv = pem_decode_pkcs(data, (unsigned long)data_len, &key_from_pem, NULL);
         }
         if (rv != CRYPT_OK) croak("FATAL: pem_decode_pkcs failed: %s", error_to_string(rv));
-        if (key_from_pem.id != LTC_PKA_DSA) croak("FATAL: pem_decode_pkcs decoded non-DSA key");
+        if (key_from_pem.id != LTC_PKA_DSA) {
+          pka_key_free(&key_from_pem);
+          croak("FATAL: pem_decode_pkcs decoded non-DSA key");
+        }
         self->key = key_from_pem.u.dsa;
         XPUSHs(ST(0)); /* return self */
     }
@@ -165,7 +168,10 @@ _import_openssh(Crypt::PK::DSA self, SV * key_data, SV * passwd)
           rv = pem_decode_openssh(data, (unsigned long)data_len, &key_from_pem, NULL);
         }
         if (rv != CRYPT_OK) croak("FATAL: pem_decode_openssh failed: %s", error_to_string(rv));
-        if (key_from_pem.id != LTC_PKA_DSA) croak("FATAL: pem_decode_openssh decoded non-DSA key");
+        if (key_from_pem.id != LTC_PKA_DSA) {
+          pka_key_free(&key_from_pem);
+          croak("FATAL: pem_decode_openssh decoded non-DSA key");
+        }
         self->key = key_from_pem.u.dsa;
         XPUSHs(ST(0)); /* return self */
     }
