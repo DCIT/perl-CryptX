@@ -257,6 +257,7 @@ key2hash(Crypt::PK::DSA self)
         /* g */
         siz = (self->key.g) ? mp_ubin_size(self->key.g) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'g' too big number");
         }
         if (siz>0) {
@@ -269,6 +270,7 @@ key2hash(Crypt::PK::DSA self)
         /* q */
         siz = (self->key.q) ? mp_ubin_size(self->key.q) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'q' too big number");
         }
         if (siz>0) {
@@ -281,6 +283,7 @@ key2hash(Crypt::PK::DSA self)
         /* p */
         siz = (self->key.p) ? mp_ubin_size(self->key.p) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'p' too big number");
         }
         if (siz>0) {
@@ -293,6 +296,7 @@ key2hash(Crypt::PK::DSA self)
         /* x */
         siz = (self->key.x) ? mp_ubin_size(self->key.x) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'x' too big number");
         }
         if (siz>0) {
@@ -305,6 +309,7 @@ key2hash(Crypt::PK::DSA self)
         /* y */
         siz = (self->key.y) ? mp_ubin_size(self->key.y) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'y' too big number");
         }
         if (siz>0) {
@@ -319,6 +324,7 @@ key2hash(Crypt::PK::DSA self)
         /* type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
         LTC_UNUSED_PARAM(not_used);
+        zeromem(buf, sizeof(buf));
         RETVAL = newRV_noinc((SV*)rv_hash);
     OUTPUT:
         RETVAL
@@ -334,12 +340,12 @@ export_key_der(Crypt::PK::DSA self, char * type)
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strEQ(type, "private")) {
           rv = dsa_export(out, &out_len, PK_PRIVATE|PK_STD, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: dsa_export(PK_PRIVATE|PK_STD) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(out, sizeof(out)); croak("FATAL: dsa_export(PK_PRIVATE|PK_STD) failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else if (strEQ(type, "public")) {
           rv = dsa_export(out, &out_len, PK_PUBLIC|PK_STD, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: dsa_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(out, sizeof(out)); croak("FATAL: dsa_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
@@ -368,7 +374,7 @@ encrypt(Crypt::PK::DSA self, SV * data, const char * hash_name = "SHA1")
         rv = dsa_encrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                              &self->pstate, self->pindex,
                              hash_id, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: dsa_encrypt_key failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) { zeromem(buffer, sizeof(buffer)); croak("FATAL: dsa_encrypt_key failed: %s", error_to_string(rv)); }
         RETVAL = newSVpvn((char*)buffer, buffer_len);
         zeromem(buffer, sizeof(buffer));
     }
@@ -388,7 +394,7 @@ decrypt(Crypt::PK::DSA self, SV * data)
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
         rv = dsa_decrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: dsa_decrypt_key failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) { zeromem(buffer, sizeof(buffer)); croak("FATAL: dsa_decrypt_key failed: %s", error_to_string(rv)); }
         RETVAL = newSVpvn((char*)buffer, buffer_len);
         zeromem(buffer, sizeof(buffer));
     }
@@ -412,14 +418,18 @@ sign_hash(Crypt::PK::DSA self, SV * data, const char * hash_name = "SHA1")
           id = cryptx_internal_find_hash(hash_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
           rv = hash_memory(id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
-          if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(tmp, sizeof(tmp)); croak("FATAL: hash_memory failed: %s", error_to_string(rv)); }
           data_ptr = tmp;
           data_len = tmp_len;
         }
         rv = dsa_sign_hash(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                            &self->pstate, self->pindex,
                            &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: dsa_sign_hash failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) {
+          zeromem(buffer, sizeof(buffer));
+          zeromem(tmp, sizeof(tmp));
+          croak("FATAL: dsa_sign_hash failed: %s", error_to_string(rv));
+        }
         RETVAL = newSVpvn((char*)buffer, buffer_len);
         zeromem(buffer, sizeof(buffer));
         zeromem(tmp, sizeof(tmp));

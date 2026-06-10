@@ -175,6 +175,7 @@ key2hash(Crypt::PK::DH self)
         /* x */
         siz = (self->key.x) ? mp_ubin_size(self->key.x) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'x' too big number");
         }
         if (siz>0) {
@@ -187,6 +188,7 @@ key2hash(Crypt::PK::DH self)
         /* y */
         siz = (self->key.y) ? mp_ubin_size(self->key.y) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'y' too big number");
         }
         if (siz>0) {
@@ -199,6 +201,7 @@ key2hash(Crypt::PK::DH self)
         /* p */
         siz = (self->key.prime) ? mp_ubin_size(self->key.prime) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'p' too big number");
         }
         if (siz>0) {
@@ -212,6 +215,7 @@ key2hash(Crypt::PK::DH self)
         /* g */
         siz = (self->key.base) ? mp_ubin_size(self->key.base) : 0;
         if (siz>10000) {
+          zeromem(buf, sizeof(buf));
           croak("FATAL: key2hash failed - 'g' too big number");
         }
         if (siz>0) {
@@ -226,6 +230,7 @@ key2hash(Crypt::PK::DH self)
         /* type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
         LTC_UNUSED_PARAM(not_used);
+        zeromem(buf, sizeof(buf));
         RETVAL = newRV_noinc((SV*)rv_hash);
     OUTPUT:
         RETVAL
@@ -281,12 +286,12 @@ export_key(Crypt::PK::DH self, char * type)
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strEQ(type, "private")) {
           rv = dh_export(out, &out_len, PK_PRIVATE, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: dh_export(PK_PRIVATE) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(out, sizeof(out)); croak("FATAL: dh_export(PK_PRIVATE) failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else if (strEQ(type, "public")) {
           rv = dh_export(out, &out_len, PK_PUBLIC, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: dh_export(PK_PUBLIC) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(out, sizeof(out)); croak("FATAL: dh_export(PK_PUBLIC) failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
@@ -306,7 +311,7 @@ shared_secret(Crypt::PK::DH self, Crypt::PK::DH pubkey)
         unsigned long buffer_len = sizeof(buffer);
 
         rv = dh_shared_secret(&self->key, &pubkey->key, buffer, &buffer_len);
-        if (rv != CRYPT_OK) croak("FATAL: dh_shared_secret failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) { zeromem(buffer, sizeof(buffer)); croak("FATAL: dh_shared_secret failed: %s", error_to_string(rv)); }
         RETVAL = newSVpvn((char*)buffer, buffer_len);
         zeromem(buffer, sizeof(buffer));
     }
@@ -324,12 +329,12 @@ export_key_raw(Crypt::PK::DH self, char * type)
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strEQ(type, "private")) {
           rv = dh_export_key(out, &out_len, PK_PRIVATE, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: dh_export_key(PK_PRIVATE) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(out, sizeof(out)); croak("FATAL: dh_export_key(PK_PRIVATE) failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else if (strEQ(type, "public")) {
           rv = dh_export_key(out, &out_len, PK_PUBLIC, &self->key);
-          if (rv != CRYPT_OK) croak("FATAL: dh_export_key(PK_PUBLIC) failed: %s", error_to_string(rv));
+          if (rv != CRYPT_OK) { zeromem(out, sizeof(out)); croak("FATAL: dh_export_key(PK_PUBLIC) failed: %s", error_to_string(rv)); }
           sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
