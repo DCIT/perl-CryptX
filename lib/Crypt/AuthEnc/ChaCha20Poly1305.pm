@@ -48,11 +48,12 @@ Crypt::AuthEnc::ChaCha20Poly1305 - Authenticated encryption in ChaCha20-Poly1305
  my $pt = $ae_dec->decrypt_add('ciphertext1');
  $pt .= $ae_dec->decrypt_add('ciphertext2');
  $pt .= $ae_dec->decrypt_add('ciphertext3');
- my $computed_tag = $ae_dec->decrypt_done();
- die "decrypt failed" unless $computed_tag eq $expected_tag;
+ $ae_dec->decrypt_done($expected_tag) or die "decrypt failed"; # constant-time tag check
 
- #or
- my $result = $ae_dec->decrypt_done($expected_tag); # 0 or 1
+ #or, if you need the computed tag, compare it with slow_eq from Crypt::Misc
+ #(Perl's 'eq' is not constant-time and leaks timing information)
+ my $computed_tag = $ae_dec->decrypt_done();
+ die "decrypt failed" unless Crypt::Misc::slow_eq($computed_tag, $expected_tag);
 
  ### functional interface
  use Crypt::AuthEnc::ChaCha20Poly1305 qw(chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify);

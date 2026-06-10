@@ -55,11 +55,12 @@ Crypt::AuthEnc::OCB - Authenticated encryption in OCBv3 mode
  $pt .= $ae_dec->decrypt_add('ciphertext2');
  $pt .= $ae_dec->decrypt_add('ciphertext3');
  $pt .= $ae_dec->decrypt_last('rest of data');
- my $computed_tag = $ae_dec->decrypt_done();
- die "decrypt failed" unless $computed_tag eq $expected_tag;
+ $ae_dec->decrypt_done($expected_tag) or die "decrypt failed"; # constant-time tag check
 
- #or
- my $result = $ae_dec->decrypt_done($expected_tag); # 0 or 1
+ #or, if you need the computed tag, compare it with slow_eq from Crypt::Misc
+ #(Perl's 'eq' is not constant-time and leaks timing information)
+ my $computed_tag = $ae_dec->decrypt_done();
+ die "decrypt failed" unless Crypt::Misc::slow_eq($computed_tag, $expected_tag);
 
  ### functional interface
  use Crypt::AuthEnc::OCB qw(ocb_encrypt_authenticate ocb_decrypt_verify);

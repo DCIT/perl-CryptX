@@ -631,8 +631,10 @@ verify_hash(Crypt::PK::RSA self, SV * sig, SV * data, const char * hash_name = "
           rv = ltc_mp.rsa_me(sig_ptr, (unsigned long)sig_len, buffer, &buffer_len, PK_PUBLIC, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: rsa_me failed: %s", error_to_string(rv));
           if (data_len <= buffer_len && buffer_len > 0 && data_len > 0) {
-            for (i = 0; i < buffer_len - data_len; i++) if (buffer[i] != 0) RETVAL = 0;
-            if (memNE(data_ptr, buffer + buffer_len - data_len, data_len)) RETVAL = 0;
+            unsigned char acc = 0;
+            for (i = 0; i < buffer_len - data_len; i++) acc |= buffer[i];
+            if (acc != 0) RETVAL = 0;
+            if (mem_neq(data_ptr, buffer + buffer_len - data_len, data_len)) RETVAL = 0;
           }
           else {
             RETVAL = 0;
