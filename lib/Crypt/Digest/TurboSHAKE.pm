@@ -2,7 +2,7 @@ package Crypt::Digest::TurboSHAKE;
 
 use strict;
 use warnings;
-our $VERSION = '0.089_002';
+our $VERSION = '0.090';
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;

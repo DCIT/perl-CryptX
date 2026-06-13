@@ -2,7 +2,7 @@ package Crypt::Mac::KMAC;
 
 use strict;
 use warnings;
-our $VERSION = '0.089_002';
+our $VERSION = '0.090';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( kmac kmac_hex kmac_b64 kmac_b64u )] );
