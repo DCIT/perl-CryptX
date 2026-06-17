@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.090   2026-NEXT
+0.090   2026-06-17
         - new: Crypt::AuthEnc::GCMSIV
         - new: Crypt::Cipher::ARIA
         - new: Crypt::Digest::SM3
