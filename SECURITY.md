@@ -27,6 +27,14 @@ For more information, see
 [Report a Security Issue](https://security.metacpan.org/docs/report.html)
 on the CPANSec website.
 
+## Previously Fixed Issues
+
+Reports submitted after an issue has already been fixed in any
+released version, including a development release, will be rejected.
+
+Before reporting, verify that the issue still exists in the latest
+version available on CPAN, including the latest development release.
+
 ## Response to Reports
 
 The maintainer(s) aim to acknowledge your security report as soon as
