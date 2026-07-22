@@ -40,10 +40,10 @@ int ltc_ecc_verify_key(const ecc_key *key)
 
    /* Test 3: does nG = O? (n = order, O = point at infinity, G = public key) */
    point = ltc_ecc_new_point();
-   if ((err = ltc_ecc_mulmod(order, &(key->pubkey), point, a, prime, 1)) != CRYPT_OK)     { goto done1; }
+   if ((err = ltc_ecc_mulmod(order, &(key->pubkey), point, a, prime, 0)) != CRYPT_OK)     { goto done1; }
 
    err = ltc_ecc_is_point_at_infinity(point, prime, &inf);
-   if (err != CRYPT_OK || inf) {
+   if (err != CRYPT_OK || !inf) {
       err = CRYPT_ERROR;
    }
    else {

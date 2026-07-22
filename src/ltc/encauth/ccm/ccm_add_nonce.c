@@ -20,8 +20,11 @@ int ccm_add_nonce(ccm_state *ccm,
    LTC_ARGCHK(ccm   != NULL);
    LTC_ARGCHK(nonce != NULL);
 
-   /* increase L to match the nonce len */
-   ccm->noncelen = (noncelen > 13) ? 13 : noncelen;
+   /* CCM nonce is 7..13 bytes */
+   if (noncelen < 7 || noncelen > 13) {
+      return CRYPT_INVALID_ARG;
+   }
+   ccm->noncelen = noncelen;
    if ((15 - ccm->noncelen) > ccm->L) {
       ccm->L = 15 - ccm->noncelen;
    }
@@ -29,9 +32,9 @@ int ccm_add_nonce(ccm_state *ccm,
       return CRYPT_INVALID_ARG;
    }
 
-   /* decrease noncelen to match L */
+   /* flags byte + nonce + length field must fit the 16-byte block */
    if ((ccm->noncelen + ccm->L) > 15) {
-      ccm->noncelen = 15 - ccm->L;
+      return CRYPT_INVALID_ARG;
    }
 
    /* form B_0 == flags | Nonce N | l(m) */

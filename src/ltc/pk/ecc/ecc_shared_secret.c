@@ -23,8 +23,8 @@ int ecc_shared_secret(const ecc_key *private_key, const ecc_key *public_key,
 {
    unsigned long  x;
    ecc_point     *result;
-   void          *prime, *a;
-   int            err;
+   void          *prime, *a, *mp = NULL;
+   int            err, inf;
 
    LTC_ARGCHK(private_key != NULL);
    LTC_ARGCHK(public_key  != NULL);
@@ -59,7 +59,15 @@ int ecc_shared_secret(const ecc_key *private_key, const ecc_key *public_key,
    prime = private_key->dp.prime;
    a     = private_key->dp.A;
 
-   if ((err = ltc_mp.ecc_ptmul(private_key->k, &public_key->pubkey, result, a, prime, 1)) != CRYPT_OK)   { goto done; }
+   if ((err = ltc_mp.ecc_ptmul(private_key->k, &public_key->pubkey, result, a, prime, 0)) != CRYPT_OK)   { goto done; }
+
+   /* reject small-subgroup / invalid-curve attacks: k*pubkey must not be O */
+   if ((err = ltc_ecc_is_point_at_infinity(result, prime, &inf)) != CRYPT_OK)                            { goto done; }
+   if (inf) { err = CRYPT_ERROR; goto done; }
+
+   /* map=0 above kept z meaningful for the infinity check; now finish the affine map */
+   if ((err = ltc_mp_montgomery_setup(prime, &mp)) != CRYPT_OK)                                          { goto done; }
+   if ((err = ltc_mp.ecc_map(result, prime, mp)) != CRYPT_OK)                                            { goto done; }
 
    x = (unsigned long)ltc_mp_unsigned_bin_size(prime);
    if (*outlen < x) {
@@ -73,6 +81,7 @@ int ecc_shared_secret(const ecc_key *private_key, const ecc_key *public_key,
    err     = CRYPT_OK;
    *outlen = x;
 done:
+   if (mp != NULL) ltc_mp_montgomery_free(mp);
    ltc_ecc_del_point(result);
    return err;
 }

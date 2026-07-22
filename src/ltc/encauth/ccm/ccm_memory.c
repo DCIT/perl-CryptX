@@ -78,7 +78,8 @@ int ccm_memory(int cipher,
    if (*taglen < 4 || *taglen > 16 || (*taglen % 2) == 1 || headerlen > 0x7fffffffu) {
       return CRYPT_INVALID_ARG;
    }
-   if (noncelen < 7) {
+   /* CCM nonce is 7..13 bytes */
+   if (noncelen < 7 || noncelen > 13) {
       return CRYPT_INVALID_ARG;
    }
 
@@ -107,11 +108,15 @@ int ccm_memory(int cipher,
    }
 
    /* increase L to match the nonce len */
-   noncelen = (noncelen > 13) ? 13 : noncelen;
    if ((15 - noncelen) > L) {
       L = 15 - noncelen;
    }
    if (L > 8) {
+      return CRYPT_INVALID_ARG;
+   }
+
+   /* flags byte + nonce + length field must fit the 16-byte block */
+   if ((noncelen + L) > 15) {
       return CRYPT_INVALID_ARG;
    }
 

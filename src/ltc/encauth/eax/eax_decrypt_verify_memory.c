@@ -49,8 +49,13 @@ int eax_decrypt_verify_memory(int cipher,
    /* default to zero */
    *stat = 0;
 
-   /* limit taglen */
-   taglen = MIN(taglen, MAXBLOCKSIZE);
+   if ((err = cipher_is_valid(cipher)) != CRYPT_OK) {
+      return err;
+   }
+   /* NOTE: zero-length tag is legal (it just provides no authenticity) */
+   if (taglen > (unsigned long)cipher_descriptor[cipher].block_length) {
+      return CRYPT_INVALID_ARG;
+   }
 
    /* allocate ram */
    buf = XMALLOC(taglen);
