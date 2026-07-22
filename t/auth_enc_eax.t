@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 23;
 
 use Crypt::AuthEnc::EAX qw( eax_encrypt_authenticate eax_decrypt_verify );
 
@@ -67,4 +67,24 @@ my $key   = "12345678901234561234567890123456";
   substr($tag, 0, 1) = pack("H2", "AA");
   $pt = eax_decrypt_verify('AES', $key, $nonce, "", $ct, $tag);
   is($pt, undef, "eax_decrypt_verify: plaintext (no header) / bad tag");
+}
+
+{
+  # EAX tag-length: 0..16 (16 == AES blocklen)
+  my ($ct, $tag) = eax_encrypt_authenticate('AES', $key, $nonce, "abc", "data_data_data_data");
+  my $empty = "";
+  my $short = substr($tag, 0, 3);
+  is(eax_decrypt_verify('AES', $key, $nonce, "abc", $ct, $empty), "data_data_data_data", "eax_decrypt_verify: empty tag accepted");
+  is(eax_decrypt_verify('AES', $key, $nonce, "abc", $ct, $short), "data_data_data_data", "eax_decrypt_verify: truncated tag accepted");
+  is(eax_decrypt_verify('AES', $key, $nonce, "abc", $ct, $tag),   "data_data_data_data", "eax_decrypt_verify: full tag accepted");
+  is(eax_decrypt_verify('AES', $key, "123456789012", "", $ct, $tag . ("A" x 200)), undef, "ocb_decrypt_verify: over-long tag rejected");
+}
+
+{
+  # EAX imposes no nonce-length restriction
+  for my $nlen (0, 1, 64) {
+    my $n = "N" x $nlen;
+    my ($ct, $tag) = eax_encrypt_authenticate('AES', $key, $n, "", "data");
+    is(eax_decrypt_verify('AES', $key, $n, "", $ct, $tag), "data", "eax_decrypt_verify: nonce length $nlen accepted");
+  }
 }

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 21;
 
 use Crypt::AuthEnc::ChaCha20Poly1305 qw( chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify );
 
@@ -62,4 +62,22 @@ my $key   = "12345678901234561234567890123456";
   substr($tag, 0, 1) = pack("H2", "AA");
   $pt = chacha20poly1305_decrypt_verify($key, "123456789012", "adata-123456789012", $ct, $tag);
   is($pt, undef, "chacha20poly1305_decrypt_verify: plaintext (no header) / bad tag");
+}
+
+{
+  # tags outside the documented 16-byte length must not authenticate
+  my ($ct, $tag) = chacha20poly1305_encrypt_authenticate($key, "123456789012", "", "plain_halfplain_half");
+  my $empty = "";
+  my $short = substr($tag, 0, 8); # correct 8-byte prefix of the real tag
+  is(chacha20poly1305_decrypt_verify($key, "123456789012", "", $ct, $empty), undef, "chacha20poly1305_decrypt_verify: empty tag rejected");
+  is(chacha20poly1305_decrypt_verify($key, "123456789012", "", $ct, $short), undef, "chacha20poly1305_decrypt_verify: short tag rejected");
+  is(chacha20poly1305_decrypt_verify($key, "123456789012", "", $ct, $tag), "plain_halfplain_half", "chacha20poly1305_decrypt_verify: full tag accepted");
+}
+
+{
+  # nonce outside the documented 8- or 12-byte lengths must be rejected
+  eval { chacha20poly1305_encrypt_authenticate($key, "N" x 7, "", "data") };
+  like($@, qr/chacha20poly1305_memory failed/, "chacha20poly1305_encrypt_authenticate: 7-byte nonce rejected");
+  eval { chacha20poly1305_encrypt_authenticate($key, "N" x 16, "", "data") };
+  like($@, qr/chacha20poly1305_memory failed/, "chacha20poly1305_encrypt_authenticate: 16-byte nonce rejected");
 }

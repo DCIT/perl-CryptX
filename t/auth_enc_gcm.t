@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 20;
 
 use Crypt::AuthEnc::GCM qw( gcm_encrypt_authenticate gcm_decrypt_verify );
 
@@ -63,4 +63,22 @@ my $key   = "12345678901234561234567890123456";
   substr($tag, 0, 1) = pack("H2", "AA");
   $pt = gcm_decrypt_verify('AES', $key, "123456789012", "adata-123456789012", $ct, $tag);
   is($pt, undef, "gcm_decrypt_verify: plaintext (no header) / bad tag");
+}
+
+{
+  # tags outside the documented 16-byte length must not authenticate
+  my ($ct, $tag) = gcm_encrypt_authenticate('AES', $key, "123456789012", "", "plain_halfplain_half");
+  my $empty = "";
+  my $short = substr($tag, 0, 8); # correct 8-byte prefix of the real tag
+  is(gcm_decrypt_verify('AES', $key, "123456789012", "", $ct, $empty), undef, "gcm_decrypt_verify: empty tag rejected");
+  is(gcm_decrypt_verify('AES', $key, "123456789012", "", $ct, $short), undef, "gcm_decrypt_verify: short tag rejected");
+  is(gcm_decrypt_verify('AES', $key, "123456789012", "", $ct, $tag), "plain_halfplain_half", "gcm_decrypt_verify: full tag accepted");
+}
+
+{
+  # GCM accepts any positive IV length, but an empty IV must be rejected
+  eval { gcm_encrypt_authenticate('AES', $key, "", "", "data") };
+  like($@, qr/gcm_memory failed/, "gcm_encrypt_authenticate: empty IV rejected");
+  my ($ct) = gcm_encrypt_authenticate('AES', $key, "N", "", "data");
+  ok(defined $ct, "gcm_encrypt_authenticate: 1-byte IV accepted");
 }

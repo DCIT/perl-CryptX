@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 29;
 
 use Crypt::AuthEnc::OCB qw( ocb_encrypt_authenticate ocb_decrypt_verify );
 
@@ -49,4 +49,12 @@ my $key   = "12345678901234561234567890123456";
   substr($tag, 0, 1) = pack("H2", "AA");
   $pt = ocb_decrypt_verify('AES', $key, "123456789012", "adata-123456789012", $ct, $tag);
   is($pt, undef, "ocb_decrypt_verify: plaintext (no header) / bad tag");
+}
+
+{
+  # OCBv3 tag-length: 0..16
+  for (0..16) {
+    my ($ct, $tag) = ocb_encrypt_authenticate('AES', $key, "123456789012", "", $_, "data_data_data_data");
+    is(ocb_decrypt_verify('AES', $key, "123456789012", "", $ct, $tag), "data_data_data_data", "ocb_decrypt_verify: tag (len=$_) accepted");
+  }
 }

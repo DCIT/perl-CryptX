@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 86;
+use Test::More tests => 88;
 
 use Crypt::KeyDerivation qw(pbkdf1 pbkdf1_openssl pbkdf2 hkdf hkdf_expand hkdf_extract bcrypt_pbkdf scrypt_pbkdf argon2_pbkdf);
 
@@ -247,6 +247,11 @@ use Crypt::KeyDerivation qw(pbkdf1 pbkdf1_openssl pbkdf2 hkdf hkdf_expand hkdf_e
   is(unpack('H*', scrypt_pbkdf("pleaseletmein", "SodiumChloride", 16384, 8, 1, 64)),
      '7023bdcb3afd7348461c06cd81fd38ebfda8fbba904f8e3ea9b543f6545da1f2d5432955613f0fcf62d49705242a9af9e61e85dc0d651e40dfcf017b45575887',
      'scrypt_pbkdf("pleaseletmein", "SodiumChloride", 16384, 8, 1)');
+}
+
+{ ### argon2_pbkdf - rejects out-of-range parallelism
+  is(eval { argon2_pbkdf('argon2id', 'password', '12345678', 1, 8, 0x1000000, 32); 1 }, undef, 'argon2_pbkdf rejects parallelism above 0xFFFFFF');
+  is(eval { argon2_pbkdf('argon2id', 'password', '12345678', 1, 8, 2**30, 32); 1 }, undef, 'argon2_pbkdf rejects parallelism 2**30 (no SIGFPE)');
 }
 
 { ### argon2_pbkdf - RFC 9106 test vectors

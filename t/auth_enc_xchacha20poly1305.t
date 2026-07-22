@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 23;
+plan tests => 29;
 
 use Crypt::AuthEnc::XChaCha20Poly1305 qw(
   xchacha20poly1305_encrypt_authenticate
@@ -105,4 +105,23 @@ my $tag_hex = "996a94a6808314a5d012d9e4e329aabf";
   ok(!$ok, 'rejects non-24-byte nonce');
   like($@, qr/nonce length must be 24 bytes/, 'invalid nonce error');
 
+}
+
+{
+  # tags outside the documented 16-byte length must not authenticate
+  my ($ct, $tag) = xchacha20poly1305_encrypt_authenticate($key, $nonce, $aad, $pt);
+  my $empty = "";
+  my $short = substr($tag, 0, 8); # correct 8-byte prefix of the real tag
+  is(xchacha20poly1305_decrypt_verify($key, $nonce, $aad, $ct, $empty), undef, 'xchacha20poly1305_decrypt_verify: empty tag rejected');
+  is(xchacha20poly1305_decrypt_verify($key, $nonce, $aad, $ct, $short), undef, 'xchacha20poly1305_decrypt_verify: short tag rejected');
+  is(xchacha20poly1305_decrypt_verify($key, $nonce, $aad, $ct, $tag . ("A" x 200)), undef, 'xchacha20poly1305_decrypt_verify: over-long tag rejected');
+  is(xchacha20poly1305_decrypt_verify($key, $nonce, $aad, $ct, $tag), $pt, 'xchacha20poly1305_decrypt_verify: full tag accepted');
+}
+
+{
+  # functional helper rejects a nonce that is not exactly 24 bytes
+  eval { xchacha20poly1305_encrypt_authenticate($key, "N" x 23, $aad, $pt) };
+  like($@, qr/nonce length must be 24 bytes/, 'xchacha20poly1305_encrypt_authenticate: 23-byte nonce rejected');
+  eval { xchacha20poly1305_encrypt_authenticate($key, "N" x 25, $aad, $pt) };
+  like($@, qr/nonce length must be 24 bytes/, 'xchacha20poly1305_encrypt_authenticate: 25-byte nonce rejected');
 }

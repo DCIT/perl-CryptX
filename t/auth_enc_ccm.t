@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 24;
 
 use Crypt::AuthEnc::CCM qw( ccm_encrypt_authenticate ccm_decrypt_verify );
 
@@ -69,4 +69,25 @@ my $key   = "12345678901234561234567890123456";
   my ($ct1, $tag1) = ccm_encrypt_authenticate('AES', $key, $nonce, undef, 16, 1234567890);
   my ($ct2, $tag2) = ccm_encrypt_authenticate('AES', $key, $nonce, undef, 16, "1234567890");
   ok($ct1 eq $ct2 && $tag1 eq $tag2, "GH issue 105");
+}
+
+{
+  # tags outside the documented 4..16 byte range must not authenticate
+  my ($ct, $tag) = ccm_encrypt_authenticate('AES', $key, $nonce, "header-abc", 16, "plain_halfplain_half");
+  my $empty = "";
+  my $short = substr($tag, 0, 3); # below the 4-byte minimum
+  is(ccm_decrypt_verify('AES', $key, $nonce, "header-abc", $ct, $empty), undef, "ccm_decrypt_verify: empty tag rejected");
+  is(ccm_decrypt_verify('AES', $key, $nonce, "header-abc", $ct, $short), undef, "ccm_decrypt_verify: short tag (<4) rejected");
+  is(ccm_decrypt_verify('AES', $key, $nonce, "header-abc", $ct, $tag), "plain_halfplain_half", "ccm_decrypt_verify: full tag accepted");
+}
+
+{
+  # nonce outside the documented 7..13 byte range must be rejected
+  # (not silently truncated -- over-long used to be clamped to 13)
+  eval { ccm_encrypt_authenticate('AES', $key, "N" x 6, undef, 16, "data") };
+  like($@, qr/ccm_memory failed/, "ccm_encrypt_authenticate: nonce below 7 bytes rejected");
+  eval { ccm_encrypt_authenticate('AES', $key, "N" x 14, undef, 16, "data") };
+  like($@, qr/ccm_memory failed/, "ccm_encrypt_authenticate: nonce above 13 bytes rejected");
+  my ($ct) = ccm_encrypt_authenticate('AES', $key, "N" x 7, undef, 16, "data");
+  ok(defined $ct, "ccm_encrypt_authenticate: 7-byte nonce accepted");
 }
