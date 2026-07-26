@@ -150,6 +150,9 @@ This call finalizes the current message.
 
  my $tag = $ae->encrypt_done();                 # returns $tag value
 
+B<IMPORTANT:> The length of the tag is a security parameter and a zero-length
+tag is legal (it simply provides no authenticity), which is the caller's choice.
+
 =head2 decrypt_add
 
 Returns a binary string of plaintext (raw bytes).

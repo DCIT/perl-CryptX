@@ -135,6 +135,9 @@ C<new>, for example:
  # $nonce ... [binary string] unique nonce/salt (no need to keep it secret)
  # $tag_len . [integer] required length of output tag
 
+B<IMPORTANT:> The length of the tag is a security parameter and a zero-length
+tag is legal (it simply provides no authenticity), which is the caller's choice.
+
 =head2 adata_add
 
 Can be called only before the first C<encrypt_add>, C<encrypt_last>,
