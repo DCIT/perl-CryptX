@@ -341,8 +341,8 @@ int der_decode_custom_type_ex(const unsigned char *in,   unsigned long  inlen,
 
            case LTC_ASN1_SETOF:
            case LTC_ASN1_SEQUENCE:
-               /* detect if we have the right type */
-               if ((type == LTC_ASN1_SETOF && (in[x] & 0x3F) != 0x31) || (type == LTC_ASN1_SEQUENCE && (in[x] & 0x3F) != 0x30)) {
+               /* detect if we have the right type, the inlen test keeps in[x] inside the packet */
+               if ((inlen == 0) || (type == LTC_ASN1_SETOF && (in[x] & 0x3F) != 0x31) || (type == LTC_ASN1_SEQUENCE && (in[x] & 0x3F) != 0x30)) {
                   err = CRYPT_INVALID_PACKET;
                   goto LBL_ERR;
                }
@@ -389,6 +389,11 @@ int der_decode_custom_type_ex(const unsigned char *in,   unsigned long  inlen,
            case LTC_ASN1_EOL:
                err = CRYPT_INVALID_ARG;
                goto LBL_ERR;
+       }
+       /* z is the canonical length of the decoded value, not always the octets consumed; without this test inlen wraps and the next element is read OOB */
+       if (z > inlen) {
+          err = CRYPT_INVALID_PACKET;
+          goto LBL_ERR;
        }
        x           += z;
        inlen       -= z;

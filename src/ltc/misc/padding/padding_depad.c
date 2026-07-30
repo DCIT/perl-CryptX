@@ -52,7 +52,7 @@ int padding_depad(const unsigned char *data, unsigned long *length, unsigned lon
    switch (type) {
       case LTC_PAD_ANSI_X923:
          pad = 0x0;
-         /* FALLTHROUGH */
+         LTC_FALLTHROUGH; /* FALLTHROUGH */
       case LTC_PAD_PKCS7:
          for (n = unpadded_length; n < padded_length - 1; ++n) {
             data_xor_pad |= data[n] ^ pad;

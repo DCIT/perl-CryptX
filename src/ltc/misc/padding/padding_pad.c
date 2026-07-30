@@ -28,7 +28,7 @@ static int s_padding_padded_length(unsigned long *length, unsigned long mode)
             t = 0;
             break;
          }
-         /* FALLTHROUGH */
+         LTC_FALLTHROUGH; /* FALLTHROUGH */
       case LTC_PAD_PKCS7:
       case LTC_PAD_ONE_AND_ZERO:
       case LTC_PAD_ZERO_ALWAYS:

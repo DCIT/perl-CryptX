@@ -14,11 +14,16 @@ int pkcs8_get_children(const ltc_asn1_list *decoded_list, enum ltc_oid_id *pka, 
    int err;
    unsigned long n;
    der_flexi_check flexi_should[4];
-   ltc_asn1_list *seq_l, *version;
+   ltc_asn1_list *seq_l = NULL, *priv_l = NULL, *version = NULL;
 
    LTC_ARGCHK(ltc_mp.name != NULL);
 
    if (alg_id == NULL) alg_id = &seq_l;
+   if (priv_key == NULL) priv_key = &priv_l;
+
+   /* der_flexi_sequence_cmp() writes only matched outputs, so unmatched ones stay NULL */
+   *alg_id = NULL;
+   *priv_key = NULL;
 
    /* Setup for basic structure */
    n=0;
@@ -35,12 +40,18 @@ int pkcs8_get_children(const ltc_asn1_list *decoded_list, enum ltc_oid_id *pka, 
           * we get an 'input too long' error but the rest is already decoded and can be
           * handled the same as for version 0
           */
+         if (version == NULL) {
+            return CRYPT_INVALID_PACKET;
+         }
          if (ltc_mp_cmp_d(version->data, 0) != LTC_MP_EQ && ltc_mp_cmp_d(version->data, 1) != LTC_MP_EQ) {
             return CRYPT_INVALID_PACKET;
          }
          break;
       default:
          return err;
+   }
+   if ((*alg_id == NULL) || ((*alg_id)->child == NULL) || (*priv_key == NULL)) {
+      return CRYPT_INVALID_PACKET;
    }
    return pk_get_oid_from_asn1((*alg_id)->child, pka);
 }

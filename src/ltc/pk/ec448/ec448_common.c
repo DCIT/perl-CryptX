@@ -25,6 +25,9 @@
 */
 typedef long64 gf448[16];
 
+/* field limbs use base 2^28; multiplication avoids left-shifting negative carry values */
+#define GF448_RADIX (((long64)1) << 28)
+
 /* field constants */
 static const gf448 gf448_0 = {0};
 static const gf448 gf448_1 = {1};
@@ -96,23 +99,23 @@ static void s_gf448_carry(gf448 o)
    for (i = 0; i < 15; ++i) {
       c = o[i] >> 28;
       o[i+1] += c;
-      o[i] -= c << 28;
+      o[i] -= c * GF448_RADIX;
    }
    /* limb 15 overflow: 2^(28*16) = 2^448 == 2^224 + 1 */
    c = o[15] >> 28;
    o[0]  += c;     /* + c * 1 */
    o[8]  += c;     /* + c * 2^224 */
-   o[15] -= c << 28;
+   o[15] -= c * GF448_RADIX;
    /* one more pass to settle the extra from limb 0 and 8 */
    for (i = 0; i < 15; ++i) {
       c = o[i] >> 28;
       o[i+1] += c;
-      o[i] -= c << 28;
+      o[i] -= c * GF448_RADIX;
    }
    c = o[15] >> 28;
    o[0]  += c;
    o[8]  += c;
-   o[15] -= c << 28;
+   o[15] -= c * GF448_RADIX;
 }
 
 /* Conditional swap: if b==1, swap p and q; if b==0, no-op.  Constant-time */
@@ -254,7 +257,7 @@ static void s_gf448_mul(gf448 o, const gf448 a, const gf448 b)
    for (i = 0; i < 30; ++i) {
       c = t[i] >> 28;
       t[i+1] += c;
-      t[i] -= c << 28;
+      t[i] -= c * GF448_RADIX;
    }
    t[14] += 2 * t[30];
    t[6]  += t[30];

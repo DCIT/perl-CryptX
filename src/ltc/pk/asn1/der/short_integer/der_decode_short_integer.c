@@ -42,6 +42,11 @@ int der_decode_short_integer(const unsigned char *in, unsigned long inlen, unsig
       return CRYPT_INVALID_PACKET;
    }
 
+   /* an INTEGER holds at least one content octet */
+   if (len == 0) {
+      return CRYPT_INVALID_PACKET;
+   }
+
    if (len > sizeof(unsigned long)) {
       return CRYPT_OVERFLOW;
    }

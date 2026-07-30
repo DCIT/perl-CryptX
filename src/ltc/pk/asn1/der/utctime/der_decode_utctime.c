@@ -30,6 +30,7 @@ static LTC_INLINE int s_char_to_int(unsigned char x)
 #endif
 
 #define DECODE_V(y, max) \
+   if (x + 2 > declen) return CRYPT_INVALID_PACKET;     \
    y  = s_char_to_int(buf[x])*10 + s_char_to_int(buf[x+1]); \
    if (y >= max) return CRYPT_INVALID_PACKET;           \
    x += 2;
@@ -45,7 +46,7 @@ int der_decode_utctime(const unsigned char *in, unsigned long *inlen,
                              ltc_utctime   *out)
 {
    unsigned char buf[32] = { 0 }; /* initialize as all zeroes */
-   unsigned long x;
+   unsigned long x, declen;
    int           y;
 
    LTC_ARGCHK(in    != NULL);
@@ -65,6 +66,7 @@ int der_decode_utctime(const unsigned char *in, unsigned long *inlen,
        }
        buf[x] = y;
    }
+   declen = x; /* octets decoded into buf - the parsing below must not read past them */
    *inlen = 2 + x;
 
 
@@ -90,6 +92,9 @@ YYMMDDhhmmss-hh'mm'
     out->off_dir = out->off_hh = out->off_mm = out->ss = 0;
 
     /* now is it Z, +, - or 0-9 */
+    if (x >= declen) {
+       return CRYPT_INVALID_PACKET;
+    }
     if (buf[x] == 'Z') {
        return CRYPT_OK;
     }
@@ -104,6 +109,9 @@ YYMMDDhhmmss-hh'mm'
     DECODE_V(out->ss, 60);
 
     /* now is it Z, +, - */
+    if (x >= declen) {
+       return CRYPT_INVALID_PACKET;
+    }
     if (buf[x] == 'Z') {
        return CRYPT_OK;
     }

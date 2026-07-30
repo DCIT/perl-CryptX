@@ -88,9 +88,9 @@ static void s_decrypt(ulong32 *p, int N, const ulong32 *uk)
    int n, t;
    for (t = 4*(((N-1)>>2)&1), n = N; ;  ) {
       switch (n<=4 ? n : ((n-1)%4)+1) {
-         case 4: s_pi4(p, uk+t); --n; /* FALLTHROUGH */
-         case 3: s_pi3(p, uk+t); --n; /* FALLTHROUGH */
-         case 2: s_pi2(p, uk+t); --n; /* FALLTHROUGH */
+         case 4: s_pi4(p, uk+t); --n; LTC_FALLTHROUGH; /* FALLTHROUGH */
+         case 3: s_pi3(p, uk+t); --n; LTC_FALLTHROUGH; /* FALLTHROUGH */
+         case 2: s_pi2(p, uk+t); --n; LTC_FALLTHROUGH; /* FALLTHROUGH */
          case 1: s_pi1(p); --n; break;
          case 0: return;
       }

@@ -41,6 +41,13 @@ int der_flexi_sequence_cmp(const ltc_asn1_list *flexi, der_flexi_check *check)
       cur = cur->next;
       check++;
    }
+   /* the loop above also ends when the decoded list runs out early; returning CRYPT_OK then would leave the caller's output pointers unassigned */
+   while (check->t != LTC_ASN1_EOL) {
+      if (!check->optional) {
+         return CRYPT_INVALID_PACKET;
+      }
+      check++;
+   }
    return CRYPT_OK;
 }
 

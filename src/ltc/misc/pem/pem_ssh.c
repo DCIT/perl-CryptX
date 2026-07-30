@@ -324,7 +324,7 @@ struct ssh_pka {
    int (*decode)(const unsigned char*, unsigned long*, ltc_pka_key*, enum pem_flags);
 };
 
-struct ssh_pka ssh_pkas[] = {
+static struct ssh_pka ssh_pkas[] = {
 #ifdef LTC_CURVE25519
                              { SET_CSTR(.name, "ssh-ed25519"),
                                LTC_PKA_ED25519,
@@ -555,6 +555,7 @@ static int s_read_authorized_keys(const void *buf, unsigned long len, ssh_author
    }
    XMEMCPY(cpy, buf, len);
    s = cpy;
+   err = CRYPT_ERROR;
    while (clen && (err = s_parse_line(s, &clen, key, &comment)) == CRYPT_OK) {
       if (cb(key, comment, ctx)) {
          break;

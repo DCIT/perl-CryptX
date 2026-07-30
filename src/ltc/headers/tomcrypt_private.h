@@ -372,8 +372,8 @@ struct bufp {
    char *start, *work, *end;
 };
 
-#define SET_BUFP(n, d, l) n.start = (char*)d, n.work = (char*)d, n.end = (char*)d + l + 1
-#define UPDATE_BUFP(n, d, w, l) n.start = (char*)d, n.work = (char*)d + w, n.end = (char*)d + l + 1
+#define SET_BUFP(n, d, l) n.start = (char*)d, n.work = (char*)d, n.end = (char*)d + l
+#define UPDATE_BUFP(n, d, w, l) n.start = (char*)d, n.work = (char*)d + w, n.end = (char*)d + l
 
 struct get_char;
 struct get_char_api {
@@ -433,6 +433,20 @@ int pbes2_extract(const ltc_asn1_list *s, pbes_arg *res);
 #endif
 
 #ifdef LTC_PEM
+extern const struct pem_header_id pem_std_headers[];
+extern const unsigned long pem_std_headers_num;
+extern const struct str pem_proc_type_encrypted;
+#ifdef LTC_SSH
+extern const struct str pem_ssh_comment;
+#endif
+extern const struct str pem_dek_info_start;
+extern const struct blockcipher_info pem_dek_infos[];
+extern const unsigned long pem_dek_infos_num;
+#ifdef LTC_PEM_SSH
+extern const struct blockcipher_info ssh_ciphers[];
+extern const unsigned long ssh_ciphers_num;
+#endif
+
 int pem_decrypt(unsigned char *data, unsigned long *datalen,
                 unsigned char *key,  unsigned long keylen,
                 unsigned char *iv,   unsigned long ivlen,

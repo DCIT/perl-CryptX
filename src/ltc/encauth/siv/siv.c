@@ -161,7 +161,7 @@ static LTC_INLINE int s_siv_S2V_T(siv_omac_ctx_t *ctx,
    } else {
       s_siv_dbl(D);
       XMEMSET(&T, 0, sizeof(T));
-      XMEMCPY(&T, in, inlen);
+      if (inlen != 0) XMEMCPY(&T, in, inlen);
       T.u.byte[inlen] = 0x80;
       s_siv_xor_buf(D, &T);
 
@@ -191,7 +191,8 @@ static int s_siv_S2V(int cipher,
       return err;
    }
 
-   do {
+   /* With zero AD components the loop runs zero times. */
+   while (n < adnum) {
       if (n >= s_siv_max_aad_components) {
          return CRYPT_INPUT_TOO_LONG;
       }
@@ -199,7 +200,7 @@ static int s_siv_S2V(int cipher,
          return err;
       }
       n++;
-   } while(n < adnum);
+   }
 
    return s_siv_S2V_T(&ctx, in, inlen, &D, V);
 }
@@ -470,23 +471,19 @@ int siv_memory(                int  cipher,           int  direction,
       goto err_out;
    }
    va_start(args, adnum);
-   do {
-      if (adnum) {
-         aad = va_arg(args, const unsigned char*);
-         aadlen = va_arg(args, unsigned long);
-      } else {
-         aad = NULL;
-         aadlen = 0;
-      }
+   /* With zero AD components the loop runs zero times. */
+   while (n < adnum) {
       if (n >= s_siv_max_aad_components) {
          err = CRYPT_INPUT_TOO_LONG;
          goto err_out2;
       }
+      aad = va_arg(args, const unsigned char*);
+      aadlen = va_arg(args, unsigned long);
       if ((err = s_siv_S2V_dbl_xor_cmac(&ctx, aad, aadlen, &D)) != CRYPT_OK) {
          goto err_out2;
       }
       n++;
-   } while (n < adnum);
+   }
 
    if ((err = s_siv_S2V_T(&ctx, in_work, in_work_len, &D, &siv.V)) != CRYPT_OK) {
       goto err_out2;
@@ -614,6 +611,19 @@ int siv_test(void)
         0x3d, 0x58, 0x8e, 0x85, 0x64, 0xa5, 0xfe };
 
 
+   /* Zero AD components vs. a single *empty* AD component (vectors were cross-checked against OpenSSL 3.5.6) */
+   const unsigned char output_A1_zeroad[] =
+      { 0xf1, 0xc5, 0xfd, 0xea, 0xc1, 0xf1, 0x5a, 0x26,
+        0x77, 0x9c, 0x15, 0x01, 0xf9, 0xfb, 0x75, 0x88,
+        0x27, 0xe9, 0x46, 0xc6, 0x69, 0x08, 0x8a, 0xb0,
+        0x6d, 0xa5, 0x8c, 0x5c, 0x83, 0x1c };
+   const unsigned char output_A1_emptyad[] =
+      { 0xd1, 0x02, 0x2f, 0x5b, 0x36, 0x64, 0xe5, 0xa4,
+        0xdf, 0xaf, 0x90, 0xf8, 0x5b, 0xe6, 0xf2, 0x8a,
+        0xb6, 0x6c, 0xff, 0x6b, 0x8e, 0xca, 0x0b, 0x79,
+        0xf0, 0x83, 0xb3, 0x9a, 0x09, 0x01 };
+   const unsigned char *ad_emptyad[] = { NULL, NULL };
+   unsigned long adlen_emptyad[] = { 0, 0 };
 
 #define PL_PAIR(n) n, sizeof(n)
    struct {
@@ -632,6 +642,8 @@ int siv_test(void)
      { PL_PAIR(Key_A2), PL_PAIR(Plaintext_A2), 3, &ad_A2, &adlen_A2, PL_PAIR(output_A2), "RFC5297 - A.2.  Nonce-Based Authenticated Encryption Example" },
      { PL_PAIR(Key_A2), PL_PAIR(Plaintext_A2), 3, &ad_ossl0, &adlen_ossl0, PL_PAIR(output_ossl0), "OpenSSL based example 0" },
      { PL_PAIR(Key_A2), PL_PAIR(Plaintext_A2), 3, &ad_ossl1, &adlen_ossl1, PL_PAIR(output_ossl1), "OpenSSL based example 1" },
+     { PL_PAIR(Key_A1), PL_PAIR(Plaintext_A1), 0, NULL, NULL, PL_PAIR(output_A1_zeroad), "Zero AD components (ad = adlen = NULL)" },
+     { PL_PAIR(Key_A1), PL_PAIR(Plaintext_A1), 1, &ad_emptyad, &adlen_emptyad, PL_PAIR(output_A1_emptyad), "One empty AD component" },
    };
 #undef PL_PAIR
 
@@ -733,6 +745,44 @@ int siv_test(void)
       return err;
    }
    if (ltc_compare_testvector(buf, buflen, siv_tests[1].Plaintext, siv_tests[1].Plaintextlen, siv_tests[1].name, n + 0x1000) != 0) {
+      return CRYPT_FAIL_TESTVECTOR;
+   }
+
+   n++;
+
+   /* Testcase 0x4 - siv_memory() - zero AD components - encrypt */
+   buflen = sizeof(buf);
+   if ((err = siv_memory(cipher, LTC_ENCRYPT, Key_A1, sizeof(Key_A1), Plaintext_A1, sizeof(Plaintext_A1), buf, &buflen, 0, NULL)) != CRYPT_OK) {
+      return err;
+   }
+   if (ltc_compare_testvector(buf, buflen, output_A1_zeroad, sizeof(output_A1_zeroad), "siv_memory() - zero AD components", n) != 0) {
+      return CRYPT_FAIL_TESTVECTOR;
+   }
+   /* Testcase 0x1004 - siv_memory() - zero AD components - decrypt */
+   buflen = sizeof(buf);
+   if ((err = siv_memory(cipher, LTC_DECRYPT, Key_A1, sizeof(Key_A1), output_A1_zeroad, sizeof(output_A1_zeroad), buf, &buflen, 0, NULL)) != CRYPT_OK) {
+      return err;
+   }
+   if (ltc_compare_testvector(buf, buflen, Plaintext_A1, sizeof(Plaintext_A1), "siv_memory() - zero AD components", n + 0x1000) != 0) {
+      return CRYPT_FAIL_TESTVECTOR;
+   }
+
+   n++;
+
+   /* Testcase 0x5 - siv_memory() - one empty AD component - encrypt */
+   buflen = sizeof(buf);
+   if ((err = siv_memory(cipher, LTC_ENCRYPT, Key_A1, sizeof(Key_A1), Plaintext_A1, sizeof(Plaintext_A1), buf, &buflen, 1, NULL, 0UL, NULL)) != CRYPT_OK) {
+      return err;
+   }
+   if (ltc_compare_testvector(buf, buflen, output_A1_emptyad, sizeof(output_A1_emptyad), "siv_memory() - one empty AD component", n) != 0) {
+      return CRYPT_FAIL_TESTVECTOR;
+   }
+   /* Testcase 0x1005 - siv_memory() - one empty AD component - decrypt */
+   buflen = sizeof(buf);
+   if ((err = siv_memory(cipher, LTC_DECRYPT, Key_A1, sizeof(Key_A1), output_A1_emptyad, sizeof(output_A1_emptyad), buf, &buflen, 1, NULL, 0UL, NULL)) != CRYPT_OK) {
+      return err;
+   }
+   if (ltc_compare_testvector(buf, buflen, Plaintext_A1, sizeof(Plaintext_A1), "siv_memory() - one empty AD component", n + 0x1000) != 0) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 

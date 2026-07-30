@@ -14,6 +14,9 @@ typedef ulong64 u64;
 typedef long64 i64;
 typedef i64 gf[16];
 
+#define GF25519_RADIX (((i64)1) << 16)  /* field limbs use base 2^16; multiplication avoids left-shifting negative carry values */
+#define MODL_RADIX    (((i64)1) << 8)   /* base used by modL carry reduction; multiplication avoids left-shifting negative carry values */
+
 static const u8
   nine[32] = {9};
 static const gf
@@ -50,10 +53,10 @@ sv car25519(gf o)
   int i;
   i64 c;
   FOR(i,16) {
-    o[i]+=(1LL<<16);
+    o[i]+=GF25519_RADIX;
     c=o[i]>>16;
     o[(i+1)*(i<15)]+=c-1+37*(c-1)*(i==15);
-    o[i]-=c<<16;
+    o[i]-=c*GF25519_RADIX;
   }
 }
 
@@ -366,7 +369,7 @@ sv modL(u8 *r,i64 x[64])
     for (j = i - 32;j < i - 12;++j) {
       x[j] += carry - 16 * x[i] * L[j - (i - 32)];
       carry = (x[j] + 128) >> 8;
-      x[j] -= carry << 8;
+      x[j] -= carry * MODL_RADIX;
     }
     x[j] += carry;
     x[i] = 0;

@@ -31,12 +31,14 @@ static LTC_INLINE int s_char_to_int(unsigned char x)
 #endif
 
 #define DECODE_V(y, max) do {\
+   if (x + 2 > declen) return CRYPT_INVALID_PACKET; \
    y  = s_char_to_int(buf[x])*10 + s_char_to_int(buf[x+1]); \
    if (y >= max) return CRYPT_INVALID_PACKET;           \
    x += 2; \
 } while(0)
 
 #define DECODE_V4(y, max) do {\
+   if (x + 4 > declen) return CRYPT_INVALID_PACKET; \
    y  = s_char_to_int(buf[x])*1000 + s_char_to_int(buf[x+1])*100 + s_char_to_int(buf[x+2])*10 + s_char_to_int(buf[x+3]); \
    if (y >= max) return CRYPT_INVALID_PACKET; \
    x += 4; \
@@ -52,8 +54,8 @@ static LTC_INLINE int s_char_to_int(unsigned char x)
 int der_decode_generalizedtime(const unsigned char *in, unsigned long *inlen,
                                ltc_generalizedtime *out)
 {
-   unsigned char buf[32];
-   unsigned long x;
+   unsigned char buf[32] = { 0 }; /* initialize as all zeroes */
+   unsigned long x, declen;
    int           y;
 
    LTC_ARGCHK(in    != NULL);
@@ -78,9 +80,10 @@ int der_decode_generalizedtime(const unsigned char *in, unsigned long *inlen,
        }
        buf[x] = y;
    }
+   declen = x; /* octets decoded into buf - the parsing below must not read past them */
    *inlen = 2 + x;
 
-   if (x < 15) {
+   if (declen < 15) {
       return CRYPT_INVALID_PACKET;
    }
 
@@ -107,14 +110,16 @@ YYYYMMDDhhmmss.fs-hh'mm'
     out->fs = 0;
 
     /* now is it Z or . */
+    if (x >= declen) {
+       return CRYPT_INVALID_PACKET;
+    }
     if (buf[x] == 'Z') {
        return CRYPT_OK;
     }
     if (buf[x] == '.') {
        x++;
-       while (buf[x] >= '0' && buf[x] <= '9') {
+       while (x < declen && buf[x] >= '0' && buf[x] <= '9') {
           unsigned fs = out->fs;
-          if (x >= sizeof(buf)) return CRYPT_INVALID_PACKET;
           out->fs *= 10;
           out->fs += s_char_to_int(buf[x]);
           if (fs > out->fs) return CRYPT_OVERFLOW;
@@ -123,6 +128,9 @@ YYYYMMDDhhmmss.fs-hh'mm'
     }
 
     /* now is it Z, +, - */
+    if (x >= declen) {
+       return CRYPT_INVALID_PACKET;
+    }
     if (buf[x] == 'Z') {
        return CRYPT_OK;
     }

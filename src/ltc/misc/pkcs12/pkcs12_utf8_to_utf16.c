@@ -30,15 +30,15 @@ int pkcs12_utf8_to_utf16(const unsigned char *in,  unsigned long  inlen,
       if (in + extra >= in_end) goto ERROR;
       switch (extra) {
          case 5: ch += *in++; ch <<= 6;
-         /* FALLTHROUGH */
+         LTC_FALLTHROUGH; /* FALLTHROUGH */
          case 4: ch += *in++; ch <<= 6;
-         /* FALLTHROUGH */
+         LTC_FALLTHROUGH; /* FALLTHROUGH */
          case 3: ch += *in++; ch <<= 6;
-         /* FALLTHROUGH */
+         LTC_FALLTHROUGH; /* FALLTHROUGH */
          case 2: ch += *in++; ch <<= 6;
-         /* FALLTHROUGH */
+         LTC_FALLTHROUGH; /* FALLTHROUGH */
          case 1: ch += *in++; ch <<= 6;
-         /* FALLTHROUGH */
+         LTC_FALLTHROUGH; /* FALLTHROUGH */
          case 0: ch += *in++;
       }
       ch -= offset[extra];

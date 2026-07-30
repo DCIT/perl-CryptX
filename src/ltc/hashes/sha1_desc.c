@@ -35,7 +35,7 @@ static LTC_INLINE void s_x86_cpuid(int* regs, int leaf)
 
     a = leaf;
     b = c = d = 0;
-    asm volatile ("cpuid"
+    __asm__ volatile ("cpuid"
         :"=a"(a), "=b"(b), "=c"(c), "=d"(d)
         :"a"(a), "c"(c)
     );

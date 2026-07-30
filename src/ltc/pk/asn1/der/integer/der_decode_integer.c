@@ -43,6 +43,11 @@ int der_decode_integer(const unsigned char *in, unsigned long inlen, void *num)
    }
    x += inlen;
 
+   /* an INTEGER holds at least one content octet, so in[x] below stays inside the packet */
+   if (y == 0) {
+      return CRYPT_INVALID_PACKET;
+   }
+
    if ((err = ltc_mp_read_unsigned_bin(num, (unsigned char *)in + x, y)) != CRYPT_OK) {
       return err;
    }

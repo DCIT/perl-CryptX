@@ -60,7 +60,7 @@ int ec448_import_pkcs8(const unsigned char *in, unsigned long inlen,
 {
    int           err;
    ltc_asn1_list *l = NULL;
-   ltc_asn1_list *alg_id, *priv_key;
+   ltc_asn1_list *alg_id = NULL, *priv_key = NULL;
    enum ltc_oid_id pka;
 
    LTC_ARGCHK(in != NULL);
