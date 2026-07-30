@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 63;
 
 use Crypt::AuthEnc::SIV qw( siv_encrypt_authenticate siv_decrypt_verify );
 
@@ -88,4 +88,61 @@ use Crypt::AuthEnc::SIV qw( siv_encrypt_authenticate siv_decrypt_verify );
 
   eval { siv_decrypt_verify('AES', $key, [], $ad) };
   like($@, qr/ciphertext must be string\/buffer scalar/, 'rejects non-string ciphertext');
+}
+
+{ ### zero AD components vs a single EMPTY AD component (RFC 5297 sec 2.4)
+  my $key128 = pack("H*", "fffefdfcfbfaf9f8f7f6f5f4f3f2f1f0f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff");
+  my $key_a2 = pack("H*", "7f7e7d7c7b7a79787776757473727170404142434445464748494a4b4c4d4e4f");
+  my $key256 = pack("C*", 0..63);
+  my @pairs = (
+    { name  => 'AES-128-SIV, 14-byte pt (dbl/pad path)',
+      key   => $key128,
+      pt    => pack("H*", "112233445566778899aabbccddee"),
+      zero  => "f1c5fdeac1f15a26779c1501f9fb758827e946c669088ab06da58c5c831c",
+      empty => "d1022f5b3664e5a4dfaf90f85be6f28ab66cff6b8eca0b79f083b39a0901"
+    },
+    { name  => 'AES-128-SIV, 47-byte pt (xorend path, RFC A.2 plaintext)',
+      key   => $key_a2,
+      pt    => pack("H*", "7468697320697320736f6d6520706c61696e7465787420746f20656e6372797074207573696e67205349562d414553"),
+      zero  => "2845219b7ad669004a254fbe17dd92411e0d1c5593d4ab4d25da6dcf3b68c3936d759629322f92317acecf8254adf8d0cde09cead8117bd80da0c95f7a1caf",
+      empty => "dd69885ab4f07e5e98b6bf8bc63dc8d79223b59ed79e7845c52ccfccdc2165114046bef7ad8de77b79c3e1624838a4c925b43158a5962077bf85747e6141a0"
+    },
+    { name  => 'AES-128-SIV, exactly 16-byte pt (xorend boundary)',
+      key   => $key128,
+      pt    => pack("H*", "30313233343536373839616263646566"),
+      zero  => "3f5cd23c5b68fc1f8ef7557952deb21fbc7fb7c62617d12b41d9703c3c72d446",
+      empty => "c6972c63cb7bcdae674a441f817e8be6b322c97182a15032d3ac5475022f72e6"
+    },
+    { name  => 'AES-128-SIV, empty plaintext',
+      key   => $key128,
+      pt    => "",
+      zero  => "f2007a5beb2b8900c588a7adf599f172",
+      empty => "499e3994710218de7582e0f2c0ab5ed0"
+    },
+    { name  => 'AES-256-SIV, 14-byte pt',
+      key   => $key256,
+      pt    => pack("H*", "112233445566778899aabbccddee"),
+      zero  => "c561d53546fd103cd5a6e4d39112abddadc39943b2f0cf1517c3fd6efa3d",
+      empty => "956c2bf56e4501728ae2079d6b73ce05df466d1acd665bfab51b4057cd83"
+    },
+  );
+  for my $t (@pairs) {
+    my ($key, $pt, $n) = ($t->{key}, $t->{pt}, $t->{name});
+    my $zero_ct  = pack("H*", $t->{zero});
+    my $empty_ct = pack("H*", $t->{empty});
+    # --- zero AD components: every way of saying "no AD" must agree ---
+    is(unpack("H*", siv_encrypt_authenticate('AES', $key, $pt)), $t->{zero}, "$n: encrypt with AD argument omitted == zero-AD-component KAT");
+    is(unpack("H*", siv_encrypt_authenticate('AES', $key, $pt, undef)), $t->{zero}, "$n: encrypt with AD undef == zero-AD-component KAT");
+    is(unpack("H*", siv_encrypt_authenticate('AES', $key, $pt, [])), $t->{zero}, "$n: encrypt with empty arrayref AD == zero-AD-component KAT");
+    is(unpack("H*", siv_encrypt_authenticate('AES', $key, $pt, [undef])), $t->{zero}, "$n: encrypt with [undef] AD == zero-AD-component KAT");
+    # --- one empty AD component is a DIFFERENT input to S2V ---
+    is(unpack("H*", siv_encrypt_authenticate('AES', $key, $pt, "")), $t->{empty}, "$n: encrypt with \"\" AD == one-empty-AD-component KAT");
+    is(unpack("H*", siv_encrypt_authenticate('AES', $key, $pt, [""])), $t->{empty}, "$n: encrypt with [\"\"] AD == one-empty-AD-component KAT");
+    # --- round trips ---
+    is(siv_decrypt_verify('AES', $key, $zero_ct), $pt, "$n: decrypt zero-AD ciphertext with no AD");
+    is(siv_decrypt_verify('AES', $key, $empty_ct, ""), $pt, "$n: decrypt one-empty-AD ciphertext with \"\" AD");
+    # --- and the two must not be interchangeable ---
+    is(siv_decrypt_verify('AES', $key, $zero_ct, ""), undef, "$n: zero-AD ciphertext does NOT verify under \"\" AD");
+    is(siv_decrypt_verify('AES', $key, $empty_ct), undef, "$n: one-empty-AD ciphertext does NOT verify under no AD");
+  }
 }

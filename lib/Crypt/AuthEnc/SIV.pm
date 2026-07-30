@@ -50,6 +50,29 @@ B<BEWARE:> SIV requires a key that is twice the length of the underlying cipher 
 
 If you pass associated data as an arrayref, at most 126 components are accepted.
 
+=head2 No associated data vs. empty associated data
+
+RFC 5297 feeds C<S2V> a I<list> of strings (C<AD1..ADm>, then the plaintext), and the
+number of components changes the result. Passing B<no> associated data is therefore
+not the same as passing B<one empty> associated data string:
+
+  siv_encrypt_authenticate('AES', $key, $pt);         # zero AD components
+  siv_encrypt_authenticate('AES', $key, $pt, undef);  # zero AD components
+  siv_encrypt_authenticate('AES', $key, $pt, []);     # zero AD components
+
+  siv_encrypt_authenticate('AES', $key, $pt, "");     # ONE empty AD component
+  siv_encrypt_authenticate('AES', $key, $pt, [""]);   # ONE empty AD component
+
+The two groups produce different tags, and ciphertext produced by one does not
+verify under the other.
+
+Beware that some other libraries expose only a single associated data argument and
+so cannot express the zero-component case at all; when interoperating with those,
+an "empty" associated data string usually corresponds to the C<""> form above.
+
+C<undef> elements inside an arrayref are skipped rather than folded as empty
+components, so C<[$ad1, undef, $ad2]> is equivalent to C<[$ad1, $ad2]>.
+
 =head1 EXPORT
 
 Nothing is exported by default.
