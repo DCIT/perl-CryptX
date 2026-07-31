@@ -18,7 +18,7 @@
 #elif defined(_MSC_VER)
 #include <intrin.h>
 #endif
-#include <emmintrin.h> /* SSE2 _mm_load_si128 _mm_loadu_si128 _mm_store_si128 _mm_set_epi32 _mm_set_epi64x _mm_setzero_si128 _mm_xor_si128 _mm_add_epi32 _mm_shuffle_epi32 */
+#include <emmintrin.h> /* SSE2 _mm_loadu_si128 _mm_storeu_si128 _mm_set_epi32 _mm_set_epi64x _mm_setzero_si128 _mm_xor_si128 _mm_add_epi32 _mm_shuffle_epi32 */
 #include <tmmintrin.h> /* SSSE3 _mm_shuffle_epi8 */
 #include <smmintrin.h> /* SSE4.1 _mm_extract_epi32 */
 #include <immintrin.h> /* SHA _mm_sha1msg1_epu32 _mm_sha1msg2_epu32 _mm_sha1rnds4_epu32 _mm_sha1nexte_epu32 */
@@ -65,7 +65,7 @@ static int LTC_SHA_TARGET s_sha1_x86_compress(hash_state *md, const unsigned cha
     __m128i msg_3;
 
     reverse_8 = _mm_set_epi64x(0x0001020304050607ull, 0x08090a0b0c0d0e0full);
-    abcdx = _mm_load_si128(((__m128i const*)(&md->sha1.state[0])));
+    abcdx = _mm_loadu_si128(((__m128i const*)(&md->sha1.state[0])));
     abcdx = _mm_shuffle_epi32(abcdx, k_reverse_32);
     e = _mm_set_epi32(*((int const*)(&md->sha1.state[4])), 0, 0, 0);
 
@@ -173,7 +173,7 @@ static int LTC_SHA_TARGET s_sha1_x86_compress(hash_state *md, const unsigned cha
     e = _mm_add_epi32(e, old_e);
 
     abcdx = _mm_shuffle_epi32(abcdx, k_reverse_32);
-    _mm_store_si128(((__m128i*)(&md->sha1.state[0])), abcdx);
+    _mm_storeu_si128(((__m128i*)(&md->sha1.state[0])), abcdx);
     *((int*)(&md->sha1.state[4])) = _mm_extract_epi32(e, 3);
 
     return CRYPT_OK;
@@ -199,8 +199,6 @@ static int s_sha1_x86_compress(hash_state *md, const unsigned char *buf)
 int sha1_x86_init(hash_state * md)
 {
    LTC_ARGCHK(md != NULL);
-
-   md->sha1.state = LTC_ALIGN_BUF(md->sha1.state_buf, 16);
 
    md->sha1.state[0] = 0x67452301UL;
    md->sha1.state[1] = 0xefcdab89UL;

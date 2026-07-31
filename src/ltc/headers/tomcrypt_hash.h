@@ -37,18 +37,16 @@ struct sha512_state {
 #ifdef LTC_SHA256
 struct sha256_state {
     ulong64 length;
-    ulong32 *state, curlen;
+    ulong32 state[8], curlen;
     unsigned char buf[64];
-    unsigned char state_buf[LTC_ALIGNED_BUF_SIZE(ulong32, 8, 16)];
 };
 #endif
 
 #ifdef LTC_SHA1
 struct sha1_state {
     ulong64 length;
-    ulong32 *state, curlen;
+    ulong32 state[5], curlen;
     unsigned char buf[64];
-    unsigned char state_buf[LTC_ALIGNED_BUF_SIZE(ulong32, 5, 16)];
 };
 #endif
 

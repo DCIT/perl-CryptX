@@ -1,7 +1,7 @@
 Changes for CryptX
 
 0.091   NEXT
-        - bundled libtomcrypt update branch:develop (commit: c5607aff 2026-07-30)
+        - bundled libtomcrypt update branch:develop (commit: a467ea58 2026-07-31)
 
 0.090   2026-06-17
         - new: Crypt::AuthEnc::GCMSIV

@@ -188,8 +188,6 @@ int sha1_c_init(hash_state * md)
 {
    LTC_ARGCHK(md != NULL);
 
-   md->sha1.state = LTC_ALIGN_BUF(md->sha1.state_buf, 16);
-
    md->sha1.state[0] = 0x67452301UL;
    md->sha1.state[1] = 0xefcdab89UL;
    md->sha1.state[2] = 0x98badcfeUL;

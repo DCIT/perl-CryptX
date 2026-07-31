@@ -267,12 +267,34 @@ typedef unsigned long ltc_mp_digit;
 #endif
 
 #ifdef LTC_FAST
-   #define LTC_FAST_TYPE_PTR_CAST(x) ((LTC_FAST_TYPE*)(void*)(x))
    #ifdef ENDIAN_64BITWORD
    typedef ulong64 __attribute__((__may_alias__)) LTC_FAST_TYPE;
    #else
    typedef ulong32 __attribute__((__may_alias__)) LTC_FAST_TYPE;
    #endif
+   #define LTC_FAST_TYPE_XOR3(dst, src1, src2) \
+      do { \
+         LTC_FAST_TYPE fast_src1, fast_src2, fast_dst; \
+         XMEMCPY(&fast_src1, (src1), sizeof(LTC_FAST_TYPE)); \
+         XMEMCPY(&fast_src2, (src2), sizeof(LTC_FAST_TYPE)); \
+         fast_dst = fast_src1 ^ fast_src2; \
+         XMEMCPY((dst), &fast_dst, sizeof(LTC_FAST_TYPE)); \
+      }while (0)
+   #define LTC_FAST_TYPE_XOR2(dst, src) LTC_FAST_TYPE_XOR3((dst), (dst), (src))
+   #define LTC_FAST_TYPE_MASK(dst, src, mask) \
+      do { \
+         LTC_FAST_TYPE fast_src, fast_mask, fast_dst; \
+         XMEMCPY(&fast_src, (src), sizeof(LTC_FAST_TYPE)); \
+         fast_mask = ((LTC_FAST_TYPE)(mask)); \
+         fast_dst = fast_src & fast_mask; \
+         XMEMCPY((dst), &fast_dst, sizeof(LTC_FAST_TYPE)); \
+      }while (0)
+   #define LTC_FAST_TYPE_ASSIGN(dst, src) \
+      do { \
+         LTC_FAST_TYPE fast_tmp; \
+         XMEMCPY(&fast_tmp, (src), sizeof(LTC_FAST_TYPE)); \
+         XMEMCPY((dst), &fast_tmp, sizeof(LTC_FAST_TYPE)); \
+      }while (0)
 #endif
 
 #if !defined(ENDIAN_NEUTRAL) && (defined(ENDIAN_BIG) || defined(ENDIAN_LITTLE)) && !(defined(ENDIAN_32BITWORD) || defined(ENDIAN_64BITWORD))

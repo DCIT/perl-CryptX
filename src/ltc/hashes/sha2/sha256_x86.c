@@ -18,7 +18,7 @@
 #elif defined(_MSC_VER)
 #include <intrin.h>
 #endif
-#include <emmintrin.h> /* SSE2 _mm_load_si128 _mm_loadu_si128 _mm_store_si128 _mm_set_epi64x _mm_add_epi32 _mm_shuffle_epi32 */
+#include <emmintrin.h> /* SSE2 _mm_load_si128 _mm_loadu_si128 _mm_storeu_si128 _mm_set_epi64x _mm_add_epi32 _mm_shuffle_epi32 */
 #include <tmmintrin.h> /* SSSE3 _mm_alignr_epi8 _mm_shuffle_epi8 */
 #include <smmintrin.h> /* SSE4.1 _mm_blend_epi16 */
 #include <immintrin.h> /* SHA _mm_sha256msg1_epu32 _mm_sha256msg2_epu32 _mm_sha256rnds2_epu32 */
@@ -90,8 +90,8 @@ static int LTC_SHA_TARGET s_sha256_x86_compress(hash_state * md, const unsigned 
     __m128i msg_3;
 
     reverse = _mm_set_epi64x(0x0c0d0e0f08090a0bull, 0x0405060700010203ull);
-    state_0 = _mm_load_si128(((__m128i const*)(&md->sha256.state[0])));
-    state_1 = _mm_load_si128(((__m128i const*)(&md->sha256.state[4])));
+    state_0 = _mm_loadu_si128(((__m128i const*)(&md->sha256.state[0])));
+    state_1 = _mm_loadu_si128(((__m128i const*)(&md->sha256.state[4])));
     tmp = _mm_shuffle_epi32(state_0, k_shuffle_epi32(0x2, 0x3, 0x0, 0x1));
     state_1 = _mm_shuffle_epi32(state_1, k_shuffle_epi32(0x0, 0x1, 0x2, 0x3));
     state_0 = _mm_alignr_epi8(tmp, state_1, k_alignr_epi8(2));
@@ -242,8 +242,8 @@ static int LTC_SHA_TARGET s_sha256_x86_compress(hash_state * md, const unsigned 
     state_1 = _mm_shuffle_epi32(state_1, k_shuffle_epi32(0x2, 0x3, 0x0, 0x1));
     state_0 = ltc_mm_blend_epi32(tmp, state_1, k_blend_epi32(0x1, 0x1, 0x0, 0x0));
     state_1 = _mm_alignr_epi8(state_1, tmp, k_alignr_epi8(2));
-    _mm_store_si128(((__m128i*)(&md->sha256.state[0])), state_0);
-    _mm_store_si128(((__m128i*)(&md->sha256.state[4])), state_1);
+    _mm_storeu_si128(((__m128i*)(&md->sha256.state[0])), state_0);
+    _mm_storeu_si128(((__m128i*)(&md->sha256.state[4])), state_1);
     return CRYPT_OK;
 }
 #undef K
@@ -266,8 +266,6 @@ static int s_sha256_compress(hash_state * md, const unsigned char *buf)
 int sha256_x86_init(hash_state * md)
 {
     LTC_ARGCHK(md != NULL);
-
-    md->sha256.state = LTC_ALIGN_BUF(md->sha256.state_buf, 16);
 
     md->sha256.curlen = 0;
     md->sha256.length = 0;

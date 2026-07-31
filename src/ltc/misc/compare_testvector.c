@@ -59,7 +59,7 @@ int ltc_compare_testvector(const void* is, const unsigned long is_len, const voi
    int res = 0;
    if(is_len != should_len) {
       res = is_len > should_len ? -1 : 1;
-   } else if (is_len == 0) {
+   } else if (is_len == 0 && (!is || !should)) {
       res = 0;
    } else {
       res = XMEMCMP(is, should, is_len);

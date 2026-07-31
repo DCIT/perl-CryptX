@@ -37,8 +37,6 @@ int sha224_x86_init(hash_state * md)
 {
     LTC_ARGCHK(md != NULL);
 
-    md->sha256.state = LTC_ALIGN_BUF(md->sha256.state_buf, 16);
-
     md->sha256.curlen = 0;
     md->sha256.length = 0;
     md->sha256.state[0] = 0xc1059ed8UL;
