@@ -1,6 +1,7 @@
 Changes for CryptX
 
 0.091   NEXT
+        - re-enable SHA1/SHA224/SHA256 hash state cloning
         - bundled libtomcrypt update branch:develop (commit: a467ea58 2026-07-31)
 
 0.090   2026-06-17

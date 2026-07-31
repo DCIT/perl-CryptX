@@ -131,13 +131,6 @@ typedef struct digest_struct {          /* used by Crypt::Digest */
   int finalized;
 } *Crypt__Digest;
 
-STATIC int cryptx_internal_noclone_hash(const char *name) {
-  if (name == NULL) return 0;
-  return strcmp(name, "sha1") == 0
-      || strcmp(name, "sha224") == 0
-      || strcmp(name, "sha256") == 0;
-}
-
 typedef struct digest_shake_struct {    /* used by Crypt::Digest::SHAKE, TurboSHAKE, KangarooTwelve */
   hash_state state;
   int num;

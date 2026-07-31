@@ -48,9 +48,6 @@ reset(Crypt::Digest self)
 Crypt::Digest
 clone(Crypt::Digest self)
     CODE:
-        if (self->desc != NULL && cryptx_internal_noclone_hash(self->desc->name)) {
-          croak("FATAL: clone is not supported for given hash state");
-        }
         Newz(0, RETVAL, 1, struct digest_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
         Copy(self, RETVAL, 1, struct digest_struct);

@@ -24,13 +24,19 @@ is( Crypt::Digest::SHA224->new->hashsize, 28, 'hashsize/6');
 {
   my $d = Crypt::Digest::SHA224->new;
   isa_ok($d, 'Crypt::Digest::SHA224', 'new returns subclass instance');
-  diag("skipping clone returns subclass instance"); ok(1);
+  isa_ok($d->clone, 'Crypt::Digest::SHA224', 'clone returns subclass instance');
 }
 {
-  diag("skipping clone/original-first/original + clone/original-first/clone"); ok(1); ok(1);
+  my $d = Crypt::Digest::SHA224->new->add("abc");
+  my $c = $d->clone;
+  is($d->hexdigest, "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7", 'sha224 (clone/original-first/original)');
+  is($c->hexdigest, "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7", 'sha224 (clone/original-first/clone)');
 }
 {
-  diag("skipping clone/clone-first/clone + clone/clone-first/original"); ok(1); ok(1);
+  my $d = Crypt::Digest::SHA224->new->add("abc");
+  my $c = $d->clone;
+  is($c->hexdigest, "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7", 'sha224 (clone/clone-first/clone)');
+  is($d->hexdigest, "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7", 'sha224 (clone/clone-first/original)');
 }
 {
   my $d = Crypt::Digest::SHA224->new->add("AAA");
