@@ -34,7 +34,7 @@ int omac_process(omac_state *omac, const unsigned char *in, unsigned long inlen)
    if (omac->buflen == 0 && inlen > (unsigned long)omac->blklen) {
       for (x = 0; x < (inlen - omac->blklen); x += omac->blklen) {
           for (n = 0; n < (unsigned long)omac->blklen; n += sizeof(LTC_FAST_TYPE)) {
-              LTC_FAST_TYPE_XOR2(&omac->prev[n], &in[n]);
+              LTC_FAST_XOR2(&omac->prev[n], &in[n]);
           }
           in += omac->blklen;
           if ((err = ecb_encrypt_block(omac->prev, omac->prev, &omac->key)) != CRYPT_OK) {

@@ -37,6 +37,32 @@ static int s_ed25519_import_spki(const unsigned char *in, unsigned long inlen, v
 }
 #endif
 
+#ifdef LTC_CURVE448
+static int s_x448_import_pub(const unsigned char *in, unsigned long inlen, void *key)
+{
+   return x448_import_raw(in, inlen, PK_PUBLIC, key);
+}
+static int s_x448_import_spki(const unsigned char *in, unsigned long inlen, void *key)
+{
+   return x509_process_public_key_from_spki(in, inlen,
+                                            LTC_OID_X448,
+                                            LTC_ASN1_EOL, NULL, NULL,
+                                            s_x448_import_pub, key);
+}
+
+static int s_ed448_import_pub(const unsigned char *in, unsigned long inlen, void *key)
+{
+   return ed448_import_raw(in, inlen, PK_PUBLIC, key);
+}
+static int s_ed448_import_spki(const unsigned char *in, unsigned long inlen, void *key)
+{
+   return x509_process_public_key_from_spki(in, inlen,
+                                            LTC_OID_ED448,
+                                            LTC_ASN1_EOL, NULL, NULL,
+                                            s_ed448_import_pub, key);
+}
+#endif
+
 static const import_fn s_import_spki_fns[LTC_PKA_NUM] = {
 #ifdef LTC_MRSA
                                                 [LTC_PKA_RSA] = (import_fn)rsa_import_spki,
@@ -53,8 +79,8 @@ static const import_fn s_import_spki_fns[LTC_PKA_NUM] = {
                                                 [LTC_PKA_ED25519] = (import_fn)s_ed25519_import_spki,
 #endif
 #ifdef LTC_CURVE448
-                                                [LTC_PKA_X448] = (import_fn)x448_import_x509,
-                                                [LTC_PKA_ED448] = (import_fn)ed448_import_x509,
+                                                [LTC_PKA_X448] = (import_fn)s_x448_import_spki,
+                                                [LTC_PKA_ED448] = (import_fn)s_ed448_import_spki,
 #endif
 };
 

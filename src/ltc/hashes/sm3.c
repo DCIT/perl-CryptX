@@ -16,7 +16,7 @@
 const struct ltc_hash_descriptor sm3_desc =
 {
    "sm3",                  /* name of hash */
-   34,                     /* internal ID */
+   36,                     /* internal ID */
    32,                     /* Size of digest in octets */
    64,                     /* Input block size in octets */
    {1,2,156,10197,1,401},  /* ASN.1 OID 1.2.156.10197.1.401 */

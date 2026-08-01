@@ -20,7 +20,7 @@ const struct ltc_hash_descriptor sha256_portable_desc =
    { 2, 16, 840, 1, 101, 3, 4, 2, 1,  },
    9,
 
-    &sha256_c_init,
+    &sha256_init,
     &sha256_c_process,
     &sha256_c_done,
     &sha256_c_test,
@@ -225,28 +225,6 @@ static int s_sha256_compress(hash_state * md, const unsigned char *buf)
     return err;
 }
 #endif
-
-/**
-   Initialize the hash state
-   @param md   The hash state you wish to initialize
-   @return CRYPT_OK if successful
-*/
-int sha256_c_init(hash_state * md)
-{
-    LTC_ARGCHK(md != NULL);
-
-    md->sha256.curlen = 0;
-    md->sha256.length = 0;
-    md->sha256.state[0] = 0x6A09E667UL;
-    md->sha256.state[1] = 0xBB67AE85UL;
-    md->sha256.state[2] = 0x3C6EF372UL;
-    md->sha256.state[3] = 0xA54FF53AUL;
-    md->sha256.state[4] = 0x510E527FUL;
-    md->sha256.state[5] = 0x9B05688CUL;
-    md->sha256.state[6] = 0x1F83D9ABUL;
-    md->sha256.state[7] = 0x5BE0CD19UL;
-    return CRYPT_OK;
-}
 
 /**
    Process a block of memory though the hash

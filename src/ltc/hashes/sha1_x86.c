@@ -15,7 +15,8 @@
 #pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
 #pragma GCC diagnostic ignored "-Wuninitialized"
 #pragma GCC diagnostic ignored "-Wunused-function"
-#elif defined(_MSC_VER)
+#endif
+#if defined(_MSC_VER)
 #include <intrin.h>
 #endif
 #include <emmintrin.h> /* SSE2 _mm_loadu_si128 _mm_storeu_si128 _mm_set_epi32 _mm_set_epi64x _mm_setzero_si128 _mm_xor_si128 _mm_add_epi32 _mm_shuffle_epi32 */
@@ -190,25 +191,6 @@ static int s_sha1_x86_compress(hash_state *md, const unsigned char *buf)
    return err;
 }
 #endif
-
-/**
-   Initialize the hash state
-   @param md   The hash state you wish to initialize
-   @return CRYPT_OK if successful
-*/
-int sha1_x86_init(hash_state * md)
-{
-   LTC_ARGCHK(md != NULL);
-
-   md->sha1.state[0] = 0x67452301UL;
-   md->sha1.state[1] = 0xefcdab89UL;
-   md->sha1.state[2] = 0x98badcfeUL;
-   md->sha1.state[3] = 0x10325476UL;
-   md->sha1.state[4] = 0xc3d2e1f0UL;
-   md->sha1.curlen = 0;
-   md->sha1.length = 0;
-   return CRYPT_OK;
-}
 
 /**
    Process a block of memory though the hash

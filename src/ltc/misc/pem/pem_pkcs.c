@@ -213,9 +213,10 @@ int pem_decode_pkcs_filehandle(FILE *f, ltc_pka_key *k, const password_ctx *pw_c
 
 int pem_decode_pkcs(const void *buf, unsigned long len, ltc_pka_key *k, const password_ctx *pw_ctx)
 {
-   LTC_ARGCHK(buf != NULL);
-   LTC_ARGCHK(len != 0);
+   LTC_ARGCHK(buf != NULL || len == 0);
    LTC_ARGCHK(k != NULL);
+   if (len == 0)
+      return CRYPT_OK;
    {
       struct get_char g = pem_get_char_init(buf, len);
       return s_decode(&g, k, pw_ctx);

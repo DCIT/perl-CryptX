@@ -108,7 +108,7 @@ int pelican_process(pelican_state *pelmac, const unsigned char *in, unsigned lon
       while (inlen & ~15) {
          int x;
          for (x = 0; x < 16; x += sizeof(LTC_FAST_TYPE)) {
-            LTC_FAST_TYPE_XOR2((unsigned char *)pelmac->state + x, (unsigned char *)in + x);
+            LTC_FAST_XOR2((unsigned char *)pelmac->state + x, (unsigned char *)in + x);
          }
          s_four_rounds(pelmac);
          in    += 16;

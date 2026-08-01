@@ -253,8 +253,8 @@ int ccm_memory(int cipher,
 
                 /* xor the PT against the pad first */
                 for (z = 0; z < 16; z += sizeof(LTC_FAST_TYPE)) {
-                    LTC_FAST_TYPE_XOR2(&PAD[z], &pt[y+z]);
-                    LTC_FAST_TYPE_XOR3(&ct[y+z], &pt[y+z], &CTRPAD[z]);
+                    LTC_FAST_XOR2(&PAD[z], &pt[y+z]);
+                    LTC_FAST_XOR3(&ct[y+z], &pt[y+z], &CTRPAD[z]);
                 }
                 if ((err = ecb_encrypt_block(PAD, PAD, skey)) != CRYPT_OK) {
                    goto error;
@@ -273,8 +273,8 @@ int ccm_memory(int cipher,
 
                 /* xor the PT against the pad last */
                 for (z = 0; z < 16; z += sizeof(LTC_FAST_TYPE)) {
-                    LTC_FAST_TYPE_XOR3(&pt[y+z], &ct[y+z], &CTRPAD[z]);
-                    LTC_FAST_TYPE_XOR2(&PAD[z], &pt[y+z]);
+                    LTC_FAST_XOR3(&pt[y+z], &ct[y+z], &CTRPAD[z]);
+                    LTC_FAST_XOR2(&PAD[z], &pt[y+z]);
                 }
                 if ((err = ecb_encrypt_block(PAD, PAD, skey)) != CRYPT_OK) {
                    goto error;

@@ -30,7 +30,7 @@ void gcm_mult_h(const gcm_state *gcm, unsigned char *I)
    for (x = 1; x < 16; x++) {
 #ifdef LTC_FAST
        for (y = 0; y < 16; y += sizeof(LTC_FAST_TYPE)) {
-           LTC_FAST_TYPE_XOR2(T + y, &gcm->PC[x][I[x]][y]);
+           LTC_FAST_XOR2(T + y, &gcm->PC[x][I[x]][y]);
        }
 #else
        for (y = 0; y < 16; y++) {

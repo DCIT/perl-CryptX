@@ -329,13 +329,13 @@ int sha3_shake_memory(int num, const unsigned char *in, unsigned long inlen, uns
 #define keccak_256_init(a)    sha3_256_init(a)
 #define keccak_224_init(a)    sha3_224_init(a)
 #define keccak_process(a,b,c) sha3_process(a,b,c)
-extern const struct ltc_hash_descriptor keccak_512_desc;
+extern const struct ltc_hash_descriptor keccak512_desc;
 int keccak_512_test(void);
-extern const struct ltc_hash_descriptor keccak_384_desc;
+extern const struct ltc_hash_descriptor keccak384_desc;
 int keccak_384_test(void);
-extern const struct ltc_hash_descriptor keccak_256_desc;
+extern const struct ltc_hash_descriptor keccak256_desc;
 int keccak_256_test(void);
-extern const struct ltc_hash_descriptor keccak_224_desc;
+extern const struct ltc_hash_descriptor keccak224_desc;
 int keccak_224_test(void);
 int keccak_done(hash_state *md, unsigned char *out);
 #endif
@@ -405,14 +405,14 @@ int sha256_done(hash_state * md, unsigned char *out);
 int sha256_test(void);
 extern const struct ltc_hash_descriptor sha256_desc;
 
-int sha256_c_init(hash_state * md);
+#define sha256_c_init sha256_init
 int sha256_c_process(hash_state * md, const unsigned char *in, unsigned long inlen);
 int sha256_c_done(hash_state * md, unsigned char *out);
 int sha256_c_test(void);
 extern const struct ltc_hash_descriptor sha256_portable_desc;
 
 #ifdef LTC_SHA256_X86
-int sha256_x86_init(hash_state * md);
+#define sha256_x86_init sha256_init
 int sha256_x86_process(hash_state * md, const unsigned char *in, unsigned long inlen);
 int sha256_x86_done(hash_state * md, unsigned char *out);
 int sha256_x86_test(void);
@@ -430,14 +430,14 @@ int sha224_done(hash_state * md, unsigned char *out);
 int sha224_test(void);
 extern const struct ltc_hash_descriptor sha224_desc;
 
-int sha224_c_init(hash_state * md);
+#define sha224_c_init sha224_init
 #define sha224_c_process sha256_c_process
 int sha224_c_done(hash_state * md, unsigned char *out);
 int sha224_c_test(void);
 extern const struct ltc_hash_descriptor sha224_portable_desc;
 
 #ifdef LTC_SHA224_X86
-int sha224_x86_init(hash_state * md);
+#define sha224_x86_init sha224_init
 #define sha224_x86_process sha256_x86_process
 int sha224_x86_done(hash_state * md, unsigned char *out);
 int sha224_x86_test(void);
@@ -452,14 +452,14 @@ int sha1_done(hash_state * md, unsigned char *out);
 int sha1_test(void);
 extern const struct ltc_hash_descriptor sha1_desc;
 
-int sha1_c_init(hash_state * md);
+#define sha1_c_init sha1_init
 int sha1_c_process(hash_state * md, const unsigned char *in, unsigned long inlen);
 int sha1_c_done(hash_state * md, unsigned char *out);
 int sha1_c_test(void);
 extern const struct ltc_hash_descriptor sha1_portable_desc;
 
 #ifdef LTC_SHA1_X86
-int sha1_x86_init(hash_state * md);
+#define sha1_x86_init sha1_init
 int sha1_x86_process(hash_state * md, const unsigned char *in, unsigned long inlen);
 int sha1_x86_done(hash_state * md, unsigned char *out);
 int sha1_x86_test(void);

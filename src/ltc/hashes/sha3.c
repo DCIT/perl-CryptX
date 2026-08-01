@@ -99,7 +99,7 @@ const struct ltc_hash_descriptor shake256_desc =
 #endif
 
 #ifdef LTC_KECCAK
-const struct ltc_hash_descriptor keccak_224_desc =
+const struct ltc_hash_descriptor keccak224_desc =
 {
    "keccak224",                 /* name of hash */
    29,                          /* internal ID */
@@ -113,7 +113,7 @@ const struct ltc_hash_descriptor keccak_224_desc =
    NULL
 };
 
-const struct ltc_hash_descriptor keccak_256_desc =
+const struct ltc_hash_descriptor keccak256_desc =
 {
    "keccak256",                 /* name of hash */
    30,                          /* internal ID */
@@ -127,7 +127,7 @@ const struct ltc_hash_descriptor keccak_256_desc =
    NULL
 };
 
-const struct ltc_hash_descriptor keccak_384_desc =
+const struct ltc_hash_descriptor keccak384_desc =
 {
    "keccak384",                 /* name of hash */
    31,                          /* internal ID */
@@ -141,7 +141,7 @@ const struct ltc_hash_descriptor keccak_384_desc =
    NULL
 };
 
-const struct ltc_hash_descriptor keccak_512_desc =
+const struct ltc_hash_descriptor keccak512_desc =
 {
    "keccak512",                 /* name of hash */
    32,                          /* internal ID */

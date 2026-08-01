@@ -34,7 +34,7 @@ void copy_or_zeromem(const unsigned char* src, unsigned char* dest, unsigned lon
    if (len & ~15) {
       for (; y < (len & ~15); y += 16) {
         for (z = 0; z < 16; z += sizeof(LTC_FAST_TYPE)) {
-          LTC_FAST_TYPE_MASK(&dest[y+z], &src[y+z], fastMask);
+          LTC_FAST_MASK(&dest[y+z], &src[y+z], fastMask);
         }
       }
    }

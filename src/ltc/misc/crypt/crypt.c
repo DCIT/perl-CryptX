@@ -584,6 +584,11 @@ const char *crypt_build_settings =
 #if defined(LTC_NO_FAST)
     " LTC_NO_FAST "
 #endif
+#if defined(LTC_NO_INLINE)
+    " LTC_NO_INLINE "
+#else
+    " " NAME_VALUE(LTC_INLINE) " "
+#endif
 #if defined(LTC_NO_BSWAP)
     " LTC_NO_BSWAP "
 #endif

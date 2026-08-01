@@ -19,7 +19,7 @@ void pmac_shift_xor(pmac_state *pmac)
    y = pmac_ntz(pmac->block_index++);
 #ifdef LTC_FAST
    for (x = 0; x < pmac->block_len; x += sizeof(LTC_FAST_TYPE)) {
-       LTC_FAST_TYPE_XOR2((unsigned char *)pmac->Li + x, (unsigned char *)pmac->Ls[y] + x);
+       LTC_FAST_XOR2((unsigned char *)pmac->Li + x, (unsigned char *)pmac->Ls[y] + x);
    }
 #else
    for (x = 0; x < pmac->block_len; x++) {

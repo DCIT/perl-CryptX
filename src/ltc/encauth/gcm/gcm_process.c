@@ -79,8 +79,8 @@ int gcm_process(gcm_state *gcm,
          for (x = 0; x < (ptlen & ~15); x += 16) {
              /* ctr encrypt */
              for (y = 0; y < 16; y += sizeof(LTC_FAST_TYPE)) {
-                 LTC_FAST_TYPE_XOR3(&ct[x + y], &pt[x+y], &gcm->buf[y]);
-                 LTC_FAST_TYPE_XOR2(&gcm->X[y], &ct[x+y]);
+                 LTC_FAST_XOR3(&ct[x + y], &pt[x+y], &gcm->buf[y]);
+                 LTC_FAST_XOR2(&gcm->X[y], &ct[x+y]);
              }
              /* GMAC it */
              gcm->pttotlen += 128;
@@ -97,8 +97,8 @@ int gcm_process(gcm_state *gcm,
          for (x = 0; x < (ptlen & ~15); x += 16) {
              /* ctr encrypt */
              for (y = 0; y < 16; y += sizeof(LTC_FAST_TYPE)) {
-                 LTC_FAST_TYPE_XOR2(&gcm->X[y], &ct[x+y]);
-                 LTC_FAST_TYPE_XOR3(&pt[x + y], &ct[x+y], &gcm->buf[y]);
+                 LTC_FAST_XOR2(&gcm->X[y], &ct[x+y]);
+                 LTC_FAST_XOR3(&pt[x + y], &ct[x+y], &gcm->buf[y]);
              }
              /* GMAC it */
              gcm->pttotlen += 128;

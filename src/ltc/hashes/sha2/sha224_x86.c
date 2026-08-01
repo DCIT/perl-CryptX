@@ -20,35 +20,12 @@ const struct ltc_hash_descriptor sha224_x86_desc =
    { 2, 16, 840, 1, 101, 3, 4, 2, 4,  },
    9,
 
-    &sha224_x86_init,
-    &sha256_x86_process,
+    &sha224_init,
+    &sha224_x86_process,
     &sha224_x86_done,
     &sha224_x86_test,
     NULL
 };
-
-/* init the sha256 er... sha224 state ;-) */
-/**
-   Initialize the hash state
-   @param md   The hash state you wish to initialize
-   @return CRYPT_OK if successful
-*/
-int sha224_x86_init(hash_state * md)
-{
-    LTC_ARGCHK(md != NULL);
-
-    md->sha256.curlen = 0;
-    md->sha256.length = 0;
-    md->sha256.state[0] = 0xc1059ed8UL;
-    md->sha256.state[1] = 0x367cd507UL;
-    md->sha256.state[2] = 0x3070dd17UL;
-    md->sha256.state[3] = 0xf70e5939UL;
-    md->sha256.state[4] = 0xffc00b31UL;
-    md->sha256.state[5] = 0x68581511UL;
-    md->sha256.state[6] = 0x64f98fa7UL;
-    md->sha256.state[7] = 0xbefa4fa4UL;
-    return CRYPT_OK;
-}
 
 /**
    Terminate the hash to get the digest

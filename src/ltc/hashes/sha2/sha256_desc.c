@@ -4,6 +4,10 @@
 
 #if defined LTC_ARCH_X86
 
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
+
 #if !defined (LTC_S_X86_CPUID)
 #define LTC_S_X86_CPUID
 static LTC_INLINE void s_x86_cpuid(int* regs, int leaf)
@@ -88,12 +92,19 @@ const struct ltc_hash_descriptor sha256_desc =
 */
 int sha256_init(hash_state * md)
 {
-#if defined LTC_SHA256_X86
-    if(s_sha256_x86_is_supported()) {
-        return sha256_x86_init(md);
-    }
-#endif
-    return sha256_c_init(md);
+   LTC_ARGCHK(md != NULL);
+
+   md->sha256.curlen = 0;
+   md->sha256.length = 0;
+   md->sha256.state[0] = 0x6A09E667UL;
+   md->sha256.state[1] = 0xBB67AE85UL;
+   md->sha256.state[2] = 0x3C6EF372UL;
+   md->sha256.state[3] = 0xA54FF53AUL;
+   md->sha256.state[4] = 0x510E527FUL;
+   md->sha256.state[5] = 0x9B05688CUL;
+   md->sha256.state[6] = 0x1F83D9ABUL;
+   md->sha256.state[7] = 0x5BE0CD19UL;
+   return CRYPT_OK;
 }
 
 /**

@@ -53,7 +53,7 @@ static int s_ctr_encrypt(const unsigned char *pt, unsigned char *ct, unsigned lo
 #ifdef LTC_FAST
       if ((ctr->padlen == 0) && (len >= (unsigned long)ctr->ecb.blocklen)) {
          for (x = 0; x < ctr->ecb.blocklen; x += sizeof(LTC_FAST_TYPE)) {
-            LTC_FAST_TYPE_XOR3((unsigned char *)ct + x, (unsigned char *)pt + x, (unsigned char *)ctr->pad + x);
+            LTC_FAST_XOR3((unsigned char *)ct + x, (unsigned char *)pt + x, (unsigned char *)ctr->pad + x);
          }
        pt         += ctr->ecb.blocklen;
        ct         += ctr->ecb.blocklen;
