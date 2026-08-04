@@ -43,9 +43,10 @@ int dsa_int_validate_pqg(const dsa_key *key, int *stat)
    void *tmp1, *tmp2;
    int  err;
 
-   LTC_ARGCHK(key  != NULL);
+   /* stat is cleared before anything else can return, it stays 0 unless the params are valid */
    LTC_ARGCHK(stat != NULL);
    *stat = 0;
+   LTC_ARGCHK(key  != NULL);
 
    /* check q-order */
    if ( key->qord >= LTC_MDSA_MAX_GROUP || key->qord <= 15 ||
@@ -96,9 +97,10 @@ int dsa_int_validate_primes(const dsa_key *key, int *stat)
 {
    int err, res;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the primes are valid */
+   LTC_ARGCHK(stat != NULL);
    *stat = 0;
    LTC_ARGCHK(key  != NULL);
-   LTC_ARGCHK(stat != NULL);
 
    /* key->q prime? */
    if ((err = ltc_mp_prime_is_prime(key->q, LTC_MILLER_RABIN_REPS, &res)) != CRYPT_OK) {
@@ -132,9 +134,10 @@ int dsa_int_validate_xy(const dsa_key *key, int *stat)
    void *tmp;
    int  err;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the key is valid */
+   LTC_ARGCHK(stat != NULL);
    *stat = 0;
    LTC_ARGCHK(key  != NULL);
-   LTC_ARGCHK(stat != NULL);
 
    /* 1 < y < p-1 */
    if ((err = ltc_mp_init(&tmp)) != CRYPT_OK) {

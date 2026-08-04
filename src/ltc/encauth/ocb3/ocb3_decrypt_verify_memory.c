@@ -40,9 +40,8 @@ int ocb3_decrypt_verify_memory(int cipher,
    unsigned char *buf;
    unsigned long  buflen;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the tag is good */
    LTC_ARGCHK(stat    != NULL);
-
-   /* default to zero */
    *stat = 0;
 
    /* limit taglen */

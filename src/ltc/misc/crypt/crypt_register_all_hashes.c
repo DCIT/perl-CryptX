@@ -16,6 +16,7 @@
 int register_all_hashes(void)
 {
 #ifdef LTC_SHA512
+   /* `sha512_desc` does the multiplexing into `sha512_x86_desc` resp. `sha512_portable_desc` depending on the capabilities of the CPU. */
    REGISTER_HASH(&sha512_desc);
 #endif
 #ifdef LTC_SHA256
@@ -33,9 +34,11 @@ int register_all_hashes(void)
    REGISTER_HASH(&shake256_desc);
 #endif
 #ifdef LTC_SHA512_256
+   /* `sha512_256_desc` does the multiplexing into `sha512_256_x86_desc` resp. `sha512_256_portable_desc` depending on the capabilities of the CPU. */
    REGISTER_HASH(&sha512_256_desc);
 #endif
 #ifdef LTC_SHA512_224
+   /* `sha512_224_desc` does the multiplexing into `sha512_224_x86_desc` resp. `sha512_224_portable_desc` depending on the capabilities of the CPU. */
    REGISTER_HASH(&sha512_224_desc);
 #endif
 #ifdef LTC_SHA224
@@ -45,6 +48,7 @@ int register_all_hashes(void)
    REGISTER_HASH(&sha224_desc);
 #endif
 #ifdef LTC_SHA384
+   /* `sha384_desc` does the multiplexing into `sha384_x86_desc` resp. `sha384_portable_desc` depending on the capabilities of the CPU. */
    REGISTER_HASH(&sha384_desc);
 #endif
 #ifdef LTC_SHA1
@@ -62,11 +66,14 @@ int register_all_hashes(void)
    REGISTER_HASH(&blake2s_224_desc);
    REGISTER_HASH(&blake2s_256_desc);
 #endif
-#ifdef LTC_BLAKE2S
+#ifdef LTC_BLAKE2B
    REGISTER_HASH(&blake2b_160_desc);
    REGISTER_HASH(&blake2b_256_desc);
    REGISTER_HASH(&blake2b_384_desc);
    REGISTER_HASH(&blake2b_512_desc);
+#endif
+#ifdef LTC_BLAKE3
+   REGISTER_HASH(&blake3_desc);
 #endif
 #ifdef LTC_KECCAK
    REGISTER_HASH(&keccak224_desc);

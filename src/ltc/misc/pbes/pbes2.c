@@ -197,6 +197,9 @@ int pbes2_extract(const ltc_asn1_list *s, pbes_arg *res)
       } else {
          return CRYPT_INVALID_PACKET;
       }
+   } else {
+      /* PBES2 always carries the IV in the parameters, there is nothing to derive it from */
+      return CRYPT_INVALID_PACKET;
    }
 
    return CRYPT_OK;

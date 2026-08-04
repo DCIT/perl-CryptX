@@ -30,13 +30,13 @@ int rsa_verify_hash_v2(const unsigned char   *sig,    unsigned long  siglen,
   unsigned char *tmpbuf;
   ltc_rsa_op_checked op_checked = ltc_rsa_op_checked_init(key, params);
 
+  /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+  LTC_ARGCHK(stat  != NULL);
+  *stat = 0;
+
   LTC_ARGCHK(hash  != NULL);
   LTC_ARGCHK(sig   != NULL);
-  LTC_ARGCHK(stat  != NULL);
   LTC_ARGCHK(key   != NULL);
-
-  /* default to invalid */
-  *stat = 0;
 
   if ((err = rsa_key_valid_op(LTC_RSA_VERIFY, &op_checked)) != CRYPT_OK) {
     return err;

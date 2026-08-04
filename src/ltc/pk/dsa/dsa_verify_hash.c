@@ -27,13 +27,13 @@ int dsa_verify_hash_raw(         void   *r,          void   *s,
    void          *w, *v, *u1, *u2;
    int           err;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat != NULL);
+   *stat = 0;
+
    LTC_ARGCHK(r    != NULL);
    LTC_ARGCHK(s    != NULL);
-   LTC_ARGCHK(stat != NULL);
    LTC_ARGCHK(key  != NULL);
-
-   /* default to invalid signature */
-   *stat = 0;
 
    /* init our variables */
    if ((err = ltc_mp_init_multi(&w, &v, &u1, &u2, LTC_NULL)) != CRYPT_OK) {
@@ -95,8 +95,9 @@ int dsa_verify_hash(const unsigned char *sig,        unsigned long  siglen,
    ltc_asn1_list sig_seq[2];
    unsigned long reallen = 0;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
    LTC_ARGCHK(stat != NULL);
-   *stat = 0; /* must be set before the first return */
+   *stat = 0;
 
    if ((err = ltc_mp_init_multi(&r, &s, LTC_NULL)) != CRYPT_OK) {
       return err;

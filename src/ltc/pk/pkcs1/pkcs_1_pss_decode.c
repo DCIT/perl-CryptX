@@ -31,13 +31,13 @@ int ltc_pkcs_1_pss_decode_mgf1(const unsigned char *msghash, unsigned long  msgh
    hash_state    md;
    ltc_rsa_op_checked op_checked = ltc_pkcs1_op_checked_init(params);
 
+   /* res is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(res     != NULL);
+   *res = 0;
+
    LTC_ARGCHK(msghash != NULL);
    LTC_ARGCHK(sig     != NULL);
    LTC_ARGCHK(params  != NULL);
-   LTC_ARGCHK(res     != NULL);
-
-   /* default to invalid */
-   *res = 0;
 
    if ((err = rsa_key_valid_op(LTC_PKCS1_VERIFY, &op_checked)) != CRYPT_OK) {
       return err;

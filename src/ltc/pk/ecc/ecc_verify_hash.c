@@ -46,8 +46,10 @@ int ecc_verify_hash_v2(const unsigned char *sig,
                                        int *stat,
                        const       ecc_key *key)
 {
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
    LTC_ARGCHK(stat != NULL);
    *stat = 0;
+   LTC_ARGCHK(opts != NULL);
    if (opts->type < 0 || opts->type >= LTC_ARRAY_SIZE(s_ecc_verify_hash))
       return CRYPT_PK_INVALID_TYPE;
    if (s_ecc_verify_hash[opts->type] == NULL)

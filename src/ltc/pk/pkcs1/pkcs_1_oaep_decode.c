@@ -30,17 +30,17 @@ int ltc_pkcs_1_oaep_decode(const unsigned char *msg,    unsigned long msglen,
    int           err, ret;
    ltc_rsa_op_checked op_checked = ltc_pkcs1_op_checked_init(params);
 
+   /* res is cleared before anything else can return, it stays 0 unless the padding is valid */
+   LTC_ARGCHK(res    != NULL);
+   *res = 0;
+
    LTC_ARGCHK(msg    != NULL);
    LTC_ARGCHK(out    != NULL);
    LTC_ARGCHK(outlen != NULL);
-   LTC_ARGCHK(res    != NULL);
 
    if ((err = rsa_key_valid_op(LTC_PKCS1_DECRYPT, &op_checked)) != CRYPT_OK) {
       return err;
    }
-
-   /* default to invalid packet */
-   *res = 0;
 
    hLen        = hash_descriptor[op_checked.hash_alg].hashsize;
    modulus_len = (modulus_bitlen >> 3) + (modulus_bitlen & 7 ? 1 : 0);

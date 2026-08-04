@@ -44,6 +44,8 @@ int pbes_decrypt(const pbes_arg  *arg, unsigned char *dec_data, unsigned long *d
    if (arg->iv != NULL) {
       iv = arg->iv->data;
    } else {
+      /* PBES1 derives key and IV in one go, the IV follows the key in k; blocklen is 0 for PBES2, which has no IV to derive from */
+      if (arg->type.blocklen != (unsigned long)cipher_descriptor[cid].block_length) return CRYPT_INVALID_PACKET;
       iv = k + klen;
       klen += arg->type.blocklen;
    }

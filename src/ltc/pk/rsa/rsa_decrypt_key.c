@@ -30,13 +30,13 @@ int rsa_decrypt_key_v2(const unsigned char *in,             unsigned long  inlen
   unsigned long modulus_bitlen, modulus_bytelen, x;
   ltc_rsa_op_checked op_checked = ltc_rsa_op_checked_init(key, params);
 
+  /* stat is cleared before anything else can return, it stays 0 unless the padding is valid */
+  LTC_ARGCHK(stat   != NULL);
+  *stat = 0;
+
   LTC_ARGCHK(in     != NULL);
   LTC_ARGCHK(out    != NULL);
   LTC_ARGCHK(outlen != NULL);
-  LTC_ARGCHK(stat   != NULL);
-
-  /* default to invalid */
-  *stat = 0;
 
   /* valid padding? */
   if ((err = rsa_key_valid_op(LTC_RSA_DECRYPT, &op_checked)) != CRYPT_OK) {

@@ -17,6 +17,10 @@ int ecc_verify_hash_x962(const unsigned char *sig,  unsigned long siglen,
    void *r, *s;
    int err;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat != NULL);
+   *stat = 0;
+
    LTC_ARGCHK(sig != NULL);
 
    if ((err = ltc_mp_init_multi(&r, &s, NULL)) != CRYPT_OK) return err;

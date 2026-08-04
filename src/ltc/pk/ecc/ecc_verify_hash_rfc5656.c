@@ -31,6 +31,10 @@ int ecc_verify_hash_rfc5656(const unsigned char *sig,  unsigned long siglen,
    unsigned long name2len = sizeof(name2);
    unsigned long slen = siglen;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat != NULL);
+   *stat = 0;
+
    LTC_ARGCHK(sig != NULL);
    LTC_ARGCHK(key != NULL);
 

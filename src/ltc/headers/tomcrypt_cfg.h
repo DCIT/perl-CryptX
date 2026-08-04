@@ -342,6 +342,23 @@ typedef unsigned long ltc_mp_digit;
          #define LTC_SHA256_X86
       #endif
    #endif
+   /* the SHA512 extension intrinsics require GCC 14 resp. clang 17 */
+   #if (defined __GNUC__ && !defined __clang__ && (__GNUC__ >= 14)) || \
+       (defined __clang__ && (__clang_major__ >= 17)) || \
+       (defined _MSC_FULL_VER && (_MSC_FULL_VER) >=  194033813l) /* MSVC 2022 17.10 */
+      #if !defined(LTC_NO_SHA384_X86)
+         #define LTC_SHA384_X86
+      #endif
+      #if !defined(LTC_NO_SHA512_X86)
+         #define LTC_SHA512_X86
+      #endif
+      #if !defined(LTC_NO_SHA512_224_X86)
+         #define LTC_SHA512_224_X86
+      #endif
+      #if !defined(LTC_NO_SHA512_256_X86)
+         #define LTC_SHA512_256_X86
+      #endif
+   #endif
 #endif
 
 #if defined(__aarch64__) || defined(_M_ARM64)

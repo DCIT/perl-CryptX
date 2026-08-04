@@ -27,6 +27,10 @@ int ecc_verify_hash_eth27(const unsigned char *sig,  unsigned long siglen,
    void *r, *s;
    int err;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat != NULL);
+   *stat = 0;
+
    LTC_ARGCHK(sig != NULL);
    LTC_ARGCHK(key != NULL);
 

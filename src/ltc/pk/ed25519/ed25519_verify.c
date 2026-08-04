@@ -19,12 +19,13 @@ static int s_ed25519_verify(const  unsigned char *msg, unsigned long msglen,
    unsigned long long mlen;
    int err;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat       != NULL);
+   *stat = 0;
+
    LTC_ARGCHK(msg        != NULL);
    LTC_ARGCHK(sig        != NULL);
-   LTC_ARGCHK(stat       != NULL);
    LTC_ARGCHK(public_key != NULL);
-
-   *stat = 0;
 
    if (find_hash("sha512") == -1) return CRYPT_INVALID_HASH;
    if (siglen != 64uL) return CRYPT_INVALID_ARG;
@@ -74,6 +75,10 @@ int ed25519ctx_verify(const  unsigned char *msg, unsigned long msglen,
    unsigned char ctx_prefix[292];
    unsigned long ctx_prefix_size = sizeof(ctx_prefix);
 
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat != NULL);
+   *stat = 0;
+
    LTC_ARGCHK(ctx != NULL);
 
    if (ec25519_crypto_ctx(ctx_prefix, &ctx_prefix_size, 0, ctx, ctxlen) != CRYPT_OK)
@@ -104,6 +109,10 @@ int ed25519ph_verify(const  unsigned char *msg, unsigned long msglen,
    unsigned char msg_hash[64];
    unsigned char ctx_prefix[292];
    unsigned long ctx_prefix_size = sizeof(ctx_prefix);
+
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat != NULL);
+   *stat = 0;
 
    if ((err = ec25519_crypto_ctx(ctx_prefix, &ctx_prefix_size, 1, ctx, ctxlen)) != CRYPT_OK)
       return err;

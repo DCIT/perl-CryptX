@@ -284,6 +284,7 @@
 #define LTC_BLAKE2S
 #define LTC_BLAKE2B
 #define LTC_SM3
+#define LTC_BLAKE3
 
 #define LTC_HASH_HELPERS
 

@@ -17,14 +17,14 @@ int ecc_verify_hash_internal(void *r, void *s,
    unsigned long pbits, pbytes, i, shift_right;
    unsigned char ch, buf[MAXBLOCKSIZE];
 
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat != NULL);
+   *stat = 0;
+
    LTC_ARGCHK(r    != NULL);
    LTC_ARGCHK(s    != NULL);
    LTC_ARGCHK(hash != NULL);
-   LTC_ARGCHK(stat != NULL);
    LTC_ARGCHK(key  != NULL);
-
-   /* default to invalid signature */
-   *stat = 0;
 
    /* allocate ints */
    if ((err = ltc_mp_init_multi(&v, &w, &u1, &u2, &e, &a_plus3, LTC_NULL)) != CRYPT_OK) {

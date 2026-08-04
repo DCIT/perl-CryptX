@@ -18,6 +18,10 @@ int ecc_verify_hash_rfc7518_internal(const unsigned char *sig,  unsigned long si
    int err;
    unsigned long i;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat != NULL);
+   *stat = 0;
+
    LTC_ARGCHK(sig != NULL);
    LTC_ARGCHK(key != NULL);
 

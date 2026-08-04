@@ -19,12 +19,13 @@ static int s_ed448_verify(const  unsigned char *msg, unsigned long msglen,
    unsigned long long mlen;
    int err;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat       != NULL);
+   *stat = 0;
+
    LTC_ARGCHK(msg        != NULL);
    LTC_ARGCHK(sig        != NULL);
-   LTC_ARGCHK(stat       != NULL);
    LTC_ARGCHK(public_key != NULL);
-
-   *stat = 0;
 
    if (siglen != 114uL) return CRYPT_INVALID_ARG;
    if (public_key->pka != LTC_PKA_ED448) return CRYPT_PK_INVALID_TYPE;
@@ -74,6 +75,10 @@ int ed448ctx_verify(const  unsigned char *msg, unsigned long msglen,
    unsigned char ctx_prefix[266];
    unsigned long ctx_prefix_size = sizeof(ctx_prefix);
 
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat != NULL);
+   *stat = 0;
+
    LTC_ARGCHK(ctx != NULL);
 
    if ((err = ec448_crypto_ctx(ctx_prefix, &ctx_prefix_size, 0, ctx, ctxlen)) != CRYPT_OK)
@@ -105,6 +110,10 @@ int ed448ph_verify(const  unsigned char *msg, unsigned long msglen,
    unsigned char ctx_prefix[266];
    unsigned long ctx_prefix_size = sizeof(ctx_prefix);
 
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat != NULL);
+   *stat = 0;
+
    if ((err = ec448_crypto_ctx(ctx_prefix, &ctx_prefix_size, 1, ctx, ctxlen)) != CRYPT_OK)
       return err;
 
@@ -132,6 +141,10 @@ int ed448_verify(const  unsigned char *msg, unsigned long msglen,
    int err;
    unsigned char ctx_prefix[266];
    unsigned long ctx_prefix_size = sizeof(ctx_prefix);
+
+   /* stat is cleared before anything else can return, it stays 0 unless the signature is good */
+   LTC_ARGCHK(stat != NULL);
+   *stat = 0;
 
    /* Pure Ed448 still uses DOM4 with flag=0 and empty context */
    if ((err = ec448_crypto_ctx(ctx_prefix, &ctx_prefix_size, 0, NULL, 0)) != CRYPT_OK)

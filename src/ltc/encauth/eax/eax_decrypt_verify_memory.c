@@ -40,14 +40,14 @@ int eax_decrypt_verify_memory(int cipher,
    unsigned char *buf;
    unsigned long  buflen;
 
+   /* stat is cleared before anything else can return, it stays 0 unless the tag is good */
    LTC_ARGCHK(stat != NULL);
+   *stat = 0;
+
    LTC_ARGCHK(key  != NULL);
    LTC_ARGCHK(pt   != NULL);
    LTC_ARGCHK(ct   != NULL);
    LTC_ARGCHK(tag  != NULL);
-
-   /* default to zero */
-   *stat = 0;
 
    if ((err = cipher_is_valid(cipher)) != CRYPT_OK) {
       return err;
