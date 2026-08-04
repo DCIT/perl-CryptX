@@ -57,6 +57,7 @@ my %list = (
         BLAKE2s_160 => { ltc=>'blake2s-160', since=>'0.048', info=>'Hash function BLAKE2s [size: 160 bits]', urls=>['https://blake2.net/', 'https://www.rfc-editor.org/rfc/rfc7693'] },
         BLAKE2s_224 => { ltc=>'blake2s-224', since=>'0.048', info=>'Hash function BLAKE2s [size: 224 bits]', urls=>['https://blake2.net/', 'https://www.rfc-editor.org/rfc/rfc7693'] },
         BLAKE2s_256 => { ltc=>'blake2s-256', since=>'0.048', info=>'Hash function BLAKE2s [size: 256 bits]', urls=>['https://blake2.net/', 'https://www.rfc-editor.org/rfc/rfc7693'] },
+        BLAKE3      => { ltc=>'blake3',      since=>'0.091', info=>'Hash function BLAKE3 [size: 256 bits]', urls=>['https://github.com/BLAKE3-team/BLAKE3', 'https://en.wikipedia.org/wiki/BLAKE_(hash_function)#BLAKE3'] },
 );
 
 my @test_strings = ( '', '123', "test\0test\0test\n");

@@ -18,7 +18,7 @@ Test::Pod::Spelling->import(
                           decrypt decrypts interoperability cryptographically cryptographic octects
                           libtomcrypt libtommath
                           params paramshash irand perl endian zbase bumac bmac budigest bdigest md de
-                          blakes_ blakeb_
+                          blakes_ blakeb_ blake
                           XOR'ing XOR'ed XORed
                           keccak Ethereum recid
                           RC rand reseeding SSH CTR Poly CipherHash en aka
@@ -45,7 +45,7 @@ Test::Pod::Spelling->import(
                     },
 );
 
-plan tests => 123;
+plan tests => 124;
 
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');

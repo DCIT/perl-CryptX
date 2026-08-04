@@ -57,6 +57,7 @@ use Crypt::Digest::BLAKE2s_128;
 use Crypt::Digest::BLAKE2s_160;
 use Crypt::Digest::BLAKE2s_224;
 use Crypt::Digest::BLAKE2s_256;
+use Crypt::Digest::BLAKE3;
 use Crypt::Digest::CHAES;
 use Crypt::Digest::MD2;
 use Crypt::Digest::MD4;
