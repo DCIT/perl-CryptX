@@ -41,11 +41,12 @@ Test::Pod::Spelling->import(
                           behaviour reseeds
                           OIDs MGF RSASSA
                           NIST SP KMACXOF cSHAKE TupleHash ParallelHash SM
+                          XTS XEX FIPS dm zeroized
                         )]
                     },
 );
 
-plan tests => 124;
+plan tests => 125;
 
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');

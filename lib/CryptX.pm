@@ -193,6 +193,9 @@ Use these only when authentication is handled separately or not needed:
 
 =item * B<CBC> (L<Crypt::Mode::CBC>) - Classic mode, needs padding. Prefer CTR or an AEAD mode.
 
+=item * B<XTS> (L<Crypt::Mode::XTS>) - For encrypting storage in place (disk sectors); one tweaked
+data unit per call. Not for data that travels.
+
 =item * B<ECB> (L<Crypt::Mode::ECB>) - B<Insecure for most uses.> Each block encrypted independently.
 
 =back
@@ -332,7 +335,7 @@ L<Crypt::Cipher::Twofish>, L<Crypt::Cipher::XTEA>
 
 =item * Block cipher modes
 
-L<Crypt::Mode::CBC>, L<Crypt::Mode::CFB>, L<Crypt::Mode::CTR>, L<Crypt::Mode::ECB>, L<Crypt::Mode::OFB>
+L<Crypt::Mode::CBC>, L<Crypt::Mode::CFB>, L<Crypt::Mode::CTR>, L<Crypt::Mode::ECB>, L<Crypt::Mode::OFB>, L<Crypt::Mode::XTS>
 
 =item * Stream ciphers
 

@@ -107,6 +107,7 @@ use Crypt::Mode::CFB;
 use Crypt::Mode::CTR;
 use Crypt::Mode::ECB;
 use Crypt::Mode::OFB;
+use Crypt::Mode::XTS;
 use Crypt::Mode;
 use Crypt::PK::DH;
 use Crypt::PK::DSA;

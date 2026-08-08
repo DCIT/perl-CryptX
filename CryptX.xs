@@ -736,9 +736,7 @@ typedef struct ofb_struct {             /* used by Crypt::Mode::OFB */
 } *Crypt__Mode__OFB;
 
 typedef struct xts_struct {             /* used by Crypt::Mode::XTS */
-  int cipher_id, cipher_rounds;
-  symmetric_xts state;
-  int direction;
+  symmetric_xts state;                  /* the two key schedules; raw key is never kept */
 } *Crypt__Mode__XTS;
 
 typedef struct prng_struct {            /* used by Crypt::PRNG */
@@ -1513,7 +1511,7 @@ INCLUDE: inc/CryptX_Mode_OFB.xs.inc
 INCLUDE: inc/CryptX_Mode_CTR.xs.inc
 #INCLUDE: inc/CryptX_Mode_F8.xs.inc
 #INCLUDE: inc/CryptX_Mode_LRW.xs.inc
-#INCLUDE: inc/CryptX_Mode_XTS.xs.inc
+INCLUDE: inc/CryptX_Mode_XTS.xs.inc
 
 INCLUDE: inc/CryptX_PRNG.xs.inc
 

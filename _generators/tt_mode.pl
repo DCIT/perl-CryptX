@@ -46,8 +46,8 @@ my %list = (
 #                 desc=>q[xxx-desc-goes here]},
 #        LRW => { info=>'Block cipher mode LRW [Liskov, Rivest, Wagner]',
 #                 desc=>q[xxx-desc-goes here]},
-#        XTS => { info=>'Block cipher mode XTS [XEX-based tweaked-codebook mode with ciphertext stealing]',
-#                 desc=>q[xxx-desc-goes here]},
+# XTS is NOT generated - inc/CryptX_Mode_XTS.xs.inc + lib/Crypt/Mode/XTS.pm are hand-written
+# (XTS has a different API: tweak per data unit, no start/add/finish)
 );
 
 my ($pmver) = grep { /^our\s+\$VERSION/ } read_file("$FindBin::Bin/../lib/Crypt/Digest.pm");

@@ -1,6 +1,7 @@
 Changes for CryptX
 
 0.091   NEXT
+        - new: Crypt::Mode::XTS
         - new: Crypt::Digest::BLAKE3
         - re-enable SHA1/SHA224/SHA256 hash state cloning
         - bundled libtomcrypt update branch:develop (commit: 223ecd23 2026-08-04)

@@ -126,6 +126,8 @@ Use these only when authentication is handled separately or not needed:
 
 - **CTR** ([Crypt::Mode::CTR](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACTR)) - Turns a block cipher into a stream cipher. Parallelizable.
 - **CBC** ([Crypt::Mode::CBC](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACBC)) - Classic mode, needs padding. Prefer CTR or an AEAD mode.
+- **XTS** ([Crypt::Mode::XTS](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AXTS)) - For encrypting storage in place (disk sectors); one tweaked
+data unit per call. Not for data that travels.
 - **ECB** ([Crypt::Mode::ECB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AECB)) - **Insecure for most uses.** Each block encrypted independently.
 
 The individual [Crypt::Cipher::AES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAES), [Crypt::Cipher::Twofish](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ATwofish), etc. modules implement
@@ -227,7 +229,7 @@ module POD when you need exact failure semantics.
 
 - Block cipher modes
 
-    [Crypt::Mode::CBC](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACBC), [Crypt::Mode::CFB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACFB), [Crypt::Mode::CTR](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACTR), [Crypt::Mode::ECB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AECB), [Crypt::Mode::OFB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AOFB)
+    [Crypt::Mode::CBC](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACBC), [Crypt::Mode::CFB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACFB), [Crypt::Mode::CTR](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3ACTR), [Crypt::Mode::ECB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AECB), [Crypt::Mode::OFB](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AOFB), [Crypt::Mode::XTS](https://metacpan.org/pod/Crypt%3A%3AMode%3A%3AXTS)
 
 - Stream ciphers
 

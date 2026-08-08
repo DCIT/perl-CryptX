@@ -41,15 +41,7 @@ DESTROY(Crypt::Mode::[%orig_name%] self)
     }
 
 void
-[%-IF lc_name == 'xts' %]
-start_decrypt(_XXX_XXX_XXX_)
-[%-ELSIF lc_name == 'f8' %]
-start_decrypt(_XXX_XXX_XXX_)
-[%-ELSIF lc_name == 'lrw' %]
-start_decrypt(_XXX_XXX_XXX_)
-[%-ELSE%]
 start_decrypt(Crypt::Mode::[%orig_name%] self, SV * key, SV * iv)
-[%-END%]
     ALIAS:
         start_encrypt = 1
     PPCODE:
@@ -71,12 +63,6 @@ start_decrypt(Crypt::Mode::[%orig_name%] self, SV * key, SV * iv)
 
 [%-IF lc_name == 'ctr' %]
         rv = [%lc_name%]_start(self->cipher_id, i, k, (int)k_len, self->cipher_rounds, self->ctr_mode_param, &self->state);
-[%-ELSIF lc_name == 'xts' %]
-        rv = _XXX_XXX_XXX_;
-[%-ELSIF lc_name == 'f8' %]
-        rv = _XXX_XXX_XXX_;
-[%-ELSIF lc_name == 'lrw' %]
-        rv = _XXX_XXX_XXX_;
 [%-ELSE%]
         rv = [%lc_name%]_start(self->cipher_id, i, k, (int)k_len, self->cipher_rounds, &self->state);
 [%-END%]
