@@ -153,6 +153,12 @@ static int s_der_decode_sequence_flexi(const unsigned char *in, unsigned long *i
                 goto error;
              }
 
+             /* Flexi INTEGER nodes are MPI-backed, so reject no-math builds before ltc_mp_init(). */
+             if (ltc_mp.name == NULL) {
+                err = CRYPT_INVALID_ARG;
+                goto error;
+             }
+
              /* init field */
              l->size = 1;
              if ((err = ltc_mp_init(&l->data)) != CRYPT_OK) {

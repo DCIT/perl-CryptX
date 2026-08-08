@@ -511,6 +511,9 @@ struct get_char {
 void copy_or_zeromem(const unsigned char* src, unsigned char* dest, unsigned long len, int coz);
 void password_free(struct password *pw, const struct password_ctx *ctx);
 
+/* Case-insensitive ASCII compare that ignores ' ', '-' and '_'. Returns 1 on match, 0 otherwise. */
+int ltc_algname_match(const char *left, const char *right);
+
 int ltc_compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
 int ltc_do_compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
 

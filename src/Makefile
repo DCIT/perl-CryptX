@@ -48,34 +48,36 @@ ltc/mac/poly1305/poly1305_memory_multi.o ltc/mac/xcbc/xcbc_done.o ltc/mac/xcbc/x
 ltc/mac/xcbc/xcbc_init.o ltc/mac/xcbc/xcbc_memory.o ltc/mac/xcbc/xcbc_memory_multi.o \
 ltc/mac/xcbc/xcbc_process.o ltc/math/fp/ltc_ecc_fp_mulmod.o ltc/math/ltm_desc.o ltc/math/multi.o \
 ltc/math/radix_to_bin.o ltc/math/rand_bn.o ltc/math/rand_prime.o ltc/math/tfm_desc.o \
-ltc/misc/adler32.o ltc/misc/argon2/argon2.o ltc/misc/base16/base16_decode.o ltc/misc/base16/base16_encode.o \
-ltc/misc/base32/base32_decode.o ltc/misc/base32/base32_encode.o ltc/misc/base64/base64_decode.o \
-ltc/misc/base64/base64_encode.o ltc/misc/bcrypt/bcrypt.o ltc/misc/burn_stack.o ltc/misc/compare_testvector.o \
-ltc/misc/copy_or_zeromem.o ltc/misc/crc32.o ltc/misc/crypt/crypt.o ltc/misc/crypt/crypt_argchk.o \
-ltc/misc/crypt/crypt_cipher_descriptor.o ltc/misc/crypt/crypt_cipher_is_valid.o ltc/misc/crypt/crypt_constants.o \
-ltc/misc/crypt/crypt_find_cipher.o ltc/misc/crypt/crypt_find_cipher_any.o ltc/misc/crypt/crypt_find_cipher_id.o \
-ltc/misc/crypt/crypt_find_hash.o ltc/misc/crypt/crypt_find_hash_any.o ltc/misc/crypt/crypt_find_hash_id.o \
-ltc/misc/crypt/crypt_find_hash_oid.o ltc/misc/crypt/crypt_find_prng.o ltc/misc/crypt/crypt_fsa.o \
-ltc/misc/crypt/crypt_hash_descriptor.o ltc/misc/crypt/crypt_hash_is_valid.o ltc/misc/crypt/crypt_inits.o \
-ltc/misc/crypt/crypt_ltc_mp_descriptor.o ltc/misc/crypt/crypt_prng_descriptor.o ltc/misc/crypt/crypt_prng_is_valid.o \
-ltc/misc/crypt/crypt_prng_rng_descriptor.o ltc/misc/crypt/crypt_register_all_ciphers.o \
-ltc/misc/crypt/crypt_register_all_hashes.o ltc/misc/crypt/crypt_register_all_prngs.o \
-ltc/misc/crypt/crypt_register_cipher.o ltc/misc/crypt/crypt_register_hash.o ltc/misc/crypt/crypt_register_prng.o \
-ltc/misc/crypt/crypt_sizes.o ltc/misc/crypt/crypt_unregister_cipher.o ltc/misc/crypt/crypt_unregister_hash.o \
-ltc/misc/crypt/crypt_unregister_prng.o ltc/misc/deprecated.o ltc/misc/error_to_string.o \
-ltc/misc/hkdf/hkdf.o ltc/misc/mem_neq.o ltc/misc/padding/padding_depad.o ltc/misc/padding/padding_pad.o \
-ltc/misc/password_free.o ltc/misc/pbes/pbes.o ltc/misc/pbes/pbes1.o ltc/misc/pbes/pbes2.o \
-ltc/misc/pem/pem.o ltc/misc/pem/pem_pkcs.o ltc/misc/pem/pem_read.o ltc/misc/pem/pem_ssh.o \
-ltc/misc/pkcs12/pkcs12_kdf.o ltc/misc/pkcs12/pkcs12_utf8_to_utf16.o ltc/misc/pkcs5/pkcs_5_1.o \
-ltc/misc/pkcs5/pkcs_5_2.o ltc/misc/scrypt/scrypt.o ltc/misc/ssh/ssh_decode_sequence_multi.o \
-ltc/misc/ssh/ssh_encode_sequence_multi.o ltc/misc/zeromem.o ltc/modes/cbc/cbc_decrypt.o \
-ltc/modes/cbc/cbc_done.o ltc/modes/cbc/cbc_encrypt.o ltc/modes/cbc/cbc_getiv.o ltc/modes/cbc/cbc_setiv.o \
-ltc/modes/cbc/cbc_start.o ltc/modes/cfb/cfb_decrypt.o ltc/modes/cfb/cfb_done.o ltc/modes/cfb/cfb_encrypt.o \
-ltc/modes/cfb/cfb_getiv.o ltc/modes/cfb/cfb_setiv.o ltc/modes/cfb/cfb_start.o ltc/modes/ctr/ctr_decrypt.o \
-ltc/modes/ctr/ctr_done.o ltc/modes/ctr/ctr_encrypt.o ltc/modes/ctr/ctr_getiv.o ltc/modes/ctr/ctr_setiv.o \
-ltc/modes/ctr/ctr_start.o ltc/modes/ecb/ecb_decrypt.o ltc/modes/ecb/ecb_done.o ltc/modes/ecb/ecb_encrypt.o \
-ltc/modes/ecb/ecb_start.o ltc/modes/ofb/ofb_decrypt.o ltc/modes/ofb/ofb_done.o ltc/modes/ofb/ofb_encrypt.o \
-ltc/modes/ofb/ofb_getiv.o ltc/modes/ofb/ofb_setiv.o ltc/modes/ofb/ofb_start.o ltc/pk/asn1/der/bit/der_decode_bit_string.o \
+ltc/misc/adler32.o ltc/misc/algname_match.o ltc/misc/argon2/argon2.o ltc/misc/base16/base16_decode.o \
+ltc/misc/base16/base16_encode.o ltc/misc/base32/base32_decode.o ltc/misc/base32/base32_encode.o \
+ltc/misc/base64/base64_decode.o ltc/misc/base64/base64_encode.o ltc/misc/bcrypt/bcrypt.o \
+ltc/misc/burn_stack.o ltc/misc/compare_testvector.o ltc/misc/copy_or_zeromem.o ltc/misc/crc32.o \
+ltc/misc/crypt/crypt.o ltc/misc/crypt/crypt_argchk.o ltc/misc/crypt/crypt_cipher_descriptor.o \
+ltc/misc/crypt/crypt_cipher_is_valid.o ltc/misc/crypt/crypt_constants.o ltc/misc/crypt/crypt_find_cipher.o \
+ltc/misc/crypt/crypt_find_cipher_any.o ltc/misc/crypt/crypt_find_cipher_id.o ltc/misc/crypt/crypt_find_hash.o \
+ltc/misc/crypt/crypt_find_hash_any.o ltc/misc/crypt/crypt_find_hash_id.o ltc/misc/crypt/crypt_find_hash_oid.o \
+ltc/misc/crypt/crypt_find_prng.o ltc/misc/crypt/crypt_fsa.o ltc/misc/crypt/crypt_hash_descriptor.o \
+ltc/misc/crypt/crypt_hash_is_valid.o ltc/misc/crypt/crypt_inits.o ltc/misc/crypt/crypt_ltc_mp_descriptor.o \
+ltc/misc/crypt/crypt_prng_descriptor.o ltc/misc/crypt/crypt_prng_is_valid.o ltc/misc/crypt/crypt_prng_rng_descriptor.o \
+ltc/misc/crypt/crypt_register_all_ciphers.o ltc/misc/crypt/crypt_register_all_hashes.o \
+ltc/misc/crypt/crypt_register_all_prngs.o ltc/misc/crypt/crypt_register_cipher.o \
+ltc/misc/crypt/crypt_register_hash.o ltc/misc/crypt/crypt_register_prng.o ltc/misc/crypt/crypt_sizes.o \
+ltc/misc/crypt/crypt_unregister_cipher.o ltc/misc/crypt/crypt_unregister_hash.o ltc/misc/crypt/crypt_unregister_prng.o \
+ltc/misc/deprecated.o ltc/misc/error_to_string.o ltc/misc/hkdf/hkdf.o ltc/misc/mem_neq.o \
+ltc/misc/padding/padding_depad.o ltc/misc/padding/padding_pad.o ltc/misc/password_free.o \
+ltc/misc/pbes/pbes.o ltc/misc/pbes/pbes1.o ltc/misc/pbes/pbes2.o ltc/misc/pem/pem.o \
+ltc/misc/pem/pem_pkcs.o ltc/misc/pem/pem_read.o ltc/misc/pem/pem_ssh.o ltc/misc/pkcs12/pkcs12_kdf.o \
+ltc/misc/pkcs12/pkcs12_utf8_to_utf16.o ltc/misc/pkcs5/pkcs_5_1.o ltc/misc/pkcs5/pkcs_5_2.o \
+ltc/misc/scrypt/scrypt.o ltc/misc/ssh/ssh_decode_sequence_multi.o ltc/misc/ssh/ssh_encode_sequence_multi.o \
+ltc/misc/zeromem.o ltc/modes/cbc/cbc_decrypt.o ltc/modes/cbc/cbc_done.o ltc/modes/cbc/cbc_encrypt.o \
+ltc/modes/cbc/cbc_getiv.o ltc/modes/cbc/cbc_setiv.o ltc/modes/cbc/cbc_start.o ltc/modes/cfb/cfb_decrypt.o \
+ltc/modes/cfb/cfb_done.o ltc/modes/cfb/cfb_encrypt.o ltc/modes/cfb/cfb_getiv.o ltc/modes/cfb/cfb_setiv.o \
+ltc/modes/cfb/cfb_start.o ltc/modes/ctr/ctr_decrypt.o ltc/modes/ctr/ctr_done.o ltc/modes/ctr/ctr_encrypt.o \
+ltc/modes/ctr/ctr_getiv.o ltc/modes/ctr/ctr_setiv.o ltc/modes/ctr/ctr_start.o ltc/modes/ecb/ecb_decrypt.o \
+ltc/modes/ecb/ecb_done.o ltc/modes/ecb/ecb_encrypt.o ltc/modes/ecb/ecb_start.o ltc/modes/ofb/ofb_decrypt.o \
+ltc/modes/ofb/ofb_done.o ltc/modes/ofb/ofb_encrypt.o ltc/modes/ofb/ofb_getiv.o ltc/modes/ofb/ofb_setiv.o \
+ltc/modes/ofb/ofb_start.o ltc/modes/xts/xts_decrypt.o ltc/modes/xts/xts_done.o ltc/modes/xts/xts_encrypt.o \
+ltc/modes/xts/xts_init.o ltc/modes/xts/xts_mult_x.o ltc/pk/asn1/der/bit/der_decode_bit_string.o \
 ltc/pk/asn1/der/bit/der_decode_raw_bit_string.o ltc/pk/asn1/der/bit/der_encode_bit_string.o \
 ltc/pk/asn1/der/bit/der_encode_raw_bit_string.o ltc/pk/asn1/der/bit/der_length_bit_string.o \
 ltc/pk/asn1/der/boolean/der_decode_boolean.o ltc/pk/asn1/der/boolean/der_encode_boolean.o \
