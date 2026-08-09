@@ -4,7 +4,7 @@ package Crypt::Cipher::ARIA;
 
 use strict;
 use warnings;
-our $VERSION = '0.090_004';
+our $VERSION = '0.090_005';
 
 use base qw(Crypt::Cipher);
 
