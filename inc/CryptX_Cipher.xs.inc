@@ -72,6 +72,7 @@ encrypt(Crypt::Cipher self, SV * data)
           RETVAL = NEWSV(0, len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);
+          *SvEND(RETVAL) = '\0';
           rv = self->desc->ecb_encrypt(plaintext, (unsigned char *)SvPVX(RETVAL), &self->skey);
           if (rv!=CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
@@ -103,6 +104,7 @@ decrypt(Crypt::Cipher self, SV * data)
           RETVAL = NEWSV(0, len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);
+          *SvEND(RETVAL) = '\0';
           rv = self->desc->ecb_decrypt(ciphertext, (unsigned char *)SvPVX(RETVAL), &self->skey);
           if (rv!=CRYPT_OK) {
             SvREFCNT_dec(RETVAL);

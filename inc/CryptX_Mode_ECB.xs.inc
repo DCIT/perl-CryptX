@@ -199,7 +199,10 @@ add(Crypt::Mode::ECB self, ...)
             }
           }
         }
-        if (out_len > 0) SvCUR_set(RETVAL, out_len);
+        if (out_len > 0) {
+          SvCUR_set(RETVAL, out_len);
+          *SvEND(RETVAL) = '\0';
+        }
     }
     OUTPUT:
         RETVAL

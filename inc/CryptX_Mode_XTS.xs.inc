@@ -109,6 +109,7 @@ encrypt(Crypt::Mode::XTS self, SV * data, SV * tweak)
           croak("FATAL: xts_%scrypt failed: %s", ix == 1 ? "de" : "en", error_to_string(rv));
         }
         SvCUR_set(RETVAL, in_len);
+        *SvEND(RETVAL) = '\0';
     }
     OUTPUT:
         RETVAL

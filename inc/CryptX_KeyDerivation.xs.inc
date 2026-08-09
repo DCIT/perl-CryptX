@@ -41,6 +41,7 @@ pbkdf1(SV * password, SV * salt, int iteration_count = 5000, const char * hash_n
             croak("FATAL: pkcs_5_alg1 process failed: %s", error_to_string(rv));
           }
           SvCUR_set(RETVAL, output_len);
+          *SvEND(RETVAL) = '\0';
         }
     }
     OUTPUT:
@@ -80,6 +81,7 @@ pbkdf1_openssl(SV * password, SV * salt, int iteration_count = 5000, const char 
             croak("FATAL: pkcs_5_alg1_openssl process failed: %s", error_to_string(rv));
           }
           SvCUR_set(RETVAL, output_len);
+          *SvEND(RETVAL) = '\0';
         }
     }
     OUTPUT:
@@ -118,6 +120,7 @@ pbkdf2(SV * password, SV * salt, int iteration_count = 5000, const char * hash_n
             croak("FATAL: pkcs_5_alg2 process failed: %s", error_to_string(rv));
           }
           SvCUR_set(RETVAL, output_len);
+          *SvEND(RETVAL) = '\0';
         }
     }
     OUTPUT:
@@ -155,6 +158,7 @@ hkdf_extract(SV * in, SV * salt = &PL_sv_undef, const char * hash_name = "SHA256
           croak("FATAL: hkdf_extract process failed: %s", error_to_string(rv));
         }
         SvCUR_set(RETVAL, output_len);
+        *SvEND(RETVAL) = '\0';
     }
     OUTPUT:
         RETVAL
@@ -193,6 +197,7 @@ hkdf_expand(SV * in, const char * hash_name = "SHA256", unsigned long output_len
             croak("FATAL: hkdf_expand process failed: %s", error_to_string(rv));
           }
           SvCUR_set(RETVAL, output_len);
+          *SvEND(RETVAL) = '\0';
         }
     }
     OUTPUT:
@@ -236,6 +241,7 @@ hkdf(SV * in, SV * salt, const char * hash_name = "SHA256", unsigned long output
             croak("FATAL: hkdf process failed: %s", error_to_string(rv));
           }
           SvCUR_set(RETVAL, output_len);
+          *SvEND(RETVAL) = '\0';
         }
     }
     OUTPUT:
@@ -274,6 +280,7 @@ bcrypt_pbkdf(SV * password, SV * salt, unsigned int rounds = 16, const char * ha
             croak("FATAL: bcrypt_pbkdf process failed: %s", error_to_string(rv));
           }
           SvCUR_set(RETVAL, output_len);
+          *SvEND(RETVAL) = '\0';
         }
     }
     OUTPUT:
@@ -301,6 +308,7 @@ scrypt_pbkdf(SV * password, SV * salt, unsigned long N = 1024, unsigned long r =
           RETVAL = NEWSV(0, output_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, output_len);
+          *SvEND(RETVAL) = '\0';
           output = (unsigned char *)SvPVX(RETVAL);
 
           rv = scrypt_pbkdf(password_ptr, (unsigned long)password_len, salt_ptr, (unsigned long)salt_len, N, r, p, output, output_len);
@@ -347,6 +355,7 @@ argon2_pbkdf(const char * type, SV * password, SV * salt, unsigned int t_cost = 
           RETVAL = NEWSV(0, output_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, output_len);
+          *SvEND(RETVAL) = '\0';
           output = (unsigned char *)SvPVX(RETVAL);
 
           rv = argon2_hash(password_ptr, (unsigned long)password_len,

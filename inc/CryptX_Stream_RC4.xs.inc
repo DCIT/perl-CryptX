@@ -56,6 +56,7 @@ keystream(Crypt::Stream::RC4 self, unsigned long out_len)
           RETVAL = NEWSV(0, out_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, out_len);
+          *SvEND(RETVAL) = '\0';
           out_data = (unsigned char *)SvPVX(RETVAL);
           rv = rc4_stream_keystream(self, out_data, out_len);
           if (rv != CRYPT_OK) {
@@ -83,6 +84,7 @@ crypt(Crypt::Stream::RC4 self, SV * data)
           RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
+          *SvEND(RETVAL) = '\0';
           out_data = (unsigned char *)SvPVX(RETVAL);
           rv = rc4_stream_crypt(self, in_data, (unsigned long)in_data_len, out_data);
           if (rv != CRYPT_OK) {

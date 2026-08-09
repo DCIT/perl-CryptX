@@ -1158,6 +1158,7 @@ _radix_to_bin(SV *in, int radix)
             RETVAL = NEWSV(0, len); /* avoid zero! */
             SvPOK_only(RETVAL);
             SvCUR_set(RETVAL, len);
+            *SvEND(RETVAL) = '\0';
             out_data = (unsigned char *)SvPVX(RETVAL);
             if (mp_to_ubin(&mpi, out_data, len, NULL) != MP_OKAY) {
               SvREFCNT_dec(RETVAL);
@@ -1294,6 +1295,7 @@ decode_b64(SV * in)
             XSRETURN_UNDEF;
           }
           SvCUR_set(RETVAL, out_len);
+          *SvEND(RETVAL) = '\0';
         }
     }
     OUTPUT:
@@ -1375,6 +1377,7 @@ decode_b32r(SV *in)
             XSRETURN_UNDEF;
           }
           SvCUR_set(RETVAL, out_len);
+          *SvEND(RETVAL) = '\0';
         }
     }
     OUTPUT:
@@ -1396,6 +1399,7 @@ increment_octets_le(SV * in)
           RETVAL = NEWSV(0, len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);
+          *SvEND(RETVAL) = '\0';
           out_data = (unsigned char *)SvPVX(RETVAL);
           Copy(in_data, out_data, len, unsigned char);
           while (i < len) {
@@ -1428,6 +1432,7 @@ increment_octets_be(SV * in)
           RETVAL = NEWSV(0, len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, len);
+          *SvEND(RETVAL) = '\0';
           out_data = (unsigned char *)SvPVX(RETVAL);
           Copy(in_data, out_data, len, unsigned char);
           while (i < len) {

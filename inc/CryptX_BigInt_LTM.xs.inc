@@ -434,6 +434,7 @@ _to_bytes(Class, Math::BigInt::LTM n)
       buf = (unsigned char*)SvPVX(RETVAL);
       merr = mp_to_ubin(n, buf, len, NULL);
       SvCUR_set(RETVAL, len);
+      *SvEND(RETVAL) = '\0';
     }
     else {
       RETVAL = newSV(1);
@@ -441,6 +442,7 @@ _to_bytes(Class, Math::BigInt::LTM n)
       buf = (unsigned char*)SvPVX(RETVAL);
       buf[0] = 0;
       SvCUR_set(RETVAL, 1);
+      *SvEND(RETVAL) = '\0';
     }
     PERL_UNUSED_VAR(merr);
   OUTPUT:

@@ -29,6 +29,7 @@ gcm_siv_encrypt_authenticate(char *cipher_name, SV *key, SV *nonce, SV *aad, SV 
         RETVAL = NEWSV(0, ct_len);
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, ct_len);
+        *SvEND(RETVAL) = '\0';
         ct = (unsigned char *)SvPVX(RETVAL);
         tag_len = 16;
 
@@ -78,6 +79,7 @@ gcm_siv_decrypt_verify(char *cipher_name, SV *key, SV *nonce, SV *aad, SV *ciphe
         output = NEWSV(0, pt_len > 0 ? pt_len : 1);
         SvPOK_only(output);
         SvCUR_set(output, pt_len);
+        *SvEND(output) = '\0';
         pt = (unsigned char *)SvPVX(output);
         memcpy(tag, ct + pt_len, 16);
         tag_len = 16;

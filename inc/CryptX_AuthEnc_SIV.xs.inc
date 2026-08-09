@@ -60,6 +60,7 @@ siv_encrypt_authenticate(char *cipher_name, SV *key, SV *plaintext, SV *aad = &P
             croak("FATAL: siv_encrypt_memory failed: %s", error_to_string(rv));
         }
         SvCUR_set(RETVAL, ct_len);
+        *SvEND(RETVAL) = '\0';
     }
     OUTPUT:
         RETVAL
@@ -124,6 +125,7 @@ siv_decrypt_verify(char *cipher_name, SV *key, SV *ciphertext, SV *aad = &PL_sv_
             XPUSHs(sv_2mortal(newSVpvn(NULL, 0))); /* undef */
         } else {
             SvCUR_set(output, pt_len);
+            *SvEND(output) = '\0';
             XPUSHs(sv_2mortal(output));
         }
     }

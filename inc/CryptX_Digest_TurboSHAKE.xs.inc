@@ -81,6 +81,7 @@ done(Crypt::Digest::TurboSHAKE self, unsigned long out_len)
         RETVAL = NEWSV(0, out_len); /* avoid zero! */
         SvPOK_only(RETVAL);
         SvCUR_set(RETVAL, out_len);
+        *SvEND(RETVAL) = '\0';
         out_data = (unsigned char *)SvPVX(RETVAL);
         rv = turbo_shake_done(&self->state, out_data, out_len);
         if (rv != CRYPT_OK) {

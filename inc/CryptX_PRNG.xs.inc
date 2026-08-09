@@ -187,6 +187,7 @@ bytes(Crypt::PRNG self, unsigned long output_len)
             RETVAL = NEWSV(0, output_len); /* avoid zero! */
             SvPOK_only(RETVAL);
             SvCUR_set(RETVAL, output_len);
+            *SvEND(RETVAL) = '\0';
             rdata = SvPVX(RETVAL);
             rv_len = (self->desc->read)((unsigned char*)rdata, (unsigned long)output_len, &self->state);
             if ((UV)rv_len != output_len) {

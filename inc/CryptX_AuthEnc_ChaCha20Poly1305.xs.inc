@@ -120,6 +120,7 @@ decrypt_add(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * data)
           RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
+          *SvEND(RETVAL) = '\0';
           out_data = (unsigned char *)SvPVX(RETVAL);
           rv = chacha20poly1305_decrypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
           if (rv != CRYPT_OK) {
@@ -148,6 +149,7 @@ encrypt_add(Crypt::AuthEnc::ChaCha20Poly1305 self, SV * data)
           RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
+          *SvEND(RETVAL) = '\0';
           out_data = (unsigned char *)SvPVX(RETVAL);
           rv = chacha20poly1305_encrypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
           if (rv != CRYPT_OK) {
@@ -234,6 +236,7 @@ chacha20poly1305_encrypt_authenticate(SV *key, SV *nonce, SV *header, SV *plaint
         output = NEWSV(0, pt_len > 0 ? pt_len : 1); /* avoid zero! */
         SvPOK_only(output);
         SvCUR_set(output, pt_len);
+        *SvEND(output) = '\0';
 
         rv = chacha20poly1305_memory(k, (unsigned long)k_len, n, (unsigned long)n_len, h, (unsigned long)h_len,
                                      pt, (unsigned long)pt_len, (unsigned char *)SvPVX(output), tag, &tag_len,
@@ -275,6 +278,7 @@ chacha20poly1305_decrypt_verify(SV *key, SV *nonce, SV *header, SV *ciphertext, 
         output = NEWSV(0, ct_len > 0 ? ct_len : 1); /* avoid zero! */
         SvPOK_only(output);
         SvCUR_set(output, ct_len);
+        *SvEND(output) = '\0';
         /* Clamp malformed tags to the stack buffer size before copying. */
         tag_len = (unsigned long)(t_len > sizeof(tag) ? sizeof(tag) : t_len);
         if (tag_len > 0) {

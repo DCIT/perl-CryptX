@@ -73,6 +73,7 @@ encrypt_add(Crypt::AuthEnc::EAX self, SV * data)
           RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
+          *SvEND(RETVAL) = '\0';
           out_data = (unsigned char *)SvPVX(RETVAL);
           rv = eax_encrypt(&self->state, in_data, out_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) {
@@ -101,6 +102,7 @@ decrypt_add(Crypt::AuthEnc::EAX self, SV * data)
           RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
+          *SvEND(RETVAL) = '\0';
           out_data = (unsigned char *)SvPVX(RETVAL);
           rv = eax_decrypt(&self->state, in_data, out_data, (unsigned long)in_data_len);
           if (rv != CRYPT_OK) {
@@ -203,6 +205,7 @@ eax_encrypt_authenticate(char *cipher_name, SV *key, SV *nonce, SV *header, SV *
         output = NEWSV(0, pt_len > 0 ? pt_len : 1); /* avoid zero! */
         SvPOK_only(output);
         SvCUR_set(output, pt_len);
+        *SvEND(output) = '\0';
 
         rv = eax_encrypt_authenticate_memory(id, k, (unsigned long)k_len, n, (unsigned long)n_len,
                                              h, (unsigned long)h_len, pt, (unsigned long)pt_len,
@@ -246,6 +249,7 @@ eax_decrypt_verify(char *cipher_name, SV *key, SV *nonce, SV *header, SV *cipher
         output = NEWSV(0, ct_len > 0 ? ct_len : 1); /* avoid zero! */
         SvPOK_only(output);
         SvCUR_set(output, ct_len);
+        *SvEND(output) = '\0';
         /* Clamp malformed tags to the stack buffer size before copying. */
         tag_len = (unsigned long)(t_len > sizeof(tag) ? sizeof(tag) : t_len);
         if (tag_len > 0) {

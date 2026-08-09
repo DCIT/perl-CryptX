@@ -85,6 +85,7 @@ encrypt_add(Crypt::AuthEnc::CCM self, SV * data)
           RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
+          *SvEND(RETVAL) = '\0';
           out_data = (unsigned char *)SvPVX(RETVAL);
           rv = ccm_process(&self->state, in_data, (unsigned long)in_data_len, out_data, CCM_ENCRYPT);
           if (rv != CRYPT_OK) {
@@ -113,6 +114,7 @@ decrypt_add(Crypt::AuthEnc::CCM self, SV * data)
           RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
+          *SvEND(RETVAL) = '\0';
           out_data = (unsigned char *)SvPVX(RETVAL);
           rv = ccm_process(&self->state, out_data, (unsigned long)in_data_len, in_data, CCM_DECRYPT);
           if (rv != CRYPT_OK) {
@@ -200,6 +202,7 @@ ccm_encrypt_authenticate(char *cipher_name, SV *key, SV *nonce, SV *header, unsi
         output = NEWSV(0, pt_len > 0 ? pt_len : 1); /* avoid zero! */
         SvPOK_only(output);
         SvCUR_set(output, pt_len);
+        *SvEND(output) = '\0';
         if(tag_len < 4 || tag_len > 16) tag_len = 16;
 
         rv = ccm_memory(id, k, (unsigned long)k_len, NULL, n, (unsigned long)n_len, h, (unsigned long)h_len,
@@ -243,6 +246,7 @@ ccm_decrypt_verify(char *cipher_name, SV *key, SV *nonce, SV *header, SV *cipher
         output = NEWSV(0, ct_len > 0 ? ct_len : 1); /* avoid zero! */
         SvPOK_only(output);
         SvCUR_set(output, ct_len);
+        *SvEND(output) = '\0';
         /* Clamp malformed tags to the stack buffer size before copying. */
         tag_len = (unsigned long)(t_len > sizeof(tag) ? sizeof(tag) : t_len);
         if (tag_len > 0) {
