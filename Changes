@@ -1,10 +1,11 @@
 Changes for CryptX
 
 0.091   NEXT
+        - fix #125 (non-NUL-terminated PVs)
         - new: Crypt::Mode::XTS
         - new: Crypt::Digest::BLAKE3
         - re-enable SHA1/SHA224/SHA256 hash state cloning
-        - bundled libtomcrypt update branch:develop (commit: 223ecd23 2026-08-04)
+        - bundled libtomcrypt update branch:develop (commit: a10cad62 2026-08-07)
 
 0.090   2026-06-17
         - new: Crypt::AuthEnc::GCMSIV

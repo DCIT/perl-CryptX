@@ -99,7 +99,7 @@ my %eumm_args = (
   MIN_PERL_VERSION => '5.006',
   LICENSE          => 'perl',
   PREREQ_PM        => { 'Math::BigInt' => 0, 'Time::HiRes' => 0 },
-  TEST_REQUIRES    => { 'Test::More' => 0 },
+  TEST_REQUIRES    => { 'Test::More' => 0, 'Devel::Peek' => 0 },
   META_MERGE       => { resources  => { repository => 'https://github.com/DCIT/perl-CryptX', bugtracker => 'https://github.com/DCIT/perl-CryptX/issues' } },
   dist             => { PREOP => 'perldoc -u lib/CryptX.pm | pod2markdown > README.md', TARFLAGS => '--owner=0 --group=0 -cvf' },
   @EUMM_INC_LIB
