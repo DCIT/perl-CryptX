@@ -1,6 +1,6 @@
 Changes for CryptX
 
-0.091   NEXT
+0.091   2026-08-10
         - fix #125 (non-NUL-terminated PVs)
         - new: Crypt::Mode::XTS
         - new: Crypt::Digest::BLAKE3
