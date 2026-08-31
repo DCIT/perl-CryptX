@@ -37,6 +37,8 @@ Test::Pod::Spelling->import(
                           rarr UTCTime TLV
                           OpenSSH codecs
                           undef adata
+                          FIPS unencoded KEM NIST standardised decapsulate decapsulation SPHINCS SLH FIPS SLH HashSLH SPHINCS Kyber ACVP
+                          COSE JOSE AKP ietf pqc serialisation
                           pre Edctx Edph
                           behaviour reseeds
                           OIDs MGF RSASSA
@@ -46,7 +48,7 @@ Test::Pod::Spelling->import(
                     },
 );
 
-plan tests => 125;
+plan tests => 128;
 
 my @files;
 File::Find::find({ wanted=>sub { push @files, $_ if /\.pm$/ }, no_chdir=>1 }, 'lib');

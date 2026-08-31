@@ -55,6 +55,18 @@ CryptX is the distribution entry point. In normal code, load one of the concrete
     my $bob = Crypt::PK::X25519->new->generate_key;
     my $shared_secret = $alice->shared_secret($bob);
 
+    ## post-quantum signatures (FIPS 204)
+    use Crypt::PQ::MLDSA;
+    my $signer_pq = Crypt::PQ::MLDSA->new;
+    $signer_pq->generate_key('ML-DSA-65');
+    my $sig_pq = $signer_pq->sign_message('hello world');
+
+    ## post-quantum key encapsulation (FIPS 203)
+    use Crypt::PQ::MLKEM;
+    my $kem = Crypt::PQ::MLKEM->new;
+    $kem->generate_key('ML-KEM-768');
+    my ($ciphertext_pq, $shared_secret_pq) = $kem->encapsulate;
+
 # DESCRIPTION
 
 Perl cryptographic modules built on the bundled [LibTomCrypt](https://github.com/libtom/libtomcrypt) library.
@@ -181,6 +193,39 @@ preferred. Prefer OAEP for encryption and PSS for signatures.
 - **DSA** ([Crypt::PK::DSA](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ADSA)) - Legacy. Prefer Ed25519 or ECDSA.
 - **DH** ([Crypt::PK::DH](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ADH)) - Classic Diffie-Hellman. Prefer X25519 for new designs.
 
+### Post-Quantum Cryptography
+
+NIST-standardised post-quantum primitives. Use these to add quantum
+resistance to long-lived secrets and signatures, typically alongside (not
+instead of) a classical algorithm in a hybrid construction.
+
+- **ML-KEM** ([Crypt::PQ::MLKEM](https://metacpan.org/pod/Crypt%3A%3APQ%3A%3AMLKEM)) - Module-Lattice Key Encapsulation,
+FIPS 203 (formerly CRYSTALS-Kyber). A post-quantum alternative to ECDH for
+key establishment, but a KEM, not a key agreement: one side calls
+`encapsulate`, the other `decapsulate`. Three parameter sets:
+`ML-KEM-512`, `ML-KEM-768` (default), `ML-KEM-1024`; 32-byte shared
+secret. Usually deployed in a hybrid with a classical exchange such as
+X25519; the combiner is defined by your protocol, not by CryptX. JWK
+export/import follows draft-ietf-jose-pqc-kem.
+- **ML-DSA** ([Crypt::PQ::MLDSA](https://metacpan.org/pod/Crypt%3A%3APQ%3A%3AMLDSA)) - Module-Lattice Digital Signature
+Algorithm, FIPS 204 (formerly CRYSTALS-Dilithium). Default post-quantum
+signature scheme. Three parameter sets: `ML-DSA-44`, `ML-DSA-65`
+(default), and `ML-DSA-87`. Signatures are a few kilobytes. Also supports
+External-mu signing (RFC 9881), which splits signing into a message pre-hash
+and a signature over the resulting 64-byte representative, and JWK export/import
+(RFC 9964, `kty` `"AKP"`).
+- **SLH-DSA** ([Crypt::PQ::SLHDSA](https://metacpan.org/pod/Crypt%3A%3APQ%3A%3ASLHDSA)) - Stateless Hash-Based Digital
+Signature Algorithm, FIPS 205 (formerly SPHINCS+). Hash-based, which makes
+its security assumptions different from (and more conservative than)
+ML-DSA. Twelve "pure" parameter sets along three axes - hash family
+(SHA-2 or SHAKE), security level (128/192/256-bit), and tradeoff (`s` =
+small signature, slow signing; `f` = fast signing, larger signatures) -
+plus twelve pre-hash variants. Signatures range from 8 KB (`128s`) to
+50 KB (`256f`); key generation and signing for the `s` variants can be
+slow. Prefer ML-DSA unless you specifically need hash-based assumptions.
+JWK export/import follows draft-ietf-cose-sphincs-plus, which so far registers
+an `alg` for only two parameter sets.
+
 ### Key Derivation / Password hashing
 
 - **HKDF** (["hkdf" in Crypt::KeyDerivation](https://metacpan.org/pod/Crypt%3A%3AKeyDerivation#hkdf)) - Extract-then-expand KDF. Use for deriving
@@ -263,6 +308,10 @@ module POD when you need exact failure semantics.
 - Public-key cryptography
 
     [Crypt::PK::RSA](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ARSA), [Crypt::PK::DSA](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ADSA), [Crypt::PK::ECC](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AECC), [Crypt::PK::DH](https://metacpan.org/pod/Crypt%3A%3APK%3A%3ADH), [Crypt::PK::Ed25519](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AEd25519), [Crypt::PK::X25519](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AX25519), [Crypt::PK::Ed448](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AEd448), [Crypt::PK::X448](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AX448)
+
+- Post-quantum cryptography
+
+    [Crypt::PQ::MLKEM](https://metacpan.org/pod/Crypt%3A%3APQ%3A%3AMLKEM) (FIPS 203), [Crypt::PQ::MLDSA](https://metacpan.org/pod/Crypt%3A%3APQ%3A%3AMLDSA) (FIPS 204), [Crypt::PQ::SLHDSA](https://metacpan.org/pod/Crypt%3A%3APQ%3A%3ASLHDSA) (FIPS 205)
 
 - Cryptographically secure random number generators
 

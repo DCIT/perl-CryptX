@@ -94,6 +94,18 @@ CryptX is the distribution entry point. In normal code, load one of the concrete
  my $bob = Crypt::PK::X25519->new->generate_key;
  my $shared_secret = $alice->shared_secret($bob);
 
+ ## post-quantum signatures (FIPS 204)
+ use Crypt::PQ::MLDSA;
+ my $signer_pq = Crypt::PQ::MLDSA->new;
+ $signer_pq->generate_key('ML-DSA-65');
+ my $sig_pq = $signer_pq->sign_message('hello world');
+
+ ## post-quantum key encapsulation (FIPS 203)
+ use Crypt::PQ::MLKEM;
+ my $kem = Crypt::PQ::MLKEM->new;
+ $kem->generate_key('ML-KEM-768');
+ my ($ciphertext_pq, $shared_secret_pq) = $kem->encapsulate;
+
 =head1 DESCRIPTION
 
 Perl cryptographic modules built on the bundled L<LibTomCrypt|https://github.com/libtom/libtomcrypt> library.
@@ -276,6 +288,45 @@ preferred. Prefer OAEP for encryption and PSS for signatures.
 
 =back
 
+=head3 Post-Quantum Cryptography
+
+NIST-standardised post-quantum primitives. Use these to add quantum
+resistance to long-lived secrets and signatures, typically alongside (not
+instead of) a classical algorithm in a hybrid construction.
+
+=over
+
+=item * B<ML-KEM> (L<Crypt::PQ::MLKEM>) - Module-Lattice Key Encapsulation,
+FIPS 203 (formerly CRYSTALS-Kyber). A post-quantum alternative to ECDH for
+key establishment, but a KEM, not a key agreement: one side calls
+C<encapsulate>, the other C<decapsulate>. Three parameter sets:
+C<ML-KEM-512>, C<ML-KEM-768> (default), C<ML-KEM-1024>; 32-byte shared
+secret. Usually deployed in a hybrid with a classical exchange such as
+X25519; the combiner is defined by your protocol, not by CryptX. JWK
+export/import follows draft-ietf-jose-pqc-kem.
+
+=item * B<ML-DSA> (L<Crypt::PQ::MLDSA>) - Module-Lattice Digital Signature
+Algorithm, FIPS 204 (formerly CRYSTALS-Dilithium). Default post-quantum
+signature scheme. Three parameter sets: C<ML-DSA-44>, C<ML-DSA-65>
+(default), and C<ML-DSA-87>. Signatures are a few kilobytes. Also supports
+External-mu signing (RFC 9881), which splits signing into a message pre-hash
+and a signature over the resulting 64-byte representative, and JWK export/import
+(RFC 9964, C<kty> C<"AKP">).
+
+=item * B<SLH-DSA> (L<Crypt::PQ::SLHDSA>) - Stateless Hash-Based Digital
+Signature Algorithm, FIPS 205 (formerly SPHINCS+). Hash-based, which makes
+its security assumptions different from (and more conservative than)
+ML-DSA. Twelve "pure" parameter sets along three axes - hash family
+(SHA-2 or SHAKE), security level (128/192/256-bit), and tradeoff (C<s> =
+small signature, slow signing; C<f> = fast signing, larger signatures) -
+plus twelve pre-hash variants. Signatures range from 8 KB (C<128s>) to
+50 KB (C<256f>); key generation and signing for the C<s> variants can be
+slow. Prefer ML-DSA unless you specifically need hash-based assumptions.
+JWK export/import follows draft-ietf-cose-sphincs-plus, which so far registers
+an C<alg> for only two parameter sets.
+
+=back
+
 =head3 Key Derivation / Password hashing
 
 =over
@@ -369,6 +420,10 @@ L<Crypt::Mac::OMAC>, L<Crypt::Mac::Pelican>, L<Crypt::Mac::PMAC>, L<Crypt::Mac::
 =item * Public-key cryptography
 
 L<Crypt::PK::RSA>, L<Crypt::PK::DSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DH>, L<Crypt::PK::Ed25519>, L<Crypt::PK::X25519>, L<Crypt::PK::Ed448>, L<Crypt::PK::X448>
+
+=item * Post-quantum cryptography
+
+L<Crypt::PQ::MLKEM> (FIPS 203), L<Crypt::PQ::MLDSA> (FIPS 204), L<Crypt::PQ::SLHDSA> (FIPS 205)
 
 =item * Cryptographically secure random number generators
 
