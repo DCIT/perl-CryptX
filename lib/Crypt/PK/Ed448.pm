@@ -90,7 +90,10 @@ sub export_key_pem {
   local $SIG{__DIE__} = \&CryptX::_croak;
   my $key = $self->export_key_der($type||'');
   return unless $key;
-  return der_to_pem($key, "PRIVATE KEY", $password, $cipher) if $type eq 'private';
+  if ($type eq 'private') {
+    croak "FATAL: export_key_pem: password-protected PEM is not supported for PKCS#8 keys yet, see the export_key_pem documentation" if defined $password;
+    return der_to_pem($key, "PRIVATE KEY");
+  }
   return der_to_pem($key, "PUBLIC KEY") if $type eq 'public';
 }
 
@@ -225,7 +228,8 @@ Returns the key as a PEM-encoded string (ASCII).
 
  my $pem = $pk->export_key_pem('private');
  my $pem = $pk->export_key_pem('public');
- my $pem = $pk->export_key_pem('private', $password, 'AES-256-CBC');
+
+B<Password protection is not supported> for these keys.
 
 =head2 export_key_jwk
 

@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 
 plan skip_all => "JSON module not installed" unless eval { require JSON };
-plan tests => 63;
+plan tests => 76;
 
 use Crypt::PK::X25519;
 use Crypt::Misc qw(read_rawfile);
@@ -173,4 +173,44 @@ use Crypt::Misc qw(read_rawfile);
    my $sk = Crypt::PK::X25519->new->import_key_raw(pack("H*", "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb"), 'private');
    my $pk = Crypt::PK::X25519->new->import_key_raw(pack("H*", "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a"), 'public');
    is(unpack("H*", $sk->shared_secret($pk)), "4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742");
+}
+
+### export_key_jwk_thumbprint (RFC 7638 over the RFC 8037 OKP members crv/kty/x)
+{
+  my $k = Crypt::PK::X25519->new->generate_key;
+  my $h = $k->export_key_jwk('public', 1);
+  my $tp = $k->export_key_jwk_thumbprint;
+  like($tp, qr/^[A-Za-z0-9_-]{43}$/, 'thumbprint is base64url SHA256');
+  is($tp, Crypt::Digest::digest_data_b64u('SHA256',
+       CryptX::_encode_json({crv=>$h->{crv}, kty=>$h->{kty}, x=>$h->{x}})),
+     'thumbprint is over crv/kty/x in lexicographic order');
+  is($tp, Crypt::PK::X25519->new(\($k->export_key_jwk('public')))->export_key_jwk_thumbprint,
+     'same thumbprint from a public-only key');
+  isnt($tp, $k->export_key_jwk_thumbprint('SHA512'), 'hash argument is honoured');
+  is($h->{crv}, 'X25519', 'crv');
+}
+
+### password-protected PEM export is refused rather than writing an unreadable file
+{
+  my $gen = sub { Crypt::PK::X25519->new->generate_key };
+  my $k = $gen->();
+  my $ref = $k->export_key_der('private');
+
+  # unencrypted export is unaffected
+  my $plain = $k->export_key_pem('private');
+  like($plain, qr/^-----BEGIN PRIVATE KEY-----/, 'unencrypted PEM keeps the PRIVATE KEY label');
+  unlike($plain, qr/Proc-Type|DEK-Info/, 'RFC 7468 permits no PEM headers');
+  is(Crypt::PK::X25519->new(\$plain)->export_key_der('private'), $ref, 'unencrypted PEM round-trips');
+  ok($k->export_key_pem('public'), 'public PEM is unaffected');
+
+  # a password croaks instead of producing something nothing can read
+  eval { $k->export_key_pem('private', 'secret') };
+  like($@, qr/password-protected PEM is not supported/, 'password croaks');
+  eval { $k->export_key_pem('private', 'secret', 'AES-128-CBC') };
+  like($@, qr/password-protected PEM is not supported/, 'password + cipher croaks');
+  eval { $k->export_key_pem('private', '') };
+  like($@, qr/password-protected PEM is not supported/, 'even an empty password croaks');
+
+  # reading an externally produced ENCRYPTED PRIVATE KEY is a separate path and stays supported
+  ok(Crypt::PK::X25519->can('import_key'), 'import_key still available for reading encrypted keys');
 }
