@@ -15,7 +15,7 @@ new(Class, const char * variant, SV * key, SV * cust = NULL)
 
         if (!SvPOK_spec(key)) croak("FATAL: key must be string/buffer scalar");
         k = (unsigned char *) SvPVbyte(key, k_len);
-        if (cust && SvOK(cust)) {
+        if (SvOK_spec(cust)) {
           if (!SvPOK_spec(cust)) croak("FATAL: cust must be string/buffer scalar");
           c = (unsigned char *) SvPVbyte(cust, c_len);
         }

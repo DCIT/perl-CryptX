@@ -227,7 +227,7 @@ chacha20poly1305_encrypt_authenticate(SV *key, SV *nonce, SV *header, SV *plaint
         n  = (unsigned char *) SvPVbyte(nonce, n_len);
         if (!SvPOK_spec(plaintext)) croak("FATAL: plaintext must be string/buffer scalar");
         pt = (unsigned char *) SvPVbyte(plaintext, pt_len);
-        if (header && SvOK(header)) {
+        if (SvOK_spec(header)) {
           if (!SvPOK_spec(header)) croak("FATAL: header must be string/buffer scalar");
           h = (unsigned char *) SvPVbyte(header, h_len);
             zeromem(tag, sizeof(tag));
@@ -269,7 +269,7 @@ chacha20poly1305_decrypt_verify(SV *key, SV *nonce, SV *header, SV *ciphertext, 
         ct = (unsigned char *) SvPVbyte(ciphertext, ct_len);
         if (!SvPOK_spec(tagsv)) croak("FATAL: tag must be string/buffer scalar");
         t  = (unsigned char *) SvPVbyte(tagsv, t_len);
-        if (header && SvOK(header)) {
+        if (SvOK_spec(header)) {
           if (!SvPOK_spec(header)) croak("FATAL: header must be string/buffer scalar");
           h = (unsigned char *) SvPVbyte(header, h_len);
             zeromem(tag, sizeof(tag));

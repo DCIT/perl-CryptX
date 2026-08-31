@@ -191,7 +191,7 @@ ccm_encrypt_authenticate(char *cipher_name, SV *key, SV *nonce, SV *header, unsi
         n  = (unsigned char *) SvPVbyte(nonce, n_len);
         if (!SvPOK_spec(plaintext)) croak("FATAL: plaintext must be string/buffer scalar");
         pt = (unsigned char *) SvPVbyte(plaintext, pt_len);
-        if (header && SvOK(header)) {
+        if (SvOK_spec(header)) {
           if (!SvPOK_spec(header)) croak("FATAL: header must be string/buffer scalar");
           h = (unsigned char *) SvPVbyte(header, h_len);
             zeromem(tag, sizeof(tag));
@@ -235,7 +235,7 @@ ccm_decrypt_verify(char *cipher_name, SV *key, SV *nonce, SV *header, SV *cipher
         ct = (unsigned char *) SvPVbyte(ciphertext, ct_len);
         if (!SvPOK_spec(tagsv)) croak("FATAL: tag must be string/buffer scalar");
         t  = (unsigned char *) SvPVbyte(tagsv, t_len);
-        if (header && SvOK(header)) {
+        if (SvOK_spec(header)) {
           if (!SvPOK_spec(header)) croak("FATAL: header must be string/buffer scalar");
           h = (unsigned char *) SvPVbyte(header, h_len);
             zeromem(tag, sizeof(tag));

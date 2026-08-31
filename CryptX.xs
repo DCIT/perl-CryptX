@@ -19,7 +19,14 @@
 #endif
 
 /* HACK: https://github.com/DCIT/perl-CryptX/issues/105 (replacement for SvPOK(sv) suggestet by Leont) */
-#define SvPOK_spec(sv) (SvOK(sv) && (!SvROK(sv) || SvAMAGIC(sv)))
+/* SvGETMAGIC first: SvOK() is a plain flag test and does not fetch get-magic, so
+   without it a magical SV - the lvalue scalar substr() yields when passed straight
+   into a call, a tied scalar - reads as undefined although its value is fine.
+   Both are NULL-tolerant so that an omitted optional argument is "no value".
+   SvOK_spec  .. was an argument supplied at all (undef/omitted = no)
+   SvPOK_spec .. and can we take a byte string out of it */
+#define SvOK_spec(sv)  ((sv) != NULL && (SvGETMAGIC(sv), SvOK(sv)))
+#define SvPOK_spec(sv) (SvOK_spec(sv) && (!SvROK(sv) || SvAMAGIC(sv)))
 
 #undef LTC_SOURCE
 #include "tomcrypt.h"
