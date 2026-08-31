@@ -378,6 +378,8 @@ B<BEWARE:> For JWK support you need to have L<JSON> module installed.
 
 =head2 export_key_jwk_thumbprint
 
+I<Since: CryptX-0.092>
+
 Returns a JWK thumbprint (RFC 7638) of the public key as a base64url string.
 Per RFC 8037 the C<OKP> members included in the hash are C<crv>, C<kty> and
 C<x>, in that order.
