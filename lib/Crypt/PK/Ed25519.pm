@@ -13,6 +13,7 @@ use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 use Crypt::PK;
+use Crypt::Digest qw(digest_data_b64u);
 use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pem_to_der der_to_pem);
 
 sub new {
@@ -117,6 +118,17 @@ sub export_key_jwk {
   $hash->{x} = encode_b64u(pack("H*", $kh->{pub}));
   $hash->{d} = encode_b64u(pack("H*", $kh->{priv})) if $type && $type eq 'private' && $kh->{priv};
   return $wanthash ? $hash : CryptX::_encode_json($hash);
+}
+
+sub export_key_jwk_thumbprint {
+  my ($self, $hash_name) = @_;
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  $hash_name ||= 'SHA256';
+  my $h = $self->export_key_jwk('public', 1);
+  # RFC 8037: "When calculating JWK Thumbprints, the three public key fields are
+  # included in the hash input in lexicographic order: crv, kty and x"
+  my $json = CryptX::_encode_json({crv=>$h->{crv}, kty=>$h->{kty}, x=>$h->{x}});
+  return digest_data_b64u($hash_name, $json);
 }
 
 sub CLONE_SKIP { 1 } # prevent cloning
@@ -374,6 +386,15 @@ Also exports public/private keys as a Perl HASH with JWK structure.
  my $jwk_hash = $pk->export_key_jwk('public', 1);
 
 B<BEWARE:> For JWK support you need to have L<JSON> module installed.
+
+=head2 export_key_jwk_thumbprint
+
+Returns a JWK thumbprint (RFC 7638) of the public key as a base64url string.
+Per RFC 8037 the C<OKP> members included in the hash are C<crv>, C<kty> and
+C<x>, in that order.
+
+ my $thumbprint = $pk->export_key_jwk_thumbprint;           # SHA256 (DEFAULT)
+ my $thumbprint = $pk->export_key_jwk_thumbprint('SHA512');
 
 =head2 export_key_raw
 
